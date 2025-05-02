@@ -361,3 +361,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# 🔒 Hide confidential settings
+appsettings.json
+
+# 🛠️ Visual Studio Standard
+.vs/
+*.user
+*.suo
+bin/
+obj/
+*.log
