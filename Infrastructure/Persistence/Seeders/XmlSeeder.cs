@@ -30,7 +30,7 @@ namespace Infrastructure.Persistence.Seeders
             await context.SaveChangesAsync();
         }
 
-        private static IEnumerable<Category> LoadCategoriesFromXml(string path)
+        private static List<Category> LoadCategoriesFromXml(string path)
         {
             var doc = XDocument.Load(path);
 

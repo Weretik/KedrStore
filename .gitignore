@@ -364,6 +364,7 @@ FodyWeavers.xsd
 
 # 🔒 Hide confidential settings
 appsettings.json
+appsettings.Development.json
 
 # 🛠️ Visual Studio Standard
 .vs/
