@@ -366,6 +366,8 @@ FodyWeavers.xsd
 appsettings.json
 appsettings.Development.json
 
+Web/wwwroot/xml/
+
 # 🛠️ Visual Studio Standard
 .vs/
 *.user
