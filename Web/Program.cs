@@ -1,23 +1,32 @@
+using Application.Common;
+using Application.Common.Settings;
+using Domain.Entities;
+using Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MediatR;
-using AutoMapper;
-using Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
-using Application.Common.Settings;
-using Application.Common;
 using Infrastructure.Persistence.Seeders;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-
+using Serilog;
+using Serilog.Events;
+using Web.Middlewares;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/kedr-log-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Host.UseSerilog();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(ApplicationAssemblyMarker).Assembly);
@@ -25,9 +34,10 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Appli
 builder.Services.AddValidatorsFromAssembly(typeof(ApplicationAssemblyMarker).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<int>>(option =>
@@ -39,12 +49,46 @@ builder.Services
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddHttpClient();
 builder.Services.Configure<ImageSettings>(
     builder.Configuration.GetSection("ImageSettings"));
 
-builder.Services.AddHttpClient();
-
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "Handled {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+    options.GetLevel = (httpContext, elapsed, ex) =>
+    {
+        if (httpContext.Request.Path.StartsWithSegments("/css") ||
+            httpContext.Request.Path.StartsWithSegments("/js") ||
+            httpContext.Request.Path.StartsWithSegments("/images"))
+            return LogEventLevel.Debug;
+
+        return LogEventLevel.Information;
+    };
+
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        var user = httpContext.User.Identity?.Name ?? "Anonymous";
+        var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        diagnosticContext.Set("User", user);
+        diagnosticContext.Set("ClientIP", ip);
+    };
+});
 
 using (var scope = app.Services.CreateScope())
 {
@@ -53,16 +97,12 @@ using (var scope = app.Services.CreateScope())
     var settings = services.GetRequiredService<IOptions<ImageSettings>>().Value;
     var httpClient = services.GetRequiredService<HttpClient>();
 
-    var seeder = new XmlSeeder(httpClient);
+    var logger = services.GetRequiredService<ILogger<XmlSeeder>>();
+    var seeder = new XmlSeeder(httpClient, logger);
     await seeder.SeedAsync(context, settings);
 }
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -72,10 +112,11 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapDefaultControllerRoute();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-app.MapDefaultControllerRoute();
+
 
 app.Run();

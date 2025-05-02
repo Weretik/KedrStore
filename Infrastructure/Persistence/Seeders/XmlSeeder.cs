@@ -1,33 +1,41 @@
 ﻿using Application.Common.Settings;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Infrastructure.Persistence.Seeders
 {
-    public class XmlSeeder(HttpClient httpClient)
+    public class XmlSeeder(HttpClient httpClient, ILogger<XmlSeeder> logger)
     {
+        private readonly ILogger<XmlSeeder> _logger = logger;
         private readonly HttpClient _httpClient = httpClient;
 
         public async Task SeedAsync(AppDbContext context, ImageSettings settings)
         {
+            _logger.LogInformation("📥 XML Seeding started");
+
             string baseUrl = settings.BaseUrl;
 
             if (await context.Categories.AnyAsync() || await context.Products.AnyAsync())
+            {
+                _logger.LogInformation("⚠️ Data already exists, seeding skipped");
                 return;
+            }
 
             var categories = LoadCategoriesFromXml("wwwroot/xml/category.xml");
+            _logger.LogInformation("📦 Loaded {Count} categories from XML", categories.Count);
+
             await context.Categories.AddRangeAsync(categories.ToList());
 
             var products = await LoadProductsFromXml("wwwroot/xml/product.xml", baseUrl);
+            _logger.LogInformation("📦 Loaded {Count} products from XML", products.Count);
+
             await context.Products.AddRangeAsync(products.ToList());
+
             await context.SaveChangesAsync();
+            _logger.LogInformation("✅ XML Seeding finished");
         }
 
         private static List<Category> LoadCategoriesFromXml(string path)
@@ -78,7 +86,7 @@ namespace Infrastructure.Persistence.Seeders
             }
             catch
             {
-                // Логировать
+                _logger.LogWarning("❌ Photo not found for Product ID {Id}, using fallback image", idProduct);
             }
 
             return $"{baseUrl}/images/furniture/00000000.jpg";

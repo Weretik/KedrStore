@@ -366,6 +366,8 @@ FodyWeavers.xsd
 appsettings.json
 appsettings.Development.json
 
+Web/wwwroot/xml/
+
 # 🛠️ Visual Studio Standard
 .vs/
 *.user
@@ -373,3 +375,10 @@ appsettings.Development.json
 bin/
 obj/
 *.log
+
+# Node
+node_modules/
+package-lock.json
+
+# Tailwind output
+wwwroot/css/site.css
