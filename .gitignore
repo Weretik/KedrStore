@@ -375,3 +375,10 @@ Web/wwwroot/xml/
 bin/
 obj/
 *.log
+
+# Node
+node_modules/
+package-lock.json
+
+# Tailwind output
+wwwroot/css/site.css
