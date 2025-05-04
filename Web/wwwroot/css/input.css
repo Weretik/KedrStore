@@ -1,2 +1,37 @@
 ﻿@import "tailwindcss";
 @plugin "daisyui";
+
+@plugin "daisyui/theme" {
+    name: "kedrStore";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+    --color-base-100: #ffffff;
+    --color-base-200: #F4F4F4;
+    --color-base-300: #E5E5E5;
+    --color-base-content: #1F1F1F;
+    --color-primary: #43B02A;
+    --color-primary-content: #ffffff;
+    --color-secondary: #231F20;
+    --color-secondary-content: #ffffff;
+    --color-accent: #6B7280;
+    --color-accent-content: #ffffff;
+    --color-neutral: #1F1F1F;
+    --color-neutral-content: #ffffff;
+    --color-info: #2094f3;
+    --color-info-content: #ffffff;
+    --color-success: #009485;
+    --color-success-content: #ffffff;
+    --color-warning: #ff9900;
+    --color-warning-content: #ffffff;
+    --color-error: #ff5724;
+    --color-error-content: #ffffff;
+    --radius-selector: 2rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 1;
+}

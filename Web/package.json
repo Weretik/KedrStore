@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build:css": "postcss wwwroot/css/input.css -o wwwroot/css/site.css",
+    "build": "postcss wwwroot/css/input.css -o wwwroot/css/site.css",
     "watch": "postcss wwwroot/css/input.css -o wwwroot/css/site.css --watch"
   },
   "keywords": [],
