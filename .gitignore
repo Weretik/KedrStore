@@ -362,12 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# 🔒 Hide confidential settings
-appsettings.json
-appsettings.Development.json
-
-Web/wwwroot/xml/
-
 # 🛠️ Visual Studio Standard
 .vs/
 *.user
@@ -382,3 +376,4 @@ package-lock.json
 
 # Tailwind output
 wwwroot/css/site.css
+Web/wwwroot/xml/
