@@ -9,7 +9,7 @@
 
     <title>@ViewBag.Title - Web</title>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
     <header>
         <h1>@ViewBag.H1</h1>
         <nav>
@@ -19,12 +19,67 @@
         </nav>
     </header>
 
-    <main class ="container mx-auto p-4">
+    <main class="container mx-auto p-4 flex-grow">
         @RenderBody()
     </main>
 
-    <footer>
-    <p>&copy; 2025 Кедр. Всі права захищені.</p>
+    <footer class="bg-secondary text-secondary-content">
+        <div class="container mx-auto px-4 py-10">
+            <div class="footer sm:footer-horizontal">
+                <!-- Logo -->
+                <div>
+                    <img src="/images/logo/kedr-logo.svg" alt="Kedr — логотип" class="h-10 mb-4" />
+                    <p>© 2025 kedr.ua — Всі права захищені.</p>
+                </div>
+
+                <!-- Services -->
+                <nav>
+                    <h6 class="footer-title">Каталог</h6>
+                    <a class="link link-hover">Branding</a>
+                    <a class="link link-hover">Design</a>
+                    <a class="link link-hover">Marketing</a>
+                    <a class="link link-hover">Advertisement</a>
+                </nav>
+
+                <!-- Company -->
+                <nav>
+                    <h6 class="footer-title">Компанія</h6>
+                    <a class="link link-hover">About us</a>
+                    <a class="link link-hover">Contact</a>
+                    <a class="link link-hover">Jobs</a>
+                    <a class="link link-hover">Press kit</a>
+                </nav>
+
+                <!-- Legal -->
+                <nav>
+                    <h6 class="footer-title">Безпека</h6>
+                    <a class="link link-hover">Terms of use</a>
+                    <a class="link link-hover">Privacy policy</a>
+                    <a class="link link-hover">Cookie policy</a>
+                </nav>
+
+                <!-- Social -->
+                <nav>
+                    <p>(068) 713-50-49 <br>(068) 713-50-49</p>
+                    <p>вул. Ахієзерів, 46 м.Харків</p>
+
+                    <div class="grid grid-flow-col gap-3">
+                        <a href="https://www.instagram.com/kedr.class/" target="_blank" class="text-white hover:text-secondary">
+                            <img src="/images/icons/instagram.svg" alt="Instagram" class="h-6 w-6" />
+                        </a>
+                        <a href="https://www.youtube.com/channel/UCMzipw3fGj8I8HgQXiPoTWQ" target="_blank" class="text-white hover:text-primary">
+                            <img src="/images/icons/icons8-youtube.svg" alt="Youtube" class="h-6 w-6" />
+                        </a>
+                        <a href="https://web.telegram.org/k/#197393163" target="_blank" class="text-white hover:text-primary">
+                            <img src="/images/icons/telegram-app.svg" alt="Telegram" class="h-6 w-6" />
+                        </a>
+                    </div>
+
+                    <img src="/images/visa_mastercard.png" alt="Visa MasterCard" class="h-6" />
+                </nav>
+            </div>
+        </div>
     </footer>
+
 </body>
 </html>

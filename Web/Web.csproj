@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\images\Новая папка\**" />
+    <Content Remove="wwwroot\images\Новая папка\**" />
+    <EmbeddedResource Remove="wwwroot\images\Новая папка\**" />
+    <None Remove="wwwroot\images\Новая папка\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="postcss.config.js" />
   </ItemGroup>
 
