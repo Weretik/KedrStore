@@ -10,13 +10,111 @@
     <title>@ViewBag.Title - Web</title>
 </head>
 <body class="min-h-screen flex flex-col">
+
     <header>
-        <h1>@ViewBag.H1</h1>
-        <nav>
-            <a href="/">Головна</a>
-            <a href="/catalog">Каталог</a>
-            <a href="/contacts">Контакти</a>
-        </nav>
+
+        <div class="hidden md:block w-full bg-gray-200">
+            <div class="container mx-auto px-4 py-2 flex justify-between items-center text-black">
+                <span class="text-sm font-bold text-lg">info@kedr.ua</span>
+                <span class="text-sm">(068) 713-50-49 | (068) 713-50-49 | Пн–Пт | 9:00–18:00</span>
+            </div>
+        </div>
+
+        <!-- ✅ Mobile Header  -->
+        <div class="md:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-2 flex justify-between items-center relative z-50">
+            <!-- Left side: burger -->
+            <div>
+                <input id="menu-drawer" type="checkbox" class="drawer-toggle hidden" />
+                <label for="menu-drawer" class="btn btn-circle swap swap-rotate md:hidden">
+                    <input type="checkbox" />
+                    <img src="/images/icons/menu.svg" class="swap-off w-6 h-6" alt="open" />
+                    <img src="/images/icons/close.svg" class="swap-on w-6 h-6" alt="close" />
+                </label>
+                <!-- Drawer menu -->
+                <div class="drawer-side z-50">
+                    <label for="menu-drawer" class="drawer-overlay"></label>
+                    <ul class="menu p-4 w-72 min-h-full bg-base-100 text-base-content">
+                        <li class="mt-4">
+                            <label class="input w-full">
+                                <img src="/images/icons/search.png" alt="search" class="h-5 w-5" />
+                                <input type="search" placeholder="Пошук товарів" class="w-full" />
+                            </label>
+                        </li>
+                        <li><a href="#">Каталог</a></li>
+                        <li><a href="#">Про нас</a></li>
+                        <li><a href="#">Контакти</a></li>
+                        <li><a href="#">Вхід</a></li>
+                        <li><a href="#">Реєстрація</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Center: logo  -->
+            <img src="/images/logo/kedr-logo.svg" alt="Kedr — логотип" class="h-10" />
+
+            <!-- Right side: basket -->
+            <div class="indicator">
+                <span class="indicator-item badge badge-primary  translate-x-2 -translate-y-1 scale-70">8</span>
+                <button class="btn btn-ghost btn-circle">
+                    <img src="/images/icons/basket.png" alt="basket" class="h-5 w-5 block" />
+                </button>
+            </div>
+        </div>
+
+        <!-- ✅ Tablet and above title -->
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            
+            <div class="flex items-center gap-3 shrink-0">
+
+                <!-- LOGO -->
+                <img src="/images/logo/kedr-logo.svg" alt="Kedr — логотип" class="h-10 align-middle hidden md:block" />
+
+                <!-- Text -->
+                <label class="hidden lg:block text-sm">
+                    Продаж замків і дверної<br> фурнітури по всій Україні
+                </label>
+                <!-- basket mini -->
+                <div class="indicator block hidden md:block lg:hidden">
+                    <span class="indicator-item badge badge-primary  translate-x-2 -translate-y-1 scale-70">8</span>
+                    <button class="btn btn-ghost btn-circle">
+                        <img src="/images/icons/basket.png" alt="basket" class="h-5 w-5 block" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="hidden md:block w-full lg:w-120">
+                <label class="input  w-full lg:w-120">
+                    <img src="/images/icons/search.png" alt="search" class="h-5 w-5 md:h-6 md:w-6" />
+                    <input type="search" required placeholder="Пошук по всім товарам" class="w-full" />
+                </label>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <!-- basket full -->
+                <div class="hidden indicator lg:block">
+                    <span class="indicator-item badge badge-primary translate-x-2 -translate-y-1 scale-90">8</span>
+                    <button class="btn btn-outline">
+                        <img src="/images/icons/basket.png" alt="basket" class="h-5 w-5 block" />
+                        <span class="text-black">Корзина</span>
+                    </button>
+                </div>
+                <!-- account full -->
+                <div class=" dropdown dropdown-hover hidden md:block">
+                    <button class="btn btn-outline">
+                        <img src="/images/icons/account.png" alt="account" class="h-5 w-5 block" />
+                        Акаунт
+                    </button>
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-auto p-2 shadow-sm">
+                        <li><a class="hover:bg-primary hover:text-white">Вхід</a></li>
+                        <li><a class="hover:bg-primary hover:text-white">Реєстрація</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
     </header>
 
     <main class="container mx-auto p-4 flex-grow">
