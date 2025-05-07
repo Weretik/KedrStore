@@ -9,9 +9,9 @@
 
     <title>@ViewBag.Title - Web</title>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gray-200">
 
-    <header>
+    <header class="bg-base-100">
 
         <div class="hidden md:block w-full bg-gray-200">
             <div class="container mx-auto px-4 py-2 flex justify-between items-center text-black">
@@ -62,7 +62,7 @@
         </div>
 
         <!-- ✅ Tablet and above title -->
-        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="hidden md:flex md:flex-row md:justify-between items-center container mx-auto px-4 py-4 flex flex-col  gap-4">
             
             <div class="flex items-center gap-3 shrink-0">
 
@@ -113,7 +113,33 @@
                 </div>
             </div>
         </div>
+        
+        <!-- ✅ Tablet and above Nav-->
+        <div class="hidden md:flex bg-neutral text-white">
+            <div class="container mx-auto px-4 flex">
+                <nav aria-label="Основна навігація">
+                    <ul class="flex divide-x divide-white/30 text-sm">
 
+                        <li><a href="#" class="uppercase px-4 py-3 inline-block transition-colors duration-300 hover:bg-primary">Головна</a></li>
+                        <li><a href="#" class="uppercase px-4 py-3 inline-block transition-colors duration-300 hover:bg-primary">Фурнітура</a></li>
+
+                        <li class="relative group">
+                            <a href="#" class="uppercase px-4 py-3 block transition-colors duration-300 hover:bg-primary hover:text-white">Двері</a>
+
+                            <ul class="absolute left-0 top-full hidden group-hover:block bg-white text-black shadow-md z-50 min-w-[200px] border border-gray-200">
+                                <li><a href="#" class="block px-4 py-2 transition-colors duration-300 hover:bg-gray-100">Вхідні двері</a></li>
+                                <li><a href="#" class="block px-4 py-2 transition-colors duration-300 hover:bg-gray-100">Міжкімнатні двері</a></li>
+                            </ul>
+                        </li>
+
+                        <li><a href="#" class="uppercase px-4 py-3 inline-block transition-colors duration-300 hover:bg-primary">Акції</a></li>
+                        <li><a href="#" class="uppercase px-4 py-3 inline-block transition-colors duration-300 hover:bg-primary">Про нас</a></li>
+                        <li><a href="#" class="uppercase px-4 py-3 inline-block transition-colors duration-300 hover:bg-primary">Контакти</a></li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
 
     </header>
 
