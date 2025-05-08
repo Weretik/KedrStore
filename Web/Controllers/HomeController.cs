@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 
@@ -6,9 +7,15 @@ namespace Web.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ProductService _service;
+        public HomeController(ProductService service)
         {
-            return View();
+            _service = service;
+        }
+        public async Task<IActionResult> Index()
+        {
+            var products = await _service.GetAllProductsAsync();
+            return View(products);
         }
     }
 }

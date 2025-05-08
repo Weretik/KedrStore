@@ -1,5 +1,6 @@
 using Application.Common;
 using Application.Common.Settings;
+using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
 using FluentValidation;
@@ -40,6 +41,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
+builder.Services.AddScoped<ProductService>();
 
 builder.Services
     .AddIdentity<ApplicationUser, IdentityRole<int>>(option =>
