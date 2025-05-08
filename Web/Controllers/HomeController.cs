@@ -12,7 +12,11 @@ namespace Web.Controllers
         {
             _service = service;
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Product()
         {
             var products = await _service.GetAllProductsAsync();
             return View(products);

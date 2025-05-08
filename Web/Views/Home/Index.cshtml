@@ -3,28 +3,4 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div>
-    <h1 class="text-2xl font-bold">Каталог</h1>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-        @foreach (var item in Model)
-        {
-            <div class="card bg-base-100 w-80 shadow-sm">
-                <figure class="px-10 pt-10">
-                    <img src="@item.PhotoUrl"
-                         alt="@item.Name"
-                         class="rounded-xl" />
-                </figure>
-                <div class="card-body">
-                    <h2 class="card-title">@item.Name</h2>
-                    <label> @item.Price грн </label>
-                    <div class="card-actions flex justify-between items-center">
-                        <input type="number" value="1" min="1" class="input input-bordered w-20 text-center text-base font-semibold" />
-                        <button class="btn btn-primary">Додати до кошика</button>
-                    </div>
-                </div>
-            </div>
-        }
-        
-    </div>
-</div>
+<h1 class="text-2xl font-bold>Головна</h1>
