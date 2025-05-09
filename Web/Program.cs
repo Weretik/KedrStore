@@ -57,13 +57,18 @@ builder.Services.AddHttpClient();
 builder.Services.Configure<ImageSettings>(
     builder.Configuration.GetSection("ImageSettings"));
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(44338, listenOptions => listenOptions.UseHttps());
+});
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    //app.UseHsts();
 }
 else
 {
@@ -108,7 +113,7 @@ using (var scope = app.Services.CreateScope())
 
 
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
