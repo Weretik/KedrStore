@@ -1,54 +1,71 @@
-# KedrStore — Clean Architecture E-Commerce Platform
+# 🛍️ KedrStore — Modular E-commerce Platform
 
-KedrStore is a real-world wholesale and retail e-commerce application developed for the Kedr company.  
-It follows the **Clean Architecture** pattern and is built using ASP.NET Core MVC, Razor Views, MediatR, AutoMapper, PostgreSQL, and Redis.
-
----
-
-## 🔧 Technologies & Stack
-
-- ASP.NET Core MVC 8.0
-- Razor Pages & Areas (Admin/User)
-- Entity Framework Core + PostgreSQL
-- MediatR (CQRS)
-- AutoMapper
-- FluentValidation
-- Identity (with custom ApplicationUser)
-- Serilog (structured logging)
-- Redis (for caching and session)
-- Docker-ready configuration
+**KedrStore** is a production-level B2B/B2C e-commerce application developed for Kedr.  
+It is built using **.NET 8**, **Blazor Web App**, and follows a **Clean Architecture** pattern with layered structure and modular monolith principles.
 
 ---
 
-## 🏗️ Architecture Overview
+## ⚙️ Tech Stack
+
+- **.NET 8**, **ASP.NET Core**, **Blazor Web App**
+- **Entity Framework Core** + **PostgreSQL**
+- **MediatR** (CQRS), **AutoMapper**, **FluentValidation**
+- **ASP.NET Identity** (custom `AppUser`)
+- **Redis** (caching/session), **Serilog**
+- **Tailwind CSS**, **DaisyUI**, **MudBlazor**
+- **Docker-ready configuration**
+
+---
+
+## 📐 Project Structure
 
 ```
-/Web            - UI layer (Razor, Controllers, ViewModels)
-/Application    - UseCases, DTOs, Validators, CQRS
-/Domain         - Core business entities and interfaces
-/Infrastructure - EF Core DbContext, Repositories, Services
+/Web            - Razor UI (Pages, Components, Admin Area)
+/Application    - UseCases, DTOs, CQRS Handlers, Validation
+/Domain         - Core business logic and contracts
+/Infrastructure - EF Core setup, Repositories, External services
 ```
 
-- Strict separation of concerns
-- One-way dependencies: UI → Application → Domain → Infrastructure
-- Supports both synchronous Razor UI and future asynchronous APIs
+Supports strict separation of concerns and one-way dependencies:  
+`UI → Application → Domain → Infrastructure`
 
 ---
 
-## 📦 Features (current & planned)
+## 🚀 Features (in progress)
 
-✅ Catalog of products with category structure  
-✅ Filtering, pagination, sorting  
-✅ Basket (cart) functionality  
-✅ Contact page and order request form  
-✅ Admin panel (products, orders, users)  
-⏳ Mobile API (planned, for .NET MAUI)
+- 🛒 Product catalog with filtering, sorting, pagination  
+- 📦 Cart system  
+- 🔐 Admin panel (product management, users)  
+- 🧾 Contact & order request form  
+- 📱 API planned for .NET MAUI (mobile client)
+
+---
+
+## 🧰 Dev Highlights
+
+- Modular monolith structure  
+- CQRS with MediatR  
+- Razor UI components (no JS)  
+- Structured logging with Serilog  
+- Integrated Redis for performance  
+- SEO-friendly frontend with Tailwind + MudBlazor
+
+---
+
+## 📌 Project Status
+
+✅ Architecture & layering complete  
+✅ Catalog UI in progress  
+✅ Filtering & pagination done  
+🔜 Basket logic  
+🔜 Admin CRUD for orders  
+🔜 Mobile API (.NET MAUI)
 
 ---
 
 ## 🔒 License
 
-This source code is proprietary and provided for demonstration purposes only.  
-Any copying, use, or redistribution without explicit permission is prohibited.
+This source code is proprietary and developed for Kedr.  
+Copying or distribution without permission is prohibited.
 
 © 2025 Vitalii Tsiupin / Kedr
