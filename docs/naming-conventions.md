@@ -43,6 +43,9 @@
 - **Repository Interfaces**: `I{Entity}Repository` (e.g. `IOrderRepository`)
 - **Domain Services**: `{Functionality}Service` (e.g. `DiscountCalculationService`)
 - **Enums**: Clear noun (e.g. `OrderStatus`, `PaymentMethod`)
+- **Abstractions**: Interface names must use `I` prefix (e.g. `IAggregateRoot`)
+- **Base Classes**: Common behavior must be placed in `BaseEntity`, `ValueObject`, `BusinessRule`
+- **Domain Events**: `BaseDomainEvent` is used as foundation for specific events
 
 ### Application Layer
 

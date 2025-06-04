@@ -21,10 +21,13 @@ KedrStore applies the principles of **Clean Architecture** to ensure long-term m
 ### 1. Domain Layer (`KedrStore.Domain`)
 The innermost and most stable layer containing:
 - Business entities
+- Domain events (e.g., `BaseDomainEvent`)
 - Repository interfaces
 - Domain services
 - Domain-specific exceptions
 - Enums and domain constants
+- Base abstractions (`IEntity`, `IAggregateRoot`, `IDomainEvent`, `IHasDomainEvents`)
+- Base classes (`BaseEntity`, `ValueObject`, `BusinessRule`, `RuleChecker`)
 
 🧱 This layer has **no dependencies** on other layers or external libraries.
 

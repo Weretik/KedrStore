@@ -48,6 +48,13 @@ This glossary defines key architectural and business terms used across the KedrS
 - **ErrorBoundary**  
   A Blazor component used to catch and display UI-level errors gracefully.
 
+- **Domain Event**  
+  A notification object that represents something that has happened in the domain (e.g., OrderPlacedEvent).
+  
+- **Business Rule**  
+  A validation rule encapsulated as a standalone object in the domain, used to enforce domain invariants.
+
+
 ---
 
 ## 🧰 Development Terms
