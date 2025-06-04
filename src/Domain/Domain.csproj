@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Abstractions\" />
       <Folder Include="Catalog\" />
       <Folder Include="Common\" />
       <Folder Include="Events\" />
