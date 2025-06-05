@@ -11,7 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Behaviors\" />
       <Folder Include="Common\" />
       <Folder Include="Interfaces\" />
       <Folder Include="UseCases\" />
