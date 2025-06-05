@@ -45,19 +45,27 @@ The Application layer contains application-specific business logic and orchestra
 ```
 Application/
 ├── Common/
-│   ├── Behaviors/      # MediatR behaviors (logging, validation)
-│   ├── Exceptions/     # Application-level exceptions
-│   ├── Interfaces/     # Service interfaces
-│   ├── Mapping/        # AutoMapper profiles and utilities
-│   └── Validation/     # Validation utilities
-├── Features/           # Application features (CQRS)
-│   ├── EntityName1/
-│   │   ├── Commands/   # Commands (write operations)
-│   │   └── Queries/    # Queries (read operations)
-│   └── EntityName2/
-│       ├── Commands/
-│       └── Queries/
-└── Models/             # DTOs and view models
+│   ├── Abstractions/    # Абстракции и интерфейсы
+│   │   ├── Common/      # Общие абстракции
+│   │   ├── Commands/    # Абстракции для команд
+│   │   ├── Events/      # Абстракции для событий
+│   │   └── Queries/     # Абстракции для запросов
+│   ├── Behaviors/       # MediatR behaviors (logging, validation)
+│   ├── Constants/       # Константы приложения
+│   ├── Events/          # Реализации для событий
+│   ├── Exceptions/      # Application-level exceptions
+│   ├── Extensions/      # Методы расширения
+│   ├── Mapping/         # AutoMapper profiles and utilities
+│   └── Validation/      # Validation utilities
+├── DependencyInjection/ # Регистрация зависимостей
+├── Interfaces/          # Интерфейсы для инфраструктуры
+└── UseCases/            # Случаи использования (по модулям)
+    ├── ModuleName1/
+    │   ├── Commands/    # Commands (write operations)
+    │   └── Queries/     # Queries (read operations)
+    └── ModuleName2/
+        ├── Commands/
+        └── Queries/
 ```
 
 ### Infrastructure

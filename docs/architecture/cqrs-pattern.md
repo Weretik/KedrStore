@@ -1,21 +1,21 @@
-﻿# CQRS паттерн в KedrStore
+﻿# CQRS Pattern in KedrStore
 
-## Обзор
+## Overview
 
-В проекте KedrStore используется паттерн CQRS (Command Query Responsibility Segregation) для разделения операций чтения и изменения данных. Этот подход обеспечивает следующие преимущества:
+The KedrStore project uses the CQRS (Command Query Responsibility Segregation) pattern to separate read and write operations. This approach provides the following benefits:
 
-- Четкое разделение ответственности между компонентами системы
-- Упрощение модели предметной области для конкретных сценариев использования
-- Возможность оптимизации операций чтения и записи независимо друг от друга
-- Улучшение тестируемости и поддерживаемости кода
+- Clear separation of responsibilities between system components
+- Simplified domain model for specific use cases
+- Ability to optimize read and write operations independently
+- Improved testability and maintainability
 
-## Основные компоненты
+## Core Components
 
-### Команды (Commands)
+### Commands
 
-Команды представляют намерение изменить состояние системы. В KedrStore они реализуют интерфейс `ICommand<TResult>` или `ICommand` для команд без возвращаемого значения.
+Commands represent an intent to change the system state. In KedrStore, they implement the `ICommand<TResult>` or `ICommand` interface for commands without a return value.
 
-Пример команды:
+Example command:
 ```csharp
 public class CreateProductCommand : ICommand<int>
 {
@@ -25,11 +25,11 @@ public class CreateProductCommand : ICommand<int>
 }
 ```
 
-### Запросы (Queries)
+### Queries
 
-Запросы служат для получения данных без изменения состояния системы. Они реализуют интерфейс `IQuery<TResult>`.
+Queries are used to retrieve data without changing the system state. They implement the `IQuery<TResult>` interface.
 
-Пример запроса:
+Example query:
 ```csharp
 public class GetProductByIdQuery : IQuery<ProductDto>
 {
@@ -37,14 +37,14 @@ public class GetProductByIdQuery : IQuery<ProductDto>
 }
 ```
 
-### Обработчики (Handlers)
+### Handlers
 
-Каждая команда или запрос имеет соответствующий обработчик, который реализует бизнес-логику:
+Each command or query has a corresponding handler that contains the business logic:
 
-- `ICommandHandler<TCommand, TResult>` - для обработки команд
-- `IQueryHandler<TQuery, TResult>` - для обработки запросов
+- `ICommandHandler<TCommand, TResult>` – for command processing
+- `IQueryHandler<TQuery, TResult>` – for query processing
 
-Пример обработчика команды:
+Example command handler:
 ```csharp
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, int>
 {
@@ -64,31 +64,31 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 }
 ```
 
-### Пагинация
+### Pagination
 
-Для поддержки пагинации в запросах используются интерфейсы:
+To support pagination in queries, the following interfaces are used:
 
-- `IHasPagination` - для запросов, требующих пагинацию
-- `IPagedList<T>` - для возврата пагинированных результатов
+- `IHasPagination` – for requests that require pagination
+- `IPagedList<T>` – for returning paginated results
 
-### Валидация
+### Validation
 
-Валидация входных данных осуществляется с помощью интерфейса `IValidator<T>`, который проверяет корректность команд и запросов перед их обработкой.
+Input data is validated using the `IValidator<T>` interface, which ensures that commands and queries are checked before execution.
 
-## Практические рекомендации
+## Best Practices
 
-1. Команды должны представлять одну конкретную операцию
-2. Запросы должны возвращать только необходимые данные (DTO)
-3. Обработчики не должны вызывать друг друга напрямую
-4. Используйте валидацию для проверки входных данных перед обработкой
-5. Команды и запросы должны быть неизменяемыми (immutable) после создания
+1. Commands should represent a single, specific operation
+2. Queries should return only the necessary data (DTO)
+3. Handlers should not call each other directly
+4. Use validation to check input data before processing
+5. Commands and queries should be immutable after creation
 
-## Пример полного потока
+## Example Flow
 
-1. Контроллер или другой компонент создает команду/запрос
-2. Медиатор направляет команду/запрос соответствующему обработчику
-3. Валидатор проверяет входные данные
-4. Обработчик выполняет бизнес-логику
-5. Результат возвращается вызывающей стороне
+1. A controller or other component creates a command or query
+2. The mediator routes the request to the appropriate handler
+3. A validator checks the input data
+4. The handler executes the business logic
+5. The result is returned to the calling layer
 
-Этот подход обеспечивает четкое разделение ответственности и упрощает поддержку системы при росте её сложности.
+This approach ensures clear separation of concerns and makes the system easier to maintain as complexity grows.
