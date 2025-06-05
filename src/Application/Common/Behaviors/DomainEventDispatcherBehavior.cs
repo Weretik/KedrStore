@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Common.Abstractions.Entities;
 using Application.Common.Abstractions.Events;
+using Application.Common.Abstractions.Commands;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

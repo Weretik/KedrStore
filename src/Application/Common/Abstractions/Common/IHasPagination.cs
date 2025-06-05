@@ -1,7 +1,7 @@
-﻿namespace Application.Common.Abstractions
+﻿namespace Application.Common.Abstractions.Common
 {
     /// <summary>
-    /// Интерфейс для запросов, поддерживающих пагинацию
+    /// Интерфейс для объектов, поддерживающих пагинацию
     /// </summary>
     public interface IHasPagination
     {
@@ -11,7 +11,7 @@
         int PageNumber { get; }
 
         /// <summary>
-        /// Размер страницы (количество элементов на странице)
+        /// Размер страницы
         /// </summary>
         int PageSize { get; }
     }

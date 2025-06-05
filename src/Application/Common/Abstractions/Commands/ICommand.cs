@@ -1,10 +1,10 @@
-﻿namespace Application.Common.Abstractions
+﻿namespace Application.Common.Abstractions.Commands
 {
     /// <summary>
     /// Интерфейс для команд, которые выполняют действия в системе и изменяют состояние
     /// </summary>
     /// <typeparam name="TResult">Тип результата выполнения команды</typeparam>
-    public interface ICommand<out TResult> : IUseCase
+    public interface ICommand<out TResult> : Common.IUseCase
     {
     }
 

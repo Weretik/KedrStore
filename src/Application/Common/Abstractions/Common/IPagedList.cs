@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Application.Common.Abstractions
+namespace Application.Common.Abstractions.Common
 {
     /// <summary>
-    /// Интерфейс для представления пагинированного списка результатов
+    /// Интерфейс для постраничного списка элементов
     /// </summary>
     /// <typeparam name="T">Тип элементов в списке</typeparam>
     public interface IPagedList<out T>
@@ -29,12 +29,12 @@ namespace Application.Common.Abstractions
         int TotalPages { get; }
 
         /// <summary>
-        /// Есть ли предыдущая страница
+        /// Признак наличия предыдущей страницы
         /// </summary>
         bool HasPreviousPage { get; }
 
         /// <summary>
-        /// Есть ли следующая страница
+        /// Признак наличия следующей страницы
         /// </summary>
         bool HasNextPage { get; }
 

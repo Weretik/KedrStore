@@ -35,18 +35,25 @@ Provides convenient extension methods for mapping operations:
 - `MapList<TSource, TDestination>` – maps a list of objects
 - `ProjectToListAsync<TSource, TDestination>` – asynchronous projection and retrieval of a list
 
-### EntityMappingExtensions
+### EntityMappingExtensions (в пространстве имен Application.DependencyInjection)
 
-Includes additional methods for working with entities:
+Включает дополнительные методы для работы с сущностями:
 
-- `MapTo<TSource, TDestination>` – updates an existing object
-- `SyncList<TSource, TDestination, TKey>` – synchronizes object lists
+- `MapTo<TSource, TDestination>` – обновляет существующий объект
+- `SyncList<TSource, TDestination, TKey>` – синхронизирует списки объектов
 
 ## Usage
 
 ### DI Registration
 
 ```csharp
+// В Program.cs или аналогичном файле настройки сервисов:
+using Application.DependencyInjection;
+
+// Добавление всех сервисов слоя приложения, включая AutoMapper:
+services.AddApplicationServices();
+
+// Или более детальная регистрация:
 services.AddAutoMapperProfiles(typeof(IMapWith<>).Assembly);
 ```
 

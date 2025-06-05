@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Common.Abstractions
+namespace Application.Common.Abstractions.Queries
 {
     /// <summary>
-    /// Интерфейс для обработчиков запросов, которые получают данные из системы
+    /// Интерфейс для обработчиков запросов
     /// </summary>
     /// <typeparam name="TQuery">Тип запроса</typeparam>
     /// <typeparam name="TResult">Тип результата запроса</typeparam>
@@ -12,11 +12,11 @@ namespace Application.Common.Abstractions
         where TQuery : IQuery<TResult>
     {
         /// <summary>
-        /// Асинхронно обрабатывает запрос
+        /// Обрабатывает запрос
         /// </summary>
         /// <param name="query">Запрос для обработки</param>
-        /// <param name="cancellationToken">Токен отмены операции</param>
-        /// <returns>Результат выполнения запроса</returns>
+        /// <param name="cancellationToken">Токен отмены</param>
+        /// <returns>Результат запроса</returns>
         Task<TResult> HandleAsync(TQuery query, CancellationToken cancellationToken = default);
     }
 }

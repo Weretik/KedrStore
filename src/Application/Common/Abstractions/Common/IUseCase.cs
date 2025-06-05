@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Abstractions
+﻿namespace Application.Common.Abstractions.Common
 {
     /// <summary>
     /// Базовый маркерный интерфейс для всех случаев использования

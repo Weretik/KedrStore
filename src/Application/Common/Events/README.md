@@ -10,7 +10,7 @@
 2. **DomainEvent** (`Application.Common.Events`) - абстрактный базовый класс для доменных событий
 3. **IDomainEventHandler<T>** (`Application.Common.Abstractions.Events`) - интерфейс для обработчиков событий
 4. **IDomainEventDispatcher** (`Application.Common.Abstractions.Events`) - интерфейс для диспетчера событий
-5. **IHasDomainEvents** (`Application.Common.Abstractions.Entities`) - интерфейс для сущностей с доменными событиями
+5. **IHasDomainEvents** (`Application.Common.Abstractions.Events`) - интерфейс для сущностей с доменными событиями
 
 ## Использование
 

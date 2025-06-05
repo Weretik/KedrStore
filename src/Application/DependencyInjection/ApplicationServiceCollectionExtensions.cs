@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
 using Application.Common.Abstractions.Events;
+using Application.Common.Abstractions.Common;
+using Application.Common.Abstractions.Commands;
 using Application.Common.Behaviors;
+using Application.Common.Mapping;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,6 +33,9 @@ namespace Application.DependencyInjection
 
             // Регистрация обработчиков доменных событий из текущей сборки
             services.AddDomainEventHandlers(Assembly.GetExecutingAssembly());
+
+            // Регистрация AutoMapper с профилями из сборки приложения
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             return services;
         }

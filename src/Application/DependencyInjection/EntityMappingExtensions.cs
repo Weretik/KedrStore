@@ -1,6 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 
-namespace Application.Common.Extensions
+namespace Application.DependencyInjection
 {
     /// <summary>
     /// Расширения для маппинга сущностей

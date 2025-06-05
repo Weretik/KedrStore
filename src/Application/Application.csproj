@@ -23,4 +23,8 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Common\Abstractions\IUseCase.cs" />
+    </ItemGroup>
+
 </Project>
