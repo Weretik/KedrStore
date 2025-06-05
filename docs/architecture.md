@@ -95,6 +95,29 @@ Responsible for user-facing components:
 - Presentation invokes use cases via DI
 - Translates DTOs into ViewModels or UI data
 
+### Диаграмма зависимостей слоёв
+
+```
+┌─────────────────┐
+│  Presentation   │
+│    (UI Layer)   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│   Application   │     │ Infrastructure   │
+│  (Use Cases)    │◄────┤ (Implementation) │
+└────────┬────────┘     └─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│     Domain      │
+│ (Business Logic)│
+└─────────────────┘
+```
+
+The direction of the arrows indicates the dependencies between the layers. Note that Infrastructure depends on Application and Domain, but not vice versa - this is an implementation of the dependency inversion principle.
+
 ---
 
 ## Design Patterns & Architecture Styles
@@ -124,7 +147,55 @@ Responsible for user-facing components:
 
 ## Database Design
 
-> (To be added later: include ER diagrams or a link to a separate database schema document)
+### Master Tables
+
+- **Products**: Store Products
+- **Categories**: Product categories
+- **Orders**: Customer Orders
+- **OrderItems**: Order Items
+- **Customers**: Customer Data
+- **Users**: System users (administrators, managers)
+- **Baskets**: Shopping baskets
+- **BasketItems**: Basket items
+
+### Data schema (simplified)
+
+```
++---------------+      +---------------+      +---------------+
+|   Category    |      |    Product    |      |   OrderItem   |
++---------------+      +---------------+      +---------------+
+| CategoryId PK |<---->| ProductId PK  |<---->| OrderItemId PK|
+| Name          |      | Name          |      | ProductId FK  |
+| Description   |      | Description   |      | OrderId FK    |
+| ParentId FK   |      | Price         |      | Quantity      |
++---------------+      | CategoryId FK |      | UnitPrice     |
+                       | Stock         |      +---------------+
+                       | ImageUrl      |              |
+                       +---------------+              |
+                                                      |
+                       +---------------+              |
+                       |    Order      |<-------------+
+                       +---------------+
+                       | OrderId PK    |
+                       | CustomerId FK |
+                       | OrderDate     |
+                       | Status        |
+                       | TotalAmount   |
+                       +---------------+
+                                |
+                                |
+                       +---------------+
+                       |   Customer    |
+                       +---------------+
+                       | CustomerId PK |
+                       | Name          |
+                       | Email         |
+                       | Phone         |
+                       | Address       |
+                       +---------------+
+```
+
+A complete detailed database schema with indexes, constraints, and triggers is available in the file [docs/architecture/db-schema.md](/docs/architecture/db-schema.md).
 
 ---
 
@@ -146,7 +217,34 @@ Responsible for user-facing components:
 
 ## Deployment
 
-> (To be added later: description of containerization, hosting, CI/CD pipelines)
+### Containerization
+
+The project comes with a Docker-ready configuration for all components:
+
+- **Web App**: .NET 8 Blazor Web App
+- **Database**: PostgreSQL in a separate container
+- **Cache**: Redis for caching and sessions
+
+### Docker Compose
+
+For local development and testing, `docker-compose.yml` is used to bring up all necessary services in an isolated environment.
+
+### CI/CD Pipeline
+
+The repository is configured to work with GitHub Actions:
+
+1. **Continuous Integration**: Tests and code quality checks are run on every PR
+2. **Continuous Deployment**:
+   - Building Docker images
+   - Publishing to Azure Container Registry
+   - Updating Kubernetes cluster via Helm
+
+### Infrastructure
+
+- **Production**: Azure Kubernetes Service (AKS)
+- **Staging**: Azure App Service
+- **Development**: Local Developer Environment
+A detailed deployment and configuration diagram is available in [docs/architecture/deployment.md](/docs/architecture/deployment.md).
 
 ---
 

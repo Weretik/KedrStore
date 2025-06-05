@@ -59,4 +59,10 @@ The architecture is organized into the following layers:
 3. Communication between layers is handled via DTOs (Data Transfer Objects).
 
 4. Dependency inversion is implemented using interfaces and a DI container.
+
+5. The CQRS (Command Query Responsibility Segregation) pattern is implemented in the Application layer:
+   - Commands represent intentions to change the system state
+   - Queries represent requests for data without state changes
+   - Each command and query has a dedicated handler
+   - Clear separation of read and write operations improves maintainability
 ~~~~
