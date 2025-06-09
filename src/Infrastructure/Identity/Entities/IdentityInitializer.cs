@@ -1,4 +1,5 @@
-﻿using Infrastructure.Identity.Constants;
+﻿using Domain.Abstractions;
+using Infrastructure.Identity.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,13 +11,13 @@ namespace Infrastructure.Identity.Entities;
 /// <summary>
 /// Ініціалізатор даних для Identity
 /// </summary>
-public class IdentityInitializer
+public class IdentityInitializer : IInitializer
 {
     /// <summary>
     /// Ініціалізує початкові дані для Identity
     /// </summary>
     /// <param name="serviceProvider">Провайдер сервісів для отримання необхідних залежностей</param>
-    public static async Task InitializeAsync(IServiceProvider serviceProvider)
+    public async Task InitializeAsync(IServiceProvider? serviceProvider, CancellationToken cancellationToken = default)
     {
         try
         {
