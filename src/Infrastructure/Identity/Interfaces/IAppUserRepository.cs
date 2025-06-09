@@ -1,5 +1,4 @@
-﻿using Domain.Identity.ValueObjects;
-using Infrastructure.Identity.Entities;
+﻿using Infrastructure.Identity.Entities;
 
 namespace Infrastructure.Identity.Interfaces
 {
@@ -14,7 +13,7 @@ namespace Infrastructure.Identity.Interfaces
         /// <param name="id">Идентификатор пользователя</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>Пользователь, если найден; иначе null</returns>
-        Task<AppUser?> GetByIdAsync(AppUserId id, CancellationToken cancellationToken = default);
+        Task<AppUser?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить пользователя по имени пользователя
@@ -52,7 +51,7 @@ namespace Infrastructure.Identity.Interfaces
         /// </summary>
         /// <param name="id">Идентификатор пользователя для удаления</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
-        Task DeleteAsync(AppUserId id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(int id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Проверить существование пользователя с указанным идентификатором
@@ -60,7 +59,7 @@ namespace Infrastructure.Identity.Interfaces
         /// <param name="id">Идентификатор пользователя</param>
         /// <param name="cancellationToken">Токен отмены операции</param>
         /// <returns>true если пользователь существует; иначе false</returns>
-        Task<bool> ExistsAsync(AppUserId id, CancellationToken cancellationToken = default);
+        Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Проверить существование пользователя с указанным именем
