@@ -27,10 +27,10 @@ public class IdentityInitializer : IInitializer
             var logger = serviceProvider.GetRequiredService<ILogger<IdentityInitializer>>();
 
             // Створюємо ролі
-            await CreateRolesAsync(roleManager, logger);
+            await CreateRolesAsync(roleManager, logger, cancellationToken);
 
             // Створюємо адміністратора
-            await CreateAdminUserAsync(userManager, roleManager, configuration, logger);
+            await CreateAdminUserAsync(userManager, roleManager, configuration, logger, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -39,10 +39,10 @@ public class IdentityInitializer : IInitializer
             throw;
         }
     }
-    private static async Task CreateRolesAsync(RoleManager<AppRole> roleManager, ILogger logger)
+    private static async Task CreateRolesAsync(RoleManager<AppRole> roleManager, ILogger logger, CancellationToken cancellationToken)
     {
         // Перевіряємо наявність ролей
-        if (!await roleManager.Roles.AnyAsync())
+        if (!await roleManager.Roles.AnyAsync(cancellationToken))
         {
             logger.LogInformation("Створення ролей за замовчуванням");
 
@@ -96,7 +96,7 @@ public class IdentityInitializer : IInitializer
     }
 
     private static async Task CreateAdminUserAsync(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager,
-        IConfiguration configuration, ILogger logger)
+        IConfiguration configuration, ILogger logger, CancellationToken cancellationToken)
     {
         // Отримання налаштувань з конфігурації або змінних середовища
         var adminSettings = configuration.GetSection("Identity:AdminUser");
