@@ -1,6 +1,7 @@
 ﻿using Domain.Identity.ValueObjects;
+using Infrastructure.Identity.Entities;
 
-namespace Domain.Identity.Interfaces
+namespace Infrastructure.Identity.Interfaces
 {
     /// <summary>
     /// Интерфейс репозитория для работы с пользователями приложения
@@ -35,6 +36,7 @@ namespace Domain.Identity.Interfaces
         /// Сохранить нового пользователя
         /// </summary>
         /// <param name="user">Пользователь для сохранения</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>Идентификатор созданного пользователя</returns>
         Task AddAsync(AppUser user, CancellationToken cancellationToken = default);
 
