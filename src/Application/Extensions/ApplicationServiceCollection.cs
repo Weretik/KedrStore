@@ -1,21 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Application.Common.Abstractions.Events;
-using Application.Common.Abstractions.Common;
-using Application.Common.Abstractions.Commands;
 using Application.Common.Behaviors;
-using Application.Common.Mapping;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.DependencyInjection
+namespace Application.Extensions
 {
     /// <summary>
     /// Методы расширения для регистрации сервисов приложения
     /// </summary>
-    public static class ApplicationServiceCollectionExtensions
+    public static class ApplicationServiceCollection
     {
         /// <summary>
         /// Регистрирует сервисы слоя приложения

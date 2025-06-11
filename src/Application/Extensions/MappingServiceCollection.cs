@@ -2,12 +2,12 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.DependencyInjection
+namespace Application.Extensions
 {
     /// <summary>
     /// Расширения для регистрации маппингов в DI-контейнере
     /// </summary>
-    public static class MappingServiceCollectionExtensions
+    public static class MappingServiceCollection
     {
         /// <summary>
         /// Регистрирует AutoMapper с профилями из указанной сборки

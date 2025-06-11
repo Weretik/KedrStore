@@ -17,3 +17,4 @@ public class CatalogDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
     }
 }
+

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 
-namespace Application.DependencyInjection
+namespace Application.Extensions
 {
     /// <summary>
     /// Расширения для маппинга сущностей
     /// </summary>
-    public static class EntityMappingExtensions
+    public static class EntityMapping
     {
         /// <summary>
         /// Обновляет свойства сущности на основе данных из другой сущности
