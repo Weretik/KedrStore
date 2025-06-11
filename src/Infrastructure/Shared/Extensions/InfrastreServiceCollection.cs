@@ -1,5 +1,5 @@
-﻿using Domain.Abstractions;
-using Domain.Catalog.Interfaces;
+﻿using Domain.Catalog.Interfaces;
+using Domain.Identity.Interfaces;
 using Infrastructure.Catalog;
 using Infrastructure.Catalog.Repositories;
 using Infrastructure.Identity;
@@ -11,9 +11,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Shared.Extensions;
 
-public static class AddInfrastructureServices
+public static class InfrastreServiceCollection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Подключение Catalog БД
         services.AddDbContext<CatalogDbContext>(options =>
