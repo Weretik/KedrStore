@@ -1,0 +1,1235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<categories>
+<category>
+<id>15</id>
+<parent>29</parent>
+<name>Врізні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>104</id>
+<parent>15</parent>
+<name>Сувальдні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>105</id>
+<parent>104</parent>
+<name>Сувальдні замки CLASS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>172</id>
+<parent>104</parent>
+<name>Сувальдные замки BORDER_Про-Сам</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>207</id>
+<parent>104</parent>
+<name>Сувальдные замки CISA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>175</id>
+<parent>104</parent>
+<name>Сувальдные замки KALE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>134</id>
+<parent>104</parent>
+<name>Сувальдные замки MOTTURA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>183</id>
+<parent>104</parent>
+<name>Сувальдные замки USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>131</id>
+<parent>104</parent>
+<name>Сувальдные замки ГАРДИАН</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>191</id>
+<parent>104</parent>
+<name>Сувальдные замки МЕТТЕМ</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>192</id>
+<parent>104</parent>
+<name>Сувальдные замки СЕНАТ</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>129</id>
+<parent>104</parent>
+<name>Сувальдные замки ЭЛЬБОР</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>121</id>
+<parent>15</parent>
+<name>Циліндрові замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>181</id>
+<parent>121</parent>
+<name>Цилиндровые замки APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>174</id>
+<parent>121</parent>
+<name>Цилиндровые замки KALE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>135</id>
+<parent>121</parent>
+<name>Цилиндровые замки MOTTURA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>184</id>
+<parent>121</parent>
+<name>Цилиндровые замки USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>132</id>
+<parent>121</parent>
+<name>Цилиндровые замки ГАРДИАН</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>199</id>
+<parent>121</parent>
+<name>Цилиндровые замки Укр.пр-ли</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>128</id>
+<parent>121</parent>
+<name>Цилиндровые замки ЭЛЬБОР</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>122</id>
+<parent>121</parent>
+<name>Циліндрові замки CLASS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>23</id>
+<parent></parent>
+<name>Дотягувачі для дверей</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>142</id>
+<parent>23</parent>
+<name>Доводчики Apecs</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>153</id>
+<parent>23</parent>
+<name>Доводчики GEZE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>22</id>
+<parent>23</parent>
+<name>Дотягувачі KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>77</id>
+<parent></parent>
+<name>Завіси дверні</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>193</id>
+<parent>77</parent>
+<name>Завіси приварні</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>78</id>
+<parent>77</parent>
+<name>Завіси штирьові</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>211</id>
+<parent>78</parent>
+<name>Ковпачки KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>206</id>
+<parent>78</parent>
+<name>Колпачки MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>140</id>
+<parent>78</parent>
+<name>Петли штыревые AGB</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>203</id>
+<parent>78</parent>
+<name>Петли штыревые OTLAV</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>109</id>
+<parent>77</parent>
+<name>З'ємні (ліві/праві)</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>110</id>
+<parent>109</parent>
+<name>З'ємні KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>147</id>
+<parent>109</parent>
+<name>Съемные APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>65</id>
+<parent>77</parent>
+<name>Накладні (метелик)</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>189</id>
+<parent>65</parent>
+<name>Бабочка USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>7</id>
+<parent>65</parent>
+<name>Метелик KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>67</id>
+<parent>77</parent>
+<name>Нез'ємні (універсальні)</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>148</id>
+<parent>67</parent>
+<name>Универсальные APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>112</id>
+<parent>67</parent>
+<name>Універсальні KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>29</id>
+<parent></parent>
+<name>Замки дверні</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>15</id>
+<parent>29</parent>
+<name>Врізні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>104</id>
+<parent>15</parent>
+<name>Сувальдні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>121</id>
+<parent>15</parent>
+<name>Циліндрові замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>197</id>
+<parent>29</parent>
+<name>Електромеханічні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>40</id>
+<parent>29</parent>
+<name>Кодові замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>205</id>
+<parent>40</parent>
+<name>Кодові замки KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>204</id>
+<parent>40</parent>
+<name>Кодовые замки Mettem</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>64</id>
+<parent>29</parent>
+<name>Навісні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>145</id>
+<parent>64</parent>
+<name>Навесные замки APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>188</id>
+<parent>64</parent>
+<name>Навесные замки USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>198</id>
+<parent>64</parent>
+<name>Навесные замки Укр.пр-ли</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>178</id>
+<parent>64</parent>
+<name>Навесные замки ЧАЗ</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>149</id>
+<parent>64</parent>
+<name>Навісні замки KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>66</id>
+<parent>29</parent>
+<name>Накладні замки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>201</id>
+<parent>66</parent>
+<name>Накладні замки KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>146</id>
+<parent>66</parent>
+<name>Накладные замки APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>136</id>
+<parent>66</parent>
+<name>Накладные замки MOTTURA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>133</id>
+<parent>66</parent>
+<name>Накладные замки ГАРДИАН</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>173</id>
+<parent>66</parent>
+<name>Накладные замки Про-Сам</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>196</id>
+<parent>66</parent>
+<name>Накладные замки СЕНАТ</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>200</id>
+<parent>66</parent>
+<name>Накладные замки Укр.пр-ли</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>130</id>
+<parent>66</parent>
+<name>Накладные замки ЭЛЬБОР</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>28</id>
+<parent></parent>
+<name>Замки у комплекті з ручками</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>180</id>
+<parent>28</parent>
+<name>Комплект APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>41</id>
+<parent>28</parent>
+<name>Комплект KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>170</id>
+<parent>28</parent>
+<name>Комплект MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>195</id>
+<parent>28</parent>
+<name>Комплект USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>45</id>
+<parent></parent>
+<name>Круги отрезные</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>48</id>
+<parent>123</parent>
+<name>Лазерний ключ</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>165</id>
+<parent>48</parent>
+<name>Цилиндры APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>166</id>
+<parent>165</parent>
+<name>Серия 4КС</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>167</id>
+<parent>165</parent>
+<name>Серия RT</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>169</id>
+<parent>165</parent>
+<name>Серия SC</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>168</id>
+<parent>165</parent>
+<name>Серия XD</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>55</id>
+<parent></parent>
+<name>Межкімнатні механізми</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>56</id>
+<parent>55</parent>
+<name>Межкімнатні механізми CLASS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>139</id>
+<parent>55</parent>
+<name>Межкомнатные механизмы AGB</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>143</id>
+<parent>55</parent>
+<name>Межкомнатные механизмы APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>185</id>
+<parent>55</parent>
+<name>Межкомнатные механизмы USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>82</id>
+<parent></parent>
+<name>Розсувні системи</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>182</id>
+<parent>82</parent>
+<name>Раздвижные системы USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>83</id>
+<parent>82</parent>
+<name>Розсувні системи KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>88</id>
+<parent>86</parent>
+<name>Ручки на розетці</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>63</id>
+<parent>88</parent>
+<name>Дверні ручки TM KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>224</id>
+<parent>63</parent>
+<name>Дверні ручки TM GENRICH</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>217</id>
+<parent>63</parent>
+<name>Накладки к MVM/LINDE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>96</id>
+<parent>63</parent>
+<name>Серія KEDR HRoz-07</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>97</id>
+<parent>63</parent>
+<name>Серія KEDR INNOX (нержавійка)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>215</id>
+<parent>63</parent>
+<name>Серія KEDR R-08 (AL)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>98</id>
+<parent>63</parent>
+<name>Серія KEDR R-10 (AL)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>99</id>
+<parent>63</parent>
+<name>Серія KEDR R-10 (CINK)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>220</id>
+<parent>63</parent>
+<name>Серія KEDR R-62 (AL)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>219</id>
+<parent>63</parent>
+<name>Серія KEDR ULTRA (AL)</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>160</id>
+<parent>88</parent>
+<name>На розетке APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>161</id>
+<parent>160</parent>
+<name>Серия 500 Premier</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>162</id>
+<parent>160</parent>
+<name>Серия 700 Standard</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>163</id>
+<parent>160</parent>
+<name>Серия 800 Alumio</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>86</id>
+<parent></parent>
+<name>Ручкки дверні</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>39</id>
+<parent>86</parent>
+<name>Кноби</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>209</id>
+<parent>39</parent>
+<name>Кноби KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>141</id>
+<parent>39</parent>
+<name>Кнобы Apecs</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>87</id>
+<parent>86</parent>
+<name>Ручки на планці</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>164</id>
+<parent>87</parent>
+<name>На планке APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>194</id>
+<parent>87</parent>
+<name>На планке GSN-Турция</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>186</id>
+<parent>87</parent>
+<name>На планке USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>62</id>
+<parent>87</parent>
+<name>На планці KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>88</id>
+<parent>86</parent>
+<name>Ручки на розетці</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>63</id>
+<parent>88</parent>
+<name>Дверні ручки TM KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>160</id>
+<parent>88</parent>
+<name>На розетке APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>216</id>
+<parent>88</parent>
+<name>На розетке LINDE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>155</id>
+<parent>88</parent>
+<name>На розетке MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>218</id>
+<parent>88</parent>
+<name>На розетке MVM Нержавеющая сталь</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>187</id>
+<parent>88</parent>
+<name>На розетке USK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>89</id>
+<parent>86</parent>
+<name>Ручки скоби</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>90</id>
+<parent>89</parent>
+<name>Ручки скоби KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>157</id>
+<parent>89</parent>
+<name>Ручки скобы MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>61</id>
+<parent></parent>
+<name>Смарт-циліндри</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>208</id>
+<parent></parent>
+<name>Сталеві двері</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>213</id>
+<parent></parent>
+<name>Ущільнювач KEDR</name>
+<photo></photo>
+<display>0</display>
+<nav>0</nav>
+</category>
+<category>
+<id>113</id>
+<parent></parent>
+<name>Ущільнювачі для дверей</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>179</id>
+<parent>113</parent>
+<name>Уплотнители SANOK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>114</id>
+<parent></parent>
+<name>Фурнітура для дверей</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>12</id>
+<parent>114</parent>
+<name>Броненакладки</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>144</id>
+<parent>12</parent>
+<name>Броненакладки APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>138</id>
+<parent>12</parent>
+<name>Броненакладки KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>137</id>
+<parent>12</parent>
+<name>Броненакладки MOTTURA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>156</id>
+<parent>12</parent>
+<name>Броненакладки MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>16</id>
+<parent>114</parent>
+<name>Вічка дверні</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>154</id>
+<parent>16</parent>
+<name>Вічка дверні KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>17</id>
+<parent>16</parent>
+<name>Глазки Apecs</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>202</id>
+<parent>16</parent>
+<name>Глазки Беларусь</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>151</id>
+<parent>114</parent>
+<name>Засувки, квадрати</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>152</id>
+<parent>151</parent>
+<name>Засувки, квадрати KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>71</id>
+<parent>114</parent>
+<name>Обмежувачі дверей</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>210</id>
+<parent>71</parent>
+<name>Обмежувачи дверей CLASS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>158</id>
+<parent>71</parent>
+<name>Ограничители дверей APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>171</id>
+<parent>71</parent>
+<name>Ограничители дверей MVM</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>127</id>
+<parent>114</parent>
+<name>Шпінгалети</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>159</id>
+<parent>127</parent>
+<name>Шпингалеты APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>150</id>
+<parent>127</parent>
+<name>Шпінгалети KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>123</id>
+<parent></parent>
+<name>Циліндрові механізми</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>5</id>
+<parent>123</parent>
+<name>Англійский ключ</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>48</id>
+<parent>123</parent>
+<name>Лазерний ключ</name>
+<photo></photo>
+<display>1</display>
+<nav>1</nav>
+</category>
+<category>
+<id>165</id>
+<parent>48</parent>
+<name>Цилиндры APECS</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>177</id>
+<parent>48</parent>
+<name>Цилиндры IMPERIAL</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>176</id>
+<parent>48</parent>
+<name>Цилиндры KALE</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>190</id>
+<parent>48</parent>
+<name>Цилиндры MORTIRA</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>214</id>
+<parent>48</parent>
+<name>Циліндри GWK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>212</id>
+<parent>48</parent>
+<name>Циліндри KEDR</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>222</id>
+<parent>48</parent>
+<name>Циліндри KEDR AL</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>221</id>
+<parent>48</parent>
+<name>Циліндри KEDR ZINK</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+<category>
+<id>223</id>
+<parent>48</parent>
+<name>Циліндрові замки</name>
+<photo></photo>
+<display>1</display>
+<nav>0</nav>
+</category>
+</categories>
