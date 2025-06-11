@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Application\Application.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.13" />
     </ItemGroup>
