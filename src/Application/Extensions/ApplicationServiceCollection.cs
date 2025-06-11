@@ -6,16 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Extensions
 {
-    /// <summary>
-    /// Методы расширения для регистрации сервисов приложения
-    /// </summary>
     public static class ApplicationServiceCollection
     {
-        /// <summary>
-        /// Регистрирует сервисы слоя приложения
-        /// </summary>
-        /// <param name="services">Коллекция сервисов</param>
-        /// <returns>Коллекция сервисов с добавленными сервисами приложения</returns>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             // Регистрация MediatR и поведений
@@ -33,13 +25,6 @@ namespace Application.Extensions
 
             return services;
         }
-
-        /// <summary>
-        /// Регистрирует все обработчики доменных событий из указанной сборки
-        /// </summary>
-        /// <param name="services">Коллекция сервисов</param>
-        /// <param name="assembly">Сборка, содержащая обработчики</param>
-        /// <returns>Коллекция сервисов с добавленными обработчиками</returns>
         public static IServiceCollection AddDomainEventHandlers(this IServiceCollection services, Assembly assembly)
         {
             var handlerTypes = assembly.GetTypes()
@@ -62,14 +47,6 @@ namespace Application.Extensions
 
             return services;
         }
-
-        /// <summary>
-        /// Регистрирует обработчик для конкретного типа события
-        /// </summary>
-        /// <typeparam name="TEvent">Тип доменного события</typeparam>
-        /// <typeparam name="THandler">Тип обработчика</typeparam>
-        /// <param name="services">Коллекция сервисов</param>
-        /// <returns>Коллекция сервисов с добавленным обработчиком</returns>
         public static IServiceCollection AddDomainEventHandler<TEvent, THandler>(this IServiceCollection services)
             where TEvent : IDomainEvent
             where THandler : class, IDomainEventHandler<TEvent>
@@ -79,3 +56,4 @@ namespace Application.Extensions
         }
     }
 }
+

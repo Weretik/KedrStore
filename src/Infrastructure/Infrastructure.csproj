@@ -19,6 +19,7 @@
       <Folder Include="Persistence\" />
       <Folder Include="Persistence\Seed\" />
       <Folder Include="Shared\Abstractions\" />
+      <Folder Include="Shared\Configuration\" />
       <Folder Include="Shared\Services\" />
     </ItemGroup>
 
