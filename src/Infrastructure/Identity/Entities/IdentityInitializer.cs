@@ -198,3 +198,4 @@ public class IdentityInitializer : IInitializer
         return new string(password);
     }
 }
+

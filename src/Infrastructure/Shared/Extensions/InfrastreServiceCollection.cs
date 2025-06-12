@@ -28,7 +28,7 @@ public static class InfrastreServiceCollection
         services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 5;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;

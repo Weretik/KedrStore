@@ -35,7 +35,7 @@ public class CategorySeeder : ICategorySeeder
             .Select(c =>
             {
                 var id = int.Parse(c.Element("id")?.Value ?? "0");
-                var name = c.Element("n")?.Value ?? string.Empty;
+                var name = c.Element("name")?.Value ?? string.Empty;
                 var parentRaw = c.Element("parent")?.Value;
                 var parentId = string.IsNullOrWhiteSpace(parentRaw) ? null : new CategoryId(int.Parse(parentRaw));
 

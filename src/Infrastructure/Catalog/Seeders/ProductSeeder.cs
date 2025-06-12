@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Linq;
 using Domain.Catalog.Entities;
 using Domain.Catalog.Interfaces;
@@ -38,9 +39,9 @@ public class ProductSeeder : IProductSeeder
                 var id = int.Parse(p.Element("id")?.Value ?? "0");
                 var name = p.Element("name")?.Value ?? string.Empty;
                 var manufacturer = p.Element("manufacturer")?.Value ?? string.Empty;
-                var price = decimal.Parse(p.Element("price")?.Value ?? "0");
-                var categoryId = int.Parse(p.Element("category_id")?.Value ?? "0");
-                var photo = p.Element("photo")?.Value ?? string.Empty;
+                var price = decimal.Parse(p.Element("price")?.Value ?? "0", CultureInfo.InvariantCulture);
+                var categoryId = int.Parse(p.Element("category")?.Value ?? "0");
+                var photo = p.Element("photos")?.Element("photo")?.Value ?? "/product/default.jpg";
 
                 return new
                 {
@@ -66,3 +67,4 @@ public class ProductSeeder : IProductSeeder
         await _context.SaveChangesAsync();
     }
 }
+
