@@ -43,3 +43,4 @@ public static class InfrastreServiceCollection
         return services;
     }
 }
+

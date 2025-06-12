@@ -14,7 +14,10 @@ public class CatalogDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
+
+        // Применяем только конфигурации из namespace Infrastructure. Catalog
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(CatalogDbContext).Assembly,
+            type => type.Namespace?.StartsWith("Infrastructure.Catalog") ?? false);
     }
 }
-

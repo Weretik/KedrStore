@@ -14,6 +14,8 @@ public class AppIdentityDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.ApplyConfigurationsFromAssembly(typeof(AppIdentityDbContext).Assembly);
+        builder.ApplyConfigurationsFromAssembly(
+            typeof(AppIdentityDbContext).Assembly,
+            type => type.Namespace?.StartsWith("Infrastructure.Identity") ?? false);
     }
 }
