@@ -2,6 +2,7 @@
 using Domain.Identity.Interfaces;
 using Infrastructure.Catalog;
 using Infrastructure.Catalog.Repositories;
+using Infrastructure.Catalog.Seeders;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +39,14 @@ public static class InfrastreServiceCollection
         // Регистрация Сервисов и Репозиториев
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+        // Регистрация инициализатора Identity
         services.AddScoped<IInitializer, IdentityInitializer>();
+
+        // Регистрация сидеров
+        services.AddScoped<ICategorySeeder, CategorySeeder>();
+        services.AddScoped<IProductSeeder, ProductSeeder>();
 
         return services;
     }
 }
-

@@ -1,4 +1,5 @@
 using Application.Extensions;
+using Domain.Catalog.Interfaces;
 using Domain.Identity.Interfaces;
 using Infrastructure.Shared.Extensions;
 using Presentation.Components;
@@ -17,15 +18,20 @@ builder.Services
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var initializers = scope.ServiceProvider.GetServices<IInitializer>();
+await using var scope = app.Services.CreateAsyncScope();
+var services = scope.ServiceProvider;
 
-    foreach (var initializer in initializers)
-    {
-        await initializer.InitializeAsync(scope.ServiceProvider);
-    }
+// Инициализация Identity
+var initializers = services.GetServices<IInitializer>();
+foreach (var initializer in initializers)
+{
+    await initializer.InitializeAsync(services);
 }
+
+// Сидирование данных каталога
+await services.GetRequiredService<ICategorySeeder>().SeedAsync();
+await services.GetRequiredService<IProductSeeder>().SeedAsync();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -52,6 +58,3 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
 
 app.Run();
-
-
-

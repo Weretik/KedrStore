@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\CatalogSeeder\" />
+      <Folder Include="Catalog\Seeders\" />
       <Folder Include="Catalog\Migrations\" />
       <Folder Include="Catalog\Repositories\" />
       <Folder Include="Messaging\" />
