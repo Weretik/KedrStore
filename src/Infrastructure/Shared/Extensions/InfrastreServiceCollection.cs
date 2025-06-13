@@ -1,10 +1,12 @@
-﻿using Domain.Catalog.Interfaces;
+﻿using Domain.Abstractions;
+using Domain.Catalog.Interfaces;
 using Domain.Identity.Interfaces;
 using Infrastructure.Catalog;
 using Infrastructure.Catalog.Repositories;
 using Infrastructure.Catalog.Seeders;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Entities;
+using Infrastructure.Identity.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,12 +42,19 @@ public static class InfrastreServiceCollection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-        // Регистрация инициализатора Identity
-        services.AddScoped<IInitializer, IdentityInitializer>();
+        // Регистрация сидеров Identity
+        services.AddScoped<ISeeder, RoleSeeder>();
+        services.AddScoped<IIdentitySeeder, RoleSeeder>();
 
-        // Регистрация сидеров
-        services.AddScoped<ICategorySeeder, CategorySeeder>();
-        services.AddScoped<IProductSeeder, ProductSeeder>();
+        services.AddScoped<ISeeder, IdentitySeeder>();
+        services.AddScoped<IIdentitySeeder, IdentitySeeder>();
+
+        // Регистрация сидеров Catalog
+        services.AddScoped<ISeeder, CategorySeeder>();
+        services.AddScoped<ICatalogSeeder, CategorySeeder>();
+
+        services.AddScoped<ISeeder, ProductSeeder>();
+        services.AddScoped<ICatalogSeeder, ProductSeeder>();
 
         return services;
     }
