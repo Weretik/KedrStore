@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Constants
+﻿namespace Domain.Identity.Constants
 {
     /// <summary>
     /// Константы для детальных разрешений в приложении

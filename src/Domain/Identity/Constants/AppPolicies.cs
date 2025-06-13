@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Constants
+﻿namespace Domain.Identity.Constants
 {
     /// <summary>
     /// Константы для политик авторизации
