@@ -1,3 +1,5 @@
+using Domain.Catalog.Repositories;
+
 namespace Infrastructure.Catalog.Repositories;
 
 public class ProductRepository(CatalogDbContext context) : IProductRepository

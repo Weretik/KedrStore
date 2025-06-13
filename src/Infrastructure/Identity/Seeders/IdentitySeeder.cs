@@ -1,7 +1,8 @@
-﻿namespace Infrastructure.Identity.Seeders;
+﻿using Infrastructure.Shared.Abstractions;
+
+namespace Infrastructure.Identity.Seeders;
 
 public class IdentitySeeder(
-    RoleManager<AppRole> roleManager,
     UserManager<AppUser> userManager,
     IOptions<AdminUserConfig> adminOptions,
     ILogger<IdentitySeeder> logger)

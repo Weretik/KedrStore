@@ -45,6 +45,6 @@ public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
         await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Сидування категорій завершено: {Count} записів.", categories.Count);
+        logger.LogInformation($"Сидування категорій завершено: {categories.Count} записів.");
     }
 }

@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <Folder Include="Catalog\Events\" />
-      <Folder Include="Catalog\Interfaces\" />
+      <Folder Include="Catalog\Repositories\" />
       <Folder Include="Catalog\Services\" />
     </ItemGroup>
 

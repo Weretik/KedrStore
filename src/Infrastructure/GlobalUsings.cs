@@ -1,6 +1,3 @@
-global using Domain.Abstractions;
-global using Domain.Catalog.Interfaces;
-global using Domain.Identity.Interfaces;
 global using Infrastructure.Catalog;
 global using Infrastructure.Catalog.Repositories;
 global using Infrastructure.Catalog.Seeders;
@@ -28,3 +25,5 @@ global using Microsoft.EntityFrameworkCore.Storage;
 global using IHasDomainEvents = Application.Common.Abstractions.Events.IHasDomainEvents;
 global using Application.Common.Abstractions.Events;
 global using Application.Interfaces;
+global using Domain.Catalog.Repositories;
+global using Infrastructure.Shared.Abstractions;

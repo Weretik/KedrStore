@@ -1,4 +1,4 @@
-namespace Domain.Catalog.Interfaces;
+namespace Domain.Catalog.Repositories;
 
 public interface ICategoryRepository
 {

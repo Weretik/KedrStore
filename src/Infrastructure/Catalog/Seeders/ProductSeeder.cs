@@ -63,6 +63,6 @@ public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
         await dbContext.Products.AddRangeAsync(products, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation("Сидування продуктів завершено: {Count} записів.", products.Count);
+        logger.LogInformation($"Сидування продуктів завершено: {products.Count} записів.");
     }
 }

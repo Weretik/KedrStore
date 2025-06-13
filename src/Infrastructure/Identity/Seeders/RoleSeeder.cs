@@ -1,3 +1,5 @@
+using Infrastructure.Shared.Abstractions;
+
 namespace Infrastructure.Identity.Seeders;
 
 public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> logger) : IIdentitySeeder

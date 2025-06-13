@@ -1,4 +1,4 @@
-﻿namespace Domain.Abstractions;
+﻿namespace Infrastructure.Shared.Abstractions;
 
 public interface ISeeder
 {
