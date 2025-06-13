@@ -27,3 +27,5 @@ global using Application.Common.Abstractions.Events;
 global using Application.Interfaces;
 global using Domain.Catalog.Repositories;
 global using Infrastructure.Shared.Abstractions;
+global using Application.Common.Abstractions.Security;
+global using Infrastructure.Security;

@@ -42,6 +42,9 @@ public static class InfrastreServiceCollection
         services.AddScoped<ISeeder, ProductSeeder>();
         services.AddScoped<ICatalogSeeder, ProductSeeder>();
 
+        //Регистрация Fake Permission Service
+        services.AddScoped<IPermissionService, FakePermissionService>();
+
         return services;
     }
 }
