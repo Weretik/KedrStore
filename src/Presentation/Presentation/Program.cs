@@ -1,36 +1,28 @@
 using Application.Extensions;
-using Domain.Catalog.Interfaces;
-using Domain.Identity.Interfaces;
+using Infrastructure.Identity.Configuration;
 using Infrastructure.Shared.Extensions;
 using Presentation.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Razor-компоненты
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// Добавляем сервисы инфраструктуры
+// Конфигурация AdminUser
+builder.Services.Configure<AdminUserConfig>(
+    builder.Configuration.GetSection("Identity:AdminUser"));
+
+// DI: Application + Infrastructure
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
-await using var scope = app.Services.CreateAsyncScope();
-var services = scope.ServiceProvider;
-
-// Инициализация Identity
-var initializers = services.GetServices<IInitializer>();
-foreach (var initializer in initializers)
-{
-    await initializer.InitializeAsync(services);
-}
-
-// Сидирование данных каталога
-await services.GetRequiredService<ICategorySeeder>().SeedAsync();
-await services.GetRequiredService<IProductSeeder>().SeedAsync();
+// Seeders — вызываем централизованно
+await app.UseAppSeeders(); //  или UseCatalogSeeders или UseIdentitySeeders
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
