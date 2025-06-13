@@ -9,6 +9,8 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 {
     public async Task<Product?> GetByIdAsync(ProductId id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         return await context.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
@@ -16,6 +18,8 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task<List<Product>> GetByCategoryIdAsync(CategoryId categoryId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         return await context.Products
             .AsNoTracking()
             .Where(p => p.CategoryId == categoryId)
@@ -24,6 +28,8 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task<bool> ExistsAsync(ProductId id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         return await context.Products
             .AsNoTracking()
             .AnyAsync(p => p.Id == id, cancellationToken);
@@ -31,11 +37,15 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task AddAsync(Product product, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         await context.Products.AddAsync(product, cancellationToken);
     }
 
     public async Task UpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         // Загружаем существующую сущность для отслеживания
         var existingProduct = await context.Products
             .FirstOrDefaultAsync(p => p.Id == product.Id, cancellationToken);
@@ -54,6 +64,8 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task DeleteAsync(ProductId id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         // Загружаем сущность для отслеживания
         var product = await context.Products
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
