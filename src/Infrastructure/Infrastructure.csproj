@@ -15,7 +15,6 @@
       <Folder Include="Catalog\Seeders\" />
       <Folder Include="Catalog\Migrations\" />
       <Folder Include="Catalog\Repositories\" />
-      <Folder Include="Messaging\" />
       <Folder Include="Persistence\" />
       <Folder Include="Persistence\Seed\" />
       <Folder Include="Shared\Abstractions\" />
