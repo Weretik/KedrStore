@@ -12,11 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Seeders\" />
       <Folder Include="Catalog\Migrations\" />
       <Folder Include="Catalog\Repositories\" />
-      <Folder Include="Persistence\" />
-      <Folder Include="Persistence\Seed\" />
       <Folder Include="Shared\Configuration\" />
       <Folder Include="Shared\Services\" />
     </ItemGroup>

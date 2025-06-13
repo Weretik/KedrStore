@@ -8,6 +8,11 @@ public static class InfrastreServiceCollection
         services.AddDbContext<CatalogDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+        services.AddScoped<ICatalogDbContext>(provider =>
+            provider.GetRequiredService<CatalogDbContext>());
+
+        services.AddScoped<ICatalogUnitOfWork, CatalogUnitOfWork>();
+
         // Подключение Identity БД
         services.AddDbContext<AppIdentityDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));

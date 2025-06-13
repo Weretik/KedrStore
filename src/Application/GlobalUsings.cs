@@ -14,3 +14,5 @@ global using AutoMapper.QueryableExtensions;
 global using System.Text.RegularExpressions;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Domain.Catalog.Entities;
+global using Application.UseCases.Catalog.Interfaces;

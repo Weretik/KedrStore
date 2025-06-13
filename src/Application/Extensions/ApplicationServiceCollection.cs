@@ -1,4 +1,6 @@
-﻿namespace Application.Extensions
+﻿using Application.Common.Events;
+
+namespace Application.Extensions
 {
     public static class ApplicationServiceCollection
     {
@@ -10,6 +12,9 @@
                 // Добавляем поведение для отправки доменных событий
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(DomainEventDispatcherBehavior<,>));
             });
+
+            // Регистрация обработчиков событий
+            services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
             // Регистрация обработчиков доменных событий из текущей сборки
             services.AddDomainEventHandlers(Assembly.GetExecutingAssembly());
