@@ -3,32 +3,38 @@ using Domain.Catalog.Entities;
 using Domain.Catalog.Interfaces;
 using Domain.Catalog.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Catalog.Seeders;
 
-public class CategorySeeder : ICategorySeeder
+public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
 {
-    private readonly CatalogDbContext _context;
-    private readonly string _xmlPath;
-
-    public CategorySeeder(CatalogDbContext context)
+    public async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
-        _context = context;
-        _xmlPath = Path.Combine("wwwroot", "xml", "category.xml");
-    }
+        cancellationToken.ThrowIfCancellationRequested();
 
-    public async Task SeedAsync()
-    {
-        if (await _context.Categories.AnyAsync())
+        var dbContext = serviceProvider.GetRequiredService<CatalogDbContext>();
+        var xmlPath = Path.Combine("wwwroot", "xml", "category.xml");
+
+        if (await dbContext.Categories.AnyAsync(cancellationToken))
+        {
+            logger.LogInformation("Категории уже существуют — сидирование пропущено.");
             return;
+        }
 
-        if (!File.Exists(_xmlPath))
-            throw new FileNotFoundException($"XML файл не знайдено: {_xmlPath}");
+        if (!File.Exists(xmlPath))
+        {
+            logger.LogError("XML-файл не знайдено: {Path}", xmlPath);
+            throw new FileNotFoundException($"XML-файл не знайдено: {xmlPath}");
+        }
 
-        var doc = XDocument.Load(_xmlPath);
-
+        var doc = XDocument.Load(xmlPath);
         if (doc.Root == null || !doc.Root.Elements("category").Any())
-            throw new InvalidDataException("В XML-файлі відсутні елементи <category>.");
+        {
+            logger.LogError("XML-файл порожній або не містить елементів <category>.");
+            throw new InvalidDataException("XML-файл не містить елементів <category>.");
+        }
 
         var categories = doc.Root
             .Elements("category")
@@ -38,14 +44,15 @@ public class CategorySeeder : ICategorySeeder
                 var name = c.Element("name")?.Value ?? string.Empty;
                 var parentRaw = c.Element("parent")?.Value;
                 var parentId = string.IsNullOrWhiteSpace(parentRaw) ? null : new CategoryId(int.Parse(parentRaw));
-
                 return new { Id = id, Name = name, ParentId = parentId };
             })
             .DistinctBy(c => c.Id)
             .Select(c => Category.Create(new CategoryId(c.Id), c.Name, c.ParentId))
             .ToList();
 
-        await _context.Categories.AddRangeAsync(categories);
-        await _context.SaveChangesAsync();
+        await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Сидування категорій завершено: {Count} записів.", categories.Count);
     }
 }

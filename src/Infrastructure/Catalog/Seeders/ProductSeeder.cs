@@ -3,34 +3,40 @@ using System.Xml.Linq;
 using Domain.Catalog.Entities;
 using Domain.Catalog.Interfaces;
 using Domain.Catalog.ValueObjects;
-using Domain.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Catalog.Seeders;
 
-public class ProductSeeder : IProductSeeder
+public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
 {
-    private readonly CatalogDbContext _context;
-    private readonly string _xmlPath;
-
-    public ProductSeeder(CatalogDbContext context)
+    public async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
-        _context = context;
-        _xmlPath = Path.Combine("wwwroot", "xml", "product.xml");
-    }
+        cancellationToken.ThrowIfCancellationRequested();
 
-    public async Task SeedAsync()
-    {
-        if (await _context.Products.AnyAsync())
+        var dbContext = serviceProvider.GetRequiredService<CatalogDbContext>();
+        var xmlPath = Path.Combine("wwwroot", "xml", "product.xml");
+
+        if (await dbContext.Products.AnyAsync(cancellationToken))
+        {
+            logger.LogInformation("Продукти вже існують - сидування пропущено.");
             return;
+        }
 
-        if (!File.Exists(_xmlPath))
-            throw new FileNotFoundException($"XML файл не знайдено: {_xmlPath}");
+        if (!File.Exists(xmlPath))
+        {
+            logger.LogError("XML-файл не знайдено: {Path}", xmlPath);
+            throw new FileNotFoundException($"XML-файл не знайдено: {xmlPath}");
+        }
 
-        var doc = XDocument.Load(_xmlPath);
+        var doc = XDocument.Load(xmlPath);
 
         if (doc.Root == null || !doc.Root.Elements("product").Any())
-            throw new InvalidDataException("В XML-файлі відсутні елементи <product>.");
+        {
+            logger.LogError("XML файл порожній або не містить елементів <product>.");
+            throw new InvalidDataException("XML-файл не містить елементів <product>.");
+        }
 
         var products = doc.Root
             .Elements("product")
@@ -63,8 +69,9 @@ public class ProductSeeder : IProductSeeder
                 p.Photo))
             .ToList();
 
-        await _context.Products.AddRangeAsync(products);
-        await _context.SaveChangesAsync();
+        await dbContext.Products.AddRangeAsync(products, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation("Сидування продуктів завершено: {Count} записів.", products.Count);
     }
 }
-
