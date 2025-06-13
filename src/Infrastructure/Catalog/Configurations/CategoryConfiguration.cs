@@ -1,8 +1,3 @@
-using Domain.Catalog.Entities;
-using Domain.Catalog.ValueObjects;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace Infrastructure.Catalog.Configurations;
 
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>

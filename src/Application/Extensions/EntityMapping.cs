@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-namespace Application.Extensions
+﻿namespace Application.Extensions
 {
     /// <summary>
     /// Расширения для маппинга сущностей

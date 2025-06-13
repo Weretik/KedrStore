@@ -1,0 +1,16 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Reflection;
+global using System.Security.Claims;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using AutoMapper;
+global using MediatR;
+global using Microsoft.Extensions.DependencyInjection;
+global using Application.Common.Abstractions.Events;
+global using Application.Common.Behaviors;
+global using Microsoft.EntityFrameworkCore;
+global using AutoMapper.QueryableExtensions;
+global using System.Text.RegularExpressions;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using Microsoft.EntityFrameworkCore.Infrastructure;

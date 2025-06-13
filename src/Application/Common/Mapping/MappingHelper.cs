@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using System.Reflection;
-
-namespace Application.Common.Mapping
+﻿namespace Application.Common.Mapping
 {
     /// <summary>
     /// Вспомогательный класс для работы с маппингами

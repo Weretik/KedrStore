@@ -1,8 +1,4 @@
-﻿using Infrastructure.Identity.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Infrastructure.Identity.Configuration;
+﻿namespace Infrastructure.Identity.Configuration;
 
 public class AppUserRoleConfiguration : IEntityTypeConfiguration<AppUserRole>
 {

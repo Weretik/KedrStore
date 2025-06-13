@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     /// <summary>
     /// Модель для отправки электронного письма

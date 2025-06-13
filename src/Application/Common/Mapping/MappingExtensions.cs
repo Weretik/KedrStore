@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-
-namespace Application.Common.Mapping
+﻿namespace Application.Common.Mapping
 {
     /// <summary>
     /// Расширения для работы с маппингом

@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-namespace Application.Common.Mapping
+﻿namespace Application.Common.Mapping
 {
     /// <summary>
     /// Интерфейс для классов, которые должны маппиться с типом T

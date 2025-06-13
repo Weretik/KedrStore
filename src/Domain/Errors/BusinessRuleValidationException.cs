@@ -1,4 +1,4 @@
-﻿using Domain.Abstractions;
+﻿namespace Domain.Errors;
 
 /// <summary>
 /// Исключение, выбрасываемое при нарушении бизнес-правила домена.

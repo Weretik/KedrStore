@@ -1,5 +1,3 @@
-using Domain.Common;
-
 namespace Domain.Catalog.ValueObjects;
 
 public sealed class Money : ValueObject

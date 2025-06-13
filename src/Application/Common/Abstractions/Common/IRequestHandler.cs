@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Common.Abstractions.Common
+﻿namespace Application.Common.Abstractions.Common
 {
     /// <summary>
     /// Универсальный интерфейс для обработчиков запросов и команд

@@ -1,6 +1,4 @@
-﻿using Infrastructure.Identity.Entities;
-
-namespace Infrastructure.Identity.Interfaces
+﻿namespace Infrastructure.Identity.Interfaces
 {
     /// <summary>
     /// Интерфейс репозитория для работы с пользователями приложения

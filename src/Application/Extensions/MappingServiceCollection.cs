@@ -1,8 +1,4 @@
-﻿using System.Reflection;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Application.Extensions
+﻿namespace Application.Extensions
 {
     /// <summary>
     /// Расширения для регистрации маппингов в DI-контейнере

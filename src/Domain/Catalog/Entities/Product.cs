@@ -1,9 +1,3 @@
-using Domain.Abstractions;
-using Domain.Catalog.ValueObjects;
-using Domain.Common;
-using Domain.Catalog.Events;
-
-
 namespace Domain.Catalog.Entities;
 
 public class Product : BaseEntity<ProductId>, IAggregateRoot

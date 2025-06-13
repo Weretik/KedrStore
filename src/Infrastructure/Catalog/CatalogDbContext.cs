@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Domain.Catalog.Entities;
-
 namespace Infrastructure.Catalog;
 
 public class CatalogDbContext : DbContext

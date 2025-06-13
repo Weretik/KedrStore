@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Common.Abstractions.Events;
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     /// <summary>
     /// Интерфейс для реализации паттерна Unit of Work

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Common.Abstractions.Common
+﻿namespace Application.Common.Abstractions.Common
 {
     /// <summary>
     /// Интерфейс для валидаторов

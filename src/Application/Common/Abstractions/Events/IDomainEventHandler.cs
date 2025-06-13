@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Common.Abstractions.Events
+﻿namespace Application.Common.Abstractions.Events
 {
     /// <summary>
     /// Интерфейс для обработчиков доменных событий

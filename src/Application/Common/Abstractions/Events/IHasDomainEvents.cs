@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Application.Common.Abstractions.Events
+﻿namespace Application.Common.Abstractions.Events
 {
     /// <summary>
     /// Интерфейс для сущностей, которые могут содержать доменные события

@@ -1,12 +1,3 @@
-using System.Globalization;
-using System.Xml.Linq;
-using Domain.Catalog.Entities;
-using Domain.Catalog.Interfaces;
-using Domain.Catalog.ValueObjects;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
 namespace Infrastructure.Catalog.Seeders;
 
 public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder

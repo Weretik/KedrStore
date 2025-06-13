@@ -1,4 +1,4 @@
-using Domain.Abstractions;
+using Domain.Errors;
 
 namespace Domain.Common;
 

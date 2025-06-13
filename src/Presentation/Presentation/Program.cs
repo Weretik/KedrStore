@@ -1,8 +1,3 @@
-using Application.Extensions;
-using Infrastructure.Identity.Configuration;
-using Infrastructure.Shared.Extensions;
-using Presentation.Components;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Razor-компоненты

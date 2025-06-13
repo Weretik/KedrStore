@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     /// <summary>
     /// Сервис для получения текущей даты и времени

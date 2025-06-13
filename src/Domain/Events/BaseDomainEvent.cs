@@ -1,6 +1,4 @@
-﻿using Domain.Abstractions;
-
-namespace Domain.Events;
+﻿namespace Domain.Events;
 
 public abstract class BaseDomainEvent : IDomainEvent
 {

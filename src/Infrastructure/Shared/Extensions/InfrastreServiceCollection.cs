@@ -1,18 +1,4 @@
-﻿using Domain.Abstractions;
-using Domain.Catalog.Interfaces;
-using Domain.Identity.Interfaces;
-using Infrastructure.Catalog;
-using Infrastructure.Catalog.Repositories;
-using Infrastructure.Catalog.Seeders;
-using Infrastructure.Identity;
-using Infrastructure.Identity.Entities;
-using Infrastructure.Identity.Seeders;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
-
-namespace Infrastructure.Shared.Extensions;
+﻿namespace Infrastructure.Shared.Extensions;
 
 public static class InfrastreServiceCollection
 {

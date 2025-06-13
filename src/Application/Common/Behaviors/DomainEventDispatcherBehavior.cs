@@ -1,12 +1,4 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Common.Abstractions.Events;
-using Application.Common.Abstractions.Commands;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-
-namespace Application.Common.Behaviors
+﻿namespace Application.Common.Behaviors
 {
     /// <summary>
     /// Поведение для автоматической отправки доменных событий после обработки команды

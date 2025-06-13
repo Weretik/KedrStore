@@ -1,10 +1,3 @@
-using Domain.Abstractions;
-using Domain.Catalog.Interfaces;
-using Domain.Identity.Interfaces;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
 namespace Infrastructure.Shared.Extensions;
 
 public static class SeederExtensions

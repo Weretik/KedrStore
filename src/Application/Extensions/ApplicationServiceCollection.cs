@@ -1,10 +1,4 @@
-﻿using System.Reflection;
-using Application.Common.Abstractions.Events;
-using Application.Common.Behaviors;
-using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Application.Extensions
+﻿namespace Application.Extensions
 {
     public static class ApplicationServiceCollection
     {

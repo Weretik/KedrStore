@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Common.Abstractions.Events
+﻿namespace Application.Common.Abstractions.Events
 {
     /// <summary>
     /// Интерфейс для диспетчера доменных событий

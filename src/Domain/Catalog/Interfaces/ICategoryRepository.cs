@@ -1,6 +1,3 @@
-using Domain.Catalog.Entities;
-using Domain.Catalog.ValueObjects;
-
 namespace Domain.Catalog.Interfaces;
 
 public interface ICategoryRepository

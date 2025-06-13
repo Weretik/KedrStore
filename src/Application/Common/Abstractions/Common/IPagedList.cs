@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Application.Common.Abstractions.Common
+﻿namespace Application.Common.Abstractions.Common
 {
     /// <summary>
     /// Интерфейс для постраничного списка элементов

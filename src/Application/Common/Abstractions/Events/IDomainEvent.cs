@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Application.Common.Abstractions.Events
+﻿namespace Application.Common.Abstractions.Events
 {
     /// <summary>
     /// Определяет базовый интерфейс для всех доменных событий

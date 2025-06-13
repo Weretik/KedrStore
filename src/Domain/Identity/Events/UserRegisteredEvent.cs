@@ -1,6 +1,4 @@
-﻿using Domain.Events;
-
-namespace Domain.Identity.Events
+﻿namespace Domain.Identity.Events
 {
     /// <summary>
     /// Событие, представляющее регистрацию нового пользователя в системе

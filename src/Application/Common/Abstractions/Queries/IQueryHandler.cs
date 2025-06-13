@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Common.Abstractions.Queries
+﻿namespace Application.Common.Abstractions.Queries
 {
     /// <summary>
     /// Интерфейс для обработчиков запросов

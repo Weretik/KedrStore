@@ -1,7 +1,4 @@
-﻿using System;
-using Application.Common.Abstractions.Events;
-
-namespace Application.Common.Events
+﻿namespace Application.Common.Events
 {
     /// <summary>
     /// Базовый класс для всех доменных событий

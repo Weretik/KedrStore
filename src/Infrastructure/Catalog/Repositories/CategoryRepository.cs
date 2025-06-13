@@ -1,8 +1,3 @@
-using Domain.Catalog.Entities;
-using Domain.Catalog.Interfaces;
-using Domain.Catalog.ValueObjects;
-using Microsoft.EntityFrameworkCore;
-
 namespace Infrastructure.Catalog.Repositories;
 
 public class CategoryRepository(CatalogDbContext context) : ICategoryRepository

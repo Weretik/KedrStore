@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     /// <summary>
     /// Сервис для получения информации о текущем пользователе

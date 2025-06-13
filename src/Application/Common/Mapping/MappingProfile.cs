@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using AutoMapper;
-
-namespace Application.Common.Mapping
+﻿namespace Application.Common.Mapping
 {
     /// <summary>
     /// Базовый профиль маппинга, автоматически применяющий маппинги из классов, реализующих IMapWith

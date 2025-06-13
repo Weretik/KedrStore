@@ -1,9 +1,3 @@
-using Domain.Identity.Interfaces;
-using Infrastructure.Identity.Constants;
-using Infrastructure.Identity.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-
 namespace Infrastructure.Identity.Seeders;
 
 public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> logger) : IIdentitySeeder

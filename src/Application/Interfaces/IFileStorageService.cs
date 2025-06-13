@@ -1,6 +1,4 @@
-﻿
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     /// <summary>
     /// Информация о файле в хранилище

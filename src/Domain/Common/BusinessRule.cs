@@ -1,5 +1,3 @@
-using Domain.Abstractions;
-
 namespace Domain.Common;
 
 public abstract class BusinessRule : IBusinessRule
