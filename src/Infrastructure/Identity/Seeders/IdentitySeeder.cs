@@ -1,4 +1,5 @@
-﻿using Infrastructure.Shared.Abstractions;
+﻿using Domain.Identity.Constants;
+using Infrastructure.Shared.Abstractions;
 
 namespace Infrastructure.Identity.Seeders;
 
@@ -47,7 +48,7 @@ public class IdentitySeeder(
             return;
         }
 
-        result = await userManager.AddToRoleAsync(user, AppRoles.Administrator);
+        result = await userManager.AddToRoleAsync(user, AppRoles.Admin);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));

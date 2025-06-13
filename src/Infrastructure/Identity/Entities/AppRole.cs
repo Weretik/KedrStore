@@ -3,7 +3,7 @@ namespace Infrastructure.Identity.Entities;
 public class AppRole : IdentityRole<int>
 {
     public string Description { get; set; } = string.Empty;
-    public string Scope { get; set; }
+    public string Scope { get; set; } = string.Empty;
 
     public bool IsSystemRole { get; set; } = false;
     public int AccessLevel { get; set; }
