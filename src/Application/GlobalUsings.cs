@@ -15,4 +15,7 @@ global using System.Text.RegularExpressions;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
 global using Domain.Catalog.Entities;
-global using Application.UseCases.Catalog.Interfaces;
+global using Application.Common.Abstractions.Common;
+global using Application.UseCases.Catalog.DTOs;
+global using Application.Common.Abstractions.Queries;
+global using Domain.Catalog.ValueObjects;

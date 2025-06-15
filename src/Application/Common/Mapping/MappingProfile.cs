@@ -1,8 +1,7 @@
-﻿namespace Application.Common.Mapping
+﻿using Application.Common.Abstractions.Mapping;
+
+namespace Application.Common.Mapping
 {
-    /// <summary>
-    /// Базовый профиль маппинга, автоматически применяющий маппинги из классов, реализующих IMapWith
-    /// </summary>
     public class MappingProfile : Profile
     {
         public MappingProfile()
@@ -10,10 +9,6 @@
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        /// <summary>
-        /// Применяет маппинги из всех типов в сборке, реализующих IMapWith
-        /// </summary>
-        /// <param name="assembly">Сборка для сканирования</param>
         private void ApplyMappingsFromAssembly(Assembly assembly)
         {
             var types = assembly.GetExportedTypes()

@@ -12,6 +12,8 @@
 
     <ItemGroup>
       <Folder Include="Common\" />
+      <Folder Include="UseCases\Catalog\Commands\" />
+      <Folder Include="UseCases\Catalog\Queries\" />
       <Folder Include="UseCases\Identity\" />
     </ItemGroup>
 
