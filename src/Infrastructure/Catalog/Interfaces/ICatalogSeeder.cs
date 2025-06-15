@@ -1,4 +1,4 @@
-namespace Infrastructure.Shared.Abstractions;
+namespace Infrastructure.Catalog.Interfaces;
 
 public interface ICatalogSeeder : ISeeder
 {

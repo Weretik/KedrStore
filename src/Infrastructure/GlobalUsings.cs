@@ -28,3 +28,6 @@ global using Application.Common.Abstractions.Security;
 global using Infrastructure.Security;
 global using Application.UseCases.Catalog.Interfaces;
 global using Infrastructure.Catalog.Persistence;
+global using Infrastructure.Catalog.Interfaces;
+global using Domain.Identity.Constants;
+global using Infrastructure.Identity.Interfaces;

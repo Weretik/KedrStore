@@ -1,7 +1,4 @@
-﻿using Domain.Identity.Constants;
-using Infrastructure.Shared.Abstractions;
-
-namespace Infrastructure.Identity.Seeders;
+﻿namespace Infrastructure.Identity.Seeders;
 
 public class IdentitySeeder(
     UserManager<AppUser> userManager,
