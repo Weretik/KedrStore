@@ -39,6 +39,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(
                 id => id.Value,
                 value => new CategoryId(value))
+            //.HasColumnName("CategoryId")
+            //.HasColumnType("int")
             .IsRequired();
 
         builder.Property(x => x.Photo)
