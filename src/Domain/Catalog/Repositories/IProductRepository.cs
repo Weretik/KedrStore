@@ -2,6 +2,7 @@ namespace Domain.Catalog.Repositories;
 
 public interface IProductRepository
 {
+    IQueryable<Product> GetAllProductAsync();
     Task<Product?> GetByIdAsync(ProductId id, CancellationToken cancellationToken = default);
     Task<List<Product>> GetByCategoryIdAsync(CategoryId categoryId, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(ProductId id, CancellationToken cancellationToken = default);
@@ -9,3 +10,4 @@ public interface IProductRepository
     Task UpdateAsync(Product product, CancellationToken cancellationToken = default);
     Task DeleteAsync(ProductId id, CancellationToken cancellationToken = default);
 }
+

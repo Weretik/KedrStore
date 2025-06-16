@@ -1,13 +1,14 @@
-using Domain.Catalog.Repositories;
-
 namespace Infrastructure.Catalog.Repositories;
 
-public class ProductRepository(CatalogDbContext context) : IProductRepository
+public class ProductRepository(CatalogDbContext context)
+    : IProductRepository
 {
+    public IQueryable<Product> GetAllProductAsync()
+    {
+        return context.Products.AsNoTracking();
+    }
     public async Task<Product?> GetByIdAsync(ProductId id, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         return await context.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
@@ -15,8 +16,6 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task<List<Product>> GetByCategoryIdAsync(CategoryId categoryId, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         return await context.Products
             .AsNoTracking()
             .Where(p => p.CategoryId == categoryId)
@@ -25,17 +24,13 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
 
     public async Task<bool> ExistsAsync(ProductId id, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         return await context.Products
-            .AsNoTracking()
             .AnyAsync(p => p.Id == id, cancellationToken);
     }
 
     public async Task AddAsync(Product product, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-
         await context.Products.AddAsync(product, cancellationToken);
     }
 
@@ -43,15 +38,18 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Загружаем существующую сущность для отслеживания
         var existingProduct = await context.Products
             .FirstOrDefaultAsync(p => p.Id == product.Id, cancellationToken);
 
         if (existingProduct != null)
         {
-            // Используем доменный метод для обновления
-            existingProduct.Update(product.Name, product.Manufacturer, product.Price, product.CategoryId, product.Photo);
-            // EF Core автоматически отследит изменения
+            existingProduct.Update(
+                product.Name,
+                product.Manufacturer,
+                product.Price,
+                product.CategoryId,
+                product.Photo
+            );
         }
         else
         {
@@ -63,14 +61,13 @@ public class ProductRepository(CatalogDbContext context) : IProductRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Загружаем сущность для отслеживания
         var product = await context.Products
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(product => product.Id == id && !product.IsDeleted, cancellationToken);
 
         if (product != null)
         {
             product.MarkAsDeleted();
-            // EF Core автоматически отследит изменение IsDeleted
         }
     }
+
 }
