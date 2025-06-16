@@ -1,6 +1,6 @@
 namespace Application.UseCases.Catalog.Queries;
 
 public record GetProductsByCategoryQuery(CategoryId CategoryId)
-    : IQuery<List<ProductDto>>;
+    : IQuery<AppResult<List<ProductDto>>>;
 
 

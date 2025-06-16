@@ -20,3 +20,4 @@ global using Application.UseCases.Catalog.DTOs;
 global using Application.Common.Abstractions.Queries;
 global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Repositories;
+global using Application.Common.Results;
