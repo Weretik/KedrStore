@@ -10,7 +10,7 @@ public sealed record AppError(string Code, string Message)
     public override string ToString() =>
         $"{Code}: {Message}" + (Details is not null ? $" | Details: {Details}" : string.Empty);
 
-    #region Common Errors
+    #region Pagination Errors
 
     public static AppError NotFound(string entityName, string? id = null) =>
         new(AppErrorTypes.NotFound, $"{entityName} not found" + (id is not null ? $" (ID: {id})" : ""));
