@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Abstractions.Common
+﻿namespace Application.Common.Abstractions.Pagination
 {
     public interface IHasPagination
     {

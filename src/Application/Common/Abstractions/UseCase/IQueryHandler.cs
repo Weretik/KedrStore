@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Abstractions.Queries
+﻿namespace Application.Common.Abstractions.UseCase
 {
     public interface IQueryHandler<TQuery, TResult>
         : IRequestHandler<TQuery, TResult>

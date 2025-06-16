@@ -1,3 +1,3 @@
-﻿namespace Application.Common.Abstractions.Common;
+﻿namespace Application.Common.Abstractions.UseCase;
 
 public interface IUseCase { }
