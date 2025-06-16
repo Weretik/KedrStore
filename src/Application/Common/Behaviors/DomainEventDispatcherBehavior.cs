@@ -1,10 +1,7 @@
-﻿namespace Application.Common.Behaviors
+﻿using IHasDomainEvents = Application.Common.Abstractions.Events.IHasDomainEvents;
+
+namespace Application.Common.Behaviors
 {
-    /// <summary>
-    /// Поведение для автоматической отправки доменных событий после обработки команды
-    /// </summary>
-    /// <typeparam name="TRequest">Тип запроса</typeparam>
-    /// <typeparam name="TResponse">Тип ответа</typeparam>
     public class DomainEventDispatcherBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {

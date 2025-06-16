@@ -1,4 +1,4 @@
-﻿using Application.Common.Events;
+﻿using IDomainEvent = Application.Common.Abstractions.Events.IDomainEvent;
 
 namespace Application.Extensions
 {

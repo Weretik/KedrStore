@@ -91,7 +91,12 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
         return new Product(id, name, manufacturer, price, categoryId, photo);
     }
 
-    public void Update(string name, string manufacturer, Money price, CategoryId categoryId, string photo)
+    public void Update(
+        string name,
+        string manufacturer,
+        Money price,
+        CategoryId categoryId,
+        string photo)
     {
         ValidateName(name);
         ValidateManufacturer(manufacturer);

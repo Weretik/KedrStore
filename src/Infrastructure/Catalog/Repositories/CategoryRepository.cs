@@ -57,9 +57,9 @@ public class CategoryRepository(CatalogDbContext context) : ICategoryRepository
 
         if (existingCategory != null)
         {
-            // Используем доменный метод для обновления
-            existingCategory.Update(category.Name, category.ParentCategoryId);
-            // EF Core автоматически отследит изменения
+            existingCategory.Update(
+                category.Name,
+                category.ParentCategoryId);
         }
         else
         {
@@ -71,14 +71,12 @@ public class CategoryRepository(CatalogDbContext context) : ICategoryRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Загружаем сущность для отслеживания
         var category = await context.Categories
             .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
 
         if (category != null)
         {
             category.MarkAsDeleted();
-            // EF Core автоматически отследит изменение IsDeleted
         }
     }
 }

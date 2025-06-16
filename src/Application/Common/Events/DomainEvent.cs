@@ -1,4 +1,6 @@
-﻿namespace Application.Common.Events
+﻿using IDomainEvent = Application.Common.Abstractions.Events.IDomainEvent;
+
+namespace Application.Common.Events
 {
     public abstract class DomainEvent : IDomainEvent
     {
