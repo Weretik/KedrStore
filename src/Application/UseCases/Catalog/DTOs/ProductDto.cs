@@ -1,4 +1,4 @@
-using Application.Common.Abstractions.Mapping;
+
 using Domain.Catalog.Entities;
 
 namespace Application.UseCases.Catalog.DTOs;
