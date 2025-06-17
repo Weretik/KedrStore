@@ -9,7 +9,9 @@ namespace Application.Common.Pagination
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
         public bool HasPreviousPage => PageNumber > 1;
         public bool HasNextPage => PageNumber < TotalPages;
-
+        public bool HasItems => Items.Any();
+        public PagedMetadata Metadata =>
+            new(PageNumber, PageSize, TotalCount, TotalPages, HasPreviousPage, HasNextPage);
         public PagedResult() { }
 
         public PagedResult(IEnumerable<T> items, int totalCount, int pageNumber, int pageSize)
@@ -19,8 +21,6 @@ namespace Application.Common.Pagination
             PageNumber = pageNumber;
             PageSize = pageSize;
         }
-
-        public bool HasItems => Items.Any();
 
         public static PagedResult<T> Empty(int pageNumber = 1, int pageSize = 20) =>
             new ([], 0, pageNumber, pageSize);

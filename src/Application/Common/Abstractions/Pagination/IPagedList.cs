@@ -8,6 +8,7 @@
         int TotalPages { get; }
         bool HasPreviousPage { get; }
         bool HasNextPage { get; }
+        bool HasItems { get; }
         IReadOnlyList<T> Items { get; }
     }
 }

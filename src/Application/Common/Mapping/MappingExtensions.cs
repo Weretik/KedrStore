@@ -2,7 +2,7 @@
 {
     public static class MappingExtensions
     {
-        public static IQueryable<TDestination> ProjectToType<TDestination>(
+        public static IQueryable<TDestination> ProjectToDto<TDestination>(
             this IQueryable source,
             IConfigurationProvider configuration)
         {

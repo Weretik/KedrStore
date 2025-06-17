@@ -1,12 +1,17 @@
-﻿using Application.Common.Abstractions.Mapping;
-
-namespace Application.Common.Mapping
+﻿namespace Application.Common.Mapping
 {
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+        }
+        public MappingProfile(params Assembly[] assemblies)
+        {
+            foreach (var assembly in assemblies)
+            {
+                ApplyMappingsFromAssembly(assembly);
+            }
         }
 
         private void ApplyMappingsFromAssembly(Assembly assembly)
