@@ -2,3 +2,8 @@
 global using Infrastructure.Identity.Configuration;
 global using Infrastructure.Shared.Extensions;
 global using Presentation.Components;
+global using System.Net;
+global using System.Text.Json;
+global using Application.Common.Errors;
+global using Application.Common.Exceptions;
+global using Presentation.Middleware;

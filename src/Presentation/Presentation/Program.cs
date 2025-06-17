@@ -33,6 +33,8 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseStaticFiles();
 app.UseAntiforgery();
 
