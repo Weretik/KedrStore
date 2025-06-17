@@ -1,6 +1,6 @@
 ﻿namespace Application.Common.Results;
 
-public class AppResult
+public class AppResult : IApplicationResult
 {
     public bool IsSuccess { get; }
     public AppError? Error { get; }
