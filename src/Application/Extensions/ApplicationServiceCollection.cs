@@ -9,8 +9,10 @@ namespace Application.Extensions
             // Регистрация MediatR и поведений
             services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-                // Добавляем поведение для отправки доменных событий
+
+                // Добавляем Behaviors
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(DomainEventDispatcherBehavior<,>));
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             });
 
             // Регистрация обработчиков событий
@@ -28,15 +30,13 @@ namespace Application.Extensions
         {
             var handlerTypes = assembly.GetTypes()
                 .Where(t => t.GetInterfaces()
-                    .Any(i => i.IsGenericType &&
-                              i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>)))
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>)))
                 .ToList();
 
             foreach (var handlerType in handlerTypes)
             {
                 var handlerInterfaces = handlerType.GetInterfaces()
-                    .Where(i => i.IsGenericType &&
-                                i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>));
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>));
 
                 foreach (var handlerInterface in handlerInterfaces)
                 {
