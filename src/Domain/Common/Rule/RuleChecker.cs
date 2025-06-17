@@ -1,6 +1,4 @@
-using Domain.Errors;
-
-namespace Domain.Common;
+namespace Domain.Common.Rule;
 
 public static class RuleChecker
 {

@@ -1,6 +1,6 @@
-﻿namespace Domain.Specifications;
+﻿namespace Domain.Common.Specifications;
 
-public class AndSpecification<T>(
+public class OrSpecification<T>(
     ISpecification<T> left, ISpecification<T> right)
     : SpecificationBase<T>
 {
@@ -10,7 +10,7 @@ public class AndSpecification<T>(
         var rightExpr = right.ToExpression();
 
         var parameter = Expression.Parameter(typeof(T));
-        var body = Expression.AndAlso(
+        var body = Expression.OrElse(
             Expression.Invoke(leftExpr, parameter),
             Expression.Invoke(rightExpr, parameter));
 

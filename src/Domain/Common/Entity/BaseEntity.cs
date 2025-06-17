@@ -1,4 +1,4 @@
-﻿namespace Domain.Common;
+﻿namespace Domain.Common.Entity;
 
 public abstract class BaseEntity<TId> : IEntity<TId>, IHasDomainEvents
 {

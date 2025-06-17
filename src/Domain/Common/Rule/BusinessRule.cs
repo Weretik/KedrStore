@@ -1,4 +1,4 @@
-namespace Domain.Common;
+namespace Domain.Common.Rule;
 
 public abstract class BusinessRule : IBusinessRule
 {

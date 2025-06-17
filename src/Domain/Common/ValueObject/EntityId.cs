@@ -1,4 +1,4 @@
-﻿namespace Domain.Common;
+﻿namespace Domain.Common.ValueObject;
 
 public abstract class EntityId : ValueObject
 {

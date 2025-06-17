@@ -1,4 +1,4 @@
-﻿namespace Domain.Specifications;
+﻿namespace Domain.Common.Specifications;
 
 public sealed class NotSpecification<T>(
     ISpecification<T> specification)

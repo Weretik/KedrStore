@@ -1,4 +1,4 @@
-﻿namespace Domain.Specifications;
+﻿namespace Domain.Common.Specifications;
 
 public abstract class SpecificationBase<T> : ISpecification<T>
 {

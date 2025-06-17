@@ -1,4 +1,4 @@
-﻿namespace Domain.Abstractions;
+﻿namespace Domain.Common.Abstractions;
 
 public interface ISpecification<T>
 {
