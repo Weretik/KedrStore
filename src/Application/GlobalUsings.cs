@@ -26,4 +26,4 @@ global using System.Linq.Expressions;
 global using Application.Common.Abstractions.Mapping;
 global using Domain.Catalog.Specifications;
 global using Application.Common.Events;
-global using Domain.Extensions;
+global using Domain.Abstractions;

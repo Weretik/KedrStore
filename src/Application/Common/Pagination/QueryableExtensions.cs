@@ -69,4 +69,11 @@ public static class QueryableExtensions
 
         return (IQueryable<T>)genericMethod.Invoke(null, new object[] { query, lambda })!;
     }
+    public static IQueryable<T> ApplySpecification<T>(
+        this IQueryable<T> query,
+        ISpecification<T> specification)
+        where T : class
+    {
+        return query.Where(specification.ToExpression());
+    }
 }
