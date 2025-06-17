@@ -21,29 +21,40 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
             logger.LogWarning("⚠️ AppException in {RequestName}: {Code} | {Description}",
                 requestName, ex.Code, ex.Description);
 
-            // Обработка AppResult<T>
-            if (typeof(TResponse).IsGenericType &&
-                typeof(TResponse).GetGenericTypeDefinition() == typeof(AppResult<>))
-            {
-                var valueType = typeof(TResponse).GenericTypeArguments[0];
-                var method = typeof(AppResult<>)
-                    .MakeGenericType(valueType)
-                    .GetMethod(nameof(AppResult<object>.Failure))!;
-
-                return (TResponse)method.Invoke(null, new object[] {
-                    new AppError(ex.Code, ex.Description)
-                })!;
-            }
-
-            // Обработка AppResult (не типизированный)
-            if (typeof(TResponse) == typeof(AppResult))
-            {
-                return (TResponse)(object)AppResult.Failure(new AppError(ex.Code, ex.Description));
-            }
-
-            // Неизвестный тип
-            throw new InvalidOperationException(
-                $"❌ ExceptionHandlingBehavior does not support response type {typeof(TResponse).Name}");
+            return CreateFailureResult(ex.Code, ex.Description);
         }
+        catch (BusinessRuleValidationException ex)
+        {
+            var requestName = typeof(TRequest).Name;
+
+            logger.LogWarning("⚠️ BusinessRule broken in {RequestName}: {RuleType} | {Message}",
+                requestName, ex.Code, ex.Message);
+
+            return CreateFailureResult(ex.Code, ex.Message);
+        }
+    }
+
+    private static TResponse CreateFailureResult(string code, string message)
+    {
+        var error = new AppError(code, message);
+
+        if (typeof(TResponse).IsGenericType &&
+            typeof(TResponse).GetGenericTypeDefinition() == typeof(AppResult<>))
+        {
+            var valueType = typeof(TResponse).GenericTypeArguments[0];
+            var method = typeof(AppResult<>)
+                .MakeGenericType(valueType)
+                .GetMethod(nameof(AppResult<object>.Failure))!;
+
+            return (TResponse)method.Invoke(null, [error])!;
+        }
+
+        if (typeof(TResponse) == typeof(AppResult))
+        {
+            return (TResponse)(object)AppResult.Failure(error);
+        }
+
+        throw new InvalidOperationException(
+            $"❌ ExceptionHandlingBehavior does not support response type {typeof(TResponse).Name}");
     }
 }

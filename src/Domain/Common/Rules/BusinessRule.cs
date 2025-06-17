@@ -1,11 +1,10 @@
-namespace Domain.Common.Rule;
+﻿namespace Domain.Common.Rules;
 
 public abstract class BusinessRule : IBusinessRule
 {
-
     public abstract string Message { get; }
 
     public abstract bool IsBroken();
 
-    public bool IsValid() => !IsBroken();
+    public override string ToString() => $"{GetType().Name}: {Message}";
 }
