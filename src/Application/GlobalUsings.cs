@@ -32,3 +32,6 @@ global using Application.Common.Abstractions.Result;
 global using System.Diagnostics;
 global using Application.Interfaces;
 global using Microsoft.Extensions.Logging;
+global using Application.Common.Exceptions;
+global using System.Runtime.Serialization;
+global using Application.Common.Errors;
