@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Security;
+﻿namespace Infrastructure.Identity.Security;
 
 public class FakePermissionService : IPermissionService
 {
