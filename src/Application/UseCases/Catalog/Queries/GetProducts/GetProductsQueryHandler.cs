@@ -39,7 +39,7 @@ public class GetProductsQueryHandler(
         catch (Exception ex)
         {
             return AppResult<PagedResult<ProductDto>>.Failure(
-                AppError.Unexpected("Failed to retrieve products")
+                AppErrors.System.Unexpected("Failed to retrieve products")
                     .WithDetails(ex.Message));
         }
     }

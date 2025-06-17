@@ -15,7 +15,7 @@ public sealed class GetProductsByCategoryQueryHandler(
         if (!products.Any())
         {
             return AppResult.Failure<List<ProductDto>>(
-                AppError.NotFound("Product", request.CategoryId.Value.ToString()));
+                AppErrors.System.NotFound("Product", request.CategoryId.Value.ToString()));
         }
         var result = mapper.Map<List<ProductDto>>(products);
 

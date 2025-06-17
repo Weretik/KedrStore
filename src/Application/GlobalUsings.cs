@@ -27,3 +27,4 @@ global using Application.Common.Abstractions.Mapping;
 global using Domain.Catalog.Specifications;
 global using Application.Common.Events;
 global using Domain.Abstractions;
+global using FluentValidation;
