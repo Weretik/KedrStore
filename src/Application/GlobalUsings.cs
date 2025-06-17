@@ -28,3 +28,7 @@ global using Domain.Catalog.Specifications;
 global using Application.Common.Events;
 global using Domain.Abstractions;
 global using FluentValidation;
+global using Application.Common.Abstractions.Result;
+global using System.Diagnostics;
+global using Application.Interfaces;
+global using Microsoft.Extensions.Logging;
