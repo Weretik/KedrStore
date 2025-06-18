@@ -12,6 +12,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasConversion(
                 id => id.Value,
                 value => new CategoryId(value));
+                //.HasColumnName("CategoryId")
+                //.HasColumnType("int");
 
         builder.Property(x => x.Name)
             .HasMaxLength(100)

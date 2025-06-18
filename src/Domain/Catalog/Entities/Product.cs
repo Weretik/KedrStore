@@ -2,6 +2,7 @@ namespace Domain.Catalog.Entities;
 
 public class Product : BaseEntity<ProductId>, IAggregateRoot
 {
+    #region Properties
     public string Name { get; private set; } = null!;
     public string Manufacturer { get; private set; } = null!;
     public Money Price { get; private set; } = null!;
@@ -21,132 +22,105 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
         //public IReadOnlyList<ProductAttribute> Attributes => _attributes.AsReadOnly();
         //public IReadOnlyList<ProductImage> Images => _images.AsReadOnly();
     */
+    #endregion
+
+    #region Constructors
 
     private Product() { }
     private Product(ProductId id, string name, string manufacturer, Money price, CategoryId categoryId, string photo)
     {
-        Id = id;
-        Name = name;
-        Manufacturer = manufacturer;
-        Price = price;
-        CategoryId = categoryId;
-        Photo = photo;
+        SetProductId(id);
+        SetName(name);
+        SetManufacturer(manufacturer);
+        SetMoney(price);
+        SetCategoryId(categoryId);
+        SetPhoto(photo);
 
-        AddDomainEvent(new ProductCreatedEvent(id));
+        AddCreatedEvent();
     }
-    /*
-     * Возможно, стоит также добавить события для других важных изменений состояния продукта, например:
-     * ProductUpdatedEvent (при обновлении основных данных)
-     * ProductStockChangedEvent (при изменении количества)
-     */
-
-    private static void ValidateId(ProductId id)
-    {
-        if (id.Value <= 0)
-            throw new ArgumentException("ProductId must be greater than zero", nameof(id));
-        if (id == null)
-            throw new ArgumentNullException(nameof(id), "ProductId cannot be null");
-    }
-
-    private static void ValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required", nameof(name));
-    }
-
-    private static void ValidateManufacturer(string manufacturer)
-    {
-        if (string.IsNullOrWhiteSpace(manufacturer))
-            throw new ArgumentException("Manufacturer is required", nameof(manufacturer));
-    }
-
-    private static void ValidatePrice(Money price)
-    {
-        if (price == null)
-            throw new ArgumentNullException(nameof(price), "Price cannot be null");
-    }
-    private static void ValidateCategoryId(CategoryId categoryId)
-    {
-        if (categoryId.Value <= 0)
-            throw new ArgumentException("CategoryId must be greater than zero", nameof(categoryId));
-        if (categoryId == null)
-            throw new ArgumentNullException(nameof(categoryId), "CategoryId cannot be null");
-    }
-
-    private static void ValidatePhoto(string photo)
-    {
-        if (string.IsNullOrWhiteSpace(photo))
-            throw new ArgumentException("Photo is required", nameof(photo));
-    }
-
     public static Product Create(ProductId id, string name, string manufacturer, Money price,
         CategoryId categoryId, string photo)
     {
-        ValidateId(id);
-        ValidateName(name);
-        ValidateManufacturer(manufacturer);
-        ValidateCategoryId(categoryId);
-        ValidatePhoto(photo);
-
         return new Product(id, name, manufacturer, price, categoryId, photo);
     }
 
-    public void Update(
-        string name,
-        string manufacturer,
-        Money price,
-        CategoryId categoryId,
-        string photo)
+    #endregion
+
+    #region Validation & Setters
+
+    private void SetProductId(ProductId id)
     {
-        ValidateName(name);
-        ValidateManufacturer(manufacturer);
-        ValidateCategoryId(categoryId);
-        ValidatePhoto(photo);
-        ValidatePrice(price);
-
+        RuleChecker.Check(new IdMustNotBeNullRule(id));
+        Id = id;
+    }
+    private void SetName(string name)
+    {
+        RuleChecker.Check(new NameMustNotBeEmptyRule(name));
         Name = name;
+    }
+    private void SetManufacturer(string manufacturer)
+    {
+        RuleChecker.Check(new ManufacturerMustNotBeEmptyRule(manufacturer));
         Manufacturer = manufacturer;
+    }
+    private void SetMoney(Money price)
+    {
+        RuleChecker.Check(new MoneyMustNotBeNullRule(price));
         Price = price;
+    }
+    private void SetCategoryId(CategoryId categoryId)
+    {
+        RuleChecker.Check(new IdMustNotBeNullRule(categoryId));
         CategoryId = categoryId;
+    }
+    private void SetPhoto(string photo)
+    {
+        RuleChecker.Check(new PhotoMustNotBeEmptyRule(photo));
         Photo = photo;
+    }
 
-        MarkAsUpdated();
+    #endregion
+
+    #region Update
+    public void Update(string name, string manufacturer, Money price, CategoryId categoryId, string photo)
+    {
+        ChangeName(name);
+        ChangeManufacturer(manufacturer);
+        ChangeMoney(price);
+        ChangeCategory(categoryId);
+        ChangePhoto(photo);
     }
 
     public void ChangeName(string name)
     {
-        ValidateName(name);
-        Name = name;
+        SetName(name);
         MarkAsUpdated();
     }
 
     public void ChangeManufacturer(string manufacturer)
     {
-        ValidateManufacturer(manufacturer);
-        Manufacturer = manufacturer;
+        SetManufacturer(manufacturer);
         MarkAsUpdated();
     }
 
     public void ChangeMoney(Money price)
     {
-        ValidatePrice(price);
-        Price = price;
+        SetMoney(price);
         MarkAsUpdated();
     }
 
     public void ChangeCategory(CategoryId categoryId)
     {
-        ValidateCategoryId(categoryId);
-        CategoryId = categoryId;
+        SetCategoryId(categoryId);
         MarkAsUpdated();
     }
 
     public void ChangePhoto(string photo)
     {
-        ValidatePhoto(photo);
-        Photo = photo;
+        SetPhoto(photo);
         MarkAsUpdated();
     }
+
     /*
     public void UpdateStock(int quantity)
     {
@@ -155,8 +129,7 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
 
         StockQuantity = quantity;
     }
-    */
-    /*
+
     public void Activate() => IsActive = true;
     public void Deactivate() => IsActive = false;
 
@@ -171,5 +144,12 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
     }
     */
 
+    #endregion
+
+    #region Domain Events
+
+    private void AddCreatedEvent() => AddDomainEvent(new ProductCreatedEvent(Id));
+
+    #endregion
 }
 

@@ -1,4 +1,4 @@
 namespace Domain.Catalog.ValueObjects;
 
-public sealed record CategoryId(int Value);
-
+public sealed class CategoryId(int value)
+    : EntityId(value);

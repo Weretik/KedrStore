@@ -1,3 +1,4 @@
 ﻿namespace Domain.Catalog.ValueObjects;
 
-public sealed record ProductId(int Value);
+public sealed class ProductId(int value)
+    : EntityId(value);

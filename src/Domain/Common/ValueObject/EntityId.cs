@@ -6,11 +6,7 @@ public abstract class EntityId : ValueObject
 
     protected EntityId(int value)
     {
-        if (value <= 0)
-            RuleChecker.Check(
-                new IdMustBePositiveRule(value)
-            );
-
+        RuleChecker.Check (new IdMustBePositiveRule(value));
         Value = value;
     }
 
@@ -20,5 +16,5 @@ public abstract class EntityId : ValueObject
     }
 
     public override string ToString() => Value.ToString();
-    public static implicit operator int(EntityId id) => id.Value;
+    public static explicit operator int(EntityId id) => id.Value;
 }

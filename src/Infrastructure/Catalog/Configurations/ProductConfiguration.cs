@@ -12,6 +12,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(
                 id => id.Value,
                 value => new ProductId(value));
+                //.HasColumnName("ProductId")
+                //.HasColumnType("int");
 
         builder.Property(x => x.Name)
             .HasMaxLength(300)
@@ -39,9 +41,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(
                 id => id.Value,
                 value => new CategoryId(value))
-            //.HasColumnName("CategoryId")
-            //.HasColumnType("int")
-            .IsRequired();
+                //.HasColumnName("CategoryId")
+                //.HasColumnType("int")
+                .IsRequired();
 
         builder.Property(x => x.Photo)
             .HasMaxLength(1000)

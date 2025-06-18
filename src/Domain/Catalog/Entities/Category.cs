@@ -2,130 +2,121 @@
 
 public class Category : BaseEntity<CategoryId>, IAggregateRoot
 {
+    #region Properties
+
     public string Name { get; private set; } = null!;
     public CategoryId? ParentCategoryId { get; private set; }
     private readonly List<Category> _children = new();
     public IReadOnlyCollection<Category> Children => _children.AsReadOnly();
 
+    #endregion
+
+    #region Constructors
     private Category() { }
 
     private Category(CategoryId id, string name, CategoryId? parentCategoryId = null)
     {
-        Id = id;
-        Name = name;
-        ParentCategoryId = parentCategoryId;
+        SetId(id);
+        SetName(name);
+        SetParentCategoryId(parentCategoryId);
 
-        AddDomainEvent(new CategoryCreatedEvent(id));
-    }
-
-    private static void ValidateId(CategoryId id)
-    {
-        if (id == null)
-            throw new ArgumentNullException(nameof(id));
-        if (id.Value <= 0)
-            throw new ArgumentException("CategoryId must be greater than zero", nameof(id));
-    }
-
-    private static void ValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required", nameof(name));
-    }
-
-    private static void ValidateParentId(CategoryId? parentId)
-    {
-        if (parentId != null && parentId.Value <= 0)
-            throw new ArgumentException("Parent CategoryId must be greater than zero", nameof(parentId));
+        AddCreatedEvent();
     }
 
     public static Category Create(CategoryId id, string name, CategoryId? parentCategoryId = null)
     {
-        ValidateId(id);
-        ValidateName(name);
-        ValidateParentId(parentCategoryId);
-
         return new Category(id, name, parentCategoryId);
     }
 
+    #endregion
+
+    #region Validation & Setters
+
+    private void SetId(CategoryId id)
+    {
+        RuleChecker.Check(new IdMustNotBeNullRule(id));
+        Id = id;
+    }
+    private void SetName(string name)
+    {
+        RuleChecker.Check(new NameMustNotBeEmptyRule(name));
+        Name = name;
+    }
+    private void SetParentCategoryId(CategoryId? parentCategoryId)
+    {
+        ParentCategoryId = parentCategoryId;
+    }
+
+    #endregion
+
+    #region Update & Change Methods
+
     public void Update(string name, CategoryId? parentCategoryId = null)
     {
-        ValidateName(name);
-        ValidateParentId(parentCategoryId);
-
-        Name = name;
-        ParentCategoryId = parentCategoryId;
-        MarkAsUpdated();
-        //AddDomainEvent(new CategoryUpdatedEvent(Id));
+        ChangeName(name);
+        ChangeParent(parentCategoryId);
     }
 
     public void ChangeName(string name)
     {
-        ValidateName(name);
-        Name = name;
+        SetName(name);
         MarkAsUpdated();
-        //AddDomainEvent(new CategoryNameChangedEvent(Id, name));
     }
 
     public void ChangeParent(CategoryId? parentCategoryId)
     {
-        ValidateParentId(parentCategoryId);
-
-        // Проверка на циклическую зависимость
-        if (parentCategoryId != null && (parentCategoryId == Id || IsDescendantOf(parentCategoryId)))
+        if(parentCategoryId != null)
         {
-            throw new InvalidOperationException("Cannot set parent: would create circular reference");
+            RuleChecker.Check(new CannotAssignSelfOrDescendantAsParentRule(this, parentCategoryId));
         }
-
-        ParentCategoryId = parentCategoryId;
+        SetParentCategoryId(parentCategoryId);
         MarkAsUpdated();
-        //AddDomainEvent(new CategoryParentChangedEvent(Id, parentCategoryId));
     }
 
+    public bool IsDescendantOf(CategoryId targetAncestorId)
+    {
+        var current = this;
+        while (current.ParentCategoryId != null)
+        {
+            if (current.ParentCategoryId == targetAncestorId)
+                return true;
+
+            break;
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region Manipulations with child categories
     public void AddChild(Category child)
     {
-        if (child == null)
-            throw new ArgumentNullException(nameof(child));
-
-        if (child.Id == Id || IsDescendantOf(child.Id))
-        {
-            throw new InvalidOperationException("Cannot add child: would create circular reference");
-        }
+        RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
+        RuleChecker.Check(new CannotAddSelfOrAncestorAsChildRule(this, child));
 
         if (!_children.Contains(child))
         {
             _children.Add(child);
             child.ParentCategoryId = Id;
             MarkAsUpdated();
-            //AddDomainEvent(new CategoryChildAddedEvent(Id, child.Id));
         }
     }
 
     public void RemoveChild(Category child)
     {
-        if (child == null)
-            throw new ArgumentNullException(nameof(child));
+        RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
 
         if (_children.Remove(child))
         {
             child.ParentCategoryId = null;
             MarkAsUpdated();
-            //AddDomainEvent(new CategoryChildRemovedEvent(Id, child.Id));
         }
     }
+    #endregion
 
-    private bool IsDescendantOf(CategoryId potentialAncestorId)
-    {
-        var current = this;
-        while (current.ParentCategoryId != null)
-        {
-            if (current.ParentCategoryId == potentialAncestorId)
-                return true;
+    #region Domain Events
 
-            // Здесь предполагается, что есть способ получить родительскую категорию
-            // В реальном приложении это может быть через репозиторий или другим способом
-            // current = GetParentCategory(current.ParentCategoryId);
-            break;
-        }
-        return false;
-    }
+    private void AddCreatedEvent() => AddDomainEvent(new CategoryCreatedEvent(Id));
+
+    #endregion
 }
