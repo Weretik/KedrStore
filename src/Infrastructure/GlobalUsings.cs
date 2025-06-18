@@ -33,3 +33,5 @@ global using Application.Interfaces;
 global using Infrastructure.Identity.Security;
 global using System.Security.Claims;
 global using Application.Catalog.Interfaces;
+global using Application.Common.Errors;
+

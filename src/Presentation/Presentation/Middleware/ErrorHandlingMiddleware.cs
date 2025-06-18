@@ -22,7 +22,9 @@ public sealed class ErrorHandlingMiddleware(
         catch (Exception ex)
         {
             logger.LogError(ex, "🔥 Unhandled exception");
-            var error = AppErrors.System.Unexpected("Виникла критична помилка.");
+            var error = AppErrors.System.Unexpected
+                .WithDetails($"{ex.Message} | {ex.StackTrace} | {ex.InnerException?.Message}");
+
             await WriteErrorResponseAsync(
                 context,
                 error.Code,

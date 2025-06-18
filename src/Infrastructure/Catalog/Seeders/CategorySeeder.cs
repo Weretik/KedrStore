@@ -11,40 +11,52 @@ public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
 
         if (await dbContext.Categories.AnyAsync(cancellationToken))
         {
-            logger.LogInformation("Категории уже существуют — сидирование пропущено.");
+            logger.LogInformation("Категорії вже існують - category seeder пропущено.");
             return;
         }
 
         if (!File.Exists(xmlPath))
         {
             logger.LogError("XML-файл не знайдено: {Path}", xmlPath);
-            throw new FileNotFoundException($"XML-файл не знайдено: {xmlPath}");
+
+            Throw.Application(AppErrors.File.NotFound.WithDetails($"Шлях: {xmlPath}"));
         }
 
         var doc = XDocument.Load(xmlPath);
         if (doc.Root == null || !doc.Root.Elements("category").Any())
         {
             logger.LogError("XML-файл порожній або не містить елементів <category>.");
-            throw new InvalidDataException("XML-файл не містить елементів <category>.");
+
+            Throw.Application(AppErrors.Seeder.DataMissing
+                .WithDetails($"XML-файл {xmlPath} не містить елементів <category>."));
         }
 
-        var categories = doc.Root
-            .Elements("category")
-            .Select(c =>
-            {
-                var id = int.Parse(c.Element("id")?.Value ?? "0");
-                var name = c.Element("name")?.Value ?? string.Empty;
-                var parentRaw = c.Element("parent")?.Value;
-                var parentId = string.IsNullOrWhiteSpace(parentRaw) ? null : new CategoryId(int.Parse(parentRaw));
-                return new { Id = id, Name = name, ParentId = parentId };
-            })
-            .DistinctBy(c => c.Id)
-            .Select(c => Category.Create(new CategoryId(c.Id), c.Name, c.ParentId))
-            .ToList();
+        try
+        {
+            var categories = doc.Root
+                .Elements("category")
+                .Select(c =>
+                {
+                    var id = int.Parse(c.Element("id")?.Value ?? "0");
+                    var name = c.Element("name")?.Value ?? string.Empty;
+                    var parentRaw = c.Element("parent")?.Value;
+                    var parentId = string.IsNullOrWhiteSpace(parentRaw) ? null : new CategoryId(int.Parse(parentRaw));
+                    return new { Id = id, Name = name, ParentId = parentId };
+                })
+                .DistinctBy(c => c.Id)
+                .Select(c => Category.Create(new CategoryId(c.Id), c.Name, c.ParentId))
+                .ToList();
 
-        await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation($"Сидування категорій завершено: {categories.Count} записів.");
+            logger.LogInformation($"Сидування категорій завершено: Створено {categories.Count} записів.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Помилка при обробці XML-файлу: {Message}", ex.Message);
+            Throw.Application(AppErrors.Seeder.Failure
+                .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
+        }
     }
 }

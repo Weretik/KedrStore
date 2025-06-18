@@ -13,6 +13,26 @@ public static class AppErrorCodes
         public const string Unknown = "System.Unknown";
     }
 
+    public static class Seeder
+    {
+        public const string Failure = "Seeder.Failure";
+        public const string DataMissing = "Seeder.DataMissing";
+        public const string DbConnection = "Seeder.DbConnection";
+
+    }
+    public static class Database
+    {
+        public const string Unavailable = "Database.Unavailable";
+        public const string MigrationFailed = "Database.MigrationFailed";
+
+    }
+
+    public static class File
+    {
+        public const string WriteError = "File.WriteError";
+        public const string ReadError = "File.ReadError";
+        public const string NotFound = "File.NotFound";
+    }
     public static class Auth
     {
         public const string Unauthorized = "Auth.Unauthorized";
