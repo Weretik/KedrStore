@@ -11,7 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Errors\" />
       <Folder Include="Identity\" />
     </ItemGroup>
 
