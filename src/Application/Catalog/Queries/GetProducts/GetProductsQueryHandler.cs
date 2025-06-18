@@ -1,4 +1,4 @@
-namespace Application.UseCases.Catalog.Queries.GetProducts;
+namespace Application.Catalog.Queries.GetProducts;
 
 public class GetProductsQueryHandler(
     IProductRepository productRepository, IMapper mapper)

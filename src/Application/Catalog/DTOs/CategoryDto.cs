@@ -1,4 +1,4 @@
-namespace Application.UseCases.Catalog.DTOs;
+namespace Application.Catalog.DTOs;
 
 public class CategoryDto
 {

@@ -1,4 +1,4 @@
-﻿namespace Application.UseCases.Catalog.Interfaces
+﻿namespace Application.Catalog.Interfaces
 {
     public interface ICatalogUnitOfWork : IDisposable
     {

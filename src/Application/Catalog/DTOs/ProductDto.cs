@@ -1,7 +1,4 @@
-
-using Domain.Catalog.Entities;
-
-namespace Application.UseCases.Catalog.DTOs;
+namespace Application.Catalog.DTOs;
 
 public record ProductDto : IMapWith<Product>
 {

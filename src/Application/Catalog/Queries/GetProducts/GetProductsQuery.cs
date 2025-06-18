@@ -1,4 +1,4 @@
-namespace Application.UseCases.Catalog.Queries.GetProducts;
+namespace Application.Catalog.Queries.GetProducts;
 
 public sealed record GetProductsQuery : PagedQuery<AppResult<PagedResult<ProductDto>>>
 {

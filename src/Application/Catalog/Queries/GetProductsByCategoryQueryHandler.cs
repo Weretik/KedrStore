@@ -1,4 +1,4 @@
-namespace Application.UseCases.Catalog.Queries;
+namespace Application.Catalog.Queries;
 
 public sealed class GetProductsByCategoryQueryHandler(
     IProductRepository productRepository, IMapper mapper)
