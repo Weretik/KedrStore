@@ -1,7 +1,8 @@
 ﻿namespace Application.Common.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(
-    IEnumerable<IValidator<TRequest>> validators)
+    IEnumerable<IValidator<TRequest>> validators,
+    ILogger<ValidationBehavior<TRequest, TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -12,6 +13,8 @@ public class ValidationBehavior<TRequest, TResponse>(
     {
         if (!validators.Any())
             return await next(cancellationToken);
+
+        logger.LogInformation($"🧪 Валідація запиту {typeof(TRequest).Name}");
 
         var context = new ValidationContext<TRequest>(request);
         var validationResults = await Task.WhenAll(
@@ -29,6 +32,7 @@ public class ValidationBehavior<TRequest, TResponse>(
         var message = string.Join("; ", failures.Select(f => f.ErrorMessage));
         var details = string.Join("; ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
 
+        logger.LogWarning($"❌ Помилка валідації: {message}. + {details}");
 
         if (typeof(TResponse).IsGenericType &&
             typeof(TResponse).GetGenericTypeDefinition() == typeof(AppResult<>))

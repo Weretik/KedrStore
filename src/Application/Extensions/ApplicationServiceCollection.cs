@@ -27,6 +27,9 @@ namespace Application.Extensions
             // Регистрация AutoMapper с профилями из сборки приложения
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+            // Регистрация FluentValidation
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
             return services;
         }
         public static IServiceCollection AddDomainEventHandlers(this IServiceCollection services, Assembly assembly)
@@ -58,4 +61,3 @@ namespace Application.Extensions
         }
     }
 }
-
