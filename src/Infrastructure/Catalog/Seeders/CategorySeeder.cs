@@ -17,7 +17,7 @@ public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
 
         if (!File.Exists(xmlPath))
         {
-            logger.LogError("XML-файл не знайдено: {Path}", xmlPath);
+            logger.LogError("XML-файл не знайдено: {xmlPath}", xmlPath);
 
             Throw.Application(AppErrors.File.NotFound.WithDetails($"Шлях: {xmlPath}"));
         }

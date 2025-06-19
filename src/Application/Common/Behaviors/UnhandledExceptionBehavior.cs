@@ -18,8 +18,7 @@ public sealed class UnhandledExceptionBehavior<TRequest, TResponse>(ILogger<TReq
             var requestName = typeof(TRequest).Name;
 
             logger.LogCritical(ex,
-                "❌ Unhandled exception occurred in request: {RequestName}. Request: {@Request}",
-                requestName, request);
+                $"❌ Unhandled exception occurred in request: {requestName}. Request: {request}");
 
             throw;
         }

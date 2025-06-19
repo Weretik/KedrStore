@@ -1,5 +1,3 @@
-using Application.Common.Errors;
-
 namespace Infrastructure.Catalog.Seeders;
 
 public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
@@ -73,7 +71,7 @@ public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Помилка при обробці XML-файлу: {Message}", ex.Message);
+            logger.LogError(ex, $"Помилка при обробці XML-файлу: {ex.Message}");
             Throw.Application(AppErrors.Seeder.Failure
                 .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
         }

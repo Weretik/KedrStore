@@ -14,8 +14,7 @@ public class LoggingBehavior<TRequest, TResponse>(
         var userId = currentUser.UserId;
         var timer = Stopwatch.StartNew();
 
-        logger.LogInformation("➡️ {RequestName} started by User: {UserId} | Payload: {@Request}",
-            requestName, userId, request);
+        logger.LogInformation($"➡️ {requestName} started by User: {userId} | Payload: {request}");
 
         TResponse response;
 
@@ -27,8 +26,7 @@ public class LoggingBehavior<TRequest, TResponse>(
         {
             timer.Stop();
 
-            logger.LogError(ex, "❌ {RequestName} crashed [{Elapsed}ms] | User: {UserId}",
-                requestName, timer.ElapsedMilliseconds, userId);
+            logger.LogError(ex, $"❌ {requestName} crashed [{timer.ElapsedMilliseconds}ms] | User: {userId}");
 
             throw;
         }
@@ -39,19 +37,19 @@ public class LoggingBehavior<TRequest, TResponse>(
         {
             if (result.IsSuccess)
             {
-                logger.LogInformation("✅ {RequestName} succeeded [{Elapsed}ms] | User: {UserId} | Response: {@Response}",
-                    requestName, timer.ElapsedMilliseconds, userId, response);
+                logger.LogInformation($"✅ {requestName} succeeded [{timer.ElapsedMilliseconds}ms] | " +
+                                      $"User: {userId} | Response: {response}");
             }
             else
             {
-                logger.LogWarning("⚠️ {RequestName} failed [{Elapsed}ms] | User: {UserId} | Error: {Error}",
-                    requestName, timer.ElapsedMilliseconds, userId, result.Error?.ToString() ?? "Unknown error");
+                logger.LogWarning($"⚠️ {requestName} failed [{timer.ElapsedMilliseconds}ms] | User: {userId} | " +
+                                  $"Error: {result.Error?.ToString() ?? "Unknown error"}");
             }
         }
         else
         {
-            logger.LogInformation("✅ {RequestName} completed [{Elapsed}ms] | User: {UserId} | Response: {@Response}",
-                requestName, timer.ElapsedMilliseconds, userId, response);
+            logger.LogInformation($"✅ {requestName} completed [{timer.ElapsedMilliseconds}ms] | " +
+                                  $"User: {userId} | Response: {response}");
         }
 
         return response;

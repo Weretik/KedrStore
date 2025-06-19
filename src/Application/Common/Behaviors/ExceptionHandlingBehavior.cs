@@ -18,8 +18,7 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogWarning("⚠️ AppException in {RequestName}: {Code} | {Description}",
-                requestName, ex.Code, ex.Description);
+            logger.LogWarning($"⚠️ AppException in {requestName}: {ex.Code} | {ex.Description}");
 
             return CreateFailureResult(ex.Code, ex.Description);
         }
@@ -27,8 +26,7 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogWarning("⚠️ BusinessRule broken in {RequestName}: {RuleType} | {Message}",
-                requestName, ex.Code, ex.Message);
+            logger.LogWarning($"⚠️ BusinessRule broken in {requestName}: {ex.Code} | {ex.Message}");
 
             return CreateFailureResult(ex.Code, ex.Message);
         }
