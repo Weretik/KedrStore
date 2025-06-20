@@ -1,12 +1,14 @@
 namespace Application.Catalog.Queries.GetProducts;
 
 public class GetProductsQueryHandler(
-    IProductRepository productRepository, IMapper mapper)
+    IProductRepository productRepository, IMapper mapper, ILogger<GetProductsQueryHandler> logger)
     : IQueryHandler<GetProductsQuery, AppResult<PagedResult<ProductDto>>>
 {
     public async Task<AppResult<PagedResult<ProductDto>>> Handle(
         GetProductsQuery request, CancellationToken cancellationToken)
     {
+        logger.LogInformation($"📦 Запит товарів: {request}");
+
         var specification = new ProductFilterSpecification(
             searchTerm: request.SearchTerm,
             minPrice: request.MinPrice,
@@ -24,6 +26,8 @@ public class GetProductsQueryHandler(
             request.PageNumber,
             request.PageSize,
             cancellationToken);
+
+        logger.LogInformation($"✅ Знайдено {pagedResult.TotalCount} продуктів");
 
         return AppResult<PagedResult<ProductDto>>.Success(pagedResult);
     }
