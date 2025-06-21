@@ -1,6 +1,7 @@
 namespace Infrastructure.Catalog.Repositories;
 
-public class ProductRepository(CatalogDbContext context)
+public class ProductRepository(
+    ICatalogDbContext context, IDateTimeProvider clock)
     : IProductRepository
 {
     public IQueryable<Product> GetAllProductAsync()
@@ -48,7 +49,8 @@ public class ProductRepository(CatalogDbContext context)
                 product.Manufacturer,
                 product.Price,
                 product.CategoryId,
-                product.Photo
+                product.Photo,
+                clock.UtcToday
             );
         }
         else
@@ -66,7 +68,7 @@ public class ProductRepository(CatalogDbContext context)
 
         if (product != null)
         {
-            product.MarkAsDeleted();
+            product.MarkAsDeleted(clock.UtcToday);
         }
     }
 

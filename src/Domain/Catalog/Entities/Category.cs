@@ -14,18 +14,19 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
     #region Constructors
     private Category() { }
 
-    private Category(CategoryId id, string name, CategoryId? parentCategoryId = null)
+    private Category(CategoryId id, string name, DateTime createdDate, CategoryId? parentCategoryId = null)
     {
         SetId(id);
         SetName(name);
         SetParentCategoryId(parentCategoryId);
+        MarkAsCreated(createdDate);
 
         AddCreatedEvent();
     }
 
-    public static Category Create(CategoryId id, string name, CategoryId? parentCategoryId = null)
+    public static Category Create(CategoryId id, string name, DateTime createdDate, CategoryId? parentCategoryId = null)
     {
-        return new Category(id, name, parentCategoryId);
+        return new Category(id, name, createdDate, parentCategoryId);
     }
 
     #endregion
@@ -51,26 +52,26 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 
     #region Update & Change Methods
 
-    public void Update(string name, CategoryId? parentCategoryId = null)
+    public void Update(string name, DateTime updatedDate, CategoryId? parentCategoryId = null)
     {
-        ChangeName(name);
-        ChangeParent(parentCategoryId);
+        ChangeName(name, updatedDate);
+        ChangeParent(parentCategoryId, updatedDate);
     }
 
-    public void ChangeName(string name)
+    public void ChangeName(string name, DateTime updatedDate)
     {
         SetName(name);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
-    public void ChangeParent(CategoryId? parentCategoryId)
+    public void ChangeParent(CategoryId? parentCategoryId, DateTime updatedDate)
     {
         if(parentCategoryId != null)
         {
             RuleChecker.Check(new CannotAssignSelfOrDescendantAsParentRule(this, parentCategoryId));
         }
         SetParentCategoryId(parentCategoryId);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
     public bool IsDescendantOf(CategoryId targetAncestorId)
@@ -89,7 +90,7 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
     #endregion
 
     #region Manipulations with child categories
-    public void AddChild(Category child)
+    public void AddChild(Category child, DateTime updatedDate)
     {
         RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
         RuleChecker.Check(new CannotAddSelfOrAncestorAsChildRule(this, child));
@@ -98,18 +99,18 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
         {
             _children.Add(child);
             child.ParentCategoryId = Id;
-            MarkAsUpdated();
+            MarkAsUpdated(updatedDate);
         }
     }
 
-    public void RemoveChild(Category child)
+    public void RemoveChild(Category child, DateTime updatedDate)
     {
         RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
 
         if (_children.Remove(child))
         {
             child.ParentCategoryId = null;
-            MarkAsUpdated();
+            MarkAsUpdated(updatedDate);
         }
     }
     #endregion

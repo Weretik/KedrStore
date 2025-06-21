@@ -1,6 +1,8 @@
 namespace Infrastructure.Catalog.Repositories;
 
-public class CategoryRepository(CatalogDbContext context) : ICategoryRepository
+public class CategoryRepository(
+    ICatalogDbContext context, IDateTimeProvider clock)
+    : ICategoryRepository
 {
     public async Task<Category?> GetByIdAsync(CategoryId id, CancellationToken cancellationToken = default)
     {
@@ -59,6 +61,7 @@ public class CategoryRepository(CatalogDbContext context) : ICategoryRepository
         {
             existingCategory.Update(
                 category.Name,
+                clock.UtcToday,
                 category.ParentCategoryId);
         }
         else
@@ -76,7 +79,7 @@ public class CategoryRepository(CatalogDbContext context) : ICategoryRepository
 
         if (category != null)
         {
-            category.MarkAsDeleted();
+            category.MarkAsDeleted(clock.UtcToday);
         }
     }
 }

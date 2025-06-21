@@ -27,7 +27,8 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
     #region Constructors
 
     private Product() { }
-    private Product(ProductId id, string name, string manufacturer, Money price, CategoryId categoryId, string photo)
+    private Product(ProductId id, string name, string manufacturer, Money price, CategoryId categoryId,
+        string photo, DateTime createdDate)
     {
         SetProductId(id);
         SetName(name);
@@ -35,13 +36,14 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
         SetMoney(price);
         SetCategoryId(categoryId);
         SetPhoto(photo);
+        MarkAsCreated(createdDate);
 
         AddCreatedEvent();
     }
     public static Product Create(ProductId id, string name, string manufacturer, Money price,
-        CategoryId categoryId, string photo)
+        CategoryId categoryId, string photo, DateTime createdDate)
     {
-        return new Product(id, name, manufacturer, price, categoryId, photo);
+        return new Product(id, name, manufacturer, price, categoryId, photo, createdDate);
     }
 
     #endregion
@@ -82,43 +84,44 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
     #endregion
 
     #region Update
-    public void Update(string name, string manufacturer, Money price, CategoryId categoryId, string photo)
+    public void Update(string name, string manufacturer, Money price, CategoryId categoryId, string photo,
+        DateTime updatedDate)
     {
-        ChangeName(name);
-        ChangeManufacturer(manufacturer);
-        ChangeMoney(price);
-        ChangeCategory(categoryId);
-        ChangePhoto(photo);
+        ChangeName(name, updatedDate);
+        ChangeManufacturer(manufacturer, updatedDate);
+        ChangeMoney(price, updatedDate);
+        ChangeCategory(categoryId, updatedDate);
+        ChangePhoto(photo, updatedDate);
     }
 
-    public void ChangeName(string name)
+    public void ChangeName(string name, DateTime updatedDate)
     {
         SetName(name);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
-    public void ChangeManufacturer(string manufacturer)
+    public void ChangeManufacturer(string manufacturer, DateTime updatedDate)
     {
         SetManufacturer(manufacturer);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
-    public void ChangeMoney(Money price)
+    public void ChangeMoney(Money price, DateTime updatedDate)
     {
         SetMoney(price);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
-    public void ChangeCategory(CategoryId categoryId)
+    public void ChangeCategory(CategoryId categoryId, DateTime updatedDate)
     {
         SetCategoryId(categoryId);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
-    public void ChangePhoto(string photo)
+    public void ChangePhoto(string photo, DateTime updatedDate)
     {
         SetPhoto(photo);
-        MarkAsUpdated();
+        MarkAsUpdated(updatedDate);
     }
 
     /*
