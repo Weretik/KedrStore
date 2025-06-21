@@ -1,6 +1,8 @@
 namespace Infrastructure.Catalog.Seeders;
 
-public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
+public class CategorySeeder(
+    ILogger<CategorySeeder> logger, IDateTimeProvider clock)
+    : ICatalogSeeder
 {
     public async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
@@ -44,7 +46,7 @@ public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
                     return new { Id = id, Name = name, ParentId = parentId };
                 })
                 .DistinctBy(c => c.Id)
-                .Select(c => Category.Create(new CategoryId(c.Id), c.Name, c.ParentId))
+                .Select(c => Category.Create(new CategoryId(c.Id), c.Name, clock.UtcToday, c.ParentId))
                 .ToList();
 
             await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
@@ -54,7 +56,7 @@ public class CategorySeeder(ILogger<CategorySeeder> logger) : ICatalogSeeder
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Помилка при обробці XML-файлу: {Message}", ex.Message);
+            logger.LogError(ex, $"Помилка при обробці XML-файлу: {ex.Message}");
             Throw.Application(AppErrors.Seeder.Failure
                 .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
         }

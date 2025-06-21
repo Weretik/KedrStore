@@ -76,7 +76,7 @@ public static class AppErrorCodes
 
     public static class Service
     {
-        public const string ExternalServiceError = "Service.ExternalServiceError";
+        public const string ExternalServiceError = "Services.ExternalServiceError";
     }
 
     public static class Cache

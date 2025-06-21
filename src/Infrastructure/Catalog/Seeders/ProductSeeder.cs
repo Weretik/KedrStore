@@ -1,6 +1,8 @@
 namespace Infrastructure.Catalog.Seeders;
 
-public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
+public class ProductSeeder(
+    ILogger<ProductSeeder> logger, IDateTimeProvider clock)
+    : ICatalogSeeder
 {
     public async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
@@ -17,7 +19,7 @@ public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
 
         if (!File.Exists(xmlPath))
         {
-            logger.LogError("XML-файл не знайдено: {Path}", xmlPath);
+            logger.LogError($"XML-файл не знайдено: {xmlPath}");
 
             Throw.Application(AppErrors.File.NotFound.WithDetails($"XML-файл: {xmlPath}"));
         }
@@ -61,7 +63,8 @@ public class ProductSeeder(ILogger<ProductSeeder> logger) : ICatalogSeeder
                     p.Manufacturer,
                     p.Price,
                     new CategoryId(p.CategoryId),
-                    p.Photo))
+                    p.Photo,
+                    clock.UtcToday))
                 .ToList();
 
             await dbContext.Products.AddRangeAsync(products, cancellationToken);

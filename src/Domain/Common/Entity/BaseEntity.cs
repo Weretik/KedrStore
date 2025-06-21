@@ -3,7 +3,7 @@
 public abstract class BaseEntity<TId> : IEntity<TId>, IHasDomainEvents
 {
     public TId Id { get; protected set; } = default!;
-    public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; protected set; }
     public DateTime? UpdatedAt { get; protected set; }
     public bool IsDeleted { get; protected set; } = false;
 
@@ -25,11 +25,12 @@ public abstract class BaseEntity<TId> : IEntity<TId>, IHasDomainEvents
         _domainEvents.Clear();
     }
 
-    public void MarkAsUpdated() => UpdatedAt = DateTime.UtcNow;
-    public void MarkAsDeleted()
+    public void MarkAsCreated(DateTime now) => CreatedAt = now;
+    public void MarkAsUpdated(DateTime now) => UpdatedAt = now;
+    public void MarkAsDeleted(DateTime now)
     {
         IsDeleted = true;
-        MarkAsUpdated();
+        MarkAsUpdated(now);
     }
 
     public override bool Equals(object? obj)
