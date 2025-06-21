@@ -1,7 +1,7 @@
 ﻿namespace Application.Common.Behaviors;
 
 public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
-    ILogger<ExceptionHandlingBehavior<TRequest, TResponse>> logger)
+    ILoggingService loggingService)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -18,7 +18,7 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogWarning($"⚠️ AppException in {requestName}: {ex.Code} | {ex.Message}");
+            loggingService.LogAppException(requestName, ex.Code, ex.Message);
 
             return CreateFailureResult(ex.Code, ex.Message);
         }
@@ -26,7 +26,7 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogWarning($"⚠️ BusinessRule broken in {requestName}: {ex.Code} | {ex.Message}");
+            loggingService.LogBusinessRuleBroken(requestName, ex.Code, ex.Message);
 
             return CreateFailureResult(ex.Code, ex.Message);
         }

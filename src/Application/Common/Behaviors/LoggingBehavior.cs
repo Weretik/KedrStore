@@ -1,9 +1,11 @@
 ﻿namespace Application.Common.Behaviors;
 
 public class LoggingBehavior<TRequest, TResponse>(
-    ILogger<LoggingBehavior<TRequest, TResponse>> logger, ICurrentUserService currentUser)
+    ILoggingService loggingService,
+    ICurrentUserService currentUser,
+    IEnvironmentService environmentService)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IUseCase
+    where TRequest : IRequest<TResponse>, IUseCase
 {
     public async Task<TResponse> Handle(
         TRequest request,
@@ -14,7 +16,10 @@ public class LoggingBehavior<TRequest, TResponse>(
         var userId = currentUser.UserId;
         var timer = Stopwatch.StartNew();
 
-        logger.LogInformation($"➡️ {requestName} started by User: {userId} | Payload: {request}");
+        var safeRequest = GetSafeRequestForLogging(request);
+
+        loggingService.LogRequestStarted(requestName, userId,
+            environmentService.IsProduction() ? null : safeRequest);
 
         TResponse response;
 
@@ -25,9 +30,7 @@ public class LoggingBehavior<TRequest, TResponse>(
         catch (Exception ex)
         {
             timer.Stop();
-
-            logger.LogError(ex, $"❌ {requestName} crashed [{timer.ElapsedMilliseconds}ms] | User: {userId}");
-
+            loggingService.LogRequestFailed(requestName, timer.ElapsedMilliseconds, userId, ex);
             throw;
         }
 
@@ -36,23 +39,29 @@ public class LoggingBehavior<TRequest, TResponse>(
         if (response is IApplicationResult result)
         {
             if (result.IsSuccess)
-            {
-                logger.LogInformation($"✅ {requestName} succeeded [{timer.ElapsedMilliseconds}ms] | " +
-                                      $"User: {userId} | Response: {response}");
-            }
+                loggingService.LogRequestSucceeded(requestName, timer.ElapsedMilliseconds, userId, response);
             else
-            {
-                logger.LogWarning($"⚠️ {requestName} failed [{timer.ElapsedMilliseconds}ms] | User: {userId} | " +
-                                  $"Error: {result.Error?.ToString() ?? "Unknown error"}");
-            }
+                loggingService.LogBusinessRuleBroken(requestName, result.Error?.Code ?? "Unknown", result.Error?.Message ?? "Unknown error");
         }
         else
         {
-            logger.LogInformation($"✅ {requestName} completed [{timer.ElapsedMilliseconds}ms] | " +
-                                  $"User: {userId} | Response: {response}");
+            loggingService.LogRequestSucceeded(requestName, timer.ElapsedMilliseconds, userId, response);
         }
 
         return response;
     }
-}
 
+    private static object? GetSafeRequestForLogging(TRequest request)
+    {
+        if (request is ISafeLoggable safe)
+            return safe.ToSafeLog();
+
+        return IsSensitive(request) ? null : request;
+    }
+
+    private static bool IsSensitive(object request)
+    {
+        //TODO: Реализовать логику определения чувствительности запроса после реализации регистрации/авторизации
+        return false; // пока ничего не считаем чувствительным
+    }
+}

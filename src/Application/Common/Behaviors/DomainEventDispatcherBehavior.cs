@@ -1,6 +1,4 @@
-﻿using IHasDomainEvents = Application.Common.Abstractions.Events.IHasDomainEvents;
-
-namespace Application.Common.Behaviors
+﻿namespace Application.Common.Behaviors
 {
     public class DomainEventDispatcherBehavior<TRequest, TResponse>(
         IDomainEventDispatcher domainEventDispatcher,

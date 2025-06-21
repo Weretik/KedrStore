@@ -1,8 +1,9 @@
 ﻿namespace Application.Common.Behaviors;
 
-public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
+public class PerformanceBehavior<TRequest, TResponse>(
+    ILoggingService loggingService)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IUseCase
+    where TRequest : IRequest<TResponse>
 {
     // Порог в миллисекундах. Всё, что дольше — логгируем как медленное выполнение.
     private const int ThresholdMilliseconds = 500;
@@ -23,7 +24,7 @@ public class PerformanceBehavior<TRequest, TResponse>(ILogger<PerformanceBehavio
 
         if (elapsedMs > ThresholdMilliseconds)
         {
-            logger.LogWarning($"🐢 Long Running UseCase: {requestName} [{elapsedMs}ms] | Payload: {request}");
+            loggingService.LogPerformance(requestName, elapsedMs, request);
         }
 
         return response;

@@ -2,9 +2,9 @@
 
 public class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators,
-    ILogger<ValidationBehavior<TRequest, TResponse>> logger)
+    ILoggingService loggingService)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : IRequest<TResponse>, IUseCase
 {
     public async Task<TResponse> Handle(
         TRequest request,
@@ -14,7 +14,9 @@ public class ValidationBehavior<TRequest, TResponse>(
         if (!validators.Any())
             return await next(cancellationToken);
 
-        logger.LogInformation($"🧪 Валідація запиту {typeof(TRequest).Name}");
+        var requestName = typeof(TRequest).Name;
+
+        loggingService.LogValidationStarted(requestName);
 
         var context = new ValidationContext<TRequest>(request);
         var validationResults = await Task.WhenAll(
@@ -32,7 +34,7 @@ public class ValidationBehavior<TRequest, TResponse>(
         var message = string.Join("; ", failures.Select(f => f.ErrorMessage));
         var details = string.Join("; ", failures.Select(f => $"{f.PropertyName}: {f.ErrorMessage}"));
 
-        logger.LogWarning($"❌ Помилка валідації: {message}. + {details}");
+        loggingService.LogValidationFailed(requestName, message, details);
 
         if (typeof(TResponse).IsGenericType &&
             typeof(TResponse).GetGenericTypeDefinition() == typeof(AppResult<>))

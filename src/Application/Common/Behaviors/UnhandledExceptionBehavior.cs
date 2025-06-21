@@ -1,6 +1,7 @@
 ﻿namespace Application.Common.Behaviors;
 
-public sealed class UnhandledExceptionBehavior<TRequest, TResponse>(ILogger<TRequest> logger)
+public sealed class UnhandledExceptionBehavior<TRequest, TResponse>(
+    ILoggingService loggingService)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -16,9 +17,9 @@ public sealed class UnhandledExceptionBehavior<TRequest, TResponse>(ILogger<TReq
         catch (Exception ex)
         {
             var requestName = typeof(TRequest).Name;
+            var source = nameof(UnhandledExceptionBehavior<TRequest, TResponse>);
 
-            logger.LogCritical(ex,
-                $"❌ Unhandled exception occurred in request: {requestName}. Request: {request}");
+            loggingService.LogException(requestName, ex, source);
 
             throw;
         }
