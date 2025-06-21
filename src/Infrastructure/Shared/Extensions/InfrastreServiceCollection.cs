@@ -51,7 +51,9 @@ public static class InfrastreServiceCollection
         services.AddScoped<IPermissionService, FakePermissionService>();
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 
+        // Регистрация Services
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddScoped<IDomainEventContext, DomainEventContext>();
 
         return services;
     }

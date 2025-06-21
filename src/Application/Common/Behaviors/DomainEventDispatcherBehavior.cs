@@ -4,7 +4,7 @@ namespace Application.Common.Behaviors
 {
     public class DomainEventDispatcherBehavior<TRequest, TResponse>(
         IDomainEventDispatcher domainEventDispatcher,
-        DbContext dbContext)
+        IDomainEventContext eventContext)
         : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
@@ -17,22 +17,16 @@ namespace Application.Common.Behaviors
             var response = await next();
 
             // Получаем все сущности, которые могут иметь доменные события
-            var entitiesWithEvents = dbContext.ChangeTracker
-                .Entries<IHasDomainEvents>()
-                .Select(e => e.Entity)
-                .Where(e => e.DomainEvents.Any())
-                .ToList();
-
-            // Собираем все доменные события
-            var domainEvents = entitiesWithEvents
+            var domainEvents  = eventContext.GetDomainEntities()
                 .SelectMany(e => e.DomainEvents)
                 .ToList();
 
-            // Очищаем события у сущностей
-            entitiesWithEvents.ForEach(e => e.ClearDomainEvents());
-
             // Отправляем события на обработку
-            await domainEventDispatcher.DispatchAsync(domainEvents, cancellationToken);
+            foreach (var domainEvent in domainEvents)
+                await domainEventDispatcher.DispatchAsync(domainEvent, cancellationToken);
+
+            // Очищаем события у сущностей
+            eventContext.ClearDomainEvents();
 
             return response;
         }
