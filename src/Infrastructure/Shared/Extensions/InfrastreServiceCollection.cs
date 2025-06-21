@@ -47,9 +47,11 @@ public static class InfrastreServiceCollection
         services.AddScoped<ISeeder, ProductSeeder>();
         services.AddScoped<ICatalogSeeder, ProductSeeder>();
 
-        //Регистрация Fake Service
+        //Регистрация Fake Services
         services.AddScoped<IPermissionService, FakePermissionService>();
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
+
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

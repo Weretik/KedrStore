@@ -15,7 +15,6 @@
       <Folder Include="Catalog\Migrations\" />
       <Folder Include="Catalog\Repositories\" />
       <Folder Include="Shared\Configuration\" />
-      <Folder Include="Shared\Services\" />
     </ItemGroup>
 
     <ItemGroup>
