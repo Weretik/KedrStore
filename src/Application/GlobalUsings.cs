@@ -5,7 +5,6 @@ global using System.Reflection;
 global using System.Security.Claims;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using System.Text.RegularExpressions;
 global using System.Diagnostics;
 global using System.Linq.Expressions;
 
@@ -30,6 +29,7 @@ global using Application.Interfaces;
 global using Application.Catalog.DTOs;
 global using Application.Common.Exceptions;
 global using Application.Common.Errors;
+global using Application.DTOs;
 
 // Domain namespaces
 global using Domain.Catalog.Entities;
