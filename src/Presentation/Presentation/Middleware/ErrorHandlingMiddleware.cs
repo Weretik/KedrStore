@@ -12,7 +12,9 @@ public sealed class ErrorHandlingMiddleware(
         }
         catch (AppException ex)
         {
-            logger.LogWarning($"⚠️ AppException: {ex.Code} | {ex.Message}");
+            logger.LogWarning("⚠️ AppException | Code: {ErrorCode} | Message: {ErrorMessage}",
+                ex.Code, ex.Message);
+
             await WriteErrorResponseAsync(
                 context,
                 ex.Code,
@@ -21,7 +23,8 @@ public sealed class ErrorHandlingMiddleware(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "🔥 Unhandled exception");
+            logger.LogError(ex, "🔥 Unhandled exception during {RequestPath}", context.Request.Path);
+
             var error = AppErrors.System.Unexpected
                 .WithDetails($"{ex.Message} | {ex.StackTrace} | {ex.InnerException?.Message}");
 

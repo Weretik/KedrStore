@@ -73,3 +73,6 @@ dotnet_naming_style.constant_pascal_or_caps.capitalization = pascal_case
 
 # File Headers (optional for team style)
 file_header_template = Licensed to KedrStore Development Team under MIT License.
+
+# Require structured logging for ILogger (CA2254)
+dotnet_diagnostic.CA2254.severity = error

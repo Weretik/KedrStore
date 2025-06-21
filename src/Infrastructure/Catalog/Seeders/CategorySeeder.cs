@@ -52,11 +52,14 @@ public class CategorySeeder(
             await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation($"Сидування категорій завершено: Створено {categories.Count} записів.");
+            logger.LogInformation("Category seeding завершено: Створено {categoriesCount} записів.",
+                categories.Count);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"Помилка при обробці XML-файлу: {ex.Message}");
+            logger.LogError(ex, "Помилка при обробці XML-файлу: {XmlPath}",
+                xmlPath);
+
             Throw.Application(AppErrors.Seeder.Failure
                 .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
         }
