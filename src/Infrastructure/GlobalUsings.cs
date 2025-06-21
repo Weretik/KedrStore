@@ -15,6 +15,8 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.Options;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage;
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.Extensions.Hosting;
 
 // Infrastructure namespaces
 global using Infrastructure.Catalog;
@@ -44,4 +46,3 @@ global using Application.Common.Abstractions.Security;
 global using Application.Interfaces;
 global using Application.Catalog.Interfaces;
 global using Application.Common.Errors;
-

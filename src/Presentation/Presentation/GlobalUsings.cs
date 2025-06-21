@@ -7,3 +7,4 @@ global using System.Text.Json;
 global using Application.Common.Errors;
 global using Application.Common.Exceptions;
 global using Presentation.Middleware;
+global using Serilog;

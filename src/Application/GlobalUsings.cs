@@ -31,6 +31,7 @@ global using Application.Common.Errors;
 global using Application.Interfaces;
 global using Application.Catalog.DTOs;
 global using Application.DTOs;
+global using Application.Common.Abstractions.Logging;
 
 // Domain namespaces
 global using Domain.Catalog.Entities;
