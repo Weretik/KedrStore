@@ -11,6 +11,7 @@ public static class AppErrorCodes
         public const string Persistence = "System.Persistence";
         public const string RateLimitExceeded = "System.RateLimitExceeded";
         public const string Unknown = "System.Unknown";
+        public const string UnsupportedResponseType = "System.UnsupportedResponseType";
     }
 
     public static class Seeder

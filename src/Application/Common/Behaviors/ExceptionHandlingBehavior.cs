@@ -18,9 +18,9 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogWarning($"⚠️ AppException in {requestName}: {ex.Code} | {ex.Description}");
+            logger.LogWarning($"⚠️ AppException in {requestName}: {ex.Code} | {ex.Message}");
 
-            return CreateFailureResult(ex.Code, ex.Description);
+            return CreateFailureResult(ex.Code, ex.Message);
         }
         catch (BusinessRuleValidationException ex)
         {
@@ -52,7 +52,7 @@ public sealed class ExceptionHandlingBehavior<TRequest, TResponse>(
             return (TResponse)(object)AppResult.Failure(error);
         }
 
-        throw new InvalidOperationException(
-            $"❌ ExceptionHandlingBehavior does not support response type {typeof(TResponse).Name}");
+        Throw.Application(AppErrors.System.UnsupportedResponseType.WithDetails(typeof(TResponse).Name));
+        return default!;
     }
 }

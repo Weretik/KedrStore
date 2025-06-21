@@ -9,7 +9,7 @@ public static class Throw
 
     public static void Application(AppError error, string details)
     {
-        throw new AppException(error.Code, $"{error.Description} | {details}");
+        throw new AppException(error.Code, $"{error.Message} | {details}");
     }
 
     public static void Application(AppError error, Exception inner)
@@ -19,8 +19,6 @@ public static class Throw
 
     private static string BuildMessage(AppError error)
     {
-        return error.Details is not null
-            ? $"{error.Description} | {error.Details}"
-            : error.Description;
+        return error.Details is not null ? $"{error.Message} | {error.Details}" : error.Message;
     }
 }

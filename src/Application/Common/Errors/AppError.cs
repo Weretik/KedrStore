@@ -1,6 +1,6 @@
 ﻿namespace Application.Common.Errors;
 
-public sealed record AppError(string Code, string Description)
+public sealed record AppError(string Code, string Message)
 {
     public string? Details { get; private init; }
 
@@ -8,6 +8,6 @@ public sealed record AppError(string Code, string Description)
         this with { Details = details };
 
     public override string ToString() =>
-        $"{Code}: {Description}" + (Details is not null ? $" | Details: {Details}" : string.Empty);
+        $"{Code}: {Message}" + (Details is not null ? $" | Details: {Details}" : string.Empty);
 
 }

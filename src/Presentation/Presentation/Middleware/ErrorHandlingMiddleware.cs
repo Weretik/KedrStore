@@ -12,11 +12,11 @@ public sealed class ErrorHandlingMiddleware(
         }
         catch (AppException ex)
         {
-            logger.LogWarning("⚠️ AppException: {Code} | {Description}", ex.Code, ex.Description);
+            logger.LogWarning($"⚠️ AppException: {ex.Code} | {ex.Message}");
             await WriteErrorResponseAsync(
                 context,
                 ex.Code,
-                ex.Description,
+                ex.Message,
                 HttpStatusCode.BadRequest);
         }
         catch (Exception ex)
@@ -28,7 +28,7 @@ public sealed class ErrorHandlingMiddleware(
             await WriteErrorResponseAsync(
                 context,
                 error.Code,
-                error.Description,
+                error.Message,
                 HttpStatusCode.InternalServerError
             );
         }

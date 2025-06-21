@@ -31,6 +31,10 @@ public static class AppErrors
         public static AppError Unknown =>
             new AppError(AppErrorCodes.System.Unknown,
                     AppErrorDescriptions.System.Unknown);
+
+        public static AppError UnsupportedResponseType =>
+            new(AppErrorCodes.System.UnsupportedResponseType,
+                AppErrorDescriptions.System.UnsupportedResponseType);
     }
     public static class Seeder
     {

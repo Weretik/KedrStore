@@ -11,6 +11,7 @@ public static class AppErrorDescriptions
         public const string Unknown = "Невідома системна помилка.";
         public const string Validation = "Помилка валідації даних.";
         public const string Conflict = "Конфлікт даних або стану системи.";
+        public const string UnsupportedResponseType = "ExceptionHandlingBehavior не підтримує тип відповіді.";
     }
 
     public static class Seeder

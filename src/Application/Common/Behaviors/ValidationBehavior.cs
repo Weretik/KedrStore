@@ -43,6 +43,14 @@ public class ValidationBehavior<TRequest, TResponse>(
             return (TResponse)result;
         }
 
-        throw new ValidationException(failures);
+        if (typeof(TResponse) == typeof(AppResult))
+        {
+            var error = AppErrors.System.Validation(message).WithDetails(details);
+            return (TResponse)(object)AppResult.Failure(error);
+        }
+
+        //throw new ValidationException(failures);
+        Throw.Application(AppErrors.System.UnsupportedResponseType.WithDetails(typeof(TResponse).Name));
+        return default!;
     }
 }
