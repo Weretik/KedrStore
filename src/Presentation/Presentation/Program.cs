@@ -1,5 +1,13 @@
 var builder = WebApplication.CreateBuilder(args);
 
+// Настройка Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 // Razor-компоненты
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
@@ -13,6 +21,7 @@ builder.Services.Configure<AdminUserConfig>(
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
+
 
 var app = builder.Build();
 
