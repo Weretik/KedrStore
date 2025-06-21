@@ -52,8 +52,10 @@ public static class InfrastreServiceCollection
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 
         // Регистрация Services
+        services.AddSingleton<IEnvironmentService, EnvironmentService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IDomainEventContext, DomainEventContext>();
+        services.AddScoped<ILoggingService, LoggingService>();
 
         return services;
     }
