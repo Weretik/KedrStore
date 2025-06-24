@@ -24,4 +24,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.13" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\assets\buttons\" />
+      <Folder Include="wwwroot\assets\icons\" />
+      <Folder Include="wwwroot\assets\images\" />
+    </ItemGroup>
+
 </Project>
