@@ -84,4 +84,9 @@ public static class AppErrorDescriptions
         public const string Miss = "Кеш не містить потрібного значення.";
         public const string InvalidationFailed = "Не вдалося записати в кеш.";
     }
+
+    public static class State
+    {
+        public const string NotRegistered = "Запитуваний стан інтерфейсу не зареєстровано в StateContainer.";
+    }
 }

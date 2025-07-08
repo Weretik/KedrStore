@@ -25,14 +25,12 @@ global using Infrastructure.Catalog.Seeders;
 global using Infrastructure.Identity;
 global using Infrastructure.Identity.Entities;
 global using Infrastructure.Identity.Seeders;
-global using Infrastructure.Shared.Services;
 global using Infrastructure.Identity.Configuration;
 global using Infrastructure.Identity.Utils;
 global using Infrastructure.Identity.Security;
 global using Infrastructure.Identity.Interfaces;
 global using Infrastructure.Catalog.Persistence;
 global using Infrastructure.Catalog.Interfaces;
-global using Infrastructure.Shared.Abstractions;
 
 // Domain namespaces
 global using Domain.Catalog.Entities;

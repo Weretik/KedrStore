@@ -1,19 +1,46 @@
-﻿@using System.Net.Http
+﻿<!-- System -->
+@using System.Net.Http
 @using System.Net.Http.Json
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
 
+<!-- Microsoft -->
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 
+<!-- Presentation -->
 @using Presentation
 @using Presentation.Client
 @using Presentation.Client.Layout
 @using Presentation.Components
+
+<!-- Presentation.Shared -->
+@using Presentation.Components.Shared
+
+<!-- Layout -->
 @using Presentation.Components.Layout
+
+<!-- HomePage -->
 @using Presentation.Components.Pages.Home
+@using Presentation.Components.Layout.Header
+@using Presentation.Components.Layout.Footer
+
+<!-- HomePage -->
+@using Presentation.Components.Pages.Home.Parts
+
+<!-- CatalogPage -->
 @using Presentation.Components.Pages.Сatalog
-@using Presentation.Components.Layout.Parts
-@using Presentation.Components.Pages.Сatalog.Parts
+@using Presentation.Components.Pages.Сatalog.Category
+@using Presentation.Components.Pages.Сatalog.FilterParameters
+@using Presentation.Components.Pages.Сatalog.Filters
+@using Presentation.Components.Pages.Сatalog.ProductHeader
+@using Presentation.Components.Pages.Сatalog.Paginations
+@using Presentation.Components.Pages.Сatalog.ProductCart
+
+<!-- Common -->
+@using Presentation.Shared.Common
+
+<!-- inject -->
+@inject StateContainer State

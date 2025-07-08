@@ -12,12 +12,14 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Scrutor" Version="6.1.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <ProjectReference Include="..\..\..\Presentation.Shared\Presentation.Shared.csproj" />
         <ProjectReference Include="..\..\Application\Application.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
@@ -28,6 +30,14 @@
       <Folder Include="wwwroot\assets\buttons\" />
       <Folder Include="wwwroot\assets\icons\" />
       <Folder Include="wwwroot\assets\images\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterColors.razor" />
+      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterDelivery.razor" />
+      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterLocation.razor" />
+      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterPrice.razor" />
+      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterSize.razor" />
     </ItemGroup>
 
 </Project>

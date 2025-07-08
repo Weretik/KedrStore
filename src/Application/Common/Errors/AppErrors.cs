@@ -59,6 +59,7 @@ public static class AppErrors
         public static AppError MigrationFailed =>
             new(AppErrorCodes.Database.MigrationFailed,
                 AppErrorDescriptions.Database.MigrationFailed);
+
     }
     public static class File
     {
@@ -178,5 +179,12 @@ public static class AppErrors
                 AppErrorDescriptions.Cache.InvalidationFailed);
     }
 
+    public static class State
+    {
+        public static AppError NotRegistered<T>() =>
+            new(
+                AppErrorCodes.State.NotRegistered,
+                $"{AppErrorDescriptions.State.NotRegistered} Type: {typeof(T).Name}");
+    }
 }
 

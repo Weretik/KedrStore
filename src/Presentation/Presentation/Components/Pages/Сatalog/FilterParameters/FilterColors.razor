@@ -1,0 +1,33 @@
+﻿<div class="mb-6 py-10 px-12 bg-gray-50">
+    <h3 class="mb-8 text-2xl font-bold font-heading">FiltersColors</h3>
+    <div class="flex flex-wrap">
+        <button x-on:click="color = 1" class="mr-4 mb-2 rounded-full border border-blue-300 p-1" :class="{ 'border-blue-300': color==1, 'border-transparent hover:border-gray-300': color!=1 }">
+            <div class="rounded-full bg-blue-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 2" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==2, 'border-transparent hover:border-gray-300': color!=2 }">
+            <div class="rounded-full bg-orange-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 3" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==3, 'border-transparent hover:border-gray-300': color!=3 }">
+            <div class="rounded-full bg-gray-900 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 4" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==4, 'border-transparent hover:border-gray-300': color!=4 }">
+            <div class="rounded-full bg-red-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 5" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==5, 'border-transparent hover:border-gray-300': color!=5 }">
+            <div class="rounded-full bg-green-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 6" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==6, 'border-transparent hover:border-gray-300': color!=6 }">
+            <div class="rounded-full bg-pink-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 7" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==7, 'border-transparent hover:border-gray-300': color!=7 }">
+            <div class="rounded-full bg-yellow-300 w-5 h-5"></div>
+        </button>
+        <button x-on:click="color = 8" class="mr-4 mb-2 rounded-full border border-transparent hover:border-gray-300 p-1" :class="{ 'border-blue-300': color==8, 'border-transparent hover:border-gray-300': color!=8 }">
+            <div class="rounded-full bg-gray-100 w-5 h-5"></div>
+        </button>
+    </div>
+</div>
+
+@code {
+
+}

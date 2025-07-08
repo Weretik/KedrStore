@@ -84,4 +84,9 @@ public static class AppErrorCodes
         public const string Miss = "Cache.Miss";
         public const string InvalidationFailed = "Cache.WriteFailed";
     }
+
+    public static class State
+    {
+        public const string NotRegistered = "State.NotRegistered";
+    }
 }

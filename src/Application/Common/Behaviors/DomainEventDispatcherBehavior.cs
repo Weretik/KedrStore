@@ -12,7 +12,7 @@
             CancellationToken cancellationToken)
         {
             // Обработка запроса
-            var response = await next();
+            var response = await next(cancellationToken);
 
             // Получаем все сущности, которые могут иметь доменные события
             var domainEvents  = eventContext.GetDomainEntities()

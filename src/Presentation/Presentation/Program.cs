@@ -1,3 +1,5 @@
+using Infrastructure.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Настройка Serilog
@@ -16,6 +18,15 @@ builder.Services.AddRazorComponents()
 // Конфигурация AdminUser
 builder.Services.Configure<AdminUserConfig>(
     builder.Configuration.GetSection("Identity:AdminUser"));
+
+// DI: States
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<SharedAssemblyMarker>()
+    .AddClasses(c => c.AssignableTo<IState>())
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+// DI: State Container
+builder.Services.AddScoped<StateContainer>();
 
 // DI: Application + Infrastructure
 builder.Services

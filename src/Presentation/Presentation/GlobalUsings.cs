@@ -1,10 +1,14 @@
-﻿global using Application.Extensions;
-global using Infrastructure.Identity.Configuration;
-global using Infrastructure.Shared.Extensions;
-global using Presentation.Components;
-global using System.Net;
+﻿global using System.Net;
 global using System.Text.Json;
+
+global using Serilog;
+
+global using Infrastructure.Identity.Configuration;
+global using Application.Extensions;
 global using Application.Common.Errors;
 global using Application.Common.Exceptions;
+
+global using Presentation.Components;
 global using Presentation.Middleware;
-global using Serilog;
+global using Presentation.Shared;
+global using Presentation.Shared.Common;

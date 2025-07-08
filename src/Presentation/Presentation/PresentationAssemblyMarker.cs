@@ -1,6 +1,3 @@
 ﻿namespace Presentation;
 
-public sealed class PresentationAssemblyMarker
-{
-    
-}
+public sealed class PresentationAssemblyMarker { }
