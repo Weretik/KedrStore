@@ -14,4 +14,8 @@ public static class ValidationErrorMapper
             .GroupBy(pair => pair[0].Trim(), pair => pair[1].Trim())
             .ToDictionary(g => g.Key, g => g.ToArray());
     }
+    public static string Flatten(this Dictionary<string, string[]> errors)
+    {
+        return string.Join("; ", errors.Select(kvp => $"{kvp.Key}: {string.Join(", ", kvp.Value)}"));
+    }
 }
