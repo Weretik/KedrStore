@@ -1,12 +1,16 @@
-﻿<div class="flex flex-wrap -mx-4 mb-20 items-center justify-between">
+﻿@using FluentValidation.TestHelper
+@rendermode InteractiveWebAssembly
+@inject NavigationManager Nav
+
+<div class="flex flex-wrap -mx-4 mb-20 items-center justify-between">
     <div class="w-full lg:w-auto px-4 mb-12 xl:mb-0">
 
         <h2 class="text-5xl font-bold font-heading">
-            <span>Found 125 results for</span>
+            <span>Знайдено 125 результатів в</span>
 
             <a class="relative underline text-green-100"
-               href="/catalog">
-                Sports
+               href="/catalog/hardware">
+                @Text
             </a>
 
         </h2>
@@ -32,3 +36,18 @@
 
     </div>
 </div>
+
+@code{
+    private string? Text { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var uri = Nav.Uri;
+
+        if(uri.Contains("/catalog/doors"))
+            Text = "Двері";
+        if(uri.Contains("/catalog/hardware"))
+            Text = "Фурнітура";
+
+    }
+}

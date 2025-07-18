@@ -27,6 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Components\Pages\Сatalog\ProductHeader\" />
       <Folder Include="wwwroot\assets\buttons\" />
       <Folder Include="wwwroot\assets\icons\" />
       <Folder Include="wwwroot\assets\images\" />
