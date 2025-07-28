@@ -251,11 +251,13 @@ artifacts/
 secrets.json
 appsettings.*.local.json
 appsettings.Development.json
+local.settings.json
+ApplicationInsights.config
+
+# Файлы окружения (.env)
 *.env
 .env.*
 !.env.example
-local.settings.json
-ApplicationInsights.config
 
 ##########################
 # 💻 Blazor и SPA
@@ -359,3 +361,4 @@ Desktop.ini
 # Локальные файлы истории
 .history/
 .ionide/
+

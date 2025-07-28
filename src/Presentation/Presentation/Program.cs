@@ -2,6 +2,9 @@ using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//.env конфигурации
+Env.Load();
+
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -37,7 +40,7 @@ builder.Services
 var app = builder.Build();
 
 // Seeders — вызываем централизованно
-await app.UseAppSeeders(); //  или UseCatalogSeeders или UseIdentitySeeders
+await app.UseAppSeeders();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

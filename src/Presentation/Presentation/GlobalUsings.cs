@@ -2,6 +2,7 @@
 global using System.Text.Json;
 
 global using Serilog;
+global using DotNetEnv;
 
 global using Infrastructure.Identity.Configuration;
 global using Application.Extensions;
