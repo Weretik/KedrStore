@@ -2,8 +2,12 @@ using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//.env конфигурации
+// Загружаем .env локально
 Env.Load();
+// Конфигурация: переменные окружения → appsettings.json
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
