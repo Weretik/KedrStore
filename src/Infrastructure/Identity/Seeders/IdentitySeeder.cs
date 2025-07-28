@@ -26,7 +26,8 @@ public class IdentitySeeder(
             return;
         }
 
-        var password = _adminConfig.DefaultPassword ?? SecurityUtils.GenerateSecurePassword();
+        var password = Environment.GetEnvironmentVariable("ADMIN_DEFAULT_PASSWORD")
+                       ?? SecurityUtils.GenerateSecurePassword();
 
         var user = new AppUser
         {

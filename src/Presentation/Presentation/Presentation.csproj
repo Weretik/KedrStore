@@ -19,11 +19,11 @@
         <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-        <ProjectReference Include="..\..\..\Presentation.Shared\Presentation.Shared.csproj" />
         <ProjectReference Include="..\..\Application\Application.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.13" />
+        <ProjectReference Include="..\Presentation.Shared\Presentation.Shared\Presentation.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

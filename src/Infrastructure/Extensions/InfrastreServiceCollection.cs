@@ -1,15 +1,14 @@
-﻿using Infrastructure.Common.Abstractions;
-using Infrastructure.Common.Services;
-
-namespace Infrastructure.Extensions;
+﻿namespace Infrastructure.Extensions;
 
 public static class InfrastreServiceCollection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Подключение Catalog БД
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
         services.AddDbContext<CatalogDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<ICatalogDbContext>(provider =>
             provider.GetRequiredService<CatalogDbContext>());
@@ -18,7 +17,7 @@ public static class InfrastreServiceCollection
 
         // Подключение Identity БД
         services.AddDbContext<AppIdentityDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         // Регистрация Identity
         services.AddIdentity<AppUser, AppRole>(options =>

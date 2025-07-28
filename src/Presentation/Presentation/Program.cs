@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Загружаем .env локально
 Env.Load();
+
 // Конфигурация: переменные окружения → appsettings.json
 builder.Configuration
     .AddEnvironmentVariables()
