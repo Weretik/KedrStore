@@ -12,6 +12,22 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# JSON файлы
+[*.json]
+indent_size = 2
+
+# HTML файлы
+[*.html]
+indent_size = 2
+
+# Razor (.razor) files
+[*.razor]
+indent_size = 2
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2
+
 # C# files
 [*.cs]
 # Qualification preferences
