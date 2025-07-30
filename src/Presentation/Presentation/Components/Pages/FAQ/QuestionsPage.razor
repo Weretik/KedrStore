@@ -3,173 +3,173 @@
 
 <section class="py-20 bg-gray-100" x-data="{ showContent: false }">
 
-    <div class="container mx-auto px-4">
+  <div class="container mx-auto px-4">
 
-        <h2 class="mb-16 text-4xl font-bold font-heading">Питання та відповіді</h2>
+    <h2 class="mb-16 text-4xl font-bold font-heading">Питання та відповіді</h2>
 
-        <ul class="space-y-4">
+    <ul class="space-y-4">
 
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-                <div class="border-l-2 border-blue-300">
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+        <div class="border-l-2 border-blue-300">
 
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
 
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            Sed eget accumsan ipsum. Praesent dignissim?
-                        </span>
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              Sed eget accumsan ipsum. Praesent dignissim?
+            </span>
 
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
 
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
 
-                </div>
-            </li>
+        </div>
+      </li>
 
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
 
-                <div class="border-l-2 border-blue-300">
+        <div class="border-l-2 border-blue-300">
 
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
 
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            After curabitur eu laoreet libero eget en vel odio?
-                        </span>
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              After curabitur eu laoreet libero eget en vel odio?
+            </span>
 
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
 
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
 
-                </div>
-            </li>
+        </div>
+      </li>
 
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
 
-                <div class="border-l-2 border-blue-300">
+        <div class="border-l-2 border-blue-300">
 
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
 
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            A eget euismod dignissim, felis tortor mollis eros, non ultricies turpis eget leo?
-                        </span>
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              A eget euismod dignissim, felis tortor mollis eros, non ultricies turpis eget leo?
+            </span>
 
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
 
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
 
-                </div>
-            </li>
+        </div>
+      </li>
 
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
 
-                <div class="border-l-2 border-blue-300">
+        <div class="border-l-2 border-blue-300">
 
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            Curabitur elementum eu metus ut consequat?
-                        </span>
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              Curabitur elementum eu metus ut consequat?
+            </span>
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
 
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
-                </div>
-
-            </li>
-
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-                <div class="border-l-2 border-blue-300">
-
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            Sed eget accumsan ipsum. Praesent dignissim?
-                        </span>
-
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
-
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
-                </div>
-            </li>
-
-            <li class="pr-8 md:pr-12 py-6 bg-gray-50" :class="{ 'hidden': !showContent}" x-data="{ accordion: false }">
-                <div class="border-l-2 border-blue-300">
-
-                    <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-                        <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-                            Sed eget accumsan ipsum. Praesent dignissim?
-                        </span>
-                        <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-                            <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-                            </svg>
-                        </span>
-                    </button>
-
-                    <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-                        <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat.
-                            Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh,
-                            quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-                        </p>
-                    </div>
-                </div>
-            </li>
-        </ul>
-
-        <div class="mt-20 text-center">
-            <a
-                x-on:click.prevent="showContent = true"
-                :class="{'hidden': showContent}"
-                class="inline-block bg-blue-300 hover:bg-blue-400 text-white font-bold font-heading py-5 px-8 rounded-md uppercase hidden"
-                href="#">
-                More
-            </a>
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
         </div>
 
+      </li>
+
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+        <div class="border-l-2 border-blue-300">
+
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              Sed eget accumsan ipsum. Praesent dignissim?
+            </span>
+
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
+
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
+        </div>
+      </li>
+
+      <li class="pr-8 md:pr-12 py-6 bg-gray-50" :class="{ 'hidden': !showContent}" x-data="{ accordion: false }">
+        <div class="border-l-2 border-blue-300">
+
+          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
+              Sed eget accumsan ipsum. Praesent dignissim?
+            </span>
+            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
+              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
+              </svg>
+            </span>
+          </button>
+
+          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
+            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat.
+              Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh,
+              quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
+            </p>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="mt-20 text-center">
+      <a
+        x-on:click.prevent="showContent = true"
+        :class="{'hidden': showContent}"
+        class="inline-block bg-blue-300 hover:bg-blue-400 text-white font-bold font-heading py-5 px-8 rounded-md uppercase hidden"
+        href="#">
+        More
+      </a>
     </div>
+
+  </div>
 </section>
 
 <CallToAction></CallToAction>
