@@ -2,8 +2,12 @@ using Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Загружаем .env локально
-Env.Load();
+// Подгружаем .env ТОЛЬКО если локальная разработка
+if (builder.Environment.IsDevelopment())
+{
+    Env.TraversePath().Load();
+    Console.WriteLine("[.env] Загружен локально");
+}
 
 // Конфигурация: переменные окружения → appsettings.json
 builder.Configuration
@@ -12,9 +16,9 @@ builder.Configuration
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .CreateLogger();
+                        .ReadFrom.Configuration(builder.Configuration)
+                        .Enrich.FromLogContext()
+                        .CreateLogger();
 
 builder.Host.UseSerilog();
 

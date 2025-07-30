@@ -1,0 +1,29 @@
+﻿# Исходники IDE и временные файлы
+**/[Oo]bj/
+**/[Bb]in/
+**/.git/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.userosscache
+**/*.dbmdl
+**/*.jfm
+
+# Node.js / фронт
+**/node_modules/
+**/dist/
+
+# Docker контекст
+.dockerignore
+docker-compose*
+
+# Логи
+**/logs/
+**/*.log
+
+# Секреты и локальные настройки
+.env
+**/.env
+**/secrets.json
+**/appsettings.*.local.json

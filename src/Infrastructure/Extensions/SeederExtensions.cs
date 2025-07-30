@@ -1,5 +1,3 @@
-using Infrastructure.Common.Abstractions;
-
 namespace Infrastructure.Extensions;
 
 public static class SeederExtensions

@@ -1,0 +1,77 @@
+﻿services:
+    db:
+        image: postgres:16
+        container_name: kedr_db
+        restart: always
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - "5432:5432"
+        volumes:
+            - kedrstore_dbdata:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    migrate:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: build
+        container_name: kedr_migrate
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        entrypoint: [ "/bin/bash", "-c", "./migrate-and-seed.sh" ]
+        restart: "no"
+
+    seq:
+        image: datalust/seq:latest
+        container_name: kedr_seq
+        restart: always
+        environment:
+            ACCEPT_EULA: "Y"
+            SEQ_FIRSTRUN_ADMINPASSWORD: "${POSTGRES_PASSWORD}"
+        ports:
+            - "5341:80"
+        volumes:
+            - seq_data:/data
+        healthcheck:
+            test: [ "CMD-SHELL", "pidof seqserver || exit 1" ]
+            interval: 15s
+            timeout: 10s
+            retries: 15
+
+    webapp:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: final
+        container_name: kedr_webapp
+        ports:
+            - "8080:80"
+        environment:
+            ASPNETCORE_URLS: "http://+:80"
+            ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+            CONNECTION_STRING: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+            ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
+            SERILOG__WRITE_TO__1__NAME: Seq
+            SERILOG__WRITE_TO__1__ARGS__serverUrl: "http://seq:5341"
+        depends_on:
+            db:
+                condition: service_healthy
+            migrate:
+                condition: service_completed_successfully
+        restart: always
+
+volumes:
+    kedrstore_dbdata:
+    seq_data:
