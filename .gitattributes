@@ -1,0 +1,36 @@
+﻿# Нормализуем окончания строк для всех текстовых файлов
+* text=auto
+
+# Явно указываем LF для файлов кода
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+
+# Razor и Blazor компоненты
+*.razor text eol=lf
+
+# Конфиги и JSON
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+
+# Shell и скрипты
+*.sh text eol=lf
+*.ps1 text eol=crlf
+
+# Игнорируем бинарники и картинки - Git не будет пытаться нормализовать их
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.dll binary
+*.exe binary
+*.so binary
+*.zip binary
+*.tar binary
