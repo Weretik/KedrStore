@@ -11,8 +11,8 @@ if (builder.Environment.IsDevelopment())
 
 // Конфигурация: переменные окружения → appsettings.json
 builder.Configuration
-    .AddEnvironmentVariables()
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()

@@ -39,13 +39,14 @@
     restart: always
     environment:
       ACCEPT_EULA: "Y"
-      SEQ_FIRSTRUN_ADMINPASSWORD: "${POSTGRES_PASSWORD}"
+      SEQ_FIRSTRUN_ADMINPASSWORD: "${SEQ_PASSWORD:-seqadmin}"
     ports:
       - "5341:80"
+      - "5342:5341"
     volumes:
       - seq_data:/data
     healthcheck:
-      test: [ "CMD-SHELL", "pidof seqserver || exit 1" ]
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1" ]
       interval: 15s
       timeout: 10s
       retries: 15
@@ -60,8 +61,12 @@
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       CONNECTION_STRING: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
-      SERILOG__WRITE_TO__1__NAME: Seq
-      SERILOG__WRITE_TO__1__ARGS__serverUrl: "http://seq:5341"
+      SERILOG__USING__0: Serilog.Sinks.Console
+      SERILOG__USING__1: Serilog.Sinks.Seq
+      SERILOG__MINIMUMLEVEL__DEFAULT: Information
+      SERILOG__WRITETO__0__NAME: Console
+      SERILOG__WRITETO__1__NAME: Seq
+      SERILOG__WRITETO__1__ARGS__SERVERURL: "http://seq:80"
     depends_on:
       db:
         condition: service_healthy
