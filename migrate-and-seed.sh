@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
+echo "⏳ Starting migrations..."
+# Устанавливаем утилиты
+apt-get update && apt-get install -y postgresql-client
 
-echo "⏳ Waiting for database to be healthy..."
-# Ждём пока Postgres станет готов
-until pg_isready -h db -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
-  echo "Waiting for postgres..."
-  sleep 2
-done
-
-echo "📦 Restoring EF Core tools..."
-dotnet tool restore
+# Устанавливаем EF Tools
+dotnet tool install --global dotnet-ef --version 8.*
+export PATH="$PATH:/root/.dotnet/tools"
 
 echo "📐 Running EF Core migrations..."
 

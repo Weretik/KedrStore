@@ -16,9 +16,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get update && apt-get install -y nodejs postgresql-client
 
 # Устан. dotnet-ef
-RUN dotnet tool install --global dotnet-ef --version 8.* \
-    --add-source https://api.nuget.org/v3/index.json
-ENV PATH="$PATH:/root/.dotnet/tools"
+# RUN dotnet tool install --global dotnet-ef --version 8.* \
+#     --add-source https://api.nuget.org/v3/index.json
+# ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Кэш и restore .NET
 COPY KedrStore.sln ./
