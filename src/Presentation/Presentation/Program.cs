@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 if (builder.Environment.IsDevelopment())
 {
     Env.TraversePath().Load();
-    Console.WriteLine("[.env] Загружен локально");
 }
 
 // Конфигурация: переменные окружения → appsettings.json
@@ -37,6 +36,7 @@ builder.Services.Scan(scan => scan
     .AddClasses(c => c.AssignableTo<IState>())
     .AsImplementedInterfaces()
     .WithScopedLifetime());
+
 // DI: State Container
 builder.Services.AddScoped<StateContainer>();
 
@@ -45,9 +45,13 @@ builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
 
+// HealthChecks – регистрация
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+// Migrations
+await app.UseAppMigrations();
 // Seeders — вызываем централизованно
 await app.UseAppSeeders();
 
@@ -77,5 +81,8 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
+
+// HealthChecks endpoint
+app.MapHealthChecks("/health");
 
 app.Run();

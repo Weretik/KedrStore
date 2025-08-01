@@ -23,7 +23,12 @@ public sealed class ErrorHandlingMiddleware(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "🔥 Unhandled exception during {RequestPath}", context.Request.Path);
+            logger.LogError(ex, "🔥 Unhandled exception during {RequestPath}\n" +
+                                "Message: {Message}\nStackTrace: {StackTrace}\nInner: {Inner}",
+                context.Request.Path,
+                ex.Message,
+                ex.StackTrace,
+                ex.InnerException?.Message);
 
             var error = AppErrors.System.Unexpected
                 .WithDetails($"{ex.Message} | {ex.StackTrace} | {ex.InnerException?.Message}");

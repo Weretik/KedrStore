@@ -33,6 +33,9 @@ global using Infrastructure.Catalog.Persistence;
 global using Infrastructure.Catalog.Interfaces;
 global using Infrastructure.Common.Abstractions;
 global using Infrastructure.Common.Services;
+global using Infrastructure.Catalog.Migrations;
+global using Infrastructure.Identity.Migrations;
+
 // Domain namespaces
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;

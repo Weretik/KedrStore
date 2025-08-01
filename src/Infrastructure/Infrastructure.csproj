@@ -13,7 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Migrations\" />
       <Folder Include="Catalog\Repositories\" />
       <Folder Include="Common\Configuration\" />
     </ItemGroup>

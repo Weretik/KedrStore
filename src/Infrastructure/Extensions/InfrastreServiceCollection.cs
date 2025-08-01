@@ -31,6 +31,14 @@ public static class InfrastreServiceCollection
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
+        // Регистрация миграторов каталога и идентификации
+        services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
+        services.AddScoped<ICatalogDbMigrator, CatalogDbMigrator>();
+
+        // Регистрация миграторов идентификации
+        services.AddScoped<IDatabaseMigrator, AppIdentityDbMigrator>();
+        services.AddScoped<IAppIdentityDbMigrator, AppIdentityDbMigrator>();
+
         // Регистрация Сервисов и Репозиториев
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
