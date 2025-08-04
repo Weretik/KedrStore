@@ -1,5 +1,3 @@
-using Infrastructure.Extensions;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Подгружаем .env ТОЛЬКО если локальная разработка
@@ -18,8 +16,6 @@ Log.Logger = new LoggerConfiguration()
                         .ReadFrom.Configuration(builder.Configuration)
                         .Enrich.FromLogContext()
                         .CreateLogger();
-
-builder.Host.UseSerilog();
 
 // Razor-компоненты
 builder.Services.AddRazorComponents()
@@ -45,8 +41,10 @@ builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
 
-// HealthChecks – регистрация
+// Services
 builder.Services.AddHealthChecks();
+builder.Host.UseSerilog();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 

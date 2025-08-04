@@ -16,5 +16,9 @@
       <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Catalog\" />
+    </ItemGroup>
+
 
 </Project>

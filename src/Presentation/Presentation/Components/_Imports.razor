@@ -10,16 +10,18 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 
+<!-- MudBlazor -->
+@using MudBlazor
+
 <!-- Presentation -->
 @using Presentation
 @using Presentation.Client
 @using Presentation.Client.Layout
-@using Presentation.Client.Catalog
 @using Presentation.Components
 
 
 <!-- Presentation.Shared -->
-@using Presentation.Components.Shared
+@using Presentation.Components.Shared.Widgets
 
 <!-- Layout -->
 @using Presentation.Components.Layout
@@ -30,15 +32,11 @@
 @using Presentation.Components.Layout.Footer
 
 <!-- HomePage -->
-@using Presentation.Components.Pages.Home.Parts
+@using Presentation.Components.Pages.Home.Components.Sections
 
-<!-- HardwarePage -->
-@using Presentation.Components.Pages.Сatalog
-@using Presentation.Components.Pages.Сatalog.Category
-@using Presentation.Components.Pages.Сatalog.FilterParameters
-@using Presentation.Components.Pages.Сatalog.Filters
-@using Presentation.Components.Pages.Сatalog.Paginations
-@using Presentation.Components.Pages.Сatalog.ProductCart
+<!-- CatalogPages -->
+@using Presentation.Components.Pages.Сatalog.Components.Sections
+@using Presentation.Components.Pages.Сatalog.Components.Partials
 
 <!-- Common -->
 @using Presentation.Shared.Common

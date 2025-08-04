@@ -12,6 +12,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="MudBlazor" Version="8.10.0" />
         <PackageReference Include="Scrutor" Version="6.1.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
@@ -28,18 +29,58 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\Pages\Сatalog\ProductHeader\" />
+      <Folder Include="Components\Pages\About us\Components\" />
+      <Folder Include="Components\Pages\Contacts\Components\" />
+      <Folder Include="Components\Pages\FAQ\Components\" />
+      <Folder Include="Components\Pages\Home\Components\Forms\" />
+      <Folder Include="Components\Pages\Home\Components\Modals\" />
+      <Folder Include="Components\Pages\Home\Components\Partials\" />
       <Folder Include="wwwroot\assets\buttons\" />
       <Folder Include="wwwroot\assets\icons\" />
       <Folder Include="wwwroot\assets\images\" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterColors.razor" />
-      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterDelivery.razor" />
-      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterLocation.razor" />
-      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterPrice.razor" />
-      <AdditionalFiles Include="Components\Pages\Сatalog\FilterParameters\FilterSize.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Footer.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterContacts.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterCopyright.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterInformation.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterServices.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterSocial.razor" />
+      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterSubscription.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Header.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderLogo.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderMainNavigation.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderSearchBar.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderTopBar.razor" />
+      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderUserActions.razor" />
+      <AdditionalFiles Include="Components\Pages\Home\Components\Sections\Brending.razor" />
+      <AdditionalFiles Include="Components\Pages\Home\Components\Sections\Placeholders.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Filters\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Filters\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Paginations\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Header.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderLogo.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderMainNavigation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderSearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderTopBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderUserActions.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Header.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Partials\HeaderLogo.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Partials\HeaderMainNavigation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Partials\HeaderSearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Partials\HeaderTopBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Header\Partials\HeaderUserActions.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Footer.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterContacts.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterCopyright.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterInformation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterServices.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterSocial.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterSubscription.razor" />
     </ItemGroup>
 
 </Project>
