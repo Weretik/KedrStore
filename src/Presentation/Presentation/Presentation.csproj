@@ -30,32 +30,18 @@
 
     <ItemGroup>
       <Folder Include="Components\Pages\About us\Components\" />
+      <Folder Include="Components\Pages\About us\Pages\" />
       <Folder Include="Components\Pages\Contacts\Components\" />
+      <Folder Include="Components\Pages\Contacts\Pages\" />
       <Folder Include="Components\Pages\FAQ\Components\" />
-      <Folder Include="Components\Pages\Home\Components\Forms\" />
-      <Folder Include="Components\Pages\Home\Components\Modals\" />
-      <Folder Include="Components\Pages\Home\Components\Partials\" />
+      <Folder Include="Components\Pages\FAQ\Pages\" />
       <Folder Include="wwwroot\assets\buttons\" />
       <Folder Include="wwwroot\assets\icons\" />
       <Folder Include="wwwroot\assets\images\" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Layout\Footer\Footer.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterContacts.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterCopyright.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterInformation.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterServices.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterSocial.razor" />
-      <AdditionalFiles Include="Components\Layout\Footer\Partials\FooterSubscription.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Header.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderLogo.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderMainNavigation.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderSearchBar.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderTopBar.razor" />
-      <AdditionalFiles Include="Components\Layout\Header\Partials\HeaderUserActions.razor" />
-      <AdditionalFiles Include="Components\Pages\Home\Components\Sections\Brending.razor" />
-      <AdditionalFiles Include="Components\Pages\Home\Components\Sections\Placeholders.razor" />
+      <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,6 +67,46 @@
       <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterServices.razor" />
       <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterSocial.razor" />
       <_ContentIncludedByDefault Remove="Components\Shared\Footer\Partials\FooterSubscription.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Footer.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterContacts.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterCopyright.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterInformation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterServices.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterSocial.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterSubscription.razor" />
+      <_ContentIncludedByDefault Remove="Components\Layout\MainLayout.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterColors.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterDelivery.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterLocation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterPrice.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterSize.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterColors.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterDelivery.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterLocation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterPrice.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterSize.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Sections\ProductHeader.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Sections\ProductList.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Home\Sections\Brending.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Home\Sections\Placeholders.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Footer.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterContacts.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterCopyright.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterInformation.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterServices.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSocial.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSubscription.razor" />
     </ItemGroup>
 
 </Project>

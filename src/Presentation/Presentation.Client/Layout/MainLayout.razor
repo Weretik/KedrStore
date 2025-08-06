@@ -1,0 +1,41 @@
+﻿@inherits LayoutComponentBase
+
+
+@* Required *@
+<MudThemeProvider Theme="@KedrTheme.Themetheme" IsDarkMode="false"/>
+<MudPopoverProvider />
+@* Needed for dialogs *@
+<MudDialogProvider/>
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<MudLayout>
+
+
+  <Header></Header>
+  <!--
+  <MudDrawer @bind-Open="@_drawerOpen">
+    Test
+  </MudDrawer>
+  -->
+  <MudMainContent >
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+      <HeaderSearchBar></HeaderSearchBar>
+      @Body
+    </MudContainer>
+  </MudMainContent>
+
+  <BurgerMenu></BurgerMenu>
+
+  <Footer></Footer>
+
+</MudLayout>
+
+@code {
+  bool _drawerOpen = true;
+
+  void DrawerToggle()
+  {
+    _drawerOpen = !_drawerOpen;
+  }
+}

@@ -1,0 +1,43 @@
+﻿
+<div class="d-flex align-items-center justify-between">
+
+  <div class="d-flex">
+    <MudTextField Style="width: 30vw;"
+      @bind-Value="Search"
+      Label="Пошук"
+      Variant="Variant.Outlined"
+      Adornment="Adornment.End"
+      AdornmentIcon="@Icons.Material.Filled.Search"
+      AdornmentColor="Color.Success"/>
+  </div>
+
+  <div class="ml-4 d-flex">
+    <MudFab Class="mx-2 my-2"
+      Color="Color.Secondary"
+      StartIcon="@Icons.Custom.Brands.Instagram"
+      Size="Size.Small"
+      Href="https://www.instagram.com/kedr.class/"
+      Target="_blank"/>
+    <MudFab Class="mx-2 my-2"
+      Color="Color.Secondary"
+      StartIcon="@Icons.Custom.Brands.YouTube"
+      Size="Size.Small"
+      Href="https://www.youtube.com/channel/UCMzipw3fGj8I8HgQXiPoTWQ"
+      Target="_blank"/>
+    <MudFab Class="mx-2 my-2"
+      Color="Color.Secondary"
+      StartIcon="@Icons.Custom.Brands.Telegram"
+      Size="Size.Small"
+      Href="https://web.telegram.org/k/#197393163"
+      Target="_blank"/>
+  </div>
+
+</div>
+<div class="d-flex">
+
+
+
+</div>
+@code {
+  public string Search { get; set; }
+}

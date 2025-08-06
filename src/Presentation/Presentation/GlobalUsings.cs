@@ -16,6 +16,6 @@ global using Presentation.Components;
 global using Presentation.Middleware;
 global using Presentation.Shared;
 global using Presentation.Shared.Common;
-
+global using Presentation.Shared.Theme;
 
 

@@ -1,3 +1,5 @@
+using Presentation.Client;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Подгружаем .env ТОЛЬКО если локальная разработка
@@ -77,8 +79,8 @@ app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
+    //.AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
 
 // HealthChecks endpoint
 app.MapHealthChecks("/health");

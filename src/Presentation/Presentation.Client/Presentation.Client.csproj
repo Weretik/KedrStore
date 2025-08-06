@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.13"/>
+        <PackageReference Include="MudBlazor" Version="8.10.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,7 +18,38 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\" />
+      <None Include="Layout\MainLayout.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Components\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Footer\Footer.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterContacts.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterCopyright.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterInformation.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterServices.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterSocial.razor" />
+      <AdditionalFiles Include="Components\Footer\Partials\FooterSubscription.razor" />
+      <AdditionalFiles Include="Components\Header\Header.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderLogo.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderMainNavigation.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderSearchBar.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderTopBar.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderUserActions.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\Category.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\FilterColors.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\FilterDelivery.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\FilterLocation.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\FilterPrice.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\FilterSize.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\Pagination.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\ProductFilter.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Partials\ProductFilterMobile.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Sections\ProductHeader.razor" />
+      <AdditionalFiles Include="Components\Сatalog\Sections\ProductList.razor" />
     </ItemGroup>
 
 
