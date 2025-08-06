@@ -1,98 +1,40 @@
 ﻿<MudAppBar Elevation="4" class="py-4">
 
   <div class="d-flex flex-grow-1 align-items-center justify-between">
-
     <HeaderLogo></HeaderLogo>
-
-    <div class="mt-5">
-
-      <MudMenu Label="Каталог" Class="mx-1"
-               EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
-               Color="Color.Tertiary"
-               Variant="Variant.Filled">
-        <MudMenuItem Href="/catalog/hardware" Label="Фурнітура"/>
-        <MudMenuItem Href="/catalog/hardware_sale" Label="Фурнітура, вигідна ціна"/>
-        <MudMenuItem Href="/catalog/doors" Label="Двері"/>
-        <MudMenuItem Href="/catalog/doors_sale" Label="Двері, вигідна ціна"/>
-      </MudMenu>
-
-      <MudMenu Label="Про нас" Class="mx-1"
-               EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
-               Color="Color.Tertiary"
-               Variant="Variant.Filled">
-        <MudMenuItem Href="/about_us" Label="Про компанію"/>
-        <MudMenuItem Href="/contacts" Label="Контакти"/>
-        <MudMenuItem Href="#"  Label="Доставка та оплата"/>
-        <MudMenuItem Href="#"  Label="Повернення товару"/>
-        <MudMenuItem Href="#"  Label="Статті"/>
-      </MudMenu>
-
-
-      <MudButton Style="width: 120px;" Class="mx-1"
-                 Color="Color.Tertiary"
-                 Variant="Variant.Filled"
-                 Href="/faq">
-          FAQ
-        </MudButton>
-
-    </div>
-
-    <div Class="d-flex justify-space-around flex-wrap">
-      <MudIconButton Class="mx-2 my-4"
-                     Icon="@Icons.Material.Filled.Favorite"
-                     Size="Size.Large"
-                     Color="Color.Inherit"
-                     Variant="Variant.Outlined"/>
-
-      <MudBadge  Class="mx-2 my-4"
-                 Color="Color.Primary"
-                 Content="5" Overlap="true">
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart"
-                       Size="Size.Large"
-                       Color="Color.Inherit"
-                       Variant="Variant.Outlined"/>
-      </MudBadge>
-
-      <MudMenu Class="mx-2 my-4"
-               Icon="@Icons.Material.Filled.Person"
-               Size="Size.Large"
-               Color="Color.Inherit"
-               Variant="Variant.Outlined"
-               Dense="true"
-
-               AriaLabel="Open user menu">
-        <MudMenuItem Label="Профіль"/>
-        <MudMenuItem Label="Мій аккаунт"/>
-        <MudMenuItem Label="Вихід"/>
-      </MudMenu>
-    </div>
-
+    <HeaderMainNavigation></HeaderMainNavigation>
+    <HeaderUserActions></HeaderUserActions>
   </div>
 
 </MudAppBar>
 
-<section class="relative bg-gray-50">
+<MudDrawer @bind-Open="@BurgerMenu.IsOpen" Width="380px" Overlay="true" Elevation="1" Variant="@DrawerVariant.Temporary">
 
+  <MudDrawerHeader class="d-flex align-items-center justify-between">
+    <HeaderLogo></HeaderLogo>
+    <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close" @onclick="@BurgerMenu.Toggle"/>
+  </MudDrawerHeader>
 
+  <MudNavMenu>
+    <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
+    <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
+    <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
+  </MudNavMenu>
 
-
-  <nav class="relative flex flex-wrap">
-
-    <div class="flex justify-between w-full bg-gray-500 removed">
-
-      <div class="px-12 py-8 flex w-full items-center">
-
-        <HeaderMainNavigation></HeaderMainNavigation>
-      </div>
-
-      <HeaderUserActions></HeaderUserActions>
-
-    </div>
-  </nav>
-
-</section>
+</MudDrawer>
 
 @code {
-    public string Search { get; set; }
+  private BurgerMenuState BurgerMenu => State.Get<BurgerMenuState>();
+
+  protected override void OnInitialized()
+  {
+    BurgerMenu.OnChange += StateHasChanged;
+  }
+
+  public void Dispose()
+  {
+    BurgerMenu.OnChange -= StateHasChanged;
+  }
+}
 
 }
