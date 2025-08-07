@@ -31,6 +31,11 @@ public static class InfrastreServiceCollection
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
+        services.Configure<SecurityStampValidatorOptions>(options =>
+        {
+            options.ValidationInterval = TimeSpan.FromMinutes(30);
+        });
+
         // Регистрация миграторов каталога и идентификации
         services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
         services.AddScoped<ICatalogDbMigrator, CatalogDbMigrator>();

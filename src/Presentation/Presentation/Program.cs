@@ -1,5 +1,3 @@
-using Presentation.Client;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Подгружаем .env ТОЛЬКО если локальная разработка
@@ -15,9 +13,8 @@ builder.Configuration
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(builder.Configuration)
-                        .Enrich.FromLogContext()
-                        .CreateLogger();
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext().CreateLogger();
 
 // Razor-компоненты
 builder.Services.AddRazorComponents()
@@ -35,24 +32,36 @@ builder.Services.Scan(scan => scan
     .AsImplementedInterfaces()
     .WithScopedLifetime());
 
-// DI: State Container
-builder.Services.AddScoped<StateContainer>();
-
 // DI: Application + Infrastructure
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
 
+// DI: Authentication
+builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.AccessDeniedPath = "/Forbidden";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    });
+
+// DI: State Container
+builder.Services.AddScoped<StateContainer>();
+
 // Services
 builder.Services.AddHealthChecks();
 builder.Host.UseSerilog();
 builder.Services.AddMudServices();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
+
 
 var app = builder.Build();
 
-// Migrations
+// Migrations & Seeders
 await app.UseAppMigrations();
-// Seeders — вызываем централизованно
 await app.UseAppSeeders();
 
 // Configure the HTTP request pipeline.
@@ -68,12 +77,9 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
