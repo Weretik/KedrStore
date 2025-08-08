@@ -1,0 +1,27 @@
+﻿namespace Presentation.Shared.Common;
+
+public static class Routing
+{
+    // Home
+    public const string Home = "/";
+
+    // Catalog
+    public const string CatalogProducts = "/catalog/hardware";
+    public const string CatalogardwareSale = "/catalog/hardware_sale";
+
+    // Info
+    public const string Info = "/information";
+    public const string InfoShipping = "/information?tab=shipping";
+    public const string InfoPayment = "/information?tab=payment";
+
+    // FAQ
+    public const string Questions = "/faq";
+
+    // Contact
+    public const string Contact = "/contacts";
+
+    //About Us
+    public const string AboutUs = "/about-us";
+
+
+}

@@ -5,28 +5,28 @@
              EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
              Color="Color.Tertiary"
              Variant="Variant.Filled">
-      <MudMenuItem Href="/catalog/hardware" Label="Фурнітура"/>
-      <MudMenuItem Href="/catalog/hardware_sale" Label="Фурнітура, вигідна ціна"/>
-      <MudMenuItem Href="/catalog/doors" Label="Двері"/>
-      <MudMenuItem Href="/catalog/doors_sale" Label="Двері, вигідна ціна"/>
+      <MudMenuItem Href="@Routing.CatalogProducts" Label="Фурнітура"/>
+      <MudMenuItem Href="@Routing.CatalogardwareSale" Label="Фурнітура, вигідна ціна"/>
+      <MudMenuItem Href="#" Label="Двері"/>
+      <MudMenuItem Href="#" Label="Двері, вигідна ціна"/>
     </MudMenu>
 
     <MudMenu Label="Про нас" Class="mx-1"
              EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
              Color="Color.Tertiary"
              Variant="Variant.Filled">
-      <MudMenuItem Href="/about_us" Label="Про компанію"/>
-      <MudMenuItem Href="/contacts" Label="Контакти"/>
-      <MudMenuItem Href="#"  Label="Доставка та оплата"/>
-      <MudMenuItem Href="#"  Label="Повернення товару"/>
-      <MudMenuItem Href="#"  Label="Статті"/>
+      <MudMenuItem Href="@Routing.AboutUs" Label="Про компанію"/>
+      <MudMenuItem Href="@Routing.Info"  Label="Статті"/>
+      <MudMenuItem Href="/Information"  Label="Доставка та оплата"/>
+      <MudMenuItem Href="/Information"  Label="Повернення товару"/>
+      <MudMenuItem Href="@Routing.Contact" Label="Контакти"/>
     </MudMenu>
 
 
     <MudButton Style="width: 120px; height: 32px;" Class="mx-1"
                Color="Color.Tertiary"
                Variant="Variant.Filled"
-               Href="/faq">
+               Href="@Routing.Questions">
       FAQ
     </MudButton>
 

@@ -1,17 +1,20 @@
-﻿<div class="mb-6 py-10 px-12 bg-gray-50">
-  <h3 class="mb-8 text-2xl font-bold font-heading">Category</h3>
-  <ul>
-    <li class="mb-4"><a class="text-lg" href="#">New in</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Activewear</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Hoodies & Sweatshirts</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Jackets</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Multipacks</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Bags</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Sports</a></li>
-    <li class="mb-4"><a class="text-lg" href="#">Gifts</a></li>
-    <li><a class="text-lg" href="#">Notes</a></li>
-  </ul>
-</div>
+﻿<MudPaper Elevation="2">
+
+  <MudText Typo="Typo.h4">Категорії</MudText>
+
+  <MudTreeView T="string">
+
+    <MudTreeViewItem Text="Getting Started">
+      <MudTreeViewItem Text="Installation"/>
+    </MudTreeViewItem>
+
+    <MudTreeViewItem Value='"Components"'>
+      <MudTreeViewItem Text="Avatar" Value='"MudAvatar"'/>
+      <MudTreeViewItem Text="Button" Value='"MudButton"'/>
+    </MudTreeViewItem>
+
+  </MudTreeView>
+</MudPaper>
 
 @code {
 

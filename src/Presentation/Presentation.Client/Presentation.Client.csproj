@@ -38,7 +38,6 @@
       <AdditionalFiles Include="Components\Header\Partials\HeaderLogo.razor" />
       <AdditionalFiles Include="Components\Header\Partials\HeaderMainNavigation.razor" />
       <AdditionalFiles Include="Components\Header\Partials\HeaderSearchBar.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderTopBar.razor" />
       <AdditionalFiles Include="Components\Header\Partials\HeaderUserActions.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\Category.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\FilterColors.razor" />

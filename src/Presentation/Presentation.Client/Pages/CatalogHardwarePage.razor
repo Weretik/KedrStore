@@ -1,6 +1,22 @@
 ﻿@page "/catalog/hardware"
 
-<PageTitle>Фурнітура</PageTitle>
+<PageTitle>Каталог</PageTitle>
+
+<MudText Typo="Typo.h1" Class="mb-10">Каталог товарів</MudText>
+
+<MudGrid Spacing="10">
+
+  <MudItem xs="12" sm="4">
+    <MudStack>
+      <Category></Category>
+    </MudStack>
+  </MudItem>
+
+  <MudItem xs="12" sm="4">
+    <ProductList></ProductList>
+  </MudItem>
+
+</MudGrid>
 
 <section class="py-20 bg-gray-100" x-data="{ price: 50, size: 36, color: 1, grid: 3, showContent: false }">
 
