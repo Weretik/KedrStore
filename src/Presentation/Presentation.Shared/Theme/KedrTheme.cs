@@ -127,7 +127,7 @@ public class KedrTheme
         {
             Default = new DefaultTypography
             {
-                FontFamily = ["Roboto", "Helvetica", "Arial", "sans-serif"],
+                FontFamily = [ "Inter", "Roboto", "Arial", "sans-serif" ],
                 FontWeight = "400",
                 FontSize = ".875rem",
                 LineHeight = "1.43",
@@ -136,66 +136,67 @@ public class KedrTheme
             },
             H1 = new H1Typography
             {
+                FontFamily = [ "Montserrat", "Roboto", "Arial", "sans-serif" ],
                 FontWeight = "300",
-                FontSize = "6rem",
-                LineHeight = "1.167",
-                LetterSpacing = "-.01562em",
+                FontSize = "3.25rem",
+                LineHeight = "1.2",
+                LetterSpacing = "-.01em",
                 TextTransform = "none",
             },
             H2 = new H2Typography
             {
-                FontWeight = "300",
-                FontSize = "3.75rem",
-                LineHeight = "1.2",
-                LetterSpacing = "-.00833em",
+                FontWeight = "400",
+                FontSize = "2.5rem",
+                LineHeight = "1.3",
+                LetterSpacing = "-.005em",
                 TextTransform = "none",
             },
             H3 = new H3Typography
             {
-                FontWeight = "400",
-                FontSize = "3rem",
-                LineHeight = "1.167",
+                FontWeight = "500",
+                FontSize = "2rem",
+                LineHeight = "1.4",
                 LetterSpacing = "0",
                 TextTransform = "none",
             },
             H4 = new H4Typography
             {
-                FontWeight = "400",
-                FontSize = "2.125rem",
-                LineHeight = "1.235",
-                LetterSpacing = ".00735em",
+                FontWeight = "500",
+                FontSize = "1.5rem",
+                LineHeight = "1.4",
+                LetterSpacing = ".007em",
                 TextTransform = "none",
             },
             H5 = new H5Typography
             {
-                FontWeight = "400",
-                FontSize = "1.5rem",
-                LineHeight = "1.334",
-                LetterSpacing = "0",
+                FontWeight = "600",
+                FontSize = "1.25rem",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em",
                 TextTransform = "none",
             },
             H6 = new H6Typography
             {
-                FontWeight = "500",
-                FontSize = "1.25rem",
+                FontWeight = "600",
+                FontSize = "1.125rem",
                 LineHeight = "1.6",
-                LetterSpacing = ".0075em",
+                LetterSpacing = ".001em",
                 TextTransform = "none",
             },
             Subtitle1 = new Subtitle1Typography
             {
                 FontWeight = "400",
-                FontSize = "1rem",
-                LineHeight = "1.75",
-                LetterSpacing = ".00938em",
+                FontSize = "1.0625rem",
+                LineHeight = "1.6",
+                LetterSpacing = ".005em",
                 TextTransform = "none",
             },
             Subtitle2 = new Subtitle2Typography
             {
                 FontWeight = "500",
-                FontSize = ".875rem",
-                LineHeight = "1.57",
-                LetterSpacing = ".00714em",
+                FontSize = ".9375rem",
+                LineHeight = "1.5",
+                LetterSpacing = ".005em",
                 TextTransform = "none",
             },
             Body1 = new Body1Typography
@@ -203,40 +204,40 @@ public class KedrTheme
                 FontWeight = "400",
                 FontSize = "1rem",
                 LineHeight = "1.5",
-                LetterSpacing = ".00938em",
+                LetterSpacing = ".001em",
                 TextTransform = "none",
             },
             Body2 = new Body2Typography
             {
                 FontWeight = "400",
                 FontSize = ".875rem",
-                LineHeight = "1.43",
-                LetterSpacing = ".01071em",
+                LineHeight = "1.4",
+                LetterSpacing = ".01em",
                 TextTransform = "none",
             },
             Button = new ButtonTypography
             {
                 FontWeight = "500",
                 FontSize = ".875rem",
-                LineHeight = "1.75",
-                LetterSpacing = ".02857em",
-                TextTransform = "uppercase",
+                LineHeight = "1.5",
+                LetterSpacing = ".02em",
+                TextTransform = "none"
             },
             Caption = new CaptionTypography
             {
                 FontWeight = "400",
                 FontSize = ".75rem",
-                LineHeight = "1.66",
-                LetterSpacing = ".03333em",
+                LineHeight = "1.6",
+                LetterSpacing = ".02em",
                 TextTransform = "none",
             },
             Overline = new OverlineTypography
             {
                 FontWeight = "400",
                 FontSize = ".75rem",
-                LineHeight = "2.66",
-                LetterSpacing = ".08333em",
-                TextTransform = "none",
+                LineHeight = "1.8",
+                LetterSpacing = ".05em",
+                TextTransform = "uppercase",
             },
         },
         ZIndex = new ZIndex()

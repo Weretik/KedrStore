@@ -1,175 +1,193 @@
 ﻿@page "/FAQ"
 
 
-<section class="py-20 bg-gray-100" x-data="{ showContent: false }">
+<MudContainer MaxWidth="MaxWidth.Large">
 
-  <div class="container mx-auto px-4">
+  <MudText Typo="Typo.h1" Class="mb-10">Питання та відповіді</MudText>
 
-    <h2 class="mb-16 text-4xl font-bold font-heading">Питання та відповіді</h2>
-
-    <ul class="space-y-4">
-
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-        <div class="border-l-2 border-blue-300">
-
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              Sed eget accumsan ipsum. Praesent dignissim?
-            </span>
-
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
-
+  <MudExpansionPanels Class="mb-24">
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5">Як вибрати замок для вхідних дверей?</MudText>
         </div>
-      </li>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Для вхідних дверей важливо обирати замок, який забезпечить надійний захист та зручність у користуванні.
+          Найкраще встановлювати два замки різного типу — циліндровий і сувальдний. Циліндровий зручний у повсякденному
+          користуванні, а сувальдний додає додаткову зламостійкість.
+        </MudText>
+        <MudText Typo="Typo.body1" class="my-5">
+          Зверни увагу на клас безпеки: <strong>3 або 4 клас</strong> — оптимальний для квартир і приватних будинків.
+          Корпус замка має бути сталевим або латунним, бажано з <strong>броненакладкою</strong> на циліндр для захисту
+          від висвердлювання та бампінгу. Якщо є потреба в сучасному рішенні — розглянь
+          <strong>електронні або смарт-замки</strong>, але обов’язково з механічним дублем у разі збою. Якісний замок
+          не обов’язково має бути найдорожчим — важливі сертифікація, матеріали та професійне встановлення. Не економ
+          на безпеці — це інвестиція у спокій.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
 
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-
-        <div class="border-l-2 border-blue-300">
-
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              After curabitur eu laoreet libero eget en vel odio?
-            </span>
-
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
-
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5">Чим відрізняються ручки для міжкімнатних та вхідних дверей?</MudText>
         </div>
-      </li>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Ручки для міжкімнатних та вхідних дверей мають різне призначення та конструкцію. Вони відрізняються не
+          лише зовнішнім виглядом, а й типом механізму, міцністю та функціональністю.
+        </MudText>
 
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
+        <MudText Typo="Typo.body1" class="my-5">
+          Для міжкімнатних дверей зазвичай використовують <strong>ручки-защіпки або фіксатори</strong> — вони легкі,
+          не мають замків або мають простий поворотний механізм. Їх головне завдання — зручність користування і естетика.
+          Для ванної чи туалету — ручка з фіксатором, для кімнат — стандартна нажимна.
 
-        <div class="border-l-2 border-blue-300">
+        </MudText>
 
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+        <MudText Typo="Typo.body1" class="my-5">
+          Вхідні двері вимагають <strong>посилених ручок</strong>, які витримують навантаження, мають сталеву основу і
+          часто працюють у парі з замком. Це можуть бути ручки на планці або окремі — стаціонарні чи натискні,
+          з наскрізним кріпленням. Часто такі ручки мають <strong>захист від зламу</strong> або підсилення від
+          злодійського доступу.
 
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              A eget euismod dignissim, felis tortor mollis eros, non ultricies turpis eget leo?
-            </span>
+          При виборі зверни увагу на сумісність з замком, товщину дверей, спосіб монтажу і матеріал — латунь,
+          сталь або алюміній.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
 
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
-
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5">Які петлі краще обрати для дверей?</MudText>
         </div>
-      </li>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Петлі — це не просто кріплення для дверей, а ключовий елемент надійності та довговічності. Вони впливають на
+          плавність відкривання, зовнішній вигляд і навіть безпеку. Від правильного вибору петель залежить, наскільки
+          довго і стабільно працюватимуть двері.
+        </MudText>
+        <MudText Typo="Typo.body1" class="my-5">
+          Для міжкімнатних дверей зазвичай використовують <strong>накладні або карткові петлі</strong> — вони прості в
+          монтажі, доступні за ціною та мають декоративний вигляд. Якщо важливий мінімалізм — підійдуть
+          <strong>скриті петлі</strong>, які повністю ховаються в полотні та коробці, але потребують точного врізання.
+        </MudText>
+        <MudText Typo="Typo.body1" class="my-5">
+          Для вхідних або масивних дверей використовують <strong>посилені петлі з опорним підшипником</strong> — вони
+          витримують велику вагу та інтенсивну експлуатацію. Варто також обирати моделі з
+          <strong>антизнімними штирями</strong> — це підвищує захист від зламу.
+        </MudText>
+        <MudText Typo="Typo.body1" class="my-5">
+          При виборі враховуй вагу дверей, сторону відкривання, матеріал коробки (дерево, метал) і сумісність з замками.
+          Правильно підібрані петлі — це тиша, плавність і безпека на роки.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
 
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-
-        <div class="border-l-2 border-blue-300">
-
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              Curabitur elementum eu metus ut consequat?
-            </span>
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5">Навіщо потрібен доводчик на двері?</MudText>
         </div>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Доводчик — це механізм, який автоматично і плавно зачиняє двері після відкривання.
+          Його встановлюють для комфорту, безпеки та контролю доступу, особливо у місцях з великою
+          прохідністю: під’їзди, офіси, магазини.
+        </MudText>
 
-      </li>
+        <MudText Typo="Typo.body1" class="my-5">
+          Основні переваги: двері не гримають, зменшується знос петель та замків, зберігається тепло, а також
+          унеможливлюється випадкове або навмисне залишення дверей відкритими. У деяких моделях є функції фіксації
+          у відкритому положенні та антизахлопування.
+        </MudText>
 
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" x-data="{ accordion: false }">
-        <div class="border-l-2 border-blue-300">
+        <MudText Typo="Typo.body1" class="my-5">
+          Для міжкімнатних або легких дверей підійдуть компактні моделі з класом сили EN1–3. Для вхідних металевих
+          дверей обирають доводчики EN4–6 з регулюванням швидкості та демпфером закривання.
+        </MudText>
 
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
+        <MudText Typo="Typo.body1" class="my-5">
+          Важливо правильно підібрати доводчик по вазі й ширині дверей, а також враховувати температуру
+          експлуатації — у вуличних умовах потрібна термостійка модель. Монтаж краще довірити фахівцям:
+          навіть дорогий доводчик працюватиме погано при неправильному встановленні.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
 
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              Sed eget accumsan ipsum. Praesent dignissim?
-            </span>
-
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat. Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh, quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5">Що таке дверний обмежувач і чи варто його ставити?</MudText>
         </div>
-      </li>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Дверний обмежувач — це невеликий пристрій, який обмежує кут відкривання дверей і захищає стіни,
+          меблі або самі двері від ударів. Найчастіше його використовують у квартирах, офісах або приватних
+          будинках, де двері можуть випадково розкриватися занадто широко.
+        </MudText>
 
-      <li class="pr-8 md:pr-12 py-6 bg-gray-50" :class="{ 'hidden': !showContent}" x-data="{ accordion: false }">
-        <div class="border-l-2 border-blue-300">
+        <MudText Typo="Typo.body1" class="my-5">
+          Обмежувачі бувають <strong>підлогові, настінні або приховані</strong>. Підлоговий варіант
+          — найпопулярніший: його монтують на підлозі біля стіни. Настінний — кріпиться там, де дверне
+          полотно може вдарити. Приховані обмежувачі інтегруються в петлі або коробку й непомітні зовні.
+        </MudText>
 
-          <button x-on:click="accordion = !accordion" class="pl-8 md:pl-16 lg:pl-28 w-full flex justify-between items-center text-left">
-            <span class="mr-4 font-bold font-heading text-xl" :class="{ 'text-xl': !accordion, 'text-2xl text-blue-300': accordion }">
-              Sed eget accumsan ipsum. Praesent dignissim?
-            </span>
-            <span :class="{'rotate-180': accordion, 'rotate-0': !accordion }" class="inline-block transform rotate-0">
-              <svg class="flex-shrink-0" width="18" height="10" viewbox="0 0 18 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16.0185 0.201172C16.2905 -0.0668276 16.7275 -0.0668276 16.9975 0.201172C17.2675 0.469172 17.2685 0.902172 16.9975 1.17017L9.0895 9.00017C8.8195 9.26817 8.3825 9.26817 8.1105 9.00017L0.2025 1.17017C-0.0674999 0.902172 -0.0674999 0.469172 0.2025 0.201172C0.4735 -0.0668278 0.9115 -0.0668278 1.1815 0.201172L8.6005 7.34217L16.0185 0.201172Z" fill="#1F40FF"></path>
-              </svg>
-            </span>
-          </button>
+        <MudText Typo="Typo.body1" class="my-5">
+          Також існують <strong>магнітні моделі</strong>, які одночасно виконують функцію обмежувача
+          і фіксатора — зручно, якщо потрібно тимчасово утримати двері відкритими. Це особливо актуально
+          для комерційних приміщень або дверей, що часто використовуються.
+        </MudText>
 
-          <div x-ref="container" :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''" class="overflow-hidden h-0 duration-500" style="">
-            <p class="pl-8 md:pl-16 lg:pl-28 pr-20 max-w-4xl mt-4 text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod orci sed tristique placerat.
-              Fusce in ligula urna. Fusce eget nunc et libero accumsan rutrum quis nec lectus. Quisque luctus sem nibh,
-              quis ornare neque consectetur varius. Maecenas rhoncus consectetur rutrum.
-            </p>
-          </div>
+        <MudText Typo="Typo.body1" class="my-5">
+          Варто встановити обмежувач, якщо двері відкриваються у бік стіни, вікна або меблів. Це недорогий
+          і ефективний спосіб уникнути ремонту після першого ж сильного протягу або необережного руху.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
+
+    <MudExpansionPanel>
+      <TitleContent>
+        <div class="d-flex align-center">
+          <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3"></MudIcon>
+          <MudText Typo="Typo.h5"> Чи можна самостійно встановити дверну фурнітуру?</MudText>
         </div>
-      </li>
-    </ul>
+      </TitleContent>
+      <ChildContent>
+        <MudText Typo="Typo.body1">
+          Встановити дверну фурнітуру самостійно — можливо, але не завжди доцільно. Якщо йдеться про просту міжкімнатну
+          ручку або защіпку — монтаж займе 15–30 хвилин навіть без досвіду. У більш складних випадках — краще
+          звернутись до майстра.
+        </MudText>
 
-    <div class="mt-20 text-center">
-      <a
-        x-on:click.prevent="showContent = true"
-        :class="{'hidden': showContent}"
-        class="inline-block bg-blue-300 hover:bg-blue-400 text-white font-bold font-heading py-5 px-8 rounded-md uppercase hidden"
-        href="#">
-        More
-      </a>
-    </div>
+        <MudText Typo="Typo.body1" class="my-5">
+          Найбільше помилок трапляється при врізанні замків, доводчиків або прихованих петель. Навіть невелике
+          зміщення на кілька міліметрів може призвести до перекосу, скрипу або зниження ресурсу роботи фурнітури.
+          Особливо це критично для вхідних дверей — там похибка може коштувати безпеки.
+        </MudText>
 
-  </div>
-</section>
+        <MudText Typo="Typo.body1" class="my-5">
+          Якщо все ж плануєш встановлювати сам — заздалегідь підготуй інструмент: дриль, стамески, шуруповерт,
+          рівень. Працюй по інструкції, з точними замірами, і не поспішай. Але пам’ятай: професійне
+          встановлення — це не витрати, а гарантія довговічності та безпроблемної експлуатації.
+        </MudText>
+      </ChildContent>
+    </MudExpansionPanel>
+
+  </MudExpansionPanels>
+</MudContainer>
+
 
 <CallToAction></CallToAction>
