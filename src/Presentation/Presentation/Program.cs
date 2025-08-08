@@ -76,8 +76,8 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.UseAuthentication();

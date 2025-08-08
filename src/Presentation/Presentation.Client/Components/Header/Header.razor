@@ -1,11 +1,9 @@
 ﻿<MudAppBar Elevation="4" class="py-4">
-
-  <div class="d-flex flex-grow-1 align-items-center justify-between">
-    <HeaderLogo></HeaderLogo>
-    <HeaderMainNavigation></HeaderMainNavigation>
-    <HeaderUserActions></HeaderUserActions>
-  </div>
-
+    <MudStack Style="width: 100%;" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+      <HeaderLogo></HeaderLogo>
+      <HeaderMainNavigation></HeaderMainNavigation>
+      <HeaderUserActions></HeaderUserActions>
+    </MudStack>
 </MudAppBar>
 
 <MudDrawer @bind-Open="@BurgerMenu.IsOpen" Width="380px" Overlay="true" Elevation="1" Variant="@DrawerVariant.Temporary">

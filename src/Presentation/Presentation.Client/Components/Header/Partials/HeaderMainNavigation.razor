@@ -1,35 +1,37 @@
-﻿<div class="mt-5">
+﻿<MudHidden Breakpoint="Breakpoint.SmAndDown">
+  <MudStack Row="true" AlignItems="AlignItems.Center">
 
-  <MudMenu Label="Каталог" Class="mx-1"
-           EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
-           Color="Color.Tertiary"
-           Variant="Variant.Filled">
-    <MudMenuItem Href="/catalog/hardware" Label="Фурнітура"/>
-    <MudMenuItem Href="/catalog/hardware_sale" Label="Фурнітура, вигідна ціна"/>
-    <MudMenuItem Href="/catalog/doors" Label="Двері"/>
-    <MudMenuItem Href="/catalog/doors_sale" Label="Двері, вигідна ціна"/>
-  </MudMenu>
-
-  <MudMenu Label="Про нас" Class="mx-1"
-           EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
-           Color="Color.Tertiary"
-           Variant="Variant.Filled">
-    <MudMenuItem Href="/about_us" Label="Про компанію"/>
-    <MudMenuItem Href="/contacts" Label="Контакти"/>
-    <MudMenuItem Href="#"  Label="Доставка та оплата"/>
-    <MudMenuItem Href="#"  Label="Повернення товару"/>
-    <MudMenuItem Href="#"  Label="Статті"/>
-  </MudMenu>
-
-
-  <MudButton Style="width: 120px;" Class="mx-1"
+    <MudMenu Label="Каталог" Class="mx-1"
+             EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
              Color="Color.Tertiary"
-             Variant="Variant.Filled"
-             Href="/faq">
-    FAQ
-  </MudButton>
+             Variant="Variant.Filled">
+      <MudMenuItem Href="/catalog/hardware" Label="Фурнітура"/>
+      <MudMenuItem Href="/catalog/hardware_sale" Label="Фурнітура, вигідна ціна"/>
+      <MudMenuItem Href="/catalog/doors" Label="Двері"/>
+      <MudMenuItem Href="/catalog/doors_sale" Label="Двері, вигідна ціна"/>
+    </MudMenu>
 
-</div>
+    <MudMenu Label="Про нас" Class="mx-1"
+             EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
+             Color="Color.Tertiary"
+             Variant="Variant.Filled">
+      <MudMenuItem Href="/about_us" Label="Про компанію"/>
+      <MudMenuItem Href="/contacts" Label="Контакти"/>
+      <MudMenuItem Href="#"  Label="Доставка та оплата"/>
+      <MudMenuItem Href="#"  Label="Повернення товару"/>
+      <MudMenuItem Href="#"  Label="Статті"/>
+    </MudMenu>
+
+
+    <MudButton Style="width: 120px; height: 36px;" Class="mx-1"
+               Color="Color.Tertiary"
+               Variant="Variant.Filled"
+               Href="/faq">
+      FAQ
+    </MudButton>
+
+  </MudStack>
+</MudHidden>
 
 @code {
 

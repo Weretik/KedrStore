@@ -1,43 +1,25 @@
-﻿
-<div class="d-flex align-items-center justify-between mt-14">
+﻿<MudStack Class="my-10" Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Wrap="Wrap.Wrap">
 
-  <div class="d-flex">
-    <MudTextField Style="width: 30vw;"
-      @bind-Value="Search"
-      Label="Пошук"
-      Variant="Variant.Outlined"
-      Adornment="Adornment.End"
-      AdornmentIcon="@Icons.Material.Filled.Search"
-      AdornmentColor="Color.Success"/>
-  </div>
-
-  <div class="ml-4 d-flex">
-    <MudFab Class="mx-2 my-2"
-      Color="Color.Secondary"
-      StartIcon="@Icons.Custom.Brands.Instagram"
-      Size="Size.Small"
-      Href="https://www.instagram.com/kedr.class/"
-      Target="_blank"/>
-    <MudFab Class="mx-2 my-2"
-      Color="Color.Secondary"
-      StartIcon="@Icons.Custom.Brands.YouTube"
-      Size="Size.Small"
-      Href="https://www.youtube.com/channel/UCMzipw3fGj8I8HgQXiPoTWQ"
-      Target="_blank"/>
-    <MudFab Class="mx-2 my-2"
-      Color="Color.Secondary"
-      StartIcon="@Icons.Custom.Brands.Telegram"
-      Size="Size.Small"
-      Href="https://web.telegram.org/k/#197393163"
-      Target="_blank"/>
-  </div>
-
-</div>
-<div class="d-flex">
+  <MudStack Style="width: 100%; max-width: 450px;" Row="true" AlignItems="AlignItems.Center">
+    <MudTextField @bind-Value="Search" Label="Пошук"
+                  Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                  AdornmentColor="Color.Success"/>
+  </MudStack>
 
 
+  <MudStack Row="true">
+    <MudFab  Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Custom.Brands.Instagram"
+            Href="https://www.instagram.com/kedr.class/" Target="_blank"/>
 
-</div>
+    <MudFab  Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Custom.Brands.YouTube"
+            Href="https://www.youtube.com/channel/UCMzipw3fGj8I8HgQXiPoTWQ" Target="_blank"/>
+
+    <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Custom.Brands.Telegram"
+            Href="https://web.telegram.org/k/#197393163" Target="_blank"/>
+  </MudStack>
+
+</MudStack>
+
 @code {
   public string Search { get; set; }
 }
