@@ -1,25 +1,38 @@
 ﻿@page "/information"
 
-<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6"
+         ActivePanelIndex="_index">
 
-  <MudTabPanel Text="Tab One">
-    <MudText>Content One</MudText>
+  <MudTabPanel Text="Доставка" Icon="@Icons.Material.Filled.Api">
+    <MudText>Информация о доставке...</MudText>
   </MudTabPanel>
 
-  <MudTabPanel Text="Tab Two">
-    <MudText>Content Two</MudText>
+  <MudTabPanel Text="Оплата">
+    <MudText>Информация о Оплате...</MudText>
   </MudTabPanel>
 
-  <MudTabPanel Text="Tab Three">
-    <MudText>Content Three</MudText>
-  </MudTabPanel>
-
-  <MudTabPanel Text="Tab Disabled" Disabled="true">
-    <MudText>Content Disabled</MudText>
+  <MudTabPanel Text="Возврат">
+    <MudText>Информация о Возврате...</MudText>
   </MudTabPanel>
 
 </MudTabs>
 
 @code {
+
+  [SupplyParameterFromQuery(Name = "tab")]
+  private string? Tab { get; set; }
+
+  private int _index;
+
+  protected override void OnInitialized()
+  {
+    _index = (Tab ?? "shipping").ToLowerInvariant() switch
+      {
+        "shipping" => 0,
+        "payment" => 1,
+        "returns" => 2,
+        _ => 0
+      };
+  }
 
 }
