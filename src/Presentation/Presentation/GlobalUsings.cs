@@ -16,9 +16,10 @@ global using Application.Extensions;
 global using Application.Common.Errors;
 global using Application.Common.Exceptions;
 
+global using Presentation.Components;
 global using Presentation.Client;
 global using Presentation.Middleware;
 global using Presentation.Shared;
 global using Presentation.Shared.Common;
-
-
+global using Presentation.Shared.Common.Abstractions;
+global using Presentation.Shared.Common.States;

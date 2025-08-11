@@ -35,8 +35,8 @@ public class AppResult : IApplicationResult
 
     public static object CreateFailureResult(Type valueType, AppError error)
     {
-        if (valueType == null) throw new ArgumentNullException(nameof(valueType));
-        if (error == null) throw new ArgumentNullException(nameof(error));
+        ArgumentNullException.ThrowIfNull(valueType);
+        ArgumentNullException.ThrowIfNull(error);
 
         var resultType = typeof(AppResult<>).MakeGenericType(valueType);
         return Activator.CreateInstance(resultType, false, null, error)!;

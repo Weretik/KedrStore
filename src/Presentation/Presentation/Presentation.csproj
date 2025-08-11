@@ -1,19 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="DotNetEnv" Version="3.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.19" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MudBlazor" Version="8.10.0" />
+        <PackageReference Include="MudBlazor" Version="8.11.0" />
         <PackageReference Include="Scrutor" Version="6.1.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
@@ -25,30 +25,20 @@
         <ProjectReference Include="..\..\Application\Application.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.13" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.8" />
         <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\Pages\About us\Components\" />
-      <Folder Include="Components\Pages\About us\Pages\" />
-      <Folder Include="Components\Pages\Contacts\Components\" />
-      <Folder Include="Components\Pages\Contacts\Pages\" />
-      <Folder Include="Components\Pages\FAQ\Components\" />
-      <Folder Include="Components\Pages\FAQ\Pages\" />
       <Folder Include="wwwroot\assets\buttons\" />
       <Folder Include="wwwroot\assets\icons\" />
       <Folder Include="wwwroot\assets\images\" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Filters\ProductFilter.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Filters\ProductFilterMobile.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Paginations\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Filters\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Filters\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Paginations\Pagination.razor" />
       <_ContentIncludedByDefault Remove="Components\Layout\Header\Header.razor" />
       <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderLogo.razor" />
       <_ContentIncludedByDefault Remove="Components\Layout\Header\Partials\HeaderMainNavigation.razor" />
@@ -76,28 +66,35 @@
       <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterSocial.razor" />
       <_ContentIncludedByDefault Remove="Components\Layout\Footer\Partials\FooterSubscription.razor" />
       <_ContentIncludedByDefault Remove="Components\Layout\MainLayout.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\Category.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterColors.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterDelivery.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterLocation.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterPrice.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\FilterSize.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\Pagination.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\ProductFilter.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Components\Partials\ProductFilterMobile.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\Category.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterColors.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterDelivery.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterLocation.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterPrice.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\FilterSize.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\Pagination.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\ProductFilter.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Partials\ProductFilterMobile.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Sections\ProductHeader.razor" />
-      <_ContentIncludedByDefault Remove="Components\Pages\Сatalog\Sections\ProductList.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\FilterColors.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\FilterDelivery.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\FilterLocation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\FilterPrice.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\FilterSize.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Components\Partials\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\FilterColors.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\FilterDelivery.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\FilterLocation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\FilterPrice.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\FilterSize.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\Pagination.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\ProductFilter.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Partials\ProductFilterMobile.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Sections\ProductHeader.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\�atalog\Sections\ProductList.razor" />
       <_ContentIncludedByDefault Remove="Components\Pages\Home\Sections\Brending.razor" />
       <_ContentIncludedByDefault Remove="Components\Pages\Home\Sections\Placeholders.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Header.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderLogo.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderSearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderUserActions.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Widgets\ButtonToCatalog.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Widgets\CallToAction.razor" />
     </ItemGroup>
 
     <ItemGroup>

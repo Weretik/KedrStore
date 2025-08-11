@@ -19,7 +19,13 @@ Log.Logger = new LoggerConfiguration()
 // Razor-компоненты
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveWebAssemblyComponents()
+    .AddAuthenticationStateSerialization(options =>
+    {
+        // По желанию: как именно сериализовать клеймы
+        options.SerializeAllClaims = true;
+        // options.SerializationCallback = ctx => ctx.ProjectClaims(...);
+    });;
 
 // Конфигурация AdminUser
 builder.Services.Configure<AdminUserConfig>(
@@ -36,7 +42,7 @@ builder.Services.Scan(scan => scan
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
-
+/*
 // DI: Authentication
 builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -46,7 +52,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Forbidden";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     });
-
+*/
 // DI: State Container
 builder.Services.AddScoped<StateContainer>();
 
@@ -77,8 +83,10 @@ else
 }
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.MapStaticAssets();
 app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();

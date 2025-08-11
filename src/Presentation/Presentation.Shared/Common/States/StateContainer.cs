@@ -1,4 +1,6 @@
-﻿namespace Presentation.Shared.Common;
+﻿using Presentation.Shared.Common.Abstractions;
+
+namespace Presentation.Shared.Common.States;
 
 public sealed class StateContainer
 {

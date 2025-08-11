@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using System.Diagnostics
 @using MudBlazor
 
 @using Microsoft.AspNetCore.Components.Forms
@@ -12,20 +13,20 @@
 
 @using Application.Common.Errors
 
-@using Presentation.Client
 @using Presentation.Shared.States
 @using Presentation.Shared.Common
-@using Presentation.Shared.Theme;
+@using Presentation.Shared.Theme
+@using Presentation.Shared.Common.States
+@using Presentation.Shared.Common.Routing
 
-@using Presentation.Client.Components.Header
+@using Presentation.Client
+@using Presentation.Client.Components.Shared.Widgets
 @using Presentation.Client.Components.Footer
-@using Presentation.Client.Components.Header.Partials
 @using Presentation.Client.Components.Footer.Partials
 @using Presentation.Client.Components.Home
 @using Presentation.Client.Components.Home.Sections
 @using Presentation.Client.Components.Сatalog.Sections
 @using Presentation.Client.Components.Сatalog.Partials
-
 
 @inject StateContainer State
 @inject NavigationManager Nav

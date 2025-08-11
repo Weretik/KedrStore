@@ -1,5 +1,5 @@
-﻿<MudHidden Breakpoint="Breakpoint.SmAndDown">
-  <MudStack Row="true" AlignItems="AlignItems.Center">
+﻿
+  <MudStack Row="true" AlignItems="AlignItems.Center"  Class="d-none d-md-flex d-lg-none">
 
     <MudMenu Label="Каталог" Class="mx-1"
              EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
@@ -23,7 +23,6 @@
       <MudMenuItem Href="@Routing.Contact" Label="Контакти"/>
     </MudMenu>
 
-
     <MudButton Style="width: 120px; height: 32px;" Class="mx-1"
                Color="Color.Tertiary"
                Variant="Variant.Filled"
@@ -32,7 +31,7 @@
     </MudButton>
 
   </MudStack>
-</MudHidden>
+
 
 @code {
 

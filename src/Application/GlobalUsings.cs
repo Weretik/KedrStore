@@ -16,21 +16,23 @@ global using Microsoft.EntityFrameworkCore.ChangeTracking;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
 
 // Application namespaces
-global using Application.Common.Abstractions.Events;
-global using Application.Common.Abstractions.UseCase;
-global using Application.Common.Abstractions.Pagination;
-global using Application.Common.Abstractions.Mapping;
-global using Application.Common.Abstractions.Result;
-global using Application.Common.Abstractions.Background;
+global using Application.Extensions;
+global using Application.DTOs;
+global using Application.Interfaces;
+global using Application.Catalog.DTOs;
 global using Application.Common.Behaviors;
 global using Application.Common.Results;
 global using Application.Common.Pagination;
 global using Application.Common.Events;
 global using Application.Common.Exceptions;
 global using Application.Common.Errors;
-global using Application.Interfaces;
-global using Application.Catalog.DTOs;
-global using Application.DTOs;
+global using Application.Common.Mapping;
+global using Application.Common.Abstractions.Events;
+global using Application.Common.Abstractions.UseCase;
+global using Application.Common.Abstractions.Pagination;
+global using Application.Common.Abstractions.Mapping;
+global using Application.Common.Abstractions.Result;
+global using Application.Common.Abstractions.Background;
 global using Application.Common.Abstractions.Logging;
 
 // Domain namespaces

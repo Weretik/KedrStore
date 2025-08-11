@@ -1,4 +1,4 @@
-﻿namespace Application.Extensions
+﻿namespace Application.Common.Mapping
 {
     public static class EntityMapping
     {

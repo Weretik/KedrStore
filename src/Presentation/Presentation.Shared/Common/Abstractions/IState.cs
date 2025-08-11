@@ -1,4 +1,4 @@
-﻿namespace Presentation.Shared.Common;
+﻿namespace Presentation.Shared.Common.Abstractions;
 
 public interface IState
 {

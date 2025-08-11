@@ -36,9 +36,10 @@ global using Infrastructure.Catalog.Migrations;
 global using Infrastructure.Identity.Migrations;
 
 // Domain namespaces
+global using Domain.Common.Abstractions;
+global using Domain.Identity.Constants;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
-global using Domain.Identity.Constants;
 global using Domain.Catalog.Repositories;
 
 // Application namespaces

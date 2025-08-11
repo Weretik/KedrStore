@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
@@ -9,18 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.19" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.13"/>
-        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.19" />
-        <PackageReference Include="MudBlazor" Version="8.10.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.8" />
+        <PackageReference Include="MudBlazor" Version="8.11.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="Layout\MainLayout.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,11 +32,8 @@
       <AdditionalFiles Include="Components\Footer\Partials\FooterServices.razor" />
       <AdditionalFiles Include="Components\Footer\Partials\FooterSocial.razor" />
       <AdditionalFiles Include="Components\Footer\Partials\FooterSubscription.razor" />
-      <AdditionalFiles Include="Components\Header\Header.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderLogo.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderMainNavigation.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderSearchBar.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderUserActions.razor" />
+      <AdditionalFiles Include="Components\Shared\Widgets\ButtonToCatalog.razor" />
+      <AdditionalFiles Include="Components\Shared\Widgets\CallToAction.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\Category.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\FilterColors.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\FilterDelivery.razor" />
@@ -51,6 +45,14 @@
       <AdditionalFiles Include="Components\Сatalog\Partials\ProductFilterMobile.razor" />
       <AdditionalFiles Include="Components\Сatalog\Sections\ProductHeader.razor" />
       <AdditionalFiles Include="Components\Сatalog\Sections\ProductList.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Header\Header.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderLogo.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderSearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderUserActions.razor" />
     </ItemGroup>
 
 

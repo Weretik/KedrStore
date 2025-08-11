@@ -1,6 +1,4 @@
-﻿using IDomainEvent = Application.Common.Abstractions.Events.IDomainEvent;
-
-namespace Application.Extensions
+﻿namespace Application.Extensions
 {
     public static class ApplicationServiceCollection
     {
@@ -26,7 +24,7 @@ namespace Application.Extensions
             services.AddDomainEventHandlers(Assembly.GetExecutingAssembly());
 
             // Регистрация AutoMapper с профилями из сборки приложения
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapperProfiles<ApplicationAssemblyMarker>();
 
             // Регистрация FluentValidation
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

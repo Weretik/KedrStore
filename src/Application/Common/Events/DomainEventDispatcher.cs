@@ -1,5 +1,3 @@
-using IDomainEvent = Application.Common.Abstractions.Events.IDomainEvent;
-
 namespace Application.Common.Events;
 
 public class DomainEventDispatcher : IDomainEventDispatcher

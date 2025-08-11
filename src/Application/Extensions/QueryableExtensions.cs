@@ -61,12 +61,22 @@ public static class QueryableExtensions
         var property = Expression.Property(parameter, sortBy);
         var lambda = Expression.Lambda(property, parameter);
 
-        var methodName = sortDirection == SortDirection.Asc ? nameof(Queryable.OrderBy) : nameof(Queryable.OrderByDescending);
+        var methodName = sortDirection == SortDirection.Asc
+            ? nameof(Queryable.OrderBy)
+            : nameof(Queryable.OrderByDescending);
+
         var genericMethod = typeof(Queryable)
             .GetMethods()
             .First(m => m.Name == methodName && m.GetParameters().Length == 2)
             .MakeGenericMethod(typeof(T), property.Type);
 
         return (IQueryable<T>)genericMethod.Invoke(null, new object[] { query, lambda })!;
+    }
+    public static IQueryable<T> ApplySpecification<T>(
+        this IQueryable<T> query,
+        ISpecification<T> specification)
+        where T : class
+    {
+        return query.Where(specification.ToExpression());
     }
 }

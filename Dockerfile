@@ -1,5 +1,5 @@
 ﻿# === Runtime образ (production) ===
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -8,17 +8,8 @@ RUN useradd -m kedruser
 USER kedruser
 
 # === Build образ (SDK + Node.js + EF CLI) ===
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-
-# Node.js LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get update && apt-get install -y nodejs postgresql-client
-
-# Устан. dotnet-ef
-# RUN dotnet tool install --global dotnet-ef --version 8.* \
-#     --add-source https://api.nuget.org/v3/index.json
-# ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Кэш и restore .NET
 COPY KedrStore.sln ./
