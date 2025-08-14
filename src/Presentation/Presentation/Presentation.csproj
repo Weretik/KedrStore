@@ -95,6 +95,8 @@
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderUserActions.razor" />
       <_ContentIncludedByDefault Remove="Components\Shared\Widgets\ButtonToCatalog.razor" />
       <_ContentIncludedByDefault Remove="Components\Shared\Widgets\CallToAction.razor" />
+      <_ContentIncludedByDefault Remove="Components\Сatalog\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Сatalog\Sections\ProductList.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -110,6 +112,39 @@
       <UpToDateCheckInput Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
       <UpToDateCheckInput Remove="Components\Header\Partials\HeaderSearchBar.razor" />
       <UpToDateCheckInput Remove="Components\Header\Partials\HeaderUserActions.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Footer.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterContacts.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterCopyright.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterInformation.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterServices.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSocial.razor" />
+      <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSubscription.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Layout\Footer\Footer.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterContacts.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterCopyright.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterInformation.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterServices.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterSocial.razor" />
+      <AdditionalFiles Include="Layout\Footer\Components\FooterSubscription.razor" />
+      <AdditionalFiles Include="Layout\Header\Header.razor" />
+      <AdditionalFiles Include="Layout\Header\Components\HeaderLogo.razor" />
+      <AdditionalFiles Include="Layout\Header\Components\HeaderMainNavigation.razor" />
+      <AdditionalFiles Include="Layout\Header\Components\HeaderSearchBar.razor" />
+      <AdditionalFiles Include="Layout\Header\Components\HeaderUserActions.razor" />
+      <AdditionalFiles Include="Layout\MainLayout.razor" />
+      <AdditionalFiles Include="Pages\AboutUsPage.razor" />
+      <AdditionalFiles Include="Pages\CatalogPage.razor" />
+      <AdditionalFiles Include="Pages\ContactsPage.razor" />
+      <AdditionalFiles Include="Pages\Error.razor" />
+      <AdditionalFiles Include="Pages\HardwareSalePage.razor" />
+      <AdditionalFiles Include="Pages\Index.razor" />
+      <AdditionalFiles Include="Pages\InformationPage.razor" />
+      <AdditionalFiles Include="Pages\QuestionsPage.razor" />
+      <AdditionalFiles Include="Components\Widgets\ButtonToCatalog.razor" />
+      <AdditionalFiles Include="Components\Widgets\CallToAction.razor" />
     </ItemGroup>
 
 </Project>

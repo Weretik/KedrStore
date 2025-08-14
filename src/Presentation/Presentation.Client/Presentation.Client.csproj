@@ -25,39 +25,24 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Footer\Footer.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterContacts.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterCopyright.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterInformation.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterServices.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterSocial.razor" />
-      <AdditionalFiles Include="Components\Footer\Partials\FooterSubscription.razor" />
-      <AdditionalFiles Include="Components\Header\Header.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderLogo.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderMainNavigation.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderSearchBar.razor" />
-      <AdditionalFiles Include="Components\Header\Partials\HeaderUserActions.razor" />
-      <AdditionalFiles Include="Components\Shared\Widgets\ButtonToCatalog.razor" />
-      <AdditionalFiles Include="Components\Shared\Widgets\CallToAction.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\Category.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\FilterColors.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\FilterDelivery.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\FilterLocation.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\FilterPrice.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\FilterSize.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\Pagination.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\ProductFilter.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Partials\ProductFilterMobile.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Sections\ProductHeader.razor" />
-      <AdditionalFiles Include="Components\Сatalog\Sections\ProductList.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\Header\Header.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderLogo.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderSearchBar.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderUserActions.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Footer.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterContacts.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterCopyright.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterInformation.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterServices.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterSocial.razor" />
+      <_ContentIncludedByDefault Remove="Components\Footer\Partials\FooterSubscription.razor" />
+      <_ContentIncludedByDefault Remove="Components\Home\Sections\Brending.razor" />
+      <_ContentIncludedByDefault Remove="Components\Home\Sections\Placeholders.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Widgets\ButtonToCatalog.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\Widgets\CallToAction.razor" />
+      <_ContentIncludedByDefault Remove="Components\Сatalog\Partials\Category.razor" />
+      <_ContentIncludedByDefault Remove="Components\Сatalog\Sections\ProductList.razor" />
     </ItemGroup>
 
 
