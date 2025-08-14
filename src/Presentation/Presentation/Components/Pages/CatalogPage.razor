@@ -1,0 +1,21 @@
+﻿@page "/catalog/hardware"
+
+<PageTitle>Каталог</PageTitle>
+
+<MudText Typo="Typo.h1" Class="mb-10">Каталог товарів</MudText>
+
+<MudGrid Spacing="10">
+
+  <MudItem xs="12" md="4">
+    <MudStack>
+      <Category @rendermode="InteractiveAuto"></Category>
+    </MudStack>
+  </MudItem>
+
+  <MudItem xs="12" md="8">
+      <ProductList @rendermode="InteractiveAuto"></ProductList>
+  </MudItem>
+
+</MudGrid>
+
+

@@ -1,6 +1,10 @@
 ﻿@page "/"
 
-<PageTitle>Головна | Class Kedr</PageTitle>
+<PageTitle>@Title</PageTitle>
+<HeadContent>
+  <meta name="description" content="@Description">
+</HeadContent>
+
 
 <section class="bg-blue-50 bg-opacity-20 bs-section-dragged">
 
@@ -10,3 +14,8 @@
 </section>
 
 <CallToAction></CallToAction>
+
+@code{
+  string Description { get;} = "Class Kedr Description";
+  string Title  { get; } = "Головна | Class Kedr";
+}

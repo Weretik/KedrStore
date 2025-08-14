@@ -2,37 +2,15 @@
 
 @* Required *@
 <MudThemeProvider Theme="@KedrTheme.Themetheme" IsDarkMode="false"/>
-<MudPopoverProvider/>
+<MudPopoverProvider @rendermode="InteractiveAuto"/>
 @* Needed for dialogs *@
-<MudDialogProvider/>
+<MudDialogProvider @rendermode="InteractiveAuto"/>
 @* Needed for snackbars *@
-<MudSnackbarProvider/>
+<MudSnackbarProvider @rendermode="InteractiveAuto"/>
 
 <MudLayout>
 
-  <MudAppBar Elevation="4" class="py-4" >
-    <MudStack Style="width: 100%;" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-      <HeaderLogo ></HeaderLogo>
-      <HeaderMainNavigation></HeaderMainNavigation>
-      <HeaderUserActions></HeaderUserActions>
-    </MudStack>
-  </MudAppBar>
-
-  <MudDrawer @bind-Open="@BurgerMenu.IsOpen"
-             Width="380px" Overlay="true" Elevation="1" Variant="@DrawerVariant.Temporary">
-
-    <MudDrawerHeader class="d-flex align-items-center justify-between">
-      <HeaderLogo></HeaderLogo>
-      <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close" @onclick="@BurgerMenu.Toggle"/>
-    </MudDrawerHeader>
-
-    <MudNavMenu>
-      <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
-      <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
-      <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
-    </MudNavMenu>
-
-  </MudDrawer>
+  <Header @rendermode="InteractiveAuto"></Header>
 
   <MudMainContent >
     <MudContainer MaxWidth="MaxWidth.ExtraLarge">
@@ -45,18 +23,4 @@
 
 </MudLayout>
 
-@code {
-  private BurgerMenuState BurgerMenu => State.Get<BurgerMenuState>();
 
-  protected override void OnInitialized()
-  {
-    BurgerMenu.OnChange += StateHasChanged;
-  }
-
-  public void Dispose()
-  {
-    BurgerMenu.OnChange -= StateHasChanged;
-  }
-}
-
-}

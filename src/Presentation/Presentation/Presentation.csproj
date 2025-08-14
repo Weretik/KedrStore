@@ -105,6 +105,11 @@
       <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterServices.razor" />
       <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSocial.razor" />
       <UpToDateCheckInput Remove="Components\Layout\Footer\Partials\FooterSubscription.razor" />
+      <UpToDateCheckInput Remove="Components\Header\Header.razor" />
+      <UpToDateCheckInput Remove="Components\Header\Partials\HeaderLogo.razor" />
+      <UpToDateCheckInput Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
+      <UpToDateCheckInput Remove="Components\Header\Partials\HeaderSearchBar.razor" />
+      <UpToDateCheckInput Remove="Components\Header\Partials\HeaderUserActions.razor" />
     </ItemGroup>
 
 </Project>

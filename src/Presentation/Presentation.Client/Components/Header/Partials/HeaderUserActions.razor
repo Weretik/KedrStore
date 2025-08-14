@@ -1,4 +1,6 @@
-﻿<MudStack Row="true" AlignItems="AlignItems.Center">
+﻿@rendermode InteractiveAuto
+
+<MudStack Row="true" AlignItems="AlignItems.Center">
 
   <MudHidden Breakpoint="Breakpoint.SmAndDown">
 
@@ -28,5 +30,11 @@
 </MudStack>
 
 @code {
-  private BurgerMenuState BurgerMenu => State.Get<BurgerMenuState>();
+  private readonly StateContainer _state;
+  public HeaderUserActions(StateContainer State)
+  {
+    _state = State;
+  }
+
+  private BurgerMenuState BurgerMenu => _state.Get<BurgerMenuState>();
 }

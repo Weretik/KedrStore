@@ -59,7 +59,9 @@ builder.Services.AddScoped<StateContainer>();
 // Services
 builder.Services.AddHealthChecks();
 builder.Host.UseSerilog();
+
 builder.Services.AddMudServices();
+
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
@@ -85,16 +87,16 @@ else
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.MapStaticAssets();
 app.UseAntiforgery();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode();
-    //.AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
 
 // HealthChecks endpoint
 app.MapHealthChecks("/health");

@@ -32,6 +32,11 @@
       <AdditionalFiles Include="Components\Footer\Partials\FooterServices.razor" />
       <AdditionalFiles Include="Components\Footer\Partials\FooterSocial.razor" />
       <AdditionalFiles Include="Components\Footer\Partials\FooterSubscription.razor" />
+      <AdditionalFiles Include="Components\Header\Header.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderLogo.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderMainNavigation.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderSearchBar.razor" />
+      <AdditionalFiles Include="Components\Header\Partials\HeaderUserActions.razor" />
       <AdditionalFiles Include="Components\Shared\Widgets\ButtonToCatalog.razor" />
       <AdditionalFiles Include="Components\Shared\Widgets\CallToAction.razor" />
       <AdditionalFiles Include="Components\Сatalog\Partials\Category.razor" />

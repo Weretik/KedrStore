@@ -1,5 +1,7 @@
-﻿
-  <MudStack Row="true" AlignItems="AlignItems.Center"  Class="d-none d-md-flex d-lg-none">
+﻿@rendermode InteractiveAuto
+
+<MudHidden Breakpoint="Breakpoint.SmAndDown">
+  <MudStack Row="true" AlignItems="AlignItems.Center">
 
     <MudMenu Label="Каталог" Class="mx-1"
              EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
@@ -31,7 +33,7 @@
     </MudButton>
 
   </MudStack>
-
+</MudHidden>
 
 @code {
 
