@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Mapping
+﻿namespace Application.Extensions
 {
     public static class MappingExtensions
     {

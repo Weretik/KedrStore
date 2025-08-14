@@ -6,15 +6,15 @@
         {
             // Регистрация MediatR и поведений
             services.AddMediatR(cfg => {
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 // Добавляем Behaviors
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
-                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(DomainEventDispatcherBehavior<,>));
+                cfg.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));
+                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+                cfg.AddOpenBehavior(typeof(ExceptionHandlingBehavior<,>));
+                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+                cfg.AddOpenBehavior(typeof(PerformanceBehavior<,>));
+                cfg.AddOpenBehavior(typeof(DomainEventDispatcherBehavior<,>));
             });
 
             // Регистрация обработчиков событий
