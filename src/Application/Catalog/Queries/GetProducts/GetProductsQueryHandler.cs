@@ -16,7 +16,7 @@ public class GetProductsQueryHandler(
             manufacturer: request.Manufacturer
         );
 
-        var query = productRepository.GetAllProductAsync()
+        var query = productRepository.QueryProducts()
             .ApplySpecification(specification)
             .ApplySort(request.SortBy, request.SortDirection);
 

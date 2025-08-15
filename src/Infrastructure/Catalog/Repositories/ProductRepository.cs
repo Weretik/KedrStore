@@ -4,7 +4,7 @@ public class ProductRepository(
     ICatalogDbContext context, IDateTimeProvider clock)
     : IProductRepository
 {
-    public IQueryable<Product> GetAllProductAsync()
+    public IQueryable<Product> QueryProducts()
     {
         return context.Products.AsNoTracking();
     }

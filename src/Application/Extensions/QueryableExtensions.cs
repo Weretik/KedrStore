@@ -50,7 +50,7 @@ public static class QueryableExtensions
     public static IQueryable<T> ApplySort<T>(
         this IQueryable<T> query,
         string? sortBy,
-        SortDirection sortDirection)
+        AppSortDirection sortDirection)
     {
         if (string.IsNullOrWhiteSpace(sortBy))
         {
@@ -61,7 +61,7 @@ public static class QueryableExtensions
         var property = Expression.Property(parameter, sortBy);
         var lambda = Expression.Lambda(property, parameter);
 
-        var methodName = sortDirection == SortDirection.Asc
+        var methodName = sortDirection == AppSortDirection.Asc
             ? nameof(Queryable.OrderBy)
             : nameof(Queryable.OrderByDescending);
 

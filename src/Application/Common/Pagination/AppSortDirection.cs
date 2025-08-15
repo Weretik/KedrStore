@@ -1,13 +1,13 @@
 namespace Application.Common.Pagination
 {
-    public readonly record struct SortDirection
+    public readonly record struct AppSortDirection
     {
-        public static readonly SortDirection Asc = new("Asc");
-        public static readonly SortDirection Desc = new("Desc");
+        public static readonly AppSortDirection Asc = new("Asc");
+        public static readonly AppSortDirection Desc = new("Desc");
 
         public string Value { get; }
 
-        private SortDirection(string value)
+        private AppSortDirection(string value)
         {
             Value = value;
         }
@@ -17,7 +17,7 @@ namespace Application.Common.Pagination
 
         public override string ToString() => Value;
 
-        public static SortDirection FromString(string? value) =>
+        public static AppSortDirection FromString(string? value) =>
             value?.ToLowerInvariant() switch
             {
                 "asc" => Asc,
@@ -25,8 +25,8 @@ namespace Application.Common.Pagination
                 _ => throw new ArgumentException($"Invalid sort direction: '{value}'")
             };
 
-        public static implicit operator string(SortDirection direction) => direction.Value;
-        public static explicit operator SortDirection(string value) => FromString(value);
+        public static implicit operator string(AppSortDirection direction) => direction.Value;
+        public static explicit operator AppSortDirection(string value) => FromString(value);
     }
 }
 

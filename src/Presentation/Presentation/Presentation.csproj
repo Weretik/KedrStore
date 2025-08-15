@@ -135,14 +135,7 @@
       <AdditionalFiles Include="Layout\Header\Components\HeaderSearchBar.razor" />
       <AdditionalFiles Include="Layout\Header\Components\HeaderUserActions.razor" />
       <AdditionalFiles Include="Layout\MainLayout.razor" />
-      <AdditionalFiles Include="Pages\AboutUsPage.razor" />
-      <AdditionalFiles Include="Pages\CatalogPage.razor" />
-      <AdditionalFiles Include="Pages\ContactsPage.razor" />
       <AdditionalFiles Include="Pages\Error.razor" />
-      <AdditionalFiles Include="Pages\HardwareSalePage.razor" />
-      <AdditionalFiles Include="Pages\Index.razor" />
-      <AdditionalFiles Include="Pages\InformationPage.razor" />
-      <AdditionalFiles Include="Pages\QuestionsPage.razor" />
       <AdditionalFiles Include="Components\Widgets\ButtonToCatalog.razor" />
       <AdditionalFiles Include="Components\Widgets\CallToAction.razor" />
     </ItemGroup>

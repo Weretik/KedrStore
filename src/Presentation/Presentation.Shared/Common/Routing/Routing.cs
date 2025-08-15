@@ -6,7 +6,7 @@ public static class Routing
     public const string Home = "/";
 
     // Catalog
-    public const string CatalogProducts = "/catalog/hardware";
+    public const string CatalogProducts = "/catalog";
     public const string CatalogardwareSale = "/catalog/hardware_sale";
 
     // Info

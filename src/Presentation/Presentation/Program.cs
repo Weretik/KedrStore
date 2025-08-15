@@ -54,7 +54,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 */
 // DI: State Container
+
 builder.Services.AddScoped<StateContainer>();
+//builder.Services.AddScoped<BurgerMenuState>();
+//builder.Services.AddScoped<CatalogState>();
 
 // Services
 builder.Services.AddHealthChecks();

@@ -8,7 +8,6 @@ public class SearchTermSpecification(string? searchTerm)
     public override Expression<Func<Product, bool>> ToExpression()
     {
         return product => string.IsNullOrEmpty(_searchTerm) ||
-                         product.Name.ToLower().Contains(_searchTerm) ||
-                         product.Id.ToString().ToLower().Contains(_searchTerm);
+                         product.Name.ToLower().Contains(_searchTerm);
     }
 }

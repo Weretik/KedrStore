@@ -28,11 +28,5 @@
 </MudStack>
 
 @code {
-  private readonly StateContainer _state;
-  public HeaderUserActions(StateContainer State)
-  {
-    _state = State;
-  }
-
-  private BurgerMenuState BurgerMenu => _state.Get<BurgerMenuState>();
+  private BurgerMenuState BurgerMenu => StateContainer.Get<BurgerMenuState>();
 }

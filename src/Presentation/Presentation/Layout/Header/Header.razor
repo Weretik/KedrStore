@@ -24,13 +24,7 @@
 
 
 @code {
-  private readonly StateContainer _state;
-  public Header(StateContainer State)
-  {
-    _state = State;
-  }
-
-  private BurgerMenuState BurgerMenu => _state.Get<BurgerMenuState>();
+  private BurgerMenuState BurgerMenu => StateContainer.Get<BurgerMenuState>();
 
   protected override void OnInitialized()
   {

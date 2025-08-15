@@ -23,3 +23,4 @@ global using Presentation.Shared;
 global using Presentation.Shared.Common;
 global using Presentation.Shared.Common.Abstractions;
 global using Presentation.Shared.Common.States;
+global using Presentation.Shared.States;

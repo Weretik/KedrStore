@@ -19,7 +19,7 @@ public sealed record GetProductsQuery : PagedQuery<AppResult<PagedResult<Product
         int pageNumber = 1,
         int pageSize = 20,
         string? sortBy = null,
-        SortDirection sortDirection = default)
+        AppSortDirection sortDirection = default)
         : base(pageNumber, pageSize, sortBy, sortDirection)
     {
         SearchTerm = searchTerm;

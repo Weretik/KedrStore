@@ -1,9 +1,11 @@
 ﻿<MudStack Class="mt-10 mb-20" Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Wrap="Wrap.Wrap">
 
   <MudStack Style="width: 100%; max-width: 450px;" Row="true" AlignItems="AlignItems.Center">
-    <MudTextField @bind-Value="Search" Label="Пошук"
+
+    <MudTextField @bind-Value="Search" Label="Пошук" OnKeyDown="HandleKeyDown"
                   Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
                   AdornmentColor="Color.Success"/>
+
   </MudStack>
 
 
@@ -21,5 +23,16 @@
 </MudStack>
 
 @code {
-  public string Search { get; set; }
+  private CatalogState CatalogState => StateContainer.Get<CatalogState>();
+  public string? Search { get; set; }
+
+  //private string? _searchTerm;
+  private void HandleKeyDown(KeyboardEventArgs e)
+  {
+    if (e.Key != "Enter") return;
+
+    CatalogState.SetSearchTerm(Search);
+    Nav.NavigateTo("/catalog");
+  }
+  }
 }

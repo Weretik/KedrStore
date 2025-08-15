@@ -1,6 +1,4 @@
-﻿using Presentation.Shared.Common.Abstractions;
-
-namespace Presentation.Shared.States;
+﻿namespace Presentation.Shared.States;
 
 public class BurgerMenuState : IState
 {

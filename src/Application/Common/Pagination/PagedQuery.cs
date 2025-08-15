@@ -5,11 +5,11 @@ namespace Application.Common.Pagination
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 20;
         public string? SortBy { get; init; }
-        public SortDirection SortDirection { get; init; } = SortDirection.Asc;
+        public AppSortDirection SortDirection { get; init; } = AppSortDirection.Asc;
 
         public PagedQuery() { }
 
-        public PagedQuery(int pageNumber, int pageSize, string? sortBy, SortDirection sortDirection)
+        public PagedQuery(int pageNumber, int pageSize, string? sortBy, AppSortDirection sortDirection)
         {
             PageNumber = pageNumber <= 0 ? 1 : pageNumber;
             PageSize = pageSize <= 0 ? 20 : pageSize;

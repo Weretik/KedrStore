@@ -24,7 +24,7 @@ public sealed class GetProductsQueryValidator
             .WithMessage("Мінімальна ціна не може бути більшою за максимальну.");
 
         RuleFor(q => q.SortDirection)
-            .Must(d => d == SortDirection.Asc || d == SortDirection.Desc)
+            .Must(d => d == AppSortDirection.Asc || d == AppSortDirection.Desc)
             .WithMessage("Напрямок сортування має бути 'asc' або 'desc'.");
 
         RuleFor(q => q.SortBy)
