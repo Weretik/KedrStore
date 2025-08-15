@@ -1,4 +1,7 @@
-﻿namespace Infrastructure.Extensions;
+﻿using Application.Catalog.Abstractions;
+using Infrastructure.Identity.Persistence;
+
+namespace Infrastructure.Extensions;
 
 public static class InfrastreServiceCollection
 {
@@ -36,6 +39,12 @@ public static class InfrastreServiceCollection
             options.ValidationInterval = TimeSpan.FromMinutes(30);
         });
 
+        // Регистрация Репозиториев
+        services.AddScoped(typeof(ICatalogReadRepository<>),  typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(ICatalogRepository<>),      typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(IAppIdentityReadRepository<>), typeof(AppIdentityEfRepository<>));
+        services.AddScoped(typeof(IAppIdentityRepository<>),     typeof(AppIdentityEfRepository<>));
+
         // Регистрация миграторов каталога и идентификации
         services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
         services.AddScoped<ICatalogDbMigrator, CatalogDbMigrator>();
@@ -43,10 +52,6 @@ public static class InfrastreServiceCollection
         // Регистрация миграторов идентификации
         services.AddScoped<IDatabaseMigrator, AppIdentityDbMigrator>();
         services.AddScoped<IAppIdentityDbMigrator, AppIdentityDbMigrator>();
-
-        // Регистрация Сервисов и Репозиториев
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         // Регистрация сидеров Identity
         services.AddScoped<ISeeder, RoleSeeder>();

@@ -3,6 +3,7 @@ global using System.Xml.Linq;
 global using System.Globalization;
 global using System.Security.Claims;
 
+
 // Microsoft namespaces
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
@@ -19,7 +20,6 @@ global using Microsoft.Extensions.Hosting;
 
 // Infrastructure namespaces
 global using Infrastructure.Catalog;
-global using Infrastructure.Catalog.Repositories;
 global using Infrastructure.Catalog.Seeders;
 global using Infrastructure.Identity;
 global using Infrastructure.Identity.Entities;
@@ -48,3 +48,8 @@ global using Application.Common.Abstractions.Security;
 global using Application.Interfaces;
 global using Application.Catalog.Interfaces;
 global using Application.Common.Errors;
+global using Application.Identity.Abstractions;
+
+// Ardalis
+global using Ardalis.Specification;
+global using Ardalis.Specification.EntityFrameworkCore;

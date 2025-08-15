@@ -13,11 +13,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Repositories\" />
       <Folder Include="Common\Configuration\" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Ardalis.Specification" Version="9.2.0" />
+      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">

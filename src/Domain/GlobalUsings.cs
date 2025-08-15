@@ -9,7 +9,6 @@ global using Domain.Catalog.Events;
 global using Domain.Common.Abstractions;
 global using Domain.Common.Entity;
 global using Domain.Common.Events;
-global using Domain.Common.Specifications;
 global using Domain.Common.ValueObject;
 global using Domain.Common.Exception;
 global using Domain.Common.Rules;

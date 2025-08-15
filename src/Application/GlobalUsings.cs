@@ -48,3 +48,6 @@ global using AutoMapper;
 global using AutoMapper.QueryableExtensions;
 global using MediatR;
 global using FluentValidation;
+
+// Ardalis
+global using Ardalis.Specification;
