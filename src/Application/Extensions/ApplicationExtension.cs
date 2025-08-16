@@ -1,20 +1,23 @@
 ﻿namespace Application.Extensions
 {
-    public static class ApplicationServiceCollection
+    public static class ApplicationExtension
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            // Регистрация MediatR и поведений
-            services.AddMediatR(cfg => {
-
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-                // Добавляем Behaviors
-                cfg.AddOpenBehavior(typeof(UnhandledExceptionBehavior<,>));
-                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
-                cfg.AddOpenBehavior(typeof(ExceptionHandlingBehavior<,>));
-                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-                cfg.AddOpenBehavior(typeof(PerformanceBehavior<,>));
-                cfg.AddOpenBehavior(typeof(DomainEventDispatcherBehavior<,>));
+            // Регистрация Mediator
+            services.AddMediator(options =>
+            {
+                options.Assemblies = [ typeof(ApplicationAssemblyMarker) ];
+                options.ServiceLifetime = ServiceLifetime.Scoped;
+                options.PipelineBehaviors =
+                [
+                    typeof(UnhandledExceptionBehavior<,>),
+                    typeof(LoggingBehavior<,>),
+                    typeof(ExceptionHandlingBehavior<,>),
+                    typeof(ValidationBehavior<,>),
+                    typeof(PerformanceBehavior<,>),
+                    typeof(DomainEventDispatcherBehavior<,>)
+                ];
             });
 
             // Регистрация обработчиков событий
@@ -22,9 +25,6 @@
 
             // Регистрация обработчиков доменных событий из текущей сборки
             services.AddDomainEventHandlers(Assembly.GetExecutingAssembly());
-
-            // Регистрация AutoMapper с профилями из сборки приложения
-            services.AddAutoMapperProfiles<ApplicationAssemblyMarker>();
 
             // Регистрация FluentValidation
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

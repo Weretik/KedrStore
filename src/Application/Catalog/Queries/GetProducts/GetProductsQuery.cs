@@ -1,31 +1,13 @@
 namespace Application.Catalog.Queries.GetProducts;
 
-public sealed record GetProductsQuery : PagedQuery<AppResult<PagedResult<ProductDto>>>
-{
-    public string? SearchTerm { get; init; }
-    public decimal? MinPrice { get; init; }
-    public decimal? MaxPrice { get; init; }
-    public int? CategoryId { get; init; }
-    public string? Manufacturer { get; init; }
+public sealed record GetProductsQuery(
+    string? SearchTerm,
+    int? CategoryId,
+    decimal? MinPrice,
+    decimal? MaxPrice,
+    string? Manufacturer,
+    string? Sort,
+    int PageNumber = 1,
+    int PageSize   = 12)
+    : IQuery<Result<PageResponse<ProductDto>>>;
 
-    public GetProductsQuery() { }
-
-    public GetProductsQuery(
-        string? searchTerm = null,
-        decimal? minPrice = null,
-        decimal? maxPrice = null,
-        int? categoryId = null,
-        string? manufacturer = null,
-        int pageNumber = 1,
-        int pageSize = 20,
-        string? sortBy = null,
-        AppSortDirection sortDirection = default)
-        : base(pageNumber, pageSize, sortBy, sortDirection)
-    {
-        SearchTerm = searchTerm;
-        MinPrice = minPrice;
-        MaxPrice = maxPrice;
-        CategoryId = categoryId;
-        Manufacturer = manufacturer;
-    }
-}

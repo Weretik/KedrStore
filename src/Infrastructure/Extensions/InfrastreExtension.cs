@@ -3,7 +3,7 @@ using Infrastructure.Identity.Persistence;
 
 namespace Infrastructure.Extensions;
 
-public static class InfrastreServiceCollection
+public static class InfrastreExtension
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {

@@ -21,33 +21,27 @@ global using Application.DTOs;
 global using Application.Interfaces;
 global using Application.Catalog.DTOs;
 global using Application.Common.Behaviors;
-global using Application.Common.Results;
-global using Application.Common.Pagination;
 global using Application.Common.Events;
 global using Application.Common.Exceptions;
 global using Application.Common.Errors;
-global using Application.Common.Mapping;
 global using Application.Common.Abstractions.Events;
 global using Application.Common.Abstractions.UseCase;
-global using Application.Common.Abstractions.Pagination;
-global using Application.Common.Abstractions.Mapping;
-global using Application.Common.Abstractions.Result;
 global using Application.Common.Abstractions.Background;
 global using Application.Common.Abstractions.Logging;
+global using Application.Common.Sorting;
+global using Application.Common.Paging;
 
 // Domain namespaces
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Repositories;
-global using Domain.Catalog.Specifications;
 global using Domain.Common.Exception;
 global using Domain.Common.Abstractions;
 
 // External libraries
-global using AutoMapper;
-global using AutoMapper.QueryableExtensions;
-global using MediatR;
+global using Mediator;
 global using FluentValidation;
-
-// Ardalis
 global using Ardalis.Specification;
+global using Ardalis.Specification.EntityFrameworkCore;
+global using Ardalis.Result;
+global using Ardalis.Result.FluentValidation;

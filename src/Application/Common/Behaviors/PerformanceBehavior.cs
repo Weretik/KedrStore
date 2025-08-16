@@ -3,7 +3,7 @@
 public class PerformanceBehavior<TRequest, TResponse>(
     ILoggingService loggingService)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    where TRequest : IRequest<TResponse>, IUseCase
 {
     // Порог в миллисекундах. Всё, что дольше — логгируем как медленное выполнение.
     private const int ThresholdMilliseconds = 500;
