@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Common.Services;
+﻿using Application.Common.Interfaces;
+
+namespace Infrastructure.Common.Services;
 
 public sealed class DateTimeProvider : IDateTimeProvider
 {

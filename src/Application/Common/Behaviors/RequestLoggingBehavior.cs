@@ -1,0 +1,34 @@
+﻿namespace Application.Common.Behaviors;
+
+public sealed class RequestLoggingBehavior<TMessage, TResponse>(
+    ILogger<RequestLoggingBehavior<TMessage, TResponse>> logger)
+    : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IMessage
+{
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken ct)
+    {
+        var requestName = typeof(TMessage).Name;
+        var timer = Stopwatch.StartNew();
+
+        RequestLog.Handling(logger, requestName);
+
+        try
+        {
+            var response = await next(message, ct);
+            timer.Stop();
+
+            RequestLog.Handled(logger, requestName, timer.ElapsedMilliseconds);;
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            timer.Stop();
+            RequestLog.Failed(logger, requestName, timer.ElapsedMilliseconds, ex);
+            throw;
+        }
+    }
+}

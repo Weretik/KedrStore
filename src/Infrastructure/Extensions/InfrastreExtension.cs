@@ -1,7 +1,4 @@
-﻿using Application.Catalog.Abstractions;
-using Infrastructure.Identity.Persistence;
-
-namespace Infrastructure.Extensions;
+﻿namespace Infrastructure.Extensions;
 
 public static class InfrastreExtension
 {
@@ -33,11 +30,6 @@ public static class InfrastreExtension
             })
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
-
-        services.Configure<SecurityStampValidatorOptions>(options =>
-        {
-            options.ValidationInterval = TimeSpan.FromMinutes(30);
-        });
 
         // Регистрация Репозиториев
         services.AddScoped(typeof(ICatalogReadRepository<>),  typeof(CatalogEfRepository<>));
@@ -74,9 +66,8 @@ public static class InfrastreExtension
         // Регистрация Services
         services.AddSingleton<IEnvironmentService, EnvironmentService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddScoped<IDomainEventContext, DomainEventContext>();
-        services.AddScoped<ILoggingService, LoggingService>();
-
+        services.AddScoped<IDomainEventContext, EfDomainEventContext>();
+        services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
         return services;
     }
 }

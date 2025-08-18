@@ -37,8 +37,6 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
         SetCategoryId(categoryId);
         SetPhoto(photo);
         MarkAsCreated(createdDate);
-
-        AddCreatedEvent();
     }
     public static Product Create(ProductId id, string name, string manufacturer, Money price,
         CategoryId categoryId, string photo, DateTime createdDate)
@@ -149,10 +147,5 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
 
     #endregion
 
-    #region Domain Events
-
-    private void AddCreatedEvent() => AddDomainEvent(new ProductCreatedEvent(Id));
-
-    #endregion
 }
 

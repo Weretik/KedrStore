@@ -3,6 +3,7 @@ global using System.Xml.Linq;
 global using System.Globalization;
 global using System.Security.Claims;
 
+global using Mediator;
 
 // Microsoft namespaces
 global using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,10 @@ global using Microsoft.Extensions.Hosting;
 // Infrastructure namespaces
 global using Infrastructure.Catalog;
 global using Infrastructure.Catalog.Seeders;
+global using Infrastructure.Catalog.Persistence;
+global using Infrastructure.Catalog.Interfaces;
+global using Infrastructure.Catalog.Migrations;
+
 global using Infrastructure.Identity;
 global using Infrastructure.Identity.Entities;
 global using Infrastructure.Identity.Seeders;
@@ -28,12 +33,12 @@ global using Infrastructure.Identity.Configuration;
 global using Infrastructure.Identity.Utils;
 global using Infrastructure.Identity.Security;
 global using Infrastructure.Identity.Interfaces;
-global using Infrastructure.Catalog.Persistence;
-global using Infrastructure.Catalog.Interfaces;
-global using Infrastructure.Common.Abstractions;
-global using Infrastructure.Common.Services;
-global using Infrastructure.Catalog.Migrations;
 global using Infrastructure.Identity.Migrations;
+global using Infrastructure.Identity.Persistence;
+
+global using Infrastructure.Common.Abstractions;
+global using Infrastructure.Common.Events;
+global using Infrastructure.Common.Services;
 
 // Domain namespaces
 global using Domain.Common.Abstractions;
@@ -43,12 +48,11 @@ global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Repositories;
 
 // Application namespaces
-global using Application.Common.Abstractions.Events;
-global using Application.Common.Abstractions.Security;
-global using Application.Interfaces;
 global using Application.Catalog.Interfaces;
-global using Application.Common.Errors;
 global using Application.Identity.Abstractions;
+global using Application.Common.Interfaces;
+global using Application.Common.Notifications;
+global using Application.Common.Interfaces;
 
 // Ardalis
 global using Ardalis.Specification;

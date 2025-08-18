@@ -1,11 +1,10 @@
 namespace Application.Catalog.Queries.GetProducts;
 
 public class GetProductsQueryHandler(
-    IProductRepository productRepository,
-    IMapper mapper)
-    : IQueryHandler<GetProductsQuery, AppResult<PagedResult<ProductDto>>>
+    IProductRepository productRepository)
+    : IQueryHandler<GetProductsQuery, Result<PageResponse<ProductDto>>>
 {
-    public async Task<AppResult<PagedResult<ProductDto>>> Handle(
+    public async ValueTask<Result<PagedResult<ProductDto>>> Handle(
         GetProductsQuery request, CancellationToken cancellationToken)
     {
         var specification = new ProductFilterSpecification(
@@ -26,6 +25,6 @@ public class GetProductsQueryHandler(
             request.PageSize,
             cancellationToken);
 
-        return AppResult<PagedResult<ProductDto>>.Success(pagedResult);
+        return Result<PagedResult<ProductDto>>.Success(pagedResult);
     }
 }

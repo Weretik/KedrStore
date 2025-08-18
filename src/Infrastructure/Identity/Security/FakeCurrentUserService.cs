@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Identity.Security;
+﻿using Application.Common.Interfaces;
+
+namespace Infrastructure.Identity.Security;
 
 public class FakeCurrentUserService : ICurrentUserService
 {

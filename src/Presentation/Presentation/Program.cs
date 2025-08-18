@@ -1,31 +1,23 @@
-var builder = WebApplication.CreateBuilder(args);
-
-// Подгружаем .env ТОЛЬКО если локальная разработка
-if (builder.Environment.IsDevelopment())
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 {
     Env.TraversePath().Load();
 }
 
-// Конфигурация: переменные окружения → appsettings.json
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddEnvironmentVariables();
+var builder = WebApplication.CreateBuilder(args);
 
 // Настройка Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext().CreateLogger();
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Razor-компоненты
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents()
-    .AddAuthenticationStateSerialization(options =>
-    {
-        // По желанию: как именно сериализовать клеймы
-        options.SerializeAllClaims = true;
-        // options.SerializationCallback = ctx => ctx.ProjectClaims(...);
-    });;
+    .AddInteractiveWebAssemblyComponents();
 
 // Конфигурация AdminUser
 builder.Services.Configure<AdminUserConfig>(
@@ -42,29 +34,13 @@ builder.Services.Scan(scan => scan
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
-/*
-// DI: Authentication
-builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/Forbidden";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    });
-*/
-// DI: State Container
 
+// DI: State Container
 builder.Services.AddScoped<StateContainer>();
-//builder.Services.AddScoped<BurgerMenuState>();
-//builder.Services.AddScoped<CatalogState>();
 
 // Services
 builder.Services.AddHealthChecks();
-builder.Host.UseSerilog();
-
 builder.Services.AddMudServices();
-
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
@@ -75,21 +51,18 @@ var app = builder.Build();
 await app.UseAppMigrations();
 await app.UseAppSeeders();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
+    app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseHttpsRedirection();
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
-app.UseMiddleware<ErrorHandlingMiddleware>();
-
-app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.MapStaticAssets();
 app.UseAntiforgery();
 
@@ -98,8 +71,7 @@ app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Presentation.Client._Imports).Assembly);
+    .AddInteractiveWebAssemblyRenderMode();
 
 // HealthChecks endpoint
 app.MapHealthChecks("/health");

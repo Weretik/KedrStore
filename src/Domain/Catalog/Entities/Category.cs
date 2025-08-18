@@ -20,8 +20,6 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
         SetName(name);
         SetParentCategoryId(parentCategoryId);
         MarkAsCreated(createdDate);
-
-        AddCreatedEvent();
     }
 
     public static Category Create(CategoryId id, string name, DateTime createdDate, CategoryId? parentCategoryId = null)
@@ -113,11 +111,5 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
             MarkAsUpdated(updatedDate);
         }
     }
-    #endregion
-
-    #region Domain Events
-
-    private void AddCreatedEvent() => AddDomainEvent(new CategoryCreatedEvent(Id));
-
     #endregion
 }

@@ -3,7 +3,6 @@
     public interface ICatalogUnitOfWork : IDisposable
     {
         ICatalogDbContext DbContext { get; }
-        IDomainEventDispatcher EventDispatcher { get; }
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
