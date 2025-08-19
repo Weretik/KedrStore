@@ -50,33 +50,27 @@ public class Product : BaseEntity<ProductId>, IAggregateRoot
 
     private void SetProductId(ProductId id)
     {
-        RuleChecker.Check(new IdMustNotBeNullRule(id));
-        Id = id;
+        Id = Guard.Against.Null(id, nameof(id));
     }
     private void SetName(string name)
     {
-        RuleChecker.Check(new NameMustNotBeEmptyRule(name));
-        Name = name;
+        Name = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();
     }
     private void SetManufacturer(string manufacturer)
     {
-        RuleChecker.Check(new ManufacturerMustNotBeEmptyRule(manufacturer));
-        Manufacturer = manufacturer;
+        Manufacturer = Guard.Against.NullOrWhiteSpace(manufacturer, nameof(manufacturer));
     }
     private void SetMoney(Money price)
     {
-        RuleChecker.Check(new MoneyMustNotBeNullRule(price));
-        Price = price;
+        Price = Guard.Against.Null(price, nameof(price)) ;
     }
     private void SetCategoryId(CategoryId categoryId)
     {
-        RuleChecker.Check(new IdMustNotBeNullRule(categoryId));
-        CategoryId = categoryId;
+        CategoryId = Guard.Against.Null(categoryId, nameof(categoryId));
     }
     private void SetPhoto(string photo)
     {
-        RuleChecker.Check(new PhotoMustNotBeEmptyRule(photo));
-        Photo = photo;
+        Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
     }
 
     #endregion

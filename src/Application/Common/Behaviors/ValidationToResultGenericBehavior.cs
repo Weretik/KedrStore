@@ -9,17 +9,22 @@ public class ValidationToResultGenericBehavior<TMessage, TResponse>(
     public async ValueTask<Result<TResponse>> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, Result<TResponse>> next,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         if (!validators.Any())
-            return await next(message, ct);
+            return await next(message, cancellationToken);
 
-        var ctx      = new ValidationContext<TMessage>(message);
-        var results  = await Task.WhenAll(validators.Select(v => v.ValidateAsync(ctx, ct)));
-        var failures = results.SelectMany(r => r.Errors).Where(e => e is not null).ToList();
+        var context = new ValidationContext<TMessage>(message);
+        var results  = await Task.WhenAll(validators.Select(
+            v => v.ValidateAsync(context, cancellationToken))
+        );
+        var failures = results
+            .SelectMany(r => r.Errors)
+            .Where(e => e is not null)
+            .ToList();
 
         if (failures.Count == 0)
-            return await next(message, ct);
+            return await next(message, cancellationToken);
 
         ValidationLog.Failed(
             logger,

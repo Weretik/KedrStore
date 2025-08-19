@@ -8,13 +8,13 @@ public sealed class UnhandledExceptionBehavior<TMessage, TResponse>(
     public async ValueTask<TResponse> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         try
         {
-            return await next(message, ct);
+            return await next(message, cancellationToken);
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             throw;
         }

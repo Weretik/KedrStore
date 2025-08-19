@@ -11,19 +11,23 @@ public sealed class ValidationToResultBehavior<TMessage>(
     public async ValueTask<Result> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, Result> next,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         if (!validators.Any())
-            return await next(message, ct);
+            return await next(message, cancellationToken);
 
-        var ctx      = new ValidationContext<TMessage>(message);
-        var results  = await Task.WhenAll(validators.Select(v => v.ValidateAsync(ctx, ct)));
-        var failures = results.SelectMany(r => r.Errors).Where(e => e is not null).ToList();
+        var context = new ValidationContext<TMessage>(message);
+        var results  = await Task.WhenAll(validators.Select(
+            v => v.ValidateAsync(context, cancellationToken))
+        );
+        var failures = results
+            .SelectMany(r => r.Errors)
+            .Where(e => e is not null)
+            .ToList();
 
         if (failures.Count == 0)
-            return await next(message, ct);
+            return await next(message, cancellationToken);
 
-        // Логируем только имена полей и тексты — без значений (PII-safe)
         ValidationLog.Failed(
             logger,
             typeof(TMessage).Name,

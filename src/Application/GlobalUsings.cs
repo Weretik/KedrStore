@@ -27,7 +27,6 @@ global using Application.Common.Interfaces;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Repositories;
-global using Domain.Common.Exception;
 global using Domain.Common.Abstractions;
 
 // External libraries

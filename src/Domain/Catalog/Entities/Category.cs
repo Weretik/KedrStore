@@ -33,19 +33,36 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 
     private void SetId(CategoryId id)
     {
-        RuleChecker.Check(new IdMustNotBeNullRule(id));
-        Id = id;
+        Id = Guard.Against.Null(id, nameof(id));
     }
     private void SetName(string name)
     {
-        RuleChecker.Check(new NameMustNotBeEmptyRule(name));
-        Name = name;
+        Name = Guard.Against.NullOrWhiteSpace(name, nameof(name)).Trim();;
     }
     private void SetParentCategoryId(CategoryId? parentCategoryId)
     {
         ParentCategoryId = parentCategoryId;
     }
 
+    private bool HasDescendant(CategoryId candidateId)
+    {
+        var stack = new Stack<Category>(_children);
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+
+            if (node.Id == candidateId) return true;
+
+            if (node._children.Count > 0)
+            {
+                foreach (var child in node._children)
+                {
+                    stack.Push(child);
+                }
+            }
+        }
+        return false;
+    }
     #endregion
 
     #region Update & Change Methods
@@ -64,52 +81,66 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 
     public void ChangeParent(CategoryId? parentCategoryId, DateTime updatedDate)
     {
-        if(parentCategoryId != null)
+        if (parentCategoryId is not null)
         {
-            RuleChecker.Check(new CannotAssignSelfOrDescendantAsParentRule(this, parentCategoryId));
+            Guard.Against.InvalidInput(parentCategoryId, nameof(parentCategoryId),
+                parentId => parentId != Id,
+                "You cannot assign yourself as the parent category.");
+
+            Guard.Against.InvalidInput(parentCategoryId, nameof(parentCategoryId),
+                parentId => !HasDescendant(parentId),
+                "You cannot assign a child category to a parent (cycle).");
         }
+
         SetParentCategoryId(parentCategoryId);
         MarkAsUpdated(updatedDate);
+
     }
 
-    public bool IsDescendantOf(CategoryId targetAncestorId)
-    {
-        var current = this;
-        while (current.ParentCategoryId != null)
-        {
-            if (current.ParentCategoryId == targetAncestorId)
-                return true;
-
-            break;
-        }
-
-        return false;
-    }
     #endregion
 
     #region Manipulations with child categories
     public void AddChild(Category child, DateTime updatedDate)
     {
-        RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
-        RuleChecker.Check(new CannotAddSelfOrAncestorAsChildRule(this, child));
+        child = Guard.Against.Null(child, nameof(child));
 
-        if (!_children.Contains(child))
-        {
-            _children.Add(child);
-            child.ParentCategoryId = Id;
-            MarkAsUpdated(updatedDate);
-        }
+        Guard.Against.InvalidInput(child, nameof(child),
+            c => c.Id != Id,
+            "You cannot add a category to itself as a child category.");
+
+        Guard.Against.InvalidInput(child.Id, nameof(child.Id),
+            id => _children.All(c => c.Id != id),
+            "Child already added.");
+
+        Guard.Against.InvalidInput(child, nameof(child),
+            c => c.ParentCategoryId is null || c.ParentCategoryId == Id,
+            "Child belongs to another parent. Detach or move it first.");
+
+        Guard.Against.InvalidInput(child, nameof(child),
+            c => !c.HasDescendant(Id),
+            "You cannot add an ancestor as a child (cycle).");
+
+        _children.Add(child);
+        child.ParentCategoryId = Id;
+        MarkAsUpdated(updatedDate);
+
     }
 
     public void RemoveChild(Category child, DateTime updatedDate)
     {
-        RuleChecker.Check(new ChildCategoryMustNotBeNullRule(child));
+        child = Guard.Against.Null(child, nameof(child));
 
-        if (_children.Remove(child))
-        {
-            child.ParentCategoryId = null;
-            MarkAsUpdated(updatedDate);
-        }
+        var node = _children.FirstOrDefault(c => c.Id == child.Id);
+
+        if (node is null)
+            return;
+
+        _children.Remove(node);
+
+        if (node.ParentCategoryId == Id)
+            node.ParentCategoryId = null;
+
+        MarkAsUpdated(updatedDate);
     }
     #endregion
 }

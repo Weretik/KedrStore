@@ -7,12 +7,11 @@ public sealed class Money : ValueObject
 
     public Money(decimal amount, string currency = "грн")
     {
-        RuleChecker.Check(new AmountMustBePositiveRule(amount));
-        RuleChecker.Check(new CurrencyMustNotBeEmptyRule(currency));
-        RuleChecker.Check(new CurrencyMustBeThreeLettersRule(currency));
-
-        Amount = amount;
-        Currency = currency;
+        Amount = Guard.Against.NegativeOrZero(amount);
+        Currency = Guard.Against.NullOrWhiteSpace(currency).Trim();
+        Guard.Against.InvalidInput(Currency, nameof(Currency),
+            v => v.Length == 3 && v.All(char.IsLetter),
+            "Currency must be a 3-letter code..");
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

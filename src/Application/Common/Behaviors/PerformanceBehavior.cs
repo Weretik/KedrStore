@@ -10,12 +10,13 @@ public class PerformanceBehavior<TMessage, TResponse>(
     public async ValueTask<TResponse> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
+
         try
         {
-            return await next(message, ct);
+            return await next(message, cancellationToken);
         }
         finally
         {

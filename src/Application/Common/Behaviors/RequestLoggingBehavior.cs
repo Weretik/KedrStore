@@ -8,7 +8,7 @@ public sealed class RequestLoggingBehavior<TMessage, TResponse>(
     public async ValueTask<TResponse> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         var requestName = typeof(TMessage).Name;
         var timer = Stopwatch.StartNew();
@@ -17,7 +17,7 @@ public sealed class RequestLoggingBehavior<TMessage, TResponse>(
 
         try
         {
-            var response = await next(message, ct);
+            var response = await next(message, cancellationToken);
             timer.Stop();
 
             RequestLog.Handled(logger, requestName, timer.ElapsedMilliseconds);;

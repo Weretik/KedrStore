@@ -2,5 +2,5 @@
 
 public interface IDomainEventDispatcher
 {
-    ValueTask DispatchAsync(IDomainEvent domainEvent, CancellationToken ct);
+    ValueTask DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken);
 }

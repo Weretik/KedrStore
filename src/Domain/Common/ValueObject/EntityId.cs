@@ -1,14 +1,8 @@
 ﻿namespace Domain.Common.ValueObject;
 
-public abstract class EntityId : ValueObject
+public abstract class EntityId(int value) : ValueObject
 {
-    public int Value { get; }
-
-    protected EntityId(int value)
-    {
-        RuleChecker.Check (new IdMustBePositiveRule(value));
-        Value = value;
-    }
+    public int Value { get; } = Guard.Against.NegativeOrZero(value, nameof(value));
 
     protected override IEnumerable<object> GetEqualityComponents()
     {

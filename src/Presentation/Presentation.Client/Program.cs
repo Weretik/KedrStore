@@ -1,10 +1,3 @@
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Presentation.Shared.Common;
-using Presentation.Shared.States;
-using MudBlazor.Services;
-using Presentation.Shared.Common.Abstractions;
-using Presentation.Shared.Common.States;
-
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddAuthenticationStateDeserialization();

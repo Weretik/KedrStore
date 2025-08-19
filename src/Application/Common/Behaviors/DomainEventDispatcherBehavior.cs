@@ -10,9 +10,9 @@
         public async ValueTask<TResponse> Handle(
             TMessage message,
             MessageHandlerDelegate<TMessage, TResponse> next,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
-            var response = await next(message, ct);
+            var response = await next(message, cancellationToken);
 
             var entities = eventContext.GetDomainEntities();
             var events = entities.SelectMany(e => e.DomainEvents).ToList();
@@ -29,10 +29,10 @@
                 try
                 {
                     DomainEventLog.Dispatching(logger, eventName);
-                    await dispatcher.DispatchAsync(@event, ct);
+                    await dispatcher.DispatchAsync(@event, cancellationToken);
                     DomainEventLog.Dispatched(logger, eventName);
                 }
-                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
                     throw;
                 }
