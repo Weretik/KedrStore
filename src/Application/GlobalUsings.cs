@@ -7,6 +7,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using System.Diagnostics;
 global using System.Linq.Expressions;
+global using System.Globalization;
 
 // Microsoft namespaces
 global using Microsoft.Extensions.DependencyInjection;
@@ -17,17 +18,18 @@ global using Microsoft.EntityFrameworkCore.Infrastructure;
 
 // Application namespaces
 global using Application.Extensions;
-global using Application.Catalog.DTOs;
 global using Application.Common.Behaviors;
 global using Application.Common.Sorting;
 global using Application.Common.Paging;
 global using Application.Common.Logging;
-global using Application.Common.Interfaces;
+global using Application.Catalog.DTOs;
+global using Application.Catalog.Sorting;
+
 // Domain namespaces
+global using Domain.Common.Abstractions;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Repositories;
-global using Domain.Common.Abstractions;
 
 // External libraries
 global using Mediator;

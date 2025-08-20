@@ -1,10 +1,8 @@
-﻿using System.Globalization;
+﻿namespace Application.Catalog.Queries.GetProducts;
 
-namespace Application.Catalog.Specifications;
-
-public sealed class ProductsPagedSpec : Specification<Product, ProductDto>
+public sealed class GetProductsQueryPagedSpecification : Specification<Product, ProductDto>
 {
-    public ProductsPagedSpec(
+    public GetProductsQueryPagedSpecification(
         string? search,
         CategoryId? categoryId,
         decimal? minPrice,
@@ -38,17 +36,9 @@ public sealed class ProductsPagedSpec : Specification<Product, ProductDto>
         if (!string.IsNullOrWhiteSpace(manufacturer))
             Query.Search(p => p.Manufacturer, $"%{manufacturer!.Trim()}%");
 
-        IOrderedSpecificationBuilder<Product>? ordered = null;
-        foreach (var term in SortParser.Parse(sort))
-        {
-            var key = ProductSortMap.Keys[term.Field];
-            ordered = ordered is null
-                ? (term.isDesc ? Query.OrderByDescending(key) : Query.OrderBy(key))
-                : (term.isDesc ? ordered.ThenByDescending(key) : ordered.ThenBy(key));
-        }
-
-        (ordered ?? Query.OrderBy(ProductSortMap.Keys[ProductSortMap.DefaultField]))
-            .ThenBy(p => p.Id.Value); // стабильность
+        var ordered = Query.ApplySorting(new ProductSortMap(), sort);
+        (ordered ?? Query.OrderBy(p => p.Name))
+            .ThenBy(p => p.Id.Value);
 
         Query.Skip((page - 1) * pageSize).Take(pageSize);
 

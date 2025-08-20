@@ -1,4 +1,6 @@
-﻿namespace Application.Common.Behaviors
+﻿using Application.Common.Notifications;
+
+namespace Application.Common.Behaviors
 {
     public sealed class DomainEventDispatcherBehavior<TMessage, TResponse>(
         IDomainEventContext eventContext,

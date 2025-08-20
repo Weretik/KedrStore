@@ -2,26 +2,21 @@
 
 public static class SortParser
 {
-    // "name,-price" -> [("name", false), ("price", true)]
-    public static IReadOnlyList<SortTerm> Parse(string? sort)
+    public static IReadOnlyList<(string key, bool desc)> Parse(string? sort, string defaultKey)
     {
-        var result = new List<SortTerm>();
+        var list = new List<(string key, bool desc)>();
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
             foreach (var raw in sort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                var desc  = raw.StartsWith('-');
-                var field = desc ? raw[1..] : raw;
-
-                if (ProductSortMap.Keys.ContainsKey(field))
-                    result.Add(new SortTerm(Field: field, isDesc: desc));
+                var desc = raw.StartsWith('-');
+                var key  = (desc ? raw[1..] : raw).ToLowerInvariant();
+                list.Add((key, desc));
             }
         }
 
-        if (result.Count == 0)
-            result.Add(new SortTerm(ProductSortMap.DefaultField, isDesc: false));
-
-        return result;
+        if (list.Count == 0) list.Add((defaultKey, false));
+        return list;
     }
 }

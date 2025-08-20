@@ -1,8 +1,8 @@
 ﻿namespace Application.Catalog.Specifications;
 
-public class ProductsByCategorySpec : Specification<Product>
+public class ProductsByCategorySpecification : Specification<Product>
 {
-    public ProductsByCategorySpec(CategoryId categoryId)
+    public ProductsByCategorySpecification(CategoryId categoryId)
     {
         Query.Where(p => p.CategoryId == categoryId)
             .AsNoTracking();

@@ -1,8 +1,8 @@
 ﻿namespace Application.Catalog.Specifications;
 
-public sealed class RootCategoriesSpec : Specification<Category>
+public sealed class RootCategoriesSpecification : Specification<Category>
 {
-    public RootCategoriesSpec()
+    public RootCategoriesSpecification()
     {
         Query.Where(c => c.ParentCategoryId == null)
             .AsNoTracking();

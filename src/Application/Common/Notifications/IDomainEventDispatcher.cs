@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Interfaces;
+﻿namespace Application.Common.Notifications;
 
 public interface IDomainEventDispatcher
 {
