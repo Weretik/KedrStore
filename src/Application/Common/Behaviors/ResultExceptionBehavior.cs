@@ -1,13 +1,13 @@
 ﻿namespace Application.Common.Behaviors;
 
-public sealed class UnhandledExceptionBehavior<TMessage, TResponse>(
-    ILogger<UnhandledExceptionBehavior<TMessage, TResponse>> logger)
-    : IPipelineBehavior<TMessage, TResponse>
+public sealed class ResultExceptionBehavior<TMessage>(
+    ILogger<ResultExceptionBehavior<TMessage>> logger)
+    : IPipelineBehavior<TMessage, Result>
     where TMessage : IMessage
 {
-    public async ValueTask<TResponse> Handle(
+    public async ValueTask<Result> Handle(
         TMessage message,
-        MessageHandlerDelegate<TMessage, TResponse> next,
+        MessageHandlerDelegate<TMessage, Result> next,
         CancellationToken cancellationToken)
     {
         try
@@ -22,13 +22,10 @@ public sealed class UnhandledExceptionBehavior<TMessage, TResponse>(
         {
             var messageType = typeof(TMessage).Name;
             var exType = ex.GetType().Name;
+            UnhandledLog.Error(logger, messageType, exType, ex);
 
-            if (IsCritical(ex))
-                UnhandledLog.Critical(logger, messageType, exType, ex);
-            else
-                UnhandledLog.Error(logger, messageType, exType, ex);
-
-            throw;
+            var msg = $"Сталася помилка {ex.Message}";
+            return Result.Error(msg);
         }
     }
     private static bool IsCritical(Exception ex)

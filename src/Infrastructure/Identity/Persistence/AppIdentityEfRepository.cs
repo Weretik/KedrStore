@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Identity.Persistence;
+﻿using Application.Identity.Interfaces;
+
+namespace Infrastructure.Identity.Persistence;
 
 public class AppIdentityEfRepository<T>
     : RepositoryBase<T>, IAppIdentityReadRepository<T>, IAppIdentityRepository<T>

@@ -24,7 +24,8 @@ global using Application.Common.Paging;
 global using Application.Common.Logging;
 global using Application.Catalog.DTOs;
 global using Application.Catalog.Sorting;
-
+global using Application.Catalog.Interfaces;
+global using Application.Catalog.Specifications;
 // Domain namespaces
 global using Domain.Common.Abstractions;
 global using Domain.Catalog.Entities;

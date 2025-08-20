@@ -22,17 +22,14 @@ public class CategorySeeder(
         if (!File.Exists(xmlPath))
         {
             logger.LogError("XML-файл не знайдено: {xmlPath}", xmlPath);
-
-            Throw.Application(AppErrors.File.NotFound.WithDetails($"Шлях: {xmlPath}"));
+            throw new FileNotFoundException($"XML-файл не знайдено:{xmlPath}", xmlPath);
         }
 
         var doc = XDocument.Load(xmlPath);
         if (doc.Root == null || !doc.Root.Elements("category").Any())
         {
-            logger.LogError("XML-файл порожній або не містить елементів <category>.");
-
-            Throw.Application(AppErrors.Seeder.DataMissing
-                .WithDetails($"XML-файл {xmlPath} не містить елементів <category>."));
+            logger.LogError("XML файл порожній або не містить елементів <category>.");
+            throw new InvalidDataException("XML файл порожній або не містить елементів <category>.");
         }
 
         try
@@ -54,16 +51,13 @@ public class CategorySeeder(
             await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Category seeding завершено: Створено {categoriesCount} записів.",
-                categories.Count);
+            logger.LogInformation("Category seeding завершено: Створено {categoriesCount} записів.", categories.Count);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Помилка при обробці XML-файлу: {XmlPath}",
-                xmlPath);
+            logger.LogError(ex, "Помилка при обробці XML-файлу: {XmlPath}", xmlPath);
+            throw;
 
-            Throw.Application(AppErrors.Seeder.Failure
-                .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
         }
     }
 }

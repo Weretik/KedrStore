@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Extensions;
+﻿using Application.Identity.Interfaces;
+
+namespace Infrastructure.Extensions;
 
 public static class InfrastreExtension
 {
@@ -9,11 +11,6 @@ public static class InfrastreExtension
 
         services.AddDbContext<CatalogDbContext>(options =>
             options.UseNpgsql(connectionString));
-
-        services.AddScoped<ICatalogDbContext>(provider =>
-            provider.GetRequiredService<CatalogDbContext>());
-
-        services.AddScoped<ICatalogUnitOfWork, CatalogUnitOfWork>();
 
         // Подключение Identity БД
         services.AddDbContext<AppIdentityDbContext>(options =>
@@ -32,10 +29,10 @@ public static class InfrastreExtension
             .AddDefaultTokenProviders();
 
         // Регистрация Репозиториев
-        services.AddScoped(typeof(ICatalogReadRepository<>),  typeof(CatalogEfRepository<>));
-        services.AddScoped(typeof(ICatalogRepository<>),      typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(IAppIdentityRepository<>), typeof(AppIdentityEfRepository<>));
         services.AddScoped(typeof(IAppIdentityReadRepository<>), typeof(AppIdentityEfRepository<>));
-        services.AddScoped(typeof(IAppIdentityRepository<>),     typeof(AppIdentityEfRepository<>));
 
         // Регистрация миграторов каталога и идентификации
         services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
@@ -68,6 +65,7 @@ public static class InfrastreExtension
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
+
         return services;
     }
 }

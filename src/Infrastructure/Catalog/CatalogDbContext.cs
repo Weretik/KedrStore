@@ -1,7 +1,7 @@
 namespace Infrastructure.Catalog;
 
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
-    : DbContext(options), ICatalogDbContext
+    : DbContext(options)
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();

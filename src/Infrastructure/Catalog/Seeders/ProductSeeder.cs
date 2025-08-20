@@ -21,10 +21,8 @@ public class ProductSeeder(
 
         if (!File.Exists(xmlPath))
         {
-            logger.LogError("XML-файл не знайдено: {xmlPath}",
-                xmlPath);
-
-            Throw.Application(AppErrors.File.NotFound.WithDetails($"XML-файл: {xmlPath}"));
+            logger.LogError("XML-файл не знайдено: {xmlPath}", xmlPath);
+            throw new FileNotFoundException($"XML-файл не знайдено:{xmlPath}", xmlPath);
         }
 
         var doc = XDocument.Load(xmlPath);
@@ -32,9 +30,7 @@ public class ProductSeeder(
         if (doc.Root == null || !doc.Root.Elements("product").Any())
         {
             logger.LogError("XML файл порожній або не містить елементів <product>.");
-
-            Throw.Application(AppErrors.Seeder.DataMissing
-                .WithDetails($"XML-файл {xmlPath} не містить елементів <product>."));
+            throw new InvalidDataException("XML файл порожній або не містить елементів <product>.");
         }
 
         try
@@ -78,11 +74,8 @@ public class ProductSeeder(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Помилка при обробці XML-файлу: {XmlPath}",
-                xmlPath);
-
-            Throw.Application(AppErrors.Seeder.Failure
-                .WithDetails($"XML-файл {xmlPath} містить некоректні дані.{ex}"));
+            logger.LogError(ex, "Помилка при обробці XML-файлу: {XmlPath}", xmlPath);
+            throw;
         }
 
     }

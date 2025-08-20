@@ -2,7 +2,7 @@ namespace Application.Catalog.Queries.GetProducts;
 
 public sealed record GetProductsQuery(
     string? SearchTerm,
-    int? CategoryId,
+    CategoryId? CategoryId,
     decimal? MinPrice,
     decimal? MaxPrice,
     string? Manufacturer,

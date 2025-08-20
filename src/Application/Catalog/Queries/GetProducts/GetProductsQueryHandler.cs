@@ -1,30 +1,40 @@
 namespace Application.Catalog.Queries.GetProducts;
 
 public class GetProductsQueryHandler(
-    IProductRepository productRepository)
+    ICatalogReadRepository<Product> productRepository)
     : IQueryHandler<GetProductsQuery, Result<PageResponse<ProductDto>>>
 {
-    public async ValueTask<Result<PagedResult<ProductDto>>> Handle(
-        GetProductsQuery request, CancellationToken cancellationToken)
+    public async ValueTask<Result<PageResponse<ProductDto>>> Handle(
+        GetProductsQuery query, CancellationToken cancellationToken)
     {
-        var specification = new ProductFilterSpecification(
-            searchTerm: request.SearchTerm,
-            minPrice: request.MinPrice,
-            maxPrice: request.MaxPrice,
-            categoryId: request.CategoryId.HasValue ? new CategoryId(request.CategoryId.Value) : null,
-            manufacturer: request.Manufacturer
-        );
+        var pageSpec  = new ProductsPageSpecification(
+            query.SearchTerm,
+            query.CategoryId,
+            query.MinPrice,
+            query.MaxPrice,
+            query.Manufacturer,
+            query.Sort,
+            query.PageNumber,
+            query.PageSize);
 
-        var query = productRepository.QueryProducts()
-            .ApplySpecification(specification)
-            .ApplySort(request.SortBy, request.SortDirection);
+        var countSpec = ProductsPageSpecification.ForCount(
+            query.SearchTerm,
+            query.CategoryId,
+            query.MinPrice,
+            query.MaxPrice,
+            query.Manufacturer);
 
-        var pagedResult = await query.ToPagedResultAsync<Product, ProductDto>(
-            mapper,
-            request.PageNumber,
-            request.PageSize,
-            cancellationToken);
+        var items = await productRepository.ListAsync(pageSpec,  cancellationToken);
+        var total = await productRepository.CountAsync(countSpec, cancellationToken);
 
-        return Result<PagedResult<ProductDto>>.Success(pagedResult);
+        if (total == 0)
+        {
+            return Result.NotFound("Нічого не знайдено за заданими фільтрами.");
+        }
+
+        var response = new PageResponse<ProductDto>(items, total, query.PageNumber, query.PageSize);
+        return Result.Success(response);
+
+
     }
 }

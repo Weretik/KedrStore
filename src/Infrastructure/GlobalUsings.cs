@@ -49,7 +49,6 @@ global using Domain.Catalog.Repositories;
 
 // Application namespaces
 global using Application.Catalog.Interfaces;
-global using Application.Identity.Abstractions;
 global using Application.Common.Interfaces;
 global using Application.Common.Notifications;
 global using Application.Common.Interfaces;
