@@ -38,7 +38,7 @@ public sealed class GetProductsQueryValidator
             return true;
 
         var map = new ProductSortMap();
-        var parsed = SortParser.Parse(sort, map.DefaultKey);
+        var parsed = SortParser.ParseStrict(sort, map.DefaultKey);
 
         return parsed.Any();
     }

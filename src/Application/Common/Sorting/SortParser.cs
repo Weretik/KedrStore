@@ -2,21 +2,36 @@
 
 public static class SortParser
 {
-    public static IReadOnlyList<(string key, bool desc)> Parse(string? sort, string defaultKey)
+    public static IReadOnlyList<SortToken> ParseStrict(string? sort, string defaultKey)
     {
-        var list = new List<(string key, bool desc)>();
+        var tokens = new List<SortToken>();
+        var seen   = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
-            foreach (var raw in sort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            var sortArray = sort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            foreach (var raw in sortArray)
             {
-                var desc = raw.StartsWith('-');
-                var key  = (desc ? raw[1..] : raw).ToLowerInvariant();
-                list.Add((key, desc));
+                var parts = raw.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length is 0) continue;
+
+                var key = parts[0];
+                var direction = SortDirection.Asc;
+                if (parts.Length >= 2)
+                {
+                    var d = parts[1];
+                    if (d.Equals("desc", StringComparison.OrdinalIgnoreCase)) direction = SortDirection.Desc;
+                    else if (d.Equals("asc",  StringComparison.OrdinalIgnoreCase)) direction = SortDirection.Asc;
+                }
+
+                if (string.IsNullOrWhiteSpace(key)) continue;
+                if (seen.Add(key)) tokens.Add(new SortToken(key, direction));
             }
         }
 
-        if (list.Count == 0) list.Add((defaultKey, false));
-        return list;
+        if (tokens.Count == 0) tokens.Add(new SortToken(defaultKey, SortDirection.Asc));
+
+        return tokens;
     }
 }

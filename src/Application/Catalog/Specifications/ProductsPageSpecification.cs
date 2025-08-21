@@ -16,9 +16,7 @@ public sealed class ProductsPageSpecification : Specification<Product, ProductDt
 
         ApplyCommonFilters(Query, search, categoryId, minPrice, maxPrice, manufacturer);
 
-        var ordered = Query.ApplySorting(new ProductSortMap(), sort);
-        (ordered ?? Query.OrderBy(p => p.Name))
-            .ThenBy(p => p.Id.Value);
+        Query.ApplySortingStrict(new ProductSortMap(), sort);
 
         Query.Skip((page - 1) * pageSize).Take(pageSize);
 

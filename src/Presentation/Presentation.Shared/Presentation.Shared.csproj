@@ -11,6 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Fluxor" Version="6.7.0" />
+      <PackageReference Include="Fluxor.Blazor.Web" Version="6.7.0" />
       <PackageReference Include="MudBlazor" Version="8.11.0" />
     </ItemGroup>
 
@@ -18,6 +20,10 @@
       <Content Update="Layout\MainLayout.razor">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="States\Catalog\" />
     </ItemGroup>
 
 </Project>

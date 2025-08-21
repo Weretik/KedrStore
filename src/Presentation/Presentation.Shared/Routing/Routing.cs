@@ -1,4 +1,4 @@
-﻿namespace Presentation.Shared.Common.Routing;
+﻿namespace Presentation.Shared.Routing;
 
 public static class Routing
 {

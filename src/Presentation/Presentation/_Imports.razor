@@ -4,10 +4,8 @@
 @using MudBlazor
 @using Mediator
 
-
 @using Application.Catalog.DTOs
 @using Application.Catalog.Queries.GetProducts
-
 
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Forms
@@ -18,31 +16,29 @@
 
 @using Presentation
 @using Presentation.Client
-@using Presentation.Shared
-@using Presentation.Layout
+
 @using Presentation.Components
 @using Presentation.Components.Widgets
 
-@using Presentation.Shared.Theme
-@using Presentation.Shared.Common
-@using Presentation.Shared.Common.States
-@using Presentation.Shared.Common.Routing
-
+@using Presentation.Layout
 @using Presentation.Layout.Footer
 @using Presentation.Layout.Header
 @using Presentation.Layout.Header.Components
 @using Presentation.Layout.Footer.Components
 
+@using Presentation.Shared
+@using Presentation.Shared.Theme
+@using Presentation.Shared.Routing
+
 @using Presentation.Pages
 @using Presentation.Pages.Home
+@using Presentation.Pages.Home.Components
 @using Presentation.Pages.Catalog
+@using Presentation.Pages.Catalog.Components
 @using Presentation.Pages.AboutUs
 @using Presentation.Pages.FAQ
 @using Presentation.Pages.Informations
 
-@using Presentation.Pages.Home.Components
-@using Presentation.Pages.Catalog.Components
 
-@inject StateContainer StateContainer
 @inject IMediator Sender
 @inject NavigationManager Nav

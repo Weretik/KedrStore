@@ -23,20 +23,10 @@ builder.Services.AddRazorComponents()
 builder.Services.Configure<AdminUserConfig>(
     builder.Configuration.GetSection("Identity:AdminUser"));
 
-// DI: States
-builder.Services.Scan(scan => scan
-    .FromAssemblyOf<SharedAssemblyMarker>()
-    .AddClasses(c => c.AssignableTo<IState>())
-    .AsImplementedInterfaces()
-    .WithScopedLifetime());
-
 // DI: Application + Infrastructure
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
-
-// DI: State Container
-builder.Services.AddScoped<StateContainer>();
 
 // Services
 builder.Services.AddHealthChecks();
