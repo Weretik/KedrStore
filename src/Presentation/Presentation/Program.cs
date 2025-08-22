@@ -1,3 +1,5 @@
+using Presentation.Shared.States.Layout;
+
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 {
@@ -27,6 +29,10 @@ builder.Services.Configure<AdminUserConfig>(
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration);
+
+// DI: Fluxor + State services
+builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
+builder.Services.AddScoped<IBurgerMenuFacade, BurgerMenuFacade>();
 
 // Services
 builder.Services.AddHealthChecks();

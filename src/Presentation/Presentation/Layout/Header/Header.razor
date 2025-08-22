@@ -6,7 +6,7 @@
   </MudStack>
 </MudAppBar>
 
-<MudDrawer @bind-Open="@BurgerMenu.IsOpen"
+<MudDrawer @bind-Open="@Open"
            Width="380px" Overlay="true" Elevation="1" Variant="@DrawerVariant.Temporary">
 
   <MudDrawerHeader class="d-flex align-items-center justify-between">
@@ -24,17 +24,12 @@
 
 
 @code {
-  private BurgerMenuState BurgerMenu => StateContainer.Get<BurgerMenuState>();
 
-  protected override void OnInitialized()
+  [Inject] public IBurgerMenuFacade BurgerMenu { get; set; } = null!;
+
+  bool Open
   {
-    BurgerMenu.OnChange += StateHasChanged;
+    get => BurgerMenu.IsOpen;
+    set => BurgerMenu.Open(value);
   }
-
-  public void Dispose()
-  {
-    BurgerMenu.OnChange -= StateHasChanged;
-  }
-}
-
 }

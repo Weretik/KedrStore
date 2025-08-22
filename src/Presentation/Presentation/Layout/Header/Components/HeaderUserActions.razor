@@ -28,5 +28,5 @@
 </MudStack>
 
 @code {
-  private BurgerMenuState BurgerMenu => StateContainer.Get<BurgerMenuState>();
+  [Inject] public IBurgerMenuFacade BurgerMenu { get; set; } = null!;
 }
