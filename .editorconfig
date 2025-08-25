@@ -20,10 +20,6 @@ indent_size = 2
 [*.html]
 indent_size = 2
 
-# Razor (.razor) files
-[*.razor]
-indent_size = 2
-
 # YAML
 [*.{yml,yaml}]
 indent_size = 2

@@ -17,10 +17,11 @@ public sealed class RequestLoggingBehavior<TMessage, TResponse>(
 
         try
         {
+            ArgumentNullException.ThrowIfNull(next);
             var response = await next(message, cancellationToken);
             timer.Stop();
 
-            RequestLog.Handled(logger, requestName, timer.ElapsedMilliseconds);;
+            RequestLog.Handled(logger, requestName, timer.ElapsedMilliseconds);
 
             return response;
         }

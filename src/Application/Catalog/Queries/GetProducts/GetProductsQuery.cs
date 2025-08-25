@@ -9,5 +9,5 @@ public sealed record GetProductsQuery(
     string? Sort,
     int PageNumber = 1,
     int PageSize   = 12)
-    : IQuery<Result<PageResponse<ProductDto>>>;
+    : IQuery<Result<PaginatedList<ProductDto>>>;
 

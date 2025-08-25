@@ -1,119 +1,78 @@
-﻿
-  @if (_pageResult is null)
-  {
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<CatalogState> Catalog
+@inject ICatalogStore CatalogStore
+
+
+@if (CatalogSelectors.IsLoading(Catalog.Value))
+{
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
-  }
-  else if (_productsList is null || !_productsList.Any())
-  {
-    <MudText Typo="Typo.h6" Color="Color.Warning">За даними критеріями товари не знайдено</MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnResetFilters" Class="mx-auto d-block">
-      Скинути фільтри
-    </MudButton>
-  }
-  else
-  {
-    <MudGrid>
-      @foreach(var item in _productsList)
-      {
-        <MudItem xs="12" md="4">
-          <MudCard>
+}
+else if (CatalogSelectors.IsEmpty(Catalog.Value))
+{
+      <MudText Typo="Typo.h6" Color="Color.Warning">За даними критеріями товари не знайдено</MudText>
+      <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CatalogStore.Reset" Class="mx-auto d-block">
+          Скинути фільтри
+      </MudButton>
+}
+else if (CatalogSelectors.HasError(Catalog.Value))
+{
+    <MudText Typo="Typo.body1" Color="Color.Error">
+        @CatalogSelectors.Error(Catalog.Value)
+    </MudText>
+}
+else
+{
+      <MudGrid>
+          @foreach(var item in CatalogSelectors.Items(Catalog.Value))
+          {
+              <MudItem xs="12" md="4">
+                  <MudCard>
 
-            <MudCardHeader>
+                      <MudCardHeader>
 
-              <CardHeaderContent>
-                <MudText Typo="Typo.button" Color="Color.Primary">Атрикул: @item.Id </MudText>
-              </CardHeaderContent>
+                          <CardHeaderContent>
+                              <MudText Typo="Typo.button" Color="Color.Primary">Атрикул: @item.Id </MudText>
+                          </CardHeaderContent>
 
-              <CardHeaderActions>
-                <MudChip T="string" Variant="Variant.Text" Color="Color.Info">Новинка</MudChip>
-              </CardHeaderActions>
-            </MudCardHeader>
+                          <CardHeaderActions>
+                              <MudChip T="string" Variant="Variant.Text" Color="Color.Info">Новинка</MudChip>
+                          </CardHeaderActions>
+                      </MudCardHeader>
 
-            <MudCardContent>
+                      <MudCardContent>
 
-              <div class="d-flex justify-center">
-                <MudImage ObjectFit="ObjectFit.Cover" Src="assets/images/placeholder3.png"
-                          Alt="Product" Class="rounded-lg"/>
-              </div>
-              <MudText Typo="Typo.h6">@item.Name Old Paint</MudText>
-              <MudText Typo="Typo.subtitle1">@item.Amount @item.Currency</MudText>
-            </MudCardContent>
+                          <div class="d-flex justify-center">
+                              <MudImage ObjectFit="ObjectFit.Cover" Src="assets/images/placeholder3.png"
+                                        Alt="Product" Class="rounded-lg"/>
+                          </div>
+                          <MudText Typo="Typo.h6">@item.Name Old Paint</MudText>
+                          <MudText Typo="Typo.subtitle1">@item.Amount @item.Currency</MudText>
+                      </MudCardContent>
 
-            <MudCardActions>
-              <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="true"
-                         StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
-                Швидке замовлення
-              </MudButton>
-            </MudCardActions>
+                      <MudCardActions>
+                          <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="true"
+                                     StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
+                              Швидке замовлення
+                          </MudButton>
+                      </MudCardActions>
 
-          </MudCard>
+                  </MudCard>
 
-        </MudItem>
-      }
-    </MudGrid>
+              </MudItem>
+          }
+      </MudGrid>
 
-    <MudPagination ShowFirstButton="true" Size="Size.Large" ShowLastButton="true"  Class="mt-10 mb-20"
-                   Count="@_totalPages" Selected="@_pageNumber" SelectedChanged="OnPageChanged"/>
-  }
-
+      <MudPagination ShowFirstButton="true"
+                     Size="Size.Large"
+                     ShowLastButton="true"
+                     Class="mt-10 mb-20"
+                     Count="@CatalogSelectors.TotalPages(Catalog.Value)"
+                     Selected="@CatalogSelectors.TotalPages(Catalog.Value)"
+                     SelectedChanged="@CatalogStore.GoToPage"/>
+}
 
 
 @code {
-  private CatalogState CatalogState => StateContainer.Get<CatalogState>();
-  private PagedResult<ProductDto>? _pageResult;
-  private List<ProductDto>? _productsList;
-  private int _totalPages;
-  private int _pageNumber;
-  private CancellationTokenSource? _cts;
-
-  private async Task LoadProductsAsync()
-  {
-    _cts?.Cancel();
-    _cts = new CancellationTokenSource();
-
-    var resultQury = await Sender.Send(new GetProductsQuery(
-    searchTerm: CatalogState.SearchTerm,
-    minPrice: null,
-    maxPrice: null,
-    categoryId: CatalogState.CategoryId,
-    manufacturer: null,
-    pageNumber: CatalogState.PageNumber,
-    pageSize: CatalogState.PageSize,
-    sortBy: CatalogState.SortBy,
-    sortDirection: CatalogState.SortDirection
-    ), _cts.Token);
-
-    if (resultQury.HasValue)
-    {
-      _pageResult = resultQury.Value;
-      _productsList = _pageResult.Items.ToList();
-      _totalPages = _pageResult.TotalPages;
-      _pageNumber = _pageResult.PageNumber;
-    }
-    else if (resultQury.IsSuccess)
-    {
-      _productsList = null;
-      _totalPages = 0;
-      _pageNumber = 1;
-    }
-  }
-
-  private async void Reload()
-  {
-    await LoadProductsAsync();
-    await InvokeAsync(StateHasChanged);
-  }
-
-  protected override async Task OnInitializedAsync()
-  {
-    CatalogState.OnChange += Reload;
-    await LoadProductsAsync();
-  }
-
-  private async void OnPageChanged(int page) => CatalogState.SetPageNumber(page);
-
-  private void OnResetFilters() => CatalogState.Reset();
 
 
-  public void Dispose() => CatalogState.OnChange -= Reload;
 }

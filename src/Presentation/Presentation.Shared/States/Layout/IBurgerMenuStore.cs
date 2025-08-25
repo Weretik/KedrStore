@@ -1,8 +1,7 @@
 ﻿namespace Presentation.Shared.States.Layout;
 
-public interface IBurgerMenuFacade
+public interface IBurgerMenuStore
 {
-    bool IsOpen { get;}
     void Open(bool value);
     void Toggle();
 }

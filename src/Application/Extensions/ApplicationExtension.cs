@@ -13,11 +13,8 @@
                 [
                     typeof(RequestLoggingBehavior<,>),
                     typeof(PerformanceBehavior<,>),
-                    typeof(CriticalExceptionBehavior<,>),
-                    typeof(ResultExceptionBehavior<>),
-                    typeof(ResultExceptionGenericBehavior<,>),
-                    typeof(ValidationToResultBehavior<>),
-                    typeof(ValidationToResultGenericBehavior<,>),
+                    typeof(ValidationBehavior<,>),
+                    typeof(ExceptionBehavior<,>),
                     typeof(DomainEventDispatcherBehavior<,>)
                 ];
             });

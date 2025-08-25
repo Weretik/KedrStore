@@ -16,6 +16,7 @@ public class PerformanceBehavior<TMessage, TResponse>(
 
         try
         {
+            ArgumentNullException.ThrowIfNull(next);
             return await next(message, cancellationToken);
         }
         finally

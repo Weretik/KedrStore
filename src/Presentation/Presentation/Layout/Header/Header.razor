@@ -1,35 +1,38 @@
-﻿<MudAppBar Elevation="4" class="py-4" >
-  <MudStack Style="width: 100%;" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-    <HeaderLogo ></HeaderLogo>
-    <HeaderMainNavigation></HeaderMainNavigation>
-    <HeaderUserActions></HeaderUserActions>
-  </MudStack>
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<BurgerMenuState> BurgerMenuState
+@inject IBurgerMenuStore BurgerMenuStore
+
+
+<MudAppBar Elevation="4" class="py-4" >
+    <MudStack Style="width: 100%;" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <HeaderLogo ></HeaderLogo>
+        <HeaderMainNavigation></HeaderMainNavigation>
+        <HeaderUserActions></HeaderUserActions>
+    </MudStack>
 </MudAppBar>
 
 <MudDrawer @bind-Open="@Open"
            Width="380px" Overlay="true" Elevation="1" Variant="@DrawerVariant.Temporary">
 
-  <MudDrawerHeader class="d-flex align-items-center justify-between">
-    <HeaderLogo></HeaderLogo>
-    <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close" @onclick="@BurgerMenu.Toggle"/>
-  </MudDrawerHeader>
+    <MudDrawerHeader class="d-flex align-items-center justify-between">
+        <HeaderLogo></HeaderLogo>
+        <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close" @onclick="@BurgerMenuStore.Toggle"/>
+    </MudDrawerHeader>
 
-  <MudNavMenu>
-    <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
-    <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
-    <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
-  </MudNavMenu>
+    <MudNavMenu>
+        <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
+    </MudNavMenu>
 
 </MudDrawer>
 
 
 @code {
 
-  [Inject] public IBurgerMenuFacade BurgerMenu { get; set; } = null!;
-
   bool Open
   {
-    get => BurgerMenu.IsOpen;
-    set => BurgerMenu.Open(value);
+      get => BurgerMenuState.Value.IsOpen;
+      set => BurgerMenuStore.Open(value);
   }
 }

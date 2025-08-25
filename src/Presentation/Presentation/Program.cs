@@ -1,5 +1,3 @@
-using Presentation.Shared.States.Layout;
-
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 {
@@ -32,8 +30,8 @@ builder.Services
 
 // DI: Fluxor + State services
 builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
-builder.Services.AddScoped<IBurgerMenuFacade, BurgerMenuFacade>();
-
+builder.Services.AddScoped<IBurgerMenuStore, BurgerMenuStore>();
+builder.Services.AddScoped<ICatalogStore, CatalogStore>();
 // Services
 builder.Services.AddHealthChecks();
 builder.Services.AddMudServices();

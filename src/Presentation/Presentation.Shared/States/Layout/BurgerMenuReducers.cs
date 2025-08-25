@@ -1,12 +1,16 @@
 ﻿namespace Presentation.Shared.States.Layout;
 
+using static BurgerMenuActions;
+
+[SuppressMessage("ReSharper", "WithExpressionModifiesAllMembers")]
 public static class BurgerMenuReducers
 {
     [ReducerMethod]
-    public static BurgerMenuState OnOpen(BurgerMenuState state, BurgerMenuActions.SetOpen action)
-        => new (IsOpen: action.IsOpen);
+    public static BurgerMenuState OnOpen(BurgerMenuState state, SetOpen action)
+        => state with { IsOpen = action.IsOpen };
 
     [ReducerMethod]
-    public static BurgerMenuState OnToggle(BurgerMenuState state, BurgerMenuActions.Toggle _)
-        => new (IsOpen: !state.IsOpen);
+    public static BurgerMenuState OnToggle(BurgerMenuState state, Toggle _)
+        => state with { IsOpen =  !state.IsOpen};
+
 }

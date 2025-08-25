@@ -51,7 +51,6 @@ global using Domain.Catalog.Repositories;
 global using Application.Catalog.Interfaces;
 global using Application.Common.Interfaces;
 global using Application.Common.Notifications;
-global using Application.Common.Interfaces;
 
 // Ardalis
 global using Ardalis.Specification;

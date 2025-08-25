@@ -14,6 +14,7 @@ namespace Application.Common.Behaviors
             MessageHandlerDelegate<TMessage, TResponse> next,
             CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(next);
             var response = await next(message, cancellationToken);
 
             var entities = eventContext.GetDomainEntities();

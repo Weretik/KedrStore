@@ -2,9 +2,9 @@ namespace Application.Catalog.Queries.GetProducts;
 
 public class GetProductsQueryHandler(
     ICatalogReadRepository<Product> productRepository)
-    : IQueryHandler<GetProductsQuery, Result<PageResponse<ProductDto>>>
+    : IQueryHandler<GetProductsQuery, Result<PaginatedList<ProductDto>>>
 {
-    public async ValueTask<Result<PageResponse<ProductDto>>> Handle(
+    public async ValueTask<Result<PaginatedList<ProductDto>>> Handle(
         GetProductsQuery query, CancellationToken cancellationToken)
     {
         var pageSpec  = new ProductsPageSpecification(
@@ -17,6 +17,8 @@ public class GetProductsQueryHandler(
             query.PageNumber,
             query.PageSize);
 
+
+
         var countSpec = ProductsPageSpecification.ForCount(
             query.SearchTerm,
             query.CategoryId,
@@ -27,13 +29,18 @@ public class GetProductsQueryHandler(
         var items = await productRepository.ListAsync(pageSpec,  cancellationToken);
         var total = await productRepository.CountAsync(countSpec, cancellationToken);
 
-        if (total == 0)
+        if (items is null)
         {
-            return Result.NotFound("Нічого не знайдено за заданими фільтрами.");
+            return Result.NotFound();
         }
 
-        var response = new PageResponse<ProductDto>(items, total, query.PageNumber, query.PageSize);
-        return Result.Success(response);
+        var pageList = new PaginatedList<ProductDto>(
+            items,
+            total,
+            query.PageNumber,
+            query.PageSize);
+
+        return Result.Success(pageList);
 
 
     }

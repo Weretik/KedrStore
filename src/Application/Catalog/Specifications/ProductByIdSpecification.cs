@@ -1,6 +1,6 @@
 ﻿namespace Application.Catalog.Specifications;
 
-public sealed class ProductByIdSpecification : Specification<Product>, ISingleResultSpecification
+public sealed class ProductByIdSpecification : Specification<Product>, ISingleResultSpecification<Product>
 {
     public ProductByIdSpecification(ProductId id)
     {
