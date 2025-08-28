@@ -1,5 +1,4 @@
 ﻿@inject ICatalogStore Catalog
-@inject IState<CatalogState> CatalogState
 
 <MudStack Class="mt-10 mb-20" Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Wrap="Wrap.Wrap">
 
@@ -7,12 +6,13 @@
 
         <MudTextField @bind-Value="_term"
                       Label="Пошук"
-                      OnKeyDown="OnSearch"
+                      OnKeyUp="OnSearch"
                       Variant="Variant.Outlined"
                       Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Search"
-                      AdornmentColor="Color.Success"/>
-
+                      AdornmentColor="Color.Success"
+                      OnAdornmentClick="@DoSearch"
+                      Immediate="true" />
     </MudStack>
 
 
@@ -36,9 +36,14 @@
     {
       if (e.Key != "Enter") return;
 
-      if (!Nav.Uri.EndsWith(Routing.CatalogProducts))
-          Nav.NavigateTo(Routing.CatalogProducts, replace: true);
+      DoSearch();
+    }
 
-      Catalog.SetSearchTerm(_term);
+    void DoSearch()
+    {
+        Catalog.SetSearchTerm(_term);
+
+        if (!Nav.Uri.EndsWith(Routing.CatalogProducts, StringComparison.OrdinalIgnoreCase))
+            Nav.NavigateTo(Routing.CatalogProducts, replace: true);
     }
 }
