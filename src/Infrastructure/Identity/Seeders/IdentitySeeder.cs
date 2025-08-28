@@ -22,7 +22,7 @@ public class IdentitySeeder(
         var existingAdmin = await userManager.FindByEmailAsync(_adminConfig.Email);
         if (existingAdmin != null)
         {
-            logger.LogInformation("Адміністратор уже існує: {Email}", _adminConfig.Email);
+            logger.LogInformation("Адміністратор вже існує: {Email}", _adminConfig.Email);
             return;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace Presentation.Shared.States.Catalog;
+﻿using Domain.Catalog.Entities;
+
+namespace Presentation.Shared.States.Catalog;
 
 public sealed class CatalogEffects(
     IMediator mediator,

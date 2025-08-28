@@ -21,8 +21,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 
         builder.Property(x => x.ParentCategoryId)
             .HasConversion(
-                id => id != null ? id.Value : (int?)null,
-                value => value != null ? new CategoryId(value.Value) : null);
+                id => id.HasValue ? id.Value.Value : (int?)null,
+                value => value.HasValue ?  new CategoryId(value.Value) : null);
 
         // Настройка self-referencing relationship для иерархии категорий
         builder.HasMany(c => c.Children)

@@ -15,7 +15,7 @@ public static class SeederExtensions
         foreach (var seeder in allSeeders.DistinctBy(s => s.GetType()))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            logger.LogInformation("Выполнение сидера: {Seeder}", seeder.GetType().Name);
+            logger.LogInformation("Виконання: {Seeder}", seeder.GetType().Name);
             await seeder.SeedAsync(services, cancellationToken);
         }
     }

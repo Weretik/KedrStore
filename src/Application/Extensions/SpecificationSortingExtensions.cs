@@ -13,7 +13,6 @@ public static class SpecificationSortingExtensions
         ArgumentNullException.ThrowIfNull(map);
 
         var tokens = SortParser.ParseStrict(sort, map.DefaultKey);
-        var hasId  = tokens.Any(t => t.Key.Equals("id", StringComparison.OrdinalIgnoreCase));
         IOrderedSpecificationBuilder<TEntity>? ordered = null;
 
         foreach (var token in tokens)
@@ -22,15 +21,11 @@ public static class SpecificationSortingExtensions
                 continue;
 
             ordered = ordered is null
-                ? (token.Direction == SortDirection.Desc ? specification.OrderByDescending(expr) : specification.OrderBy(expr))
-                : (token.Direction == SortDirection.Desc ? ordered.ThenByDescending(expr) : ordered.ThenBy(expr));
+                ? token.Direction == SortDirection.Desc ? specification.OrderByDescending(expr) : specification.OrderBy(expr)
+                : token.Direction == SortDirection.Desc ? ordered.ThenByDescending(expr) : ordered.ThenBy(expr);
         }
 
         ordered ??= specification.OrderBy(map.Keys[map.DefaultKey]);
-
-        if (!hasId && map.Keys.TryGetValue("id", out var stable))
-            ordered = ordered.ThenBy(stable);
-
         return ordered;
     }
 }

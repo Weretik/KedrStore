@@ -6,7 +6,7 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 
     public string Name { get; private set; } = null!;
     public CategoryId? ParentCategoryId { get; private set; }
-    private readonly List<Category> _children = new();
+    private readonly List<Category> _children = [];
     public IReadOnlyCollection<Category> Children => _children.AsReadOnly();
 
     #endregion
@@ -33,7 +33,7 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 
     private void SetId(CategoryId id)
     {
-        Id = Guard.Against.Null(id, nameof(id));
+        Id = Guard.Against.Default(id, nameof(id));
     }
     private void SetName(string name)
     {
@@ -73,22 +73,24 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
         ChangeParent(parentCategoryId, updatedDate);
     }
 
-    public void ChangeName(string name, DateTime updatedDate)
+    private void ChangeName(string name, DateTime updatedDate)
     {
         SetName(name);
         MarkAsUpdated(updatedDate);
     }
 
-    public void ChangeParent(CategoryId? parentCategoryId, DateTime updatedDate)
+    private void ChangeParent(CategoryId? parentCategoryId, DateTime updatedDate)
     {
         if (parentCategoryId is not null)
         {
-            Guard.Against.InvalidInput(parentCategoryId, nameof(parentCategoryId),
-                parentId => parentId != Id,
+            var parentId = parentCategoryId.Value;
+
+            Guard.Against.InvalidInput(parentId, nameof(parentCategoryId),
+                pId => pId != Id,
                 "You cannot assign yourself as the parent category.");
 
-            Guard.Against.InvalidInput(parentCategoryId, nameof(parentCategoryId),
-                parentId => !HasDescendant(parentId),
+            Guard.Against.InvalidInput(parentId, nameof(parentCategoryId),
+                pId => !HasDescendant(pId),
                 "You cannot assign a child category to a parent (cycle).");
         }
 

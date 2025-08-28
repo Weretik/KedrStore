@@ -45,7 +45,7 @@ global using Domain.Common.Abstractions;
 global using Domain.Identity.Constants;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
-global using Domain.Catalog.Repositories;
+
 
 // Application namespaces
 global using Application.Catalog.Interfaces;

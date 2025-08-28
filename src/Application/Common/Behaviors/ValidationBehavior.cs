@@ -37,7 +37,7 @@ public class ValidationBehavior<TMessage, TResponse>(
             failures.Select(f => new { f.PropertyName, f.ErrorMessage })
         );
 
-        var errors = new FluentValidation.Results.ValidationResult(failures).AsErrors();
+        var errors = new ValidationResult(failures).AsErrors();
 
         if (typeof(TResponse) == typeof(Result))
         {
@@ -53,12 +53,10 @@ public class ValidationBehavior<TMessage, TResponse>(
             ArgumentNullException.ThrowIfNull(method);
 
 
-            var result = method.Invoke(null, [errors])!;
+            var result = method.Invoke(null, [errors]);
             return (TResponse)result!;
         }
 
         throw new ValidationException(failures);
-
     }
-
 }

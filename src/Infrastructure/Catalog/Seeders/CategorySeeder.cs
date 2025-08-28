@@ -41,7 +41,10 @@ public class CategorySeeder(
                     var id = int.Parse(c.Element("id")?.Value ?? "0");
                     var name = c.Element("name")?.Value ?? string.Empty;
                     var parentRaw = c.Element("parent")?.Value;
-                    var parentId = string.IsNullOrWhiteSpace(parentRaw) ? null : new CategoryId(int.Parse(parentRaw));
+                    var parentId = string.IsNullOrWhiteSpace(parentRaw)
+                        ? (CategoryId?)null
+                        : new CategoryId(int.Parse(parentRaw));
+
                     return new { Id = id, Name = name, ParentId = parentId };
                 })
                 .DistinctBy(c => c.Id)

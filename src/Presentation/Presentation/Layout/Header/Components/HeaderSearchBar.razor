@@ -32,7 +32,7 @@
 @code {
     private string? _term;
 
-    private void OnSearch(KeyboardEventArgs e)
+    public void OnSearch(KeyboardEventArgs e)
     {
       if (e.Key != "Enter") return;
 
@@ -40,7 +40,5 @@
           Nav.NavigateTo(Routing.CatalogProducts, replace: true);
 
       Catalog.SetSearchTerm(_term);
-      Catalog.Reload();
-
     }
 }

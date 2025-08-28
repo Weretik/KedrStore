@@ -16,7 +16,8 @@ public sealed class ProductsPageSpecification : Specification<Product, ProductDt
 
         ApplyCommonFilters(Query, search, categoryId, minPrice, maxPrice, manufacturer);
 
-        Query.ApplySortingStrict(new ProductSortMap(), sort);
+        var ordered = Query.ApplySortingStrict(new ProductSortMap(), sort);
+        ordered.ThenBy(p => p.Id);
 
         Query.Skip((page - 1) * pageSize).Take(pageSize);
 
@@ -58,13 +59,24 @@ public sealed class ProductsPageSpecification : Specification<Product, ProductDt
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim();
+            var tokens = term.Split(' ',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id))
-                query.Where(p => p.Id.Value == id);
-
-            query.Where(p =>
-                EF.Functions.ILike(p.Name, $"%{term}%")
-                || EF.Functions.ILike(p.Manufacturer, $"%{term}%"));
+            if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
+            {
+                query.Where(p => p.Id == id);
+            }
+            else
+            {
+                foreach (var raw in tokens)
+                {
+                    var text = EscapeLike(raw);
+                    var pattern = $"%{text}%";
+                    query.Where(p =>
+                        EF.Functions.ILike(p.Name, pattern, @"\") ||
+                        EF.Functions.ILike(p.Manufacturer, pattern, @"\"));
+                }
+            }
         }
 
         if (categoryId is not null)
@@ -78,5 +90,13 @@ public sealed class ProductsPageSpecification : Specification<Product, ProductDt
 
         if (!string.IsNullOrWhiteSpace(manufacturer))
             query.Search(p => p.Manufacturer, $"%{manufacturer.Trim()}%");
+    }
+
+    static string EscapeLike(string text)
+    {
+        return text
+            .Replace(@"\", @"\\", StringComparison.Ordinal)
+            .Replace("%", @"\%",StringComparison.Ordinal)
+            .Replace("_", @"\_",StringComparison.Ordinal);
     }
 }

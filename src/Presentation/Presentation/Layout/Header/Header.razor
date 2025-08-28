@@ -2,7 +2,6 @@
 @inject IState<BurgerMenuState> BurgerMenuState
 @inject IBurgerMenuStore BurgerMenuStore
 
-
 <MudAppBar Elevation="4" class="py-4" >
     <MudStack Style="width: 100%;" Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
         <HeaderLogo ></HeaderLogo>
@@ -16,7 +15,8 @@
 
     <MudDrawerHeader class="d-flex align-items-center justify-between">
         <HeaderLogo></HeaderLogo>
-        <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close" @onclick="@BurgerMenuStore.Toggle"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Close" aria-label="close"
+                       @onclick="() => BurgerMenuStore.Toggle()"/>
     </MudDrawerHeader>
 
     <MudNavMenu>

@@ -30,11 +30,11 @@ global using Application.Catalog.Specifications;
 global using Domain.Common.Abstractions;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
-global using Domain.Catalog.Repositories;
 
 // External libraries
 global using Mediator;
 global using FluentValidation;
+global using FluentValidation.Results;
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
 global using Ardalis.Result;

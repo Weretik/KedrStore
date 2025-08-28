@@ -1,29 +1,29 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-@inject IState<CatalogState> Catalog
+@inject IState<CatalogState> CatalogState
 @inject ICatalogStore CatalogStore
 
 
-@if (CatalogSelectors.IsLoading(Catalog.Value))
+@if (CatalogSelectors.IsLoading(CatalogState.Value))
 {
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
-else if (CatalogSelectors.IsEmpty(Catalog.Value))
+else if (CatalogSelectors.IsEmpty(CatalogState.Value))
 {
       <MudText Typo="Typo.h6" Color="Color.Warning">За даними критеріями товари не знайдено</MudText>
       <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@CatalogStore.Reset" Class="mx-auto d-block">
           Скинути фільтри
       </MudButton>
 }
-else if (CatalogSelectors.HasError(Catalog.Value))
+else if (CatalogSelectors.HasError(CatalogState.Value))
 {
     <MudText Typo="Typo.body1" Color="Color.Error">
-        @CatalogSelectors.Error(Catalog.Value)
+        @CatalogSelectors.Error(CatalogState.Value)
     </MudText>
 }
 else
 {
       <MudGrid>
-          @foreach(var item in CatalogSelectors.Items(Catalog.Value))
+          @foreach(var item in CatalogSelectors.Items(CatalogState.Value))
           {
               <MudItem xs="12" md="4">
                   <MudCard>
@@ -66,13 +66,26 @@ else
                      Size="Size.Large"
                      ShowLastButton="true"
                      Class="mt-10 mb-20"
-                     Count="@CatalogSelectors.TotalPages(Catalog.Value)"
-                     Selected="@CatalogSelectors.TotalPages(Catalog.Value)"
-                     SelectedChanged="@CatalogStore.GoToPage"/>
+                     Count="@CatalogSelectors.TotalPages(CatalogState.Value)"
+                     @bind-Selected="CurrentPage" />
+                    // Selected="@CatalogState.Value.Params.PageNumber"
+                    // SelectedChanged="@CatalogStore.GoToPage"/>
 }
 
 
 @code {
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        CatalogStore.Reload();
+    }
+
+    int CurrentPage
+    {
+        get => CatalogState.Value.Params.PageNumber;
+        set => CatalogStore.GoToPage(value);
+    }
 
 
 }
