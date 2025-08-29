@@ -1,4 +1,5 @@
-﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+﻿@rendermode InteractiveServer
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<BurgerMenuState> BurgerMenuState
 @inject IBurgerMenuStore BurgerMenuStore
 
@@ -20,9 +21,17 @@
     </MudDrawerHeader>
 
     <MudNavMenu>
-        <MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
-        <MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
-        <MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
+        <MudNavLink Match="NavLinkMatch.All" Href="@Routing.CatalogProducts">Каталог</MudNavLink>
+        <MudNavGroup Title="Інформація">
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.AboutUs">Про компанію</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="#">Статті</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.InfoShipping">Доставка</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.InfoPayment">Оплата</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.InfoReturns">Повернення товару</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.InfoWarranty">Гарантія</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.All" Href="@Routing.Contact">Контакти</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Match="NavLinkMatch.All" Href="@Routing.Questions">FAQ</MudNavLink>
     </MudNavMenu>
 
 </MudDrawer>

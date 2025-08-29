@@ -2,17 +2,71 @@
 
 <PageTitle>@Title</PageTitle>
 <HeadContent>
-  <meta name="description" content="@Description">
+    <meta name="description" content="@Description">
 </HeadContent>
 
+<MudContainer MaxWidth="MaxWidth.False" Class="py-10">
 
-<section class="bg-blue-50 bg-opacity-20 bs-section-dragged">
+    <MudGrid Spacing="0" Justify="Justify.Center">
 
-  <Placeholders></Placeholders>
-  <Brending></Brending>
+        <MudItem xs="12" md="5">
+            <MudPaper Elevation="2" Class="rounded-2xl overflow-hidden pa-10" Height="500px">
+                <MudStack Spacing="2" Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start" Style="height: 100%;">
 
-</section>
+                    <MudText Typo="Typo.h1">
+                        Class Kedr
+                        <MudText Typo="Typo.subtitle2" Class="opacity-80">
+                            Постачальник дверної фурнітури з широким асортиментом та професійною підтримкою.
+                        </MudText>
+                    </MudText>
 
+                    <MudText Typo="Typo.body1">
+                        Працюємо по всій Україні. У нас Вы знайдете комплектуючі для квартир, приватних будинків і комерційних об’єктів.
+                    </MudText>
+
+                    <MudStack Row="true" Spacing="2" Class="mt-2">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                                   StartIcon="@Icons.Material.Filled.Storefront" Href="@Routing.CatalogProducts">
+                            Перейти в каталог
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Large"
+                                   StartIcon="@Icons.Material.Filled.HeadsetMic">
+                            Отримати консультацію
+                        </MudButton>
+                    </MudStack>
+
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" md="7">
+            <MudPaper Elevation="2" Class="rounded-2xl overflow-hidden" Style="height:500px;">
+                <img src="/assets/images/class-kedr-store.jpg" alt="Дверна фурнітура Class Kedr"
+                     style="display:block; width:100%; height:100%; object-fit:cover; object-position:center;" />
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
+
+    <!-- STATS -->
+    <MudGrid Class="mt-10" Justify="Justify.SpaceAround">
+        <MudItem xs="12" md="4" Class="text-center py-6">
+            <MudText Typo="Typo.h2" Color="Color.Primary">15</MudText>
+            <MudText Typo="Typo.subtitle1" Class="tracking-wider">РОКІВ НА РИНКУ</MudText>
+        </MudItem>
+        <MudItem xs="12" md="4" Class="text-center py-6">
+            <MudText Typo="Typo.h2" Color="Color.Primary">15&nbsp;000+</MudText>
+            <MudText Typo="Typo.subtitle1" Class="tracking-wider">ТОВАРІВ В АСОРТИМЕНТІ</MudText>
+        </MudItem>
+        <MudItem xs="12" md="4" Class="text-center py-6">
+            <MudText Typo="Typo.h2" Color="Color.Primary">50&nbsp;572+</MudText>
+            <MudText Typo="Typo.subtitle1" Class="tracking-wider">КЛІЄНТІВ</MudText>
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+
+<Brending></Brending>
 <CallToAction></CallToAction>
 
 @code{
