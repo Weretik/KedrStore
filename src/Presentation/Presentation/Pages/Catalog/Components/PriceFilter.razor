@@ -1,0 +1,62 @@
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ISnackbar Snackbar
+@inject IState<CatalogState> CatalogState
+@inject ICatalogStore CatalogStore
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h4" class="mt-5 mb-3">
+        Ціна
+    </MudText>
+
+    <MudStack Row="true"  Spacing="2" AlignItems="AlignItems.Center">
+        <MudNumericField T="decimal?"
+                         @bind-Value="MinPrice"
+                         Label="Мін. ціна"
+                         Variant="Variant.Outlined"
+                         Adornment="Adornment.End"
+                         AdornmentText="₴"/>
+
+        <MudNumericField T="decimal?"
+                         @bind-Value="MaxPrice"
+                         Label="Макс. ціна"
+                         Variant="Variant.Outlined"
+                         Adornment="Adornment.End"
+                         AdornmentText="₴"/>
+
+    </MudStack>
+</MudPaper>
+
+@code {
+    decimal? MinPrice
+    {
+        get => CatalogState.Value.Params.MinPrice;
+        set
+        {
+            var other = MaxPrice;
+            if (value is not null && other is not null && value > other)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+                Snackbar.Add("Мін. ціна не може бути більшою за макс.", Severity.Warning);
+                return;
+            }
+            CatalogStore.SetPrice(value, other);
+        }
+    }
+
+    decimal? MaxPrice
+    {
+        get => CatalogState.Value.Params.MaxPrice;
+        set
+        {
+            var other = MinPrice;
+            if (other is not null && value is not null && other > value)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+                Snackbar.Add("Мін. ціна не може бути більшою за макс.", Severity.Warning);
+                return;
+            }
+            CatalogStore.SetPrice(other, value);
+        }
+    }
+
+}

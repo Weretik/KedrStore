@@ -1,46 +1,83 @@
-﻿<MudPaper Elevation="2">
+﻿@inject ICatalogStore CatalogStore
+@inject ISnackbar Snackbar
 
-    <MudText Typo="Typo.h4">Категорії</MudText>
+<MudPaper Class="pa-4 mt-4">
+    <MudText Typo="Typo.h4" class="mt-5 mb-3 ml-5">
+        Категорії
+    </MudText>
 
-    @*<MudProgressLinear Indeterminate="true" Style="height:3px" Visible="@_loading"/>*@
+    @if (_isLoading)
+    {
+        <MudProgressLinear Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+    }
+    else
+    {
+        <MudTreeView T="CategoryDto"
+                     Items="@_items"
+                     SelectedValue="@_selected"
+                     SelectedValueChanged="OnSelectedChanged"
+                     Hover="true"
+                     Dense="true"
+                     ExpandOnClick="true">
+            <ItemTemplate>
+                <MudTreeViewItem Value="@context.Value"
+                                 Text="@context.Text"
+                                 Items="@context.Children" />
+            </ItemTemplate>
+        </MudTreeView>
+    }
 
-    <MudTreeView T="CategoryDto"
-                 Items="@_tree"
-                 @bind-SelectedValue="_selected"
-                 Hover="true"
-                 Dense="true">
-
-        <ItemTemplate Context="item">
-            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                <MudIcon Icon="@Icons.Material.Filled.Folder" />
-                <MudText>@item.Value.Name</MudText>
-            </MudStack>
-        </ItemTemplate>
-
-    </MudTreeView>
 </MudPaper>
 
 @code {
-     private bool _loading = true;
-     private IReadOnlyCollection<TreeItemData<CategoryDto>> _tree = [];
-     private CategoryDto? _selected;
+    private IReadOnlyCollection<TreeItemData<CategoryDto>> _items = [];
+    private CategoryDto? _selected;
+    private bool _isLoading = true;
 
-     protected override async Task OnInitializedAsync()
-     {
-         var res = await Mediator.Send(new GetCategoriesQuery());
-         var list = res.IsSuccess ? res.Value : [];
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var res = await Mediator.Send(new GetCategoriesQuery());
+            if (!res.IsSuccess || res.Value is null) return;
 
-         _tree = list.Select(ToTreeItem).ToList();
-         _loading = false;
-     }
+            var roots = res.Value.Where(c => c.ParentCategoryId is null);
+            _items = Build(roots);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
-     private static TreeItemData<CategoryDto> ToTreeItem(CategoryDto c)
-     {
-         return new TreeItemData<CategoryDto>
-         {
-             Value    = c,
-             Text     = c.Name,
-             Children = (c.Children?.Select(ToTreeItem).ToList()) ?? []
-         };
-     }
- }
+    private static IReadOnlyCollection<TreeItemData<CategoryDto>> Build(IEnumerable<CategoryDto> src)
+        => src.Select(Map).ToList();
+
+    private static TreeItemData<CategoryDto> Map(CategoryDto c)
+        => new()
+        {
+            Text = c.Name,
+            Value = c,
+            Children = c.Children is { Count: > 0 }
+                ? c.Children.Select(Map).ToList()
+                : null
+        };
+
+    private void OnSelectedChanged(CategoryDto? node)
+    {
+        if (node?.Children is { Count: > 0 })
+        {
+            _selected = null;
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+            Snackbar.Add("Виберіть кінцеву категорію.", Severity.Info,
+                c => c.SnackbarVariant = Variant.Outlined);
+            return;
+        }
+
+        _selected = node;
+        CatalogStore.SetCategoryId(node?.Id);
+
+    }
+
+}
