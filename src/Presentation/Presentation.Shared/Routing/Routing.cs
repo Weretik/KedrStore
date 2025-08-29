@@ -14,6 +14,7 @@ public static class Routing
     public const string InfoShipping = "/information?tab=shipping";
     public const string InfoPayment = "/information?tab=payment";
     public const string InfoReturns = "/information?tab=returns";
+    public const string InfoWarranty = "/information?tab=warranty";
 
     // FAQ
     public const string Questions = "/faq";

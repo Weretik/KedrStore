@@ -1,39 +1,59 @@
 ﻿@page "/information"
 @rendermode InteractiveServer
 
-<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6"
-         ActivePanelIndex="_index">
+<MudTabs Elevation="2" Rounded="true" PanelClass="pa-6" ApplyEffectsToContainer="true"
+         @bind-ActivePanelIndex="Index">
 
-  <MudTabPanel Text="Доставка" Icon="@Icons.Material.Filled.Api">
-    <MudText>Информация о доставке...</MudText>
-  </MudTabPanel>
-
-  <MudTabPanel Text="Оплата">
-    <MudText>Информация о Оплате...</MudText>
-  </MudTabPanel>
-
-  <MudTabPanel Text="Возврат">
-    <MudText>Информация о Возврате...</MudText>
-  </MudTabPanel>
+    <MudTabPanel Text="Доставка" Icon="@Icons.Material.Filled.LocalShipping">
+        <Delivery></Delivery>
+    </MudTabPanel>
+    <MudTabPanel Text="Оплата" Icon="@Icons.Material.Filled.Payment">
+        <Payment></Payment>
+    </MudTabPanel>
+    <MudTabPanel Text="Повернення" Icon="@Icons.Material.Filled.AssignmentReturn">
+        <Returns></Returns>
+    </MudTabPanel>
+    <MudTabPanel Text="Гарантія" Icon="@Icons.Material.Filled.VerifiedUser">
+        <Warranty></Warranty>
+    </MudTabPanel>
 
 </MudTabs>
 
 @code {
+    [SupplyParameterFromQuery(Name = "tab")]
+    private string? Tab { get; set; }
 
-  [SupplyParameterFromQuery(Name = "tab")]
-  private string? Tab { get; set; }
+    private int _index;
+    private int Index
+    {
+        get => _index;
+        set
+        {
+            if (_index == value) return;
+            _index = value;
 
-  private int _index;
+            var newTab = value switch
+            {
+                0 => "shipping",
+                1 => "payment",
+                2 => "returns",
+                3 => "warranty",
+                _ => "shipping"
+            };
+            if (!string.Equals(Tab, newTab, StringComparison.OrdinalIgnoreCase))
+                Nav.NavigateTo($"/information?tab={newTab}", forceLoad: false);
+        }
+    }
 
-  protected override void OnInitialized()
-  {
-    _index = (Tab ?? "shipping").ToLowerInvariant() switch
-      {
-        "shipping" => 0,
-        "payment" => 1,
-        "returns" => 2,
-        _ => 0
-      };
-  }
-
+    protected override void OnParametersSet()
+    {
+        _index = (Tab ?? "shipping").ToLowerInvariant() switch
+        {
+            "shipping" => 0,
+            "payment"  => 1,
+            "returns"  => 2,
+            "warranty" => 3,
+            _ => 0
+        };
+    }
 }

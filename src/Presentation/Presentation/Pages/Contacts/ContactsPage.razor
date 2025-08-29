@@ -1,57 +1,115 @@
 ﻿@page "/contacts"
+@rendermode InteractiveServer
 
-<section class="py-24 2xl:pt-28 2xl:pb-36 bg-gray-50 rounded-b-10xl">
-  <div class="container px-4 mx-auto">
-    <div class="flex flex-wrap -mx-4">
-      <div class="w-full lg:w-1/2 px-4 mb-10 lg:mb-0">
-        <div class="max-w-lg lg:mt-20 mx-auto">
-          <h2 class="text-9xl md:text-10xl xl:text-11xl font-medium font-heading mb-16 lg:mb-24 leading-tight">Contact us</h2>
-          <div class="max-w-sm py-4 border-b border-gray-200 border-opacity-50">
-            <div class="flex items-center">
-              <img class="mr-6 h-14" src="uinel-assets/images/contacts/icon1.svg" alt=""/>
-              <a class="text-xl font-semibold" href="#">+ 44 1447881709</a>
-            </div>
-          </div>
-          <div class="max-w-sm py-4 border-b border-gray-200 border-opacity-50">
-            <div class="flex items-center">
-              <img class="mr-6 h-14" src="uinel-assets/images/contacts/icon2.svg" alt=""/>
-              <a class="text-xl font-semibold" href="#">uinelchat</a>
-            </div>
-          </div>
-          <div class="py-4">
-            <div class="flex items-center">
-              <img class="mr-6 h-14" src="uinel-assets/images/contacts/icon3.svg" alt=""/>
-              <a class="text-xl font-semibold" href="#">help@uinel.dev</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="w-full lg:w-1/2 px-4">
-        <div class="max-w-xl mx-auto py-14 md:pt-16 md:pb-20 px-8 md:px-20 bg-white rounded-xl">
-          <h3 class="font-heading font-medium text-7xl lg:text-8xl mb-12">Message</h3>
-          <input class="mb-5 w-full px-12 py-5 text-xl border-2 border-blue-400 rounded-xl placeholder-darkBlueGray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" type="email" placeholder="Your Email"/>
-          <textarea class="mb-10 w-full px-12 py-5 h-32 text-xl border-2 border-blue-400 rounded-xl placeholder-darkBlueGray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" placeholder="Message" name="" id="" cols="30" rows="10"></textarea>
-          <div class="flex mb-6">
-            <div class="relative">
-              <input type="checkbox"/>
-              <span class="absolute top-0 left-0 bg-white">
-                <svg width="28" height="28" viewbox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="0.5" y="0.5" width="27" height="27" rx="13.5" stroke="#348BF6"></rect>
-                  <path d="M11.135 20.6747L5 14.0559L5.81024 13.1818L11.135 18.9265L22.1898 7L23 7.87414L11.135 20.6747Z" fill="#326BFF"></path>
-                </svg>
-              </span>
-            </div>
-            <p class="ml-10 text-base text-gray-400">By singning up, you agree to our Terms, Data Policy and Cookies.</p>
-          </div>
-          <div class="text-right"><a class="inline-block py-5 px-10 w-full md:w-auto text-xl leading-6 text-white font-medium tracking-tighter font-heading text-center bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-xl" href="#">Send</a></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<MudGrid Class="mt-6 mb-10" Justify="Justify.Center">
+    <!-- LEFT: info -->
+    <MudItem xs="12" md="5">
+        <MudPaper Elevation="1" Class="pa-4 mb-4">
 
+            <MudStack Row="true" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.SupportAgent" Class="mr-2"/>
+                <MudText Typo="Typo.h5">Контакти Class Kedr</MudText>
+            </MudStack>
+
+            <MudList T="string" Dense="true">
+                <MudListItem T="string">
+                    <MudStack Row="true">
+                        <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2"/>
+                        <MudText Typo="Typo.body1">
+                            <a href="tel:+38(068)713-50-49">+38 (068) 713-50-493</a>
+                        </MudText>
+                    </MudStack>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudStack Row="true">
+                        <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2"/>
+                        <MudText Typo="Typo.body1"><a href="mailto:info@classkedr.ua">info@kedr.ua</a></MudText>
+                    </MudStack>
+                </MudListItem>
+            </MudList>
+
+            <MudDivider Class="my-3"/>
+
+            <MudStack Row="true" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.Schedule" Class="mr-2"/>
+                <MudText Typo="Typo.h6">Графік роботи</MudText>
+            </MudStack>
+
+            <!-- ВАЖНО: у MudTable есть Items + RowTemplate -->
+            <MudTable Items="@_schedule" Dense="true" Hover="false" Bordered="true">
+                <HeaderContent>
+                    <MudTh>Дні</MudTh>
+                    <MudTh>Час</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Дні">@context.Day</MudTd>
+                    <MudTd DataLabel="Час"><strong>@context.Hours</strong></MudTd>
+                </RowTemplate>
+            </MudTable>
+
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+                Приймаємо оплату у гривнях і USD. Доставка по Україні «Нова Пошта», доступний самовивіз.
+            </MudAlert>
+        </MudPaper>
+    </MudItem>
+
+    <!-- RIGHT: visual-only form stub -->
+    <MudItem xs="12" md="7">
+        <MudPaper Elevation="1" Class="pa-4">
+            <div class="d-flex align-center mb-2">
+                <MudIcon Icon="@Icons.Material.Filled.MailOutline" Class="mr-2" />
+                <MudText Typo="Typo.h5">Зворотний зв’язок</MudText>
+            </div>
+            <MudText Typo="Typo.body2" Class="mb-3">
+                Це візуальна форма-заглушка. Поля редагуються, але дані нікуди не надсилаються.
+            </MudText>
+
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string" Label="Ваше ім’я" Placeholder="Ім’я та прізвище" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string" Label="Електронна пошта" Placeholder="you@example.com" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string" Label="Ваш телефон" Placeholder="+38 (0__) ___-__-__" Immediate="true" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="string" Label="Тема запитання">
+                        <MudSelectItem Value="@("Питання про замовлення")" />
+                        <MudSelectItem Value="@("Оплата та доставка")" />
+                        <MudSelectItem Value="@("Підбір фурнітури")" />
+                        <MudSelectItem Value="@("Партнерство / гурт")" />
+                        <MudSelectItem Value="@("Інше")" />
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Ваше повідомлення" Lines="8" Variant="Variant.Outlined" Immediate="true" />
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send">
+                        Відправити
+                    </MudButton>
+                    <MudButton Class="ml-2" Variant="Variant.Outlined">
+                        Скинути
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 <CallToAction></CallToAction>
 
+@code {
+    // Простая модель для таблицы расписания
+    private readonly List<ScheduleRow> _schedule =
+    [
+        new("Пн–Пт", "09:00–18:00"),
+        new("Сб",    "10:00–15:00"),
+        new("Нд",    "Вихідний"),
+    ];
 
-
+    private sealed record ScheduleRow(string Day, string Hours);
+}

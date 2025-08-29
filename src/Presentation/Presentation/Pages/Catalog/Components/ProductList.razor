@@ -44,10 +44,11 @@ else
                       <MudCardContent>
 
                           <div class="d-flex justify-center">
-                              <MudImage Class="rounded-lg"
-                                        ObjectFit="ObjectFit.Cover"
-                                        Src="assets/images/placeholder3.png"
-                                        Alt="Product"/>
+                              <img class="rounded-lg"
+                                   style="max-width: 100%; height: auto; object-fit: cover;"
+                                   src="@ProductImageUrl(item.Id)"
+                                   alt="Product"
+                                   onerror="this.onerror=null;this.src='@PlaceholderUrl';" />
                           </div>
                           <MudText Typo="Typo.h6">
                               @item.Name
@@ -93,5 +94,9 @@ else
         set => CatalogStore.GoToPage(value);
     }
 
+    private static string ProductImageUrl(int id)
+        => $"https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/{id}.jpg";
 
+    private const string PlaceholderUrl =
+        "https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/00000000.jpg";
 }

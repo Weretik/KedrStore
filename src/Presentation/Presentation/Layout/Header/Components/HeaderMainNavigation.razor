@@ -1,6 +1,7 @@
 ﻿<MudHidden Breakpoint="Breakpoint.SmAndDown">
     <MudStack Row="true" AlignItems="AlignItems.Center">
 
+        @*
         <MudMenu Label="Каталог" Class="mx-1"
                  EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
                  Color="Color.Tertiary"
@@ -10,6 +11,13 @@
             <MudMenuItem Href="#" Label="Двері"/>
             <MudMenuItem Href="#" Label="Двері, вигідна ціна"/>
         </MudMenu>
+        *@
+        <MudButton Style="width: 120px; height: 32px;" Class="mx-1"
+                   Color="Color.Tertiary"
+                   Variant="Variant.Filled"
+                   Href="@Routing.CatalogProducts">
+            Каталог
+        </MudButton>
 
         <MudMenu Label="Про нас" Class="mx-1"
                  EndIcon="@Icons.Material.Filled.KeyboardArrowDown"
@@ -20,6 +28,7 @@
             <MudMenuItem Href="@Routing.InfoShipping" Label="Доставка"/>
             <MudMenuItem Href="@Routing.InfoPayment" Label="Оплата"/>
             <MudMenuItem Href="@Routing.InfoReturns" Label="Повернення товару"/>
+            <MudMenuItem Href="@Routing.InfoWarranty" Label="Гарантія"/>
             <MudMenuItem Href="@Routing.Contact" Label="Контакти"/>
         </MudMenu>
 
