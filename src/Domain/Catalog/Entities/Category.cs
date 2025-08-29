@@ -4,7 +4,7 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
 {
     #region Properties
 
-    public string Name { get; private set; } = null!;
+    public  string Name { get; private set; } = null!;
     public CategoryId? ParentCategoryId { get; private set; }
     private readonly List<Category> _children = [];
     public IReadOnlyCollection<Category> Children => _children.AsReadOnly();

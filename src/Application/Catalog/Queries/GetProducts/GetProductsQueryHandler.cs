@@ -29,7 +29,7 @@ public class GetProductsQueryHandler(
         var items = await productRepository.ListAsync(pageSpec,  cancellationToken);
         var total = await productRepository.CountAsync(countSpec, cancellationToken);
 
-        if (items is null)
+        if (items.Count == 0)
         {
             return Result.NotFound();
         }

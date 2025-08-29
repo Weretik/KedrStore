@@ -5,6 +5,25 @@
 
 @if (CatalogSelectors.IsLoading(CatalogState.Value))
 {
+    for (int i = 0; i < CatalogState.Value.Params.PageSize; i++)
+    {
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudCard>
+                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
+                    <MudCardContent>
+                        <MudSkeleton Width="30%" Height="42px;"/>
+                        <MudSkeleton Width="80%"/>
+                        <MudSkeleton Width="100%"/>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudSkeleton Width="64px" Height="40px" Class="ml-2"/>
+                        <MudSkeleton Width="105px" Height="40px" Class="ml-3"/>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    }
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else if (CatalogSelectors.IsEmpty(CatalogState.Value))
@@ -42,11 +61,17 @@ else
                       <MudCardContent>
 
                           <div class="d-flex justify-center">
-                              <MudImage ObjectFit="ObjectFit.Cover" Src="assets/images/placeholder3.png"
-                                        Alt="Product" Class="rounded-lg"/>
+                              <MudImage Class="rounded-lg"
+                                        ObjectFit="ObjectFit.Cover"
+                                        Src="assets/images/placeholder3.png"
+                                        Alt="Product"/>
                           </div>
-                          <MudText Typo="Typo.h6">@item.Name Old Paint</MudText>
-                          <MudText Typo="Typo.subtitle1">@item.Amount @item.Currency</MudText>
+                          <MudText Typo="Typo.h6">
+                              @item.Name
+                          </MudText>
+                          <MudText Align="Align.End" Typo="Typo.subtitle1">
+                              @item.Amount @item.Currency
+                          </MudText>
                       </MudCardContent>
 
                       <MudCardActions>
@@ -68,8 +93,6 @@ else
                      Class="mt-10 mb-20"
                      Count="@CatalogSelectors.TotalPages(CatalogState.Value)"
                      @bind-Selected="CurrentPage" />
-                    // Selected="@CatalogState.Value.Params.PageNumber"
-                    // SelectedChanged="@CatalogStore.GoToPage"/>
 }
 
 

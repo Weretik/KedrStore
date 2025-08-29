@@ -1,21 +1,46 @@
 ﻿<MudPaper Elevation="2">
 
-  <MudText Typo="Typo.h4">Категорії</MudText>
+    <MudText Typo="Typo.h4">Категорії</MudText>
 
-  <MudTreeView T="string">
+    @*<MudProgressLinear Indeterminate="true" Style="height:3px" Visible="@_loading"/>*@
 
-    <MudTreeViewItem Text="Getting Started">
-      <MudTreeViewItem Text="Installation"/>
-    </MudTreeViewItem>
+    <MudTreeView T="CategoryDto"
+                 Items="@_tree"
+                 @bind-SelectedValue="_selected"
+                 Hover="true"
+                 Dense="true">
 
-    <MudTreeViewItem Value='"Components"'>
-      <MudTreeViewItem Text="Avatar" Value='"MudAvatar"'/>
-      <MudTreeViewItem Text="Button" Value='"MudButton"'/>
-    </MudTreeViewItem>
+        <ItemTemplate Context="item">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icons.Material.Filled.Folder" />
+                <MudText>@item.Value.Name</MudText>
+            </MudStack>
+        </ItemTemplate>
 
-  </MudTreeView>
+    </MudTreeView>
 </MudPaper>
 
 @code {
+     private bool _loading = true;
+     private IReadOnlyCollection<TreeItemData<CategoryDto>> _tree = [];
+     private CategoryDto? _selected;
 
-}
+     protected override async Task OnInitializedAsync()
+     {
+         var res = await Mediator.Send(new GetCategoriesQuery());
+         var list = res.IsSuccess ? res.Value : [];
+
+         _tree = list.Select(ToTreeItem).ToList();
+         _loading = false;
+     }
+
+     private static TreeItemData<CategoryDto> ToTreeItem(CategoryDto c)
+     {
+         return new TreeItemData<CategoryDto>
+         {
+             Value    = c,
+             Text     = c.Name,
+             Children = (c.Children?.Select(ToTreeItem).ToList()) ?? []
+         };
+     }
+ }

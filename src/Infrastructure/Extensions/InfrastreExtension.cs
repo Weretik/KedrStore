@@ -9,8 +9,17 @@ public static class InfrastreExtension
         // Подключение Catalog БД
         var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-        services.AddDbContext<CatalogDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        services.AddDbContext<CatalogDbContext>(
+            options => options.UseNpgsql(connectionString));
+
+        services.AddDbContextFactory<CatalogDbContext>(
+            options => options.UseNpgsql(connectionString),
+            lifetime: ServiceLifetime.Scoped
+        );
+
+        // services.AddPooledDbContextFactory<CatalogDbContext>(
+        // o => o.UseNpgsql(connectionString),
+        // lifetime: ServiceLifetime.Scoped);
 
         // Подключение Identity БД
         services.AddDbContext<AppIdentityDbContext>(options =>
@@ -30,7 +39,8 @@ public static class InfrastreExtension
 
         // Регистрация Репозиториев
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
-        services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogEfRepository<>));
+        services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
+
         services.AddScoped(typeof(IAppIdentityRepository<>), typeof(AppIdentityEfRepository<>));
         services.AddScoped(typeof(IAppIdentityReadRepository<>), typeof(AppIdentityEfRepository<>));
 
