@@ -76,6 +76,10 @@ public static class InfrastreExtension
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
 
+        //Telegram
+        services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
+        services.AddSingleton<ITelegramBotClient, TelegramBotClient>();
+
         return services;
     }
 }

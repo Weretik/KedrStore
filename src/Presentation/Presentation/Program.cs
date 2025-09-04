@@ -38,7 +38,6 @@ builder.Services.AddMudServices();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
-
 var app = builder.Build();
 
 // Migrations & Seeders

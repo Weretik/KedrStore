@@ -22,10 +22,13 @@ global using Application.Common.Behaviors;
 global using Application.Common.Sorting;
 global using Application.Common.Paging;
 global using Application.Common.Logging;
+global using Application.Common.Helper;
 global using Application.Catalog.DTOs;
 global using Application.Catalog.Sorting;
 global using Application.Catalog.Interfaces;
 global using Application.Catalog.Specifications;
+global using Application.Catalog.Notifications;
+
 // Domain namespaces
 global using Domain.Common.Abstractions;
 global using Domain.Catalog.Entities;
@@ -39,3 +42,4 @@ global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
 global using Ardalis.Result;
 global using Ardalis.Result.FluentValidation;
+global using PhoneNumbers;

@@ -49,9 +49,14 @@ global using Domain.Catalog.ValueObjects;
 
 // Application namespaces
 global using Application.Catalog.Interfaces;
+global using Application.Catalog.Notifications;
 global using Application.Common.Interfaces;
 global using Application.Common.Notifications;
 
 // Ardalis
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
+
+// Telegram
+global using Telegram.Bot;
+global using Telegram.Bot.Types;
