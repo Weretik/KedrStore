@@ -43,7 +43,7 @@
     environment:
       ASPNETCORE_URLS: "http://+:80"
       ASPNETCORE_ENVIRONMENT: Production
-      CONNECTION_STRING: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
       SERILOG__USING__0: Serilog.Sinks.Console
       SERILOG__USING__1: Serilog.Sinks.Seq
@@ -51,8 +51,8 @@
       SERILOG__WRITETO__0__NAME: Console
       SERILOG__WRITETO__1__NAME: Seq
       SERILOG__WRITETO__1__ARGS__SERVERURL: "http://seq:80"
-      Telegram__BotToken: "${TELEGRAM_BOT_TOKEN}"
-      Telegram__ChatId: "${TELEGRAM_CHAT_ID}"
+      Telegram__BotToken: "${Telegram__BotToken}"
+      Telegram__ChatId: "${Telegram__ChatId}"
     volumes:
       - ./data-protection-keys:/home/kedruser/.aspnet/DataProtection-Keys
     depends_on:

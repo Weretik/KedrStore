@@ -28,6 +28,7 @@ global using Application.Catalog.Sorting;
 global using Application.Catalog.Interfaces;
 global using Application.Catalog.Specifications;
 global using Application.Catalog.Notifications;
+global using Application.Catalog.Extensions;
 
 // Domain namespaces
 global using Domain.Common.Abstractions;

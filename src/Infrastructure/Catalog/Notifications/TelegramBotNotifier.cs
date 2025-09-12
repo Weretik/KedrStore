@@ -1,10 +1,15 @@
 ﻿namespace Infrastructure.Catalog.Notifications;
 
-public sealed class TelegramBotNotifier(IOptions<TelegramOptions> options) : ITelegramNotifier
+public sealed class TelegramBotNotifier(
+    ITelegramBotClient bot,
+    IOptions<TelegramOptions> options) : ITelegramNotifier
 {
+    /*
     private readonly ITelegramBotClient _bot = new TelegramBotClient(options.Value.BotToken);
     private readonly string _chatId = options.Value.ChatId;
-
+    */
+    private readonly ITelegramBotClient _bot = bot;
+    private readonly string _chatId = options.Value.ChatId;
     public Task SendMessageAsync(string text, CancellationToken cancellationToken = default)
         => _bot.SendMessage(
             chatId: _chatId,

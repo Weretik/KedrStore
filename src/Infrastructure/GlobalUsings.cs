@@ -25,6 +25,7 @@ global using Infrastructure.Catalog.Seeders;
 global using Infrastructure.Catalog.Persistence;
 global using Infrastructure.Catalog.Interfaces;
 global using Infrastructure.Catalog.Migrations;
+global using Infrastructure.Catalog.Notifications;
 
 global using Infrastructure.Identity;
 global using Infrastructure.Identity.Entities;
@@ -52,6 +53,7 @@ global using Application.Catalog.Interfaces;
 global using Application.Catalog.Notifications;
 global using Application.Common.Interfaces;
 global using Application.Common.Notifications;
+global using Application.Identity.Interfaces;
 
 // Ardalis
 global using Ardalis.Specification;

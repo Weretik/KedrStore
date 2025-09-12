@@ -1,14 +1,12 @@
-﻿using Application.Identity.Interfaces;
-
-namespace Infrastructure.Extensions;
+﻿namespace Infrastructure.Extensions;
 
 public static class InfrastreExtension
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Подключение Catalog БД
-        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-
+        //var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+        var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<CatalogDbContext>(
             options => options.UseNpgsql(connectionString));
 
@@ -78,7 +76,17 @@ public static class InfrastreExtension
 
         //Telegram
         services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
-        services.AddSingleton<ITelegramBotClient, TelegramBotClient>();
+        services.AddHttpClient("telegram")
+            .AddTypedClient<ITelegramBotClient>((http, sp) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<TelegramOptions>>().Value;
+
+                if (string.IsNullOrWhiteSpace(opts.BotToken))
+                    throw new InvalidOperationException("Telegram:BotToken is not set (ENV Telegram__BotToken).");
+
+                return new TelegramBotClient(new TelegramBotClientOptions(opts.BotToken), http);
+            });
+        services.AddScoped<ITelegramNotifier, TelegramBotNotifier>();
 
         return services;
     }

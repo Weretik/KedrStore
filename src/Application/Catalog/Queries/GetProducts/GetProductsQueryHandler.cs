@@ -17,9 +17,7 @@ public class GetProductsQueryHandler(
             query.PageNumber,
             query.PageSize);
 
-
-
-        var countSpec = ProductsPageSpecification.ForCount(
+        var countSpec = new ProductsForCountSpecification(
             query.SearchTerm,
             query.CategoryId,
             query.MinPrice,
