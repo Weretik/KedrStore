@@ -7,22 +7,10 @@ public class GetProductsQueryHandler(
     public async ValueTask<Result<PaginatedList<ProductDto>>> Handle(
         GetProductsQuery query, CancellationToken cancellationToken)
     {
-        var pageSpec  = new ProductsPageSpecification(
-            query.SearchTerm,
-            query.CategoryId,
-            query.MinPrice,
-            query.MaxPrice,
-            query.Manufacturer,
-            query.Sort,
-            query.PageNumber,
-            query.PageSize);
+        ArgumentNullException.ThrowIfNull(query);
 
-        var countSpec = new ProductsForCountSpecification(
-            query.SearchTerm,
-            query.CategoryId,
-            query.MinPrice,
-            query.MaxPrice,
-            query.Manufacturer);
+        var pageSpec  = new ProductsPageSpecification(query.Criteria);
+        var countSpec = new ProductsForCountSpecification(query.Criteria);
 
         var items = await productRepository.ListAsync(pageSpec,  cancellationToken);
         var total = await productRepository.CountAsync(countSpec, cancellationToken);
@@ -35,8 +23,8 @@ public class GetProductsQueryHandler(
         var pageList = new PaginatedList<ProductDto>(
             items,
             total,
-            query.PageNumber,
-            query.PageSize);
+            query.Criteria.PageNumber,
+            query.Criteria.PageSize);
 
         return Result.Success(pageList);
 

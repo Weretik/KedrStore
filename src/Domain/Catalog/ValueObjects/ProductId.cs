@@ -1,6 +1,6 @@
 ﻿namespace Domain.Catalog.ValueObjects;
 
-public readonly record struct ProductId(int Value)
+public readonly record struct ProductId(int Value) : IEntityId<int>
 {
     public override string ToString() => Value.ToString();
     public static implicit operator int(ProductId id) => id.Value;

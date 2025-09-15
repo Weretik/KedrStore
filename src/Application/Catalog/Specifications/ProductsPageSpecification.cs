@@ -2,20 +2,12 @@
 
 public sealed class ProductsPageSpecification : Specification<Product, ProductDto>
 {
-    public ProductsPageSpecification(
-        string? search,
-        CategoryId? categoryId,
-        decimal? minPrice,
-        decimal? maxPrice,
-        string? manufacturer,
-        string? sort,
-        int page,
-        int pageSize)
+    public ProductsPageSpecification(ProductsCriteria criteria)
     {
         Query.AsNoTracking()
-            .ApplyCommonFilters(search, categoryId, minPrice, maxPrice, manufacturer)
-            .ApplySortingStrict(new ProductSortMap(), sort).ThenBy(p => p.Id)
-            .Skip((page - 1) * pageSize).Take(pageSize);
+            .ApplyCommonFilters(criteria)
+            .ApplySortingStrict(new ProductSortMap(), criteria.Sort).ThenBy(p => p.Id)
+            .Skip((criteria.PageNumber - 1) * criteria.PageSize).Take(criteria.PageSize);
 
         Query.Select(p => new ProductDto
         {

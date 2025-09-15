@@ -29,7 +29,7 @@ global using Application.Catalog.Interfaces;
 global using Application.Catalog.Specifications;
 global using Application.Catalog.Notifications;
 global using Application.Catalog.Extensions;
-
+global using Application.Catalog.Queries.GetProducts;
 // Domain namespaces
 global using Domain.Common.Abstractions;
 global using Domain.Catalog.Entities;

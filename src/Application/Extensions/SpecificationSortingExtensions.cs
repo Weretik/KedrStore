@@ -20,12 +20,20 @@ public static class SpecificationSortingExtensions
             if (!map.Keys.TryGetValue(token.Key, out var expr))
                 continue;
 
-            ordered = ordered is null
-                ? token.Direction == SortDirection.Desc ? specification.OrderByDescending(expr) : specification.OrderBy(expr)
-                : token.Direction == SortDirection.Desc ? ordered.ThenByDescending(expr) : ordered.ThenBy(expr);
+            if (ordered is null)
+            {
+                ordered = token.Direction == SortDirection.Desc
+                    ? specification.OrderByDescending(expr)
+                    : specification.OrderBy(expr);
+            }
+            else
+            {
+                ordered = token.Direction == SortDirection.Desc
+                    ? ordered.ThenByDescending(expr)
+                    : ordered.ThenBy(expr);
+            }
         }
 
-        ordered ??= specification.OrderBy(map.Keys[map.DefaultKey]);
-        return ordered;
+        return ordered ?? specification.OrderBy(map.Keys[map.DefaultKey]);
     }
 }

@@ -9,23 +9,38 @@ public static class SortParser
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
-            var sortArray = sort.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var sortArray = sort
+                .Replace(" desc", ":desc", StringComparison.OrdinalIgnoreCase)
+                .Replace(" asc",  ":asc",  StringComparison.OrdinalIgnoreCase)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 
             foreach (var raw in sortArray)
             {
-                var parts = raw.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length is 0) continue;
-
-                var key = parts[0];
+                var trimRaw = raw.Trim();
                 var direction = SortDirection.Asc;
-                if (parts.Length >= 2)
+
+                if (trimRaw.StartsWith('-'))
                 {
-                    var d = parts[1];
-                    if (d.Equals("desc", StringComparison.OrdinalIgnoreCase)) direction = SortDirection.Desc;
-                    else if (d.Equals("asc",  StringComparison.OrdinalIgnoreCase)) direction = SortDirection.Asc;
+                    direction = SortDirection.Desc;
+                    trimRaw = trimRaw[1..].Trim();
                 }
 
+                var parts = trimRaw.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 0) continue;
+
+                var key = parts[0];
                 if (string.IsNullOrWhiteSpace(key)) continue;
+
+                if (parts.Length >= 2 && parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase))
+                {
+                    direction = SortDirection.Desc;
+                }
+                else if (parts.Length < 2)
+                {
+                    direction = SortDirection.Asc;
+                }
+
                 if (seen.Add(key)) tokens.Add(new SortToken(key, direction));
             }
         }

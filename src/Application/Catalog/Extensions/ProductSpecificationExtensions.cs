@@ -4,15 +4,14 @@ public static class ProductFiltersSpecificationExtensions
 {
     public static ISpecificationBuilder<Product> ApplyCommonFilters(
         this ISpecificationBuilder<Product> specification,
-        string? search,
-        CategoryId? categoryId,
-        decimal? minPrice,
-        decimal? maxPrice,
-        string? manufacturer)
+        ProductsCriteria criteria)
     {
-        if (!string.IsNullOrWhiteSpace(search))
+
+        ArgumentNullException.ThrowIfNull(criteria);
+
+        if (!string.IsNullOrWhiteSpace(criteria.SearchTerm))
         {
-            var term = search.Trim();
+            var term = criteria.SearchTerm!.Trim();
             var tokens = term.Split(' ',
                 StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -34,17 +33,17 @@ public static class ProductFiltersSpecificationExtensions
             }
         }
 
-        if (categoryId is not null)
-            specification.Where(p => p.CategoryId == categoryId);
+        if (criteria.CategoryId is not null)
+            specification.Where(p => p.CategoryId == criteria.CategoryId);
 
-        if (minPrice.HasValue)
-            specification.Where(p => p.Price.Amount >= minPrice.Value);
+        if (criteria.MinPrice.HasValue)
+            specification.Where(p => p.Price.Amount >= criteria.MinPrice.Value);
 
-        if (maxPrice.HasValue)
-            specification.Where(p => p.Price.Amount <= maxPrice.Value);
+        if (criteria.MaxPrice.HasValue)
+            specification.Where(p => p.Price.Amount <= criteria.MaxPrice.Value);
 
-        if (!string.IsNullOrWhiteSpace(manufacturer))
-            specification.Search(p => p.Manufacturer, $"%{manufacturer.Trim()}%");
+        if (!string.IsNullOrWhiteSpace(criteria.Manufacturer))
+            specification.Search(p => p.Manufacturer, $"%{criteria.Manufacturer.Trim()}%");
 
         return specification;
     }

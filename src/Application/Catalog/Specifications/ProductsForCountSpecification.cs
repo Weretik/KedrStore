@@ -2,14 +2,8 @@
 
 public class ProductsForCountSpecification : Specification<Product>
 {
-    public ProductsForCountSpecification(
-        string? search,
-        CategoryId? categoryId,
-        decimal? minPrice,
-        decimal? maxPrice,
-        string? manufacturer)
+    public ProductsForCountSpecification(ProductsCriteria criteria)
     {
-        Query.AsNoTracking()
-            .ApplyCommonFilters(search, categoryId, minPrice, maxPrice, manufacturer);
+        Query.AsNoTracking().ApplyCommonFilters(criteria);
     }
 }

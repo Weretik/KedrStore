@@ -1,6 +1,4 @@
-﻿using Domain.Catalog.Entities;
-
-namespace Presentation.Shared.States.Catalog;
+﻿namespace Presentation.Shared.States.Catalog;
 
 public sealed class CatalogEffects(
     IMediator mediator,
@@ -16,21 +14,22 @@ public sealed class CatalogEffects(
         _cancellationToken = new CancellationTokenSource();
 
         var ct = _cancellationToken.Token;
-
         var p = state.Value.Params;
 
-        CategoryId? category = p.CategoryId.HasValue ? new CategoryId(p.CategoryId.Value) : null;
+        CategoryId? categoryId = p.CategoryId.HasValue ? new CategoryId(p.CategoryId.Value) : null;
 
-        var query = new GetProductsQuery(
-            SearchTerm:   p.SearchTerm,
-            CategoryId:   category,
-            MinPrice:     p.MinPrice,
-            MaxPrice:     p.MaxPrice,
+        var criteria = new ProductsCriteria(
+            SearchTerm: p.SearchTerm,
+            CategoryId: categoryId,
+            MinPrice: p.MinPrice,
+            MaxPrice: p.MaxPrice,
             Manufacturer: p.Manufacturer,
-            Sort:         p.Sort,
-            PageNumber:   p.PageNumber,
-            PageSize:     p.PageSize
+            Sort: p.Sort,
+            PageNumber: p.PageNumber,
+            PageSize: p.PageSize
         );
+
+        var query = new GetProductsQuery(criteria);
 
         try
         {
