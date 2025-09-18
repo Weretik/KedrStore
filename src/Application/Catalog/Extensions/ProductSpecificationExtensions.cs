@@ -4,19 +4,17 @@ public static class ProductFiltersSpecificationExtensions
 {
     public static ISpecificationBuilder<Product> ApplyCommonFilters(
         this ISpecificationBuilder<Product> specification,
-        ProductsCriteria criteria)
+        ProductsFilter filter)
     {
 
-        ArgumentNullException.ThrowIfNull(criteria);
+        ArgumentNullException.ThrowIfNull(filter);
 
-        if (!string.IsNullOrWhiteSpace(criteria.SearchTerm))
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            var term = criteria.SearchTerm!.Trim();
-            var tokens = term.Split(' ',
-                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var term = filter.SearchTerm!.Trim();
+            var tokens = term.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)
-                && id > 0)
+            if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
             {
                 specification.Where(p => p.Id == id);
             }
@@ -33,17 +31,17 @@ public static class ProductFiltersSpecificationExtensions
             }
         }
 
-        if (criteria.CategoryId is not null)
-            specification.Where(p => p.CategoryId == criteria.CategoryId);
+        if (filter.CategoryId is not null)
+            specification.Where(p => p.CategoryId == filter.CategoryId);
 
-        if (criteria.MinPrice.HasValue)
-            specification.Where(p => p.Price.Amount >= criteria.MinPrice.Value);
+        if (filter.MinPrice.HasValue)
+            specification.Where(p => p.Price.Amount >= filter.MinPrice.Value);
 
-        if (criteria.MaxPrice.HasValue)
-            specification.Where(p => p.Price.Amount <= criteria.MaxPrice.Value);
+        if (filter.MaxPrice.HasValue)
+            specification.Where(p => p.Price.Amount <= filter.MaxPrice.Value);
 
-        if (!string.IsNullOrWhiteSpace(criteria.Manufacturer))
-            specification.Search(p => p.Manufacturer, $"%{criteria.Manufacturer.Trim()}%");
+        if (!string.IsNullOrWhiteSpace(filter.Manufacturer))
+            specification.Search(p => p.Manufacturer, $"%{filter.Manufacturer.Trim()}%");
 
         return specification;
     }

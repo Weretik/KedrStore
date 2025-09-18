@@ -22,6 +22,11 @@
             // Регистрация FluentValidation
             services.AddValidatorsFromAssembly(typeof(ApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
 
+            // Карты сортировки
+            services.AddSingleton<ISortMap<Product>, ProductSortMap>();
+            // services.AddSingleton<ISortMap<Order>,   OrderSortMap>();
+            // services.AddSingleton<ISortMap<User>,    UserSortMap>();
+
             return services;
         }
 

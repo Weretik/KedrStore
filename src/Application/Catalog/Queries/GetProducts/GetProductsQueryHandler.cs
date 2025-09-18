@@ -9,8 +9,8 @@ public class GetProductsQueryHandler(
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        var pageSpec  = new ProductsPageSpecification(query.Criteria);
-        var countSpec = new ProductsForCountSpecification(query.Criteria);
+        var pageSpec  = new ProductsPageSpecification(query.Filter, query.PageRequest, query.Sort);
+        var countSpec = new ProductsForCountSpecification(query.Filter);
 
         var items = await productRepository.ListAsync(pageSpec,  cancellationToken);
         var total = await productRepository.CountAsync(countSpec, cancellationToken);
@@ -20,14 +20,8 @@ public class GetProductsQueryHandler(
             return Result.NotFound();
         }
 
-        var pageList = new PaginatedList<ProductDto>(
-            items,
-            total,
-            query.Criteria.PageNumber,
-            query.Criteria.PageSize);
+        var pageList = new PaginatedList<ProductDto>(items, total, query.PageRequest);
 
         return Result.Success(pageList);
-
-
     }
 }

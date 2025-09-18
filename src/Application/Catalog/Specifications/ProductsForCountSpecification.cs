@@ -2,8 +2,8 @@
 
 public class ProductsForCountSpecification : Specification<Product>
 {
-    public ProductsForCountSpecification(ProductsCriteria criteria)
+    public ProductsForCountSpecification(ProductsFilter filter)
     {
-        Query.AsNoTracking().ApplyCommonFilters(criteria);
+        Query.AsNoTracking().ApplyCommonFilters(filter);
     }
 }

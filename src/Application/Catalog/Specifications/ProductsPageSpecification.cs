@@ -2,12 +2,14 @@
 
 public sealed class ProductsPageSpecification : Specification<Product, ProductDto>
 {
-    public ProductsPageSpecification(ProductsCriteria criteria)
+    public ProductsPageSpecification(ProductsFilter filter, PageRequest pageRequest, string? sort)
     {
+        ArgumentNullException.ThrowIfNull(filter);
+
         Query.AsNoTracking()
-            .ApplyCommonFilters(criteria)
-            .ApplySortingStrict(new ProductSortMap(), criteria.Sort).ThenBy(p => p.Id)
-            .Skip((criteria.PageNumber - 1) * criteria.PageSize).Take(criteria.PageSize);
+            .ApplyCommonFilters(filter)
+            .ApplySortingStrict(new ProductSortMap(), sort).ThenBy(p => p.Id)
+            .Skip((pageRequest.CurrentPage - 1) * pageRequest.PageSize).Take(pageRequest.PageSize);
 
         Query.Select(p => new ProductDto
         {

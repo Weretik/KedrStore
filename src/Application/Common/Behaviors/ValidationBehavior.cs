@@ -18,30 +18,27 @@ public class ValidationBehavior<TMessage, TResponse>(
         }
 
         var context = new ValidationContext<TMessage>(message);
-        var results  = await Task.WhenAll(
-            validators.Select(v=> v.ValidateAsync(context, cancellationToken)));
+        var results  = await Task.WhenAll(validators.Select(validator => validator.ValidateAsync(context, cancellationToken)));
+        var failuresList = results.SelectMany(result => result.Errors).Where(failure => failure is not null).ToList();
 
-        var failures = results
-            .SelectMany(r => r.Errors)
-            .Where(e => e is not null)
-            .ToList();
-
-        if (failures.Count == 0)
+        if (failuresList.Count == 0)
         {
             ArgumentNullException.ThrowIfNull(next);
             return await next(message, cancellationToken);
-
         }
 
         ValidationLog.Failed(logger, typeof(TMessage).Name,
-            failures.Select(f => new { f.PropertyName, f.ErrorMessage })
-        );
+            failuresList.Select(failure => new
+            {
+                failure.PropertyName,
+                failure.ErrorMessage
+            }));
 
-        var errors = new ValidationResult(failures).AsErrors();
+        var errorsList = new ValidationResult(failuresList).AsErrors();
 
         if (typeof(TResponse) == typeof(Result))
         {
-            var result = Result.Invalid(errors);
+            var result = Result.Invalid(errorsList);
             return (TResponse)(object)result;
         }
         if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
@@ -51,12 +48,10 @@ public class ValidationBehavior<TMessage, TResponse>(
                 .GetMethod("Invalid", [typeof(List<ValidationError>)]);
 
             ArgumentNullException.ThrowIfNull(method);
-
-
-            var result = method.Invoke(null, [errors]);
+            var result = method.Invoke(null, [errorsList]);
             return (TResponse)result!;
         }
 
-        throw new ValidationException(failures);
+        throw new ValidationException(failuresList);
     }
 }
