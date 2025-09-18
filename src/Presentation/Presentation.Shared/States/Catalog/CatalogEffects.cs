@@ -1,9 +1,6 @@
 ﻿namespace Presentation.Shared.States.Catalog;
 
-public sealed class CatalogEffects(
-    IMediator mediator,
-    IState<CatalogState> state,
-    ILogger<CatalogEffects> logger)
+public sealed class CatalogEffects(IMediator mediator, IState<CatalogState> state, ILogger<CatalogEffects> logger)
 {
     private CancellationTokenSource? _cancellationToken;
 
@@ -13,27 +10,24 @@ public sealed class CatalogEffects(
         _cancellationToken?.Cancel();
         _cancellationToken = new CancellationTokenSource();
 
-        var ct = _cancellationToken.Token;
-        var p = state.Value.Params;
+        var cancellationToken = _cancellationToken.Token;
+        var parameters = state.Value.Params;
 
-        CategoryId? categoryId = p.CategoryId.HasValue ? new CategoryId(p.CategoryId.Value) : null;
-
-        var criteria = new ProductsCriteria(
-            SearchTerm: p.SearchTerm,
+        CategoryId? categoryId = parameters.CategoryId.HasValue ? new CategoryId(parameters.CategoryId.Value) : null;
+        PageRequest pageRequest = new(parameters.PageNumber, parameters.PageSize);
+        ProductsFilter criteria = new(
+            SearchTerm: parameters.SearchTerm,
             CategoryId: categoryId,
-            MinPrice: p.MinPrice,
-            MaxPrice: p.MaxPrice,
-            Manufacturer: p.Manufacturer,
-            Sort: p.Sort,
-            PageNumber: p.PageNumber,
-            PageSize: p.PageSize
+            MinPrice: parameters.MinPrice,
+            MaxPrice: parameters.MaxPrice,
+            Manufacturer: parameters.Manufacturer
         );
 
-        var query = new GetProductsQuery(criteria);
+        var query = new GetProductsQuery(criteria, pageRequest, parameters.Sort);
 
         try
         {
-            var result = await mediator.Send(query, ct);
+            var result = await mediator.Send(query, cancellationToken);
 
             if (result.Status == ResultStatus.Ok && result.Value is not null)
             {
@@ -46,8 +40,7 @@ public sealed class CatalogEffects(
                 var empty = new PaginatedList<ProductDto>(
                     Items: [],
                     Total: 0,
-                    PageNumber: p.PageNumber,
-                    PageSize: p.PageSize
+                    pageRequest
                 );
 
                 dispatcher.Dispatch(new CatalogActions.LoadSuccess(empty));

@@ -1,8 +1,6 @@
 ﻿namespace Presentation.Shared.States.Catalog;
 
-public sealed class CatalogStore(
-    IState<CatalogState> state, IDispatcher dispatcher)
-    : ICatalogStore
+public sealed class CatalogStore(IState<CatalogState> state, IDispatcher dispatcher) : ICatalogStore
 {
     public void SetSearchTerm(string? value)
         => Apply(p => {
@@ -10,7 +8,8 @@ public sealed class CatalogStore(
             if (v == p.SearchTerm) return p;
             return p with
             {
-                SearchTerm = v, PageNumber = 1
+                SearchTerm = v,
+                PageNumber = 1
             };
         });
 
@@ -18,7 +17,8 @@ public sealed class CatalogStore(
         => Apply(p =>
             p.CategoryId == id ? p : p with
             {
-                CategoryId = id, PageNumber = 1
+                CategoryId = id,
+                PageNumber = 1
             });
 
     public void SetSort(string? sort)
@@ -27,14 +27,17 @@ public sealed class CatalogStore(
             if (s == p.Sort) return p;
             return p with
             {
-                Sort = s, PageNumber = 1
+                Sort = s,
+                PageNumber = 1
             };
         });
 
     public void SetPrice(decimal? min, decimal? max)
         => Apply(p => (p.MinPrice, p.MaxPrice) == (min, max) ? p : p with
         {
-            MinPrice = min, MaxPrice = max, PageNumber = 1
+            MinPrice = min,
+            MaxPrice = max,
+            PageNumber = 1
         });
 
 
@@ -44,7 +47,8 @@ public sealed class CatalogStore(
             if (m == p.Manufacturer) return p;
             return p with
             {
-                Manufacturer = m, PageNumber = 1
+                Manufacturer = m,
+                PageNumber = 1
             };
         });
 
@@ -54,7 +58,8 @@ public sealed class CatalogStore(
             if (sz == p.PageSize) return p;
             return p with
             {
-                PageSize = sz, PageNumber = 1
+                PageSize = sz,
+                PageNumber = 1
             };
         });
 
