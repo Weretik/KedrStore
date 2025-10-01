@@ -1,6 +1,6 @@
 ﻿namespace Domain.Common.Entity;
 
-public class CategoryNode<TId, TSelf> : BaseEntity<TId>, IAggregateRoot
+public class CategoryNode<TId, TSelf> : BaseEntity<TId>
     where TSelf : CategoryNode<TId, TSelf>
     where TId : struct
 {
