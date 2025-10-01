@@ -19,7 +19,6 @@ public class Category : BaseEntity<CategoryId>, IAggregateRoot
         SetId(id);
         SetName(name);
         SetParentCategoryId(parentCategoryId);
-        MarkAsCreated(createdDate);
     }
 
     public static Category Create(CategoryId id, string name, DateTime createdDate, CategoryId? parentCategoryId = null)

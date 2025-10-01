@@ -7,17 +7,14 @@ public static class InfrastreExtension
         // Подключение Catalog БД
         //var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
         var connectionString = configuration.GetConnectionString("Default");
+
         services.AddDbContext<CatalogDbContext>(
             options => options.UseNpgsql(connectionString));
-
+        // services.AddPooledDbContextFactory<CatalogDbContext>(o => o.UseNpgsql(connectionString),lifetime: ServiceLifetime.Scoped);
         services.AddDbContextFactory<CatalogDbContext>(
             options => options.UseNpgsql(connectionString),
             lifetime: ServiceLifetime.Scoped
         );
-
-        // services.AddPooledDbContextFactory<CatalogDbContext>(
-        // o => o.UseNpgsql(connectionString),
-        // lifetime: ServiceLifetime.Scoped);
 
         // Подключение Identity БД
         services.AddDbContext<AppIdentityDbContext>(options =>

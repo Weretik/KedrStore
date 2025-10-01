@@ -15,15 +15,20 @@ public sealed class CreateQuickOrderCommandHandler(ITelegramNotifier telegram)
 
         var message = string.IsNullOrWhiteSpace(request.Request.Message)
             ? string.Empty
-            : $"Повідомлення: {request.Request.Message.Trim()}"  ;
+            : request.Request.Message.Trim() ;
 
         var parts = new List<string>
         {
-            "Нове звернення:",
-            $"Ім'я: {name}",
-            $"Телефон: {phone}"
+            "<b>Нове звернення:</b>",
+            $"👨‍💼 {name}",
+            $"📲 {phone}"
         };
-        if (!string.IsNullOrWhiteSpace(message)) parts.Add(message);
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            parts.Add("");
+            parts.Add("<b>Повідомлення:</b>");
+            parts.Add(message);
+        }
         var messageText = string.Join(Environment.NewLine, parts);
 
         await telegram.SendMessageAsync(messageText, cancellationToken);

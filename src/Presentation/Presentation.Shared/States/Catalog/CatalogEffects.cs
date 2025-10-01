@@ -50,7 +50,7 @@ public sealed class CatalogEffects(IMediator mediator, IState<CatalogState> stat
             if (result.Status == ResultStatus.Invalid)
             {
                 var msg = string.Join("; ",
-                    result.ValidationErrors.Select(e => $"{e.Identifier}: {e.ErrorMessage}"));
+                    result.ValidationErrors.Select(error => $"{error.Identifier}: {error.ErrorMessage}"));
                 dispatcher.Dispatch(new CatalogActions.LoadFailure(msg));
             }
 

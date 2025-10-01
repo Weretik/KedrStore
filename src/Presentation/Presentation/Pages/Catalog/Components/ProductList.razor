@@ -1,6 +1,7 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<CatalogState> CatalogState
 @inject ICatalogStore CatalogStore
+@inject IDialogService DialogService
 
 
 @if (CatalogSelectors.IsLoading(CatalogState.Value))
@@ -50,8 +51,10 @@ else
                                    alt="Product"
                                    onerror="this.onerror=null;this.src='@PlaceholderUrl';" />
                           </div>
-                          <MudText Typo="Typo.h6">
-                              @item.Name
+                          <MudText @key="item.Name" Typo="Typo.h6">
+                              <MudHighlighter
+                                  Text="@item.Name"
+                                  HighlightedTexts="@(new[] { CatalogState.Value.Params.SearchTerm })" />
                           </MudText>
                           <MudText Align="Align.End" Typo="Typo.subtitle1">
                               @item.Amount @item.Currency
@@ -59,7 +62,8 @@ else
                       </MudCardContent>
 
                       <MudCardActions>
-                          <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="true"
+                          <MudButton OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
+                                     Variant="Variant.Outlined" Color="Color.Default" FullWidth="true"
                                      StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
                               Швидке замовлення
                           </MudButton>
@@ -99,4 +103,22 @@ else
 
     private const string PlaceholderUrl =
         "https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/00000000.jpg";
+
+    private Task OpenСontactDialogAsync(int id, string name)
+    {
+        string order = $"🆔({id.ToString()}) — 🧾{name}";
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+        var parameters = new DialogParameters<СontactDialog>
+        {
+            { x => x.Model, new QuickOrderVm(message: order)}
+        };
+
+        return DialogService.ShowAsync<СontactDialog>("Simple Dialog", parameters, options);
+    }
 }

@@ -1,6 +1,6 @@
 namespace Domain.Catalog.Entities;
 
-public class Product : BaseEntity<ProductId>, IAggregateRoot
+public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 {
     #region Properties
     public string Name { get; private set; } = null!;

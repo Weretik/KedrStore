@@ -12,8 +12,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(
                 id => id.Value,
                 value => new ProductId(value));
-                //.HasColumnName("ProductId")
-                //.HasColumnType("int");
 
         builder.Property(x => x.Name)
             .HasMaxLength(300)
@@ -23,7 +21,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(100)
             .IsRequired();
 
-        // Конфигурация для Money как owned type
         builder.OwnsOne(x => x.Price, priceBuilder =>
         {
             priceBuilder.Property(m => m.Amount)
@@ -49,16 +46,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(1000)
             .IsRequired();
 
-        // Связь с категорией
         builder.HasOne<Category>()
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Индекс для оптимизации поиска по категории
         builder.HasIndex(x => x.CategoryId);
 
-        // Настройка фильтра для мягкого удаления
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

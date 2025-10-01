@@ -1,6 +1,7 @@
 // System namespaces
 global using System;
 global using System.Linq.Expressions;
+global using Microsoft.EntityFrameworkCore;
 
 // Domain namespaces
 global using Domain.Catalog.Entities;

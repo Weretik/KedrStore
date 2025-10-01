@@ -1,4 +1,6 @@
-﻿@page "/"
+﻿@inject IDialogService DialogService
+
+@page "/"
 
 <PageTitle>@Title</PageTitle>
 <HeadContent>
@@ -29,10 +31,8 @@
                                    StartIcon="@Icons.Material.Filled.Storefront" Href="@Routing.CatalogProducts">
                             Перейти в каталог
                         </MudButton>
-                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Large"
-                                   StartIcon="@Icons.Material.Filled.HeadsetMic">
-                            Отримати консультацію
-                        </MudButton>
+                        <ButtonToFeedback></ButtonToFeedback>
+
                     </MudStack>
 
                 </MudStack>

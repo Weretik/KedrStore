@@ -10,7 +10,6 @@ public static class SeederExtensions
             .CreateLogger("SeederRunner");
 
 
-        // Универсальный запуск всех сидеров
         var allSeeders = services.GetServices<ISeeder>();
         foreach (var seeder in allSeeders.DistinctBy(s => s.GetType()))
         {

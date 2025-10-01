@@ -1,14 +1,17 @@
 ﻿@page "/contacts"
 @rendermode InteractiveServer
+@using FluentValidation
+@inject IValidator<IQuickOrder> Validator
+@inject ISnackbar Snackbar
 
 <MudGrid Class="mt-6 mb-10" Justify="Justify.Center">
-    <!-- LEFT: info -->
-    <MudItem xs="12" md="5">
+
+    <MudItem xs="12" md="6">
         <MudPaper Elevation="1" Class="pa-4 mb-4">
 
-            <MudStack Row="true" Spacing="2" Class="mb-3">
-                <MudIcon Icon="@Icons.Material.Filled.SupportAgent" Class="mr-2"/>
-                <MudText Typo="Typo.h5">Контакти Class Kedr</MudText>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.SupportAgent" Size="Size.Large" Class="mr-2"/>
+                <MudText Typo="Typo.h2">Контакти Class Kedr</MudText>
             </MudStack>
 
             <MudList T="string" Dense="true">
@@ -28,14 +31,13 @@
                 </MudListItem>
             </MudList>
 
-            <MudDivider Class="my-3"/>
+            <MudDivider Class="mt-5 mb-10"/>
 
-            <MudStack Row="true" Spacing="2" Class="mb-3">
-                <MudIcon Icon="@Icons.Material.Filled.Schedule" Class="mr-2"/>
-                <MudText Typo="Typo.h6">Графік роботи</MudText>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Large" Class="mr-2"/>
+                <MudText Typo="Typo.h3">Графік роботи</MudText>
             </MudStack>
 
-            <!-- ВАЖНО: у MudTable есть Items + RowTemplate -->
             <MudTable Items="@_schedule" Dense="true" Hover="false" Bordered="true">
                 <HeaderContent>
                     <MudTh>Дні</MudTh>
@@ -47,55 +49,67 @@
                 </RowTemplate>
             </MudTable>
 
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mt-3">
+            <MudAlert Severity="MudBlazor.Severity.Info" Variant="Variant.Outlined" Class="mt-10 mb-2">
                 Приймаємо оплату у гривнях і USD. Доставка по Україні «Нова Пошта», доступний самовивіз.
             </MudAlert>
         </MudPaper>
     </MudItem>
 
-    <!-- RIGHT: visual-only form stub -->
-    <MudItem xs="12" md="7">
+    <MudItem xs="12" md="6">
         <MudPaper Elevation="1" Class="pa-4">
-            <div class="d-flex align-center mb-2">
-                <MudIcon Icon="@Icons.Material.Filled.MailOutline" Class="mr-2" />
-                <MudText Typo="Typo.h5">Зворотний зв’язок</MudText>
-            </div>
-            <MudText Typo="Typo.body2" Class="mb-3">
-                Це візуальна форма-заглушка. Поля редагуються, але дані нікуди не надсилаються.
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-3">
+                <MudIcon Icon="@Icons.Material.Filled.MailOutline" Size="Size.Large" Class="mr-2"/>
+                <MudText Typo="Typo.h2">Зворотний зв’язок</MudText>
+            </MudStack>
+            <MudText Typo="Typo.body1" Class="mb-3">
+                Вкажіть ваше ім’я та телефон. Менеджер зв’яжеться з вами протягом 15 хвилин.
             </MudText>
 
-            <MudGrid>
-                <MudItem xs="12" md="6">
-                    <MudTextField T="string" Label="Ваше ім’я" Placeholder="Ім’я та прізвище" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField T="string" Label="Електронна пошта" Placeholder="you@example.com" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField T="string" Label="Ваш телефон" Placeholder="+38 (0__) ___-__-__" Immediate="true" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudSelect T="string" Label="Тема запитання">
-                        <MudSelectItem Value="@("Питання про замовлення")" />
-                        <MudSelectItem Value="@("Оплата та доставка")" />
-                        <MudSelectItem Value="@("Підбір фурнітури")" />
-                        <MudSelectItem Value="@("Партнерство / гурт")" />
-                        <MudSelectItem Value="@("Інше")" />
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudTextField T="string" Label="Ваше повідомлення" Lines="8" Variant="Variant.Outlined" Immediate="true" />
-                </MudItem>
+            <MudForm Model="@_model" @ref="@_form" Validation="@(Validator.ValidateValue(_model))" ValidationDelay="0">
 
-                <MudItem xs="12" md="6">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send">
+                <MudTextField @bind-Value="_model.Name"
+                              For="()=>_model.Name"
+                              InputType="InputType.Text"
+                              Placeholder="Андрій"
+                              DebounceInterval="500"
+                              Variant="Variant.Outlined"
+                              Counter="25"
+                              MaxLength="25"
+                              Label="Ім'я *"/>
+
+                <MudTextField @bind-Value="_model.Phone"
+                              For="()=>_model.Phone"
+                              InputType="InputType.Telephone"
+                              Mask="@(new PatternMask("00 000 00 00"))"
+                              Placeholder="99 123 45 67"
+                              Adornment="Adornment.Start"
+                              AdornmentText="(+380)"
+                              MaxLength="9"
+                              DebounceInterval="500"
+                              Variant="Variant.Outlined"
+                              Label="Телефон *"/>
+
+                <MudTextField @bind-Value="_model.Message"
+                              For="()=>_model.Message"
+                              Variant="Variant.Outlined"
+                              Lines="5"
+                              DebounceInterval="500"
+                              Counter="500"
+                              MaxLength="500"
+                              Label="Повідомлення"/>
+                <MudStack Row="true" Spacing="2" Class="mt-3">
+                    <MudButton OnClick="SubmitAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send">
                         Відправити
                     </MudButton>
-                    <MudButton Class="ml-2" Variant="Variant.Outlined">
+                    <MudButton OnClick="Reset" Class="ml-2" Variant="Variant.Outlined">
                         Скинути
                     </MudButton>
-                </MudItem>
-            </MudGrid>
+                </MudStack>
+            </MudForm>
+
+
+
+
         </MudPaper>
     </MudItem>
 </MudGrid>
@@ -103,13 +117,37 @@
 <CallToAction></CallToAction>
 
 @code {
-    // Простая модель для таблицы расписания
     private readonly List<ScheduleRow> _schedule =
     [
         new("Пн–Пт", "09:00–18:00"),
-        new("Сб",    "10:00–15:00"),
-        new("Нд",    "Вихідний"),
+        new("Сб", "10:00–15:00"),
+        new("Нд", "Вихідний"),
     ];
 
     private sealed record ScheduleRow(string Day, string Hours);
+
+    private QuickOrderVm _model = new();
+    private MudForm _form = null!;
+
+    private async Task SubmitAsync()
+    {
+        await _form.Validate();
+
+        if (_form.IsValid)
+        {
+            var request = new QuickOrderRequest(_model!.Name, _model.Phone, _model.Message);
+            var command = new CreateQuickOrderCommand(request);
+            await Mediator.Send(command);
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+            Snackbar.Add("📩 Ваші дані успішно відправлені. Наш менеджер зв’яжеться з вами найближчим часом.", MudBlazor.Severity.Success);
+
+            Reset();
+        }
+    }
+
+    private void Reset()
+    {
+        _model = new QuickOrderVm();
+    }
 }
