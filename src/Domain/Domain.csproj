@@ -10,6 +10,7 @@
       <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
       <PackageReference Include="Ardalis.SmartEnum" Version="8.2.0" />
       <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0" />
+      <PackageReference Include="NodaMoney" Version="2.5.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     </ItemGroup>
 
