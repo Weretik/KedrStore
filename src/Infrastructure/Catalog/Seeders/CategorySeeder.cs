@@ -1,5 +1,3 @@
-using Application.Common.Interfaces;
-
 namespace Infrastructure.Catalog.Seeders;
 
 public class CategorySeeder(
@@ -48,13 +46,13 @@ public class CategorySeeder(
                     return new { Id = id, Name = name, ParentId = parentId };
                 })
                 .DistinctBy(c => c.Id)
-                .Select(c => Category.Create(new CategoryId(c.Id), c.Name, clock.UtcToday, c.ParentId))
+                .Select(c => ProductCategory.Create(new CategoryId(c.Id), c.Name, clock.UtcToday, c.ParentId))
                 .ToList();
 
             await dbContext.Categories.AddRangeAsync(categories, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Category seeding завершено: Створено {categoriesCount} записів.", categories.Count);
+            logger.LogInformation("ProductCategory seeding завершено: Створено {categoriesCount} записів.", categories.Count);
         }
         catch (Exception ex)
         {
