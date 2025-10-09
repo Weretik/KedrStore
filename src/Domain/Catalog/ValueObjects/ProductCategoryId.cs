@@ -1,7 +1,7 @@
-﻿namespace Domain.Catalog.ValueObjects;
+namespace Domain.Catalog.ValueObjects;
 
 [ValueObject<int>(conversions: Conversions.EfCoreValueConverter | Conversions.SystemTextJson)]
-public readonly partial struct ProductId
+public readonly partial struct ProductCategoryId
 {
     private static Validation Validate(int value)
     {
@@ -10,3 +10,5 @@ public readonly partial struct ProductId
         return Validation.Ok;
     }
 }
+
+

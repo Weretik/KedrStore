@@ -16,3 +16,4 @@ global using Domain.Catalog.ValueObjects;
 global using Ardalis.GuardClauses;
 global using Ardalis.SmartEnum;
 global using NodaMoney;
+global using Vogen;
