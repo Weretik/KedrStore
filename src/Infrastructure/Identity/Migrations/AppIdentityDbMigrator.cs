@@ -18,7 +18,7 @@ public class AppIdentityDbMigrator: IAppIdentityDbMigrator
                 async ct => await appIdentityDbContext.Database.MigrateAsync(ct),
                 cancellationToken);
 
-            
+
             logger.LogInformation("✅ Migrations for AppIdentityDbContext applied successfully.");
         }
         catch (OperationCanceledException)
@@ -33,5 +33,3 @@ public class AppIdentityDbMigrator: IAppIdentityDbMigrator
         }
     }
 }
-
-

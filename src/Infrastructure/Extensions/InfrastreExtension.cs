@@ -44,8 +44,8 @@ public static class InfrastreExtension
         services.AddScoped<ICatalogDbMigrator, CatalogDbMigrator>();
 
         // Регистрация миграторов идентификации
-        services.AddScoped<IDatabaseMigrator, AppIdentityDbMigrator>();
-        services.AddScoped<IAppIdentityDbMigrator, AppIdentityDbMigrator>();
+        services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
+        services.AddScoped<IAppIdentityDbMigrator, CatalogDbMigrator>();
 
         // Регистрация сидеров Identity
         services.AddScoped<ISeeder, RoleSeeder>();
