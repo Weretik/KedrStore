@@ -4,6 +4,7 @@ global using System.Globalization;
 global using System.Security.Claims;
 
 global using Mediator;
+global using NodaMoney;
 
 // Microsoft namespaces
 global using Microsoft.EntityFrameworkCore;
@@ -40,13 +41,15 @@ global using Infrastructure.Identity.Persistence;
 global using Infrastructure.Common.Abstractions;
 global using Infrastructure.Common.Events;
 global using Infrastructure.Common.Services;
+global using Infrastructure.Common.Configurations;
 
 // Domain namespaces
 global using Domain.Common.Abstractions;
+global using Domain.Common.Entity;
 global using Domain.Identity.Constants;
 global using Domain.Catalog.Entities;
 global using Domain.Catalog.ValueObjects;
-
+global using Domain.Catalog.Enumerations;
 
 // Application namespaces
 global using Application.Catalog.Interfaces;
@@ -58,6 +61,7 @@ global using Application.Identity.Interfaces;
 // Ardalis
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
+global using SmartEnum.EFCore;
 
 // Telegram
 global using Telegram.Bot;

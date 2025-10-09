@@ -1,6 +1,6 @@
 ﻿namespace Application.Catalog.Specifications;
 
-public sealed class AllCategoriesDtoSpecification : Specification<Category, CategoryDto>
+public sealed class AllCategoriesDtoSpecification : Specification<ProductCategory, CategoryDto>
 {
     public AllCategoriesDtoSpecification()
     {

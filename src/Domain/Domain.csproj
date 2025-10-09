@@ -12,6 +12,7 @@
       <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0" />
       <PackageReference Include="NodaMoney" Version="2.5.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+      <PackageReference Include="Vogen" Version="8.0.2" />
     </ItemGroup>
 
 </Project>

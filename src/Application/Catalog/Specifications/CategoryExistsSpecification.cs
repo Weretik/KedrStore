@@ -1,6 +1,6 @@
 ﻿namespace Application.Catalog.Specifications;
 
-public sealed class CategoryExistsSpecification : Specification<Category>
+public sealed class CategoryExistsSpecification : Specification<ProductCategory>
 {
     public CategoryExistsSpecification(CategoryId id)
     {

@@ -1,7 +1,7 @@
 ﻿namespace Application.Catalog.Queries.GetCategories;
 
 public class GetCategoriesQuryHandler(
-    ICatalogReadRepository<Category> categoryRepository)
+    ICatalogReadRepository<ProductCategory> categoryRepository)
     : IQueryHandler<GetCategoriesQuery, Result<List<CategoryDto>>>
 {
     public async ValueTask<Result<List<CategoryDto>>> Handle(

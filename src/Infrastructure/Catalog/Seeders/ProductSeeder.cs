@@ -1,5 +1,3 @@
-using Application.Common.Interfaces;
-
 namespace Infrastructure.Catalog.Seeders;
 
 public class ProductSeeder(

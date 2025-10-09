@@ -22,7 +22,7 @@ namespace Infrastructure.Catalog.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Catalog.Entities.Category", b =>
+            modelBuilder.Entity("Domain.Catalog.Entities.ProductCategory", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer");
@@ -90,9 +90,9 @@ namespace Infrastructure.Catalog.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Catalog.Entities.Category", b =>
+            modelBuilder.Entity("Domain.Catalog.Entities.ProductCategory", b =>
                 {
-                    b.HasOne("Domain.Catalog.Entities.Category", null)
+                    b.HasOne("Domain.Catalog.Entities.ProductCategory", null)
                         .WithMany("Children")
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -100,7 +100,7 @@ namespace Infrastructure.Catalog.Migrations
 
             modelBuilder.Entity("Domain.Catalog.Entities.Product", b =>
                 {
-                    b.HasOne("Domain.Catalog.Entities.Category", null)
+                    b.HasOne("Domain.Catalog.Entities.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -133,7 +133,7 @@ namespace Infrastructure.Catalog.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Catalog.Entities.Category", b =>
+            modelBuilder.Entity("Domain.Catalog.Entities.ProductCategory", b =>
                 {
                     b.Navigation("Children");
                 });

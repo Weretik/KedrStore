@@ -1,6 +1,4 @@
-﻿using IValidator = FluentValidation.IValidator;
-
-namespace Application.Catalog.Queries.GetProducts;
+﻿namespace Application.Catalog.Queries.GetProducts;
 
 public sealed class GetProductsQueryValidator : AbstractValidator<GetProductsQuery>
 {

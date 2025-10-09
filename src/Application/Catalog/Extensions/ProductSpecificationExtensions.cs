@@ -24,9 +24,8 @@ public static class ProductFiltersSpecificationExtensions
                 {
                     var text = EscapeLike(raw);
                     var pattern = $"%{text}%";
-                    specification.Where(p =>
-                        EF.Functions.ILike(p.Name, pattern, @"\") ||
-                        EF.Functions.ILike(p.Manufacturer, pattern, @"\"));
+                    specification.Where(
+                        p => EF.Functions.ILike(p.Name, pattern, @"\"));
                 }
             }
         }
