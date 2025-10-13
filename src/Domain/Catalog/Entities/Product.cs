@@ -5,6 +5,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Properties
     public string Name { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
+    public ProductType ProductType { get; private set; }
     public string Photo { get; private set; } = null!;
     public decimal Stock { get; private set; }
 
@@ -14,17 +15,20 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     #region Constructors
     private Product() { }
-    private Product(ProductId id, string name, ProductCategoryId categoryId, string photo, DateTime createdDate, decimal stock = 0)
+    private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
+        string photo, DateTime createdDate, decimal stock = 0)
     {
         SetProductId(id);
         SetName(name);
         SetCategoryId(categoryId);
+        SetProductType(productType);
         SetPhoto(photo);
         SetStock(stock);
         MarkAsCreated(createdDate);
     }
-    public static Product Create(ProductId id, string name, ProductCategoryId categoryId, string photo, DateTime createdDate)
-        => new(id, name, categoryId, photo, createdDate);
+    public static Product Create(ProductId id, string name, ProductCategoryId categoryId,ProductType productType,
+        string photo, DateTime createdDate)
+        => new(id, name, categoryId, productType, photo, createdDate);
 
     #endregion
 
@@ -38,6 +42,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         Name = name.Trim();
     }
     private void SetCategoryId(ProductCategoryId categoryId) => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
+    private void SetProductType(ProductType productType) => ProductType = Guard.Against.Null(productType, nameof(productType));
     private void SetPhoto(string photo) => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
     private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 1_000);
     #endregion
@@ -52,17 +57,21 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
             else _prices.Add(poductPrice);
         }
     }
+
     public void ReplaceAllPrices(IEnumerable<ProductPrice> prices)
     {
         _prices.Clear();
         _prices.AddRange(prices);
-    }public void UpsertPrice(PriceType type, decimal amount, string iso = "UAH")
+    }
+
+    public void UpsertPrice(PriceType type, decimal amount, string iso = "UAH")
     {
         var created = ProductPrice.Create(type, amount, iso);
         var existing = _prices.FirstOrDefault(p => p.PriceType == type);
         if (existing is not null) _prices.Remove(existing);
         _prices.Add(created);
     }
+
     public ProductPrice? GetPrice(PriceType type) => _prices.FirstOrDefault(x => x.PriceType == type);
     #endregion
 

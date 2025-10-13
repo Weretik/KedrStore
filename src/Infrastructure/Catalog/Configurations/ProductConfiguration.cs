@@ -15,6 +15,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.CategoryId);
 
+        builder.Property(p => p.ProductType)
+            .HasColumnName("PriceTypeId")
+            .IsRequired();
+
         builder.Property(p => p.Photo)
             .HasMaxLength(1000)
             .IsRequired();
@@ -44,7 +48,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
             price.HasKey("ProductId", "PriceType");
 
-            price.Property(x => x.PriceType)
+            price.Property(p => p.PriceType)
                 .HasColumnName("PriceTypeId")
                 .IsRequired();
 
@@ -64,8 +68,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .IsRequired();
         });
 
-        builder.HasIndex(x => x.CategoryId);
+        builder.HasIndex(p => new { p.CategoryId, p.ProductType });
 
-        builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.HasQueryFilter(p => !p.IsDeleted);
     }
 }
