@@ -2,7 +2,7 @@
 
 public sealed record ProductsFilter(
     string? SearchTerm,
-    CategoryId? CategoryId,
+    ProductCategoryId? CategoryId,
     decimal? MinPrice,
     decimal? MaxPrice,
     string? Manufacturer);
