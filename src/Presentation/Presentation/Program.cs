@@ -37,6 +37,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddMudServices();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
+builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
 
