@@ -5,7 +5,7 @@ public abstract class BaseCategory<TId, TSelf> : BaseEntity<TId>
     where TId : struct
 {
     #region Properties & Constructors
-    public  string Name { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
     public LTree Path { get; private set; }
 
     protected BaseCategory() { }
