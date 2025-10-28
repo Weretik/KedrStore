@@ -15,8 +15,8 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     #region Constructors
     private Product() { }
-    private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
-        string photo, DateTime createdDate, decimal stock = 0)
+    private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType, string photo,
+        DateTimeOffset createdDate, decimal stock = 0)
     {
         SetProductId(id);
         SetName(name);
@@ -27,8 +27,19 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         MarkAsCreated(createdDate);
     }
     public static Product Create(ProductId id, string name, ProductCategoryId categoryId,ProductType productType,
-        string photo, DateTime createdDate)
-        => new(id, name, categoryId, productType, photo, createdDate);
+        string photo, DateTimeOffset createdDate, decimal stock)
+        => new(id, name, categoryId, productType, photo, createdDate, stock);
+
+    public void Update(string name, ProductCategoryId categoryId, ProductType productType, string photo,
+        DateTimeOffset updatedDate, decimal stock)
+    {
+        SetName(name);
+        SetCategoryId(categoryId);
+        SetProductType(productType);
+        SetPhoto(photo);
+        SetStock(stock);
+        MarkAsUpdated(updatedDate);
+    }
 
     #endregion
 
