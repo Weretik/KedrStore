@@ -27,6 +27,17 @@
             // services.AddSingleton<ISortMap<Order>,   OrderSortMap>();
             // services.AddSingleton<ISortMap<User>,    UserSortMap>();
 
+            // Mapster
+            services.AddSingleton<TypeAdapterConfig>(serviceProvider =>
+            {
+                var config  = new TypeAdapterConfig();
+                var time = serviceProvider.GetRequiredService<TimeProvider>();
+                MapsterRegistration.RegisterAll(config, time);
+                return config;
+            });
+            // IMapper (Mapster.DependencyInjection)
+            services.AddScoped<IMapper, ServiceMapper>();
+
             return services;
         }
 
