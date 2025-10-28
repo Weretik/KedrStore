@@ -1,4 +1,6 @@
-﻿namespace Application.Catalog.Commands.CreateQuickOrder;
+﻿using Application.Common.Helpers;
+
+namespace Application.Catalog.Commands.CreateQuickOrder;
 
 public sealed class CreateQuickOrderCommandHandler(ITelegramNotifier telegram)
     : ICommandHandler<CreateQuickOrderCommand, Result>
