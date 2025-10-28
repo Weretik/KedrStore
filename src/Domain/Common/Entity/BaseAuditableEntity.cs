@@ -6,10 +6,10 @@ public abstract class BaseAuditableEntity<TId> : BaseEntity<TId>
     public DateTimeOffset? UpdatedAt { get; protected set; }
     public bool IsDeleted { get; protected set; }
 
-    public void MarkAsCreated(DateTime now) => CreatedAt = now;
-    public void MarkAsUpdated(DateTime now) => UpdatedAt = now;
+    public void MarkAsCreated(DateTimeOffset now) => CreatedAt = now;
+    public void MarkAsUpdated(DateTimeOffset now) => UpdatedAt = now;
 
-    public void MarkAsDeleted(DateTime now)
+    public void MarkAsDeleted(DateTimeOffset now)
     {
         if (IsDeleted) return;
         IsDeleted = true;
