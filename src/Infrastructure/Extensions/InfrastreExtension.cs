@@ -54,20 +54,12 @@ public static class InfrastreExtension
         services.AddScoped<ISeeder, IdentitySeeder>();
         services.AddScoped<IIdentitySeeder, IdentitySeeder>();
 
-        // Регистрация сидеров Catalog
-        services.AddScoped<ISeeder, CategorySeeder>();
-        services.AddScoped<ICatalogSeeder, CategorySeeder>();
-
-        services.AddScoped<ISeeder, ProductSeeder>();
-        services.AddScoped<ICatalogSeeder, ProductSeeder>();
-
         //Регистрация Fake Services
         services.AddScoped<IPermissionService, FakePermissionService>();
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 
         // Регистрация Services
         services.AddSingleton<IEnvironmentService, EnvironmentService>();
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
 
