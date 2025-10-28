@@ -4,7 +4,7 @@ global using System.Globalization;
 global using System.Security.Claims;
 
 global using Mediator;
-global using NodaMoney;
+global using System.Xml;
 
 // Microsoft namespaces
 global using Microsoft.EntityFrameworkCore;
@@ -19,10 +19,10 @@ global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.Extensions.Hosting;
+global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 // Infrastructure namespaces
 global using Infrastructure.Catalog;
-global using Infrastructure.Catalog.Seeders;
 global using Infrastructure.Catalog.Persistence;
 global using Infrastructure.Catalog.Interfaces;
 global using Infrastructure.Catalog.Migrations;
@@ -52,6 +52,7 @@ global using Domain.Catalog.ValueObjects;
 global using Domain.Catalog.Enumerations;
 
 // Application namespaces
+global using Application.Catalog.DTOs;
 global using Application.Catalog.Interfaces;
 global using Application.Catalog.Notifications;
 global using Application.Common.Interfaces;
