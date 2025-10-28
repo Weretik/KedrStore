@@ -11,7 +11,7 @@ USER kedruser
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# restore .NET
+# === restore .NET ===
 COPY KedrStore.sln ./
 COPY src/Domain/*.csproj src/Domain/
 COPY src/Application/*.csproj src/Application/
@@ -25,10 +25,10 @@ COPY tests/ArchitectureTests/*.csproj tests/ArchitectureTests/
 
 RUN dotnet restore "KedrStore.sln"
 
-# Копируем весь код
+# === Копируем весь код ===
 COPY . .
 
-# Публикация .NET
+# === Публикация .NET ===
 RUN dotnet publish src/Presentation/Presentation/Presentation.csproj -c Release -o /app --no-restore
 
 # === Финальный образ ===
