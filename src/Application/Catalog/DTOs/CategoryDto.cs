@@ -1,3 +1,3 @@
-namespace Application.Catalog.DTOs;
+﻿namespace Application.Catalog.DTOs;
 
-public sealed record CategoryDto(int Id, string Name, int? ParentId);
+public sealed record CategoryDto(int Id, string Name, string Path);
