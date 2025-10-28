@@ -2,7 +2,7 @@
 
 public sealed class CategoryExistsSpecification : Specification<ProductCategory>
 {
-    public CategoryExistsSpecification(CategoryId id)
+    public CategoryExistsSpecification(ProductCategoryId id)
     {
         Query.Where(c => c.Id == id);
     }

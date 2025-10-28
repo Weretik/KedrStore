@@ -59,4 +59,6 @@ internal sealed class CatalogReadEfRepository<T>(IDbContextFactory<CatalogDbCont
     public Task<T?> GetByIdAsync<TId>(TId id, CancellationToken ct = default)
         where TId : notnull
         => WithReadRepo(r => r.GetByIdAsync(id, ct), ct);
+
+
 }
