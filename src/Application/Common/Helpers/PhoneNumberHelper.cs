@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Helper;
+﻿namespace Application.Common.Helpers;
 
 public static class PhoneNumberHelper
 {
