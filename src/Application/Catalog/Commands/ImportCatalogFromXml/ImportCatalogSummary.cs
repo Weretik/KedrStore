@@ -3,7 +3,7 @@
 public sealed record ImportCatalogSummary(
     int CategoriesCreated,
     int ProductsCreated,
-    int Updated,
-    int Skipped,
-    int Error,
-    int Deleted);
+    int CategoriesUpdated,
+    int ProductsUpdated,
+    int CategoriesDeleted,
+    int ProductsDeleted);
