@@ -17,10 +17,8 @@ public class ProductCategory : BaseCategory<ProductCategoryId, ProductCategory>,
         => new(id, name, path);
     public static ProductCategory CreateRoot(ProductCategoryId id, string name)
         => new(id, name, new LTree($"n{id}"));
-    public static ProductCategory CreateChild(ProductCategoryId id, string name, LTree parentPath)
-        => new(id, name, new LTree($"{parentPath}.n{id}"));
     public static ProductCategory CreateChild(ProductCategoryId id, string name, ProductCategory parent)
-        => new(id, name, new LTree($"{parent.Path}.n{id}"));
+        => new(id, name, $"{parent.Path}.n{id}");
     #endregion
 
 }
