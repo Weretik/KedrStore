@@ -1,3 +1,6 @@
+using Domain.Catalog.Enumerations;
+using Domain.Catalog.ValueObjects;
+
 namespace Domain.Catalog.Entities;
 
 public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
@@ -26,7 +29,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetStock(stock);
         MarkAsCreated(createdDate);
     }
-    public static Product Create(ProductId id, string name, ProductCategoryId categoryId,ProductType productType,
+    public static Product Create(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
         string photo, DateTimeOffset createdDate, decimal stock)
         => new(id, name, categoryId, productType, photo, createdDate, stock);
 
@@ -53,7 +56,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         Name = name.Trim();
     }
     private void SetCategoryId(ProductCategoryId categoryId) => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
-    private void SetProductType(ProductType productType) => ProductType = Guard.Against.Null(productType, nameof(productType));
+    private void SetProductType(ProductType productType) => ProductType = Guard.Against.Default(productType, nameof(productType));
     private void SetPhoto(string photo) => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
     private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 1_000);
     #endregion
@@ -75,9 +78,9 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         _prices.AddRange(prices);
     }
 
-    public void UpsertPrice(PriceType type, decimal amount, string iso = "UAH")
+    public void UpsertPrice(PriceType type, Money price)
     {
-        var created = ProductPrice.Create(type, amount, iso);
+        var created = ProductPrice.Create(type, price);
         var existing = _prices.FirstOrDefault(p => p.PriceType == type);
         if (existing is not null) _prices.Remove(existing);
         _prices.Add(created);

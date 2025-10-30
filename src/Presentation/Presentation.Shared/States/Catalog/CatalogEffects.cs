@@ -1,4 +1,8 @@
-﻿namespace Presentation.Shared.States.Catalog;
+﻿using Application.Catalog.GetProducts;
+using Application.Catalog.GetProducts.DTOs;
+using Application.Catalog.Shared.DTOs;
+
+namespace Presentation.Shared.States.Catalog;
 
 public sealed class CatalogEffects(IMediator mediator, IState<CatalogState> state, ILogger<CatalogEffects> logger)
 {
@@ -13,53 +17,60 @@ public sealed class CatalogEffects(IMediator mediator, IState<CatalogState> stat
         var cancellationToken = _cancellationToken.Token;
         var parameters = state.Value.Params;
 
-        CategoryId? categoryId = parameters.CategoryId.HasValue ? new CategoryId(parameters.CategoryId.Value) : null;
-        PageRequest pageRequest = new(parameters.PageNumber, parameters.PageSize);
-        ProductsFilter criteria = new(
+        ProductCategoryId? categoryId = parameters.CategoryId.HasValue
+            ? ProductCategoryId.From(parameters.CategoryId.Value)
+            : null;
+
+        ProductPagination productPagination = new(parameters.PageNumber, parameters.PageSize);
+        ProductSorter productSorter = new(parameters.SortKey, parameters.Desc);
+
+        ProductFilter filters = new(
             SearchTerm: parameters.SearchTerm,
             CategoryId: categoryId,
             MinPrice: parameters.MinPrice,
             MaxPrice: parameters.MaxPrice,
-            Manufacturer: parameters.Manufacturer
+            Stock: parameters.Stock
         );
 
-        var query = new GetProductsQuery(criteria, pageRequest, parameters.Sort);
+        var query = new GetProductsQuery(filters, productPagination, productSorter, parameters.PriceTypeId);
 
         try
         {
             var result = await mediator.Send(query, cancellationToken);
 
-            if (result.Status == ResultStatus.Ok && result.Value is not null)
+            if (result is { Status: ResultStatus.Ok, Value: not null })
             {
                 dispatcher.Dispatch(new CatalogActions.LoadSuccess(result.Value));
                 return;
             }
 
-            if (result.Status == ResultStatus.NotFound)
+            switch (result.Status)
             {
-                var empty = new PaginatedList<ProductDto>(
-                    Items: [],
-                    Total: 0,
-                    pageRequest
-                );
+                case ResultStatus.NotFound:
+                {
+                    var empty = new PaginationResult<ProductDto>(
+                        Items: [],
+                        Total: 0,
+                        productPagination
+                    );
 
-                dispatcher.Dispatch(new CatalogActions.LoadSuccess(empty));
-                return;
+                    dispatcher.Dispatch(new CatalogActions.LoadSuccess(empty));
+                    return;
+                }
+                case ResultStatus.Invalid:
+                {
+                    var msg = string.Join("; ",
+                        result.ValidationErrors.Select(error => $"{error.Identifier}: {error.ErrorMessage}"));
+                    dispatcher.Dispatch(new CatalogActions.LoadFailure(msg));
+                    break;
+                }
+                default:
+                {
+                    var fallback = result.Errors?.FirstOrDefault() ?? "Помилка завантаження каталогу.";
+                    dispatcher.Dispatch(new CatalogActions.LoadFailure(fallback));
+                    break;
+                }
             }
-
-            if (result.Status == ResultStatus.Invalid)
-            {
-                var msg = string.Join("; ",
-                    result.ValidationErrors.Select(error => $"{error.Identifier}: {error.ErrorMessage}"));
-                dispatcher.Dispatch(new CatalogActions.LoadFailure(msg));
-            }
-
-            else
-            {
-                var fallback = result.Errors?.FirstOrDefault() ?? "Помилка завантаження каталогу.";
-                dispatcher.Dispatch(new CatalogActions.LoadFailure(fallback));
-            }
-
         }
         catch (OperationCanceledException)
         {

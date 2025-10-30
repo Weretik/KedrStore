@@ -1,4 +1,22 @@
-﻿namespace Infrastructure.Extensions;
+﻿using Application.Catalog.CreateQuickOrder;
+using Application.Catalog.Shared;
+using Application.Identity.Shared;
+using Infrastructure.Catalog;
+using Infrastructure.Catalog.Interfaces;
+using Infrastructure.Catalog.Migrations;
+using Infrastructure.Catalog.Notifications;
+using Infrastructure.Catalog.Persistence;
+using Infrastructure.Common.Contracts;
+using Infrastructure.Identity;
+using Infrastructure.Identity.Contracts;
+using Infrastructure.Identity.Entities;
+using Infrastructure.Identity.Interfaces;
+using Infrastructure.Identity.Migrations;
+using Infrastructure.Identity.Persistence;
+using Infrastructure.Identity.Security;
+using Infrastructure.Identity.Seeders;
+
+namespace Infrastructure.Extensions;
 
 public static class InfrastreExtension
 {

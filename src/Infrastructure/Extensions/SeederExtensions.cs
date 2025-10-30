@@ -1,3 +1,7 @@
+using Infrastructure.Catalog.Interfaces;
+using Infrastructure.Common.Contracts;
+using Infrastructure.Identity.Interfaces;
+
 namespace Infrastructure.Extensions;
 
 public static class SeederExtensions

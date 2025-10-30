@@ -1,4 +1,6 @@
-﻿namespace Presentation.Shared.ViewModels;
+﻿using Application.Catalog.CreateQuickOrder.Contracts;
+
+namespace Presentation.Shared.ViewModels;
 
 public sealed class QuickOrderVm(string name = "", string phone = "", string? message = null) : IQuickOrder
 {

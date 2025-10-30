@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Identity.Migrations;
+﻿using Infrastructure.Identity.Contracts;
+
+namespace Infrastructure.Identity.Migrations;
 
 public class AppIdentityDbMigrator: IAppIdentityDbMigrator
 {

@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Extensions;
+﻿using Infrastructure.Common.Contracts;
+
+namespace Infrastructure.Extensions;
 
 public static class MigrationExtensions
 {

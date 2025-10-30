@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Catalog.Migrations;
+﻿using Infrastructure.Catalog.Interfaces;
+
+namespace Infrastructure.Catalog.Migrations;
 
 public class CatalogDbMigrator : ICatalogDbMigrator
 {

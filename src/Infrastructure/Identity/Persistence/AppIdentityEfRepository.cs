@@ -1,4 +1,4 @@
-﻿using Application.Identity.Interfaces;
+﻿using Application.Identity.Shared;
 
 namespace Infrastructure.Identity.Persistence;
 

@@ -1,3 +1,7 @@
+using Domain.Catalog.Entities;
+using Domain.Catalog.Enumerations;
+using Domain.Catalog.ValueObjects;
+
 namespace Infrastructure.Catalog.Configurations;
 
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
@@ -9,7 +13,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Id)
-            .HasConversion(new ProductCategoryId.EfCoreValueConverter())
+            .HasConversion(new ProductId.EfCoreValueConverter())
             .ValueGeneratedNever();
 
         builder.Property(p => p.Name)
@@ -20,7 +24,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(new ProductCategoryId.EfCoreValueConverter());
 
         builder.Property(p => p.ProductType)
-            .HasColumnName("PriceTypeId")
+            .HasConversion(
+                productType => productType.Name,
+                name => ProductType.FromName(name, false)
+            )
+            .HasMaxLength(50)
+            .HasColumnName("ProductType")
             .IsRequired();
 
         builder.Property(p => p.Photo)
@@ -44,7 +53,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         {
             price.ToTable("ProductPrices",t =>
             {
-                t.HasCheckConstraint("CK_ProductPrices_Amount_Positive", "\"Amount\" > 0");
+                t.HasCheckConstraint("CK_ProductPrices_Amount_Positive", "\"Amount\" >= 0");
             });
 
             price.WithOwner()
@@ -56,20 +65,18 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .HasColumnName("PriceTypeId")
                 .IsRequired();
 
-            price.Property<decimal>("_amount")
-                .HasField("_amount")
-                .UsePropertyAccessMode(PropertyAccessMode.Field)
+            price.Property(p => p.Amount)
                 .HasColumnName("Amount")
                 .HasPrecision(18, 2)
                 .IsRequired();
 
-            price.Property<string>("_currencyIso")
-                .HasField("_currencyIso")
-                .UsePropertyAccessMode(PropertyAccessMode.Field)
+            price.Property( p => p.CurrencyIso)
                 .HasColumnName("Currency")
                 .HasMaxLength(3)
                 .IsFixedLength()
                 .IsRequired();
+
+            price.HasIndex("ProductId", "PriceTypeId").IsUnique();
         });
 
         builder.HasIndex(p => new { p.CategoryId, p.ProductType });

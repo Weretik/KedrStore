@@ -1,5 +1,8 @@
 ﻿@page "/contacts"
 @rendermode InteractiveServer
+@using Application.Catalog.CreateQuickOrder
+@using Application.Catalog.CreateQuickOrder.Contracts
+@using Application.Catalog.CreateQuickOrder.DTOs
 @using FluentValidation
 @inject IValidator<IQuickOrder> Validator
 @inject ISnackbar Snackbar

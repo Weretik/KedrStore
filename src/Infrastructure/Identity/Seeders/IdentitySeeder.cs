@@ -1,4 +1,10 @@
-﻿namespace Infrastructure.Identity.Seeders;
+﻿using Domain.Identity.Constants;
+using Infrastructure.Identity.Configuration;
+using Infrastructure.Identity.Entities;
+using Infrastructure.Identity.Interfaces;
+using Infrastructure.Identity.Utils;
+
+namespace Infrastructure.Identity.Seeders;
 
 public class IdentitySeeder(
     UserManager<AppUser> userManager,

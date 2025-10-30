@@ -1,11 +1,14 @@
-﻿namespace Presentation.Shared.States.Catalog;
+﻿using Application.Catalog.GetProducts;
+using Application.Catalog.Shared.DTOs;
+
+namespace Presentation.Shared.States.Catalog;
 
 public static class CatalogSelectors
 {
     public static CatalogParams Params(CatalogState state) => state.Params;
     public static bool IsLoading(CatalogState state) => state.IsLoading;
     public static string? Error(CatalogState state) => state.Error;
-    public static PaginatedList<ProductDto>? PageList(CatalogState state) => state.PageList;
+    public static PaginationResult<ProductDto>? PageList(CatalogState state) => state.PageList;
 
 
     public static IReadOnlyList<ProductDto> Items(CatalogState state)

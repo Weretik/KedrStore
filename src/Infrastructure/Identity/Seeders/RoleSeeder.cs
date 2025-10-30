@@ -1,3 +1,7 @@
+using Domain.Identity.Constants;
+using Infrastructure.Identity.Entities;
+using Infrastructure.Identity.Interfaces;
+
 namespace Infrastructure.Identity.Seeders;
 
 public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> logger) : IIdentitySeeder

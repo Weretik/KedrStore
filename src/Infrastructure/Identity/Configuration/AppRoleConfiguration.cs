@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Identity.Configuration;
+﻿using Infrastructure.Identity.Entities;
+
+namespace Infrastructure.Identity.Configuration;
 
 public class AppRoleConfiguration : IEntityTypeConfiguration<AppRole>
 {

@@ -1,4 +1,6 @@
-﻿namespace Domain.Catalog.Entities;
+﻿using Domain.Catalog.ValueObjects;
+
+namespace Domain.Catalog.Entities;
 
 public class ProductCategory : BaseCategory<ProductCategoryId, ProductCategory>, IAggregateRoot
 {

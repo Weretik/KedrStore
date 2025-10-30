@@ -1,4 +1,7 @@
-﻿namespace Infrastructure.Catalog.Import;
+﻿using Application.Catalog.ImportCatalogFromXml;
+using Application.Catalog.Shared;
+
+namespace Infrastructure.Catalog.Import;
 
 public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlParser
 {
@@ -58,22 +61,22 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         return await Task.FromResult(new CatalogParseResult(categories, products));
     }
 
-    static List<CategoryDto> GetBaseCategories(int productTypeId)
+    static List<ImportCategoryDto> GetBaseCategories(int productTypeId)
     {
         return productTypeId switch
         {
             1 =>
             [
-                new CategoryDto(101, "Міжкімнатні двері", "n101"),
-                new CategoryDto(102, "Вхідні двері", "n102"),
-                new CategoryDto(103, "Інше", "n103")
+                new ImportCategoryDto(101, "Міжкімнатні двері", "n101"),
+                new ImportCategoryDto(102, "Вхідні двері", "n102"),
+                new ImportCategoryDto(103, "Інше", "n103")
             ],
             2 =>
             [
-                new CategoryDto(104, "Завіси", "n104"),
-                new CategoryDto(105, "Замки", "n105"),
-                new CategoryDto(106, "Ручки", "n106"),
-                new CategoryDto(107, "Циліндри", "n107")
+                new ImportCategoryDto(104, "Завіси", "n104"),
+                new ImportCategoryDto(105, "Замки", "n105"),
+                new ImportCategoryDto(106, "Ручки", "n106"),
+                new ImportCategoryDto(107, "Циліндри", "n107")
             ],
             _ => throw new ArgumentOutOfRangeException(nameof(productTypeId), productTypeId, null)
         };
@@ -140,17 +143,17 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         _ => new()
     };
 
-    static void EnsureCategoryById(List<CategoryDto> list, int id, string name, int parentBaseId)
+    static void EnsureCategoryById(List<ImportCategoryDto> list, int id, string name, int parentBaseId)
     {
         for (int i = 0; i < list.Count; i++)
             if (list[i].Id == id) return;
 
         var parentPath = parentBaseId == 0 ? "" : PathOfId(list, parentBaseId);
         var path = string.IsNullOrWhiteSpace(parentPath) ? $"n{id}" : $"{parentPath}.n{id}";
-        list.Add(new CategoryDto(id, name, path));
+        list.Add(new ImportCategoryDto(id, name, path));
     }
 
-    static string PathOfId(List<CategoryDto> list, int id)
+    static string PathOfId(List<ImportCategoryDto> list, int id)
     {
         for (int i = 0; i < list.Count; i++)
             if (list[i].Id == id) return list[i].Path;

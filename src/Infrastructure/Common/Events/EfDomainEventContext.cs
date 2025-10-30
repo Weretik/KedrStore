@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Common.Events;
+﻿using Infrastructure.Catalog;
+
+namespace Infrastructure.Common.Events;
 
 public sealed class EfDomainEventContext(CatalogDbContext db) : IDomainEventContext
 {

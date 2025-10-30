@@ -1,4 +1,6 @@
-﻿namespace Presentation.Shared.States.Catalog;
+﻿using Application.Catalog.GetProducts.Enumerations;
+
+namespace Presentation.Shared.States.Catalog;
 
 public sealed record CatalogParams(
     int PageNumber = 1,
@@ -8,4 +10,7 @@ public sealed record CatalogParams(
     string? Sort = null,
     decimal? MinPrice = null,
     decimal? MaxPrice = null,
-    string? Manufacturer = null);
+    decimal? Stock = null,
+    ProductSortKey SortKey = ProductSortKey.Name,
+    bool Desc = false,
+    int PriceTypeId = 10);

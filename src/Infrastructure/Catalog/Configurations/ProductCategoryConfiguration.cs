@@ -1,3 +1,6 @@
+using Domain.Catalog.Entities;
+using Domain.Catalog.ValueObjects;
+
 namespace Infrastructure.Catalog.Configurations;
 
 public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCategory>

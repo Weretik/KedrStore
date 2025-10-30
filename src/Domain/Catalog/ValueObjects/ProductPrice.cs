@@ -1,44 +1,46 @@
-﻿namespace Domain.Catalog.ValueObjects;
+﻿using Domain.Catalog.Enumerations;
+
+namespace Domain.Catalog.ValueObjects;
 
 public sealed record ProductPrice
 {
     #region Properties
     public PriceType PriceType { get; init; } = null!;
-    private decimal _amount;
-    private string _currencyIso = "UAH";
-    public Money Price => new(_amount, Currency.FromCode(_currencyIso));
+    public decimal Amount { get; init; }
+    public string CurrencyIso { get; init; } = "UAH";
+    public Money Price => new(Amount, Currency.FromCode(CurrencyIso));
     #endregion
 
     #region Constructors
     private ProductPrice() { }
-    private ProductPrice(PriceType type, decimal amount, string currencyIso)
+    private ProductPrice(PriceType type, Money price)
     {
 
         PriceType = Guard.Against.Null(type, nameof(type));
 
-        Guard.Against.Negative(amount, nameof(amount));
-        Guard.Against.OutOfRange(amount, nameof(amount), 0.01m, 10_000m);
+        Guard.Against.Negative(price.Amount, nameof(price.Amount));
+        Guard.Against.OutOfRange(price.Amount, nameof(price.Amount), 0.01m, 10_000m);
 
-        Guard.Against.NullOrWhiteSpace(currencyIso, nameof(currencyIso));
-        Guard.Against.InvalidInput(currencyIso, nameof(currencyIso),
+        Guard.Against.NullOrWhiteSpace(price.Currency.Code, nameof(price.Currency.Code));
+        Guard.Against.InvalidInput(price.Currency.Code, nameof(price.Currency.Code),
             x => x.Length == 3, "Currency ISO code must be exactly 3 characters.");
-        Guard.Against.InvalidInput(currencyIso, nameof(currencyIso),
+        Guard.Against.InvalidInput(price.Currency.Code, nameof(price.Currency.Code),
             x => x.All(char.IsLetter), "Currency code must contain only letters.");
 
-        _amount = amount;
-        _currencyIso = currencyIso.ToUpper();
+        Amount = price.Amount;
+        CurrencyIso = price.Currency.Code;
     }
     #endregion
 
     #region Factory Methods
-    public static ProductPrice Create(int priceTypeId ,decimal amount, string currencyIso = "UAH")
-        => new (GetPriceTypeFromId(priceTypeId), amount, currencyIso);
+    public static ProductPrice Create(int priceTypeId, Money price)
+        => new (GetPriceTypeFromId(priceTypeId), price);
 
-    public static ProductPrice Create(string priceTypeName, decimal amount, string currencyIso = "UAH")
-        => new (GetPriceTypeFromName(priceTypeName), amount, currencyIso);
+    public static ProductPrice Create(string priceTypeName, Money price)
+        => new (GetPriceTypeFromName(priceTypeName), price);
 
-    public static ProductPrice Create(PriceType type, decimal amount, string currencyIso = "UAH")
-        => new (type, amount, currencyIso);
+    public static ProductPrice Create(PriceType type, Money price)
+        => new (type, price);
 
     #endregion
 
