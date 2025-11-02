@@ -1,14 +1,24 @@
 ﻿using Application.Catalog.GetProducts;
-using Application.Catalog.Shared.DTOs;
+using Application.Catalog.Shared;
 
 namespace Presentation.Shared.States.Catalog;
 
 [FeatureState]
 public sealed record CatalogState(
-    CatalogParams Params,
+    ProductFilter ProductsFilter,
+    ProductSorter ProductsSorter,
+    ProductPagination ProductsPagination,
+    PricingOptions PricingOptions,
     bool IsLoading = false,
     string? Error = null,
-    PaginationResult<ProductDto>? PageList = null )
+    GetProductsQueryResult<ProductDto>? QueryResult = null)
 {
-    private CatalogState() : this(new CatalogParams(), false, null, null) { }
+    public CatalogState() : this(
+        new ProductFilter(),
+        new ProductSorter(),
+        new ProductPagination(),
+        new PricingOptions(),
+        false,
+        null,
+        null) { }
 }
