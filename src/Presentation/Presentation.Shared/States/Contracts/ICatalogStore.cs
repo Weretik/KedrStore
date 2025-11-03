@@ -1,13 +1,13 @@
 ﻿using Application.Catalog.GetProducts;
 using Application.Catalog.Shared;
 
-namespace Presentation.Shared;
+namespace Presentation.Shared.States;
 
 public interface ICatalogStore
 {
     // Filter
     void SetSearchTerm(string? value);
-    void SetCategory(ProductCategoryId? id);
+    void SetCategory(int? id);
     void SetStock(decimal? value);
 
     // Sorting
