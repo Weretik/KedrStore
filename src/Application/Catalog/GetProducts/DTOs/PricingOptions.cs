@@ -1,6 +1,6 @@
 ﻿namespace Application.Catalog.GetProducts;
 
 public sealed record PricingOptions(
-    int PriceTypeId = 10,
+    string PriceType = "price_10",
     decimal? MinPrice = null,
     decimal? MaxPrice = null);
