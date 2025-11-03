@@ -1,6 +1,7 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ISnackbar Snackbar
 @inject IState<CatalogState> CatalogState
+@inject ICatalogStore CatalogStore
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h4" class="mt-5 mb-3">
@@ -26,9 +27,11 @@
 
 @code {
 
+    CatalogState State => CatalogState.Value;
+
     decimal? MinPrice
     {
-        get => CatalogState.Value.PricingOptions.MinPrice;
+        get => State.GetMinPrice();
         set
         {
             var other = MaxPrice;
@@ -38,13 +41,13 @@
                 Snackbar.Add("Мін. ціна не може бути більшою за макс.", Severity.Warning);
                 return;
             }
-            CatalogStore.SetPrice(value, other);
+            CatalogStore.SetPriceRange(value, other);
         }
     }
 
     decimal? MaxPrice
     {
-        get => CatalogState.Value.Params.MaxPrice;
+        get => State.GetMaxPrice();
         set
         {
             var other = MinPrice;
@@ -54,8 +57,7 @@
                 Snackbar.Add("Мін. ціна не може бути більшою за макс.", Severity.Warning);
                 return;
             }
-            CatalogStore.SetPrice(other, value);
+            CatalogStore.SetPriceRange(other, value);
         }
     }
-
 }
