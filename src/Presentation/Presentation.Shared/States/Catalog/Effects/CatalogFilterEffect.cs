@@ -5,14 +5,14 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStor
     private CancellationTokenSource? _searchDebounceCts;
 
     [EffectMethod(typeof(CatalogFilterAction.SetFilter))]
-    public Task OnSetFilter()
+    public Task OnSetFilter(IDispatcher dispatcher)
     {
         store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod(typeof(CatalogFilterAction.SetSearchTerm))]
-    public async Task OnSetSearchTerm()
+    public async Task OnSetSearchTerm(IDispatcher dispatcher)
     {
         _searchDebounceCts?.Cancel();
         _searchDebounceCts = new CancellationTokenSource();
@@ -29,16 +29,16 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStor
     }
 
     [EffectMethod]
-    public Task OnSetCategory(CatalogFilterAction.SetCategory action)
+    public Task OnSetCategory(CatalogFilterAction.SetCategory action, IDispatcher dispatcher)
     {
-        if (action.CategoryId != state.Value.ProductsFilter.CategoryId)
+        if (action.CategoryId!.Value != state.Value.ProductsFilter.CategoryId!.Value)
             store.Load();
 
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetStock(CatalogFilterAction.SetStock action)
+    public Task OnSetStock(CatalogFilterAction.SetStock action, IDispatcher dispatcher)
     {
         if (action.Value != state.Value.ProductsFilter.Stock)
             store.Load();

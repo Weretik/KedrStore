@@ -12,7 +12,7 @@ public sealed class CatalogLoadEffect(
     private CancellationTokenSource? _cancellationToken;
 
     [EffectMethod(typeof(CatalogLoadAction.Load))]
-    public async Task OnLoad()
+    public async Task OnLoad(IDispatcher dispatcher)
     {
         _cancellationToken?.Cancel();
         _cancellationToken = new CancellationTokenSource();

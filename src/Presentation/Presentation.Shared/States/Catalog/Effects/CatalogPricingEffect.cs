@@ -4,14 +4,14 @@
 public sealed class CatalogPricingEffects(IState<CatalogState> state, ICatalogStore store)
 {
     [EffectMethod(typeof(CatalogPricingAction.SetPricingOptions))]
-    public Task OnSetPricingOptions()
+    public Task OnSetPricingOptions(IDispatcher dispatcher)
     {
         store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetPriceRange(CatalogPricingAction.SetPriceRange action)
+    public Task OnSetPriceRange(CatalogPricingAction.SetPriceRange action, IDispatcher dispatcher)
     {
         var min = state.Value.PricingOptions.MinPrice;
         var max = state.Value.PricingOptions.MaxPrice;
@@ -24,7 +24,7 @@ public sealed class CatalogPricingEffects(IState<CatalogState> state, ICatalogSt
     }
 
     [EffectMethod]
-    public Task OnSetPrice(CatalogPricingAction.SetPriceId action)
+    public Task OnSetPrice(CatalogPricingAction.SetPriceId action, IDispatcher dispatcher)
     {
         if (action.PriceType != state.Value.PricingOptions.PriceType)
             store.Load();
