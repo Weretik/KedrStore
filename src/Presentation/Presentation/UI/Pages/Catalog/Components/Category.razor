@@ -1,7 +1,6 @@
 ﻿@using Application.Catalog.GetCategories
-@using Application.Catalog.ImportCatalogFromXml
-@using Application.Catalog.Shared
 @inject ISnackbar Snackbar
+@inject ICatalogStore CatalogStore
 
 <MudPaper Class="pa-4 mb-4">
     <MudText Typo="Typo.h4" class="mt-5 mb-3 ml-5">
@@ -14,7 +13,7 @@
     }
     else
     {
-        <MudTreeView T="CategoryNodeDto"
+        <MudTreeView T="CategoryTreeDto"
                      Items="@_items"
                      SelectedValue="@_selected"
                      SelectedValueChanged="OnSelectedChanged"
@@ -32,19 +31,18 @@
 </MudPaper>
 
 @code {
-    private IReadOnlyCollection<TreeItemData<CategoryNodeDto>> _items = [];
-    private CategoryNodeDto? _selected;
+    private IReadOnlyCollection<TreeItemData<CategoryTreeDto>> _items = [];
+    private CategoryTreeDto? _selected;
     private bool _isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var res = await Mediator.Send(new GetCategoriesQuery());
-            if (!res.IsSuccess || res.Value is null) return;
+            var result = await Mediator.Send(new GetCategoriesQuery());
+            if (!result.IsSuccess || result.Value is null) return;
 
-            var roots = res.Value.Where(c => c. is null);
-            _items = Build(roots);
+            _items = result.Value.ToTreeItems();
         }
         finally
         {
@@ -52,20 +50,7 @@
         }
     }
 
-    private static IReadOnlyCollection<TreeItemData<CategoryNodeDto>> Build(IEnumerable<CategoryNodeDto> src)
-        => src.Select(Map).ToList();
-
-    private static TreeItemData<CategoryNodeDto> Map(CategoryNodeDto c)
-        => new()
-        {
-            Text = c.Name,
-            Value = c,
-            Children = c.Children is { Count: > 0 }
-                ? c.Children.Select(Map).ToList()
-                : null
-        };
-
-    private void OnSelectedChanged(CategoryNodeDto? node)
+    private void OnSelectedChanged(CategoryTreeDto? node)
     {
         if (node?.Children is { Count: > 0 })
         {
@@ -73,12 +58,12 @@
 
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
             Snackbar.Add("Виберіть кінцеву категорію.", Severity.Info,
-                c => c.SnackbarVariant = Variant.Outlined);
+                configure => configure.SnackbarVariant = Variant.Outlined);
             return;
         }
 
         _selected = node;
-        CatalogStore.SetCategoryId(node?.Id);
+        CatalogStore.SetCategory(node?.Id);
 
     }
 
