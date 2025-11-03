@@ -6,6 +6,9 @@ public static class CatalogLoadReducer
     public static CatalogState OnLoad(CatalogState state)
         => state with { IsLoading = true, Error = null };
 
+    [ReducerMethod(typeof(CatalogLoadAction.Reset))]
+    public static CatalogState OnReset(CatalogState state) => new();
+
     [ReducerMethod]
     public static CatalogState OnLoadSuccess(CatalogState state, CatalogLoadAction.LoadSuccess action)
         => state with { IsLoading = false, Error = null, QueryResult = action.QueryResult };

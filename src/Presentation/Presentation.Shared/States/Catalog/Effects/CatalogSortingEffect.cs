@@ -1,28 +1,28 @@
 ﻿namespace Presentation.Shared.States.Catalog.Effects;
 
-public sealed class CatalogSortingEffect(IState<CatalogState> state)
+public sealed class CatalogSortingEffect(IState<CatalogState> state, ICatalogStore store)
 {
     [EffectMethod]
-    public Task OnSetSorter(CatalogSortingAction.SetSorter action, IDispatcher dispatcher)
+    public Task OnSetSorter(CatalogSortingAction.SetSorter action)
     {
-        dispatcher.Dispatch(new CatalogLoadAction.Load());
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetSortKey(CatalogSortingAction.SetSortKey action, IDispatcher dispatcher)
+    public Task OnSetSortKey(CatalogSortingAction.SetSortKey action)
     {
         if (action.Key != state.Value.ProductsSorter.Key)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetSortDesc(CatalogSortingAction.SetSortDesc action, IDispatcher dispatcher)
+    public Task OnSetSortDesc(CatalogSortingAction.SetSortDesc action)
     {
         if (action.Desc != state.Value.ProductsSorter.Desc)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }

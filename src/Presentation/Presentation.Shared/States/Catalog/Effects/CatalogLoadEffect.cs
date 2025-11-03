@@ -3,17 +3,21 @@ using Application.Catalog.Shared;
 
 namespace Presentation.Shared.States.Catalog.Effects;
 
-public sealed class CatalogLoadEffect(IState<CatalogState> state, IMediator mediator, ILogger<CatalogLoadEffect> logger)
+public sealed class CatalogLoadEffect(
+    IState<CatalogState> state,
+    ICatalogStore store,
+    IMediator mediator,
+    ILogger<CatalogLoadEffect> logger)
 {
     private CancellationTokenSource? _cancellationToken;
 
-    [EffectMethod]
-    public async Task OnLoad(CatalogLoadAction.Load action, IDispatcher dispatcher)
+    [EffectMethod(typeof(CatalogLoadAction.Load))]
+    public async Task OnLoad()
     {
         _cancellationToken?.Cancel();
         _cancellationToken = new CancellationTokenSource();
-        var cancellationToken = _cancellationToken.Token;
 
+        var cancellationToken = _cancellationToken.Token;
         var catalogState = state.Value;
 
         var query = new GetProductsQuery(
@@ -29,7 +33,7 @@ public sealed class CatalogLoadEffect(IState<CatalogState> state, IMediator medi
 
             if (result is { Status: ResultStatus.Ok, Value: not null })
             {
-                dispatcher.Dispatch(new CatalogLoadAction.LoadSuccess(result.Value));
+                store.LoadSuccess(result.Value);
                 return;
             }
 
@@ -42,23 +46,22 @@ public sealed class CatalogLoadEffect(IState<CatalogState> state, IMediator medi
                         TotalItems: 0,
                         ProductPagination: new()
                     );
-
-                    dispatcher.Dispatch(new CatalogLoadAction.LoadSuccess(empty));
+                    store.LoadSuccess(empty);
                     return;
                 }
                 case ResultStatus.Invalid:
                 {
-                    var message = string.Join("; ",
-                        result.ValidationErrors.Select(error => $"{error.Identifier}: {error.ErrorMessage}"));
+                    var validateResult = result.ValidationErrors
+                        .Select(error => $"{error.Identifier}: {error.ErrorMessage}");
+                    var message = string.Join("; ", validateResult);
 
-                    dispatcher.Dispatch(new CatalogLoadAction.LoadFailure(message));
+                    store.LoadFailure(message);
                     break;
                 }
                 default:
                 {
                     var fallback = result.Errors?.FirstOrDefault() ?? "Помилка завантаження каталогу.";
-
-                    dispatcher.Dispatch(new CatalogLoadAction.LoadFailure(fallback));
+                    store.LoadFailure(fallback);
                     break;
                 }
             }
@@ -69,7 +72,14 @@ public sealed class CatalogLoadEffect(IState<CatalogState> state, IMediator medi
         }
         catch (Exception ex)
         {
-            dispatcher.Dispatch(new CatalogLoadAction.LoadFailure(ex.Message));
+            store.LoadFailure(ex.Message);
         }
+    }
+
+    [EffectMethod(typeof(CatalogLoadAction.Reset))]
+    public Task OnReset(IDispatcher dispatcher)
+    {
+        store.Reset();
+        return Task.CompletedTask;
     }
 }

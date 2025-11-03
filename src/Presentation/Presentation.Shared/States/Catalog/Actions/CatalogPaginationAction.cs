@@ -8,5 +8,5 @@ public static class CatalogPaginationAction
     public sealed record SetPagination(ProductPagination Pagination);
     public sealed record SetPageNumber(int PageNumber);
     public sealed record SetPageSize(int PageSize);
-    public sealed record SetAllPage(bool All);
+    public sealed record SetAllPageSize(bool All);
 }

@@ -1,18 +1,18 @@
 ﻿namespace Presentation.Shared.States.Catalog.Effects;
 
-public sealed class CatalogFilterEffect(IState<CatalogState> state)
+public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStore store)
 {
     private CancellationTokenSource? _searchDebounceCts;
 
-    [EffectMethod]
-    public Task OnSetFilter(CatalogFilterAction.SetFilter action, IDispatcher dispatcher)
+    [EffectMethod(typeof(CatalogFilterAction.SetFilter))]
+    public Task OnSetFilter()
     {
-        dispatcher.Dispatch(new CatalogLoadAction.Load());
+        store.Load();
         return Task.CompletedTask;
     }
 
-    [EffectMethod]
-    public async Task OnSetSearchTerm(CatalogFilterAction.SetSearchTerm action, IDispatcher dispatcher)
+    [EffectMethod(typeof(CatalogFilterAction.SetSearchTerm))]
+    public async Task OnSetSearchTerm()
     {
         _searchDebounceCts?.Cancel();
         _searchDebounceCts = new CancellationTokenSource();
@@ -23,24 +23,25 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state)
             await Task.Delay(300, token);
 
             if (!token.IsCancellationRequested)
-                dispatcher.Dispatch(new CatalogLoadAction.Load());
+                store.Load();
         }
         catch (TaskCanceledException) { }
     }
 
     [EffectMethod]
-    public Task OnSetCategory(CatalogFilterAction.SetCategory action, IDispatcher dispatcher)
+    public Task OnSetCategory(CatalogFilterAction.SetCategory action)
     {
         if (action.CategoryId != state.Value.ProductsFilter.CategoryId)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
+
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetStock(CatalogFilterAction.SetStock action, IDispatcher dispatcher)
+    public Task OnSetStock(CatalogFilterAction.SetStock action)
     {
         if (action.Value != state.Value.ProductsFilter.Stock)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
         return Task.CompletedTask;
     }
 }

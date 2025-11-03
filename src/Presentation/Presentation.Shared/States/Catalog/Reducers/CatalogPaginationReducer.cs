@@ -21,7 +21,7 @@ public static class CatalogPaginationReducer
         };
 
     [ReducerMethod]
-    public static CatalogState OnSetAllPage(CatalogState state, CatalogPaginationAction.SetAllPage action)
+    public static CatalogState OnSetAllPage(CatalogState state, CatalogPaginationAction.SetAllPageSize action)
         => state with
         {
             ProductsPagination = state.ProductsPagination with { All = action.All }

@@ -1,33 +1,33 @@
 ﻿namespace Presentation.Shared.States.Catalog.Effects;
 
 
-public sealed class CatalogPricingEffects(IState<CatalogState> state)
+public sealed class CatalogPricingEffects(IState<CatalogState> state, ICatalogStore store)
 {
-    [EffectMethod]
-    public Task OnSetPricingOptions(CatalogPricingAction.SetPricingOptions action, IDispatcher dispatcher)
+    [EffectMethod(typeof(CatalogPricingAction.SetPricingOptions))]
+    public Task OnSetPricingOptions()
     {
-        dispatcher.Dispatch(new CatalogLoadAction.Load());
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetPriceRange(CatalogPricingAction.SetPriceRange action, IDispatcher dispatcher)
+    public Task OnSetPriceRange(CatalogPricingAction.SetPriceRange action)
     {
         var min = state.Value.PricingOptions.MinPrice;
         var max = state.Value.PricingOptions.MaxPrice;
         var hasNotChanged  = action.MinPrice == min && action.MaxPrice == max;
 
         if (!hasNotChanged)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetPrice(CatalogPricingAction.SetPrice action, IDispatcher dispatcher)
+    public Task OnSetPrice(CatalogPricingAction.SetPriceId action)
     {
-        if (action.PriceTypeId != state.Value.PricingOptions.PriceTypeId)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+        if (action.PriceType != state.Value.PricingOptions.PriceType)
+            store.Load();
 
         return Task.CompletedTask;
     }

@@ -1,37 +1,37 @@
 ﻿namespace Presentation.Shared.States.Catalog.Effects;
 
-public sealed class CatalogPaginationEffect(IState<CatalogState> state)
+public sealed class CatalogPaginationEffect(IState<CatalogState> state, ICatalogStore store)
 {
-    [EffectMethod]
-    public Task OnSetPagination(CatalogPaginationAction.SetPagination action, IDispatcher dispatcher)
+    [EffectMethod(typeof(CatalogPaginationAction.SetPagination))]
+    public Task OnSetPagination()
     {
-        dispatcher.Dispatch(new CatalogLoadAction.Load());
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetPageNumber(CatalogPaginationAction.SetPageNumber action, IDispatcher dispatcher)
+    public Task OnSetPageNumber(CatalogPaginationAction.SetPageNumber action)
     {
         if (action.PageNumber != state.Value.ProductsPagination.CurrentPage)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetPageSize(CatalogPaginationAction.SetPageSize action, IDispatcher dispatcher)
+    public Task OnSetPageSize(CatalogPaginationAction.SetPageSize action)
     {
         if (action.PageSize != state.Value.ProductsPagination.PageSize)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }
 
     [EffectMethod]
-    public Task OnSetAllPage(CatalogPaginationAction.SetAllPage action, IDispatcher dispatcher)
+    public Task OnSetAllPage(CatalogPaginationAction.SetAllPageSize action)
     {
         if (action.All != state.Value.ProductsPagination.All)
-            dispatcher.Dispatch(new CatalogLoadAction.Load());
+            store.Load();
 
         return Task.CompletedTask;
     }

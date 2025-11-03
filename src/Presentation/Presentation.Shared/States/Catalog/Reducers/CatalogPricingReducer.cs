@@ -25,11 +25,11 @@ public static class CatalogPricingReducer
 
 
     [ReducerMethod]
-    public static CatalogState OnSetPrice(CatalogState state, CatalogPricingAction.SetPrice action)
+    public static CatalogState OnSetPrice(CatalogState state, CatalogPricingAction.SetPriceId action)
     {
         var updateState =  state with
         {
-            PricingOptions =  state.PricingOptions with { PriceTypeId = action.PriceTypeId }
+            PricingOptions =  state.PricingOptions with { PriceType = action.PriceType }
         };
         return state;
     }
