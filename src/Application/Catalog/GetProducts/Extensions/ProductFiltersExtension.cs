@@ -35,7 +35,7 @@ public static class ProductFiltersExtension
         }
 
         if (filter.CategoryId is not null)
-            specification.Where(p => p.CategoryId == filter.CategoryId);
+            specification.Where(p => p.CategoryId == filter.CategoryId.Value);
 
         if (pricingOptions.MinPrice.HasValue)
             specification.Where(p =>
