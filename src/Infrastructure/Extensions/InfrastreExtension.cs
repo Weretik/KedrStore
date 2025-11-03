@@ -1,7 +1,9 @@
 ﻿using Application.Catalog.CreateQuickOrder;
+using Application.Catalog.ImportCatalogFromXml;
 using Application.Catalog.Shared;
 using Application.Identity.Shared;
 using Infrastructure.Catalog;
+using Infrastructure.Catalog.Import;
 using Infrastructure.Catalog.Interfaces;
 using Infrastructure.Catalog.Migrations;
 using Infrastructure.Catalog.Notifications;
@@ -80,6 +82,8 @@ public static class InfrastreExtension
         services.AddSingleton<IEnvironmentService, EnvironmentService>();
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
+
+        services.AddScoped<ICatalogXmlParser, CatalogXmlParser>();
 
         //Telegram
         services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
