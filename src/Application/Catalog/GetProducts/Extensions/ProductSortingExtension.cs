@@ -32,11 +32,11 @@ public static class ProductSortingExtension
             ProductSortKey.Price =>
                 sorter.Desc
                     ? spec.OrderByDescending(p => p.Prices
-                        .Where(pp => pp.PriceType == pricingOptions.PriceTypeId)
+                        .Where(pp => pp.PriceType.Name == pricingOptions.PriceType)
                         .Select(pp => pp.Amount)
                         .FirstOrDefault())
                     : spec.OrderBy(p => p.Prices
-                        .Where(pp => pp.PriceType == pricingOptions.PriceTypeId)
+                        .Where(pp => pp.PriceType.Name == pricingOptions.PriceType)
                         .Select(pp => pp.Amount)
                         .FirstOrDefault()),
 
