@@ -1,4 +1,5 @@
-﻿using Application.Catalog.Shared;
+﻿using Application.Catalog.ImportCatalogFromXml;
+using Application.Catalog.Shared;
 using Domain.Catalog.Entities;
 
 namespace Application.Catalog.GetCategories;
@@ -18,8 +19,8 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
     private static IReadOnlyList<CategoryTreeDto> BuildTree(IEnumerable<ProductCategory> categories)
     {
         var lookup = categories.ToLookup(
-            c =>
-                c.TryGetParentPath(out var parentPath)
+            category =>
+                category.TryGetParentPath(out var parentPath)
                 ? parentPath.ToString()
                 : null
         );
@@ -27,10 +28,10 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
         IReadOnlyList<CategoryTreeDto> BuildBranch(string? parentKey)
         {
             return lookup[parentKey]
-                .Select(c => new CategoryTreeDto(
-                    Id: c.Id.Value,
-                    Name: c.Name,
-                    Children: BuildBranch(c.Path.ToString())
+                .Select(category => new CategoryTreeDto(
+                    Id: category.Id.Value,
+                    Name: category.Name,
+                    Children: BuildBranch(category.Path.ToString())
                 ))
                 .ToList();
         }

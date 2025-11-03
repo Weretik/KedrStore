@@ -16,9 +16,7 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductsQue
             .IsInEnum()
             .WithMessage("Некоректний параметр сортування.");
 
-        RuleFor(query => query.PricingOptions.PriceTypeId)
-            .InclusiveBetween(1, 12)
-            .WithMessage("Для сортування за ціною має бути заданий коректний PriceTypeId (1-12).");
+        //RuleFor(query => query.PricingOptions.PriceType).InclusiveBetween(1, 12).WithMessage("Для сортування за ціною має бути заданий коректний PriceTypeId (1-12).");
 
         RuleFor(filter => filter.PricingOptions.MinPrice)
             .GreaterThanOrEqualTo(0).When(filter => filter.PricingOptions.MinPrice.HasValue)
