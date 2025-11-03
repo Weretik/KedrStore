@@ -29,6 +29,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 name => ProductType.FromName(name, false)
             )
             .HasMaxLength(50)
+            .IsUnicode(false)
             .HasColumnName("ProductType")
             .IsRequired();
 
@@ -62,7 +63,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             price.HasKey("ProductId", "PriceType");
 
             price.Property(p => p.PriceType)
-                .HasColumnName("PriceTypeId")
+                .HasConversion(
+                    priceType => priceType.Name,
+                    name => PriceType.FromName(name, false))
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PriceType")
                 .IsRequired();
 
             price.Property(p => p.Amount)
@@ -74,9 +80,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .HasColumnName("Currency")
                 .HasMaxLength(3)
                 .IsFixedLength()
+                .IsUnicode(false)
                 .IsRequired();
-
-            price.HasIndex("ProductId", "PriceTypeId").IsUnique();
         });
 
         builder.HasIndex(p => new { p.CategoryId, p.ProductType });
