@@ -23,7 +23,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
         var command = request.Request;
         if (command.Content.CanSeek) command.Content.Position = 0;
 
-        var parsed = await parser.ParseAsync(command.Content, command.productType, cancellationToken);
+        var parsed = await parser.ParseAsync(command.Content, command.ProductType, cancellationToken);
 
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(parsed, cancellationToken);
         var (categoriesCreated, categoriesUpdated) = await CreateOrUpsertCategoriesAsync(parsed, cancellationToken);
