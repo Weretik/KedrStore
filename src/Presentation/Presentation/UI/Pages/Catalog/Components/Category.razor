@@ -1,6 +1,6 @@
 ﻿@using Application.Catalog.GetCategories
 @using Application.Catalog.ImportCatalogFromXml
-@inject ICatalogStore CatalogStore
+@using Application.Catalog.Shared
 @inject ISnackbar Snackbar
 
 <MudPaper Class="pa-4 mb-4">
@@ -14,7 +14,7 @@
     }
     else
     {
-        <MudTreeView T="ImportCategoryDto"
+        <MudTreeView T="CategoryNodeDto"
                      Items="@_items"
                      SelectedValue="@_selected"
                      SelectedValueChanged="OnSelectedChanged"
@@ -32,8 +32,8 @@
 </MudPaper>
 
 @code {
-    private IReadOnlyCollection<TreeItemData<ImportCategoryDto>> _items = [];
-    private ImportCategoryDto? _selected;
+    private IReadOnlyCollection<TreeItemData<CategoryNodeDto>> _items = [];
+    private CategoryNodeDto? _selected;
     private bool _isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -43,7 +43,7 @@
             var res = await Mediator.Send(new GetCategoriesQuery());
             if (!res.IsSuccess || res.Value is null) return;
 
-            var roots = res.Value.Where(c => c.ParentCategoryId is null);
+            var roots = res.Value.Where(c => c. is null);
             _items = Build(roots);
         }
         finally
@@ -52,10 +52,10 @@
         }
     }
 
-    private static IReadOnlyCollection<TreeItemData<ImportCategoryDto>> Build(IEnumerable<ImportCategoryDto> src)
+    private static IReadOnlyCollection<TreeItemData<CategoryNodeDto>> Build(IEnumerable<CategoryNodeDto> src)
         => src.Select(Map).ToList();
 
-    private static TreeItemData<ImportCategoryDto> Map(ImportCategoryDto c)
+    private static TreeItemData<CategoryNodeDto> Map(CategoryNodeDto c)
         => new()
         {
             Text = c.Name,
@@ -65,7 +65,7 @@
                 : null
         };
 
-    private void OnSelectedChanged(ImportCategoryDto? node)
+    private void OnSelectedChanged(CategoryNodeDto? node)
     {
         if (node?.Children is { Count: > 0 })
         {
