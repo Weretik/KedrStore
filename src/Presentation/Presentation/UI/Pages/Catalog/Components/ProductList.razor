@@ -5,11 +5,11 @@
 @inject IDialogService DialogService
 
 
-@if (CatalogSelectors.IsLoading(CatalogState.Value))
+@if (State.IsLoading())
 {
     <MudProgressLinear Color="Color.Primary" Size="Size.Medium" Indeterminate="true" Class="my-5"/>
 }
-else if (CatalogSelectors.IsEmpty(CatalogState.Value))
+else if (State.IsEmpty())
 {
     <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Warning" Class="mb-5" >
         За даними критеріями товар не знайдено
@@ -18,16 +18,16 @@ else if (CatalogSelectors.IsEmpty(CatalogState.Value))
           Скинути фільтри
       </MudButton>
 }
-else if (CatalogSelectors.HasError(CatalogState.Value))
+else if (State.HasError())
 {
     <MudText Align="Align.Center" Typo="Typo.h3" Color="Color.Error">
-        @CatalogSelectors.Error(CatalogState.Value)
+        @State.GetError()
     </MudText>
 }
 else
 {
       <MudGrid>
-          @foreach(var item in CatalogSelectors.Items(CatalogState.Value))
+          @foreach(var item in State.GetItems())
           {
               <MudItem xs="12" md="4">
                   <MudCard>
@@ -44,21 +44,29 @@ else
                       </MudCardHeader>
 
                       <MudCardContent>
-
+                          <MudImage
+                              Src="@item.Photo"
+                              Alt="@item.Name"
+                              Class="rounded-lg"
+                              Style="max-width:100%; height:auto; object-fit:cover;"
+                              Fallback="@DefaultImageUrl" />
+                          <!--
                           <div class="d-flex justify-center">
                               <img class="rounded-lg"
                                    style="max-width: 100%; height: auto; object-fit: cover;"
-                                   src="@ProductImageUrl(item.Id)"
+                                   src="@item.Photo"
                                    alt="Product"
-                                   onerror="this.onerror=null;this.src='@PlaceholderUrl';" />
+                                   onerror="this.onerror=null;this.src='@DefaultImageUrl';" />
                           </div>
+                      -->
+
                           <MudText @key="item.Name" Typo="Typo.h6">
                               <MudHighlighter
                                   Text="@item.Name"
-                                  HighlightedTexts="@(new[] { CatalogState.Value.Params.SearchTerm })" />
+                                  HighlightedTexts="@(new[] { State.GetSearchTerm() })"/>
                           </MudText>
                           <MudText Align="Align.End" Typo="Typo.subtitle1">
-                              @item.Prices.Amount @item.Currency
+                              @item.GetPriceForType(_priceType) @item.GetCurrencyForType(_priceType)
                           </MudText>
                       </MudCardContent>
 
@@ -80,30 +88,27 @@ else
                      Size="Size.Large"
                      ShowLastButton="true"
                      Class="mt-10 mb-20"
-                     Count="@CatalogSelectors.TotalPages(CatalogState.Value)"
+                     Count="@State.GetTotalPages()"
                      @bind-Selected="CurrentPage" />
 }
 
 
 @code {
+    const string DefaultImageUrl = "https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/00000000.jpg";
+    CatalogState State => CatalogState.Value;
+    string _priceType = "price_10";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        CatalogStore.Reload();
+        CatalogStore.Load();
     }
 
     int CurrentPage
     {
-        get => CatalogState.Value.Params.PageNumber;
-        set => CatalogStore.GoToPage(value);
+        get => State.GetCurrentPageNumber();
+        set => CatalogStore.SetPageNumber(value);
     }
-
-    private static string ProductImageUrl(int id)
-        => $"https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/{id}.jpg";
-
-    private const string PlaceholderUrl =
-        "https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/00000000.jpg";
 
     private Task OpenСontactDialogAsync(int id, string name)
     {
