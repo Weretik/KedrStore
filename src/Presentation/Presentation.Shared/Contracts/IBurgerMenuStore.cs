@@ -1,4 +1,4 @@
-﻿namespace Presentation.Shared.States.Layout;
+﻿namespace Presentation.Shared;
 
 public interface IBurgerMenuStore
 {
