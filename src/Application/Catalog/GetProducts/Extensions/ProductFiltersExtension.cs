@@ -1,4 +1,5 @@
 ﻿using Domain.Catalog.Entities;
+// ReSharper disable All
 
 namespace Application.Catalog.GetProducts;
 
@@ -10,6 +11,7 @@ public static class ProductFiltersExtension
         PricingOptions pricingOptions)
     {
         ArgumentNullException.ThrowIfNull(filter);
+        ArgumentNullException.ThrowIfNull(pricingOptions);
 
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
@@ -38,13 +40,13 @@ public static class ProductFiltersExtension
         if (pricingOptions.MinPrice.HasValue)
             specification.Where(p =>
                 p.Prices.Any(pp =>
-                    pp.PriceType == pricingOptions.PriceTypeId &&
+                    pp.PriceType.Name == pricingOptions.PriceType &&
                     pp.Amount >= pricingOptions.MinPrice.Value));
 
         if (pricingOptions.MaxPrice.HasValue)
             specification.Where(p =>
                 p.Prices.Any(pp =>
-                    pp.PriceType == pricingOptions.PriceTypeId &&
+                    pp.PriceType.Name == pricingOptions.PriceType &&
                     pp.Amount <= pricingOptions.MaxPrice.Value));
 
         if (filter.Stock.HasValue)
