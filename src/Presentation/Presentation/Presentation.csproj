@@ -100,6 +100,19 @@
       <_ContentIncludedByDefault Remove="Components\Shared\Widgets\CallToAction.razor" />
       <_ContentIncludedByDefault Remove="Components\Сatalog\Partials\Category.razor" />
       <_ContentIncludedByDefault Remove="Components\Сatalog\Sections\ProductList.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterContacts.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterCopyright.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterInformation.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterServices.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterSocial.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Components\FooterSubscription.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Footer\Footer.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Header\Components\HeaderLogo.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Header\Components\HeaderMainNavigation.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Header\Components\HeaderSearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Header\Components\HeaderUserActions.razor" />
+      <_ContentIncludedByDefault Remove="Layout\Header\Header.razor" />
+      <_ContentIncludedByDefault Remove="Layout\MainLayout.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -125,22 +138,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Layout\Footer\Footer.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterContacts.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterCopyright.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterInformation.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterServices.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterSocial.razor" />
-      <AdditionalFiles Include="Layout\Footer\Components\FooterSubscription.razor" />
-      <AdditionalFiles Include="Layout\Header\Header.razor" />
-      <AdditionalFiles Include="Layout\Header\Components\HeaderLogo.razor" />
-      <AdditionalFiles Include="Layout\Header\Components\HeaderMainNavigation.razor" />
-      <AdditionalFiles Include="Layout\Header\Components\HeaderSearchBar.razor" />
-      <AdditionalFiles Include="Layout\Header\Components\HeaderUserActions.razor" />
-      <AdditionalFiles Include="Layout\MainLayout.razor" />
-      <AdditionalFiles Include="Pages\Error.razor" />
-      <AdditionalFiles Include="Components\Widgets\ButtonToCatalog.razor" />
-      <AdditionalFiles Include="Components\Widgets\CallToAction.razor" />
+      <AdditionalFiles Include="UI\Pages\AboutUs\AboutUsPage.razor" />
+      <AdditionalFiles Include="UI\Pages\Catalog\CatalogPage.razor" />
+      <AdditionalFiles Include="UI\Pages\Catalog\Components\Category.razor" />
+      <AdditionalFiles Include="UI\Pages\Catalog\Components\PriceFilter.razor" />
+      <AdditionalFiles Include="UI\Pages\Catalog\Components\ProductList.razor" />
+      <AdditionalFiles Include="UI\Pages\Catalog\HardwareSalePage.razor" />
+      <AdditionalFiles Include="UI\Pages\Contacts\ContactsPage.razor" />
+      <AdditionalFiles Include="UI\Pages\FAQ\QuestionsPage.razor" />
+      <AdditionalFiles Include="UI\Pages\Home\Components\Brending.razor" />
+      <AdditionalFiles Include="UI\Pages\Home\Index.razor" />
+      <AdditionalFiles Include="UI\Pages\Informations\Components\Delivery.razor" />
+      <AdditionalFiles Include="UI\Pages\Informations\Components\Payment.razor" />
+      <AdditionalFiles Include="UI\Pages\Informations\Components\Returns.razor" />
+      <AdditionalFiles Include="UI\Pages\Informations\Components\Warranty.razor" />
+      <AdditionalFiles Include="UI\Pages\Informations\InformationPage.razor" />
+      <AdditionalFiles Include="UI\Widgets\ButtonToFeedback.razor" />
+      <AdditionalFiles Include="UI\Widgets\СontactDialog.razor" />
     </ItemGroup>
 
 </Project>
