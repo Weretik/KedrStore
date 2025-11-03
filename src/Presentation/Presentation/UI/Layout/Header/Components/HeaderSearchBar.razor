@@ -1,5 +1,5 @@
 ﻿@rendermode InteractiveServer
-@inject ICatalogStore Catalog
+@inject ICatalogStore CatalogStore
 
 <MudStack Class="mt-10 mb-20" Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceEvenly" Wrap="Wrap.Wrap">
 
@@ -42,7 +42,7 @@
 
     void DoSearch()
     {
-        Catalog.SetSearchTerm(_term);
+        CatalogStore.SetSearchTerm(_term);
 
         if (!Nav.Uri.EndsWith(Routing.CatalogProducts, StringComparison.OrdinalIgnoreCase))
             Nav.NavigateTo(Routing.CatalogProducts, replace: true);
