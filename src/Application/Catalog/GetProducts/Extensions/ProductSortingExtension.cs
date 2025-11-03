@@ -5,8 +5,10 @@ namespace Application.Catalog.GetProducts;
 
 public static class ProductSortingExtension
 {
-    public static IOrderedSpecificationBuilder<Product> ApplySorting(this ISpecificationBuilder<Product> spec,
-        ProductSorter sorter, int priceTypeId)
+    public static IOrderedSpecificationBuilder<Product> ApplySorting(
+        this ISpecificationBuilder<Product> spec,
+        ProductSorter sorter,
+        PricingOptions pricingOptions)
     {
         ArgumentNullException.ThrowIfNull(sorter);
 
@@ -30,11 +32,11 @@ public static class ProductSortingExtension
             ProductSortKey.Price =>
                 sorter.Desc
                     ? spec.OrderByDescending(p => p.Prices
-                        .Where(pp => pp.PriceType == priceTypeId)
+                        .Where(pp => pp.PriceType == pricingOptions.PriceTypeId)
                         .Select(pp => pp.Amount)
                         .FirstOrDefault())
                     : spec.OrderBy(p => p.Prices
-                        .Where(pp => pp.PriceType == priceTypeId)
+                        .Where(pp => pp.PriceType == pricingOptions.PriceTypeId)
                         .Select(pp => pp.Amount)
                         .FirstOrDefault()),
 

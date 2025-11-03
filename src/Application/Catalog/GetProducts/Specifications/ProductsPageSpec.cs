@@ -5,17 +5,27 @@ namespace Application.Catalog.GetProducts;
 
 public sealed class ProductsPageSpec : Specification<Product, ProductDto>
 {
-    public ProductsPageSpec(ProductFilter filter, ProductPagination productPagination, ProductSorter sorter, int priceTypeId)
+    public ProductsPageSpec(
+        ProductFilter filter,
+        ProductPagination productPagination,
+        ProductSorter sorter,
+        PricingOptions pricingOptions )
     {
         ArgumentNullException.ThrowIfNull(filter);
         ArgumentNullException.ThrowIfNull(productPagination);
+        ArgumentNullException.ThrowIfNull(sorter);
+        ArgumentNullException.ThrowIfNull(pricingOptions);
 
         Query.AsNoTracking()
-            .ApplyFilters(filter, priceTypeId)
-            .ApplySorting(sorter, priceTypeId)
-            .ThenBy(p => p.Id)
-            .Skip((productPagination.CurrentPage - 1) * productPagination.PageSize)
-            .Take(productPagination.PageSize);
+            .ApplyFilters(filter, pricingOptions)
+            .ApplySorting(sorter, pricingOptions)
+            .ThenBy(p => p.Id);
+
+        if( !productPagination.All)
+        {
+            Query.Skip((productPagination.CurrentPage - 1) * productPagination.PageSize)
+                .Take(productPagination.PageSize);
+        }
 
         Query.Select<Product, ProductDto>(p => new ProductDto(
                 p.Id.Value,

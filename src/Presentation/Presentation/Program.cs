@@ -31,7 +31,6 @@ builder.Services
 // DI: Fluxor + State services
 builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
 builder.Services.AddScoped<IBurgerMenuStore, BurgerMenuStore>();
-builder.Services.AddScoped<ICatalogStore, CatalogStore>();
 
 // Services
 builder.Services.AddHealthChecks();

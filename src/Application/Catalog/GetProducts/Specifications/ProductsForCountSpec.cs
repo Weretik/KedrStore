@@ -4,8 +4,8 @@ namespace Application.Catalog.GetProducts;
 
 public class ProductsForCountSpec : Specification<Product>
 {
-    public ProductsForCountSpec(ProductFilter filter, int priceTypeId)
+    public ProductsForCountSpec(ProductFilter filter, PricingOptions pricingOptions)
     {
-        Query.AsNoTracking().ApplyFilters(filter, priceTypeId);
+        Query.AsNoTracking().ApplyFilters(filter, pricingOptions);
     }
 }
