@@ -6,6 +6,8 @@ public sealed class AllCategoriesSpec : Specification<ProductCategory>
 {
     public AllCategoriesSpec()
     {
-        Query.AsNoTracking().OrderBy(c => c.Name);
+        Query.AsNoTracking()
+            .OrderBy(category => category.Path)
+            .ThenBy(category => category.Name);
     }
 }
