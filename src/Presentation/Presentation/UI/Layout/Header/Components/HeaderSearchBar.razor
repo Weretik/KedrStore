@@ -7,7 +7,7 @@
 
         <MudTextField @bind-Value="_term"
                       Label="Пошук"
-                      OnKeyUp="OnSearch"
+                      OnKeyUp="@OnSearch"
                       Variant="Variant.Outlined"
                       Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Search"
@@ -31,9 +31,9 @@
 </MudStack>
 
 @code {
-    private string? _term;
+    string? _term;
 
-    public void OnSearch(KeyboardEventArgs e)
+    void OnSearch(KeyboardEventArgs e)
     {
       if (e.Key != "Enter") return;
 

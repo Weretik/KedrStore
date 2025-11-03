@@ -1,0 +1,36 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.Diagnostics
+
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+
+@using Presentation
+@using Presentation.Client
+
+@using Presentation.UI.Widgets
+
+@using Presentation.UI.Layout
+@using Presentation.UI.Layout.Footer
+@using Presentation.UI.Layout.Header
+@using Presentation.UI.Layout.Header.Components
+@using Presentation.UI.Layout.Footer.Components
+
+@using Presentation.Shared
+@using Presentation.Shared.Theme
+@using Presentation.Shared.Routing
+@using Presentation.Shared.ViewModels
+@using Presentation.Shared.Extensions;
+@using Presentation.Shared.States.Layout
+
+@using MudBlazor
+@using Mediator
+@using Fluxor
+@using Fluxor.Blazor.Web
+
+@inject NavigationManager Nav
+@inject IMediator Mediator

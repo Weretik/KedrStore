@@ -1,7 +1,6 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ISnackbar Snackbar
 @inject IState<CatalogState> CatalogState
-@inject ICatalogStore CatalogStore
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h4" class="mt-5 mb-3">
@@ -26,9 +25,10 @@
 </MudPaper>
 
 @code {
+
     decimal? MinPrice
     {
-        get => CatalogState.Value.Params.MinPrice;
+        get => CatalogState.Value.PricingOptions.MinPrice;
         set
         {
             var other = MaxPrice;
