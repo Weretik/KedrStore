@@ -3,8 +3,6 @@
 namespace Application.Catalog.GetProducts;
 
 public sealed record ProductFilter(
-    string? SearchTerm,
-    ProductCategoryId? CategoryId,
-    decimal? MinPrice,
-    decimal? MaxPrice,
-    decimal? Stock);
+    string? SearchTerm = null,
+    ProductCategoryId? CategoryId = null,
+    decimal? Stock = null);

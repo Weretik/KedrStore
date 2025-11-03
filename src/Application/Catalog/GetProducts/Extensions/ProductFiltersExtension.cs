@@ -4,8 +4,10 @@ namespace Application.Catalog.GetProducts;
 
 public static class ProductFiltersExtension
 {
-    public static ISpecificationBuilder<Product> ApplyFilters(this ISpecificationBuilder<Product> specification,
-        ProductFilter filter, int priceTypeId)
+    public static ISpecificationBuilder<Product> ApplyFilters(
+        this ISpecificationBuilder<Product> specification,
+        ProductFilter filter,
+        PricingOptions pricingOptions)
     {
         ArgumentNullException.ThrowIfNull(filter);
 
@@ -33,17 +35,17 @@ public static class ProductFiltersExtension
         if (filter.CategoryId is not null)
             specification.Where(p => p.CategoryId == filter.CategoryId);
 
-        if (filter.MinPrice.HasValue)
+        if (pricingOptions.MinPrice.HasValue)
             specification.Where(p =>
                 p.Prices.Any(pp =>
-                    pp.PriceType == priceTypeId &&
-                    pp.Amount >= filter.MinPrice.Value));
+                    pp.PriceType == pricingOptions.PriceTypeId &&
+                    pp.Amount >= pricingOptions.MinPrice.Value));
 
-        if (filter.MaxPrice.HasValue)
+        if (pricingOptions.MaxPrice.HasValue)
             specification.Where(p =>
                 p.Prices.Any(pp =>
-                    pp.PriceType == priceTypeId &&
-                    pp.Amount <= filter.MaxPrice.Value));
+                    pp.PriceType == pricingOptions.PriceTypeId &&
+                    pp.Amount <= pricingOptions.MaxPrice.Value));
 
         if (filter.Stock.HasValue)
             specification.Where(p => p.Stock == filter.Stock.Value);

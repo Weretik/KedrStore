@@ -1,28 +1,21 @@
 ﻿using Application.Catalog.GetProducts;
-using Application.Catalog.Shared.DTOs;
+using Application.Catalog.Shared;
 
 namespace Presentation.Shared.States.Catalog;
 
 public static class CatalogSelectors
 {
-    public static CatalogParams Params(CatalogState state) => state.Params;
+    public static ProductFilter Filter(CatalogState state) => state.ProductsFilter;
+    public static ProductSorter Sorter(CatalogState state) => state.ProductsSorter;
+    public static ProductPagination Pagination(CatalogState state) => state.ProductsPagination;
+    public static PricingOptions Pricing(CatalogState state) => state.PricingOptions;
     public static bool IsLoading(CatalogState state) => state.IsLoading;
     public static string? Error(CatalogState state) => state.Error;
-    public static PaginationResult<ProductDto>? PageList(CatalogState state) => state.PageList;
 
-
-    public static IReadOnlyList<ProductDto> Items(CatalogState state)
-        => state.PageList?.Items ?? [];
-
-    public static int TotalPages(CatalogState state)
-        => state.PageList?.TotalPages ?? 0;
-
-    public static bool HasError(CatalogState state)
-        => state.Error is not null;
-
-    public static bool HasPageList(CatalogState state)
-        => state.PageList is not null;
-
-    public static bool IsEmpty(CatalogState state)
-        => state.PageList is not null && state.PageList.Total == 0;
+    // ---- GetProductsQueryResult ----
+    public static IReadOnlyList<ProductDto> Items(CatalogState state) => state.QueryResult?.Items ?? [];
+    public static int TotalItems(CatalogState state) => state.QueryResult?.TotalItems ?? 0;
+    public static int TotalPages(CatalogState state) => state.QueryResult?.TotalPages ?? 0;
+    public static bool HasError(CatalogState state) => state.Error is not null;
+    public static bool IsEmpty(CatalogState state) => state.QueryResult is not null && state.QueryResult.TotalItems == 0;
 }
