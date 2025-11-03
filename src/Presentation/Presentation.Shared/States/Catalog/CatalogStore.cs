@@ -9,7 +9,7 @@ public sealed class CatalogStore(IDispatcher dispatcher) : ICatalogStore
     public void SetSearchTerm(string? value)
         => dispatcher.Dispatch(new CatalogFilterAction.SetSearchTerm(value));
 
-    public void SetCategory(ProductCategoryId? id)
+    public void SetCategory(int? id)
         => dispatcher.Dispatch(new CatalogFilterAction.SetCategory(id));
 
     public void SetStock(decimal? value)

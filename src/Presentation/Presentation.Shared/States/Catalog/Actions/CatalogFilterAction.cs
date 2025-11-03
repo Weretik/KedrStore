@@ -7,6 +7,6 @@ public static class CatalogFilterAction
 {
     public sealed record SetFilter(ProductFilter Filter);
     public sealed record SetSearchTerm(string? Value);
-    public sealed record SetCategory(ProductCategoryId? CategoryId);
+    public sealed record SetCategory(int? CategoryId);
     public sealed record SetStock(decimal? Value);
 }
