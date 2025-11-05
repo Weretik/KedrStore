@@ -44,13 +44,6 @@ else
                       </MudCardHeader>
 
                       <MudCardContent>
-                          <MudImage
-                              Src="@item.Photo"
-                              Alt="@item.Name"
-                              Class="rounded-lg"
-                              Style="max-width:100%; height:auto; object-fit:cover;"
-                              Fallback="@DefaultImageUrl" />
-                          <!--
                           <div class="d-flex justify-center">
                               <img class="rounded-lg"
                                    style="max-width: 100%; height: auto; object-fit: cover;"
@@ -58,7 +51,6 @@ else
                                    alt="Product"
                                    onerror="this.onerror=null;this.src='@DefaultImageUrl';" />
                           </div>
-                      -->
 
                           <MudText @key="item.Name" Typo="Typo.h6">
                               <MudHighlighter

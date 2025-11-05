@@ -1,13 +1,14 @@
 ﻿using Domain.Catalog.Entities;
+using Domain.Catalog.ValueObjects;
 
 namespace Application.Catalog.ImportCatalogFromXml;
 
 public sealed class CategoryMissingInImportSpec: Specification<ProductCategory>
 {
-    public CategoryMissingInImportSpec(ISet<int> importIds)
+    public CategoryMissingInImportSpec(ProductCategoryId[] importCategoryIds)
     {
         Query.IgnoreQueryFilters()
-            .Where(c => !importIds.Contains(c.Id.Value))
+            .Where(category => !importCategoryIds.Contains(category.Id))
             .OrderByDescending(c => c.Path.NLevel);
     }
 }

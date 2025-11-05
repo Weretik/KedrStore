@@ -1,16 +1,40 @@
-﻿using Application.Catalog.ImportCatalogFromXml;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using Application.Catalog.ImportCatalogFromXml;
 using Application.Catalog.Shared;
 
 namespace Infrastructure.Catalog.Import;
 
+/// <summary>
+/// Kedr XML catalog parser.
+/// Responsible for reading input XML, fixing problematic encodings,
+/// building categories and product lists.
+/// </summary>
 public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlParser
 {
+    /// <summary>
+    /// Asynchronously parses an XML catalog and returns categories and products.
+    /// </summary>
+    /// <param name="xml">Input XML file (stream)</param>
+    /// <param name="productTypeId">Product type (1 – fittings, 2 – doors)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Result of catalog parsing</returns>
     public async Task<CatalogParseResult> ParseAsync(Stream xml, int productTypeId, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("XML parse started");
 
+        // The supplier writes encoding="utf8" — .NET does not understand this, so we correct it to “utf-8.”
+        using (var streamReader = new StreamReader(xml, Encoding.UTF8, leaveOpen: true))
+        {
+            var text = await streamReader.ReadToEndAsync(cancellationToken);
+            text = Regex.Replace(text, @"encoding\s*=\s*[""']utf8[""']", "encoding=\"utf-8\"", RegexOptions.IgnoreCase);
+            xml = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        }
+
+        // Safe XML reading settings — no DTD, no resolver, no comments
         var settings = new XmlReaderSettings
         {
+            Async = true,
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             IgnoreComments = true,
@@ -22,29 +46,46 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         var products = new List<ProductDto>();
 
         using var xmlReader = XmlReader.Create(xml, settings);
-        var xmlDocument = XDocument.Load(xmlReader);
+        var xmlDocument = await XDocument.LoadAsync(xmlReader, LoadOptions.None, cancellationToken);
+
         var root = xmlDocument.Root?.Elements("product") ?? [];
 
         foreach (var xmlElement in root)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var id = TryInt(xmlElement.Element("id")?.Value);
-            var name = (xmlElement.Element("name")?.Value ?? "").Trim();
-            var idR = TryInt(xmlElement.Element("idR")?.Value);
-            var nameR = NormalizeCategoryName((xmlElement.Element("nameR")?.Value ?? "").Trim(), productTypeId);
-            var count = TryInt(xmlElement.Element("count")?.Value);
+            var id = TryGetInt(xmlElement.Element("id")?.Value);
+            var name = (TryGetValue(xmlElement, "name")  ?? "").Trim();
+            var idR = TryGetInt(xmlElement.Element("idR")?.Value);
+            var nameR = (TryGetValue(xmlElement, "nameR") ?? "").Trim();
+            var count = TryGetInt(xmlElement.Element("count")?.Value);
+
+            // Skip invalid elements (some providers return empty id/name values)
+            if (id <= 0 || idR <= 0 || IsNullOrWhite(name) || IsNullOrWhite(nameR) || count < 0)
+            {
+                logger.LogWarning("Пропуск product: некоректні поля " +
+                                  "(id={Id}, idR={IdR}, name='{Name}', nameR='{NameR}', count='{count}')",
+                    id, idR, name, nameR, count);
+                continue;
+            }
+
+            // For productTypeId=2 (fittings), remove the prefix “Kedr” from category names
+            if(productTypeId == 2) nameR = NormalizeCategoryName(nameR);
 
             var parentMap = GetParentMap(productTypeId);
             parentMap.TryGetValue(idR, out var parentBaseId);
 
-            if (productTypeId == 1 && parentBaseId == 0)
-                parentBaseId = 103;
+            // If no parent category is found, assign to “Other” (id=103)
+            if (productTypeId == 1 && parentBaseId == 0) parentBaseId = 103;
 
             EnsureCategoryById(categories, idR, nameR, parentBaseId);
 
             var pricesNode = xmlElement.Element("prices");
-            var prices = ReadPrices(pricesNode!);
+            if (pricesNode is null || !pricesNode.HasElements) continue;
+
+            var prices = ReadPrices(pricesNode);
+
+            // Photos are generated according to a fixed template on GitHub
             var photoLinks = $"https://raw.githubusercontent.com/Kedr-Class/images/refs/heads/main/furniture/{id}.jpg";
 
             products.Add(new ProductDto(
@@ -62,17 +103,20 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         return await Task.FromResult(new CatalogParseResult(categories, products));
     }
 
+    /// <summary>
+    /// Basic categories for each product type (id = fixed).
+    /// </summary>
     static List<ImportCategoryDto> GetBaseCategories(int productTypeId)
     {
         return productTypeId switch
         {
-            1 =>
+            1 => // Doors
             [
                 new ImportCategoryDto(101, "Міжкімнатні двері", "n101"),
                 new ImportCategoryDto(102, "Вхідні двері", "n102"),
                 new ImportCategoryDto(103, "Інше", "n103")
             ],
-            2 =>
+            2 => // Fittings
             [
                 new ImportCategoryDto(104, "Завіси", "n104"),
                 new ImportCategoryDto(105, "Замки", "n105"),
@@ -83,12 +127,37 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         };
     }
 
-    static int TryInt(string? element)
+    static XElement? Child(XElement parent, string localName) =>
+        parent.Elements().FirstOrDefault(e =>
+            string.Equals(e.Name.LocalName, localName, StringComparison.OrdinalIgnoreCase));
+
+    static string? TryGetValue(XElement parent, string localName) => Child(parent, localName)?.Value;
+
+    static int TryGetInt(string? element)
         => int.TryParse(element, out var value) ? value : 0;
 
-    static decimal TryDecimal(string? element)
+    static decimal TryGetDecimal(string? element)
         => decimal.TryParse(element, NumberStyles.Number, CultureInfo.InvariantCulture, out var value) ? value : 0m;
 
+    static bool IsNullOrWhite(string? value) => string.IsNullOrWhiteSpace(value);
+
+    /// <summary>
+    /// Removes the service prefix “Kedr” from category names.
+    /// </summary>
+    static string NormalizeCategoryName(string name)
+    {
+        const string deletedString = "Kedr  ";
+        var resultName = name.Trim();
+        if (resultName.StartsWith(deletedString, StringComparison.OrdinalIgnoreCase))
+        {
+            resultName = resultName.Substring(deletedString.Length).TrimStart();
+        }
+        return resultName;
+    }
+
+    /// <summary price_="nodes and generates a list of prices.">
+    /// Reads all
+    /// </summary>
     static List<ProductPriceDto> ReadPrices(XElement pricesNode)
     {
         var result = new List<ProductPriceDto>();
@@ -99,30 +168,17 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
 
             var dto = new ProductPriceDto(
                 PriceType: priceType.Trim(),
-                Amount: TryDecimal(price.Value),
+                Amount: TryGetDecimal(price.Value),
                 CurrencyIso: "UAH");
 
             result.Add(dto);
         }
         return result;
     }
-    static string NormalizeCategoryName(string name, int productTypeId)
-    {
-        if (productTypeId == 1)
-        {
-            const string deletedString = "Kedr  ";
 
-            var resultName = name.Trim();
-            if (resultName.StartsWith(deletedString, StringComparison.OrdinalIgnoreCase))
-            {
-                resultName = resultName.Substring(deletedString.Length).TrimStart();
-            }
-
-            return resultName;
-        }
-        return name;
-    }
-
+    /// <summary>
+    /// Category mapping (idR → base category). Used to build a tree.
+    /// </summary>
     static Dictionary<int, int> GetParentMap(int productTypeId) => productTypeId switch
     {
         1 => new()
@@ -144,6 +200,9 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         _ => new()
     };
 
+    /// <summary>
+    /// If the category does not yet exist, adds it with the correct path.
+    /// </summary>
     static void EnsureCategoryById(List<ImportCategoryDto> list, int id, string name, int parentBaseId)
     {
         for (int i = 0; i < list.Count; i++)

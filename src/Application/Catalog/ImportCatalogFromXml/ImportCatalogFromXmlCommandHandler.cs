@@ -20,15 +20,19 @@ public sealed class ImportCatalogFromXmlCommandHandler(
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-
         var command = request.Request;
-
         CommandLog.ImportCatalogFromXml(logger, command.File.FileName, command.File.Length, command.ProductType);
 
-        await using var stream = command.File.OpenReadStream();
+        // Copy the source file stream to memory
+        // so that it can be read again during parsing (XmlReader consumes the stream once)
+        await using var browserStream = command.File.OpenReadStream();
+        await using var memoryStream = new MemoryStream();
+        await browserStream.CopyToAsync(memoryStream, cancellationToken);
+        memoryStream.Position = 0;
 
-        var parsed = await parser.ParseAsync(stream, command.ProductType, cancellationToken);
+        var parsed = await parser.ParseAsync(memoryStream, command.ProductType, cancellationToken);
 
+        // Delete products and categories that are no longer present in the new import
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(parsed, cancellationToken);
         var (categoriesCreated, categoriesUpdated) = await CreateOrUpsertCategoriesAsync(parsed, cancellationToken);
         var (productsCreated, productsUpdated) = await CreateOrUpsertProductsAsync(parsed, cancellationToken);
@@ -46,13 +50,17 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     private async Task<(int productsDeleted, int categoriesDeleted)> DeleteMissingAsync(
         CatalogParseResult parsed, CancellationToken cancellationToken)
     {
-        var importProductIds  = parsed.Products.Select(p => p.Id).ToHashSet();
-        var importCategoryIds = parsed.Categories.Select(c => c.Id).ToHashSet();
+        var importProductIds  = parsed.Products
+            .Select(p => ProductId.From(p.Id))
+            .Distinct().ToArray();
+        var importCategoryIds = parsed.Categories
+            .Select(c => ProductCategoryId.From(c.Id))
+            .Distinct().ToArray();
 
         var productSpec = new ProductsMissingInImportSpec(importProductIds);
         var categorySpec  = new CategoryMissingInImportSpec(importCategoryIds);
 
-        var productsDeleted   = await productRepo.DeleteRangeAsync(productSpec, cancellationToken);
+        var productsDeleted = await productRepo.DeleteRangeAsync(productSpec, cancellationToken);
         var categoriesDeleted = await categoryRepo.DeleteRangeAsync(categorySpec, cancellationToken);
 
         return (productsDeleted, categoriesDeleted);
@@ -114,7 +122,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
                     productDto.Photo,
                     dateNow,
                     productDto.Stock);
-
+                // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(product, productDto.Prices);
 
                 await productRepo.AddAsync(product, cancellationToken);
@@ -130,7 +138,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
                     dateNow,
                     productDto.Stock
                 );
-
+                // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(existing, productDto.Prices);
                 updated++;
             }

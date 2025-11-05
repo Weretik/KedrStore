@@ -19,7 +19,7 @@ public sealed record ProductPrice
         PriceType = Guard.Against.Null(type, nameof(type));
 
         Guard.Against.Negative(price.Amount, nameof(price.Amount));
-        Guard.Against.OutOfRange(price.Amount, nameof(price.Amount), 0.01m, 10_000m);
+        Guard.Against.OutOfRange(price.Amount, nameof(price.Amount), 0.00m, 100_000m);
 
         Guard.Against.NullOrWhiteSpace(price.Currency.Code, nameof(price.Currency.Code));
         Guard.Against.InvalidInput(price.Currency.Code, nameof(price.Currency.Code),

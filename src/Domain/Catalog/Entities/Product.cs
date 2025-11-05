@@ -58,7 +58,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     private void SetCategoryId(ProductCategoryId categoryId) => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
     private void SetProductType(ProductType productType) => ProductType = Guard.Against.Default(productType, nameof(productType));
     private void SetPhoto(string photo) => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
-    private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 1_000);
+    private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 10_000);
     #endregion
 
     #region Price API
