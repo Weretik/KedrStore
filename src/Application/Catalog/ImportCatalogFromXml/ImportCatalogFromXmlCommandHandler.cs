@@ -7,11 +7,12 @@ namespace Application.Catalog.ImportCatalogFromXml;
 
 public sealed class ImportCatalogFromXmlCommandHandler(
     ICatalogXmlParser parser,
+    TimeProvider time,
+    ILogger<ImportCatalogFromXmlCommandHandler> logger,
     ICatalogReadRepository<ProductCategory> categoryRead,
     ICatalogRepository<ProductCategory> categoryRepo,
     ICatalogReadRepository<Product> productRead,
-    ICatalogRepository<Product> productRepo,
-    TimeProvider time)
+    ICatalogRepository<Product> productRepo)
     : ICommandHandler<ImportCatalogFromXmlCommand, Result<ImportCatalogSummary>>
 {
     public async ValueTask<Result<ImportCatalogSummary>> Handle(
@@ -21,9 +22,12 @@ public sealed class ImportCatalogFromXmlCommandHandler(
         ArgumentNullException.ThrowIfNull(request);
 
         var command = request.Request;
-        if (command.Content.CanSeek) command.Content.Position = 0;
 
-        var parsed = await parser.ParseAsync(command.Content, command.ProductType, cancellationToken);
+        CommandLog.ImportCatalogFromXml(logger, command.File.FileName, command.File.Length, command.ProductType);
+
+        await using var stream = command.File.OpenReadStream();
+
+        var parsed = await parser.ParseAsync(stream, command.ProductType, cancellationToken);
 
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(parsed, cancellationToken);
         var (categoriesCreated, categoriesUpdated) = await CreateOrUpsertCategoriesAsync(parsed, cancellationToken);
