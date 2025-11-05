@@ -51,19 +51,6 @@ void LogEnv(string key)
     Log.Information("{Key} = {Value}", key, string.IsNullOrEmpty(value) ? "<null>" : value);
 }
 
-// Например, проверим основные подключения:
-LogEnv("ASPNETCORE_ENVIRONMENT");
-LogEnv("ConnectionStrings__Default");
-LogEnv("POSTGRES_USER");
-LogEnv("POSTGRES_DB");
-LogEnv("POSTGRES_PASSWORD");
-LogEnv("Telegram__BotToken");
-LogEnv("Telegram__ChatId");
-LogEnv("ADMIN_DEFAULT_PASSWORD");
-LogEnv("SEQ_PASSWORD");
-
-
-
 // Migrations & Seeders
 await app.UseAppMigrations();
 await app.UseAppSeeders();
