@@ -1,9 +1,5 @@
-﻿namespace Application.Catalog.ImportCatalogFromXml;
+﻿using Application.Catalog.Shared;
 
-public sealed  record ImportCatalogFromXml(
-    string FileName,
-    string? ContentType,
-    long FileSize,
-    Stream Content,
-    int ProductType)
-    : ICatalogFromXml;
+namespace Application.Catalog.ImportCatalogFromXml;
+
+public sealed record ImportCatalogFromXml(UploadedFile File, int ProductType);

@@ -34,7 +34,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Shared\" />
       <Folder Include="Identity\Shared\" />
     </ItemGroup>
 

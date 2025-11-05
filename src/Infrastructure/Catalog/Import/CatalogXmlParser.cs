@@ -14,7 +14,8 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
             DtdProcessing = DtdProcessing.Prohibit,
             XmlResolver = null,
             IgnoreComments = true,
-            IgnoreWhitespace = true
+            IgnoreWhitespace = true,
+            CloseInput = false
         };
 
         var categories = GetBaseCategories(productTypeId);
