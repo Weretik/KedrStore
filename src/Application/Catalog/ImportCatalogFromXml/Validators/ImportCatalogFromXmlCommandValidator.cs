@@ -1,9 +1,16 @@
-﻿namespace Application.Catalog.ImportCatalogFromXml;
+﻿using Application.Catalog.Shared;
+
+namespace Application.Catalog.ImportCatalogFromXml;
 
 public sealed class ImportCatalogFromXmlCommandValidator : AbstractValidator<ImportCatalogFromXmlCommand>
 {
-    public ImportCatalogFromXmlCommandValidator(IValidator<ICatalogFromXml> requestValidator)
+    public ImportCatalogFromXmlCommandValidator(IValidator<UploadedFile> requestValidator)
     {
-        RuleFor(сommand => сommand.Request).SetValidator(requestValidator);
+        RuleFor(сommand => сommand.Request.File)
+            .SetValidator(requestValidator);
+
+        RuleFor(command => command.Request.ProductType)
+            .InclusiveBetween(1, 2)
+            .WithMessage("Тип продукту повинен бути в діапазоні 1–2.");
     }
 }
