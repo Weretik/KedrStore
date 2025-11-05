@@ -12,18 +12,14 @@ public sealed class CatalogSortingEffect(IState<CatalogState> state, ICatalogSto
     [EffectMethod]
     public Task OnSetSortKey(CatalogSortingAction.SetSortKey action, IDispatcher dispatcher)
     {
-        if (action.Key != state.Value.ProductsSorter.Key)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
     public Task OnSetSortDesc(CatalogSortingAction.SetSortDesc action, IDispatcher dispatcher)
     {
-        if (action.Desc != state.Value.ProductsSorter.Desc)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 }

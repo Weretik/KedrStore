@@ -6,11 +6,17 @@ public static class CatalogPricingReducer
 {
     [ReducerMethod]
     public static CatalogState OnSetPricingOptions(CatalogState state, CatalogPricingAction.SetPricingOptions action)
-        => (state with { PricingOptions = action.Pricing }).ResetPage();
+        => state with { PricingOptions = action.Pricing };
 
     [ReducerMethod]
     public static CatalogState OnSetPriceRange(CatalogState state, CatalogPricingAction.SetPriceRange action)
     {
+        var min = state.PricingOptions.MinPrice;
+        var max = state.PricingOptions.MaxPrice;
+        var hasPriceChanged  = action.MinPrice != min && action.MaxPrice != max;
+
+        if (!hasPriceChanged) return state;
+
         var updateState =  state with
         {
             PricingOptions = state.PricingOptions with
@@ -19,18 +25,18 @@ public static class CatalogPricingReducer
                 MaxPrice = action.MaxPrice
             }
         };
-
         return updateState.ResetPage();
     }
 
-
     [ReducerMethod]
-    public static CatalogState OnSetPrice(CatalogState state, CatalogPricingAction.SetPriceId action)
+    public static CatalogState OnSetPrice(CatalogState state, CatalogPricingAction.SetPriceType action)
     {
+        if (action.PriceType != state.PricingOptions.PriceType) return state;
+
         var updateState =  state with
         {
             PricingOptions =  state.PricingOptions with { PriceType = action.PriceType }
         };
-        return state;
+        return updateState;
     }
 }

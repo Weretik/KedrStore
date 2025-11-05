@@ -12,27 +12,21 @@ public sealed class CatalogPaginationEffect(IState<CatalogState> state, ICatalog
     [EffectMethod]
     public Task OnSetPageNumber(CatalogPaginationAction.SetPageNumber action, IDispatcher dispatcher)
     {
-        if (action.PageNumber != state.Value.ProductsPagination.CurrentPage)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
     public Task OnSetPageSize(CatalogPaginationAction.SetPageSize action, IDispatcher dispatcher)
     {
-        if (action.PageSize != state.Value.ProductsPagination.PageSize)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
     public Task OnSetAllPage(CatalogPaginationAction.SetAllPageSize action, IDispatcher dispatcher)
     {
-        if (action.All != state.Value.ProductsPagination.All)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 }

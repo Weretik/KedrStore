@@ -7,7 +7,7 @@ public static class CatalogSortingReducer
 {
     [ReducerMethod]
     public static CatalogState OnSetSorter(CatalogState state, CatalogSortingAction.SetSorter action)
-        => (state with { ProductsSorter = action.Sorter, }).ResetPage();
+        => state with { ProductsSorter = action.Sorter };
 
     [ReducerMethod]
     public static CatalogState OnSetSortKey(CatalogState state, CatalogSortingAction.SetSortKey action)
@@ -21,10 +21,8 @@ public static class CatalogSortingReducer
 
         var updateState = state with
         {
-            ProductsSorter = newSorter,
-            ProductsPagination = state.ProductsPagination with { CurrentPage = 1 },
+            ProductsSorter = newSorter
         };
-
         return updateState.ResetPage();
     }
 

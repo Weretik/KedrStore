@@ -34,7 +34,7 @@ public sealed class CatalogStore(IDispatcher dispatcher) : ICatalogStore
 
     // Pricing
     public void SetPriceId(string priceTypeId)
-        => dispatcher.Dispatch(new CatalogPricingAction.SetPriceId(priceTypeId));
+        => dispatcher.Dispatch(new CatalogPricingAction.SetPriceType(priceTypeId));
 
     public void SetPriceRange(decimal? min, decimal? max)
         => dispatcher.Dispatch(new CatalogPricingAction.SetPriceRange(min, max));

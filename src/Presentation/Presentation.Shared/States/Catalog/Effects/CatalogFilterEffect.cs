@@ -2,7 +2,7 @@
 
 public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStore store)
 {
-    private CancellationTokenSource? _searchDebounceCts;
+    private CancellationTokenSource? _сancellationToken;
 
     [EffectMethod(typeof(CatalogFilterAction.SetFilter))]
     public Task OnSetFilter(IDispatcher dispatcher)
@@ -14,13 +14,13 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStor
     [EffectMethod(typeof(CatalogFilterAction.SetSearchTerm))]
     public async Task OnSetSearchTerm(IDispatcher dispatcher)
     {
-        _searchDebounceCts?.Cancel();
-        _searchDebounceCts = new CancellationTokenSource();
-        var token = _searchDebounceCts.Token;
+        _сancellationToken?.Cancel();
+        _сancellationToken = new CancellationTokenSource();
+        var token = _сancellationToken.Token;
 
         try
         {
-            await Task.Delay(300, token);
+            await Task.Delay(450, token);
 
             if (!token.IsCancellationRequested)
                 store.Load();
@@ -31,17 +31,14 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStor
     [EffectMethod]
     public Task OnSetCategory(CatalogFilterAction.SetCategory action, IDispatcher dispatcher)
     {
-        if (action.CategoryId!.Value != state.Value.ProductsFilter.CategoryId!.Value)
-            store.Load();
-
+        store.Load();
         return Task.CompletedTask;
     }
 
     [EffectMethod]
     public Task OnSetStock(CatalogFilterAction.SetStock action, IDispatcher dispatcher)
     {
-        if (action.Value != state.Value.ProductsFilter.Stock)
-            store.Load();
+        store.Load();
         return Task.CompletedTask;
     }
 }
