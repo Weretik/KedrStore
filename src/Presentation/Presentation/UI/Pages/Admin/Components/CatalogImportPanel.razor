@@ -7,17 +7,17 @@
 
 <MudPaper Class="pa-4">
     <MudStack Spacing="2">
-        <MudText Typo="Typo.h5">Импорт каталога из XML</MudText>
+        <MudText Typo="Typo.h5">Імпорт каталогу з XML</MudText>
 
-        <MudSelect T="int" Label="Тип продукта" @bind-Value="_productType" Required="true">
-            <MudSelectItem Value="1">1 — Основной</MudSelectItem>
-            <MudSelectItem Value="2">2 — Дополнительный</MudSelectItem>
+        <MudSelect T="int" Label="Тип товарів" @bind-Value="_productType" Required="true">
+            <MudSelectItem Value="1">Двері</MudSelectItem>
+            <MudSelectItem Value="2">Фурнітура</MudSelectItem>
         </MudSelect>
 
         <MudFileUpload T="IBrowserFile"
                        @ref="_uploader"
                        OnFilesChanged="OnFilesSelected"
-                       Placeholder="Перетащи XML сюда или нажми, чтобы выбрать"
+                       Placeholder="Перетягни XML сюди або натисни, щоб вибрати"
                        Accept=".xml,application/xml,text/xml"
                        MaxFileCount="1"
                        Class="mt-2" />
@@ -27,20 +27,20 @@
                        Color="Color.Primary"
                        Disabled="@(!CanImport || _isBusy)"
                        OnClick="ImportAsync">
-                Импортировать
+                Імпортувати
             </MudButton>
 
             <MudButton Variant="Variant.Outlined"
                        Color="Color.Secondary"
                        Disabled="@(!HasFile || _isBusy)"
                        OnClick="ClearAsync">
-                Очистить
+                Очистити
             </MudButton>
 
             <MudButton Variant="Variant.Text"
                        Disabled="@_isBusy"
                        OnClick="OpenPickerAsync">
-                Выбрать файл…
+                Вибрати файл…
             </MudButton>
         </MudStack>
 
@@ -115,7 +115,7 @@
             switch (result.Status)
             {
                 case ResultStatus.Ok:
-                    Snackbar.Add("Импорт выполнен успешно.", Severity.Success);
+                    Snackbar.Add("Імпорт виконано успішно.", Severity.Success);
                     break;
 
                 case ResultStatus.Invalid:
@@ -125,27 +125,23 @@
                     var enumerable = validation as string[] ?? validation.ToArray();
                     var msgInvalid = enumerable.Any()
                         ? string.Join("; ", enumerable)
-                        : "Данные не прошли валидацию.";
+                        : "Дані не пройшли валідацію.";
                     Snackbar.Add(msgInvalid, Severity.Error);
                     break;
 
                 case ResultStatus.Error:
                     var msgError = result.Errors?.Any() == true
                         ? string.Join("; ", result.Errors)
-                        : "Во время импорта произошла ошибка.";
+                        : "Під час імпорту сталася помилка.";
                     Snackbar.Add(msgError, Severity.Error);
                     break;
 
                 case ResultStatus.NotFound:
-                    Snackbar.Add("Ресурсы для импорта не найдены.", Severity.Warning);
+                    Snackbar.Add("Ресурси для імпорту не знайдені.", Severity.Warning);
                     break;
 
                 case ResultStatus.Forbidden:
-                    Snackbar.Add("Нет прав на импорт.", Severity.Warning);
-                    break;
-
-                case ResultStatus.Conflict:
-                    Snackbar.Add("Конфликт при импорте (повтор/состояние).", Severity.Warning);
+                    Snackbar.Add("Немає прав на імпорт.", Severity.Warning);
                     break;
 
                 default:
@@ -155,7 +151,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Неожиданная ошибка: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Несподівана помилка: {ex.Message}", Severity.Error);
         }
         finally
         {
@@ -175,11 +171,8 @@
     private static string FormatSize(long bytes)
     {
         if (bytes < 1024) return $"{bytes} B";
-
         double kb = bytes / 1024d;
-
         if (kb < 1024) return $"{kb:0.#} KB";
-
         double mb = kb / 1024d;
 
         return $"{mb:0.#} MB";
