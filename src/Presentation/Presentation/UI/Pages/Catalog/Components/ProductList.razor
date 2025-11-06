@@ -39,7 +39,9 @@ else
                           </CardHeaderContent>
 
                           <CardHeaderActions>
-                              <MudChip T="string" Variant="Variant.Text" Color="Color.Info">Новинка</MudChip>
+                              <MudChip T="string" Variant="Variant.Text" Color="Color.Info">
+                                  На складі: @((int)item.Stock) шт.
+                              </MudChip>
                           </CardHeaderActions>
                       </MudCardHeader>
 
