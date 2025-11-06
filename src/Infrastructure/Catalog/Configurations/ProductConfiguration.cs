@@ -57,10 +57,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 t.HasCheckConstraint("CK_ProductPrices_Amount_Positive", "\"Amount\" >= 0");
             });
 
-            price.WithOwner()
-                .HasForeignKey("ProductId");
-
+            price.WithOwner().HasForeignKey("ProductId");
             price.HasKey("ProductId", "PriceType");
+
+            price.Property<ProductId>("ProductId")
+                .HasConversion(new ProductId.EfCoreValueConverter())
+                .HasColumnName("ProductId")
+                .IsRequired();
 
             price.Property(p => p.PriceType)
                 .HasConversion(
