@@ -19,7 +19,8 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
     /// <param name="productTypeId">Product type (1 – fittings, 2 – doors)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Result of catalog parsing</returns>
-    public async Task<CatalogParseResult> ParseAsync(Stream xml, int productTypeId, CancellationToken cancellationToken = default)
+    public async Task<CatalogParseResult> ParseAsync(Stream xml, int productTypeId,
+        CancellationToken cancellationToken = default)
     {
         logger.LogInformation("XML parse started");
 
@@ -55,13 +56,13 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
             cancellationToken.ThrowIfCancellationRequested();
 
             var id = TryGetInt(xmlElement.Element("id")?.Value);
-            var name = (TryGetValue(xmlElement, "name")  ?? "").Trim();
+            var name = (TryGetValue(xmlElement, "name") ?? "").Trim();
             var idR = TryGetInt(xmlElement.Element("idR")?.Value);
             var nameR = (TryGetValue(xmlElement, "nameR") ?? "").Trim();
             var count = TryGetInt(xmlElement.Element("count")?.Value);
 
             // Skip invalid elements (some providers return empty id/name values)
-            if (id <= 0 || idR <= 0 || IsNullOrWhite(name) || IsNullOrWhite(nameR) || count < 0)
+            if (id <= 0 || idR <= 0 || IsNullOrWhite(name) || nameR == "KEDR"|| IsNullOrWhite(nameR) || count < 0)
             {
                 logger.LogWarning("Пропуск product: некоректні поля " +
                                   "(id={Id}, idR={IdR}, name='{Name}', nameR='{NameR}', count='{count}')",
@@ -146,7 +147,7 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
     /// </summary>
     static string NormalizeCategoryName(string name)
     {
-        const string deletedString = "Kedr  ";
+        const string deletedString = "Kedr ";
         var resultName = name.Trim();
         if (resultName.StartsWith(deletedString, StringComparison.OrdinalIgnoreCase))
         {
