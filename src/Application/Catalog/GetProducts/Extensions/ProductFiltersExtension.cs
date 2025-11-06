@@ -1,4 +1,7 @@
 ﻿using Domain.Catalog.Entities;
+using Domain.Catalog.Enumerations;
+using Domain.Catalog.ValueObjects;
+
 // ReSharper disable All
 
 namespace Application.Catalog.GetProducts;
@@ -34,20 +37,18 @@ public static class ProductFiltersExtension
             }
         }
 
-        if (filter.CategoryId is not null)
-            specification.Where(p => p.CategoryId == filter.CategoryId.Value);
+        var priceTypeVo = PriceType.FromName(pricingOptions.PriceType, false);
+        var hasMin = pricingOptions.MinPrice.HasValue;
+        var hasMax = pricingOptions.MaxPrice.HasValue;
+        var min = pricingOptions.MinPrice.GetValueOrDefault();
+        var max = pricingOptions.MaxPrice.GetValueOrDefault();
 
-        if (pricingOptions.MinPrice.HasValue)
-            specification.Where(p =>
-                p.Prices.Any(pp =>
-                    pp.PriceType.Name == pricingOptions.PriceType &&
-                    pp.Amount >= pricingOptions.MinPrice.Value));
-
-        if (pricingOptions.MaxPrice.HasValue)
-            specification.Where(p =>
-                p.Prices.Any(pp =>
-                    pp.PriceType.Name == pricingOptions.PriceType &&
-                    pp.Amount <= pricingOptions.MaxPrice.Value));
+        specification.Where(p =>
+            p.Prices.Any(pp =>
+                pp.PriceType == priceTypeVo
+                && pp.Amount > 0
+                && (!hasMin || pp.Amount >= min)
+                && (!hasMax || pp.Amount <= max)));
 
         if (filter.Stock.HasValue)
             specification.Where(p => p.Stock == filter.Stock.Value);
