@@ -27,7 +27,7 @@ public static class CatalogFilterReducer
     [ReducerMethod]
     public static CatalogState OnSetCategory(CatalogState state, CatalogFilterAction.SetCategory action)
     {
-        if (action.CategoryId!.Value == state.ProductsFilter.CategoryId!.Value) return state;
+        if (action.CategoryId == state.ProductsFilter.CategoryId) return state;
 
         var updatedState = state with
         {

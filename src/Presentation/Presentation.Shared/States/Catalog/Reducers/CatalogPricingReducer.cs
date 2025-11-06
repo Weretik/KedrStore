@@ -13,9 +13,9 @@ public static class CatalogPricingReducer
     {
         var min = state.PricingOptions.MinPrice;
         var max = state.PricingOptions.MaxPrice;
-        var hasPriceChanged  = action.MinPrice != min && action.MaxPrice != max;
+        var hasNotChanged  = action.MinPrice == min && action.MaxPrice == max;
 
-        if (!hasPriceChanged) return state;
+        if (hasNotChanged) return state;
 
         var updateState =  state with
         {
@@ -31,7 +31,7 @@ public static class CatalogPricingReducer
     [ReducerMethod]
     public static CatalogState OnSetPrice(CatalogState state, CatalogPricingAction.SetPriceType action)
     {
-        if (action.PriceType != state.PricingOptions.PriceType) return state;
+        if (action.PriceType == state.PricingOptions.PriceType) return state;
 
         var updateState =  state with
         {
