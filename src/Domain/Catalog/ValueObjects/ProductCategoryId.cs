@@ -10,5 +10,3 @@ public readonly partial struct ProductCategoryId
         return Validation.Ok;
     }
 }
-
-
