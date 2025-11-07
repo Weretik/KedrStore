@@ -2,7 +2,7 @@
 
 public sealed class PriceType(string name, int value, string title) : SmartEnum<PriceType>(name, value)
 {
-    public string Title => title;
+    public string Title { get; } = title;
 
     public static readonly PriceType KrDv = new("price_1", 1, "Кр.Дв");
     public static readonly PriceType Purchase = new("price_2", 2,"Закуп");
