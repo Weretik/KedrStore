@@ -1,5 +1,6 @@
 using Domain.Catalog.Entities;
 using Domain.Catalog.ValueObjects;
+using Infrastructure.Catalog.Convertors;
 
 namespace Infrastructure.Catalog.Configurations;
 
@@ -11,7 +12,7 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             builder, "ProductCategories", 100);
 
         builder.Property(c => c.Id)
-            .HasConversion(new ProductCategoryId.EfCoreValueConverter())
+            .HasConversion(IdConverter.ProductCategoryIdConvert)
             .ValueGeneratedNever();
     }
 }

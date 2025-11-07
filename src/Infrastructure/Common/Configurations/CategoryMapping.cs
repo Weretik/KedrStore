@@ -1,4 +1,8 @@
-﻿namespace Infrastructure.Common.Configurations;
+﻿using Domain.Common.ValueObject;
+using Infrastructure.Common.Convertors;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace Infrastructure.Common.Configurations;
 
 public static class CategoryMapping
 {
@@ -21,8 +25,15 @@ public static class CategoryMapping
             .IsRequired();
 
         builder.Property(c => c.Path)
+            .HasConversion(PathConverter.Convert)
             .HasColumnType("ltree")
-            .IsRequired();
+            .IsRequired()
+            .Metadata.SetValueComparer(
+                new ValueComparer<CategoryPath>(
+                    (pathLeft, pathRight) => pathLeft.Value == pathRight.Value,
+                    path => StringComparer.Ordinal.GetHashCode(path.Value),
+                    path => CategoryPath.From(path.Value))
+                );
 
         builder.HasIndex(c => c.Path)
             .HasMethod("gist")
