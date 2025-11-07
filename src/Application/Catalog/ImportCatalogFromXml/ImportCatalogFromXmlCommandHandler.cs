@@ -2,6 +2,7 @@
 using Domain.Catalog.Entities;
 using Domain.Catalog.Enumerations;
 using Domain.Catalog.ValueObjects;
+using Domain.Common.ValueObject;
 
 namespace Application.Catalog.ImportCatalogFromXml;
 
@@ -81,7 +82,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
                 var productCategory = ProductCategory.Create(
                     id,
                     categoryDto.Name,
-                    new LTree(categoryDto.Path)
+                    CategoryPath.From(categoryDto.Path)
                 );
 
                 await categoryRepo.AddAsync(productCategory, cancellationToken);
@@ -90,7 +91,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
             else
             {
                 existing.Rename(categoryDto.Name);
-                existing.Repath(new LTree(categoryDto.Path));
+                existing.Repath(CategoryPath.From(categoryDto.Path));
                 updated++;
             }
         }
