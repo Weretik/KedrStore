@@ -1,8 +1,10 @@
 // System namespaces
+global using System.Xml;
+global using System.Text;
 global using System.Xml.Linq;
 global using System.Globalization;
 global using System.Security.Claims;
-global using System.Xml;
+global using System.Text.RegularExpressions;
 
 // Microsoft namespaces
 global using Microsoft.EntityFrameworkCore;

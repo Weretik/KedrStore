@@ -1,6 +1,6 @@
 // System namespaces
 global using System;
-global using Microsoft.EntityFrameworkCore;
+global using System.Text.RegularExpressions;
 
 // Domain namespaces
 global using Domain.Common.Abstractions;
