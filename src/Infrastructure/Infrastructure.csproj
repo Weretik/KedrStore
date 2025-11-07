@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="8.2.0" />
       <PackageReference Include="Ardalis.Specification" Version="9.2.0" />
       <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
