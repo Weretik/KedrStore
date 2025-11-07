@@ -9,6 +9,8 @@ public sealed class CategoryMissingInImportSpec: Specification<ProductCategory>
     {
         Query.IgnoreQueryFilters()
             .Where(category => !importCategoryIds.Contains(category.Id))
-            .OrderByDescending(c => c.Path.NLevel);
+            .OrderByDescending(category => category.Path.Value.Length
+                                           - category.Path.Value.Replace(".", "").Length
+                                           + 1);
     }
 }
