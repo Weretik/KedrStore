@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
-using Application.Catalog.ImportCatalogFromXml;
+﻿using Application.Catalog.ImportCatalogFromXml;
 using Application.Catalog.Shared;
 
 namespace Infrastructure.Catalog.Import;
