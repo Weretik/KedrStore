@@ -1,4 +1,5 @@
 ﻿using Domain.Catalog.ValueObjects;
+using Domain.Common.ValueObject;
 
 namespace Domain.Catalog.Entities;
 
@@ -6,7 +7,7 @@ public class ProductCategory : BaseCategory<ProductCategoryId, ProductCategory>,
 {
     #region Constructors
     private ProductCategory() { }
-    private ProductCategory(ProductCategoryId id, string name, LTree path)
+    private ProductCategory(ProductCategoryId id, string name, CategoryPath path)
     {
         SetCategoryId(id);
         SetName(name);
@@ -15,12 +16,12 @@ public class ProductCategory : BaseCategory<ProductCategoryId, ProductCategory>,
     #endregion
 
     #region Factories
-    public static ProductCategory Create(ProductCategoryId id, string name, LTree path)
+    public static ProductCategory Create(ProductCategoryId id, string name, CategoryPath path)
         => new(id, name, path);
     public static ProductCategory CreateRoot(ProductCategoryId id, string name)
-        => new(id, name, new LTree($"n{id}"));
+        => new(id, name, CategoryPath.Root(id.ToString()));
     public static ProductCategory CreateChild(ProductCategoryId id, string name, ProductCategory parent)
-        => new(id, name, $"{parent.Path}.n{id}");
+        => new(id, name, parent.Path.Append(id.ToString()));
     #endregion
 
 }
