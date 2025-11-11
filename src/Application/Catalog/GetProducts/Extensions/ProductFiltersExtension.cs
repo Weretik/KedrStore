@@ -37,6 +37,12 @@ public static class ProductFiltersExtension
             }
         }
 
+        if (filter.CategoryId.HasValue)
+        {
+            var filterCategoryId = ProductCategoryId.From(filter.CategoryId.Value);
+            specification.Where(p => p.CategoryId == filterCategoryId);
+        }
+
         var priceTypeVo = PriceType.FromName(pricingOptions.PriceType, false);
         var hasMin = pricingOptions.MinPrice.HasValue;
         var hasMax = pricingOptions.MaxPrice.HasValue;
