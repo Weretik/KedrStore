@@ -3,9 +3,8 @@
 [ValueObject<string>(conversions: Conversions.None)]
 public readonly partial struct CategoryPath
 {
-    public static readonly CategoryPath None = From("n0");
-
     private static readonly Regex _ltreeRegex = MyRegex();
+    public static CategoryPath None => From("n0");
 
     private static Validation Validate(string value)
     {
