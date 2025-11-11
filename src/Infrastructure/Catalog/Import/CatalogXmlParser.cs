@@ -59,8 +59,14 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
             var nameR = (TryGetValue(xmlElement, "nameR") ?? "").Trim();
             var count = TryGetInt(xmlElement.Element("count")?.Value);
 
+            var skipWords = new[] { "KEDR", "Стенди", "Замiна KEDR, CLASS" };
             // Skip invalid elements (some providers return empty id/name values)
-            if (id <= 0 || idR <= 0 || IsNullOrWhite(name) || nameR == "KEDR"|| IsNullOrWhite(nameR) || count < 0)
+            if (id <= 0
+                || idR <= 0
+                || IsNullOrWhite(name)
+                || IsNullOrWhite(nameR)
+                || skipWords.Any(words => nameR.Equals(words, StringComparison.OrdinalIgnoreCase))
+                || count < 0)
             {
                 logger.LogWarning("Пропуск product: некоректні поля " +
                                   "(id={Id}, idR={IdR}, name='{Name}', nameR='{NameR}', count='{count}')",
@@ -120,7 +126,9 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
                 new ImportCategoryDto(104, "Завіси", "n104"),
                 new ImportCategoryDto(105, "Замки", "n105"),
                 new ImportCategoryDto(106, "Ручки", "n106"),
-                new ImportCategoryDto(107, "Циліндри", "n107")
+                new ImportCategoryDto(107, "Циліндри", "n107"),
+                new ImportCategoryDto(108, "Міжкімнатні механізми", "n108")
+
             ],
             _ => throw new ArgumentOutOfRangeException(nameof(productTypeId), productTypeId, null)
         };
@@ -183,18 +191,15 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         1 => new()
         {
             [19424] = 101, [8349] = 101, [8344] = 101, [26971] = 101,
-
             [7259] = 102, [7258] = 102, [27083] = 102, [19425] = 102, [8209] = 102,
         },
         2 => new()
         {
             [4457] = 104, [6139] = 104, [1707] = 104,
-
             [5851] = 105, [1304] = 105, [2722] = 105, [2775] = 105, [2716] = 105,
-
             [5999] = 106, [5853] = 106, [26949] = 106, [6982] = 106, [5854] = 106, [5904] = 106, [5915] = 106, [6488] = 106,
-
             [6560] = 107, [2680] = 107, [26930] = 107, [26929] = 107, [5852] = 107, [4555] = 107, [27124] = 107,
+            [5513] = 108, [5273] = 108, [2197] = 108, [6108] = 108, [6878] = 108
         },
         _ => new()
     };
