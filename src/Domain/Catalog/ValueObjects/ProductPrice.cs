@@ -47,7 +47,7 @@ public sealed record ProductPrice
     #region Validation &  static Getters
     private static PriceType GetPriceTypeFromId(int priceTypeValue)
     {
-        Guard.Against.OutOfRange(priceTypeValue, nameof(priceTypeValue), 1, 12);
+        Guard.Against.OutOfRange(priceTypeValue, nameof(priceTypeValue), 1, 14);
 
         return PriceType.FromValue(priceTypeValue);
     }
