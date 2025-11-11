@@ -10,9 +10,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     ICatalogXmlParser parser,
     TimeProvider time,
     ILogger<ImportCatalogFromXmlCommandHandler> logger,
-    ICatalogReadRepository<ProductCategory> categoryRead,
     ICatalogRepository<ProductCategory> categoryRepo,
-    ICatalogReadRepository<Product> productRead,
     ICatalogRepository<Product> productRepo)
     : ICommandHandler<ImportCatalogFromXmlCommand, Result<ImportCatalogSummary>>
 {
@@ -75,7 +73,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
         foreach (var categoryDto in parsed.Categories.DistinctBy(categoryDto => categoryDto.Id))
         {
             var id = ProductCategoryId.From(categoryDto.Id);
-            var existing = await categoryRead.GetByIdAsync(id, cancellationToken);
+            var existing = await categoryRepo.GetByIdAsync(id, cancellationToken);
 
             if (existing is null)
             {
@@ -111,7 +109,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
             var categoryId = ProductCategoryId.From(productDto.CategoryId);
             var productType = ProductType.FromValue(productDto.ProductTypeId);
 
-            var existing = await productRead.GetByIdAsync(id, cancellationToken);
+            var existing = await productRepo.GetByIdAsync(id, cancellationToken);
 
             if (existing is null)
             {
