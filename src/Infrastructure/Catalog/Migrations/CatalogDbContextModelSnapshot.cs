@@ -103,7 +103,8 @@ namespace Infrastructure.Catalog.Migrations
                     b.OwnsMany("Domain.Catalog.ValueObjects.ProductPrice", "Prices", b1 =>
                         {
                             b1.Property<int>("ProductId")
-                                .HasColumnType("integer");
+                                .HasColumnType("integer")
+                                .HasColumnName("ProductId");
 
                             b1.Property<string>("PriceType")
                                 .HasMaxLength(50)
