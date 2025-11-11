@@ -152,11 +152,14 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     {
         if ( prices.Count == 0) return;
 
+        var productPriceList = new List<ProductPrice>();
+
         foreach (var dto in prices)
         {
             var priceType = PriceType.FromName(dto.PriceType, ignoreCase: true);
             var money = new Money(dto.Amount, dto.CurrencyIso);
-            product.UpsertPrice(priceType, money);
+            productPriceList.Add(ProductPrice.Create(priceType, money));
         }
+        product.ReplaceAllPrices(productPriceList);
     }
 }
