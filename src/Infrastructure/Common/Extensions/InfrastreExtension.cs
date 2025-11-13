@@ -5,7 +5,7 @@ using Application.Identity.Shared;
 using Infrastructure.Catalog;
 using Infrastructure.Catalog.Import;
 using Infrastructure.Catalog.Notifications;
-using Infrastructure.Catalog.Persistence;
+using Infrastructure.Catalog.Repositories;
 using Infrastructure.Common.Contracts;
 using Infrastructure.Common.Migrator;
 using Infrastructure.Identity;
@@ -15,7 +15,7 @@ using Infrastructure.Identity.Persistence;
 using Infrastructure.Identity.Security;
 using Infrastructure.Identity.Seeders;
 
-namespace Infrastructure.Extensions;
+namespace Infrastructure.Common.Extensions;
 
 public static class InfrastreExtension
 {

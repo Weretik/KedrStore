@@ -1,6 +1,6 @@
 ﻿using Application.Catalog.Shared;
 
-namespace Infrastructure.Catalog.Persistence;
+namespace Infrastructure.Catalog.Repositories;
 
 internal sealed class CatalogReadEfRepository<T>(IDbContextFactory<CatalogDbContext> factory)
     : ICatalogReadRepository<T>

@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Common.Contracts;
 
-namespace Infrastructure.Extensions;
+namespace Infrastructure.Common.Extensions;
 
 public static class MigrationExtensions
 {

@@ -1,4 +1,4 @@
-﻿namespace Application.Extensions
+﻿namespace Application.Common.Extensions
 {
     public static class ApplicationExtension
     {

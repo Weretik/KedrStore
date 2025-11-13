@@ -1,3 +1,6 @@
+using Application.Common.Extensions;
+using Infrastructure.Common.Extensions;
+
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 {

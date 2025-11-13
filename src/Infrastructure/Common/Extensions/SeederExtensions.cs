@@ -1,8 +1,7 @@
-using Infrastructure.Catalog.Interfaces;
 using Infrastructure.Common.Contracts;
 using Infrastructure.Identity.Contracts;
 
-namespace Infrastructure.Extensions;
+namespace Infrastructure.Common.Extensions;
 
 public static class SeederExtensions
 {
@@ -28,19 +27,6 @@ public static class SeederExtensions
         using var scope = app.ApplicationServices.CreateScope();
         var services = scope.ServiceProvider;
         var seeders = services.GetServices<IIdentitySeeder>();
-        foreach (var seeder in seeders.DistinctBy(s => s.GetType()))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            await seeder.SeedAsync(services, cancellationToken);
-        }
-    }
-
-    public static async Task UseCatalogSeeders(this IApplicationBuilder app, CancellationToken cancellationToken = default)
-    {
-        using var scope = app.ApplicationServices.CreateScope();
-        var services = scope.ServiceProvider;
-        var seeders = services.GetServices<ICatalogSeeder>();
         foreach (var seeder in seeders.DistinctBy(s => s.GetType()))
         {
             cancellationToken.ThrowIfCancellationRequested();
