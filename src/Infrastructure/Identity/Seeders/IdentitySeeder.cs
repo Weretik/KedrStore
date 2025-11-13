@@ -1,7 +1,7 @@
 ﻿using Domain.Identity.Constants;
 using Infrastructure.Identity.Configuration;
+using Infrastructure.Identity.Contracts;
 using Infrastructure.Identity.Entities;
-using Infrastructure.Identity.Interfaces;
 using Infrastructure.Identity.Utils;
 
 namespace Infrastructure.Identity.Seeders;

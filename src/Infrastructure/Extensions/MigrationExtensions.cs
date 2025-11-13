@@ -22,7 +22,7 @@ public static class MigrationExtensions
             logger.LogInformation("➡️ Migrating {MigratorName}...", name);
 
             cancellationToken.ThrowIfCancellationRequested();
-            await migrator.MigrateAsync(services, cancellationToken);
+            await migrator.MigrateAsync(cancellationToken);
 
             logger.LogInformation("✅ {MigratorName} migration completed", name);
         }

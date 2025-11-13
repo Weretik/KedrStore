@@ -1,6 +1,6 @@
 using Domain.Identity.Constants;
+using Infrastructure.Identity.Contracts;
 using Infrastructure.Identity.Entities;
-using Infrastructure.Identity.Interfaces;
 
 namespace Infrastructure.Identity.Seeders;
 

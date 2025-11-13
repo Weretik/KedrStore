@@ -4,16 +4,13 @@ using Application.Catalog.Shared;
 using Application.Identity.Shared;
 using Infrastructure.Catalog;
 using Infrastructure.Catalog.Import;
-using Infrastructure.Catalog.Interfaces;
-using Infrastructure.Catalog.Migrations;
 using Infrastructure.Catalog.Notifications;
 using Infrastructure.Catalog.Persistence;
 using Infrastructure.Common.Contracts;
+using Infrastructure.Common.Migrator;
 using Infrastructure.Identity;
 using Infrastructure.Identity.Contracts;
 using Infrastructure.Identity.Entities;
-using Infrastructure.Identity.Interfaces;
-using Infrastructure.Identity.Migrations;
 using Infrastructure.Identity.Persistence;
 using Infrastructure.Identity.Security;
 using Infrastructure.Identity.Seeders;
@@ -59,13 +56,9 @@ public static class InfrastreExtension
         services.AddScoped(typeof(IAppIdentityRepository<>), typeof(AppIdentityEfRepository<>));
         services.AddScoped(typeof(IAppIdentityReadRepository<>), typeof(AppIdentityEfRepository<>));
 
-        // Регистрация миграторов каталога и идентификации
-        services.AddScoped<IDatabaseMigrator, CatalogDbMigrator>();
-        services.AddScoped<ICatalogDbMigrator, CatalogDbMigrator>();
-
-        // Регистрация миграторов идентификации
-        services.AddScoped<IDatabaseMigrator, AppIdentityDbMigrator>();
-        services.AddScoped<IAppIdentityDbMigrator, AppIdentityDbMigrator>();
+        // Migrations
+        services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();
+        services.AddScoped<IDatabaseMigrator, DbMigrator<AppIdentityDbContext>>();
 
         // Регистрация сидеров Identity
         services.AddScoped<ISeeder, RoleSeeder>();
@@ -79,7 +72,6 @@ public static class InfrastreExtension
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 
         // Регистрация Services
-        services.AddSingleton<IEnvironmentService, EnvironmentService>();
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
 

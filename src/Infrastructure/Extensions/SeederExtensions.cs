@@ -1,6 +1,6 @@
 using Infrastructure.Catalog.Interfaces;
 using Infrastructure.Common.Contracts;
-using Infrastructure.Identity.Interfaces;
+using Infrastructure.Identity.Contracts;
 
 namespace Infrastructure.Extensions;
 

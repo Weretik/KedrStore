@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Common.Contracts;
 
-namespace Infrastructure.Identity.Interfaces;
+namespace Infrastructure.Identity.Contracts;
 
 public interface IIdentitySeeder : ISeeder
 {
