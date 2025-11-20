@@ -1,7 +1,5 @@
 using Domain.Catalog.Entities;
-using Domain.Catalog.Enumerations;
 using Domain.Catalog.ValueObjects;
-using Infrastructure.Catalog.Convertors;
 
 namespace Infrastructure.Catalog.Configurations;
 
@@ -14,7 +12,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Id)
-            .HasConversion(IdConverter.ProductIdConvert)
+            .HasConversion(CatalogConverter.ProductIdConvert)
             .ValueGeneratedNever();
 
         builder.Property(p => p.Name)
@@ -22,13 +20,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
 
         builder.Property(p => p.CategoryId)
-            .HasConversion(IdConverter.ProductCategoryIdConvert);
+            .HasConversion(CatalogConverter.ProductCategoryIdConvert);
 
         builder.Property(p => p.ProductType)
-            .HasConversion(EnumConverter.ProductTypeConvert)
+            .HasConversion(CatalogConverter.ProductTypeConvert)
             .HasMaxLength(50)
             .IsUnicode(false)
-            .HasColumnName("ProductType")
+            .HasColumnName("ProductTypeId")
             .IsRequired();
 
         builder.Property(p => p.Photo)
@@ -59,12 +57,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             price.HasKey("ProductId", "PriceType");
 
             price.Property<ProductId>("ProductId")
-                .HasConversion(IdConverter.ProductIdConvert)
+                .HasConversion(CatalogConverter.ProductIdConvert)
                 .HasColumnName("ProductId")
                 .IsRequired();
 
             price.Property(p => p.PriceType)
-                .HasConversion(EnumConverter.PriceTypeConvert)
+                .HasConversion(CatalogConverter.PriceTypeConvert)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("PriceType")
