@@ -2,4 +2,4 @@
 
 namespace Application.Catalog.ImportCatalogFromXml;
 
-public sealed record ImportCatalogFromXml(UploadedFile File, int ProductType);
+public sealed record ImportCatalogFromXml(UploadedFile File, int ProductTypeId);
