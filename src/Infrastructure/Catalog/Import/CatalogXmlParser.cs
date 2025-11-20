@@ -1,5 +1,6 @@
 ﻿using Application.Catalog.ImportCatalogFromXml;
 using Application.Catalog.Shared;
+using Infrastructure.Common.Contracts;
 
 namespace Infrastructure.Catalog.Import;
 
@@ -8,7 +9,7 @@ namespace Infrastructure.Catalog.Import;
 /// Responsible for reading input XML, fixing problematic encodings,
 /// building categories and product lists.
 /// </summary>
-public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlParser
+public class CatalogXmlParser(ILogger<CatalogXmlParser> logger, IImageResolver imageResolver) : ICatalogXmlParser
 {
     /// <summary>
     /// Asynchronously parses an XML catalog and returns categories and products.
@@ -17,8 +18,7 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
     /// <param name="productTypeId">Product type (1 – fittings, 2 – doors)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Result of catalog parsing</returns>
-    public async Task<CatalogParseResult> ParseAsync(Stream xml, int productTypeId,
-        CancellationToken cancellationToken = default)
+    public async Task<CatalogParseResult> ParseAsync(Stream xml, int productTypeId, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("XML parse started");
 
@@ -91,14 +91,14 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
             var prices = ReadPrices(pricesNode);
 
             // Photos are generated according to a fixed template on GitHub
-            var photoLinks = $"https://raw.githubusercontent.com/Kedr-Class/images/refs/heads/main/furniture/{id}.jpg";
+            var photoLink = await imageResolver.ResolveAsync(id, cancellationToken);
 
             products.Add(new ProductDto(
                 Id: id,
                 Name: name,
                 CategoryId: idR,
                 ProductTypeId: productTypeId,
-                Photo: photoLinks,
+                Photo: photoLink,
                 Stock: count,
                 Prices: prices
             ));
