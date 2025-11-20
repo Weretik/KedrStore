@@ -47,12 +47,12 @@ namespace Infrastructure.Catalog.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<string>("ProductType")
+                    b.Property<string>("ProductTypeId")
                         .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("ProductType");
+                        .HasColumnName("ProductTypeId");
 
                     b.Property<decimal>("Stock")
                         .HasPrecision(10, 2)
@@ -63,7 +63,7 @@ namespace Infrastructure.Catalog.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId", "ProductType");
+                    b.HasIndex("CategoryId", "ProductTypeId");
 
                     b.ToTable("Products", (string)null);
                 });
