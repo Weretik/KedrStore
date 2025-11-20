@@ -71,9 +71,10 @@ public static class InfrastreExtension
         services.AddScoped<IPermissionService, FakePermissionService>();
         services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
 
-        // Регистрация Services
+        //Services
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
+        services.AddHttpClient<IImageResolver, ImageResolver>();
 
         services.AddScoped<ICatalogXmlParser, CatalogXmlParser>();
 
