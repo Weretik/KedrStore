@@ -82,7 +82,7 @@ namespace Infrastructure.Catalog.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId_ProductType",
                 table: "Products",
-                columns: new[] { "CategoryId", "ProductType" });
+                columns: new[] { "CategoryId", "ProductTypeId" });
         }
 
         /// <inheritdoc />
