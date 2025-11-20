@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Catalog.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20251105174653_Init Catalog Db")]
+    [Migration("20251120152457_Init Catalog Db")]
     partial class InitCatalogDb
     {
         /// <inheritdoc />
@@ -55,7 +55,7 @@ namespace Infrastructure.Catalog.Migrations
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("ProductType");
+                        .HasColumnName("ProductTypeId");
 
                     b.Property<decimal>("Stock")
                         .HasPrecision(10, 2)
@@ -85,6 +85,13 @@ namespace Infrastructure.Catalog.Migrations
                         .IsRequired()
                         .HasColumnType("ltree");
 
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("ProductTypeId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Path")
@@ -106,7 +113,8 @@ namespace Infrastructure.Catalog.Migrations
                     b.OwnsMany("Domain.Catalog.ValueObjects.ProductPrice", "Prices", b1 =>
                         {
                             b1.Property<int>("ProductId")
-                                .HasColumnType("integer");
+                                .HasColumnType("integer")
+                                .HasColumnName("ProductId");
 
                             b1.Property<string>("PriceType")
                                 .HasMaxLength(50)

@@ -19,6 +19,7 @@ namespace Infrastructure.Catalog.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false),
+                    ProductTypeId = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Path = table.Column<string>(type: "ltree", nullable: false)
                 },
@@ -34,7 +35,7 @@ namespace Infrastructure.Catalog.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     CategoryId = table.Column<int>(type: "integer", nullable: false),
-                    ProductType = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: false),
+                    ProductTypeId = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: false),
                     Photo = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     Stock = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -80,7 +81,7 @@ namespace Infrastructure.Catalog.Migrations
                 .Annotation("Npgsql:IndexMethod", "gist");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_CategoryId_ProductType",
+                name: "IX_Products_CategoryId_ProductTypeId",
                 table: "Products",
                 columns: new[] { "CategoryId", "ProductTypeId" });
         }

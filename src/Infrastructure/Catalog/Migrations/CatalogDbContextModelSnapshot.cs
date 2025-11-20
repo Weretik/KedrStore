@@ -47,7 +47,7 @@ namespace Infrastructure.Catalog.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<string>("ProductTypeId")
+                    b.Property<string>("ProductType")
                         .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
@@ -63,7 +63,7 @@ namespace Infrastructure.Catalog.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId", "ProductTypeId");
+                    b.HasIndex("CategoryId", "ProductType");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -81,6 +81,13 @@ namespace Infrastructure.Catalog.Migrations
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("ltree");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("ProductTypeId");
 
                     b.HasKey("Id");
 

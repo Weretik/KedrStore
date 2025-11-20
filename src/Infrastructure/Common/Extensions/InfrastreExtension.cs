@@ -74,7 +74,6 @@ public static class InfrastreExtension
         //Services
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
-        services.AddHttpClient<IImageResolver, ImageResolver>();
 
         services.AddScoped<ICatalogXmlParser, CatalogXmlParser>();
 

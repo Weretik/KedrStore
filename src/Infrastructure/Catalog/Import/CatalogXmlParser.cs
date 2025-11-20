@@ -9,7 +9,7 @@ namespace Infrastructure.Catalog.Import;
 /// Responsible for reading input XML, fixing problematic encodings,
 /// building categories and product lists.
 /// </summary>
-public class CatalogXmlParser(ILogger<CatalogXmlParser> logger, IImageResolver imageResolver) : ICatalogXmlParser
+public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlParser
 {
     /// <summary>
     /// Asynchronously parses an XML catalog and returns categories and products.
@@ -91,7 +91,7 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger, IImageResolver i
             var prices = ReadPrices(pricesNode);
 
             // Photos are generated according to a fixed template on GitHub
-            var photoLink = await imageResolver.ResolveAsync(id, cancellationToken);
+            var photoLink = $"https://raw.githubusercontent.com/Kedr-Class/images/refs/heads/main/furniture/{id}.jpg";
 
             products.Add(new ProductDto(
                 Id: id,
