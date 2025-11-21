@@ -1,5 +1,6 @@
 using Application.Common.Extensions;
 using Infrastructure.Common.Extensions;
+using Presentation.Shared.States.Category;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
@@ -35,6 +36,7 @@ builder.Services
 builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
 builder.Services.AddScoped<IBurgerMenuStore, BurgerMenuStore>();
 builder.Services.AddScoped<ICatalogStore, CatalogStore>();
+builder.Services.AddScoped<ICategoryStore, CategoryStore>();
 
 // Services
 builder.Services.AddHealthChecks();
