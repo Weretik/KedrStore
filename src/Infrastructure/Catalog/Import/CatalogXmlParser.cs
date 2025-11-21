@@ -26,8 +26,14 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         using (var streamReader = new StreamReader(xml, Encoding.UTF8, leaveOpen: true))
         {
             var text = await streamReader.ReadToEndAsync(cancellationToken);
-            text = Regex.Replace(text, @"encoding\s*=\s*[""']utf8[""']", "encoding=\"utf-8\"", RegexOptions.IgnoreCase);
-            xml = new MemoryStream(Encoding.UTF8.GetBytes(text));
+
+            text = Regex.Replace(text,
+                @"encoding\s*=\s*[""']utf8[""']", "encoding=\"utf-8\"",
+                RegexOptions.IgnoreCase);
+
+            var cleaned = CleanBrokenTags(text);
+
+            xml = new MemoryStream(Encoding.UTF8.GetBytes(cleaned));
         }
 
         // Safe XML reading settings — no DTD, no resolver, no comments
@@ -41,6 +47,7 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
             CloseInput = false
         };
 
+        xml.Position = 0;
         var categories = GetBaseCategories(productTypeId);
         var products = new List<ProductDto>();
 
@@ -222,5 +229,23 @@ public class CatalogXmlParser(ILogger<CatalogXmlParser> logger) : ICatalogXmlPar
         for (int i = 0; i < list.Count; i++)
             if (list[i].Id == id) return list[i].Path;
         return "";
+    }
+
+    private static string CleanBrokenTags(string xml)
+    {
+        return Regex.Replace(
+            xml,
+            @"<([А-Яа-яA-Za-z0-9\s]+?)>",
+            m =>
+            {
+                var content = m.Groups[1].Value;
+
+                if (!Regex.IsMatch(content, @"^[A-Za-z0-9\-_]+$"))
+                    return $"&lt;{content}&gt;";
+
+                return m.Value;
+            },
+            RegexOptions.Compiled
+        );
     }
 }
