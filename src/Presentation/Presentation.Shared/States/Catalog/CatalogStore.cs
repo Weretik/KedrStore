@@ -15,6 +15,9 @@ public sealed class CatalogStore(IDispatcher dispatcher) : ICatalogStore
     public void SetStock(decimal? value)
         => dispatcher.Dispatch(new CatalogFilterAction.SetStock(value));
 
+    public void SetProductTypeId(int? id)
+        => dispatcher.Dispatch(new CatalogFilterAction.SetProductTypeId(id));
+
     // Sorting
     public void SetSortKey(ProductSortKey key)
         => dispatcher.Dispatch(new CatalogSortingAction.SetSortKey(key));
