@@ -9,6 +9,7 @@ public interface ICatalogStore
     void SetSearchTerm(string? value);
     void SetCategory(int? id);
     void SetStock(decimal? value);
+    void SetProductTypeId(int? productTypeId);
 
     // Sorting
     void SetSortKey(ProductSortKey key);
