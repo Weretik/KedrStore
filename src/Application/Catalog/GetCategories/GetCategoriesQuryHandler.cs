@@ -1,4 +1,5 @@
-﻿using Application.Catalog.Shared;
+﻿using System.Data;
+using Application.Catalog.Shared;
 using Domain.Catalog.Entities;
 
 namespace Application.Catalog.GetCategories;
@@ -8,7 +9,9 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
 {
     public async ValueTask<Result<IReadOnlyList<CategoryTreeDto>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
     {
-        var categories = await categoryRepository.ListAsync(new AllCategoriesSpec(), cancellationToken);
+        ArgumentNullException.ThrowIfNull(query);
+
+        var categories = await categoryRepository.ListAsync(new AllCategoriesSpec(query.Filter.ProductTypeId), cancellationToken);
         if (categories.Count == 0) return Result.NotFound();
 
         IReadOnlyList<CategoryTreeDto> tree = BuildTree(categories);
@@ -26,14 +29,7 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
                 Path = c.Path.ToString()
             })
             .ToList();
-/*
-        var lookup = productCategories.ToLookup(
-            category =>
-                category.TryGetParentPath(out var parentPath)
-                ? parentPath.ToString()
-                : null
-        );
-*/
+
         static string? ParentKey(string path)
         {
             var i = path.LastIndexOf('.');

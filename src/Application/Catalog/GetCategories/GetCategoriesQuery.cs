@@ -2,4 +2,4 @@
 
 namespace Application.Catalog.GetCategories;
 
-public sealed record GetCategoriesQuery  : IQuery<Result<IReadOnlyList<CategoryTreeDto>>> { }
+public sealed record GetCategoriesQuery(CategoryFilter Filter)  : IQuery<Result<IReadOnlyList<CategoryTreeDto>>> { }
