@@ -52,4 +52,17 @@ public static class CatalogFilterReducer
 
         return updatedState.ResetPage();
     }
+
+    [ReducerMethod]
+    public static CatalogState OnSetProductTypeId(CatalogState state, CatalogFilterAction.SetProductTypeId action)
+    {
+        if (action.ProductTypeId == state.ProductsFilter.ProductTypeId) return state;
+
+        var updatedState = state with
+        {
+            ProductsFilter = state.ProductsFilter with { ProductTypeId = action.ProductTypeId }
+        };
+
+        return updatedState.ResetPage();
+    }
 }

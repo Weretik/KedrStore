@@ -41,4 +41,11 @@ public sealed class CatalogFilterEffect(IState<CatalogState> state, ICatalogStor
         store.Load();
         return Task.CompletedTask;
     }
+
+    [EffectMethod]
+    public Task OnSetProductTypeId(CatalogFilterAction.SetProductTypeId action, IDispatcher dispatcher)
+    {
+        store.Load();
+        return Task.CompletedTask;
+    }
 }
