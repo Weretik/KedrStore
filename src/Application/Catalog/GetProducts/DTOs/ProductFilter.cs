@@ -1,8 +1,7 @@
-﻿using Domain.Catalog.ValueObjects;
-
-namespace Application.Catalog.GetProducts;
+﻿namespace Application.Catalog.GetProducts;
 
 public sealed record ProductFilter(
     string? SearchTerm = null,
     int? CategoryId = null,
-    decimal? Stock = null);
+    decimal? Stock = null,
+    int? ProductTypeId = null);

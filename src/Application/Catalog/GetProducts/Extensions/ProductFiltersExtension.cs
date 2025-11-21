@@ -2,8 +2,6 @@
 using Domain.Catalog.Enumerations;
 using Domain.Catalog.ValueObjects;
 
-// ReSharper disable All
-
 namespace Application.Catalog.GetProducts;
 
 public static class ProductFiltersExtension
@@ -43,6 +41,13 @@ public static class ProductFiltersExtension
             specification.Where(p => p.CategoryId == filterCategoryId);
         }
 
+        if (filter.ProductTypeId.HasValue)
+        {
+            var filterProductTypeId = ProductType.FromValue(filter.ProductTypeId.Value);
+            specification.Where(p => p.ProductType == filterProductTypeId);
+        }
+
+        //Price filter
         var priceTypeVo = PriceType.FromName(pricingOptions.PriceType, false);
         var hasMin = pricingOptions.MinPrice.HasValue;
         var hasMax = pricingOptions.MaxPrice.HasValue;
