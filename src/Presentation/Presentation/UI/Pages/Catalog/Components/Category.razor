@@ -1,20 +1,34 @@
 ﻿@using Application.Catalog.GetCategories
+@using Presentation.Shared.States.Category
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ISnackbar Snackbar
 @inject ICatalogStore CatalogStore
+@inject ICategoryStore CategoryStore
+@inject IState<CategoryState> CategoryState
 
 <MudPaper Class="pa-4 mb-4">
+    <MudTabs Elevation="2"
+             Color="@Color.Dark"
+             ActivePanelIndexChanged="@OnTabChanged"
+             ActiveTabClass="border-solid border-2 mud-border-dark"
+             Outlined="true">
+
+        <MudTabPanel Text="Фурнітура" Icon="@Icons.Material.Filled.VpnKey"/>
+        <MudTabPanel Text="Двері" Icon="@Icons.Material.Filled.MeetingRoom"/>
+
+    </MudTabs>
     <MudText Typo="Typo.h4" class="mt-5 mb-3 ml-5">
         Категорії
     </MudText>
 
-    @if (_isLoading)
+    @if (State.IsLoading())
     {
-        <MudProgressLinear Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+        <MudProgressLinear Color="Color.Primary" Size="Size.Medium" Indeterminate="true"/>
     }
     else
     {
         <MudTreeView T="CategoryTreeDto"
-                     Items="@_items"
+                     Items="@State.GetCategories()"
                      SelectedValue="@_selected"
                      SelectedValueChanged="OnSelectedChanged"
                      Hover="true"
@@ -23,7 +37,7 @@
             <ItemTemplate>
                 <MudTreeViewItem Value="@context.Value"
                                  Text="@context.Text"
-                                 Items="@context.Children" />
+                                 Items="@context.Children"/>
             </ItemTemplate>
         </MudTreeView>
     }
@@ -31,23 +45,16 @@
 </MudPaper>
 
 @code {
-    private IReadOnlyCollection<TreeItemData<CategoryTreeDto>> _items = [];
+    //private IReadOnlyCollection<TreeItemData<CategoryTreeDto>> _items = [];
     private CategoryTreeDto? _selected;
-    private bool _isLoading = true;
+    CategoryState State => CategoryState.Value;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        try
-        {
-            var result = await Mediator.Send(new GetCategoriesQuery());
-            if (!result.IsSuccess || result.Value is null) return;
-
-            _items = result.Value.ToTreeItems();
-        }
-        finally
-        {
-            _isLoading = false;
-        }
+        base.OnInitialized();
+        CatalogStore.SetProductTypeId(2);
+        CategoryStore.SetProductTypeId(2);
+        CatalogStore.Load();
     }
 
     private void OnSelectedChanged(CategoryTreeDto? node)
@@ -61,10 +68,33 @@
                 configure => configure.SnackbarVariant = Variant.Outlined);
             return;
         }
-
         _selected = node;
         CatalogStore.SetCategory(node?.Id);
-
     }
 
+    private async void OnTabChanged(int newIndex)
+    {
+        try
+        {
+            await Task.Yield();
+
+            if (newIndex == 0) //Фурнітура
+            {
+                CatalogStore.SetProductTypeId(2);
+                CategoryStore.SetProductTypeId(2);
+            }
+
+            if (newIndex == 1) //Двері
+            {
+                CatalogStore.SetProductTypeId(1);
+                CategoryStore.SetProductTypeId(1);
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomLeft;
+            Snackbar.Add($"{e}", Severity.Info,
+                configure => configure.SnackbarVariant = Variant.Outlined);
+        }
+    }
 }
