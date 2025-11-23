@@ -55,6 +55,8 @@ public static class ProductFiltersExtension
         var max = pricingOptions.MaxPrice.GetValueOrDefault();
 
         specification.Where(p =>
+            p.Stock > 0
+            &&
             p.Prices.Any(pp =>
                 pp.PriceType == priceTypeVo
                 && pp.Amount > 0
