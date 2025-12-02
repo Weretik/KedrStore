@@ -1,4 +1,7 @@
-﻿namespace Presentation.Shared.States.Catalog;
+﻿using Application.Catalog.GetProducts;
+using Presentation.Shared.Extensions;
+
+namespace Presentation.Shared.States.Catalog;
 
 public static class CatalogLoadReducer
 {
@@ -7,7 +10,16 @@ public static class CatalogLoadReducer
         => state with { IsLoading = true, Error = null };
 
     [ReducerMethod(typeof(CatalogLoadAction.Reset))]
-    public static CatalogState OnReset(CatalogState state) => new();
+    public static CatalogState OnReset(CatalogState state)
+    {
+        var updateState = state with
+        {
+            ProductsFilter = new ProductFilter(),
+            ProductsSorter = new ProductSorter(),
+            PricingOptions = new PricingOptions()
+        };
+        return updateState.ResetPage();
+    }
 
     [ReducerMethod]
     public static CatalogState OnLoadSuccess(CatalogState state, CatalogLoadAction.LoadSuccess action)
