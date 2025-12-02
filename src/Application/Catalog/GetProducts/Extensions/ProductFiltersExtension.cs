@@ -21,7 +21,7 @@ public static class ProductFiltersExtension
 
             if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
             {
-                specification.Where(p => p.Id == id);
+                specification.Where(p => p.Id == ProductId.From(id));
             }
             else
             {
