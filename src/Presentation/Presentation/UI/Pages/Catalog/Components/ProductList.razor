@@ -3,7 +3,7 @@
 @inject IState<CatalogState> CatalogState
 @inject ICatalogStore CatalogStore
 @inject IDialogService DialogService
-
+@inject IJSRuntime Js
 
 @if (State.IsLoading())
 {
@@ -83,7 +83,8 @@ else
                      ShowLastButton="true"
                      Class="mt-10 mb-20"
                      Count="@State.GetTotalPages()"
-                     @bind-Selected="CurrentPage" />
+                     Selected="@CurrentPage"
+                     SelectedChanged="OnPageChanged"/>
 }
 
 
@@ -120,5 +121,13 @@ else
         };
 
         return DialogService.ShowAsync<СontactDialog>("Simple Dialog", parameters, options);
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        CatalogStore.SetPageNumber(page);
+        CurrentPage = page;
+
+        await Js.InvokeVoidAsync("scrollToTop");
     }
 }
