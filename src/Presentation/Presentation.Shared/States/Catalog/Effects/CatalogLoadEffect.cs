@@ -16,6 +16,7 @@ public sealed class CatalogLoadEffect(
     {
         _cancellationToken?.Cancel();
         _cancellationToken = new CancellationTokenSource();
+        await Task.Delay(150, _cancellationToken.Token);
 
         var cancellationToken = _cancellationToken.Token;
         var catalogState = state.Value;
@@ -79,7 +80,7 @@ public sealed class CatalogLoadEffect(
     [EffectMethod(typeof(CatalogLoadAction.Reset))]
     public Task OnReset(IDispatcher dispatcher)
     {
-        store.Reset();
+        store.Load();
         return Task.CompletedTask;
     }
 }
