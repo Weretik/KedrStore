@@ -75,7 +75,7 @@ public static class InfrastreExtension
         services.AddScoped<IDomainEventContext, EfDomainEventContext>();
         services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
 
-        services.AddScoped<ICatalogXmlParser, CatalogXmlParser>();
+        services.AddScoped<IXmlToJsonConvector, XmlToJsonConvector>();
 
         //Telegram
         services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
