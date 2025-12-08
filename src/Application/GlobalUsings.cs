@@ -29,3 +29,4 @@ global using Ardalis.Result;
 global using Ardalis.Result.FluentValidation;
 global using PhoneNumbers;
 global using NodaMoney;
+global using Newtonsoft.Json;
