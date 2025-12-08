@@ -3,32 +3,48 @@ using Domain.Catalog.Entities;
 using Domain.Catalog.Enumerations;
 using Domain.Catalog.ValueObjects;
 using Domain.Common.ValueObject;
+using Newtonsoft.Json;
 
 namespace Application.Catalog.ImportCatalogFromXml;
 
 public sealed class ImportCatalogFromXmlCommandHandler(
-    ICatalogXmlParser parser,
+    IXmlToJsonConvector toJsonConvector,
     TimeProvider time,
     ILogger<ImportCatalogFromXmlCommandHandler> logger,
     ICatalogRepository<ProductCategory> categoryRepo,
     ICatalogRepository<Product> productRepo)
     : ICommandHandler<ImportCatalogFromXmlCommand, Result<ImportCatalogSummary>>
 {
-    public async ValueTask<Result<ImportCatalogSummary>> Handle(ImportCatalogFromXmlCommand request,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<ImportCatalogSummary>> Handle(ImportCatalogFromXmlCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var command = request.Reuest;
-        CommandLog.ImportCatalogFromXml(logger, command.File.FileName, command.File.Length, command.ProductTypeId);
+        var command = request.Request;
+
+        CommandLog.ImportCatalogFromXml(
+            logger,
+            command.File.FileName,
+            command.File.Length,
+            command.ProductTypeId);
 
         // Copy the source file stream to memory
         // so that it can be read again during parsing (XmlReader consumes the stream once)
         await using var browserStream = command.File.OpenReadStream();
         await using var memoryStream = new MemoryStream();
         await browserStream.CopyToAsync(memoryStream, cancellationToken);
+
         memoryStream.Position = 0;
 
-        var parsed = await parser.ParseAsync(memoryStream, command.ProductTypeId, cancellationToken);
+        var jsonStream = await toJsonConvector.CreateJsonStreamAsync(memoryStream, cancellationToken);
+
+        using var reader = new StreamReader(jsonStream);
+        string json = await reader.ReadToEndAsync(cancellationToken);
+
+        ImportRootDto dto = JsonConvert.DeserializeObject<ImportRootDto>(json)
+                            ?? throw new InvalidOperationException("Unable to deserialize XML preview DTO.");
+
+        var parsed = ImportCatalogMapper.MapCatalog(dto, command.ProductTypeId);
+
+        //var parsed = await parser.ParseAsync(memoryStream, command.ProductTypeId, cancellationToken);
 
         // Delete products and categories that are no longer present in the new import
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(
@@ -58,7 +74,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     }
 
     private async Task<(int productsDeleted, int categoriesDeleted)> DeleteMissingAsync(
-        CatalogParseResult parsed, int productTypeId, CancellationToken cancellationToken)
+        CatalogMapperResult parsed, int productTypeId, CancellationToken cancellationToken)
     {
         var importProductIds  = parsed.Products
             .Select(p => ProductId.From(p.Id))
@@ -77,7 +93,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     }
 
     private async Task<(int categoriesCreated, int categoriesUpdated)> CreateOrUpsertCategoriesAsync(
-        CatalogParseResult parsed, int productTypeId, CancellationToken cancellationToken)
+        CatalogMapperResult parsed, int productTypeId, CancellationToken cancellationToken)
     {
         int created = 0, updated = 0;
 
@@ -110,7 +126,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
     }
 
     private async Task<(int productsCreated, int productsUpdated)> CreateOrUpsertProductsAsync(
-        CatalogParseResult parsed, int productTypeId, CancellationToken cancellationToken)
+        CatalogMapperResult parsed, int productTypeId, CancellationToken cancellationToken)
     {
         int created = 0, updated = 0;
         var dateNow = time.GetUtcNow();

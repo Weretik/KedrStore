@@ -1,3 +1,3 @@
 ﻿namespace Application.Catalog.ImportCatalogFromXml;
 
-public sealed record ImportCatalogFromXmlCommand(ImportCatalogFromXml Reuest) : ICommand<Result<ImportCatalogSummary>>;
+public sealed record ImportCatalogFromXmlCommand(ImportCatalogFromXml Request) : ICommand<Result<ImportCatalogSummary>>;
