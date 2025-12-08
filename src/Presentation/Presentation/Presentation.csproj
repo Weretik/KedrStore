@@ -113,6 +113,7 @@
       <_ContentIncludedByDefault Remove="Layout\Header\Components\HeaderUserActions.razor" />
       <_ContentIncludedByDefault Remove="Layout\Header\Header.razor" />
       <_ContentIncludedByDefault Remove="Layout\MainLayout.razor" />
+      <_ContentIncludedByDefault Remove="wwwroot\imports\import-preview.json" />
     </ItemGroup>
 
     <ItemGroup>
