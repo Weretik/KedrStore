@@ -10,6 +10,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public ProductCategoryId CategoryId { get; private set; }
     public ProductType ProductType { get; private set; }
     public string Photo { get; private set; } = null!;
+    public string? Sсheme {get; private set;}
     public decimal Stock { get; private set; }
 
     private readonly List<ProductPrice> _prices = new();
@@ -19,27 +20,29 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Constructors
     private Product() { }
     private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset createdDate, decimal stock = 0)
+        DateTimeOffset createdDate, decimal stock = 0, string? sсheme = null)
     {
         SetProductId(id);
         SetName(name);
         SetCategoryId(categoryId);
         SetProductType(productType);
         SetPhoto(photo);
+        SetSсheme(sсheme);
         SetStock(stock);
         MarkAsCreated(createdDate);
     }
     public static Product Create(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
-        string photo, DateTimeOffset createdDate, decimal stock)
-        => new(id, name, categoryId, productType, photo, createdDate, stock);
+        string photo, DateTimeOffset createdDate, decimal stock, string? scheme = null)
+        => new(id, name, categoryId, productType, photo, createdDate, stock, scheme);
 
     public void Update(string name, ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset updatedDate, decimal stock)
+        DateTimeOffset updatedDate, decimal stock, string? scheme = null)
     {
         SetName(name);
         SetCategoryId(categoryId);
         SetProductType(productType);
         SetPhoto(photo);
+        SetSсheme(scheme);
         SetStock(stock);
         MarkAsUpdated(updatedDate);
     }
@@ -58,6 +61,14 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     private void SetCategoryId(ProductCategoryId categoryId) => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
     private void SetProductType(ProductType productType) => ProductType = Guard.Against.Default(productType, nameof(productType));
     private void SetPhoto(string photo) => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
+
+    private void SetSсheme(string? scheme)
+    {
+        if (scheme is null)
+            Sсheme = null;
+
+        Sсheme = Guard.Against.NullOrWhiteSpace(scheme, nameof(scheme)).Trim();
+    }
     private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 10_000);
     #endregion
 
