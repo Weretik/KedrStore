@@ -33,6 +33,7 @@ public sealed class ProductsPageSpec : Specification<Product, ProductDto>
                 p.CategoryId.Value,
                 p.ProductType.Value,
                 p.Photo,
+                p.Sсheme,
                 p.Stock,
                 p.Prices.Select(price => new ProductPriceDto(
                         price.PriceType.Name,
