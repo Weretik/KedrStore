@@ -44,8 +44,6 @@ public sealed class ImportCatalogFromXmlCommandHandler(
 
         var parsed = ImportCatalogMapper.MapCatalog(dto, command.ProductTypeId);
 
-        //var parsed = await parser.ParseAsync(memoryStream, command.ProductTypeId, cancellationToken);
-
         // Delete products and categories that are no longer present in the new import
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(
             parsed,
