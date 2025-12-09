@@ -33,6 +33,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(1000)
             .IsRequired();
 
+        builder.Property(p => p.Sсheme)
+            .HasMaxLength(1000);
+
         builder.Property(p => p.Stock)
             .HasPrecision(10, 2)
             .IsRequired();
