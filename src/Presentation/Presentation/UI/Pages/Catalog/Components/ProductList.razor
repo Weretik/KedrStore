@@ -35,13 +35,22 @@ else
                       <MudCardHeader>
 
                           <CardHeaderContent>
-                              <MudText Typo="Typo.button" Color="Color.Primary">Атрикул: @item.Id </MudText>
+                              <MudText Typo="Typo.button" Color="Color.Info">Атрикул: @item.Id </MudText>
                           </CardHeaderContent>
 
                           <CardHeaderActions>
-                              <MudChip T="string" Variant="Variant.Text" Color="Color.Info">
-                                  На складі: @((int)item.Stock) шт.
-                              </MudChip>
+                              @if ((int)item.Stock >= 3)
+                              {
+                                  <MudChip T="string" Variant="Variant.Text" Color="Color.Primary">
+                                      в наявності
+                                  </MudChip>
+                              }
+                              else
+                              {
+                                  <MudChip T="string" Variant="Variant.Text" Color="Color.Error">
+                                      під замовлення
+                                  </MudChip>
+                              }
                           </CardHeaderActions>
                       </MudCardHeader>
 
@@ -64,12 +73,22 @@ else
                           </MudText>
                       </MudCardContent>
 
-                      <MudCardActions>
-                          <MudButton OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
-                                     Variant="Variant.Outlined" Color="Color.Default" FullWidth="true"
+                      <MudCardActions Class="d-flex flex-wrap gap-2 w-100">
+
+                          <MudButton Class="flex-grow-1 mud-width-full-sm"
+                                     OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
+                                     Variant="Variant.Outlined" Color="Color.Default"
                                      StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
                               Швидке замовлення
                           </MudButton>
+
+                          <MudButton Class="flex-grow-1 mud-width-full-sm"
+                                     Href="@($"/product/{item.Id}")"
+                                     Variant="Variant.Outlined" Color="Color.Default"
+                                     StartIcon="@Icons.Material.Filled.NextPlan">
+                              Детальніше
+                          </MudButton>
+
                       </MudCardActions>
 
                   </MudCard>
