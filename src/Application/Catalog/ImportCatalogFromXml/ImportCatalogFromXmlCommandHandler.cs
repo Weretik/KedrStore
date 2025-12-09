@@ -140,13 +140,14 @@ public sealed class ImportCatalogFromXmlCommandHandler(
             if (existing is null)
             {
                 var product = Product.Create(
-                    id,
-                    productDto.Name,
-                    categoryId,
-                    productType,
-                    productDto.Photo,
-                    dateNow,
-                    productDto.Stock);
+                    id: id,
+                    name: productDto.Name,
+                    categoryId: categoryId,
+                    productType: productType,
+                    photo: productDto.Photo,
+                    createdDate: dateNow,
+                    stock: productDto.Stock,
+                    scheme: productDto.Scheme);
                 // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(product, productDto.Prices);
 
@@ -156,12 +157,13 @@ public sealed class ImportCatalogFromXmlCommandHandler(
             else
             {
                 existing.Update(
-                    productDto.Name,
-                    categoryId,
-                    productType,
-                    productDto.Photo,
-                    dateNow,
-                    productDto.Stock
+                    name: productDto.Name,
+                    categoryId: categoryId,
+                    productType: productType,
+                    photo: productDto.Photo,
+                    updatedDate: dateNow,
+                    stock: productDto.Stock,
+                    scheme: productDto.Scheme
                 );
                 // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(existing, productDto.Prices);
