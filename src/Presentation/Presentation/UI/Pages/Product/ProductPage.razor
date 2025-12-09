@@ -1,0 +1,33 @@
+﻿@page "/product/{id:int}"
+@using Application.Catalog.Shared
+@rendermode InteractiveAuto
+@using Application.Catalog.GetProductById;
+
+@if (_product == null)
+{
+    <MudProgressCircular Color="Color.Primary" />
+}
+else
+{
+    <MudText Typo="Typo.h1">@_product.Name</MudText>
+    <div class="d-flex justify-center">
+        <img class="rounded-lg"
+             style="max-width: 100%; height: auto; object-fit: cover;"
+             src="@_product.Photo"
+             alt="Product"
+             onerror="this.onerror=null;this.src='@DefaultImageUrl';" />
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ProductDto? _product;
+
+    const string DefaultImageUrl = "https://raw.githubusercontent.com/Kedr-Class/images/main/furniture/00000000.jpg";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = new GetProductByIdQuery(Id);
+        _product = await Mediator.Send(query);
+    }
+}
