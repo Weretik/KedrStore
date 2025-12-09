@@ -40,7 +40,8 @@ public static class ImportCatalogMapper
             if (productTypeId == 1 && parentBaseId == 0)
                 parentBaseId = 103;
 
-            var photo = $"https://raw.githubusercontent.com/Kedr-Class/images/refs/heads/main/furniture/{id}.jpg";
+            var photo = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/furniture/{id}.jpg";
+            string? scheme = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/scheme/s{id}.jpg";
 
             EnsureCategoryById(categories, idR, nameR, parentBaseId);
 
@@ -61,7 +62,8 @@ public static class ImportCatalogMapper
                 ProductTypeId: productTypeId,
                 Photo: photo,
                 Stock: count,
-                Prices: productPrice)
+                Prices: productPrice,
+                Scheme: scheme)
             );
 
         }
