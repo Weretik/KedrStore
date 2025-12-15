@@ -147,7 +147,8 @@ public sealed class ImportCatalogFromXmlCommandHandler(
                     photo: productDto.Photo,
                     createdDate: dateNow,
                     stock: productDto.Stock,
-                    scheme: productDto.Scheme);
+                    scheme: productDto.Scheme,
+                    qtyInPack: productDto.QuantityInPack);
                 // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(product, productDto.Prices);
 
@@ -163,7 +164,8 @@ public sealed class ImportCatalogFromXmlCommandHandler(
                     photo: productDto.Photo,
                     updatedDate: dateNow,
                     stock: productDto.Stock,
-                    scheme: productDto.Scheme
+                    scheme: productDto.Scheme,
+                    qtyInPack: productDto.QuantityInPack
                 );
                 // Overwrite or add prices (Upsert by price type)
                 ApplyPrices(existing, productDto.Prices);
