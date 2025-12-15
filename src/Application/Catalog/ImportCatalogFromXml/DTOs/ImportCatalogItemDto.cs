@@ -19,4 +19,6 @@ public class ImportCatalogItemDto
 
     [JsonProperty("count")]
     public string Count { get; set; } = null!;
+    [JsonProperty("qty_in_pack")]
+    public string qtyInPack { get; set; } = null!;
 }
