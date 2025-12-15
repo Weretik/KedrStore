@@ -40,10 +40,13 @@ else
                             else { <MudText Color="Color.Error">під замовлення</MudText> }
                         </td>
                     </tr>
-                    <tr>
-                        <td>Кіл-ть в упаковці</td>
-                        <td>0</td>
-                    </tr>
+                    @if (_product.QuantityInPack > 0)
+                    {
+                        <tr>
+                            <td>Кіл-ть в упаковці</td>
+                            <td>@_product.QuantityInPack</td>
+                        </tr>
+                    }
                     <tr>
                         <td>Ціна</td>
                         <td>@_product.GetPriceForType(_priceType) грн</td>
