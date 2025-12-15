@@ -19,6 +19,7 @@ public sealed class GetProductByIdSpec : Specification<Product, ProductDto>
                 p.Photo,
                 p.Sсheme,
                 p.Stock,
+                p.QuantityInPack,
                 p.Prices.Select(price => new ProductPriceDto(
                     price.PriceType.Name,
                     price.Price.Amount,
