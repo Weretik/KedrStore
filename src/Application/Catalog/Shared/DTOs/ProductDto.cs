@@ -8,5 +8,6 @@ public sealed record ProductDto(
     string Photo,
     string? Scheme,
     decimal Stock,
+    int QuantityInPack,
     IReadOnlyList<ProductPriceDto> Prices
 );
