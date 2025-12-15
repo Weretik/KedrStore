@@ -40,6 +40,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasPrecision(10, 2)
             .IsRequired();
 
+        builder.Property(p => p.QuantityInPack)
+            .HasDefaultValue(0);
+
         builder.HasOne<ProductCategory>()
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
