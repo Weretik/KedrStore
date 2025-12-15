@@ -54,6 +54,11 @@ namespace Infrastructure.Catalog.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("ProductTypeId");
 
+                    b.Property<int>("QuantityInPack")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<decimal>("Stock")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
