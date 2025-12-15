@@ -17,6 +17,7 @@ public static class ImportCatalogMapper
             var nameR = item.CategoryName.Trim();
             var count = TryGetInt(item.Count);
             var prices = item.Prices;
+            var qtyInPack = TryGetInt(item.qtyInPack);
 
             var skipWords = new[] { "KEDR", "Стенди", "Замiна KEDR, CLASS" };
 
@@ -40,8 +41,8 @@ public static class ImportCatalogMapper
             if (productTypeId == 1 && parentBaseId == 0)
                 parentBaseId = 103;
 
-            var photo = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/furniture/{id}.jpg";
-            string? scheme = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/scheme/s{id}.jpg";
+            var photo = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/products/{id}.jpg";
+            string? scheme = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/product-scheme/s{id}.jpg";
 
             EnsureCategoryById(categories, idR, nameR, parentBaseId);
 
@@ -63,7 +64,9 @@ public static class ImportCatalogMapper
                 Photo: photo,
                 Stock: count,
                 Prices: productPrice,
-                Scheme: scheme)
+                Scheme: scheme,
+                QuantityInPack: qtyInPack
+                )
             );
 
         }
