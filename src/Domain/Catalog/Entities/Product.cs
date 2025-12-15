@@ -12,6 +12,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public string Photo { get; private set; } = null!;
     public string? Sсheme {get; private set;}
     public decimal Stock { get; private set; }
+    public int QuantityInPack { get; private set; }
 
     private readonly List<ProductPrice> _prices = new();
     public IReadOnlyCollection<ProductPrice> Prices => _prices;
@@ -20,7 +21,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Constructors
     private Product() { }
     private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset createdDate, decimal stock = 0, string? sсheme = null)
+        DateTimeOffset createdDate, decimal stock = 0, string? sсheme = null, int qtyInPack = 0)
     {
         SetProductId(id);
         SetName(name);
@@ -30,13 +31,14 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetSсheme(sсheme);
         SetStock(stock);
         MarkAsCreated(createdDate);
+        SetQuantityInPack(qtyInPack);
     }
     public static Product Create(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
-        string photo, DateTimeOffset createdDate, decimal stock, string? scheme = null)
-        => new(id, name, categoryId, productType, photo, createdDate, stock, scheme);
+        string photo, DateTimeOffset createdDate, decimal stock, int qtyInPack, string? scheme)
+        => new(id, name, categoryId, productType, photo, createdDate, stock, scheme, qtyInPack);
 
     public void Update(string name, ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset updatedDate, decimal stock, string? scheme = null)
+        DateTimeOffset updatedDate, decimal stock,int qtyInPack, string? scheme)
     {
         SetName(name);
         SetCategoryId(categoryId);
@@ -44,13 +46,15 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetPhoto(photo);
         SetSсheme(scheme);
         SetStock(stock);
+        SetQuantityInPack(qtyInPack);
         MarkAsUpdated(updatedDate);
     }
 
     #endregion
 
     #region Validation & Setters
-    private void SetProductId(ProductId id) => Id = Guard.Against.Default(id, nameof(id));
+    private void SetProductId(ProductId id)
+        => Id = Guard.Against.Default(id, nameof(id));
 
     private void SetName(string name)
     {
@@ -58,18 +62,23 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         Guard.Against.OutOfRange(name.Length, nameof(name), 1, 300);
         Name = name.Trim();
     }
-    private void SetCategoryId(ProductCategoryId categoryId) => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
-    private void SetProductType(ProductType productType) => ProductType = Guard.Against.Default(productType, nameof(productType));
-    private void SetPhoto(string photo) => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
+    private void SetCategoryId(ProductCategoryId categoryId)
+        => CategoryId = Guard.Against.Default(categoryId, nameof(categoryId));
+    private void SetProductType(ProductType productType)
+        => ProductType = Guard.Against.Default(productType, nameof(productType));
+    private void SetPhoto(string photo)
+        => Photo = Guard.Against.NullOrWhiteSpace(photo).Trim();
 
     private void SetSсheme(string? scheme)
     {
-        if (scheme is null)
-            Sсheme = null;
-
-        Sсheme = Guard.Against.NullOrWhiteSpace(scheme, nameof(scheme)).Trim();
+        if (scheme is null) Sсheme = null;
+        else Sсheme = Guard.Against.NullOrWhiteSpace(scheme, nameof(scheme)).Trim();
     }
-    private void SetStock(decimal stock) => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 10_000);
+    private void SetStock(decimal stock)
+        => Stock = Guard.Against.OutOfRange(stock, nameof(stock), 0, 10_000);
+
+    private void SetQuantityInPack(int qtyInPack)
+        => QuantityInPack = Guard.Against.Negative(qtyInPack);
     #endregion
 
     #region Price API
