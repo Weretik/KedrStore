@@ -19,7 +19,8 @@ public static class ImportCatalogMapper
             var prices = item.Prices;
             var qtyInPack = TryGetInt(item.qtyInPack);
 
-            var skipWords = new[] { "KEDR", "Стенди", "Замiна KEDR, CLASS" };
+            var skipText = new[] { "KEDR", "Стенди", "Замiна KEDR, CLASS", "Товары выведенные из ассортимента",
+                "Цоколь_Робота", "Виставка", "Є-відновлення", "Рекламная продукция" };
 
             if (id <= 0
                 || idR <= 0
@@ -27,7 +28,7 @@ public static class ImportCatalogMapper
                 || string.IsNullOrWhiteSpace(nameR)
                 || prices == null
                 || count < 0
-                || skipWords.Any(w => nameR.Equals(w, StringComparison.OrdinalIgnoreCase)))
+                || skipText.Any(t => nameR.Equals(t, StringComparison.OrdinalIgnoreCase)))
             {
                 continue;
             }
@@ -41,8 +42,8 @@ public static class ImportCatalogMapper
             if (productTypeId == 1 && parentBaseId == 0)
                 parentBaseId = 103;
 
-            var photo = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/products/{id}.jpg";
-            string? scheme = $"https://cdn.jsdelivr.net/gh/inboxmakc-coder/kedr-images/product-scheme/s{id}.jpg";
+            var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
+            string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";
 
             EnsureCategoryById(categories, idR, nameR, parentBaseId);
 
@@ -120,7 +121,6 @@ public static class ImportCatalogMapper
             {
                 new ImportCategoryDto(101, "Міжкімнатні двері", "n101"),
                 new ImportCategoryDto(102, "Вхідні двері", "n102"),
-                new ImportCategoryDto(103, "Інше", "n103")
             },
 
             2 => new()

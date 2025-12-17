@@ -36,8 +36,9 @@ else
                     <tr>
                         <td>Наявність</td>
                         <td>
-                            @if (_product.Stock >= 3){<MudText Color="Color.Primary">в наявності</MudText> }
-                            else { <MudText Color="Color.Error">під замовлення</MudText> }
+                            @if (_product.Stock >= 3) { <MudText Color="Color.Primary">в наявності</MudText> }
+                            else if (_product.Stock < 3 && _product.ProductTypeId == 1) { <MudText Color="Color.Error">під замовлення</MudText> }
+                            else { <MudText Color="Color.Warning">в дорозі</MudText> }
                         </td>
                     </tr>
                     @if (_product.QuantityInPack > 0)

@@ -45,10 +45,16 @@ else
                                       в наявності
                                   </MudChip>
                               }
-                              else
+                              else if (item.Stock < 3 && item.ProductTypeId == 1)
                               {
                                   <MudChip T="string" Variant="Variant.Text" Color="Color.Error">
                                       під замовлення
+                                  </MudChip>
+                              }
+                              else
+                              {
+                                  <MudChip T="string" Variant="Variant.Text" Color="Color.Warning">
+                                      в дорозі
                                   </MudChip>
                               }
                           </CardHeaderActions>
@@ -61,8 +67,8 @@ else
                                    src="@item.Photo"
                                    alt="Product"
                                    onerror="this.onerror=null;this.src='@DefaultImageUrl';" />
-                          </div>
 
+                          </div>
                           <MudText @key="item.Name" Typo="Typo.h6">
                               <MudHighlighter
                                   Text="@item.Name"
@@ -75,12 +81,25 @@ else
 
                       <MudCardActions Class="d-flex flex-wrap gap-2 w-100">
 
-                          <MudButton Class="flex-grow-1 mud-width-full-sm"
-                                     OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
-                                     Variant="Variant.Outlined" Color="Color.Primary"
-                                     StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
-                              Швидке замовлення
-                          </MudButton>
+                          @if (item.Stock < 3 && item.ProductTypeId == 2)
+                          {
+                              <MudButton Class="flex-grow-1 mud-width-full-sm"
+                                         OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
+                                         Variant="Variant.Outlined" Color="Color.Primary"
+                                         StartIcon="@Icons.Material.Filled.ShoppingCartCheckout"
+                                         Disabled="true">
+                                  Швидке замовлення
+                              </MudButton>
+                          }
+                          else
+                          {
+                              <MudButton Class="flex-grow-1 mud-width-full-sm"
+                                         OnClick="@((e) => OpenСontactDialogAsync(item.Id, item.Name))"
+                                         Variant="Variant.Outlined" Color="Color.Primary"
+                                         StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">
+                                  Швидке замовлення
+                              </MudButton>
+                          }
 
                           <MudButton Class="flex-grow-1 mud-width-full-sm"
                                      OnClick="() => GoToPeoductPage(item.Id)"
