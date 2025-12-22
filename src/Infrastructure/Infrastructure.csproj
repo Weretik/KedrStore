@@ -33,6 +33,11 @@
 
     <ItemGroup>
       <Folder Include="Catalog\Migrations\" />
+      <Folder Include="Common\Integrations\OneC\Generated\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Infrastructure.csproj.DotSettings" />
     </ItemGroup>
 
 </Project>
