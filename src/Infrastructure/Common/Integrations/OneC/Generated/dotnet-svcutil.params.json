@@ -1,0 +1,15 @@
+{
+  "providerId": "Microsoft.Tools.ServiceModel.Svcutil",
+  "version": "8.0.0",
+  "options": {
+    "inputs": [
+      "http://91.218.214.105:8081/YTP82/ws/ws1.1cws?wsdl"
+    ],
+    "namespaceMappings": [
+      "*, Infrastructure.Common.Integrations.OneC.Generated"
+    ],
+    "outputFile": "Reference.cs",
+    "targetFramework": "net9.0",
+    "typeReuseMode": "All"
+  }
+}
