@@ -1,6 +1,7 @@
 using Application.Common.Extensions;
 using Infrastructure.Common.Extensions;
 using Presentation.Shared.States.Category;
+using Infrastructure.Common.Integrations.OneC;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
@@ -60,6 +61,13 @@ void LogEnv(string key)
 await app.UseAppMigrations();
 await app.UseAppSeeders();
 
+// SmokeTests
+if (app.Configuration.GetValue<bool>("OneCSoap:RunSmokeTest"))
+{
+    await Infrastructure.Common.Integrations.OneC.OneCSoapSmokeTest.RunAsync(app.Configuration);
+}
+
+//Environment
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
