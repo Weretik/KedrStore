@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -15,19 +15,19 @@
     <ItemGroup>
       <PackageReference Include="Ardalis.Result" Version="10.1.0" />
       <PackageReference Include="Ardalis.Result.FluentValidation" Version="10.1.0" />
-      <PackageReference Include="Ardalis.Specification" Version="9.2.0" />
-      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.2.0" />
-      <PackageReference Include="FluentValidation" Version="12.0.0" />
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-      <PackageReference Include="libphonenumber-csharp" Version="9.0.13" />
+      <PackageReference Include="Ardalis.Specification" Version="9.3.1" />
+      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.3.1" />
+      <PackageReference Include="FluentValidation" Version="12.1.1" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+      <PackageReference Include="libphonenumber-csharp" Version="9.0.21" />
       <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
       <PackageReference Include="Mediator.SourceGenerator" Version="3.0.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     </ItemGroup>
 
     <ItemGroup>

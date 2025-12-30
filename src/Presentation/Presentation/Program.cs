@@ -1,7 +1,6 @@
 using Application.Common.Extensions;
 using Infrastructure.Common.Extensions;
 using Presentation.Shared.States.Category;
-using Infrastructure.Common.Integrations.OneC;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
