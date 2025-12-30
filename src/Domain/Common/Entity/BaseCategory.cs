@@ -1,4 +1,5 @@
-﻿using Domain.Common.ValueObject;
+﻿using BuildingBlocks.Domain.Entity;
+using Domain.Common.ValueObject;
 
 namespace Domain.Common.Entity;
 

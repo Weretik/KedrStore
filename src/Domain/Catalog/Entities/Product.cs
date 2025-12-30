@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Entity;
 using Domain.Catalog.Enumerations;
 using Domain.Catalog.ValueObjects;
 

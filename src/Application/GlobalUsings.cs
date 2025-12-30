@@ -18,7 +18,7 @@ global using Application.Common.Logging;
 global using Application.Common.Helpers;
 
 // Domain namespaces
-global using Domain.Common.Abstractions;
+global using BuildingBlocks.Domain.Abstractions;
 
 // External libraries
 global using Mediator;

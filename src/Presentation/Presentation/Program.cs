@@ -1,6 +1,10 @@
 using Application.Common.Extensions;
-using Infrastructure.Common.Extensions;
+using BuildingBlocks.Infrastructure.DependencyInjection;
+using Infrastructure.Catalog.DependencyInjection;
+using Infrastructure.Identity.DependencyInjection;
+using BuildingBlocks.Infrastructure.Extensions;
 using Presentation.Shared.States.Category;
+using BuildingBlocks.Integrations.OneC;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
@@ -30,7 +34,9 @@ builder.Services.Configure<AdminUserConfig>(
 // DI: Application + Infrastructure
 builder.Services
     .AddApplicationServices()
-    .AddInfrastructureServices(builder.Configuration);
+    .AddInfrastructureServices(builder.Configuration)
+    .AddCatalogInfrastructure(builder.Configuration)
+    .AddIdentityInfrastructure(builder.Configuration);
 
 // DI: Fluxor + State services
 builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
@@ -63,7 +69,7 @@ await app.UseAppSeeders();
 // SmokeTests
 if (app.Configuration.GetValue<bool>("OneCSoap:RunSmokeTest"))
 {
-    await Infrastructure.Common.Integrations.OneC.OneCSoapSmokeTest.RunAsync(app.Configuration);
+    await OneCSoapSmokeTest.RunAsync(app.Configuration);
 }
 
 //Environment

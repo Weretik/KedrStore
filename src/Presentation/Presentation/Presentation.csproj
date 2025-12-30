@@ -26,6 +26,7 @@
         <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
         <ProjectReference Include="..\..\Application\Application.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
+        <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.8" />
         <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />

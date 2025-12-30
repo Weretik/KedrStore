@@ -21,12 +21,16 @@ global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 // Infrastructure namespaces
-global using Infrastructure.Common.Events;
-global using Infrastructure.Common.Services;
-global using Infrastructure.Common.Configurations;
+global using BuildingBlocks.Infrastructure.DomainEvents;
+global using BuildingBlocks.Infrastructure.Extensions;
+global using BuildingBlocks.Infrastructure.Migrations;
+global using BuildingBlocks.Infrastructure.Seeding;
+global using BuildingBlocks.Infrastructure.DependencyInjection;
+global using BuildingBlocks.Infrastructure.Services;
+global using BuildingBlocks.Infrastructure.Persistence.Configurations;
 
 // Domain namespaces
-global using Domain.Common.Abstractions;
+global using BuildingBlocks.Domain.Abstractions;
 global using Domain.Common.Entity;
 
 // Application namespaces

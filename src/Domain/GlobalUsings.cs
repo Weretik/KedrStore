@@ -3,7 +3,7 @@ global using System;
 global using System.Text.RegularExpressions;
 
 // Domain namespaces
-global using Domain.Common.Abstractions;
+global using BuildingBlocks.Domain.Abstractions;
 global using Domain.Common.Entity;
 
 global using Ardalis.GuardClauses;

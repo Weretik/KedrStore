@@ -9,6 +9,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
@@ -33,7 +35,6 @@
 
     <ItemGroup>
       <Folder Include="Catalog\Migrations\" />
-      <Folder Include="Common\Integrations\OneC\Generated\" />
     </ItemGroup>
 
     <ItemGroup>
