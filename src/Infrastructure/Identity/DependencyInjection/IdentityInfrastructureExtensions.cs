@@ -13,6 +13,7 @@ public static class IdentityInfrastructureExtensions
     {
         services.AddDbContext<AppIdentityDbContext>(o =>
             o.UseNpgsql(configuration.GetConnectionString("Default")));
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
 
         services.AddIdentity<AppUser, AppRole>(options =>
             {

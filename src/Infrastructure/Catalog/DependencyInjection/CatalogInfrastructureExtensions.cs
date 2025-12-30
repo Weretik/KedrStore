@@ -16,6 +16,7 @@ public static class CatalogInfrastructureExtensions
         var connectionString = configuration.GetConnectionString("Default");
 
         services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
         services.AddDbContextFactory<CatalogDbContext>(options => options.UseNpgsql(connectionString),
             lifetime: ServiceLifetime.Scoped);
 
