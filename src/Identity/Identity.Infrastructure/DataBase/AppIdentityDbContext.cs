@@ -11,6 +11,6 @@ public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(
             typeof(AppIdentityDbContext).Assembly,
-            type => type.Namespace?.StartsWith("Infrastructure.Identity") ?? false);
+            type => type.Namespace?.StartsWith("Identity.Infrastructure.Configuration") ?? false);
     }
 }

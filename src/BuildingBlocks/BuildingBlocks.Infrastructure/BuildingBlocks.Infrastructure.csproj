@@ -22,7 +22,6 @@
     <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-    <ProjectReference Include="..\..\Application\Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
