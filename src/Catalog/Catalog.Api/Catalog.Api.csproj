@@ -6,4 +6,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Ardalis.ApiEndpoints" Version="4.1.0" />
+      <PackageReference Include="Ardalis.ApiEndpoints.Swashbuckle" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
+    </ItemGroup>
+
 </Project>
