@@ -1,4 +1,4 @@
-﻿using Application.Common.Notifications;
+﻿using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Domain.Abstractions;
 using Mediator;
 

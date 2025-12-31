@@ -4,8 +4,6 @@ global using System.Text.RegularExpressions;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
-global using Domain.Common.Entity;
-
 global using Ardalis.GuardClauses;
 global using Ardalis.SmartEnum;
 global using NodaMoney;

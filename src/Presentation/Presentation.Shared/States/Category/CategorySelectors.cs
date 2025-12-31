@@ -1,6 +1,5 @@
-﻿using Application.Catalog.GetCategories;
+﻿using Catalog.Application.Features.Category.Queries.GetCategories;
 using Presentation.Shared.Extensions;
-using Presentation.Shared.States.Catalog;
 
 namespace Presentation.Shared.States.Category;
 

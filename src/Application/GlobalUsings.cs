@@ -11,11 +11,12 @@ global using System.Globalization;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
 
 // Application namespaces
-global using Application.Common.Behaviors;
-global using Application.Common.Logging;
-global using Application.Common.Helpers;
+global using BuildingBlocks.Application.Behaviors;
+global using BuildingBlocks.Application.Logging;
+global using BuildingBlocks.Application.Helpers;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;

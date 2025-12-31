@@ -1,7 +1,7 @@
 ﻿@page "/product/{id:int}"
-@using Application.Catalog.Shared
+@using global::Catalog.Application.Features.Products.Queries.GetProductById
+@using global::Catalog.Application.Shared
 @rendermode InteractiveServer
-@using Application.Catalog.GetProductById;
 @inject IDialogService DialogService
 
 @if (_product == null)

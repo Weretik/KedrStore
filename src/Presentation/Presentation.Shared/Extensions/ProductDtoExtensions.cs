@@ -1,4 +1,4 @@
-﻿using Application.Catalog.Shared;
+﻿using Catalog.Application.Shared;
 
 namespace Presentation.Shared.Extensions;
 

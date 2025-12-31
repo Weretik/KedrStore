@@ -1,10 +1,12 @@
-using Application.Common.Extensions;
+using BuildingBlocks.Application.DependencyInjection;
 using BuildingBlocks.Infrastructure.DependencyInjection;
-using Infrastructure.Catalog.DependencyInjection;
-using Infrastructure.Identity.DependencyInjection;
 using BuildingBlocks.Infrastructure.Extensions;
 using Presentation.Shared.States.Category;
 using BuildingBlocks.Integrations.OneC;
+using Catalog.Application;
+using Catalog.Application.DependencyInjection;
+using Catalog.Infrastructure.DependencyInjection;
+using Infrastructure.Identity.DependencyInjection;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
@@ -14,7 +16,9 @@ if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Настройка Serilog
+//---------------------------------------------------------------------------------------
+// Serilog
+//---------------------------------------------------------------------------------------
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -22,34 +26,49 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Razor-компоненты
+//---------------------------------------------------------------------------------------
+// Razor-components
+//---------------------------------------------------------------------------------------
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// Конфигурация AdminUser
+//---------------------------------------------------------------------------------------
+// Config AdminUser
+//---------------------------------------------------------------------------------------
 builder.Services.Configure<AdminUserConfig>(
     builder.Configuration.GetSection("Identity:AdminUser"));
 
-// DI: Application + Infrastructure
+//---------------------------------------------------------------------------------------
+// Application dependency injection
+//---------------------------------------------------------------------------------------
 builder.Services
-    .AddApplicationServices()
+    .AddApplicationServices(
+        typeof(CatalogApplicationAssemblyMarker).Assembly)
+    .AddCatalogApplication();
+//---------------------------------------------------------------------------------------
+// Infrastructure dependency injection
+//---------------------------------------------------------------------------------------
+builder.Services
     .AddInfrastructureServices(builder.Configuration)
-    .AddCatalogInfrastructure(builder.Configuration)
+    .AddCatalogInfrastructureServices(builder.Configuration)
     .AddIdentityInfrastructure(builder.Configuration);
 
-// DI: Fluxor + State services
+//---------------------------------------------------------------------------------------
+// Fluxor + State services
+//---------------------------------------------------------------------------------------
 builder.Services.AddFluxor(opt => opt.ScanAssemblies(typeof(SharedAssemblyMarker).Assembly));
 builder.Services.AddScoped<IBurgerMenuStore, BurgerMenuStore>();
 builder.Services.AddScoped<ICatalogStore, CatalogStore>();
 builder.Services.AddScoped<ICategoryStore, CategoryStore>();
 
+//---------------------------------------------------------------------------------------
 // Services
+//---------------------------------------------------------------------------------------
 builder.Services.AddHealthChecks();
 builder.Services.AddMudServices();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
-
 builder.Services.AddSingleton(TimeProvider.System);
 
 var app = builder.Build();
@@ -62,17 +81,23 @@ void LogEnv(string key)
     Log.Information("{Key} = {Value}", key, string.IsNullOrEmpty(value) ? "<null>" : value);
 }
 
+//---------------------------------------------------------------------------------------
 // Migrations & Seeders
+//---------------------------------------------------------------------------------------
 await app.UseAppMigrations();
 await app.UseAppSeeders();
 
-// SmokeTests
+//---------------------------------------------------------------------------------------
+// SmokeTests OneC
+//---------------------------------------------------------------------------------------
 if (app.Configuration.GetValue<bool>("OneCSoap:RunSmokeTest"))
 {
     await OneCSoapSmokeTest.RunAsync(app.Configuration);
 }
 
-//Environment
+//---------------------------------------------------------------------------------------
+// Environment
+//---------------------------------------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -95,7 +120,9 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode();
 
+//---------------------------------------------------------------------------------------
 // HealthChecks endpoint
+//---------------------------------------------------------------------------------------
 app.MapHealthChecks("/health");
 
 app.Run();

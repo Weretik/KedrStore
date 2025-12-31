@@ -1,5 +1,6 @@
-﻿using Application.Catalog.GetProducts;
-using Application.Catalog.Shared;
+﻿using Catalog.Application.Features.Products.Queries.GetProducts;
+using Catalog.Application.GetProducts;
+using Catalog.Application.Shared;
 
 namespace Presentation.Shared.States;
 

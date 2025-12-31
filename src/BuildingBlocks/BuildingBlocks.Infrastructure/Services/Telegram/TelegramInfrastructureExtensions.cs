@@ -1,12 +1,11 @@
-﻿using Application.Catalog.CreateQuickOrder;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 
 namespace BuildingBlocks.Infrastructure.Services;
 
-public static class TelegramInfrastructureExtensions
+public static class иTelegramInfrastructureExtensions
 {
     public static IServiceCollection AddTelegramInfrastructure(
         this IServiceCollection services,

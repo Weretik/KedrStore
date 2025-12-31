@@ -1,4 +1,4 @@
-﻿using Application.Catalog.CreateQuickOrder.Contracts;
+﻿using Catalog.Application.Features.Orders.Commands.CreateQuickOrder.Contracts;
 
 namespace Presentation.Shared.ViewModels;
 

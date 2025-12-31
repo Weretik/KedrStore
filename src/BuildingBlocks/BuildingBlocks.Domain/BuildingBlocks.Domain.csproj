@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="Events\" />
-      <Folder Include="Exceptions\" />
     </ItemGroup>
 
 </Project>

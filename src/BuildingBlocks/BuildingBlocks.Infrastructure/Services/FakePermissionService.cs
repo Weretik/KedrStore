@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+﻿using BuildingBlocks.Application.Contracts;
 
 namespace BuildingBlocks.Infrastructure.Services;
 

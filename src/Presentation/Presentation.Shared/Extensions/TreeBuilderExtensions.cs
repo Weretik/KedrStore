@@ -1,4 +1,4 @@
-﻿using Application.Catalog.GetCategories;
+﻿using Catalog.Application.Features.Category.Queries.GetCategories;
 
 namespace Presentation.Shared.Extensions;
 

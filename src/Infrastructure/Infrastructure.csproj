@@ -34,11 +34,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Migrations\" />
+      <None Remove="Infrastructure.csproj.DotSettings" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Infrastructure.csproj.DotSettings" />
+      <Folder Include="Catalog\" />
     </ItemGroup>
 
 </Project>

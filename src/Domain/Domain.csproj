@@ -22,4 +22,10 @@
       <Content Remove="..\..\..\..\.nuget\packages\vogen\8.0.4\contentFiles\any\netstandard2.0\Vogen.targets" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Catalog\Entities\" />
+      <Folder Include="Catalog\Enumerations\" />
+      <Folder Include="Catalog\ValueObjects\" />
+    </ItemGroup>
+
 </Project>

@@ -27,15 +27,11 @@ global using BuildingBlocks.Infrastructure.Migrations;
 global using BuildingBlocks.Infrastructure.Seeding;
 global using BuildingBlocks.Infrastructure.DependencyInjection;
 global using BuildingBlocks.Infrastructure.Services;
-global using BuildingBlocks.Infrastructure.Persistence.Configurations;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
-global using Domain.Common.Entity;
 
 // Application namespaces
-global using Application.Common.Interfaces;
-global using Application.Common.Notifications;
 
 // Services
 global using Mediator;

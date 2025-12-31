@@ -1,4 +1,5 @@
-﻿using Application.Catalog.GetProducts;
+﻿using Catalog.Application.Features.Products.Queries.GetProducts;
+using Catalog.Application.GetProducts;
 using Presentation.Shared.Extensions;
 
 namespace Presentation.Shared.States.Catalog;
