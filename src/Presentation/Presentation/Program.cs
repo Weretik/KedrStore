@@ -1,12 +1,12 @@
-using BuildingBlocks.Application.DependencyInjection;
 using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Infrastructure.Extensions;
 using Presentation.Shared.States.Category;
 using BuildingBlocks.Integrations.OneC;
-using Catalog.Application;
 using Catalog.Application.DependencyInjection;
 using Catalog.Infrastructure.DependencyInjection;
-using Infrastructure.Identity.DependencyInjection;
+using Identity.Infrastructure.Configuration;
+using Identity.Infrastructure.DependencyInjection;
+using Presentation.DependencyInjection;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
@@ -36,16 +36,17 @@ builder.Services.AddRazorComponents()
 //---------------------------------------------------------------------------------------
 // Config AdminUser
 //---------------------------------------------------------------------------------------
-builder.Services.Configure<AdminUserConfig>(
-    builder.Configuration.GetSection("Identity:AdminUser"));
+builder.Services
+    .Configure<AdminUserConfig>(
+        builder.Configuration.GetSection("Identity:AdminUser"));
 
 //---------------------------------------------------------------------------------------
 // Application dependency injection
 //---------------------------------------------------------------------------------------
 builder.Services
-    .AddApplicationServices(
-        typeof(CatalogApplicationAssemblyMarker).Assembly)
-    .AddCatalogApplication();
+    .AddMediatorPipeline()
+    .AddValidation();
+
 //---------------------------------------------------------------------------------------
 // Infrastructure dependency injection
 //---------------------------------------------------------------------------------------

@@ -10,7 +10,8 @@
         <PackageReference Include="DotNetEnv" Version="3.1.1" />
         <PackageReference Include="Fluxor" Version="6.9.0" />
         <PackageReference Include="Fluxor.Blazor.Web" Version="6.9.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+        <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
+        <PackageReference Include="Mediator.SourceGenerator" Version="3.0.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -27,8 +28,8 @@
         <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
         <ProjectReference Include="..\..\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Application\Application.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
+        <ProjectReference Include="..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
         <ProjectReference Include="..\Presentation.Client\Presentation.Client.csproj" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.8" />
         <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />

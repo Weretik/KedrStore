@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Shared;
+﻿using Catalog.Application.Features.Shared;
+using Catalog.Application.Shared;
 
 namespace Presentation.Shared.States.Catalog;
 

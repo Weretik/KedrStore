@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Persistance;
+﻿using Catalog.Application.Features.Shared;
+using Catalog.Application.Persistance;
 using Catalog.Application.Shared;
 using Catalog.Domain.Entities;
 

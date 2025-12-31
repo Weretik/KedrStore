@@ -23,7 +23,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(CatalogDbContext).Assembly,
-            type => type.Namespace?.StartsWith("Infrastructure.Catalog") ?? false);
+            type => type.Namespace?.StartsWith("Catalog.Infrastructure") ?? false);
 
     }
 }

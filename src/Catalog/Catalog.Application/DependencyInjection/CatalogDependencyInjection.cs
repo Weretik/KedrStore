@@ -2,7 +2,7 @@
 
 public static class CatalogDependencyInjection
 {
-    public static IServiceCollection AddCatalogApplication(this IServiceCollection services)
+    public static IServiceCollection AddValidation(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(
             typeof(CatalogApplicationAssemblyMarker).Assembly,

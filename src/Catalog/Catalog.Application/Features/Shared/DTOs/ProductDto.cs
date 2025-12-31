@@ -1,6 +1,6 @@
-using Application.Catalog.Shared;
+using Catalog.Application.Shared;
 
-namespace Catalog.Application.Shared;
+namespace Catalog.Application.Features.Shared;
 
 public sealed record ProductDto(
     int Id,

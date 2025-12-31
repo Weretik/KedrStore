@@ -1,4 +1,5 @@
 ﻿using Catalog.Application.Features.Products.Queries.GetProducts;
+using Catalog.Application.Features.Shared;
 using Catalog.Application.GetProducts;
 using Catalog.Application.Shared;
 
