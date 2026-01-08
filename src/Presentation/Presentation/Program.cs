@@ -2,6 +2,7 @@ using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Infrastructure.Extensions;
 using Presentation.Shared.States.Category;
 using BuildingBlocks.Integrations.OneC;
+using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Application.DependencyInjection;
 using Catalog.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.Configuration;
@@ -51,6 +52,7 @@ builder.Services
 // Infrastructure dependency injection
 //---------------------------------------------------------------------------------------
 builder.Services
+    .AddOneCIntegration()
     .AddInfrastructureServices(builder.Configuration)
     .AddCatalogInfrastructureServices(builder.Configuration)
     .AddIdentityInfrastructure(builder.Configuration);

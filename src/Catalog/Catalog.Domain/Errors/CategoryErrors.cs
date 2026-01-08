@@ -8,12 +8,12 @@ public static class CategoryErrors
     public static DomainError NameIsRequired() =>
         new("Catalog.Category.Name.Required", "Category name is required");
 
+    public static DomainError SlugIsRequired() =>
+        new("Catalog.Category.Slug.Required", "Category slug is required");
+
     public static DomainError NameLengthInvalid(int length) =>
         new("Catalog.Category.Name.LengthInvalid", "Category name length must be between 1 and 100 characters",
             new { length });
-
-    public static DomainError ProductTypeInvalid() =>
-        new("Catalog.Category.ProductType.Invalid", "ProductType is invalid");
 
     public static DomainError PathIsRequired() =>
         new("Catalog.Category.Path.Required", "Category path is required");

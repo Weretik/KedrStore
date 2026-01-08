@@ -13,6 +13,7 @@
       <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+      <PackageReference Include="Slugify.Core" Version="5.1.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,6 +24,7 @@
     <ItemGroup>
       <Folder Include="Features\Category\Queries\" />
       <Folder Include="Features\Import\Queries\" />
+      <Folder Include="Features\Import\Queries\ImportCatalogFromXml\Mappers\" />
       <Folder Include="Features\Orders\Commands\" />
     </ItemGroup>
 

@@ -8,71 +8,68 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 {
     #region Properties
     public string Name { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
+    public ProductCategoryId? ParentId { get; private set; }
     public CategoryPath  Path { get; private set; }
-    public ProductType ProductType { get; private set; }
     #endregion
 
     #region Constructors
     private ProductCategory() { }
-    private ProductCategory(ProductCategoryId id, string name, CategoryPath path, ProductType productType)
+    private ProductCategory(ProductCategoryId id, string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
     {
         SetCategoryId(id);
         SetName(name);
+        SetSlug(slug);
         SetPath(path);
-        SetProductType(productType);
+        SetParentId(parentId);
     }
     #endregion
 
     #region Factories
-    public static ProductCategory Create(ProductCategoryId id, string name, CategoryPath path, ProductType productType)
-        => new(id, name, path, productType);
-    public static ProductCategory CreateRoot(ProductCategoryId id, string name, ProductType productType)
-        => new(id, name, CategoryPath.Root(id.ToString()), productType);
-    public static ProductCategory CreateChild(ProductCategoryId id, string name, ProductCategory parent, ProductType productType)
-        => new(id, name, parent.Path.Append(id.ToString()), productType);
+    public static ProductCategory Create(ProductCategoryId id, string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
+        => new(id, name, slug,path, parentId);
+
+    public void Update(string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
+    {
+        SetName(name);
+        SetSlug(slug);
+        SetPath(path);
+        SetParentId(parentId);
+    }
     #endregion
 
     #region Setters/Validation
-    protected void SetCategoryId(ProductCategoryId id)
+    private void SetCategoryId(ProductCategoryId id)
     {
         if (id.Value <= 0) throw new DomainException(CategoryErrors.IdMustBePositive());
         Id = id;
     }
-    protected void SetName(string name)
+    private void SetName(string name)
     {
-
         if (string.IsNullOrWhiteSpace(name)) throw new DomainException(CategoryErrors.NameIsRequired());
         if (name.Length is < 1 or > 100) throw new DomainException(CategoryErrors.NameLengthInvalid(name.Length));
         Name = name.Trim();
     }
-    protected void SetPath(CategoryPath path)
+
+    private void SetSlug(string slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(CategoryErrors.NameIsRequired());
+        Slug = slug.Trim();
+    }
+    private void SetPath(CategoryPath path)
     {
         if(path.Value.Length == 0) throw new DomainException(CategoryErrors.PathIsRequired());
         Path = path;
     }
-    private void SetProductType(ProductType productType)
+    private void SetParentId(ProductCategoryId? parentId)
     {
-        if (productType == 0) throw new DomainException(CategoryErrors.ProductTypeInvalid());
-        ProductType = productType;
+        ParentId = parentId;
     }
     #endregion
 
     #region ProductCategory API
     public void Rename(string name) => SetName(name);
     public void Repath(CategoryPath newPath) => SetPath(newPath);
-
-    public void ReparentTo(CategoryPath newParentPath)
-    {
-        GuardReparentInvariant(newParentPath);
-        if (IsSameParent(newParentPath)) return;
-
-        var selfSegment  = GetSelfSegment();
-        Path = Concat(newParentPath, selfSegment);
-    }
-    public void ReparentTo(ProductCategory newParent)
-    {
-        ReparentTo(newParent.Path);
-    }
     #endregion
 
     #region Internal rules
@@ -99,7 +96,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         return idx < 0 ? s : s[(idx + 1)..];
     }
 
-    public bool TryGetParentPath(out CategoryPath parentPath)
+    private bool TryGetParentPath(out CategoryPath parentPath)
     {
         if (IsRoot)
         {

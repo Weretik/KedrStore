@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Persistance;
+﻿using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Persistance;
 using Catalog.Application.Shared;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Enumerations;
@@ -41,7 +42,7 @@ public sealed class ImportCatalogFromXmlCommandHandler(
         ImportRootDto dto = JsonConvert.DeserializeObject<ImportRootDto>(json)
                             ?? throw new InvalidOperationException("Unable to deserialize XML preview DTO.");
 
-        var parsed = ImportCatalogMapper.MapCatalog(dto, command.ProductTypeId);
+        var parsed = CatalogMapper.MapCatalog(dto, command.ProductTypeId);
 
         // Delete products and categories that are no longer present in the new import
         var (productsDeleted, categoriesDeleted) = await DeleteMissingAsync(

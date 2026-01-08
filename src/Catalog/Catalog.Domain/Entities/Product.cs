@@ -154,5 +154,9 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     public ProductPrice? GetPrice(PriceType type) => _prices.FirstOrDefault(x => x.PriceType == type);
     #endregion
+
+    #region OneCIntegraation
+    public void UpdateStock(decimal stock) => SetStock(stock);
+    #endregion
 }
 
