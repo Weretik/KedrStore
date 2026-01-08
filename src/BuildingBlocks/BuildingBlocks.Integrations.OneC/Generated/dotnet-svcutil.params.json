@@ -6,10 +6,23 @@
       "http://91.218.214.105:8081/YTP82/ws/ws1.1cws?wsdl"
     ],
     "namespaceMappings": [
-      "*, Infrastructure.Common.Integrations.OneC.Generated"
+      "*, BuildingBlocks.Integrations.OneC.Generated"
     ],
     "outputFile": "Reference.cs",
-    "targetFramework": "net9.0",
+    "references": [
+      "Microsoft.Bcl.AsyncInterfaces, {Microsoft.Bcl.AsyncInterfaces, 5.0.0}",
+      "Microsoft.Extensions.Configuration.Abstractions, {Microsoft.Extensions.Configuration.Abstractions, 10.0.0}",
+      "Microsoft.Extensions.ObjectPool, {Microsoft.Extensions.ObjectPool, 10.0.0}",
+      "Microsoft.Extensions.Primitives, {Microsoft.Extensions.Primitives, 10.0.0}",
+      "Microsoft.IdentityModel.Logging, {Microsoft.IdentityModel.Logging, 6.8.0}",
+      "Microsoft.IdentityModel.Protocols.WsTrust, {Microsoft.IdentityModel.Protocols.WsTrust, 6.8.0}",
+      "Microsoft.IdentityModel.Tokens, {Microsoft.IdentityModel.Tokens, 6.8.0}",
+      "Microsoft.IdentityModel.Tokens.Saml, {Microsoft.IdentityModel.Tokens.Saml, 6.8.0}",
+      "Microsoft.IdentityModel.Xml, {Microsoft.IdentityModel.Xml, 6.8.0}",
+      "System.Security.Cryptography.Pkcs, {System.Security.Cryptography.Pkcs, 10.0.0}",
+      "System.Security.Cryptography.Xml, {System.Security.Cryptography.Xml, 10.0.0}"
+    ],
+    "targetFramework": "net10.0",
     "typeReuseMode": "All"
   }
 }

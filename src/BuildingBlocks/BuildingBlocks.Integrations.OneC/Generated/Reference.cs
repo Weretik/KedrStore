@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Infrastructure.Common.Integrations.OneC.Generated
+namespace BuildingBlocks.Integrations.OneC.Generated
 {
     using System.Runtime.Serialization;
     
@@ -15,20 +15,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ProductDetails", Namespace="http://www.sample-package.org", ItemName="goods")]
-    public class ProductDetails : System.Collections.Generic.List<Infrastructure.Common.Integrations.OneC.Generated.good>
+    public class ProductDetails : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.good>
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="good", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
     public partial class good : object
     {
         
@@ -45,6 +45,8 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
         private object IsNewField;
         
         private object ExportToSiteField;
+        
+        private object QuantityInPackField;
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
         public object id
@@ -136,25 +138,38 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
                 this.ExportToSiteField = value;
             }
         }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=7)]
+        public object QuantityInPack
+        {
+            get
+            {
+                return this.QuantityInPackField;
+            }
+            set
+            {
+                this.QuantityInPackField = value;
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.CollectionDataContractAttribute(Name="Categories", Namespace="http://www.sample-package.org", ItemName="Categorys")]
-    public class Categories : System.Collections.Generic.List<Infrastructure.Common.Integrations.OneC.Generated.Category>
+    public class Categories : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.Category>
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Category", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
     public partial class Category : object
     {
         
@@ -222,20 +237,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.CollectionDataContractAttribute(Name="SNomOst", Namespace="http://www.sample-package.org", ItemName="goods")]
-    public class SNomOst : System.Collections.Generic.List<Infrastructure.Common.Integrations.OneC.Generated.goodost>
+    public class SNomOst : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.goodost>
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="goodost", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
     public partial class goodost : object
     {
         
@@ -273,20 +288,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ProductPricess", Namespace="http://www.sample-package.org", ItemName="ProductPrices")]
-    public class ProductPricess : System.Collections.Generic.List<Infrastructure.Common.Integrations.OneC.Generated.ProductPrice>
+    public class ProductPricess : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.ProductPrice>
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ProductPrice", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Infrastructure.Common.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
     public partial class ProductPrice : object
     {
         
@@ -322,21 +337,21 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.sample-package.org", ConfigurationName="Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.sample-package.org", ConfigurationName="BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType")]
     public interface Kontra1PortType
     {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductDetails", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequest request);
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductStocks", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequest request);
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetCategories", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequest request);
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductPrices", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequest request);
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -347,13 +362,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductDetails", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequestBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody Body;
         
         public GetProductDetailsRequest()
         {
         }
         
-        public GetProductDetailsRequest(Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequestBody Body)
+        public GetProductDetailsRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody Body)
         {
             this.Body = Body;
         }
@@ -362,12 +377,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
     public partial class GetProductDetailsRequestBody
     {
         
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public string RootCategoryId;
+        
         public GetProductDetailsRequestBody()
         {
+        }
+        
+        public GetProductDetailsRequestBody(string RootCategoryId)
+        {
+            this.RootCategoryId = RootCategoryId;
         }
     }
     
@@ -379,13 +402,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductDetailsResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsResponseBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponseBody Body;
         
         public GetProductDetailsResponse()
         {
         }
         
-        public GetProductDetailsResponse(Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsResponseBody Body)
+        public GetProductDetailsResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponseBody Body)
         {
             this.Body = Body;
         }
@@ -399,13 +422,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.ProductDetails @return;
+        public BuildingBlocks.Integrations.OneC.Generated.ProductDetails @return;
         
         public GetProductDetailsResponseBody()
         {
         }
         
-        public GetProductDetailsResponseBody(Infrastructure.Common.Integrations.OneC.Generated.ProductDetails @return)
+        public GetProductDetailsResponseBody(BuildingBlocks.Integrations.OneC.Generated.ProductDetails @return)
         {
             this.@return = @return;
         }
@@ -419,13 +442,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductStocks", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequestBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody Body;
         
         public GetProductStocksRequest()
         {
         }
         
-        public GetProductStocksRequest(Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequestBody Body)
+        public GetProductStocksRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody Body)
         {
             this.Body = Body;
         }
@@ -434,12 +457,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
     public partial class GetProductStocksRequestBody
     {
         
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public string RootCategoryId;
+        
         public GetProductStocksRequestBody()
         {
+        }
+        
+        public GetProductStocksRequestBody(string RootCategoryId)
+        {
+            this.RootCategoryId = RootCategoryId;
         }
     }
     
@@ -451,13 +482,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductStocksResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksResponseBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponseBody Body;
         
         public GetProductStocksResponse()
         {
         }
         
-        public GetProductStocksResponse(Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksResponseBody Body)
+        public GetProductStocksResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponseBody Body)
         {
             this.Body = Body;
         }
@@ -471,13 +502,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.SNomOst @return;
+        public BuildingBlocks.Integrations.OneC.Generated.SNomOst @return;
         
         public GetProductStocksResponseBody()
         {
         }
         
-        public GetProductStocksResponseBody(Infrastructure.Common.Integrations.OneC.Generated.SNomOst @return)
+        public GetProductStocksResponseBody(BuildingBlocks.Integrations.OneC.Generated.SNomOst @return)
         {
             this.@return = @return;
         }
@@ -491,13 +522,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCategories", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequestBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody Body;
         
         public GetCategoriesRequest()
         {
         }
         
-        public GetCategoriesRequest(Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequestBody Body)
+        public GetCategoriesRequest(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody Body)
         {
             this.Body = Body;
         }
@@ -506,12 +537,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
     public partial class GetCategoriesRequestBody
     {
         
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public string RootCategoryId;
+        
         public GetCategoriesRequestBody()
         {
+        }
+        
+        public GetCategoriesRequestBody(string RootCategoryId)
+        {
+            this.RootCategoryId = RootCategoryId;
         }
     }
     
@@ -523,13 +562,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCategoriesResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesResponseBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponseBody Body;
         
         public GetCategoriesResponse()
         {
         }
         
-        public GetCategoriesResponse(Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesResponseBody Body)
+        public GetCategoriesResponse(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponseBody Body)
         {
             this.Body = Body;
         }
@@ -543,13 +582,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.Categories @return;
+        public BuildingBlocks.Integrations.OneC.Generated.Categories @return;
         
         public GetCategoriesResponseBody()
         {
         }
         
-        public GetCategoriesResponseBody(Infrastructure.Common.Integrations.OneC.Generated.Categories @return)
+        public GetCategoriesResponseBody(BuildingBlocks.Integrations.OneC.Generated.Categories @return)
         {
             this.@return = @return;
         }
@@ -563,13 +602,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductPrices", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequestBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody Body;
         
         public GetProductPricesRequest()
         {
         }
         
-        public GetProductPricesRequest(Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequestBody Body)
+        public GetProductPricesRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody Body)
         {
             this.Body = Body;
         }
@@ -578,12 +617,20 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
     public partial class GetProductPricesRequestBody
     {
         
+        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
+        public string RootCategoryId;
+        
         public GetProductPricesRequestBody()
         {
+        }
+        
+        public GetProductPricesRequestBody(string RootCategoryId)
+        {
+            this.RootCategoryId = RootCategoryId;
         }
     }
     
@@ -595,13 +642,13 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductPricesResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesResponseBody Body;
+        public BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponseBody Body;
         
         public GetProductPricesResponse()
         {
         }
         
-        public GetProductPricesResponse(Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesResponseBody Body)
+        public GetProductPricesResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponseBody Body)
         {
             this.Body = Body;
         }
@@ -615,26 +662,26 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
     {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public Infrastructure.Common.Integrations.OneC.Generated.ProductPricess @return;
+        public BuildingBlocks.Integrations.OneC.Generated.ProductPricess @return;
         
         public GetProductPricesResponseBody()
         {
         }
         
-        public GetProductPricesResponseBody(Infrastructure.Common.Integrations.OneC.Generated.ProductPricess @return)
+        public GetProductPricesResponseBody(BuildingBlocks.Integrations.OneC.Generated.ProductPricess @return)
         {
             this.@return = @return;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public interface Kontra1PortTypeChannel : Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType, System.ServiceModel.IClientChannel
+    public interface Kontra1PortTypeChannel : BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public partial class Kontra1PortTypeClient : System.ServiceModel.ClientBase<Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType>, Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType
+    public partial class Kontra1PortTypeClient : System.ServiceModel.ClientBase<BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType>, BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType
     {
         
         /// <summary>
@@ -671,55 +718,59 @@ namespace Infrastructure.Common.Integrations.OneC.Generated
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsResponse> Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType.GetProductDetailsAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequest request)
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetProductDetailsAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest request)
         {
             return base.Channel.GetProductDetailsAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync()
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(string RootCategoryId)
         {
-            Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequest inValue = new Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequest();
-            inValue.Body = new Infrastructure.Common.Integrations.OneC.Generated.GetProductDetailsRequestBody();
-            return ((Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductDetailsAsync(inValue);
+            BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest();
+            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody();
+            inValue.Body.RootCategoryId = RootCategoryId;
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductDetailsAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksResponse> Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType.GetProductStocksAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequest request)
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetProductStocksAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest request)
         {
             return base.Channel.GetProductStocksAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync()
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(string RootCategoryId)
         {
-            Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequest inValue = new Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequest();
-            inValue.Body = new Infrastructure.Common.Integrations.OneC.Generated.GetProductStocksRequestBody();
-            return ((Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductStocksAsync(inValue);
+            BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest();
+            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody();
+            inValue.Body.RootCategoryId = RootCategoryId;
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductStocksAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesResponse> Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType.GetCategoriesAsync(Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequest request)
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetCategoriesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest request)
         {
             return base.Channel.GetCategoriesAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync()
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(string RootCategoryId)
         {
-            Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequest inValue = new Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequest();
-            inValue.Body = new Infrastructure.Common.Integrations.OneC.Generated.GetCategoriesRequestBody();
-            return ((Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType)(this)).GetCategoriesAsync(inValue);
+            BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest();
+            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody();
+            inValue.Body.RootCategoryId = RootCategoryId;
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetCategoriesAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesResponse> Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType.GetProductPricesAsync(Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequest request)
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetProductPricesAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest request)
         {
             return base.Channel.GetProductPricesAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync()
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(string RootCategoryId)
         {
-            Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequest inValue = new Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequest();
-            inValue.Body = new Infrastructure.Common.Integrations.OneC.Generated.GetProductPricesRequestBody();
-            return ((Infrastructure.Common.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductPricesAsync(inValue);
+            BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest();
+            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody();
+            inValue.Body.RootCategoryId = RootCategoryId;
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductPricesAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

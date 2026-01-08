@@ -1,6 +1,7 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
+using BuildingBlocks.Integrations.OneC.Generated;
 using Microsoft.Extensions.Configuration;
-using Infrastructure.Common.Integrations.OneC.Generated;
 
 namespace BuildingBlocks.Integrations.OneC;
 
