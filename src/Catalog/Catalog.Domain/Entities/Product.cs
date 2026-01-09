@@ -1,4 +1,3 @@
-using Catalog.Domain.Enumerations;
 using Catalog.Domain.Errors;
 using Catalog.Domain.ValueObjects;
 
@@ -15,9 +14,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
     public int QuantityInPack { get; private set; }
-
-    private readonly List<ProductPrice> _prices = new();
-    public IReadOnlyCollection<ProductPrice> Prices => _prices;
     #endregion
 
     #region Constructors
@@ -137,33 +133,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     }
     #endregion
 
-    #region Price API
-    public void AddOrReplacePrices(IEnumerable<ProductPrice> prices)
-    {
-        foreach (var poductPrice in prices)
-        {
-            var index = _prices.FindIndex(x => x.PriceType == poductPrice.PriceType);
-            if (index >= 0) _prices[index] = poductPrice;
-            else _prices.Add(poductPrice);
-        }
-    }
-
-    public void ReplaceAllPrices(IEnumerable<ProductPrice> prices)
-    {
-        _prices.Clear();
-        _prices.AddRange(prices);
-    }
-
-    public void UpsertPrice(PriceType type, Money price)
-    {
-        var created = ProductPrice.Create(type, price);
-        var existing = _prices.FirstOrDefault(p => p.PriceType == type);
-        if (existing is not null) _prices.Remove(existing);
-        _prices.Add(created);
-    }
-
-    public ProductPrice? GetPrice(PriceType type) => _prices.FirstOrDefault(x => x.PriceType == type);
-    #endregion
 
     #region Update API
     public void UpdateStock(decimal stock) => SetStock(stock);

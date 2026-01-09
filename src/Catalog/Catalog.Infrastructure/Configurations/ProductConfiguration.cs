@@ -51,45 +51,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Navigation(x => x.Prices)
-            .HasField("_prices")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.OwnsMany(p => p.Prices, price =>
-        {
-            price.ToTable("ProductPrices",t =>
-            {
-                t.HasCheckConstraint("CK_ProductPrices_Amount_Positive", "\"Amount\" >= 0");
-            });
-
-            price.WithOwner().HasForeignKey("ProductId");
-            price.HasKey("ProductId", "PriceType");
-
-            price.Property<ProductId>("ProductId")
-                .HasConversion(CatalogConverter.ProductIdConvert)
-                .HasColumnName("ProductId")
-                .IsRequired();
-
-            price.Property(p => p.PriceType)
-                .HasConversion(CatalogConverter.PriceTypeConvert)
-                .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("PriceType")
-                .IsRequired();
-
-            price.Property(p => p.Amount)
-                .HasColumnName("Amount")
-                .HasPrecision(18, 2)
-                .IsRequired();
-
-            price.Property( p => p.CurrencyIso)
-                .HasColumnName("Currency")
-                .HasMaxLength(3)
-                .IsFixedLength()
-                .IsUnicode(false)
-                .IsRequired();
-        });
-
         builder.HasQueryFilter(p => !p.IsDeleted);
     }
 }

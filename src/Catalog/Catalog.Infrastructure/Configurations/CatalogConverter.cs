@@ -1,22 +1,9 @@
-﻿using Catalog.Domain.Enumerations;
-using Catalog.Domain.ValueObjects;
+﻿using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Infrastructure.Configurations;
 
 public static class CatalogConverter
 {
-    public static readonly ValueConverter<ProductType, string> ProductTypeConvert =
-        new(
-            productType => productType.Name,
-            name => ProductType.FromName(name, false)
-        );
-
-    public static readonly ValueConverter<PriceType, string> PriceTypeConvert =
-        new(
-            priceType => priceType.Name,
-            name => PriceType.FromName(name, false)
-        );
-
     public static readonly ValueConverter<ProductId, int> ProductIdConvert =
         new(
             id => id.Value,
@@ -28,4 +15,15 @@ public static class CatalogConverter
             id => id.Value,
             value => ProductCategoryId.From(value)
         );
+    public static readonly ValueConverter<ProductPriceId, int> ProductPriceIdConvert =
+        new(
+            id => id.Value,
+            value => ProductPriceId.From(value)
+        );
+    public static readonly ValueConverter<PriceTypeId, int> PriceTypeIdConvert =
+        new(
+            id => id.Value,
+            value => PriceTypeId.From(value)
+        );
+
 }
