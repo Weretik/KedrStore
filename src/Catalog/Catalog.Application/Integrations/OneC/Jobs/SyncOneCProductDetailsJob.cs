@@ -1,6 +1,4 @@
-﻿// Licensed to KedrStore Development Team under MIT License.
-
-using BuildingBlocks.Application.Integrations.OneC.Contracts;
+﻿using BuildingBlocks.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Features.Shared;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Specifications;

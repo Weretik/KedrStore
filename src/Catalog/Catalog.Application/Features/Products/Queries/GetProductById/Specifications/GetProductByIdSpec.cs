@@ -13,15 +13,16 @@ public sealed class GetProductByIdSpec : Specification<Product, ProductDto>
 
         Query.Where(p => p.Id == ProductId.From(id))
             .Select(p => new ProductDto(
-                p.Id.Value,
-                p.Name,
-                p.CategoryId.Value,
-                p.ProductType.Value,
-                p.Photo,
-                p.Sсheme,
-                p.Stock,
-                p.QuantityInPack,
-                p.Prices.Select(price => new ProductPriceDto(
+                Id: p.Id.Value,
+                Name: p.Name,
+                CategoryId: p.CategoryId.Value,
+                Photo: p.Photo,
+                Scheme: p.Sсheme,
+                Stock: p.Stock,
+                IsSale: p.IsSale,
+                IsNew: p.IsNew,
+                QuantityInPack: p.QuantityInPack,
+                Prices: p.Prices.Select(price => new ProductPriceDto(
                     price.PriceType.Name,
                     price.Price.Amount,
                     price.Price.Currency.Code)

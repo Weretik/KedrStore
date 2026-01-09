@@ -116,6 +116,8 @@
       <_ContentIncludedByDefault Remove="Layout\Header\Header.razor" />
       <_ContentIncludedByDefault Remove="Layout\MainLayout.razor" />
       <_ContentIncludedByDefault Remove="wwwroot\imports\import-preview.json" />
+      <_ContentIncludedByDefault Remove="UI\Pages\Admin\Components\CatalogImportPanel.razor" />
+      <_ContentIncludedByDefault Remove="UI\Pages\Admin\ImportPage.razor" />
     </ItemGroup>
 
     <ItemGroup>

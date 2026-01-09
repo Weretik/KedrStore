@@ -23,8 +23,6 @@
 
     <ItemGroup>
       <Folder Include="Features\Category\Queries\" />
-      <Folder Include="Features\Import\Queries\" />
-      <Folder Include="Features\Import\Queries\ImportCatalogFromXml\Mappers\" />
       <Folder Include="Features\Orders\Commands\" />
     </ItemGroup>
 
