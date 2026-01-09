@@ -1,5 +1,4 @@
-﻿using Catalog.Domain.Enumerations;
-using Catalog.Domain.Errors;
+﻿using Catalog.Domain.Errors;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Domain.Entities;

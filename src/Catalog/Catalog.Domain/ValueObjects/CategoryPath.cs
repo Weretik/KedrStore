@@ -1,6 +1,4 @@
-﻿
-
-namespace Catalog.Domain.ValueObjects;
+﻿namespace Catalog.Domain.ValueObjects;
 
 [ValueObject<string>(conversions: Conversions.None)]
 public readonly partial struct CategoryPath

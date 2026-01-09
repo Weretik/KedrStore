@@ -44,7 +44,5 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
         builder.HasIndex(c => c.Path)
             .HasMethod("gist")
             .HasDatabaseName($"IX_ProductCategories_Path_gist");
-
-
     }
 }
