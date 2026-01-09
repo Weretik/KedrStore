@@ -2,6 +2,7 @@
 
 using BuildingBlocks.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Enumerations;
@@ -10,7 +11,8 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 
 public sealed class SyncOneCProductDetailsJob(
     IOneCClient oneC,
-    ICatalogRepository<Product> productRepo)
+    ICatalogRepository<Product> productRepo,
+    ICatalogRepository<ProductCategory> categoryRepo)
 {
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
@@ -20,6 +22,9 @@ public sealed class SyncOneCProductDetailsJob(
         if (products.Count == 0)
             return;
 
-        var parsed = CatalogMapper.MapCatalog(products, );
+        var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(), cancellationToken);
+        var slugDictionary = rows.ToDictionary(x => x.Slug, x => x.Id.Value);
+
+        var productDtos = CatalogMapper.MapProduct(products, slugDictionary);
     }
 }

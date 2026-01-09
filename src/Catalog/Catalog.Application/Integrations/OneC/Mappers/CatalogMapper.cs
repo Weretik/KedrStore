@@ -41,7 +41,9 @@ public static class CatalogMapper
         }
         return categoryDtos;
     }
-    public static IReadOnlyList<ProductDto> MapProduct(IReadOnlyList<OneCProductDto> productListOneC)
+    public static IReadOnlyList<ProductDto> MapProduct(
+        IReadOnlyList<OneCProductDto> productListOneC,
+        Dictionary<string, int> slugDictionary)
     {
         var productsDtos = new List<ProductDto>();
         var helper = new SlugHelper();
@@ -52,7 +54,10 @@ public static class CatalogMapper
 
             var id = int.Parse(item.Id.TrimStart('0'));
             var name = item.Name.Trim();
-            var categorySlug= helper.GenerateSlug(item.CategoryPath.Trim());
+
+            var categoryId = GetCategoryIdForSlug(
+                    helper.GenerateSlug(item.CategoryPath.Trim()), slugDictionary);
+
             var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
             string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";
             int stock = 0;
@@ -65,7 +70,7 @@ public static class CatalogMapper
             productsDtos.Add(new ProductDto(
                 Id: id,
                 Name: name,
-                CategorySlug: categorySlug,
+                CategoryId: categoryId,
                 Photo: photo,
                 Scheme: scheme,
                 Stock: stock,
@@ -77,4 +82,8 @@ public static class CatalogMapper
         }
         return productsDtos;
     }
+
+    private static int GetCategoryIdForSlug(string slug, Dictionary<string,int> slugDictionary)
+        => slugDictionary[slug];
+
 }

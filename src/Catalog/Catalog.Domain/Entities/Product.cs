@@ -9,10 +9,12 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Properties
     public string Name { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
-    public ProductType ProductType { get; private set; }
+    public string CategorySlug { get; private set; }
     public string Photo { get; private set; } = null!;
     public string? Sсheme {get; private set;}
     public decimal Stock { get; private set; }
+    public bool IsSale { get; private set; }
+    public bool IsNew { get; private set; }
     public int QuantityInPack { get; private set; }
 
     private readonly List<ProductPrice> _prices = new();
@@ -27,7 +29,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetProductId(id);
         SetName(name);
         SetCategoryId(categoryId);
-        SetProductType(productType);
         SetPhoto(photo);
         SetSсheme(sсheme);
         SetStock(stock);
@@ -41,12 +42,11 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         string photo, DateTimeOffset createdDate, decimal stock, int qtyInPack, string? scheme)
         => new(id, name, categoryId, productType, photo, createdDate, stock, scheme, qtyInPack);
 
-    public void Update(string name, ProductCategoryId categoryId, ProductType productType, string photo,
+    public void Update(string name,  ProductCategoryId categoryId, ProductType productType, string photo,
         DateTimeOffset updatedDate, decimal stock,int qtyInPack, string? scheme)
     {
         SetName(name);
         SetCategoryId(categoryId);
-        SetProductType(productType);
         SetPhoto(photo);
         SetSсheme(scheme);
         SetStock(stock);
@@ -62,7 +62,11 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         if (id.Value <= 0) throw new DomainException(ProductErrors.IdRequired());
         Id = id;
     }
-
+    private void SetCategoryId(ProductCategoryId categoryId)
+    {
+        if (categoryId.Value <= 0) throw new DomainException(ProductErrors.CategoryIdRequired());
+        CategoryId = categoryId;
+    }
 
     private void SetName(string name)
     {
@@ -76,20 +80,8 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
         Name = trimmed;
     }
-    private void SetCategoryId(ProductCategoryId categoryId)
-    {
-        if (categoryId.Value <= 0)
-            throw new DomainException(ProductErrors.CategoryIdRequired());
 
-        CategoryId = categoryId;
-    }
-    private void SetProductType(ProductType productType)
-    {
-        if (EqualityComparer<ProductType>.Default.Equals(productType, default))
-            throw new DomainException(ProductErrors.ProductTypeRequired());
 
-        ProductType = productType;
-    }
     private void SetPhoto(string photo)
     {
         if (string.IsNullOrWhiteSpace(photo))
@@ -124,6 +116,25 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
             throw new DomainException(ProductErrors.QuantityInPackNegative(qtyInPack));
 
         QuantityInPack = qtyInPack;
+    }
+    #endregion
+
+    #region Markers
+    public void MarkAsNew()
+    {
+        IsNew = true;
+    }
+    public void MarkAsSale()
+    {
+        IsSale = true;
+    }
+    public void RemoveSale()
+    {
+        IsSale = false;
+    }
+    public void RemoveNew()
+    {
+        IsNew = false;
     }
     #endregion
 

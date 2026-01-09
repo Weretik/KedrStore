@@ -21,13 +21,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.CategoryId)
             .HasConversion(CatalogConverter.ProductCategoryIdConvert);
-
-        builder.Property(p => p.ProductType)
-            .HasConversion(CatalogConverter.ProductTypeConvert)
-            .HasMaxLength(50)
-            .IsUnicode(false)
-            .HasColumnName("ProductTypeId")
-            .IsRequired();
+        builder.HasIndex(p => p.CategoryId);
 
         builder.Property(p => p.Photo)
             .HasMaxLength(1000)
@@ -86,8 +80,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .IsUnicode(false)
                 .IsRequired();
         });
-
-        builder.HasIndex(p => new { p.CategoryId, p.ProductType });
 
         builder.HasQueryFilter(p => !p.IsDeleted);
     }

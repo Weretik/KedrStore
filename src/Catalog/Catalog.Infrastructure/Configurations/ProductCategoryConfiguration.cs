@@ -13,11 +13,22 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Id)
+            .HasConversion(CatalogConverter.ProductCategoryIdConvert)
             .ValueGeneratedNever();
 
         builder.Property(c => c.Name)
             .HasMaxLength(100)
             .IsRequired();
+
+        builder.Property(c => c.Slug)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.HasAlternateKey(c => c.Slug);
+        builder.HasIndex(c => c.Slug).IsUnique();
+
+        builder.Property(c => c.ParentId)
+            .HasConversion(CatalogConverter.ProductCategoryIdConvert);
 
         builder.Property(c => c.Path)
             .HasConversion(PathConverter.Convert)
@@ -34,15 +45,6 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .HasMethod("gist")
             .HasDatabaseName($"IX_ProductCategories_Path_gist");
 
-        builder.Property(c => c.Id)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert)
-            .ValueGeneratedNever();
 
-        builder.Property(c => c.ProductType)
-            .HasConversion(CatalogConverter.ProductTypeConvert)
-            .HasMaxLength(50)
-            .IsUnicode(false)
-            .HasColumnName("ProductTypeId")
-            .IsRequired();
     }
 }
