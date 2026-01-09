@@ -4,6 +4,11 @@ namespace Catalog.Domain.Errors;
 
 public static class ProductPriceErrors
 {
+    public static DomainError IdRequired() =>
+        new("Catalog.ProductPrice.Id.Required", "Product price id is required");
+
+    public static DomainError ProductIdRequired() =>
+        new("Catalog.ProductId.PriceType.Required", "Product id type is required");
     public static DomainError PriceTypeRequired() =>
         new("Catalog.ProductPrice.PriceType.Required", "Price type is required");
 
