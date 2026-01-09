@@ -7,6 +7,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 {
     public DbSet<ProductCategory> Categories => Set<ProductCategory>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
