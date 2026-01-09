@@ -9,9 +9,8 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Properties
     public string Name { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
-    public string CategorySlug { get; private set; }
     public string Photo { get; private set; } = null!;
-    public string? Sсheme {get; private set;}
+    public string Sсheme {get; private set;}
     public decimal Stock { get; private set; }
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
@@ -23,8 +22,8 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     #region Constructors
     private Product() { }
-    private Product(ProductId id, string name, ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset createdDate, decimal stock = 0, string? sсheme = null, int qtyInPack = 0)
+    private Product(ProductId id, string name, ProductCategoryId categoryId, string photo,
+        DateTimeOffset createdDate, decimal stock, string sсheme, int qtyInPack, bool isNew, bool isSale)
     {
         SetProductId(id);
         SetName(name);
@@ -34,22 +33,22 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetStock(stock);
         MarkAsCreated(createdDate);
         SetQuantityInPack(qtyInPack);
+        if(isNew) MarkAsNew();
+        if(isSale) MarkAsSale();
     }
     #endregion
 
     #region Factories
-    public static Product Create(ProductId id, string name, ProductCategoryId categoryId, ProductType productType,
-        string photo, DateTimeOffset createdDate, decimal stock, int qtyInPack, string? scheme)
-        => new(id, name, categoryId, productType, photo, createdDate, stock, scheme, qtyInPack);
+    public static Product Create(ProductId id, string name, ProductCategoryId categoryId,
+        string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
+        => new(id, name, categoryId, photo, createdDate, stock, scheme, qtyInPack, isNew, isSale);
 
-    public void Update(string name,  ProductCategoryId categoryId, ProductType productType, string photo,
-        DateTimeOffset updatedDate, decimal stock,int qtyInPack, string? scheme)
+    public void Update(string name,  ProductCategoryId categoryId, string photo, int qtyInPack, string scheme, DateTimeOffset updatedDate)
     {
         SetName(name);
         SetCategoryId(categoryId);
         SetPhoto(photo);
         SetSсheme(scheme);
-        SetStock(stock);
         SetQuantityInPack(qtyInPack);
         MarkAsUpdated(updatedDate);
     }
@@ -166,7 +165,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public ProductPrice? GetPrice(PriceType type) => _prices.FirstOrDefault(x => x.PriceType == type);
     #endregion
 
-    #region OneCIntegraation
+    #region Update API
     public void UpdateStock(decimal stock) => SetStock(stock);
     #endregion
 }

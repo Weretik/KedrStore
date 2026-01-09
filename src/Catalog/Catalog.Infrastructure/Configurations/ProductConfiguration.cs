@@ -28,11 +28,20 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
 
         builder.Property(p => p.Sсheme)
-            .HasMaxLength(1000);
+            .HasMaxLength(1000)
+            .IsRequired();
 
         builder.Property(p => p.Stock)
             .HasPrecision(10, 2)
             .IsRequired();
+
+        builder.Property(p => p.IsSale)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(p => p.IsNew)
+            .IsRequired()
+            .HasDefaultValue(false);
 
         builder.Property(p => p.QuantityInPack)
             .HasDefaultValue(0);
