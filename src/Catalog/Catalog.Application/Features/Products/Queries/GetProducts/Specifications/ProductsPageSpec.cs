@@ -28,7 +28,8 @@ public sealed class ProductsPageSpec : Specification<Product, ProductDto>
                 .Take(productPagination.PageSize);
         }
 
-        Query.Select<Product, ProductDto>(p => new ProductDto(
+        Query.Select<Product, ProductDto>(p =>
+            new ProductDto(
                 Id: p.Id.Value,
                 Name: p.Name,
                 CategoryId: p.CategoryId.Value,
@@ -37,12 +38,8 @@ public sealed class ProductsPageSpec : Specification<Product, ProductDto>
                 Stock: p.Stock,
                 IsSale: p.IsSale,
                 IsNew: p.IsNew,
-                QuantityInPack: p.QuantityInPack,
-                Prices: p.Prices.Select(price => new ProductPriceDto(
-                        price.PriceType.Name,
-                        price.Price.Amount,
-                        price.Price.Currency.Code)
-                ).ToList())
+                QuantityInPack: p.QuantityInPack
+            )
         );
     }
 }

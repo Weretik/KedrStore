@@ -11,6 +11,5 @@ public sealed record ProductDto(
     decimal Stock,
     bool IsSale,
     bool IsNew,
-    int QuantityInPack,
-    IReadOnlyList<ProductPriceDto> Prices
+    int QuantityInPack
 );

@@ -21,12 +21,7 @@ public sealed class GetProductByIdSpec : Specification<Product, ProductDto>
                 Stock: p.Stock,
                 IsSale: p.IsSale,
                 IsNew: p.IsNew,
-                QuantityInPack: p.QuantityInPack,
-                Prices: p.Prices.Select(price => new ProductPriceDto(
-                    price.PriceType.Name,
-                    price.Price.Amount,
-                    price.Price.Currency.Code)
-                ).ToList())
+                QuantityInPack: p.QuantityInPack)
             );
     }
 }

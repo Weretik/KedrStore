@@ -1,10 +1,6 @@
 ﻿using BuildingBlocks.Application.Integrations.OneC.DTOs;
-using BuildingBlocks.Application.Integrations.OneC.RootCategoryId;
-using Catalog.Application.Features.Import.Queries.ImportCatalogFromXml;
 using Catalog.Application.Features.Shared;
 using Catalog.Application.Shared;
-using Catalog.Domain.ValueObjects;
-using Microsoft.Extensions.Options;
 using Slugify;
 
 namespace Catalog.Application.Integrations.OneC.Mappers;
@@ -76,8 +72,7 @@ public static class CatalogMapper
                 Stock: stock,
                 IsSale: isSale,
                 IsNew: isNew,
-                QuantityInPack: qtyInPack,
-                Prices: prices)
+                QuantityInPack: qtyInPack)
             );
         }
         return productsDtos;
