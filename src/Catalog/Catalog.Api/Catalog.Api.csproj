@@ -7,13 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.ApiEndpoints" Version="4.1.0" />
-      <PackageReference Include="Ardalis.ApiEndpoints.Swashbuckle" Version="4.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
     </ItemGroup>
 

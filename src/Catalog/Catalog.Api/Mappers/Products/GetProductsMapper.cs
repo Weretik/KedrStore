@@ -1,8 +1,7 @@
-﻿using Catalog.Api.Contracts;
-using Catalog.Api.Contracts.Products;
+﻿using Catalog.Api.Contracts.Products;
 using Catalog.Application.Features.Products.Queries.GetProducts;
 
-namespace Catalog.Api.Mappers;
+namespace Catalog.Api.Mappers.Products;
 
 public static class GetProductsMapper
 {

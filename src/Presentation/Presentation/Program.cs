@@ -9,12 +9,13 @@ using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.DependencyInjection;
 using Presentation.DependencyInjection;
 
+/*
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
 {
     Env.TraversePath().Load();
 }
-
+*/
 var builder = WebApplication.CreateBuilder(args);
 
 //---------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@ if (app.Configuration.GetValue<bool>("OneCSoap:RunSmokeTest"))
 //---------------------------------------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
+    Env.TraversePath().Load();
     app.UseDeveloperExceptionPage();
 }
 else

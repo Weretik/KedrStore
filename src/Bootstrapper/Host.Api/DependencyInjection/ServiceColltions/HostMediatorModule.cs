@@ -1,7 +1,7 @@
 ﻿using BuildingBlocks.Application.DependencyInjection;
 using Catalog.Application;
 
-namespace Presentation.DependencyInjection;
+namespace Host.Api.DependencyInjection.ServiceColltions;
 
 public static class HostMediatorModule
 {
