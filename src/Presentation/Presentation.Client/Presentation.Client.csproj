@@ -17,10 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Presentation.Shared\Presentation.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\Header\Header.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderLogo.razor" />
       <_ContentIncludedByDefault Remove="Components\Header\Partials\HeaderMainNavigation.razor" />
