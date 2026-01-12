@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-               xmlns:tns="http://www.sample-package.org">
-    <soap:Body>
-        <tns:GetCategories>
-            <tns:RootCategoryId>5513</tns:RootCategoryId>
-        </tns:GetCategories>
-    </soap:Body>
-</soap:Envelope>
