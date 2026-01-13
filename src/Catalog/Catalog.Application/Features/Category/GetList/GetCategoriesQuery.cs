@@ -1,3 +1,3 @@
-﻿namespace Catalog.Application.Features.Category.Queries.GetCategories;
+﻿namespace Catalog.Application.Features.Category.GetList;
 
 public sealed record GetCategoriesQuery(CategoryFilter Filter)  : IQuery<Result<IReadOnlyList<CategoryTreeDto>>> { }

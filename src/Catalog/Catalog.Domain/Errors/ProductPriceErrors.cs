@@ -41,20 +41,4 @@ public static class ProductPriceErrors
             new { code }
         );
 
-    public static DomainError PriceTypeIdOutOfRange(int value) =>
-        new(
-            "Catalog.ProductPrice.PriceType.Id.OutOfRange",
-            "PriceType id must be between 1 and 14",
-            new { value, min = 1, max = 14 }
-        );
-
-    public static DomainError PriceTypeNameRequired() =>
-        new("Catalog.ProductPrice.PriceType.Name.Required", "PriceType name is required");
-
-    public static DomainError UnknownPriceTypeName(string name) =>
-        new(
-            "Catalog.ProductPrice.PriceType.Name.Unknown",
-            "Unknown PriceType name",
-            new { name }
-        );
 }

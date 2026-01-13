@@ -22,8 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Category\Queries\" />
       <Folder Include="Features\Orders\Commands\" />
+      <Folder Include="Features\Products\GetById\" />
+      <Folder Include="Features\Products\GetList\" />
     </ItemGroup>
 
 </Project>

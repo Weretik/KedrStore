@@ -1,7 +1,6 @@
 ﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Enumerations;
 
-namespace Catalog.Application.Features.Category.Queries.GetCategories;
+namespace Catalog.Application.Features.Category.GetList;
 
 public sealed class AllCategoriesSpec : Specification<ProductCategory>
 {
@@ -9,9 +8,6 @@ public sealed class AllCategoriesSpec : Specification<ProductCategory>
     {
         Query.AsNoTracking();
 
-        if (productTypeId.HasValue)
-            Query.Where(x =>
-                x.ProductType == ProductType.FromValue(productTypeId.Value));
 
         Query.OrderBy(category => category.Path)
             .ThenBy(category => category.Name);

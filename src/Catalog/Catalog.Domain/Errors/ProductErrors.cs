@@ -16,9 +16,6 @@ public static class ProductErrors
     public static DomainError CategoryIdRequired() =>
         new("Catalog.Product.CategoryId.Required", "Product category id is required");
 
-    public static DomainError ProductTypeRequired() =>
-        new("Catalog.Product.ProductType.Required", "Product type is required");
-
     public static DomainError PhotoRequired() =>
         new("Catalog.Product.Photo.Required", "Product photo is required");
 

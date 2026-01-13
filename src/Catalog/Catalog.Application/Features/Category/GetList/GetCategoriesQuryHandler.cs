@@ -1,7 +1,7 @@
 ﻿using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 
-namespace Catalog.Application.Features.Category.Queries.GetCategories;
+namespace Catalog.Application.Features.Category.GetList;
 
 public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> categoryRepository)
     : IQueryHandler<GetCategoriesQuery, Result<IReadOnlyList<CategoryTreeDto>>>
