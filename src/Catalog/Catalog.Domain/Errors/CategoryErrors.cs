@@ -8,24 +8,17 @@ public static class CategoryErrors
     public static DomainError NameIsRequired() =>
         new("Catalog.Category.Name.Required", "Category name is required");
 
-    public static DomainError SlugIsRequired() =>
-        new("Catalog.Category.Slug.Required", "Category slug is required");
-
     public static DomainError NameLengthInvalid(int length) =>
-        new("Catalog.Category.Name.LengthInvalid", "Category name length must be between 1 and 100 characters",
+        new("Catalog.Category.Name.LengthInvalid",
+            "Category name length must be between 1 and 100 characters",
             new { length });
 
     public static DomainError PathIsRequired() =>
         new("Catalog.Category.Path.Required", "Category path is required");
 
-    public static DomainError ParentIsRequired() =>
-        new("Catalog.Category.Parent.Required", "Parent category is required");
-
-    public static DomainError ParentPathIsRequired() =>
-        new("Catalog.Category.Parent.Path.Required", "Parent path is required");
-
     public static DomainError CannotSetSelfAsParent(string path) =>
-        new("Catalog.Category.Reparent.SelfParentForbidden", "You cannot set a node as its own parent.",
+        new("Catalog.Category.Reparent.SelfParentForbidden",
+            "You cannot set a node as its own parent.",
             new { path });
 
     public static DomainError CannotMoveUnderDescendant(string currentPath, string newParentPath) =>

@@ -1,13 +1,8 @@
-﻿using Catalog.Domain.Errors;
+﻿using BuildingBlocks.Domain.Errors;
 
 namespace BuildingBlocks.Domain.Exceptions;
 
-public sealed class DomainException : Exception
+public sealed class DomainException(IDomainError error) : Exception(error.Message)
 {
-    public DomainError Error { get; }
-
-    public DomainException(DomainError error) : base(error.Message)
-    {
-        Error = error;
-    }
+    public IDomainError  Error { get; } = error;
 }

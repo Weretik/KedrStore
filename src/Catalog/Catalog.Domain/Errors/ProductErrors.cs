@@ -1,6 +1,4 @@
-﻿// Licensed to KedrStore Development Team under MIT License.
-
-namespace Catalog.Domain.Errors;
+﻿namespace Catalog.Domain.Errors;
 
 public static class ProductErrors
 {
