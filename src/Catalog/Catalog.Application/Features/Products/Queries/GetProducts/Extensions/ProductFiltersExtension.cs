@@ -1,5 +1,4 @@
 ﻿using Catalog.Domain.Entities;
-using Catalog.Domain.Enumerations;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.Queries.GetProducts;
@@ -41,27 +40,14 @@ public static class ProductFiltersExtension
             specification.Where(p => p.CategoryId == filterCategoryId);
         }
 
-        if (filter.ProductTypeId.HasValue)
-        {
-            var filterProductTypeId = ProductType.FromValue(filter.ProductTypeId.Value);
-            specification.Where(p => p.ProductType == filterProductTypeId);
-        }
 
         //Price filter
-        var priceTypeVo = PriceType.FromName(pricingOptions.PriceType, false);
         var hasMin = pricingOptions.MinPrice.HasValue;
         var hasMax = pricingOptions.MaxPrice.HasValue;
         var min = pricingOptions.MinPrice.GetValueOrDefault();
         var max = pricingOptions.MaxPrice.GetValueOrDefault();
 
-        specification.Where(p =>
-            p.Stock > 0
-            &&
-            p.Prices.Any(pp =>
-                pp.PriceType == priceTypeVo
-                && pp.Amount > 0
-                && (!hasMin || pp.Amount >= min)
-                && (!hasMax || pp.Amount <= max)));
+        specification.Where(p => p.Stock > 0);
 
         if (filter.Stock.HasValue)
             specification.Where(p => p.Stock == filter.Stock.Value);

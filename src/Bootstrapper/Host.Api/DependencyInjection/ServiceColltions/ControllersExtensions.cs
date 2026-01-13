@@ -2,7 +2,7 @@
 
 namespace Host.Api.DependencyInjection.ServiceColltions;
 
-public static class ControllersModule
+public static class ControllersExtensions
 {
     public static IMvcBuilder AddModuleControllers(this IServiceCollection services)
         => services.AddControllers()

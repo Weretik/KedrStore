@@ -3,7 +3,7 @@ using Catalog.Application;
 
 namespace Host.Api.DependencyInjection.ServiceColltions;
 
-public static class HostMediatorModule
+public static class MediatorExtensions
 {
     public static IServiceCollection AddMediatorPipeline(
         this IServiceCollection services)

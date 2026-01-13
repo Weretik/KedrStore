@@ -29,16 +29,6 @@ public static class ProductSortingExtension
                     ? spec.OrderByDescending(p => p.Stock)
                     : spec.OrderBy(p => p.Stock),
 
-            ProductSortKey.Price =>
-                sorter.Desc
-                    ? spec.OrderByDescending(p => p.Prices
-                        .Where(pp => pp.PriceType.Name == pricingOptions.PriceType)
-                        .Select(pp => pp.Amount)
-                        .FirstOrDefault())
-                    : spec.OrderBy(p => p.Prices
-                        .Where(pp => pp.PriceType.Name == pricingOptions.PriceType)
-                        .Select(pp => pp.Amount)
-                        .FirstOrDefault()),
 
             _ => spec.OrderBy(p => p.Name)
         };
