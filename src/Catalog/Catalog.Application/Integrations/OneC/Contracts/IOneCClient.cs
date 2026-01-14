@@ -1,6 +1,6 @@
 ﻿using Catalog.Application.Integrations.OneC.DTOs;
 
-namespace BuildingBlocks.Application.Integrations.OneC.Contracts;
+namespace Catalog.Application.Integrations.OneC.Contracts;
 
 public interface IOneCClient
 {

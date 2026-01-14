@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Integrations.OneC.Specifications;
+﻿using Catalog.Application.Integrations.OneC.Contracts;
+using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;

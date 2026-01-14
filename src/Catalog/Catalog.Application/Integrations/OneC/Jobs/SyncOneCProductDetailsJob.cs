@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Integrations.OneC.DTOs;
+﻿using Catalog.Application.Integrations.OneC.Contracts;
+using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;

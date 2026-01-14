@@ -19,7 +19,6 @@ global using BuildingBlocks.Application.Behaviors;
 global using BuildingBlocks.Application.Logging;
 global using BuildingBlocks.Application.Helpers;
 global using BuildingBlocks.Domain.Abstractions;
-global using BuildingBlocks.Application.Integrations.OneC.Contracts;
 
 // External libraries
 global using Mediator;

@@ -1,4 +1,7 @@
-﻿namespace Catalog.Application.DependencyInjection;
+﻿using Catalog.Application.Integrations.OneC.Client;
+using Catalog.Application.Integrations.OneC.Contracts;
+
+namespace Catalog.Application.DependencyInjection;
 
 public static class CatalogDependencyInjection
 {
@@ -7,6 +10,8 @@ public static class CatalogDependencyInjection
         services.AddValidatorsFromAssembly(
             typeof(CatalogApplicationAssemblyMarker).Assembly,
             includeInternalTypes: true);
+
+        services.AddScoped<IOneCClient, OneCClient>();
 
         return services;
     }

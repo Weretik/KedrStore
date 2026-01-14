@@ -1,7 +1,8 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.Contracts;
-using BuildingBlocks.Application.Integrations.OneC.DTOs;
+﻿using BuildingBlocks.Integrations.OneC;
+using Catalog.Application.Integrations.OneC.Contracts;
+using Catalog.Application.Integrations.OneC.DTOs;
 
-namespace BuildingBlocks.Integrations.OneC.Client;
+namespace Catalog.Application.Integrations.OneC.Client;
 
 public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 {
