@@ -1,5 +1,6 @@
 ﻿using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Integrations.OneC.RootCategoryId;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
@@ -7,10 +8,14 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
-public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<ProductCategory> categoryRepo, IOptionsSnapshot<OneCOptions> options)
+public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<ProductCategory> categoryRepo,
+    IOptionsSnapshot<OneCOptions> options, ILogger<SyncOneCCategoryJob> logger)
 {
+    [DisableConcurrentExecution(60 * 60)]
     public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
     {
+        logger.LogInformation("SyncOneCCategoryJob started for {Root}", rootCategoryOneCId);
+
         var rootCategoryId = int.Parse(rootCategoryOneCId.TrimStart('0'));
         var furnitureId = int.Parse(options.Value.HardwareRootCategoryId.TrimStart('0'));
 
@@ -23,6 +28,8 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
         await DeleteMissingAsync(categories, rootCategoryOneCId, cancellationToken);
         await CreateOrUpsertCategoriesAsync(categories, rootCategoryOneCId, cancellationToken);
+
+        logger.LogInformation("SyncOneCCategoryJob finished for {Root}", rootCategoryOneCId);
     }
 
     private async Task DeleteMissingAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
@@ -44,7 +51,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         foreach (var item in categoryDtos)
         {
             var id = ProductCategoryId.From(item.Id);
-            ProductCategoryId? parentId = item.ParentId == null ? null : ProductCategoryId.From(item.Id);
+            ProductCategoryId? parentId = item.ParentId == null ? null : ProductCategoryId.From(item.ParentId.Value);
             CategoryPath path = CategoryPath.From(item.Path);
             var existing = await categoryRepo.GetByIdAsync(id, cancellationToken);
 

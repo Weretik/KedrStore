@@ -5,10 +5,14 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
-public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Product> productRepo)
+public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Product> productRepo,
+    ILogger<SyncOneCStocksJob> logger)
 {
+    [DisableConcurrentExecution(60 * 60)]
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
+        logger.LogInformation("SyncOneCStocksJob started for {Root}", rootCategoryId);
+
         var stocks = await oneC.GetProductStocksAsync(rootCategoryId, cancellationToken);
 
         if (stocks.Count == 0)
@@ -24,6 +28,8 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
             return;
 
         await UpdateStockAsync(stockByProductId, rootCategoryId, cancellationToken);
+
+        logger.LogInformation("SyncOneCStocksJob finished for {Root}", rootCategoryId);
     }
 
     private async Task UpdateStockAsync(Dictionary<ProductId, decimal> stocks, string productTypeIdOneC, CancellationToken cancellationToken)

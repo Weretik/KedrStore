@@ -10,10 +10,14 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 public sealed class SyncOneCProductDetailsJob(
     IOneCClient oneC,
     ICatalogRepository<Product> productRepo,
-    ICatalogRepository<ProductCategory> categoryRepo)
+    ICatalogRepository<ProductCategory> categoryRepo,
+    ILogger<SyncOneCPricesJob> logger)
 {
+    [DisableConcurrentExecution(60 * 60 * 2)]
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
+        logger.LogInformation("SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
+
         var productsOneC = await oneC.GetProductDetailsAsync(rootCategoryId, cancellationToken);
 
         if (productsOneC.Count == 0)
@@ -26,6 +30,8 @@ public sealed class SyncOneCProductDetailsJob(
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         await CreateOrUpsertProductsAsync(products, cancellationToken);
+
+        logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
     private async Task DeleteMissingAsync(IReadOnlyList<ProductDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
@@ -81,6 +87,6 @@ public sealed class SyncOneCProductDetailsJob(
                 else existing.RemoveSale();
             }
         }
-        await categoryRepo.SaveChangesAsync(cancellationToken);
+        await productRepo.SaveChangesAsync(cancellationToken);
     }
 }

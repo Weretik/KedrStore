@@ -1,14 +1,19 @@
-﻿using Catalog.Application.Integrations.OneC.Specifications;
+﻿using Catalog.Application.Integrations.OneC.DTOs;
+using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
-public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<ProductPrice> priceRepo)
+public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<ProductPrice> priceRepo,
+    ILogger<SyncOneCPricesJob> logger)
 {
+    [DisableConcurrentExecution(60 * 60 * 2)]
     public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
     {
+        logger.LogInformation("SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
+
         var pricesOneC = await oneC.GetProductPricesAsync(rootCategoryOneCId, cancellationToken);
 
         if (pricesOneC.Count == 0)
@@ -16,6 +21,8 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
 
         await DeletePricesMissingAsync(pricesOneC, rootCategoryOneCId, cancellationToken);
         await CreateOrUpsertPricesAsync(pricesOneC, rootCategoryOneCId, cancellationToken);
+
+        logger.LogInformation("SyncOneCPricesJob finished for {Root}", rootCategoryOneCId);
     }
 
     private async Task DeletePricesMissingAsync(IReadOnlyList<OneCPriceDto> priceDtos, string productTypeIdOneC, CancellationToken cancellationToken)
