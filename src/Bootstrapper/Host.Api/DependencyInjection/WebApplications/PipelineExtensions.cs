@@ -23,7 +23,7 @@ public static class PipelineExtensions
 
         app.MapControllers();
         app.MapHealthChecks("/health");
-
+        app.UseHangfireDashboard("/hangfire");
         return app;
     }
 }

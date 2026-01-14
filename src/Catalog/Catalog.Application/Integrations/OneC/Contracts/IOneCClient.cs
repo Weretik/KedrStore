@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.DTOs;
+﻿using Catalog.Application.Integrations.OneC.DTOs;
 
 namespace BuildingBlocks.Application.Integrations.OneC.Contracts;
 

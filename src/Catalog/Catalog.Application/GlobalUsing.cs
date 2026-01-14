@@ -20,8 +20,6 @@ global using BuildingBlocks.Application.Logging;
 global using BuildingBlocks.Application.Helpers;
 global using BuildingBlocks.Domain.Abstractions;
 global using BuildingBlocks.Application.Integrations.OneC.Contracts;
-global using BuildingBlocks.Application.Integrations.OneC.RootCategoryId;
-global using BuildingBlocks.Application.Integrations.OneC.DTOs;
 
 // External libraries
 global using Mediator;
@@ -34,3 +32,4 @@ global using PhoneNumbers;
 global using NodaMoney;
 global using Newtonsoft.Json;
 global using Slugify;
+global using Hangfire;

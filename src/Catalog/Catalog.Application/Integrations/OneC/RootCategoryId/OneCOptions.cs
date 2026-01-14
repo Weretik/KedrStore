@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Application.Integrations.OneC.RootCategoryId;
+﻿namespace Catalog.Application.Integrations.OneC.RootCategoryId;
 
 public sealed class OneCOptions
 {

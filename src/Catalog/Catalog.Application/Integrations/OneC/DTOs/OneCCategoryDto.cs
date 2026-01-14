@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Application.Integrations.OneC.DTOs;
+﻿namespace Catalog.Application.Integrations.OneC.DTOs;
 
 public sealed record OneCCategoryDto(
     int CategoryId,

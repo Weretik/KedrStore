@@ -13,3 +13,5 @@ global using Catalog.Infrastructure.DependencyInjection;
 
 global using DotNetEnv;
 global using Serilog;
+global using Hangfire;
+global using Hangfire.PostgreSql;
