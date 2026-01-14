@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.DTOs;
-using Catalog.Application.Features.Shared;
-using Catalog.Application.Shared;
-using Slugify;
+﻿using Catalog.Application.Integrations.OneC.DTOs;
 
 namespace Catalog.Application.Integrations.OneC.Mappers;
 
@@ -10,7 +7,8 @@ public static class CatalogMapper
     public static IReadOnlyList<CategoryDto> MapCategory(
         IReadOnlyList<OneCCategoryDto> categoryListOneC,
         int rootCategoryId,
-        int furnitureId)
+        int furnitureId,
+        string rootCategoryOneCId)
     {
         var categoryDtos = new List<CategoryDto>();
         var helper = new SlugHelper();
@@ -19,6 +17,7 @@ public static class CatalogMapper
 
         categoryDtos.Add(new CategoryDto(
             rootCategoryId,
+            rootCategoryOneCId,
             nameRootCategory ,
             helper.GenerateSlug(nameRootCategory),
             null,
@@ -27,19 +26,20 @@ public static class CatalogMapper
 
         foreach (var item in categoryListOneC)
         {
-            var id = int.Parse(item.CategoryId.TrimStart('0'));
+            var id = item.CategoryId;
             var name = item.CategoryName.Trim();
             var slug = helper.GenerateSlug(name);
             var parentId = rootCategoryId;
             var path = $"n{rootCategoryId}.n{id}";
 
-            categoryDtos.Add(new CategoryDto(id, name, slug, parentId, path));
+            categoryDtos.Add(new CategoryDto(id, rootCategoryOneCId, name, slug, parentId, path));
         }
         return categoryDtos;
     }
     public static IReadOnlyList<ProductDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
-        Dictionary<string, int> slugDictionary)
+        Dictionary<string, int> slugDictionary,
+        string rootCategoryOneCId)
     {
         var productsDtos = new List<ProductDto>();
         var helper = new SlugHelper();
@@ -48,7 +48,7 @@ public static class CatalogMapper
         {
             //if (!item.ExportToSite) continue;
 
-            var id = int.Parse(item.Id.TrimStart('0'));
+            var id = item.Id;
             var name = item.Name.Trim();
 
             var categoryId = GetCategoryIdForSlug(
@@ -60,12 +60,13 @@ public static class CatalogMapper
             bool isSale = item.IsSale;
             bool isNew = item.IsNew;
             var qtyInPack = item.QuantityInPack;
-            List<ProductPriceDto> prices = [];
 
 
             productsDtos.Add(new ProductDto(
                 Id: id,
+                ProductTypeIdOneC: rootCategoryOneCId,
                 Name: name,
+                ProducSlug: helper.GenerateSlug(name),
                 CategoryId: categoryId,
                 Photo: photo,
                 Scheme: scheme,

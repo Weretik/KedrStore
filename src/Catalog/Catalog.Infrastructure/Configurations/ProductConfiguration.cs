@@ -1,5 +1,6 @@
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
+using Catalog.Infrastructure.Converters;
 
 namespace Catalog.Infrastructure.Configurations;
 
@@ -19,8 +20,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(300)
             .IsRequired();
 
+        builder.Property(c => c.ProductTypeIdOneC)
+            .HasMaxLength(10)
+            .IsRequired();
+
         builder.Property(p => p.CategoryId)
             .HasConversion(CatalogConverter.ProductCategoryIdConvert);
+
         builder.HasIndex(p => p.CategoryId);
 
         builder.Property(p => p.Photo)
@@ -52,5 +58,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(p => !p.IsDeleted);
+
+
     }
 }

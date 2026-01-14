@@ -1,6 +1,6 @@
 ﻿using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Infrastructure.Configurations;
+namespace Catalog.Infrastructure.Converters;
 
 public static class CatalogConverter
 {

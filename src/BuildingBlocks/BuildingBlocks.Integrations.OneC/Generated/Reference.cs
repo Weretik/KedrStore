@@ -29,6 +29,8 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
     public partial class good : object
     {
         
@@ -170,6 +172,8 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
     public partial class Category : object
     {
         
@@ -251,6 +255,8 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
     public partial class goodost : object
     {
         
@@ -302,10 +308,14 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
     public partial class ProductPrice : object
     {
         
         private object idField;
+        
+        private object PriceTypeIdField;
         
         private object PriceField;
         
@@ -323,6 +333,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=1)]
+        public object PriceTypeId
+        {
+            get
+            {
+                return this.PriceTypeIdField;
+            }
+            set
+            {
+                this.PriceTypeIdField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=2)]
         public object Price
         {
             get
@@ -332,6 +355,59 @@ namespace BuildingBlocks.Integrations.OneC.Generated
             set
             {
                 this.PriceField = value;
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="PriceTypess", Namespace="http://www.sample-package.org", ItemName="PriceTypes")]
+    public class PriceTypess : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.PriceType>
+    {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PriceType", Namespace="http://www.sample-package.org")]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
+    public partial class PriceType : object
+    {
+        
+        private object PriceTypeIdField;
+        
+        private object PriceTypeNameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
+        public object PriceTypeId
+        {
+            get
+            {
+                return this.PriceTypeIdField;
+            }
+            set
+            {
+                this.PriceTypeIdField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
+        public object PriceTypeName
+        {
+            get
+            {
+                return this.PriceTypeNameField;
+            }
+            set
+            {
+                this.PriceTypeNameField = value;
             }
         }
     }
@@ -352,6 +428,9 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductPrices", ReplyAction="*")]
         System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetPriceTypes", ReplyAction="*")]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> GetPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -674,6 +753,78 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetPriceTypesRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetPriceTypes", Namespace="http://www.sample-package.org", Order=0)]
+        public BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody Body;
+        
+        public GetPriceTypesRequest()
+        {
+        }
+        
+        public GetPriceTypesRequest(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody Body)
+        {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute()]
+    public partial class GetPriceTypesRequestBody
+    {
+        
+        public GetPriceTypesRequestBody()
+        {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class GetPriceTypesResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetPriceTypesResponse", Namespace="http://www.sample-package.org", Order=0)]
+        public BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponseBody Body;
+        
+        public GetPriceTypesResponse()
+        {
+        }
+        
+        public GetPriceTypesResponse(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponseBody Body)
+        {
+            this.Body = Body;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
+    public partial class GetPriceTypesResponseBody
+    {
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
+        public BuildingBlocks.Integrations.OneC.Generated.PriceTypess @return;
+        
+        public GetPriceTypesResponseBody()
+        {
+        }
+        
+        public GetPriceTypesResponseBody(BuildingBlocks.Integrations.OneC.Generated.PriceTypess @return)
+        {
+            this.@return = @return;
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     public interface Kontra1PortTypeChannel : BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType, System.ServiceModel.IClientChannel
     {
@@ -771,6 +922,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
             inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody();
             inValue.Body.RootCategoryId = RootCategoryId;
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductPricesAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest request)
+        {
+            return base.Channel.GetPriceTypesAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> GetPriceTypesAsync()
+        {
+            BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest();
+            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody();
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetPriceTypesAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

@@ -1,8 +1,4 @@
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-if (string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
-{
-    Env.TraversePath().Load();
-}
+Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 

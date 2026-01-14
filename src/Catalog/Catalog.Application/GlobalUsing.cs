@@ -6,6 +6,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using System.Diagnostics;
 global using System.Globalization;
+global using Microsoft.Extensions.Options;
 
 // Microsoft namespaces
 global using Microsoft.Extensions.DependencyInjection;
@@ -13,13 +14,14 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
 
-// Application namespaces
+// BuildingBlocks namespaces
 global using BuildingBlocks.Application.Behaviors;
 global using BuildingBlocks.Application.Logging;
 global using BuildingBlocks.Application.Helpers;
-
-// Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
+global using BuildingBlocks.Application.Integrations.OneC.Contracts;
+global using BuildingBlocks.Application.Integrations.OneC.RootCategoryId;
+global using BuildingBlocks.Application.Integrations.OneC.DTOs;
 
 // External libraries
 global using Mediator;
@@ -31,3 +33,4 @@ global using Ardalis.Result.FluentValidation;
 global using PhoneNumbers;
 global using NodaMoney;
 global using Newtonsoft.Json;
+global using Slugify;

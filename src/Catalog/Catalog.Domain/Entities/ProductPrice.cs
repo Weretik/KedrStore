@@ -6,7 +6,8 @@ namespace Catalog.Domain.Entities;
 public class ProductPrice : BaseEntity<ProductPriceId>, IAggregateRoot
 {
     #region Properties
-    public ProductId ProductId { get; set; }
+    public string ProductTypeIdOneC { get; private set; }
+    public ProductId ProductId { get; private set; }
     public PriceTypeId PriceTypeId { get; private set; }
     public decimal Amount { get; private set; }
     public string CurrencyIso { get; private set; } = "UAH";
@@ -16,32 +17,28 @@ public class ProductPrice : BaseEntity<ProductPriceId>, IAggregateRoot
     #region Constructors
     private ProductPrice() { }
 
-    private ProductPrice(ProductPriceId id, ProductId productId, PriceTypeId priceTypeId, Money price)
+    private ProductPrice(string productTypeIdOneC, ProductId productId, PriceTypeId priceTypeId, Money price)
     {
-        SetId(id);
+        SetProductId(productId);
+        SetPriceTypeId(priceTypeId);
+        SetMoney(price);
+        ProductTypeIdOneC = productTypeIdOneC;
+    }
+    #endregion
+
+    #region Factories
+    public static ProductPrice Create(string productTypeIdOneC, ProductId productId, PriceTypeId priceTypeId, Money price)
+        => new(productTypeIdOneC, productId, priceTypeId, price);
+
+    public void Update(ProductId productId, PriceTypeId priceTypeId, Money price)
+    {
         SetProductId(productId);
         SetPriceTypeId(priceTypeId);
         SetMoney(price);
     }
     #endregion
 
-    #region Factories
-
-    public static ProductPrice Create(ProductPriceId id, ProductId productId, PriceTypeId priceTypeId, Money price)
-        => new();
-
-    public void Update(ProductId productId, PriceTypeId priceTypeId, Money price)
-    {
-
-    }
-    #endregion
-
     #region Validation & Setters
-    private void SetId(ProductPriceId id)
-    {
-        if (id.Value <= 0) throw new DomainException(ProductPriceErrors.IdRequired());
-        Id = id;
-    }
     private void SetProductId(ProductId productId)
     {
         if (productId.Value <= 0) throw new DomainException(ProductPriceErrors.ProductIdRequired());

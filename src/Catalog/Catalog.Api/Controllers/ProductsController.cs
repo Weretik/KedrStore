@@ -1,9 +1,8 @@
 ﻿using BuildingBlocks.Api.Result;
 using Catalog.Api.Contracts.Products;
 using Catalog.Api.Mappers.Products;
-using Catalog.Application.Features.Products.Queries.GetProducts;
-using Catalog.Application.Features.Shared;
-using Microsoft.AspNetCore.Authorization;
+using Catalog.Application.Integrations.OneC.DTOs;
+
 
 namespace Catalog.Api.Controllers;
 

@@ -1,5 +1,4 @@
 ﻿using Catalog.Application.Persistance;
-using Catalog.Application.Shared;
 using Catalog.Infrastructure.DataBase;
 
 namespace Catalog.Infrastructure.Repositories;

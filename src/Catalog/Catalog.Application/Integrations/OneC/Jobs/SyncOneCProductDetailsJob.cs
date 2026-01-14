@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.Contracts;
-using Catalog.Application.Features.Shared;
+﻿using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
@@ -23,19 +22,19 @@ public sealed class SyncOneCProductDetailsJob(
         var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(), cancellationToken);
         var slugDictionary = rows.ToDictionary(x => x.Slug, x => x.Id.Value);
 
-        var products = CatalogMapper.MapProduct(productsOneC, slugDictionary);
+        var products = CatalogMapper.MapProduct(productsOneC, slugDictionary, rootCategoryId);
 
-        await DeleteMissingAsync(products, cancellationToken);
+        await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         await CreateOrUpsertProductsAsync(products, cancellationToken);
     }
-    private async Task DeleteMissingAsync(IReadOnlyList<ProductDto> productDtos, CancellationToken cancellationToken)
+    private async Task DeleteMissingAsync(IReadOnlyList<ProductDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         var importProductsIds = productDtos
             .Select(c => ProductId.From(c.Id))
             .Distinct()
             .ToArray();
 
-        var spec  = new ProductsByIdsSpec(importProductsIds, true);
+        var spec  = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId,true);
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
     }
 
@@ -50,7 +49,9 @@ public sealed class SyncOneCProductDetailsJob(
             {
                 var productList = Product.Create(
                     id: productId,
+                    productTypeIdOneC: item.ProductTypeIdOneC,
                     name: item.Name,
+                    productSlug: item.ProducSlug,
                     categoryId: ProductCategoryId.From(item.CategoryId),
                     photo: item.Photo,
                     scheme: item.Scheme,
@@ -66,6 +67,7 @@ public sealed class SyncOneCProductDetailsJob(
             {
                 existing.Update(
                     name: item.Name,
+                    productSlug: item.ProducSlug,
                     categoryId: ProductCategoryId.From(item.CategoryId),
                     photo: item.Photo,
                     scheme: item.Scheme,

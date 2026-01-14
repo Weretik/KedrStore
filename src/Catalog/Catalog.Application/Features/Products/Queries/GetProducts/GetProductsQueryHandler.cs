@@ -1,6 +1,5 @@
-using Catalog.Application.Features.Shared;
+using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Persistance;
-using Catalog.Application.Shared;
 using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Features.Products.Queries.GetProducts;

@@ -1,6 +1,4 @@
-﻿using Catalog.Application.Shared;
-
-namespace Catalog.Api.Contracts.Products;
+﻿namespace Catalog.Api.Contracts.Products;
 
 public sealed record GetProductsRequest(
 // Filtering

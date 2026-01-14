@@ -1,12 +1,9 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.Contracts;
-using BuildingBlocks.Application.Integrations.OneC.RootCategoryId;
-using Catalog.Application.Features.Shared;
+﻿using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
-using Microsoft.Extensions.Options;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
@@ -22,31 +19,26 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         if (categoriesOneC.Count == 0)
             return;
 
-        var categoriesOneIds = categoriesOneC
-            .Where(x => !string.IsNullOrWhiteSpace(x.CategoryId))
-            .Select(x => ProductCategoryId.From(int.Parse(x.CategoryId.TrimStart('0')))).ToList();
+        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId, rootCategoryOneCId);
 
-        if (categoriesOneIds.Count == 0)
-            return;
-
-        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId);
-
-        await DeleteMissingAsync(categories, cancellationToken);
-        await CreateOrUpsertCategoriesAsync(categories, cancellationToken);
+        await DeleteMissingAsync(categories, rootCategoryOneCId, cancellationToken);
+        await CreateOrUpsertCategoriesAsync(categories, rootCategoryOneCId, cancellationToken);
     }
 
-    private async Task DeleteMissingAsync(IReadOnlyList<CategoryDto> categoryDtos, CancellationToken cancellationToken)
+    private async Task DeleteMissingAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
+        CancellationToken cancellationToken)
     {
         var importCategoryIds = categoryDtos
             .Select(c => ProductCategoryId.From(c.Id))
             .Distinct()
             .ToArray();
 
-        var categorySpec  = new CategoriesByIdsSpec(importCategoryIds, true);
+        var categorySpec  = new CategoriesByIdsSpec(importCategoryIds, rootCategoryOneCId,true);
         await categoryRepo.DeleteRangeAsync(categorySpec, cancellationToken);
     }
 
-    private async Task CreateOrUpsertCategoriesAsync(IReadOnlyList<CategoryDto> categoryDtos, CancellationToken cancellationToken)
+    private async Task CreateOrUpsertCategoriesAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
+        CancellationToken cancellationToken)
     {
 
         foreach (var item in categoryDtos)
@@ -60,6 +52,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             {
                 var productCategory = ProductCategory.Create(
                     id: id,
+                    productTypeIdOneC: rootCategoryOneCId,
                     name: item.Name,
                     slug: item.Slug,
                     path: path,

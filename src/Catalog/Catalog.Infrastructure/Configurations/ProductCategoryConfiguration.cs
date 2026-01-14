@@ -1,5 +1,6 @@
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
+using Catalog.Infrastructure.Converters;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Catalog.Infrastructure.Configurations;
@@ -22,6 +23,10 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
 
         builder.Property(c => c.Slug)
             .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(c => c.ProductTypeIdOneC)
+            .HasMaxLength(10)
             .IsRequired();
 
         builder.HasAlternateKey(c => c.Slug);

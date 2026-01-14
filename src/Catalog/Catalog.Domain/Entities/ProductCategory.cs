@@ -6,6 +6,7 @@ namespace Catalog.Domain.Entities;
 public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 {
     #region Properties
+    public string ProductTypeIdOneC { get; private set; }
     public string Name { get; private set; } = null!;
     public string Slug { get; private set; } = null!;
     public ProductCategoryId? ParentId { get; private set; }
@@ -14,19 +15,23 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 
     #region Constructors
     private ProductCategory() { }
-    private ProductCategory(ProductCategoryId id, string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
+    private ProductCategory(ProductCategoryId id, string productTypeIdOneC, string name, string slug, CategoryPath path,
+        ProductCategoryId? parentId = null)
     {
         SetCategoryId(id);
         SetName(name);
         SetSlug(slug);
         SetPath(path);
         SetParentId(parentId);
+
+        ProductTypeIdOneC = productTypeIdOneC;
     }
     #endregion
 
     #region Factories
-    public static ProductCategory Create(ProductCategoryId id, string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
-        => new(id, name, slug,path, parentId);
+    public static ProductCategory Create(ProductCategoryId id, string productTypeIdOneC, string name, string slug,
+        CategoryPath path, ProductCategoryId? parentId = null)
+        => new(id, productTypeIdOneC, name, slug,path, parentId);
 
     public void Update(string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
     {

@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Entities;
+using Catalog.Infrastructure.Converters;
 
 namespace Catalog.Infrastructure.Configurations;
 
@@ -9,11 +10,12 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
         builder.ToTable("ProductPrices");
 
         builder.HasKey(p => p.Id);
-        builder.HasIndex(p => new {p.ProductId, p.PriceTypeId});
+        builder.HasIndex(p => new {p.ProductId, p.PriceTypeId})
+            .IsUnique();
 
         builder.Property(p => p.Id)
             .HasConversion(CatalogConverter.ProductPriceIdConvert)
-            .ValueGeneratedNever();
+            .ValueGeneratedOnAdd();
 
         builder.Property(p => p.ProductId)
             .HasConversion(CatalogConverter.ProductIdConvert)
@@ -22,6 +24,10 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
         builder.Property(p => p.PriceTypeId)
             .HasConversion(CatalogConverter.PriceTypeIdConvert)
             .ValueGeneratedNever();
+
+        builder.Property(c => c.ProductTypeIdOneC)
+            .HasMaxLength(10)
+            .IsRequired();
 
         builder.Property(p => p.Amount)
             .HasColumnName("Amount")

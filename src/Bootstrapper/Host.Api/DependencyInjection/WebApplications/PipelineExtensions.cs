@@ -13,8 +13,8 @@ public static class PipelineExtensions
         {
             app.UseExceptionHandler();
             app.UseHsts();
-            app.UseHttpsRedirection();
         }
+        app.UseHttpsRedirection();
 
         app.UseSerilogRequestLogging();
 

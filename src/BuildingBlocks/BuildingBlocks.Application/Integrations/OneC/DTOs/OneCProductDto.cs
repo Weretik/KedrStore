@@ -1,7 +1,7 @@
 ﻿namespace BuildingBlocks.Application.Integrations.OneC.DTOs;
 
 public sealed record OneCProductDto(
-    string Id,
+    int Id,
     string Name,
     string CategoryPath,
     string Manufacturer,

@@ -11,8 +11,8 @@ public static class IdentityInfrastructureExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<AppIdentityDbContext>(o =>
-            o.UseNpgsql(configuration.GetConnectionString("Default")));
+        services.AddDbContext<AppIdentityDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
 
         services.AddIdentity<AppUser, AppRole>(options =>

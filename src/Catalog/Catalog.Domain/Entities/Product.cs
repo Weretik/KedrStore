@@ -6,7 +6,9 @@ namespace Catalog.Domain.Entities;
 public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 {
     #region Properties
+    public string ProductTypeIdOneC { get; private set; }
     public string Name { get; private set; } = null!;
+    public string ProductSlug { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
     public string Photo { get; private set; } = null!;
     public string Sсheme {get; private set;}
@@ -18,11 +20,12 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     #region Constructors
     private Product() { }
-    private Product(ProductId id, string name, ProductCategoryId categoryId, string photo,
-        DateTimeOffset createdDate, decimal stock, string sсheme, int qtyInPack, bool isNew, bool isSale)
+    private Product(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
+        string photo, DateTimeOffset createdDate, decimal stock, string sсheme, int qtyInPack, bool isNew, bool isSale)
     {
         SetProductId(id);
         SetName(name);
+        SetProductSlug(productSlug);
         SetCategoryId(categoryId);
         SetPhoto(photo);
         SetSсheme(sсheme);
@@ -31,17 +34,21 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetQuantityInPack(qtyInPack);
         if(isNew) MarkAsNew();
         if(isSale) MarkAsSale();
+
+        ProductTypeIdOneC = productTypeIdOneC;
     }
     #endregion
 
     #region Factories
-    public static Product Create(ProductId id, string name, ProductCategoryId categoryId,
+    public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
         string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
-        => new(id, name, categoryId, photo, createdDate, stock, scheme, qtyInPack, isNew, isSale);
+        => new(id, productTypeIdOneC, name, productSlug, categoryId, photo, createdDate, stock, scheme, qtyInPack, isNew, isSale);
 
-    public void Update(string name,  ProductCategoryId categoryId, string photo, int qtyInPack, string scheme, DateTimeOffset updatedDate)
+    public void Update(string name, string productSlug, ProductCategoryId categoryId,
+        string photo, int qtyInPack, string scheme, DateTimeOffset updatedDate)
     {
         SetName(name);
+        SetProductSlug(productSlug);
         SetCategoryId(categoryId);
         SetPhoto(photo);
         SetSсheme(scheme);
@@ -76,6 +83,11 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         Name = trimmed;
     }
 
+    private void SetProductSlug(string slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(ProductErrors.NameRequired());
+        ProductSlug = slug.Trim();
+    }
 
     private void SetPhoto(string photo)
     {

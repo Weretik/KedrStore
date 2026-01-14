@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Application.Integrations.OneC.Contracts;
-using Catalog.Application.Integrations.OneC.Specifications;
+﻿using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Application.Persistance;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
@@ -16,21 +15,20 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
             return;
 
         var stockByProductId = stocks
-            .Where(x => !string.IsNullOrWhiteSpace(x.Id))
             .ToDictionary(
-                x => ProductId.From(int.Parse(x.Id.TrimStart('0'))),
+                x => ProductId.From(x.Id),
                 x => x.Stock
             );
 
         if (stockByProductId.Count == 0)
             return;
 
-        await UpdateStockAsync(stockByProductId, cancellationToken);
+        await UpdateStockAsync(stockByProductId, rootCategoryId, cancellationToken);
     }
 
-    private async Task UpdateStockAsync(Dictionary<ProductId, decimal> stocks, CancellationToken cancellationToken)
+    private async Task UpdateStockAsync(Dictionary<ProductId, decimal> stocks, string productTypeIdOneC, CancellationToken cancellationToken)
     {
-        var spec = new ProductsByIdsSpec(stocks.Keys);
+        var spec = new ProductsByIdsSpec(stocks.Keys, productTypeIdOneC );
         var products = await productRepo.ListAsync(spec, cancellationToken);
 
         foreach (var product in products)
