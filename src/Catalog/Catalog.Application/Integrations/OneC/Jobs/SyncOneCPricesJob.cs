@@ -27,6 +27,7 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
 
         var keepKeys = priceDtos
             .Select(x => (
+                ProductTypeIdOneC: productTypeIdOneC,
                 ProductId: ProductId.From(x.ProductId),
                 PriceTypeId: PriceTypeId.From(x.PriceTypeId))
             ).ToHashSet();
@@ -34,8 +35,11 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
         var existing = await priceRepo.ListAsync(new PricesByProductIdsSpec(productIds, productTypeIdOneC), cancellationToken);
 
         var toDelete = existing
-            .Where(p => !keepKeys.Contains((p.ProductId, p.PriceTypeId)))
-            .ToList();
+            .Where(p => !keepKeys.Contains((
+                p.ProductTypeIdOneC,
+                p.ProductId,
+                p.PriceTypeId))
+            ).ToList();
 
         if (toDelete.Count == 0) return;
 
@@ -74,4 +78,3 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
         await priceRepo.SaveChangesAsync(cancellationToken);
     }
 }
-
