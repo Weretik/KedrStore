@@ -12,7 +12,7 @@ public static class RecurringJobs
         var recurring = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
         var doors = Required(cfg, "OneC:DoorsRootCategoryId");
-        var hardware = Required(cfg, "OneC:Schedules:StocksDoors");
+        var hardware = Required(cfg, "OneC:HardwareRootCategoryId");
 
         var stocksDoorsCron = Required(cfg, "OneC:Schedules:StocksDoors");
         var stocksHardwareCron = Required(cfg, "OneC:Schedules:StocksHardware");

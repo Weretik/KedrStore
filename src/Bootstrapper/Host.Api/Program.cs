@@ -10,6 +10,7 @@ var app = builder.Build();
 await app.RunStartupTasksAsync();
 
 app.UseHostPipeline();
+app.AddRecurringJobs();
 
 app.Run();
 
