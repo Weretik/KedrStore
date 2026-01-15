@@ -1,4 +1,6 @@
-﻿namespace Host.Api.DependencyInjection.ServiceColltions;
+﻿using Host.Api.DependencyInjection.ServiceColltions.HostServices;
+
+namespace Host.Api.DependencyInjection.ServiceColltions;
 
 public static class HostServicesExtensions
 {
@@ -6,30 +8,29 @@ public static class HostServicesExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services
-            .AddIdentityConfiguration(configuration)
-            .AddIdentityInfrastructure(configuration);
 
-        services
-            .AddOneCIntegration()
-            .AddInfrastructureServices(configuration)
-            .AddCatalogInfrastructureServices(configuration);
+        services.AddIdentityConfiguration(configuration);
+        services.AddIdentityInfrastructure(configuration);
 
-        services
-            .AddMediatorPipeline()
-            .AddValidation();
+        services.AddOneCIntegration();
 
-        services
-            .AddModuleControllers();
+        services.AddInfrastructureServices(configuration);
+        services.AddCatalogInfrastructureServices(configuration);
 
-        services
-            .AddEndpointsApiExplorer()
-            .AddOpenApi();
+        services.AddHangfire(configuration);
+
+        services.AddMediatorPipeline();
+        services.AddValidation();
+
+        services.AddModuleControllers();
+
+        services.AddEndpointsApiExplorer();
+        services.AddOpenApi();
 
         services.AddHealthChecks();
         services.AddSingleton(TimeProvider.System);
 
-        services.AddHostAuthentication(configuration);
+        services.AddAuthentication(configuration);
 
         return services;
     }

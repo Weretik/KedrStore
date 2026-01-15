@@ -1,3 +1,5 @@
+using Host.Api.DependencyInjection.ServiceColltions.HostServices;
+
 Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,6 @@ var app = builder.Build();
 await app.RunStartupTasksAsync();
 
 app.UseHostPipeline();
-app.AddRecurringJobs();
 
 app.Run();
 
