@@ -1,6 +1,8 @@
-﻿namespace Host.Api.DependencyInjection.WebApplications;
+﻿using Host.Api.DependencyInjection.WebApplications.HostPipelines;
 
-public static class PipelineExtensions
+namespace Host.Api.DependencyInjection.WebApplications;
+
+public static class HostPipelineExtensions
 {
     public static WebApplication UseHostPipeline(this WebApplication app)
     {
@@ -14,6 +16,7 @@ public static class PipelineExtensions
             app.UseExceptionHandler();
             app.UseHsts();
         }
+
         app.UseHttpsRedirection();
 
         app.UseSerilogRequestLogging();
@@ -23,7 +26,10 @@ public static class PipelineExtensions
 
         app.MapControllers();
         app.MapHealthChecks("/health");
+
+        app.AddHangfireRecurringJobs();
         app.UseHangfireDashboard("/hangfire");
+
         return app;
     }
 }

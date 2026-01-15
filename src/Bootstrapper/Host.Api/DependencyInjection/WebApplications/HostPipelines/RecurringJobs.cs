@@ -1,10 +1,10 @@
 ﻿using Catalog.Application.Integrations.OneC.Jobs;
 
-namespace Host.Api.DependencyInjection.WebApplications;
+namespace Host.Api.DependencyInjection.WebApplications.HostPipelines;
 
 public static class RecurringJobs
 {
-    public static void AddRecurringJobs(this WebApplication app)
+    public static void AddHangfireRecurringJobs(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
 
