@@ -1,10 +1,10 @@
 ﻿using Catalog.Application.Integrations.OneC.Jobs;
 
-namespace Host.Api.DependencyInjection.ServiceColltions;
+namespace Host.Api.DependencyInjection.ServiceColltions.HostServices;
 
 public static class HangfireExtensions
 {
-    public static IServiceCollection AddHangfireServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHangfire(cfg =>
         {
@@ -23,6 +23,8 @@ public static class HangfireExtensions
             options.ServerName = $"{Environment.MachineName}:hangfire";
             options.WorkerCount = Math.Min(Environment.ProcessorCount * 5, 50);
         });
+
+        services.AddScoped<SyncOneCFullJob>();
 
         services.AddScoped<SyncOneCCategoryJob>();
         services.AddScoped<SyncOneCProductDetailsJob>();

@@ -1,8 +1,8 @@
-﻿namespace Host.Api.DependencyInjection.ServiceColltions;
+﻿namespace Host.Api.DependencyInjection.ServiceColltions.HostServices;
 
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddHostAuthentication(
+    public static IServiceCollection AddAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
     {
