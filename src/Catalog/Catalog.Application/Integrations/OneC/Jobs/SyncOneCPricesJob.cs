@@ -11,8 +11,10 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
     ILogger<SyncOneCPricesJob> logger)
 {
     [DisableConcurrentExecution(60 * 60 * 2)]
-    public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
+    public async Task RunAsync(string rootCategoryOneCId, IJobCancellationToken jobCancellationToken)
     {
+        var cancellationToken = jobCancellationToken.ShutdownToken;
+
         logger.LogInformation("SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
 
         var pricesOneC = await oneC.GetProductPricesAsync(rootCategoryOneCId, cancellationToken);
@@ -67,13 +69,13 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
 
             if (existing is null)
             {
-                var prices = ProductPrice.Create(
+                var price = ProductPrice.Create(
                     productTypeIdOneC: productTypeIdOneC,
                     productId: productId,
                     priceTypeId: priceTypeId,
                     price: priceValue);
 
-                await priceRepo.AddAsync(prices, cancellationToken);
+                await priceRepo.AddAsync(price, cancellationToken);
             }
             else
             {

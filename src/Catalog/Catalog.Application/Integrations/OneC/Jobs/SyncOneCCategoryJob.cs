@@ -13,8 +13,9 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
     IOptionsSnapshot<RootCategoryId> options, ILogger<SyncOneCCategoryJob> logger)
 {
     [DisableConcurrentExecution(60 * 60)]
-    public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
+    public async Task RunAsync(string rootCategoryOneCId, IJobCancellationToken jobCancellationToken)
     {
+        var cancellationToken = jobCancellationToken.ShutdownToken;
         logger.LogInformation("SyncOneCCategoryJob started for {Root}", rootCategoryOneCId);
 
         var rootCategoryId = int.Parse(rootCategoryOneCId.TrimStart('0'));

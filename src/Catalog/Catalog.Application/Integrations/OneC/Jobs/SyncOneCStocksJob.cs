@@ -10,8 +10,10 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
     ILogger<SyncOneCStocksJob> logger)
 {
     [DisableConcurrentExecution(60 * 60)]
-    public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
+    public async Task RunAsync(string rootCategoryId, IJobCancellationToken jobCancellationToken)
     {
+        var cancellationToken = jobCancellationToken.ShutdownToken;
+
         logger.LogInformation("SyncOneCStocksJob started for {Root}", rootCategoryId);
 
         var stocks = await oneC.GetProductStocksAsync(rootCategoryId, cancellationToken);

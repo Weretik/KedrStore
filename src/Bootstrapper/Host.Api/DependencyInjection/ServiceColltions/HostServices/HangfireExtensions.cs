@@ -25,7 +25,7 @@ public static class HangfireExtensions
         });
 
         services.AddScoped<SyncOneCFullJob>();
-
+        services.AddScoped<SyncOneCPriceTypesJob>();
         services.AddScoped<SyncOneCCategoryJob>();
         services.AddScoped<SyncOneCProductDetailsJob>();
         services.AddScoped<SyncOneCStocksJob>();

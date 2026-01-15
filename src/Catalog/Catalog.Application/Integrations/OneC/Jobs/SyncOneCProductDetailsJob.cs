@@ -15,8 +15,9 @@ public sealed class SyncOneCProductDetailsJob(
     ILogger<SyncOneCPricesJob> logger)
 {
     [DisableConcurrentExecution(60 * 60 * 2)]
-    public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
+    public async Task RunAsync(string rootCategoryId, IJobCancellationToken jobCancellationToken)
     {
+        var cancellationToken = jobCancellationToken.ShutdownToken;
         logger.LogInformation("SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
 
         var productsOneC = await oneC.GetProductDetailsAsync(rootCategoryId, cancellationToken);
@@ -54,7 +55,7 @@ public sealed class SyncOneCProductDetailsJob(
             var existing = await productRepo.GetByIdAsync(productId, cancellationToken);
             if (existing is null)
             {
-                var productList = Product.Create(
+                var product = Product.Create(
                     id: productId,
                     productTypeIdOneC: item.ProductTypeIdOneC,
                     name: item.Name,
@@ -68,7 +69,7 @@ public sealed class SyncOneCProductDetailsJob(
                     isSale: item.IsSale,
                     createdDate: DateTimeOffset.UtcNow
                 );
-                await productRepo.AddAsync(productList, cancellationToken);
+                await productRepo.AddAsync(product, cancellationToken);
             }
             else
             {

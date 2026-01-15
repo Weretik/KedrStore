@@ -14,61 +14,55 @@ public static class RecurringJobs
         var doors = Required(cfg, "OneC:DoorsRootCategoryId");
         var hardware = Required(cfg, "OneC:HardwareRootCategoryId");
 
-        var stocksDoorsCron = Required(cfg, "OneC:Schedules:StocksDoors");
-        var stocksHardwareCron = Required(cfg, "OneC:Schedules:StocksHardware");
-
-        var pricesDoorsCron = Required(cfg,"OneC:Schedules:PricesDoors");
-        var pricesHardwareCron = Required(cfg,"OneC:Schedules:PricesHardware");
-
-        var productsDoorsCron = Required(cfg,"OneC:Schedules:ProductsDoors");
-        var productsHardwareCron = Required(cfg,"OneC:Schedules:ProductsHardware");
-
-        var categoriesDoorsCron = Required(cfg,"OneC:Schedules:CategoriesDoors");
-        var categoriesHardwareCron = Required(cfg,"OneC:Schedules:CategoriesHardware");
+        // ===== PriceType =====
+        recurring.AddOrUpdate<SyncOneCPriceTypesJob>(
+            "onec-price-types",
+            j => j.RunAsync(JobCancellationToken.Null),
+            Required(cfg, "OneC:Schedules:PriceTypes"));
 
         // ===== stocks =====
         recurring.AddOrUpdate<SyncOneCStocksJob>(
             "onec-doors-stocks",
-            j => j.RunAsync(doors, CancellationToken.None),
-            stocksDoorsCron);
+            j => j.RunAsync(doors, JobCancellationToken.Null),
+            Required(cfg, "OneC:Schedules:StocksDoors"));
 
         recurring.AddOrUpdate<SyncOneCStocksJob>(
             "onec-hardware-stocks",
-            j => j.RunAsync(hardware, CancellationToken.None),
-            stocksHardwareCron);
+            j => j.RunAsync(hardware, JobCancellationToken.Null),
+            Required(cfg, "OneC:Schedules:StocksHardware"));
 
         // ===== prices =====
         recurring.AddOrUpdate<SyncOneCPricesJob>(
             "onec-doors-prices",
-            j => j.RunAsync(doors, CancellationToken.None),
-            pricesDoorsCron);
+            j => j.RunAsync(doors, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:PricesDoors"));
 
         recurring.AddOrUpdate<SyncOneCPricesJob>(
             "onec-hardware-prices",
-            j => j.RunAsync(hardware, CancellationToken.None),
-            pricesHardwareCron);
+            j => j.RunAsync(hardware, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:PricesHardware"));
 
         // ===== products =====
         recurring.AddOrUpdate<SyncOneCProductDetailsJob>(
             "onec-doors-products",
-            j => j.RunAsync(doors, CancellationToken.None),
-            productsDoorsCron);
+            j => j.RunAsync(doors, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:ProductsDoors"));
 
         recurring.AddOrUpdate<SyncOneCProductDetailsJob>(
             "onec-hardware-products",
-            j => j.RunAsync(hardware, CancellationToken.None),
-            productsHardwareCron);
+            j => j.RunAsync(hardware, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:ProductsHardware"));
 
         // ===== categories =====
         recurring.AddOrUpdate<SyncOneCCategoryJob>(
             "onec-doors-categories",
-            j => j.RunAsync(doors, CancellationToken.None),
-            categoriesDoorsCron);
+            j => j.RunAsync(doors, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:CategoriesDoors"));
 
         recurring.AddOrUpdate<SyncOneCCategoryJob>(
             "onec-hardware-categories",
-            j => j.RunAsync(hardware, CancellationToken.None),
-            categoriesHardwareCron);
+            j => j.RunAsync(hardware, JobCancellationToken.Null),
+            Required(cfg,"OneC:Schedules:CategoriesHardware"));
     }
 
     static string Required(IConfiguration cfg, string key)
