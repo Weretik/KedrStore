@@ -1,5 +1,5 @@
 ﻿using Catalog.Application.Features.Orders.Commands.CreateQuickOrder;
-using Catalog.Application.Persistance;
+using Catalog.Application.Persistence;
 using Catalog.Infrastructure.DataBase;
 using Catalog.Infrastructure.Notifications;
 using Catalog.Infrastructure.Repositories;
@@ -15,7 +15,8 @@ public static class CatalogInfrastructureExtensions
                                ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");;
 
         services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
-        services.AddScoped<DbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+        //services.AddScoped<DbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+        services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));

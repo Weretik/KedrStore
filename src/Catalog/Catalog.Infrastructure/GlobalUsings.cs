@@ -32,6 +32,5 @@ global using BuildingBlocks.Domain.Abstractions;
 // Services
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
-global using SmartEnum.EFCore;
 global using Telegram.Bot;
 global using Telegram.Bot.Types.Enums;

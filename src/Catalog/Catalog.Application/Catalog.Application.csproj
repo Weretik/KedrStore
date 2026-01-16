@@ -7,17 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.Result" Version="10.1.0" />
-      <PackageReference Include="FluentValidation" Version="12.1.1" />
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-      <PackageReference Include="Hangfire" Version="1.8.22" />
-      <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-      <PackageReference Include="Slugify.Core" Version="5.1.1" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
@@ -25,8 +14,10 @@
 
     <ItemGroup>
       <Folder Include="Features\Orders\Commands\" />
-      <Folder Include="Features\Products\GetById\" />
-      <Folder Include="Features\Products\GetList\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Catalog.Application.csproj.DotSettings" />
     </ItemGroup>
 
 </Project>

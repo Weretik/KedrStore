@@ -7,17 +7,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.Result" Version="10.1.0" />
+      <PackageReference Include="Ardalis.Result.AspNetCore" Version="10.1.0" />
       <PackageReference Include="Ardalis.Result.FluentValidation" Version="10.1.0" />
       <PackageReference Include="Ardalis.Specification" Version="9.3.1" />
+      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.3.1" />
       <PackageReference Include="FluentValidation" Version="12.1.1" />
-      <PackageReference Include="libphonenumber-csharp" Version="9.0.21" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+      <PackageReference Include="Hangfire" Version="1.8.22" />
+      <PackageReference Include="libphonenumber-csharp" Version="9.0.22" />
       <PackageReference Include="Mediator.Abstractions" Version="3.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.9" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
       <PackageReference Include="NodaMoney" Version="2.6.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+      <PackageReference Include="Slugify.Core" Version="5.1.1" />
+      <PackageReference Include="Telegram.Bot" Version="22.8.1" />
       <PackageReference Include="Vogen" Version="8.0.4" />
     </ItemGroup>
 

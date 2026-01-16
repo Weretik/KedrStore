@@ -1,4 +1,4 @@
-using Host.Api.DependencyInjection.ServiceColltions.HostServices;
+using Host.Api.DependencyInjection.ServiceCollections;
 
 Env.TraversePath().Load();
 

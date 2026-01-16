@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Persistance;
+﻿using Catalog.Application.Persistence;
 using Catalog.Infrastructure.DataBase;
 
 namespace Catalog.Infrastructure.Repositories;

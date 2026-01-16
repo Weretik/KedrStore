@@ -14,6 +14,9 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
 
+//  Catalog.Domain namespaces
+global using Catalog.Domain.Entities;
+
 // BuildingBlocks namespaces
 global using BuildingBlocks.Application.Behaviors;
 global using BuildingBlocks.Application.Logging;

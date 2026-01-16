@@ -1,8 +1,6 @@
-﻿using BuildingBlocks.Api.Result;
-using Catalog.Api.Contracts.Products;
-using Catalog.Api.Mappers.Products;
-using Catalog.Application.Integrations.OneC.DTOs;
-
+﻿using Ardalis.Result;
+using Catalog.Application.Features.Products.GetById.DTOs;
+using Catalog.Application.Features.Products.GetList;
 
 namespace Catalog.Api.Controllers;
 
@@ -11,31 +9,26 @@ namespace Catalog.Api.Controllers;
 //[Authorize(Policy = "CatalogRead")]
 public sealed class ProductsController(ISender sender) : ControllerBase
 {
-    // GET /api/catalog/products?page=1&pageSize=20
     [HttpGet]
-    [ProducesResponseType(typeof(IReadOnlyList<ProductDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IReadOnlyList<ProductDto>>> Get(
+    [ProducesResponseType(typeof(PagedResult<List<ProductListRowDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResult<List<ProductListRowDto>>>> Get(
         [FromQuery] GetProductsRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        var query = request.ToQuery();
+        var query = new GetProductListQuery(request);
         var result = await sender.Send(query, cancellationToken);
-
-        // временно,заменить на ProblemDetails
-        //return BadRequest(result.Errors);
 
         return this.ToActionResult(result);
     }
-/*
-    // GET /api/catalog/products/{id}
-    [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+
+    // GET /api/catalog/products/{}
+    [HttpGet("{slug}")]
+    [ProducesResponseType(typeof(ProductBySlugDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProductDto>> GetById(int id, CancellationToken ct = default)
+    public async Task<ActionResult<ProductBySlugDto>> GetBySlug(string slug, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new GetProductQuery(id), ct);
+        var result = await sender.Send(new GetProductQuery(id), cancellationToken);
         return result is null ? NotFound() : Ok(result);
     }
-*/
+
 }

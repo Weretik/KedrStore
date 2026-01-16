@@ -36,12 +36,12 @@ public static class CatalogMapper
         }
         return categoryDtos;
     }
-    public static IReadOnlyList<ProductDto> MapProduct(
+    public static IReadOnlyList<ProductRowOneCDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
         Dictionary<string, int> slugDictionary,
         string rootCategoryOneCId)
     {
-        var productsDtos = new List<ProductDto>();
+        var productsDtos = new List<ProductRowOneCDto>();
         var helper = new SlugHelper();
 
         foreach (var item in productListOneC)
@@ -62,7 +62,7 @@ public static class CatalogMapper
             var qtyInPack = item.QuantityInPack;
 
 
-            productsDtos.Add(new ProductDto(
+            productsDtos.Add(new ProductRowOneCDto(
                 Id: id,
                 ProductTypeIdOneC: rootCategoryOneCId,
                 Name: name,

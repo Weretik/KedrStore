@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Persistance;
+﻿using Catalog.Application.Persistence;
 using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Features.Category.GetList;

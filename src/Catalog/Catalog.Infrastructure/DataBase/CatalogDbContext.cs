@@ -1,9 +1,10 @@
+using Catalog.Application.Persistence;
 using Catalog.Domain.Entities;
 
 namespace Catalog.Infrastructure.DataBase;
 
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
-    : DbContext(options)
+    : DbContext(options), IReadCatalogDbContext
 {
     public DbSet<ProductCategory> Categories => Set<ProductCategory>();
     public DbSet<Product> Products => Set<Product>();
@@ -12,7 +13,6 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder.ConfigureSmartEnum();
         configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
         configurationBuilder.Properties<string>().HaveMaxLength(255);
         configurationBuilder.Properties<Uri>().HaveConversion<UriToStringConverter>().HaveMaxLength(2048);

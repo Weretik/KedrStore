@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuildingBlocks.Api.Result;

@@ -2,7 +2,7 @@
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Specifications;
-using Catalog.Application.Persistance;
+using Catalog.Application.Persistence;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
@@ -35,7 +35,7 @@ public sealed class SyncOneCProductDetailsJob(
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
-    private async Task DeleteMissingAsync(IReadOnlyList<ProductDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
+    private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         var importProductsIds = productDtos
             .Select(c => ProductId.From(c.Id))
@@ -46,7 +46,7 @@ public sealed class SyncOneCProductDetailsJob(
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
     }
 
-    private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductDto> productDtos, CancellationToken cancellationToken)
+    private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, CancellationToken cancellationToken)
     {
 
         foreach (var item in productDtos)
