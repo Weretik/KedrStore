@@ -3,4 +3,4 @@ using Catalog.Application.Integrations.OneC.DTOs;
 
 namespace Catalog.Application.Features.Products.GetById;
 
-public sealed record ProductBySlugQuery(string Slug) : IQuery<Result<ProductBySlugDto>>;
+public sealed record ProductBySlugQuery(GetProductBySlugRequest Request) : IQuery<Result<ProductBySlugDto>>;

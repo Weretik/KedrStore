@@ -1,7 +1,7 @@
 ﻿namespace Catalog.Application.Features.Products.GetList;
 
 
-public sealed class GetProductsRequest
+public sealed record GetProductsRequest
 {
     public string? SearchTerm { get; init; }
 

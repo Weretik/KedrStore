@@ -11,7 +11,7 @@ public class ProductBySlugQueryHandler(IReadCatalogDbContext catalogDbContext)
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        var slug = query.Slug;
+        var request = query.Request;
 
 
 
