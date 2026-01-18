@@ -23,6 +23,21 @@ namespace Catalog.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PriceTypeName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PriceType", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +71,16 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ProductSlug")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ProductTypeIdOneC")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<int>("QuantityInPack")
                         .ValueGeneratedOnAdd()
@@ -98,6 +123,11 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("ltree");
 
+                    b.Property<string>("ProductTypeIdOneC")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -105,15 +135,10 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Slug");
-
                     b.HasIndex("Path")
                         .HasDatabaseName("IX_ProductCategories_Path_gist");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
 
                     b.ToTable("ProductCategories", (string)null);
                 });
@@ -121,7 +146,10 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasPrecision(18, 2)
@@ -142,9 +170,15 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ProductTypeIdOneC")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId", "PriceTypeId");
+                    b.HasIndex("ProductId", "PriceTypeId")
+                        .IsUnique();
 
                     b.ToTable("ProductPrices", (string)null);
                 });

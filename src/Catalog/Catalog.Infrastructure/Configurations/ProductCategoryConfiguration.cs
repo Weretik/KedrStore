@@ -29,9 +29,6 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .HasMaxLength(10)
             .IsRequired();
 
-        builder.HasAlternateKey(c => c.Slug);
-        builder.HasIndex(c => c.Slug).IsUnique();
-
         builder.Property(c => c.ParentId)
             .HasConversion(CatalogConverter.ProductCategoryIdConvert);
 
