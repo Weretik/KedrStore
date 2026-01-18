@@ -18,7 +18,7 @@ public static class HostServicesExtensions
         services.AddInfrastructureServices(configuration);
 
         services.AddCatalogInfrastructureServices(configuration);
-        services.AddCatalogApplicationServices();
+        services.AddCatalogApplicationServices(configuration);
 
         services.AddHangfire(configuration);
 
