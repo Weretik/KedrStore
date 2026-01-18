@@ -20,7 +20,7 @@ public static class ProductPriceErrors
     public static DomainError AmountOutOfRange(decimal value) =>
         new(
             "Catalog.ProductPrice.Amount.OutOfRange",
-            "Price amount must be between 0 and 100000",
+            "Price amount must be between 0 and 100000 Actual",
             new { value, min = 0.00m, max = 100_000m }
         );
 

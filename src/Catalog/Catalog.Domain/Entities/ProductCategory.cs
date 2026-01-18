@@ -57,7 +57,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 
     private void SetSlug(string slug)
     {
-        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(CategoryErrors.NameIsRequired());
+        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(CategoryErrors.SlugIsRequired());
         Slug = slug.Trim();
     }
     private void SetPath(CategoryPath path)

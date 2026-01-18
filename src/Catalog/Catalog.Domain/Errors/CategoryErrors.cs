@@ -8,6 +8,9 @@ public static class CategoryErrors
     public static DomainError NameIsRequired() =>
         new("Catalog.Category.Name.Required", "Category name is required");
 
+    public static DomainError SlugIsRequired() =>
+        new("Category.SlugIsRequired", "Category slug is required");
+
     public static DomainError NameLengthInvalid(int length) =>
         new("Catalog.Category.Name.LengthInvalid",
             "Category name length must be between 1 and 100 characters",
