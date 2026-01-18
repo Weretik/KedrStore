@@ -3,12 +3,12 @@ using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Integrations.OneC.Specifications;
 
-public sealed class CategoryIdSlugMapSpec: Specification<ProductCategory, CategoryIdSlugRow>
+public sealed class CategoryIdSlugMapSpec: Specification<ProductCategory, CategoryIdAndNameRow>
 {
     public CategoryIdSlugMapSpec()
     {
         Query
             .AsNoTracking()
-            .Select(c => new CategoryIdSlugRow(c.Id, c.Slug));
+            .Select(c => new CategoryIdAndNameRow(c.Id, c.Name));
     }
 }

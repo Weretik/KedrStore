@@ -26,9 +26,9 @@ public sealed class SyncOneCProductDetailsJob(
             return;
 
         var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(), cancellationToken);
-        var slugDictionary = rows.ToDictionary(x => x.Slug, x => x.Id.Value);
+        var categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
 
-        var products = CatalogMapper.MapProduct(productsOneC, slugDictionary, rootCategoryId);
+        var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         await CreateOrUpsertProductsAsync(products, cancellationToken);

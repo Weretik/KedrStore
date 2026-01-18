@@ -1,4 +1,6 @@
 ﻿using Catalog.Application.Integrations.OneC.DTOs;
+using Unidecode.NET;
+
 
 namespace Catalog.Application.Integrations.OneC.Mappers;
 
@@ -19,7 +21,7 @@ public static class CatalogMapper
             rootCategoryId,
             rootCategoryOneCId,
             nameRootCategory ,
-            helper.GenerateSlug(nameRootCategory),
+            nameRootCategory.SlugGenerate(rootCategoryId, "category", helper),
             null,
             $"n{rootCategoryId}")
         );
@@ -27,8 +29,12 @@ public static class CatalogMapper
         foreach (var item in categoryListOneC)
         {
             var id = item.CategoryId;
-            var name = item.CategoryName.Trim();
-            var slug = helper.GenerateSlug(name);
+            var name = (item.CategoryName ?? string.Empty).Trim();
+
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            var slug = name.SlugGenerate(item.CategoryId,"category", helper);
             var parentId = rootCategoryId;
             var path = $"n{rootCategoryId}.n{id}";
 
@@ -38,7 +44,7 @@ public static class CatalogMapper
     }
     public static IReadOnlyList<ProductRowOneCDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
-        Dictionary<string, int> slugDictionary,
+        Dictionary<string, int> categoryNameDictionary,
         string rootCategoryOneCId)
     {
         var productsDtos = new List<ProductRowOneCDto>();
@@ -51,8 +57,7 @@ public static class CatalogMapper
             var id = item.Id;
             var name = item.Name.Trim();
 
-            var categoryId = GetCategoryIdForSlug(
-                    helper.GenerateSlug(item.CategoryPath.Trim()), slugDictionary);
+            var categoryId = GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
 
             var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
             string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";
@@ -66,7 +71,7 @@ public static class CatalogMapper
                 Id: id,
                 ProductTypeIdOneC: rootCategoryOneCId,
                 Name: name,
-                ProducSlug: helper.GenerateSlug(name),
+                ProducSlug: name.SlugGenerate(id, "product", helper),
                 CategoryId: categoryId,
                 Photo: photo,
                 Scheme: scheme,
@@ -79,7 +84,21 @@ public static class CatalogMapper
         return productsDtos;
     }
 
-    private static int GetCategoryIdForSlug(string slug, Dictionary<string,int> slugDictionary)
-        => slugDictionary[slug];
+    private static int GetCategoryIdForCategoryName(string categoryName, Dictionary<string,int> categoryNameDictionary)
+        => categoryNameDictionary[categoryName];
+
+    private static string SlugGenerate(this string s, int id, string fallbackSlugBase, SlugHelper helper)
+    {
+        var ascii = (s ?? string.Empty).Unidecode();
+
+        var slugPart = helper.GenerateSlug(ascii).Trim('-');
+
+        if (string.IsNullOrWhiteSpace(slugPart))
+            slugPart = fallbackSlugBase.Trim('-');
+
+        return $"{slugPart}-{id}";
+    }
+
+
 
 }
