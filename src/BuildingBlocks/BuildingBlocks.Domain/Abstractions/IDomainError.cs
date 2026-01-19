@@ -1,8 +1,7 @@
-﻿namespace BuildingBlocks.Domain.Errors;
+﻿namespace BuildingBlocks.Domain.Abstractions;
 
 public interface IDomainError
 {
     string Code { get; }
     string Message { get; }
-    object? Details { get; }
 }

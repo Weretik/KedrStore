@@ -3,7 +3,7 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Domain.Entities;
 
-public class ProductPrice : BaseEntity<ProductPriceId>, IAggregateRoot
+public class ProductPrice : BaseEntity<int>, IAggregateRoot
 {
     #region Properties
     public string ProductTypeIdOneC { get; private set; }
@@ -55,7 +55,7 @@ public class ProductPrice : BaseEntity<ProductPriceId>, IAggregateRoot
         if (price.Amount < 0m)
             throw new DomainException(ProductPriceErrors.AmountNegative(price.Amount));
 
-        if (price.Amount > 100_000m)
+        if (price.Amount > 5_000_000m)
             throw new DomainException(ProductPriceErrors.AmountOutOfRange(price.Amount));
 
         var code = price.Currency.Code;

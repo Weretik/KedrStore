@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Domain.Errors;
+﻿using BuildingBlocks.Domain.Abstractions;
 
 namespace BuildingBlocks.Domain.Exceptions;
 

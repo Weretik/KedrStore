@@ -35,9 +35,8 @@ public sealed class ExceptionBehavior<TMessage, TResponse>(
         }
         catch (DomainException ex)
         {
-            logger.LogError(ex, "Domain error {Code} {@Details}", ex.Error.Code, ex.Error.Details);
-
             var messageType = typeof(TMessage).Name;
+
             DomainLog.RuleViolated(logger, messageType, ex.Error.Code);
 
             var validationError = new ValidationError(

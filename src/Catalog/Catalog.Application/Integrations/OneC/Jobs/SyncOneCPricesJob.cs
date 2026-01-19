@@ -7,7 +7,10 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
-public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<ProductPrice> priceRepo,
+public sealed class SyncOneCPricesJob(
+    IOneCClient oneC,
+    ICatalogRepository<ProductPrice> priceRepo,
+    ICatalogRepository<Product> productRepo,
     ILogger<SyncOneCPricesJob> logger)
 {
     [DisableConcurrentExecution(60 * 60 * 2)]
@@ -64,8 +67,12 @@ public sealed class SyncOneCPricesJob(IOneCClient oneC, ICatalogRepository<Produ
             var priceTypeId = PriceTypeId.From(item.PriceTypeId);
             var priceValue = new Money(item.Price, item.Currency);
 
-            var spec = new ProductPriceByProductAndTypeSpec(productId, priceTypeId);
-            var existing = await priceRepo.FirstOrDefaultAsync(spec, cancellationToken);
+            var specProduct = new ProductByIdSpec(productId);
+            var product = await productRepo.FirstOrDefaultAsync(specProduct, cancellationToken);
+            if (product is null) continue;
+
+            var specProductPrice = new ProductPriceByProductAndTypeSpec(productId, priceTypeId);
+            var existing = await priceRepo.FirstOrDefaultAsync(specProductPrice, cancellationToken);
 
             if (existing is null)
             {

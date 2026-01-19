@@ -14,7 +14,6 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
             .IsUnique();
 
         builder.Property(p => p.Id)
-            .HasConversion(CatalogConverter.ProductPriceIdConvert)
             .ValueGeneratedOnAdd();
 
         builder.Property(p => p.ProductId)
@@ -44,6 +43,6 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
         builder.HasOne<Product>()
             .WithMany()
             .HasForeignKey(p => p.ProductId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

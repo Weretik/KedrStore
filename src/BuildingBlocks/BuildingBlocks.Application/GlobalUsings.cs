@@ -5,8 +5,7 @@ global using System.Security.Claims;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using System.Diagnostics;
-global using System.Globalization;
-global using System.Reflection;
+global using System.Text.Json;
 
 // Microsoft namespaces
 global using Microsoft.Extensions.DependencyInjection;
@@ -19,9 +18,7 @@ global using BuildingBlocks.Domain.Abstractions;
 global using Mediator;
 global using FluentValidation;
 global using FluentValidation.Results;
-global using Ardalis.Specification;
 global using Ardalis.Result;
 global using Ardalis.Result.FluentValidation;
 global using PhoneNumbers;
-global using NodaMoney;
-global using Newtonsoft.Json;
+

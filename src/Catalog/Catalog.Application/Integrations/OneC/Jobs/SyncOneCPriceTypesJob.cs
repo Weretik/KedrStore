@@ -14,7 +14,7 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
     {
         var cancellationToken = jobCancellationToken.ShutdownToken;
 
-        logger.LogInformation("SyncOneCPriceTypesJob started for");
+        logger.LogInformation("SyncOneCPriceTypesJob started");
 
         var pricesTypesOneC = await oneC.GetPriceTypesAsync(cancellationToken);
 
@@ -23,7 +23,7 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
 
         await CreateOrUpsertPriceTypesAsync(pricesTypesOneC, cancellationToken);
 
-        logger.LogInformation("SyncOneCPriceTypesJob finished for");
+        logger.LogInformation("SyncOneCPriceTypesJob finished");
     }
     private async Task CreateOrUpsertPriceTypesAsync(IReadOnlyList<OneCPriceTypeDto> priceTypeDtos,CancellationToken cancellationToken)
     {
