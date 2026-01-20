@@ -19,6 +19,8 @@ public static class HostPipelineExtensions
 
         app.UseHttpsRedirection();
 
+        app.UseCors("SpaDev");
+
         app.UseSerilogRequestLogging();
 
         app.UseAuthentication();
