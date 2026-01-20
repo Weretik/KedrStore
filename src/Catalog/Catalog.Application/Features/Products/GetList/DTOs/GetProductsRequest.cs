@@ -4,8 +4,8 @@
 public sealed record GetProductsRequest
 {
     public string? SearchTerm { get; init; }
-
     public int? CategoryId { get; init; }
+
     public bool? InStock { get; init; } = true;
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
