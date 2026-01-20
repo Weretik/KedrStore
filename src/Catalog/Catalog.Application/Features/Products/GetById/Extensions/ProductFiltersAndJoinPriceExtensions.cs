@@ -15,9 +15,9 @@ public static class ProductFiltersAndJoinPriceExtensions
 
         var withCategory = productsQuery.LeftJoin(
             categoriesQuery,
-            p => p.CategoryId,
-            c => c.Id,
-            (p, c) => new { p, c }
+            product => product.CategoryId,
+            category => category.Id,
+            (product, category) => new { product, category }
         );
 
         var priceTypeId = PriceTypeId.From(request.PriceTypeId);
@@ -25,20 +25,20 @@ public static class ProductFiltersAndJoinPriceExtensions
 
         var withCategoryAndPrice = withCategory.LeftJoin(
             filteredPrices,
-            x => x.p.Id,
-            pr => pr.ProductId,
-            (x, pr) => new { x.p, x.c, pr }
+            query => query.product.Id,
+            productPrice => productPrice.ProductId,
+            (query, productPrice) => new { query.product, query.category, productPrice }
         );
-        return withCategoryAndPrice.Select(x => new ProductBySlugDto
+        return withCategoryAndPrice.Select(query => new ProductBySlugDto
         {
-            Id = x.p.Id.Value,
-            Name = x.p.Name,
-            Photo = x.p.Photo,
-            Scheme = x.p.Sсheme,
-            Stock = x.p.Stock,
-            CategoryName = x.c.Name,
-            CategorySlug = x.c.Slug,
-            Price = x.pr!.Amount
+            Id = query.product.Id.Value,
+            Name = query.product.Name,
+            Photo = query.product.Photo,
+            Scheme = query.product.Sсheme,
+            Stock = query.product.Stock,
+            CategoryName = query.category!.Name,
+            CategorySlug = query.category.Slug,
+            Price = query.productPrice == null ? null : query.productPrice.Amount
         });
     }
 
