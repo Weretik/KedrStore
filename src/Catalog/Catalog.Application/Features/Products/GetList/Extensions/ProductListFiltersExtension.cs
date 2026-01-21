@@ -1,5 +1,4 @@
-﻿using Catalog.Domain.Entities;
-using Catalog.Domain.ValueObjects;
+﻿using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.GetList;
 
@@ -13,7 +12,6 @@ public static class ProductListFiltersExtension
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var term = request.SearchTerm!.Trim();
-            var tokens = term.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
             {
@@ -21,15 +19,16 @@ public static class ProductListFiltersExtension
             }
             else
             {
-                productsQuery = productsQuery.Where(x =>
-                    tokens.All(raw =>
-                        EF.Functions.ILike(
-                            x.Name,
-                            $"%{EscapeLike(raw)}%",
-                            @"\"
-                        )
-                    )
-                );
+                var escapedTokens = term
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(EscapeLike)
+                    .ToArray();
+
+                foreach (var token  in escapedTokens)
+                {
+                    productsQuery = productsQuery.Where(x =>
+                        EF.Functions.ILike(x.Name, $"%{token}%", @"\"));
+                }
             }
         }
 

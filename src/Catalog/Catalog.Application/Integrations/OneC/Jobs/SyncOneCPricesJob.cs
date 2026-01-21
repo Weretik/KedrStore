@@ -25,13 +25,22 @@ public sealed class SyncOneCPricesJob(
         if (pricesOneC.Count == 0)
             return;
 
-        await DeletePricesMissingAsync(pricesOneC, rootCategoryOneCId, cancellationToken);
-        await CreateOrUpsertPricesAsync(pricesOneC, rootCategoryOneCId, cancellationToken);
+        // FIX #1: убираем дубли по (ProductId, PriceTypeId), чтобы не словить 23505 на SaveChanges
+        var deduped = pricesOneC
+            .GroupBy(x => (x.ProductId, x.PriceTypeId))
+            .Select(g => g.Last())
+            .ToList();
+
+        await DeletePricesMissingAsync(deduped, rootCategoryOneCId, cancellationToken);
+        await CreateOrUpsertPricesAsync(deduped, rootCategoryOneCId, cancellationToken);
 
         logger.LogInformation("SyncOneCPricesJob finished for {Root}", rootCategoryOneCId);
     }
 
-    private async Task DeletePricesMissingAsync(IReadOnlyList<OneCPriceDto> priceDtos, string productTypeIdOneC, CancellationToken cancellationToken)
+    private async Task DeletePricesMissingAsync(
+        IReadOnlyList<OneCPriceDto> priceDtos,
+        string productTypeIdOneC,
+        CancellationToken cancellationToken)
     {
         var productIds = priceDtos
             .Select(x => ProductId.From(x.ProductId))
@@ -43,23 +52,26 @@ public sealed class SyncOneCPricesJob(
                 ProductTypeIdOneC: productTypeIdOneC,
                 ProductId: ProductId.From(x.ProductId),
                 PriceTypeId: PriceTypeId.From(x.PriceTypeId))
-            ).ToHashSet();
+            )
+            .ToHashSet();
 
-        var existing = await priceRepo.ListAsync(new PricesByProductIdsSpec(productIds, productTypeIdOneC), cancellationToken);
+        var existing = await priceRepo.ListAsync(
+            new PricesByProductIdsSpec(productIds, productTypeIdOneC),
+            cancellationToken);
 
         var toDelete = existing
-            .Where(p => !keepKeys.Contains((
-                p.ProductTypeIdOneC,
-                p.ProductId,
-                p.PriceTypeId))
-            ).ToList();
+            .Where(p => !keepKeys.Contains((p.ProductTypeIdOneC, p.ProductId, p.PriceTypeId)))
+            .ToList();
 
         if (toDelete.Count == 0) return;
 
         await priceRepo.DeleteRangeAsync(toDelete, cancellationToken);
     }
 
-    private async Task CreateOrUpsertPricesAsync(IReadOnlyList<OneCPriceDto> priceDtos, string productTypeIdOneC, CancellationToken cancellationToken)
+    private async Task CreateOrUpsertPricesAsync(
+        IReadOnlyList<OneCPriceDto> priceDtos,
+        string productTypeIdOneC,
+        CancellationToken cancellationToken)
     {
         foreach (var item in priceDtos)
         {
@@ -67,12 +79,16 @@ public sealed class SyncOneCPricesJob(
             var priceTypeId = PriceTypeId.From(item.PriceTypeId);
             var priceValue = new Money(item.Price, item.Currency);
 
-            var specProduct = new ProductByIdSpec(productId);
-            var product = await productRepo.FirstOrDefaultAsync(specProduct, cancellationToken);
+            // FIX #2: защита от FK (23503) — если товара нет, цену не пишем
+            var product = await productRepo.FirstOrDefaultAsync(
+                new ProductByIdSpec(productId),
+                cancellationToken);
+
             if (product is null) continue;
 
-            var specProductPrice = new ProductPriceByProductAndTypeSpec(productId, priceTypeId);
-            var existing = await priceRepo.FirstOrDefaultAsync(specProductPrice, cancellationToken);
+            var existing = await priceRepo.FirstOrDefaultAsync(
+                new ProductPriceByProductAndTypeSpec(productId, priceTypeId),
+                cancellationToken);
 
             if (existing is null)
             {
@@ -92,6 +108,7 @@ public sealed class SyncOneCPricesJob(
                     price: priceValue);
             }
         }
+
         await priceRepo.SaveChangesAsync(cancellationToken);
     }
 }

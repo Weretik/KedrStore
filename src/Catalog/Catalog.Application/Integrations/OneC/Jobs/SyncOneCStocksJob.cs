@@ -17,6 +17,8 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
         logger.LogInformation("SyncOneCStocksJob started for {Root}", rootCategoryId);
 
         var stocks = await oneC.GetProductStocksAsync(rootCategoryId, cancellationToken);
+        //временно
+        logger.LogWarning("STOCKS RAW COUNT = {Count}", stocks.Count);
 
         if (stocks.Count == 0)
             return;
@@ -37,8 +39,11 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
 
     private async Task UpdateStockAsync(Dictionary<ProductId, decimal> stocks, string productTypeIdOneC, CancellationToken cancellationToken)
     {
-        var spec = new ProductsByIdsSpec(stocks.Keys, productTypeIdOneC );
+        var spec = new ProductsByIdsSpec(stocks.Keys, productTypeIdOneC);
         var products = await productRepo.ListAsync(spec, cancellationToken);
+        //временно
+        logger.LogWarning("STOCKS IDS={StocksCount} PRODUCTS FOUND={ProductsCount}",
+            stocks.Count, products.Count);
 
         foreach (var product in products)
         {
