@@ -32,10 +32,9 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductList
                 .LessThanOrEqualTo(maxPageSize)
                 .WithMessage($"Розмір сторінки не може бути більше {maxPageSize}.");
 
-            RuleFor(x => x.Request.CategoryId)
-                .GreaterThan(0)
-                .When(x => x.Request.CategoryId.HasValue)
-                .WithMessage("Некоректний CategoryId.");
+            RuleFor(x => x.Request.CategorySlug)
+                .MaximumLength(maxSearchTermLength)
+                .WithMessage($"Категорія не може перевищувати {maxSearchTermLength} символів.");
 
             RuleFor(x => x.Request.PriceTypeId)
                 .GreaterThan(0)

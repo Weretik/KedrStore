@@ -32,10 +32,15 @@ public static class ProductListFiltersExtension
             }
         }
 
-        if (request.CategoryId.HasValue)
+        if (!string.IsNullOrWhiteSpace(request.CategorySlug))
         {
-            var filterCategoryId = ProductCategoryId.From(request.CategoryId.Value);
-            productsQuery = productsQuery.Where(p => p.CategoryId == filterCategoryId);
+            var categoryId = TryGetTrailingIntId(request.CategorySlug);
+
+            if (categoryId is not null)
+            {
+                var filterCategoryId = ProductCategoryId.From(categoryId.Value);
+                productsQuery = productsQuery.Where(p => p.CategoryId == filterCategoryId);
+            }
         }
 
         if (request.InStock == true)
@@ -55,5 +60,19 @@ public static class ProductListFiltersExtension
             .Replace(@"\", @"\\", StringComparison.Ordinal)
             .Replace("%", @"\%", StringComparison.Ordinal)
             .Replace("_", @"\_", StringComparison.Ordinal);
+    }
+
+    private static int? TryGetTrailingIntId(string slug)
+    {
+        var lastDash = slug.LastIndexOf('-');
+        if (lastDash < 0 || lastDash == slug.Length - 1)
+            return null;
+
+        var tail = slug[(lastDash + 1)..];
+
+        if (int.TryParse(tail, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
+            return id;
+
+        return null;
     }
 }

@@ -5,17 +5,20 @@ using Catalog.Application.Features.Products.GetList;
 namespace Catalog.Api.Controllers;
 
 [ApiController]
-[Route("api/catalog/products")]
+[Route("api/catalog/")]
 //[Authorize(Policy = "CatalogRead")]
 public sealed class ProductsController(ISender sender) : ControllerBase
 {
-    [HttpGet]
-
+    [HttpGet("products")]
+    [HttpGet("{categorySlug}/products")]
     [ProducesResponseType(typeof(PagedResult<List<ProductListRowDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResult<List<ProductListRowDto>>>> Get(
         [FromQuery] GetProductsRequest request,
+        [FromRoute] string? categorySlug,
         CancellationToken cancellationToken)
     {
+        request = request with { CategorySlug = categorySlug };
+
         var query = new GetProductListQuery(request);
         var result = await sender.Send(query, cancellationToken);
 
