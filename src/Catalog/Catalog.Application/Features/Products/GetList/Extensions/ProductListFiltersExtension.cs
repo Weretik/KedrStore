@@ -4,7 +4,7 @@ namespace Catalog.Application.Features.Products.GetList;
 
 public static class ProductListFiltersExtension
 {
-    public static IQueryable<Product> ApplyProductListFilters(this IQueryable<Product> productsQuery, GetProductsRequest request)
+    public static IQueryable<Product> ApplyProductListFilters(this IQueryable<Product> productsQuery, GetProductsRequest request, string hardwareRootCategoryId)
     {
         ArgumentNullException.ThrowIfNull(productsQuery);
         ArgumentNullException.ThrowIfNull(request);
@@ -44,7 +44,13 @@ public static class ProductListFiltersExtension
         }
 
         if (request.InStock == true)
-            productsQuery = productsQuery.Where(p => p.Stock > 0);
+        {
+            productsQuery = productsQuery.Where(p =>
+                (p.ProductTypeIdOneC == hardwareRootCategoryId && p.Stock > 2) ||
+                (p.ProductTypeIdOneC != hardwareRootCategoryId && p.Stock > 0)
+            );
+        }
+
 
         if (request.IsSale.HasValue)
             productsQuery = productsQuery.Where(p => p.IsSale == request.IsSale.Value);

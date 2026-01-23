@@ -18,7 +18,7 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         var productQuery = catalogDbContext.Products.AsNoTracking();
         var priceQuery = catalogDbContext.ProductPrices.AsNoTracking();
 
-        productQuery = productQuery.ApplyProductListFilters(request);
+        productQuery = productQuery.ApplyProductListFilters(request, hardwareRootCategoryId);
 
         var productListQuery = productQuery
             .JoinPricesForList(priceQuery, request, hardwareRootCategoryId)
