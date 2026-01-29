@@ -9,7 +9,10 @@ public static class CorsExtensions
         {
             options.AddPolicy("SpaDev", policy =>
                     policy
-                        .WithOrigins("http://localhost:4200")
+                        .WithOrigins(
+                            "http://localhost:4200",
+                            "https://classkedr.com.ua"
+                            )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                 // cookies/auth
