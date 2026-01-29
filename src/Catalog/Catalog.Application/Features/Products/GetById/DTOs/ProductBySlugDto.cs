@@ -12,5 +12,7 @@ public record  ProductBySlugDto
     public string CategoryName { get; init; } = null!;
     public string CategorySlug { get; init; } = null!;
 
+    public int QuantityInPack { get; init; }
+
     public decimal? Price { get; init; }
 }

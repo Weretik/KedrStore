@@ -38,6 +38,7 @@ public static class ProductFiltersAndJoinPriceExtensions
             Stock = query.product.Stock,
             CategoryName = query.category!.Name,
             CategorySlug = query.category.Slug,
+            QuantityInPack = query.product.QuantityInPack,
             Price = query.productPrice == null ? null : query.productPrice.Amount
         });
     }

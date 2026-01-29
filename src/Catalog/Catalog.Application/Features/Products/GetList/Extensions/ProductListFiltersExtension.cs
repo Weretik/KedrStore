@@ -51,7 +51,6 @@ public static class ProductListFiltersExtension
             );
         }
 
-
         if (request.IsSale.HasValue)
             productsQuery = productsQuery.Where(p => p.IsSale == request.IsSale.Value);
 

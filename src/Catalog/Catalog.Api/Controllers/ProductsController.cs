@@ -25,7 +25,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [HttpGet("{productSlug}")]
+    [HttpGet("product/{productSlug}")]
     [ProducesResponseType(typeof(ProductBySlugDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductBySlugDto>> GetBySlug(
