@@ -10,39 +10,56 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Копируем файлы проектов для восстановления зависимостей (кэширование слоев)
 COPY ["KedrStore.sln", "./"]
-COPY ["src/Application/Application.csproj", "src/Application/"]
-COPY ["src/Domain/Domain.csproj", "src/Domain/"]
-COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
-COPY ["src/Presentation/Presentation/Presentation.csproj", "src/Presentation/Presentation/"]
-COPY ["src/Presentation/Presentation.Client/Presentation.Client.csproj", "src/Presentation/Presentation.Client/"]
-COPY ["src/Presentation/Presentation.Shared/Presentation.Shared.csproj", "src/Presentation/Presentation.Shared/"]
+
+# BuildingBlocks
+COPY ["src/BuildingBlocks/BuildingBlocks.Api/BuildingBlocks.Api.csproj", "src/BuildingBlocks/BuildingBlocks.Api/"]
+COPY ["src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj", "src/BuildingBlocks/BuildingBlocks.Application/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj", "src/BuildingBlocks/BuildingBlocks.Domain/"]
-# Также копируем тесты, если они нужны для сборки (в вашем исходном Dockerfile они были)
+COPY ["src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj", "src/BuildingBlocks/BuildingBlocks.Infrastructure/"]
+COPY ["src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integrations.OneC.csproj", "src/BuildingBlocks/BuildingBlocks.Integrations.OneC/"]
+
+# Catalog
+COPY ["src/Catalog/Catalog.Api/Catalog.Api.csproj", "src/Catalog/Catalog.Api/"]
+COPY ["src/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Catalog/Catalog.Application/"]
+COPY ["src/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Catalog/Catalog.Domain/"]
+COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]
+
+# Identity
+COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]
+COPY ["src/Identity/Identity.Domain/Identity.Domain.csproj", "src/Identity/Identity.Domain/"]
+COPY ["src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Identity/Identity.Infrastructure/"]
+
+# Bootstrapper
+COPY ["src/Bootstrapper/Host.Api/Host.Api.csproj", "src/Bootstrapper/Host.Api/"]
+
+# Tests
 COPY ["tests/ArchitectureTests/ArchitectureTests.csproj", "tests/ArchitectureTests/"]
 COPY ["tests/IntegrationTests/IntegrationTests.csproj", "tests/IntegrationTests/"]
 COPY ["tests/UnitTests/UnitTests.csproj", "tests/UnitTests/"]
 
 RUN dotnet restore "KedrStore.sln"
 
-# Копируем все остальное
+# COPY other
 COPY . .
-WORKDIR "/src/src/Presentation/Presentation"
-RUN dotnet build "Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Bootstrapper/Host.Api"
+RUN dotnet build "Host.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# === Публикация ===
+# === publish ===
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Host.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# === Финальный образ ===
+# === final imag ===
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Настройка пользователя для безопасности
+# Instal wget for healthcheck
+USER root
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
 RUN useradd -m kedruser && chown -R kedruser:kedruser /app
 USER kedruser
 
-ENTRYPOINT ["dotnet", "Presentation.dll"]
+ENTRYPOINT ["dotnet", "Host.Api.dll"]

@@ -9,7 +9,6 @@ public static class HostServicesExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-
         services.AddIdentityConfiguration(configuration);
         services.AddIdentityInfrastructure(configuration);
 
@@ -21,7 +20,7 @@ public static class HostServicesExtensions
         services.AddCatalogApplicationServices(configuration);
 
         services.AddHangfire(configuration);
-        services.AddCorsService();
+        services.AddCorsService(configuration);
 
         services.AddMediatorPipeline();
         services.AddFluentValidation();

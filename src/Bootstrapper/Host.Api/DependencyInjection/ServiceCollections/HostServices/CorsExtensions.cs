@@ -2,23 +2,31 @@
 
 public static class CorsExtensions
 {
-    public static IServiceCollection AddCorsService(this IServiceCollection services)
+    public static IServiceCollection AddCorsService(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
+        var policyName = configuration["Cors:PolicyName"] ?? "Spa";
+        var origins = configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
 
         services.AddCors(options =>
         {
-            options.AddPolicy("SpaDev", policy =>
-                    policy
-                        .WithOrigins(
-                            "http://localhost:4200",
-                            "https://classkedr.com.ua"
-                            )
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                // cookies/auth
-                // .AllowCredentials()
-            );
+            options.AddPolicy(policyName, policy =>
+            {
+                if (origins.Length == 0)
+                {
+                    return;
+                }
+
+                policy
+                    .WithOrigins(origins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                // cookie-auth:
+                // policy.AllowCredentials();
+            });
         });
+
         return services;
     }
 }
