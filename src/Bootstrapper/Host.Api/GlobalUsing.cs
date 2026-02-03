@@ -2,7 +2,6 @@
 global using BuildingBlocks.Infrastructure.Extensions;
 global using BuildingBlocks.Integrations.OneC.DependencyInjection;
 
-global using Host.Api.DependencyInjection;
 global using Host.Api.DependencyInjection.ServiceColltions;
 global using Host.Api.DependencyInjection.WebApplications;
 global using Host.Api.DependencyInjection.ServiceCollections;
