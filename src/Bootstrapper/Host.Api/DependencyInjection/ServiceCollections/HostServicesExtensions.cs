@@ -35,6 +35,8 @@ public static class HostServicesExtensions
 
         services.AddAuthentication(configuration);
 
+        services.AddProblemDetails();
+
         return services;
     }
 }
