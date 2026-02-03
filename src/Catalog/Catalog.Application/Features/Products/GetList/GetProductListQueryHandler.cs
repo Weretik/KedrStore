@@ -1,6 +1,6 @@
+using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Application.Persistence;
 
 namespace Catalog.Application.Features.Products.GetList;
 

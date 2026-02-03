@@ -2,7 +2,7 @@
 using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Infrastructure.DomainEvents;
 using BuildingBlocks.Infrastructure.Services;
-using Catalog.Application.Features.Import.Queries.ImportCatalogFromXml;
+using Catalog.Application.Contracts.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

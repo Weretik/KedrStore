@@ -1,5 +1,5 @@
-﻿using Catalog.Application.Features.Orders.Commands.CreateQuickOrder;
-using Catalog.Application.Persistence;
+﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Orders.Commands.CreateQuickOrder;
 using Catalog.Infrastructure.DataBase;
 using Catalog.Infrastructure.Notifications;
 using Catalog.Infrastructure.Repositories;

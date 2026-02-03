@@ -1,6 +1,6 @@
-﻿using Catalog.Application.Features.Products.GetById.DTOs;
+﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetById.Extensions;
-using Catalog.Application.Persistence;
 
 namespace Catalog.Application.Features.Products.GetById;
 

@@ -1,5 +1,5 @@
-﻿using Catalog.Application.Integrations.OneC.Jobs;
-using Catalog.Application.Persistence;
+﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Domain.Entities;
 
 namespace Host.Api.DependencyInjection.WebApplications.HostPipelines;

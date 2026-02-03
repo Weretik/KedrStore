@@ -20,7 +20,7 @@ public static class HostServicesExtensions
         services.AddCatalogApplicationServices(configuration);
 
         services.AddHangfire(configuration);
-        services.AddCorsService(configuration);
+        services.AddCorsService();
 
         services.AddMediatorPipeline();
         services.AddFluentValidation();

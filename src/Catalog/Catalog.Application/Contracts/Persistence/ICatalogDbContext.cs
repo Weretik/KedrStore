@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.Entities;
-
-namespace Catalog.Application.Persistence;
+﻿namespace Catalog.Application.Contracts.Persistence;
 
 public interface IReadCatalogDbContext
 {

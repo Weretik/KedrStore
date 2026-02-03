@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Import.Queries.ImportCatalogFromXml;
+﻿namespace Catalog.Application.Contracts.Json;
 
 public interface IXmlToJsonConvector
 {

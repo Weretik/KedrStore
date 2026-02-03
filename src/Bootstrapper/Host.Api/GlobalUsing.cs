@@ -6,6 +6,8 @@ global using BuildingBlocks.Integrations.OneC.DependencyInjection;
 global using Host.Api.DependencyInjection;
 global using Host.Api.DependencyInjection.ServiceColltions;
 global using Host.Api.DependencyInjection.WebApplications;
+global using Host.Api.DependencyInjection.ServiceCollections;
+global using Host.Api.DependencyInjection.WebApplications.HostPipelines;
 
 global using Identity.Infrastructure.Configuration;
 global using Identity.Infrastructure.DependencyInjection;

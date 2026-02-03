@@ -2,29 +2,18 @@
 
 public static class CorsExtensions
 {
-    public static IServiceCollection AddCorsService(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddCorsService(this IServiceCollection services)
     {
-        var policyName = configuration["Cors:PolicyName"] ?? "Spa";
-        var origins = configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
-
         services.AddCors(options =>
         {
-            options.AddPolicy(policyName, policy =>
-            {
-                if (origins.Length == 0)
-                {
-                    return;
-                }
-
-                policy
-                    .WithOrigins(origins)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+            options.AddPolicy("SpaDev", policy =>
+                    policy
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
                 // cookie-auth:
                 // policy.AllowCredentials();
-            });
+            );
         });
 
         return services;

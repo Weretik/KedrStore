@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Xml.Linq;
-using Catalog.Application.Features.Import.Queries.ImportCatalogFromXml;
+using Catalog.Application.Contracts.Json;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

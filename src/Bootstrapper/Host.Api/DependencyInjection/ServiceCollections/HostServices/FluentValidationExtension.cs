@@ -1,6 +1,6 @@
-﻿using Application;
-using Catalog.Application;
+﻿using Catalog.Application;
 using FluentValidation;
+using Identity.Application;
 
 namespace Host.Api.DependencyInjection.ServiceCollections.HostServices;
 

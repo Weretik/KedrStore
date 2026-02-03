@@ -1,9 +1,5 @@
-﻿# === Runtime образ ===
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-# В .NET 8+ стандартный порт 8080 (non-root)
-EXPOSE 8080
-EXPOSE 8081
 
 # === Build ===
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
@@ -43,7 +39,6 @@ RUN dotnet restore "KedrStore.sln"
 # COPY other
 COPY . .
 WORKDIR "/src/src/Bootstrapper/Host.Api"
-RUN dotnet build "Host.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # === publish ===
 FROM build AS publish
@@ -55,11 +50,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Instal wget for healthcheck
-USER root
-RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-
-RUN useradd -m kedruser && chown -R kedruser:kedruser /app
-USER kedruser
+ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT:-8080}
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "Host.Api.dll"]
