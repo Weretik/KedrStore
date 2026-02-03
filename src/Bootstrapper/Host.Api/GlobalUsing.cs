@@ -1,6 +1,5 @@
 ﻿global using BuildingBlocks.Infrastructure.DependencyInjection;
 global using BuildingBlocks.Infrastructure.Extensions;
-global using BuildingBlocks.Integrations.OneC;
 global using BuildingBlocks.Integrations.OneC.DependencyInjection;
 
 global using Host.Api.DependencyInjection;
