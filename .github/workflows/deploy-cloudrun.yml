@@ -42,12 +42,10 @@ jobs:
           --platform managed \
           --allow-unauthenticated \
           --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
-          --set-secrets \
-          "ConnectionStrings__Default=db-connection:latest" \
-          "OneCSoap__Endpoint=onec-endpoint:latest" \
-          "OneCSoap__Username=onec-username:latest" \
-          "OneCSoap__Password=onec-password:latest" \
-          "Identity__AdminUser__DefaultPassword=identity-admin-password:latest" \
-          "Telegram__BotToken=telegram-bot-token:latest" \
+          --set-secrets "ConnectionStrings__Default=db-connection:latest"
+          "OneCSoap__Endpoint=onec-endpoint:latest" "OneCSoap__Username=onec-username:latest"
+          "OneCSoap__Password=onec-password:latest"
+          "Identity__AdminUser__DefaultPassword=identity-admin-password:latest"
+          "Telegram__BotToken=telegram-bot-token:latest"
           "Telegram__ChatId=telegram-chat-id:latest" \
           --quiet
