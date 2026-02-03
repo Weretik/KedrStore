@@ -13,7 +13,6 @@ global using Identity.Infrastructure.Configuration;
 global using Identity.Infrastructure.DependencyInjection;
 global using Catalog.Infrastructure.DependencyInjection;
 
-global using DotNetEnv;
 global using Serilog;
 global using Hangfire;
 global using Hangfire.PostgreSql;
