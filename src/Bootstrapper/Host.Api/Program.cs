@@ -15,7 +15,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler();
+    app.UseExceptionHandler(opt => { });
     app.UseStatusCodePages();
     app.UseHsts();
 }
