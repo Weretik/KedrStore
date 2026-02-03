@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -35,4 +36,18 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy api --image "${{ env.IMAGE }}" --region "europe-central2" --platform managed --allow-unauthenticated --quiet
+          gcloud run deploy api \
+          --image "${{ env.IMAGE }}" \
+          --region europe-central2 \
+          --platform managed \
+          --allow-unauthenticated \
+          --set-env-vars ASPNETCORE_ENVIRONMENT=Production \
+          --set-secrets \
+          "ConnectionStrings__Default=db-connection:latest" \
+          "OneCSoap__Endpoint=onec-endpoint:latest" \
+          "OneCSoap__Username=onec-username:latest" \
+          "OneCSoap__Password=onec-password:latest" \
+          "Identity__AdminUser__DefaultPassword=identity-admin-password:latest" \
+          "Telegram__BotToken=telegram-bot-token:latest" \
+          "Telegram__ChatId=telegram-chat-id:latest" \
+          --quiet
