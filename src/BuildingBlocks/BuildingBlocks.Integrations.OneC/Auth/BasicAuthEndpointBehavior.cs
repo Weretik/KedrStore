@@ -34,6 +34,8 @@ public sealed class BasicAuthEndpointBehavior(string username, string password) 
             http.Headers["Authorization"] = _authHeaderValue;
             request.Properties[HttpRequestMessageProperty.Name] = http;
 
+            Console.WriteLine($"[DEBUG_LOG] WCF Request: Authorization header set (Value starts with: '{_authHeaderValue.Substring(0, Math.Min(10, _authHeaderValue.Length))}...')");
+
             return null;
         }
 
