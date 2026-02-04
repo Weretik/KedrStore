@@ -17,17 +17,24 @@ public sealed class OneCSoapClientFactory(IConfiguration configuration)
                        ?? throw new InvalidOperationException("OneCSoap:Password is missing");
 
 
-        var binding = new BasicHttpBinding(BasicHttpSecurityMode.None)
+        var isHttps = endpoint.StartsWith("https", StringComparison.OrdinalIgnoreCase);
+        var securityMode = isHttps ? BasicHttpSecurityMode.Transport : BasicHttpSecurityMode.TransportCredentialOnly;
+
+        var binding = new BasicHttpBinding(securityMode)
         {
             MaxReceivedMessageSize = int.MaxValue,
-            AllowCookies = true
+            AllowCookies = true,
+            SendTimeout = TimeSpan.FromMinutes(5),
+            ReceiveTimeout = TimeSpan.FromMinutes(5),
+            Security = { Transport = { ClientCredentialType = HttpClientCredentialType.Basic } }
         };
 
         var address = new EndpointAddress(endpoint);
 
         var client = new Kontra1PortTypeClient(binding, address);
 
-        client.Endpoint.EndpointBehaviors.Add(new BasicAuthEndpointBehavior(username, password));
+        client.ClientCredentials.UserName.UserName = username;
+        client.ClientCredentials.UserName.Password = password;
 
         return client;
     }
