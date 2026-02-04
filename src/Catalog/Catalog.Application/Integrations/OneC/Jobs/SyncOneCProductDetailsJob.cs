@@ -14,10 +14,8 @@ public sealed class SyncOneCProductDetailsJob(
     ICatalogRepository<ProductCategory> categoryRepo,
     ILogger<SyncOneCPricesJob> logger)
 {
-    [DisableConcurrentExecution(60 * 60 * 2)]
-    public async Task RunAsync(string rootCategoryId, IJobCancellationToken jobCancellationToken)
+    public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
-        var cancellationToken = jobCancellationToken.ShutdownToken;
         logger.LogInformation("[DEBUG_LOG] SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
 
         var productsOneC = await oneC.GetProductDetailsAsync(rootCategoryId, cancellationToken);
@@ -32,7 +30,7 @@ public sealed class SyncOneCProductDetailsJob(
         var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
-        await CreateOrUpsertProductsAsync(products, cancellationToken);
+        await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
@@ -47,14 +45,18 @@ public sealed class SyncOneCProductDetailsJob(
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
     }
 
-    private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, CancellationToken cancellationToken)
+    private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
     {
+        // FIX: Получаем все ID из этого пака данных одним запросом, чтобы избежать конфликтов и ускорить работу
+        var productIdsInBatch = productDtos.Select(x => ProductId.From(x.Id)).ToList();
+        var existingProducts = await productRepo.ListAsync(new ProductsByIdsSpec(productIdsInBatch, rootCategoryId), cancellationToken);
+        var existingDict = existingProducts.ToDictionary(x => x.Id, x => x);
 
         foreach (var item in productDtos)
         {
             var productId = ProductId.From(item.Id);
-            var existing = await productRepo.GetByIdAsync(productId, cancellationToken);
-            if (existing is null)
+
+            if (!existingDict.TryGetValue(productId, out var existing))
             {
                 var product = Product.Create(
                     id: productId,
@@ -71,6 +73,8 @@ public sealed class SyncOneCProductDetailsJob(
                     createdDate: DateTimeOffset.UtcNow
                 );
                 await productRepo.AddAsync(product, cancellationToken);
+                // Добавляем в словарь, чтобы избежать дублей внутри одного цикла, если 1С прислала повтор
+                existingDict[productId] = product;
                 logger.LogInformation("[DEBUG_LOG] Added new product: {Name} (ID: {Id})", product.Name, product.Id);
             }
             else
@@ -87,7 +91,7 @@ public sealed class SyncOneCProductDetailsJob(
                 if (item.IsNew) existing.MarkAsNew();
                 else existing.RemoveNew();
 
-                if(item.IsSale) existing.MarkAsSale();
+                if (item.IsSale) existing.MarkAsSale();
                 else existing.RemoveSale();
             }
         }

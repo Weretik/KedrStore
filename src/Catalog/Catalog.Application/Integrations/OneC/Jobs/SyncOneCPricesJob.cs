@@ -13,11 +13,8 @@ public sealed class SyncOneCPricesJob(
     ICatalogRepository<Product> productRepo,
     ILogger<SyncOneCPricesJob> logger)
 {
-    [DisableConcurrentExecution(60 * 60 * 2)]
-    public async Task RunAsync(string rootCategoryOneCId, IJobCancellationToken jobCancellationToken)
+    public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
     {
-        var cancellationToken = jobCancellationToken.ShutdownToken;
-
         logger.LogInformation("[DEBUG_LOG] SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
 
         var pricesOneC = await oneC.GetProductPricesAsync(rootCategoryOneCId, cancellationToken);

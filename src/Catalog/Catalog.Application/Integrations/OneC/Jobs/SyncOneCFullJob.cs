@@ -8,26 +8,24 @@ public sealed class SyncOneCFullJob(
     SyncOneCProductDetailsJob products,
     SyncOneCCategoryJob categories)
 {
-    [DisableConcurrentExecution(60 * 60 * 3)]
-    public async Task RunAsync(IJobCancellationToken jobCancellationToken)
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
         var doors = Required(cfg, "OneC:DoorsRootCategoryId");
         var hardware = Required(cfg, "OneC:HardwareRootCategoryId");
 
-        await priceTypes.RunAsync(jobCancellationToken);
+        await priceTypes.RunAsync(cancellationToken);
 
-        await categories.RunAsync(doors, jobCancellationToken);
-        await categories.RunAsync(hardware, jobCancellationToken);
+        await categories.RunAsync(doors, cancellationToken);
+        await categories.RunAsync(hardware, cancellationToken);
 
-        await products.RunAsync(doors, jobCancellationToken);
-        await products.RunAsync(hardware, jobCancellationToken);
+        await products.RunAsync(doors, cancellationToken);
+        await products.RunAsync(hardware, cancellationToken);
 
-        await stocks.RunAsync(doors, jobCancellationToken);
-        await stocks.RunAsync(hardware, jobCancellationToken);
+        await stocks.RunAsync(doors, cancellationToken);
+        await stocks.RunAsync(hardware, cancellationToken);
 
-        await prices.RunAsync(doors, jobCancellationToken);
-        await prices.RunAsync(hardware, jobCancellationToken);
-
+        await prices.RunAsync(doors, cancellationToken);
+        await prices.RunAsync(hardware, cancellationToken);
     }
 
     private static string Required(IConfiguration cfg, string key)

@@ -9,11 +9,8 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceType> priceTypeRepo,
     ILogger<SyncOneCPricesJob> logger)
 {
-    [DisableConcurrentExecution(15 * 60)]
-    public async Task RunAsync(IJobCancellationToken jobCancellationToken)
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
-        var cancellationToken = jobCancellationToken.ShutdownToken;
-
         logger.LogInformation("[DEBUG_LOG] SyncOneCPriceTypesJob started");
 
         var pricesTypesOneC = await oneC.GetPriceTypesAsync(cancellationToken);
