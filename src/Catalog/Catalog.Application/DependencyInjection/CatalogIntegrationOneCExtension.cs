@@ -4,9 +4,9 @@ using Catalog.Application.Integrations.OneC.Options;
 
 namespace Catalog.Application.DependencyInjection;
 
-public static class CatalogDependencyExtension
+public static class CatalogIntegrationOneCExtension
 {
-    public static IServiceCollection AddCatalogApplicationServices(
+    public static IServiceCollection AddCatalogIntegrationOneCServices(
         this IServiceCollection services,
         IConfiguration configuration)
     {
