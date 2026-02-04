@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Integrations.OneC.Factory;
 using BuildingBlocks.Integrations.OneC.Generated;
 using Microsoft.Extensions.Configuration;
 
