@@ -21,7 +21,15 @@ public sealed class BasicAuthEndpointBehavior(string username, string password) 
 
         public BasicAuthMessageInspector(string username, string password)
         {
-            var raw = $"{username}:{password}";
+            var cleanUser = username?.Trim() ?? "";
+            var cleanPass = password?.Trim() ?? "";
+
+            if (cleanUser.Length != username?.Length || cleanPass.Length != password?.Length)
+            {
+                Console.WriteLine($"[DEBUG_LOG] AUTH WARNING: Credentials contained hidden spaces or newlines. Trimmed.");
+            }
+
+            var raw = $"{cleanUser}:{cleanPass}";
             _authHeaderValue = "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(raw));
         }
 
