@@ -18,23 +18,21 @@ public sealed class OneCSoapClientFactory(IConfiguration configuration)
 
 
         var isHttps = endpoint.StartsWith("https", StringComparison.OrdinalIgnoreCase);
-        var securityMode = isHttps ? BasicHttpSecurityMode.Transport : BasicHttpSecurityMode.TransportCredentialOnly;
 
-        var binding = new BasicHttpBinding(securityMode)
+        var binding = new BasicHttpBinding(isHttps ? BasicHttpSecurityMode.Transport : BasicHttpSecurityMode.None)
         {
             MaxReceivedMessageSize = int.MaxValue,
             AllowCookies = true,
             SendTimeout = TimeSpan.FromMinutes(5),
-            ReceiveTimeout = TimeSpan.FromMinutes(5),
-            Security = { Transport = { ClientCredentialType = HttpClientCredentialType.Basic } }
+            ReceiveTimeout = TimeSpan.FromMinutes(5)
         };
 
         var address = new EndpointAddress(endpoint);
 
         var client = new Kontra1PortTypeClient(binding, address);
 
-        client.ClientCredentials.UserName.UserName = username;
-        client.ClientCredentials.UserName.Password = password;
+        // Используем кастомный инспектор, так как стандартный ClientCredentials часто конфликтует с настройками 1С Web-сервисов
+        client.Endpoint.EndpointBehaviors.Add(new BasicAuthEndpointBehavior(username, password));
 
         return client;
     }
