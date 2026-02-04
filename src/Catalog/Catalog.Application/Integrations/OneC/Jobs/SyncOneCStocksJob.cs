@@ -14,9 +14,10 @@ public sealed class SyncOneCStocksJob(IOneCClient oneC, ICatalogRepository<Produ
     {
         var cancellationToken = jobCancellationToken.ShutdownToken;
 
-        logger.LogInformation("SyncOneCStocksJob started for {Root}", rootCategoryId);
+        logger.LogInformation("[DEBUG_LOG] SyncOneCStocksJob started for {Root}", rootCategoryId);
 
         var stocks = await oneC.GetProductStocksAsync(rootCategoryId, cancellationToken);
+        logger.LogInformation("[DEBUG_LOG] Received {Count} stock records from 1C for root {Root}", stocks.Count, rootCategoryId);
 
         if (stocks.Count == 0)
             return;

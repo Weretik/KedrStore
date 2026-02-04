@@ -14,12 +14,16 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
     {
         var cancellationToken = jobCancellationToken.ShutdownToken;
 
-        logger.LogInformation("SyncOneCPriceTypesJob started");
+        logger.LogInformation("[DEBUG_LOG] SyncOneCPriceTypesJob started");
 
         var pricesTypesOneC = await oneC.GetPriceTypesAsync(cancellationToken);
+        logger.LogInformation("[DEBUG_LOG] Received {Count} price types from 1C", pricesTypesOneC.Count);
 
         if (pricesTypesOneC.Count == 0)
+        {
+            logger.LogWarning("[DEBUG_LOG] No price types received from 1C. Sync stopping.");
             return;
+        }
 
         await CreateOrUpsertPriceTypesAsync(pricesTypesOneC, cancellationToken);
 

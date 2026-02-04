@@ -1,4 +1,5 @@
 ﻿using Host.Api.DependencyInjection.WebApplications.HostPipelines;
+using Host.Api.DependencyInjection.WebApplications.Jobs;
 
 namespace Host.Api.DependencyInjection.WebApplications;
 

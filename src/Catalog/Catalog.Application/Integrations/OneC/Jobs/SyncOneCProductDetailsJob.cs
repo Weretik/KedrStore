@@ -18,9 +18,10 @@ public sealed class SyncOneCProductDetailsJob(
     public async Task RunAsync(string rootCategoryId, IJobCancellationToken jobCancellationToken)
     {
         var cancellationToken = jobCancellationToken.ShutdownToken;
-        logger.LogInformation("SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
+        logger.LogInformation("[DEBUG_LOG] SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
 
         var productsOneC = await oneC.GetProductDetailsAsync(rootCategoryId, cancellationToken);
+        logger.LogInformation("[DEBUG_LOG] Received {Count} products from 1C for root {Root}", productsOneC.Count, rootCategoryId);
 
         if (productsOneC.Count == 0)
             return;
@@ -70,6 +71,7 @@ public sealed class SyncOneCProductDetailsJob(
                     createdDate: DateTimeOffset.UtcNow
                 );
                 await productRepo.AddAsync(product, cancellationToken);
+                logger.LogInformation("[DEBUG_LOG] Added new product: {Name} (ID: {Id})", product.Name, product.Id);
             }
             else
             {
