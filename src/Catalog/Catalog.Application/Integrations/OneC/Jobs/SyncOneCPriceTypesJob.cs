@@ -29,25 +29,33 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
 
         logger.LogInformation("SyncOneCPriceTypesJob finished");
     }
-    private async Task CreateOrUpsertPriceTypesAsync(IReadOnlyList<OneCPriceTypeDto> priceTypeDtos,CancellationToken cancellationToken)
+    private async Task CreateOrUpsertPriceTypesAsync(IReadOnlyList<OneCPriceTypeDto> priceTypeDtos, CancellationToken cancellationToken)
     {
+        // Получаем все существующие ID одним запросом, чтобы избежать проблемы параллельных запусков или дублей
+        var existingPriceTypes = await priceTypeRepo.ListAsync(cancellationToken);
+        var existingIds = existingPriceTypes.Select(x => x.Id).ToHashSet();
+
         foreach (var item in priceTypeDtos)
         {
             var priceTypeId = PriceTypeId.From(item.PriceTypeId);
-            var existing = await priceTypeRepo.GetByIdAsync(priceTypeId, cancellationToken);
-            if (existing is null)
+
+            if (!existingIds.Contains(priceTypeId))
             {
                 var priceType = PriceType.Create(
                     id: priceTypeId,
                     priceTypeName: item.PriceTypeName);
 
                 await priceTypeRepo.AddAsync(priceType, cancellationToken);
+                existingIds.Add(priceTypeId); // Добавляем в локальный кэш, чтобы не добавить дважды из одного списка 1С
+                logger.LogInformation("[DEBUG_LOG] Prepared new PriceType: {Name} (ID: {Id})", item.PriceTypeName, item.PriceTypeId);
             }
             else
             {
+                var existing = existingPriceTypes.First(x => x.Id == priceTypeId);
                 existing.UpdateName(item.PriceTypeName);
             }
         }
+
         await priceTypeRepo.SaveChangesAsync(cancellationToken);
     }
 

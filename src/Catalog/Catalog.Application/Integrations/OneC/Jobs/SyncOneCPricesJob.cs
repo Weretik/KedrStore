@@ -18,9 +18,10 @@ public sealed class SyncOneCPricesJob(
     {
         var cancellationToken = jobCancellationToken.ShutdownToken;
 
-        logger.LogInformation("SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
+        logger.LogInformation("[DEBUG_LOG] SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
 
         var pricesOneC = await oneC.GetProductPricesAsync(rootCategoryOneCId, cancellationToken);
+        logger.LogInformation("[DEBUG_LOG] Received {Count} prices from 1C for root {Root}", pricesOneC.Count, rootCategoryOneCId);
 
         if (pricesOneC.Count == 0)
             return;
