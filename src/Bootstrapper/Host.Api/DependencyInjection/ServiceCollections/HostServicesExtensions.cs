@@ -1,4 +1,5 @@
 ﻿using Catalog.Application.DependencyInjection;
+using Catalog.Application.Integrations.OneC.Jobs;
 using Host.Api.DependencyInjection.ServiceCollections.HostServices;
 
 namespace Host.Api.DependencyInjection.ServiceCollections;
@@ -10,16 +11,22 @@ public static class HostServicesExtensions
         IConfiguration configuration)
     {
         services.AddIdentityConfiguration(configuration);
-        services.AddIdentityInfrastructure(configuration);
+        services.AddIdentityInfrastructureServices(configuration);
 
-        services.AddOneCIntegration();
+        services.AddOneCIntegrationServices();
 
         services.AddInfrastructureServices(configuration);
 
         services.AddCatalogInfrastructureServices(configuration);
-        services.AddCatalogApplicationServices(configuration);
+        services.AddCatalogIntegrationOneCServices(configuration);
 
-        services.AddHangfire(configuration);
+        services.AddScoped<SyncOneCFullJob>();
+        services.AddScoped<SyncOneCPriceTypesJob>();
+        services.AddScoped<SyncOneCCategoryJob>();
+        services.AddScoped<SyncOneCProductDetailsJob>();
+        services.AddScoped<SyncOneCStocksJob>();
+        services.AddScoped<SyncOneCPricesJob>();
+
         services.AddCorsService();
 
         services.AddMediatorPipeline();

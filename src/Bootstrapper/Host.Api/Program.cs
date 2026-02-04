@@ -28,8 +28,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-app.AddHangfireRecurringJobs();
-app.UseHangfireDashboard("/hangfire");
-
 app.Run();
 

@@ -1,7 +1,4 @@
-﻿using Host.Api.DependencyInjection.WebApplications.HostPipelines;
-using Host.Api.DependencyInjection.WebApplications.Jobs;
-
-namespace Host.Api.DependencyInjection.WebApplications;
+﻿namespace Host.Api.DependencyInjection.WebApplications;
 
 public static class StartupTasksExtensions
 {
@@ -9,8 +6,6 @@ public static class StartupTasksExtensions
     {
         await app.UseAppMigrations();
         await app.UseAppSeeders();
-
-        await app.AddHangfireSeedJobs();
 
         return app;
     }
