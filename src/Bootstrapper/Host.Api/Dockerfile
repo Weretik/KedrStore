@@ -34,7 +34,7 @@ COPY ["tests/ArchitectureTests/ArchitectureTests.csproj", "tests/ArchitectureTes
 COPY ["tests/IntegrationTests/IntegrationTests.csproj", "tests/IntegrationTests/"]
 COPY ["tests/UnitTests/UnitTests.csproj", "tests/UnitTests/"]
 
-RUN dotnet restore "KedrStore.sln"
+RUN dotnet restore "src/Bootstrapper/Host.Api/Host.Api.csproj"
 
 # COPY other
 COPY . .
