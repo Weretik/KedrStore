@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
 
 builder.Configuration
-    .AddJsonFile("appsettings.json", optional: true)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
     .AddEnvironmentVariables();
 
 Console.WriteLine($"ENV = {builder.Environment.EnvironmentName}");
