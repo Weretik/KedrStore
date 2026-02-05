@@ -15,7 +15,6 @@ public static class JobsHostServicesExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddIdentityDbContextServices(configuration);
         services.AddCatalogDbContextServices(configuration);
 
         services.AddOneCIntegrationServices();

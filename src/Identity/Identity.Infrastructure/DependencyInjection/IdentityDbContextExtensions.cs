@@ -1,6 +1,4 @@
-﻿// Licensed to KedrStore Development Team under MIT License.
-
-using Identity.Infrastructure.Contracts;
+﻿using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Seeders;

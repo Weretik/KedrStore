@@ -26,22 +26,21 @@ var scopeServiceProvider = scope.ServiceProvider;
 
 
 var job = GetArg(args, "--job");
-var rootId = GetArg(args, "--rootId");
+var rootIds = GetArgs(args, "--rootId");
 
 if (string.IsNullOrWhiteSpace(job))
 {
-    Console.WriteLine("Usage: dotnet run -- --job=[full|category|prices|pricetypes|productdetails|stocks] [--rootId=ID]");
+    Console.WriteLine("ERROR: --job is required");
     return 1;
 }
-
 
 var cancellationToken = CancellationToken.None;
 var jobKey = job.Trim().ToLowerInvariant();
 
 var needsRootId = jobKey is "category" or "prices" or "productdetails" or "stocks";
-if (needsRootId && string.IsNullOrWhiteSpace(rootId))
+if (needsRootId && rootIds.Count == 0)
 {
-    Console.WriteLine($"ERROR: --rootId is required for job '{jobKey}'");
+    Console.WriteLine("ERROR: --rootId is required for this job");
     return 2;
 }
 
@@ -51,32 +50,36 @@ try
 
     switch (jobKey)
     {
-        case "category":
-            await scopeServiceProvider.GetRequiredService<SyncOneCCategoryJob>().RunAsync(rootId!, cancellationToken);
-            break;
-
-        case "prices":
-            await scopeServiceProvider.GetRequiredService<SyncOneCPricesJob>().RunAsync(rootId!, cancellationToken);
+        case "full":
+            await scopeServiceProvider.GetRequiredService<SyncOneCFullJob>().RunAsync(cancellationToken);
             break;
 
         case "pricetypes":
             await scopeServiceProvider.GetRequiredService<SyncOneCPriceTypesJob>().RunAsync(cancellationToken);
             break;
 
+        case "category":
+            foreach (var rid in rootIds)
+                await scopeServiceProvider.GetRequiredService<SyncOneCCategoryJob>().RunAsync(rid, cancellationToken);
+            break;
+
         case "productdetails":
-            await scopeServiceProvider.GetRequiredService<SyncOneCProductDetailsJob>().RunAsync(rootId!, cancellationToken);
+            foreach (var rid in rootIds)
+                await scopeServiceProvider.GetRequiredService<SyncOneCProductDetailsJob>().RunAsync(rid, cancellationToken);
             break;
 
         case "stocks":
-            await scopeServiceProvider.GetRequiredService<SyncOneCStocksJob>().RunAsync(rootId!, cancellationToken);
+            foreach (var rid in rootIds)
+                await scopeServiceProvider.GetRequiredService<SyncOneCStocksJob>().RunAsync(rid, cancellationToken);
             break;
 
-        case "full":
-            await scopeServiceProvider.GetRequiredService<SyncOneCFullJob>().RunAsync(cancellationToken);
+        case "prices":
+            foreach (var rid in rootIds)
+                await scopeServiceProvider.GetRequiredService<SyncOneCPricesJob>().RunAsync(rid, cancellationToken);
             break;
 
         default:
-            Console.WriteLine($"Unknown job: {job}");
+            Console.WriteLine($"Unknown job: {jobKey}");
             return 1;
     }
 
@@ -85,15 +88,24 @@ try
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine($"[ERROR] Job failed: {ex.Message}");
-    Console.Error.WriteLine(ex.StackTrace);
+    Console.Error.WriteLine(ex);
     return 1;
 }
 
-
 static string? GetArg(string[] args, string name)
 {
-    var prefix = (name + "=").ToLowerInvariant();
-    var hit = args.FirstOrDefault(a => a.Trim().StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase));
-    return (hit?.Trim())?[prefix.Length..];
+    var prefix = name + "=";
+    var hit = args.FirstOrDefault(a => a.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+    return hit is null ? null : hit.Trim().Substring(prefix.Length);
+}
+
+static List<string> GetArgs(string[] args, string name)
+{
+    var prefix = name + "=";
+    return args
+        .Select(a => a.Trim())
+        .Where(a => a.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        .Select(a => a.Substring(prefix.Length))
+        .Where(v => !string.IsNullOrWhiteSpace(v))
+        .ToList();
 }
