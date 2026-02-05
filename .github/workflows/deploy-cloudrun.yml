@@ -30,7 +30,7 @@ jobs:
       - name: Build & Push Host.Api image
         run: |
           IMAGE="europe-central2-docker.pkg.dev/classkedrproject/api/api:${{ github.sha }}"
-          docker build -f src/Bootstrapper/Host.Api/Host.Api/Dockerfile -t "$IMAGE" .
+          docker build -f src/Bootstrapper/Host.Api/Dockerfile -t "$IMAGE" .
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
