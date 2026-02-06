@@ -27,7 +27,7 @@ public static class HostServicesExtensions
         services.AddScoped<SyncOneCStocksJob>();
         services.AddScoped<SyncOneCPricesJob>();
 
-        services.AddCorsService();
+        services.AddCorsService(configuration);
 
         services.AddMediatorPipeline();
         services.AddFluentValidation();

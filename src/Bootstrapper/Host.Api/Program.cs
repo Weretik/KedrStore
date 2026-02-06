@@ -11,7 +11,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.MapOpenApi();
-    app.UseCors("SpaDev");
 }
 else
 {
@@ -19,8 +18,9 @@ else
     app.UseStatusCodePages();
     app.UseHsts();
 }
-app.UseHttpsRedirection();
 
+app.UseCors("Frontend");
+app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
