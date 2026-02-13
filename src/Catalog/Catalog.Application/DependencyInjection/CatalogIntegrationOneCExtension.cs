@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Integrations.OneC.Client;
+﻿using Catalog.Application.Contracts.ClosedXML;
+using Catalog.Application.Integrations.OneC.Client;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Options;
 
