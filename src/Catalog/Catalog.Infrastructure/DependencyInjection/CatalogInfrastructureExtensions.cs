@@ -6,7 +6,7 @@ public static class CatalogInfrastructureExtensions
         this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCatalogDbContextServices(configuration);
-        services.AddTelegramNotifierServices(configuration);
+        services.AddCatalogServices(configuration);
 
         return services;
     }
