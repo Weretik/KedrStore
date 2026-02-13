@@ -1,4 +1,6 @@
 ﻿using Catalog.Application.Features.Orders.Commands.CreateQuickOrder;
+using Catalog.Application.Features.Orders.Commands.CreateQuickOrder.Notifications;
+using Telegram.Bot.Types;
 
 namespace Catalog.Infrastructure.Notifications;
 
@@ -13,4 +15,23 @@ public sealed class TelegramBotNotifier(ITelegramBotClient bot, IOptions<Telegra
             text: text,
             ParseMode.Html,
             cancellationToken: cancellationToken);
+
+    public async Task SendDocumentAsync(
+        string fileName,
+        string contentType,
+        byte[] bytes,
+        string? caption = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var stream = new MemoryStream(bytes);
+
+        var inputFile = InputFile.FromStream(stream, fileName);
+
+        await _bot.SendDocument(
+            chatId: _chatId,
+            document: inputFile,
+            caption: caption,
+            parseMode: ParseMode.Html,
+            cancellationToken: cancellationToken);
+    }
 }
