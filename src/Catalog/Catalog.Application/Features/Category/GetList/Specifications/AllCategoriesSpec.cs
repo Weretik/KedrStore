@@ -1,6 +1,4 @@
-﻿using Catalog.Domain.Entities;
-
-namespace Catalog.Application.Features.Category.GetList;
+﻿namespace Catalog.Application.Features.Category.GetList.Specifications;
 
 public sealed class AllCategoriesSpec : Specification<ProductCategory>
 {

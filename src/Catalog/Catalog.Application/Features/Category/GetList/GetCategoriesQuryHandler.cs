@@ -1,4 +1,6 @@
 ﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Category.GetList.DTOs;
+using Catalog.Application.Features.Category.GetList.Specifications;
 using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Features.Category.GetList;
