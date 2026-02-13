@@ -13,15 +13,12 @@ public static class CatalogDbContextExtensions
                                ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");;
 
         services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
-        //services.AddScoped<DbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
         services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
 
         services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();
-
-        //services.AddScoped<ITelegramNotifier, TelegramBotNotifier>();
 
         return services;
     }
