@@ -22,6 +22,7 @@ public sealed class CreateOrderCommandHandler(ITelegramNotifier telegram, IOrder
         var parts = new List<string>
         {
             "<b>Нове замовлення</b>",
+            $"🆔 <code>{orderId}</code>",
             $"👨‍💼 {request.FirstName}",
             $"📲 <code>{request.Phone}</code>",
             $"📅 {kyivTime:dd.MM.yyyy HH:mm}"
