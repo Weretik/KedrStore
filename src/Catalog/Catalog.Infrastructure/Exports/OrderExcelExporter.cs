@@ -56,18 +56,21 @@ public sealed class OrderExcelExporter : IOrderExcelExporter
         xlWorksheet.Column(5).Style.NumberFormat.Format = "#,##0.00";
         xlWorksheet.Column(6).Style.NumberFormat.Format = "#,##0.00";
 
-        var tableRange = xlWorksheet.Range(7, 1, row - 1, 6);
-        tableRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-        tableRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
-        tableRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+        if (request.Lines.Count > 0)
+        {
+            var tableRange = xlWorksheet.Range(7, 1, row - 1, 6);
+            tableRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            tableRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            tableRange.Style.Alignment.Vertical = XLAlignmentVerticalValues.Center;
+
+            xlWorksheet.Cell(row + 1, 5).Value = "Разом:";
+            xlWorksheet.Cell(row + 1, 5).Style.Font.Bold = true;
+            xlWorksheet.Cell(row + 1, 6).FormulaA1 = $"=SUM(F7:F{row - 1})";
+            xlWorksheet.Cell(row + 1, 6).Style.Font.Bold = true;
+            xlWorksheet.Cell(row + 1, 6).Style.NumberFormat.Format = "#,##0.00";
+        }
+
         xlWorksheet.Column(3).Style.Alignment.WrapText = true;
-
-
-        xlWorksheet.Cell(row + 1, 5).Value = "Разом:";
-        xlWorksheet.Cell(row + 1, 5).Style.Font.Bold = true;
-        xlWorksheet.Cell(row + 1, 6).FormulaA1 = $"=SUM(F7:F{row - 1})";
-        xlWorksheet.Cell(row + 1, 6).Style.Font.Bold = true;
-        xlWorksheet.Cell(row + 1, 6).Style.NumberFormat.Format = "#,##0.00";
 
         xlWorksheet.Column(1).Width = 5;   // №
         xlWorksheet.Column(2).Width = 15;  // ID

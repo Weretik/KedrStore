@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Application.DependencyInjection;
+﻿using BuildingBlocks.Application;
+using BuildingBlocks.Application.Behaviors;
 using Catalog.Application;
 
 namespace Host.Api.DependencyInjection.ServiceCollections.HostServices;
@@ -14,11 +15,18 @@ public static class MediatorExtensions
 
             options.Assemblies =
             [
-                typeof(CatalogApplicationAssemblyMarker),
-                // typeof(OrderingApplicationAssemblyMarker),
+                typeof(CatalogApplicationAssemblyMarker).Assembly,
+                typeof(ApplicationAssemblyMarker).Assembly
             ];
 
-            options.PipelineBehaviors = MediatorPipeline.PipelineBehaviors;
+            options.PipelineBehaviors =
+            [
+                typeof(RequestLoggingBehavior<,>),
+                typeof(PerformanceBehavior<,>),
+                typeof(ValidationBehavior<,>),
+                typeof(ExceptionBehavior<,>),
+                typeof(DomainEventDispatcherBehavior<,>)
+            ];
         });
 
         return services;

@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Products.GetList;
+﻿namespace Catalog.Application.Features.Products.GetList.Validators;
 
 public sealed class GetProductsQueryValidator : AbstractValidator<GetProductListQuery>
 {
