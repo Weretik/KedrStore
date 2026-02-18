@@ -1,12 +1,15 @@
 ﻿using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Features.Orders.Commands.CreateQuickOrder.Notifications;
+using Catalog.Application.Features.Orders.Create.DTOs;
+using Catalog.Application.Features.Orders.Create.Notifications;
 
 namespace Catalog.Application.Features.Orders.Create;
 
 public sealed class CreateOrderCommandHandler(ITelegramNotifier telegram, IOrderExcelExporter excelExporter)
-    : ICommandHandler<CreateOrderCommand, Result<Guid>>
+    : ICommandHandler<CreateOrderCommand, Result<QuickOrderResponse>>
 {
-    public async ValueTask<Result<Guid>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
+    public async ValueTask<Result<QuickOrderResponse>> Handle(
+        CreateOrderCommand command,
+        CancellationToken cancellationToken)
     {
         var request = command.Request;
 
@@ -38,7 +41,7 @@ public sealed class CreateOrderCommandHandler(ITelegramNotifier telegram, IOrder
             caption: captionText,
             cancellationToken: cancellationToken);
 
-        return Result.Success(orderId);
+        return Result.Success(new QuickOrderResponse(orderId));
     }
 }
 

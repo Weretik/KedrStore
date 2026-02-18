@@ -1,6 +1,5 @@
 ﻿using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Features.Orders.Commands.CreateQuickOrder;
-using Catalog.Application.Features.Orders.Commands.CreateQuickOrder.Notifications;
+using Catalog.Application.Features.Orders.Create.Notifications;
 using Catalog.Infrastructure.Exports;
 using Catalog.Infrastructure.Notifications;
 

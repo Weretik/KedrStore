@@ -3,4 +3,4 @@
 namespace Catalog.Application.Features.Orders.Create;
 
 
-public sealed record CreateOrderCommand(CreateOrderRequest Request) : ICommand<Result<Guid>>;
+public sealed record CreateOrderCommand(CreateOrderRequest Request) : ICommand<Result<QuickOrderResponse>>;

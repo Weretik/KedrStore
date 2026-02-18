@@ -8,7 +8,9 @@ namespace Catalog.Api.Controllers;
 public class OrderController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<Guid>> Create([FromBody] CreateOrderRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<QuickOrderResponse>> Create(
+        [FromBody] CreateOrderRequest request,
+        CancellationToken cancellationToken)
     {
         var result = await sender.Send(new CreateOrderCommand(request), cancellationToken);
         return this.ToActionResult(result);

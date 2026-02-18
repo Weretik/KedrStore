@@ -13,10 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Features\Orders\Commands\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="Catalog.Application.csproj.DotSettings" />
     </ItemGroup>
 

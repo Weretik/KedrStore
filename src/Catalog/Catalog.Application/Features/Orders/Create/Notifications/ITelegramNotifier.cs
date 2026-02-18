@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Orders.Commands.CreateQuickOrder.Notifications;
+﻿namespace Catalog.Application.Features.Orders.Create.Notifications;
 
 public interface ITelegramNotifier
 {
