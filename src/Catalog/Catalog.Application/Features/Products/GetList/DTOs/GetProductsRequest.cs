@@ -10,7 +10,7 @@ public sealed record GetProductsRequest
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
 
-    public int PriceTypeId { get; init; } = 10;
+    public int PriceTypeId { get; init; } = 11;
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }
 
