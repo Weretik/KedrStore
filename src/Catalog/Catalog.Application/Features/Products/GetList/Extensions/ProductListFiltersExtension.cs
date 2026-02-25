@@ -13,23 +13,33 @@ public static class ProductListFiltersExtension
         {
             var term = request.SearchTerm!.Trim();
 
-            if (int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0)
-            {
-                productsQuery = productsQuery.Where(x => x.Id == ProductId.From(id));
-            }
-            else
-            {
-                var escapedTokens = term
-                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                    .Select(EscapeLike)
-                    .ToArray();
+            var tokens = term
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(EscapeLike)
+                .ToArray();
 
-                foreach (var token  in escapedTokens)
-                {
-                    productsQuery = productsQuery.Where(x =>
-                        EF.Functions.ILike(x.Name, $"%{token}%", @"\"));
-                }
+            var hasId = int.TryParse(
+                            term,
+                            NumberStyles.Integer,
+                            CultureInfo.InvariantCulture,
+                            out var id)
+                        && id > 0;
+
+            var productId = hasId ? ProductId.From(id) : ProductId.From(0);
+
+            var nameQuery = productsQuery;
+            foreach (var token in tokens)
+            {
+                nameQuery = nameQuery.Where(x =>
+                    EF.Functions.ILike(x.Name, $"%{token}%", @"\")
+                    );
             }
+
+            productsQuery = productsQuery
+                .Where(x =>
+                    (hasId && x.Id == productId) ||
+                    nameQuery.Any(p => p.Id == x.Id)
+                );
         }
 
         if (!string.IsNullOrWhiteSpace(request.CategorySlug))
