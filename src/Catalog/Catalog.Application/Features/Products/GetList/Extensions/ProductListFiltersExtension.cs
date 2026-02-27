@@ -18,14 +18,7 @@ public static class ProductListFiltersExtension
                 .Select(EscapeLike)
                 .ToArray();
 
-            var hasId = int.TryParse(
-                            term,
-                            NumberStyles.Integer,
-                            CultureInfo.InvariantCulture,
-                            out var id)
-                        && id > 0;
-
-            var productId = hasId ? ProductId.From(id) : ProductId.From(0);
+            var hasId = int.TryParse(term,NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0;
 
             var nameQuery = productsQuery;
             foreach (var token in tokens)
@@ -35,11 +28,20 @@ public static class ProductListFiltersExtension
                     );
             }
 
-            productsQuery = productsQuery
-                .Where(x =>
-                    (hasId && x.Id == productId) ||
+            if (!hasId)
+            {
+                productsQuery = nameQuery;
+
+            }
+            else
+            {
+                var productId = ProductId.From(id);
+
+                productsQuery = productsQuery.Where(x =>
+                    x.Id == productId ||
                     nameQuery.Any(p => p.Id == x.Id)
                 );
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(request.CategorySlug))
