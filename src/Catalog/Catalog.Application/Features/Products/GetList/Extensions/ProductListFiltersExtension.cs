@@ -1,6 +1,6 @@
 ﻿using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products.GetList;
+namespace Catalog.Application.Features.Products.GetList.Extensions;
 
 public static class ProductListFiltersExtension
 {

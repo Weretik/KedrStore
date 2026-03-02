@@ -1,4 +1,5 @@
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Products.GetList.Extensions;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Options;
 
