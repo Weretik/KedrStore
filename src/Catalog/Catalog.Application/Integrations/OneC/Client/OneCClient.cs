@@ -45,31 +45,18 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
         var list = resp?.Body?.@return;
 
         if (list is null || list.Count == 0)
-        {
-            // logger.LogWarning("[DEBUG_LOG] 1C returned NO products for root {Root}", rootCategoryId);
             return [];
-        }
 
-        var results = list.Select(x => {
-            var isSale = AsBool(x.IsSale);
-            var isNew = AsBool(x.IsNew);
-            var export = AsBool(x.ExportToSite);
-
-            // Если мы видим что все флаги false, возможно 1С присылает их в другом формате
-            // Логируем один раз для диагностики если нужно, но пока просто парсим
-
-            return new OneCProductDto(
+        return list.Select(x => new OneCProductDto(
                 Id: AsId(x.id),
                 Name: AsString(x.name),
                 CategoryPath: AsString(x.CategoryPath),
                 Manufacturer: AsString(x.Manufacturer),
-                IsSale: isSale,
-                IsNew: isNew,
-                ExportToSite: export,
-                QuantityInPack: AsInt(x.QuantityInPack));
-        }).ToArray();
-
-        return results;
+                IsSale: AsBool(x.IsSale),
+                IsNew: AsBool(x.IsNew),
+                ExportToSite: AsBool(x.ExportToSite),
+                QuantityInPack: AsInt(x.QuantityInPack))
+        ).ToArray();
     }
 
     public async Task<IReadOnlyList<OneCStockDto>> GetProductStocksAsync(string rootCategoryId, CancellationToken cancellationToken)
@@ -129,10 +116,8 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
             bool b => b,
             string s => s.Equals("true", StringComparison.OrdinalIgnoreCase)
                         || s == "1"
-                        || s.Equals("yes", StringComparison.OrdinalIgnoreCase)
                         || s.Equals("так", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("да", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("+", StringComparison.OrdinalIgnoreCase),
+                        || s.Equals("да", StringComparison.OrdinalIgnoreCase),
             _ => bool.TryParse(value?.ToString(), out var b) && b
         };
 
