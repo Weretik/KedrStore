@@ -37,6 +37,7 @@ public sealed class SyncOneCProductDetailsJob(
     private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         var importProductsIds = productDtos
+            .Where(c => c.ExportToSite)
             .Select(c => ProductId.From(c.Id))
             .Distinct()
             .ToArray();
@@ -47,12 +48,13 @@ public sealed class SyncOneCProductDetailsJob(
 
     private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
     {
-        // FIX: Получаем все ID из этого пака данных одним запросом, чтобы избежать конфликтов и ускорить работу
-        var productIdsInBatch = productDtos.Select(x => ProductId.From(x.Id)).ToList();
+        var exportableProducts = productDtos.Where(x => x.ExportToSite).ToList();
+
+        var productIdsInBatch = exportableProducts.Select(x => ProductId.From(x.Id)).ToList();
         var existingProducts = await productRepo.ListAsync(new ProductsByIdsSpec(productIdsInBatch, rootCategoryId), cancellationToken);
         var existingDict = existingProducts.ToDictionary(x => x.Id, x => x);
 
-        foreach (var item in productDtos)
+        foreach (var item in exportableProducts)
         {
             var productId = ProductId.From(item.Id);
 
@@ -73,7 +75,7 @@ public sealed class SyncOneCProductDetailsJob(
                     createdDate: DateTimeOffset.UtcNow
                 );
                 await productRepo.AddAsync(product, cancellationToken);
-                // Добавляем в словарь, чтобы избежать дублей внутри одного цикла, если 1С прислала повтор
+
                 existingDict[productId] = product;
                 logger.LogInformation("[DEBUG_LOG] Added new product: {Name} (ID: {Id})", product.Name, product.Id);
             }

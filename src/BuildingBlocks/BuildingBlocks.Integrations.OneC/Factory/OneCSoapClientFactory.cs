@@ -15,7 +15,6 @@ public sealed class OneCSoapClientFactory(IConfiguration configuration)
         var password = configuration["OneCSoap:Password"]
                        ?? throw new InvalidOperationException("OneCSoap:Password is missing");
 
-        Console.WriteLine($"[DEBUG_LOG] OneC Credentials - User: '{username}', Pass length: {password?.Length ?? 0}");
         Console.WriteLine($"[DEBUG_LOG] OneC Endpoint: '{endpoint}'");
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(endpoint))
         {
@@ -24,8 +23,6 @@ public sealed class OneCSoapClientFactory(IConfiguration configuration)
         else
         {
              Console.WriteLine($"[DEBUG_LOG] OneC Auth Check: User starts with '{(username.Length > 0 ? username[0] : "")}', Pass starts with '{(password.Length > 0 ? password[0] : "")}'");
-             Console.WriteLine($"[DEBUG_LOG] OneC Raw UserName: '{username}'");
-             Console.WriteLine($"[DEBUG_LOG] OneC Raw Pass: '{password}'");
         }
 
 
