@@ -114,7 +114,11 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
         => value switch
         {
             bool b => b,
-            string s => s.Equals("true", StringComparison.OrdinalIgnoreCase) || s == "1" || s.Equals("yes", StringComparison.OrdinalIgnoreCase),
+            string s => s.Equals("true", StringComparison.OrdinalIgnoreCase)
+                        || s == "1"
+                        || s.Equals("yes", StringComparison.OrdinalIgnoreCase)
+                        || s.Equals("так", StringComparison.OrdinalIgnoreCase)
+                        || s.Equals("да", StringComparison.OrdinalIgnoreCase),
             _ => bool.TryParse(value?.ToString(), out var b) && b
         };
 
