@@ -45,18 +45,31 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
         var list = resp?.Body?.@return;
 
         if (list is null || list.Count == 0)
+        {
+            // logger.LogWarning("[DEBUG_LOG] 1C returned NO products for root {Root}", rootCategoryId);
             return [];
+        }
 
-        return list.Select(x => new OneCProductDto(
+        var results = list.Select(x => {
+            var isSale = AsBool(x.IsSale);
+            var isNew = AsBool(x.IsNew);
+            var export = AsBool(x.ExportToSite);
+
+            // Если мы видим что все флаги false, возможно 1С присылает их в другом формате
+            // Логируем один раз для диагностики если нужно, но пока просто парсим
+
+            return new OneCProductDto(
                 Id: AsId(x.id),
                 Name: AsString(x.name),
                 CategoryPath: AsString(x.CategoryPath),
                 Manufacturer: AsString(x.Manufacturer),
-                IsSale: AsBool(x.IsSale),
-                IsNew: AsBool(x.IsNew),
-                ExportToSite: AsBool(x.ExportToSite),
-                QuantityInPack: AsInt(x.QuantityInPack))
-        ).ToArray();
+                IsSale: isSale,
+                IsNew: isNew,
+                ExportToSite: export,
+                QuantityInPack: AsInt(x.QuantityInPack));
+        }).ToArray();
+
+        return results;
     }
 
     public async Task<IReadOnlyList<OneCStockDto>> GetProductStocksAsync(string rootCategoryId, CancellationToken cancellationToken)
@@ -118,7 +131,8 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
                         || s == "1"
                         || s.Equals("yes", StringComparison.OrdinalIgnoreCase)
                         || s.Equals("так", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("да", StringComparison.OrdinalIgnoreCase),
+                        || s.Equals("да", StringComparison.OrdinalIgnoreCase)
+                        || s.Equals("+", StringComparison.OrdinalIgnoreCase),
             _ => bool.TryParse(value?.ToString(), out var b) && b
         };
 

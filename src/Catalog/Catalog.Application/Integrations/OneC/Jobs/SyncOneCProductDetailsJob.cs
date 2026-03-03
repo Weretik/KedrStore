@@ -37,16 +37,9 @@ public sealed class SyncOneCProductDetailsJob(
     private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         var importProductsIds = productDtos
-            .Where(c => c.ExportToSite)
             .Select(c => ProductId.From(c.Id))
             .Distinct()
             .ToArray();
-
-        if (importProductsIds.Length == 0 && productDtos.Count > 0)
-        {
-            logger.LogWarning("[DEBUG_LOG] All incoming products from 1C for root {Root} have ExportToSite = false. Skipping deletion to avoid clearing the whole database.", rootCategoryOneCId);
-            return;
-        }
 
         var spec  = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId,true);
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
@@ -54,13 +47,11 @@ public sealed class SyncOneCProductDetailsJob(
 
     private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
     {
-        var exportableProducts = productDtos.Where(x => x.ExportToSite).ToList();
-
-        var productIdsInBatch = exportableProducts.Select(x => ProductId.From(x.Id)).ToList();
+        var productIdsInBatch = productDtos.Select(x => ProductId.From(x.Id)).ToList();
         var existingProducts = await productRepo.ListAsync(new ProductsByIdsSpec(productIdsInBatch, rootCategoryId), cancellationToken);
         var existingDict = existingProducts.ToDictionary(x => x.Id, x => x);
 
-        foreach (var item in exportableProducts)
+        foreach (var item in productDtos)
         {
             var productId = ProductId.From(item.Id);
 

@@ -11,6 +11,5 @@ public sealed record ProductRowOneCDto(
     decimal Stock,
     bool IsSale,
     bool IsNew,
-    bool ExportToSite,
     int QuantityInPack
 );

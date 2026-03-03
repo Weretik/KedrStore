@@ -52,6 +52,8 @@ public static class CatalogMapper
 
         foreach (var item in productListOneC)
         {
+            if (!item.ExportToSite) continue;
+
             var id = item.Id;
             var name = item.Name.Trim();
 
@@ -62,7 +64,6 @@ public static class CatalogMapper
             int stock = 0;
             bool isSale = item.IsSale;
             bool isNew = item.IsNew;
-            bool exportToSite = item.ExportToSite;
             var qtyInPack = item.QuantityInPack;
 
 
@@ -77,7 +78,6 @@ public static class CatalogMapper
                 Stock: stock,
                 IsSale: isSale,
                 IsNew: isNew,
-                ExportToSite: exportToSite,
                 QuantityInPack: qtyInPack)
             );
         }
