@@ -42,6 +42,12 @@ public sealed class SyncOneCProductDetailsJob(
             .Distinct()
             .ToArray();
 
+        if (importProductsIds.Length == 0 && productDtos.Count > 0)
+        {
+            logger.LogWarning("[DEBUG_LOG] All incoming products from 1C for root {Root} have ExportToSite = false. Skipping deletion to avoid clearing the whole database.", rootCategoryOneCId);
+            return;
+        }
+
         var spec  = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId,true);
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
     }
