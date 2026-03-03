@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Integrations.OneC;
-using BuildingBlocks.Integrations.OneC.Factory;
+﻿using BuildingBlocks.Integrations.OneC.Factory;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 
