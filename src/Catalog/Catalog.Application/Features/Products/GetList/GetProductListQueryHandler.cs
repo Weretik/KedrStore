@@ -20,13 +20,24 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         var priceQuery = catalogDbContext.ProductPrices.AsNoTracking();
 
         productQuery = productQuery.ApplyProductListFilters(request, hardwareRootCategoryId);
+        var isIdSort = request.Sort is ProductSort.IdAsc or ProductSort.IdDesc;
 
-        var productListQuery = productQuery
-            .JoinPricesForList(priceQuery, request, hardwareRootCategoryId)
-            .ApplySorting(request.Sort);
+        if (isIdSort)
+        {
+            productQuery = request.Sort == ProductSort.IdDesc
+                ? productQuery.OrderByDescending(p => p.Id)
+                : productQuery.OrderBy(p => p.Id);
+        }
+
+        var productListWithPriceQuery = productQuery
+            .JoinPricesForList(priceQuery, request, hardwareRootCategoryId);
+
+        var productSortListQuery = isIdSort
+            ? productListWithPriceQuery
+            : productListWithPriceQuery.ApplySorting(request.Sort);
 
         const int maxPageSize = 100;
-        var totalRecords  = await productListQuery.CountAsync(cancellationToken);
+        var totalRecords  = await productListWithPriceQuery.CountAsync(cancellationToken);
         var pageNumber  = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 20 : request.PageSize;
 
@@ -35,7 +46,7 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         var totalPages = (long)Math.Ceiling(totalRecords / (double)pageSize);
         var skip = (pageNumber - 1) * pageSize;
 
-        productListQuery = productListQuery.Skip(skip).Take(pageSize);
+        var productListQuery = productSortListQuery.Skip(skip).Take(pageSize);
 
         var items = await productListQuery.ToListAsync(cancellationToken);
 

@@ -22,12 +22,8 @@ public static class ProductListSortingExtensions
             ProductSort.NameDesc =>
                 query.OrderByDescending(x =>  x.Name),
 
-            ProductSort.IdDesc =>
-                query
-                    .OrderByDescending(x => x.Id),
-
             _ =>
-                query.OrderBy(x => x.Id),
+                query.OrderBy(x => x.Name),
         };
     }
 }

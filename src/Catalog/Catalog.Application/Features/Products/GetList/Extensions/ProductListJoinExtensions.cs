@@ -1,8 +1,7 @@
-﻿using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Domain.Entities;
+﻿using Catalog.Application.Features.Products.GetList.DTOs;
 using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products.GetList;
+namespace Catalog.Application.Features.Products.GetList.Extensions;
 
 public static class ProductListJoinExtensions
 {
