@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Products.GetList;
+﻿namespace Catalog.Application.Features.Products.GetList.Extensions;
 
 public static class ProductListSortingExtensions
 {
@@ -8,19 +8,26 @@ public static class ProductListSortingExtensions
         {
             ProductSort.PriceAsc =>
                 query
-                    .OrderBy(x => x.Price == null)
+                    .OrderBy(x => x.Price.HasValue ? 0 : 1)
                     .ThenBy(x => x.Price),
 
             ProductSort.PriceDesc =>
                 query
-                    .OrderBy(x => x.Price == null)
+                    .OrderBy(x => x.Price.HasValue ? 0 : 1)
                     .ThenByDescending(x => x.Price),
 
+            ProductSort.NameAsc=>
+                query.OrderBy(x => x.Name),
+
             ProductSort.NameDesc =>
-                query.OrderByDescending(x => x.Name),
+                query.OrderByDescending(x =>  x.Name),
+
+            ProductSort.IdDesc =>
+                query
+                    .OrderByDescending(x => x.Id),
 
             _ =>
-                query.OrderBy(x => x.Name),
+                query.OrderBy(x => x.Id),
         };
     }
 }

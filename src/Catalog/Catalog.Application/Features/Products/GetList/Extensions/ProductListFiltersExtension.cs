@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.ValueObjects;
+﻿using Catalog.Application.Features.Products.GetList.DTOs;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.GetList.Extensions;
 

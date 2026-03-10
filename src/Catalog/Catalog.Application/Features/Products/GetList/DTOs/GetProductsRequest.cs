@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Products.GetList;
+﻿namespace Catalog.Application.Features.Products.GetList.DTOs;
 
 
 public sealed record GetProductsRequest
@@ -14,7 +14,7 @@ public sealed record GetProductsRequest
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }
 
-    public ProductSort Sort { get; init; } = ProductSort.NameAsc;
+    public ProductSort Sort { get; init; } = ProductSort.IdAsc;
 
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 20;

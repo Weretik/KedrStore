@@ -1,6 +1,7 @@
 ﻿using Catalog.Application.Features.Products.GetById;
 using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetList;
+using Catalog.Application.Features.Products.GetList.DTOs;
 
 namespace Catalog.Api.Controllers;
 
@@ -30,7 +31,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductBySlugDto>> GetBySlug(
         [FromRoute] string productSlug,
-        [FromQuery] int priceTypeId = 10,
+        [FromQuery] int priceTypeId = 11,
         CancellationToken cancellationToken = default)
     {
         var request = new GetProductBySlugRequest(productSlug, priceTypeId);
