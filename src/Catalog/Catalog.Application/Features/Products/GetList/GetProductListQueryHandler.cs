@@ -17,9 +17,10 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         var request = query.Request;
 
         var productQuery = catalogDbContext.Products.AsNoTracking();
+        var categoryQuery = catalogDbContext.Categories.AsNoTracking();
         var priceQuery = catalogDbContext.ProductPrices.AsNoTracking();
 
-        productQuery = productQuery.ApplyProductListFilters(request, hardwareRootCategoryId);
+        productQuery = productQuery.ApplyProductListFilters(categoryQuery, request, hardwareRootCategoryId);
         var isIdSort = request.Sort is ProductSort.IdAsc or ProductSort.IdDesc;
 
         if (isIdSort)

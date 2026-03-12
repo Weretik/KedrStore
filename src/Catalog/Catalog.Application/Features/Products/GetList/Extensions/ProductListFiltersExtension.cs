@@ -5,9 +5,14 @@ namespace Catalog.Application.Features.Products.GetList.Extensions;
 
 public static class ProductListFiltersExtension
 {
-    public static IQueryable<Product> ApplyProductListFilters(this IQueryable<Product> productsQuery, GetProductsRequest request, string hardwareRootCategoryId)
+    public static IQueryable<Product> ApplyProductListFilters(
+        this IQueryable<Product> productsQuery,
+        IQueryable<ProductCategory> categoriesQuery,
+        GetProductsRequest request,
+        string hardwareRootCategoryId)
     {
         ArgumentNullException.ThrowIfNull(productsQuery);
+        ArgumentNullException.ThrowIfNull(categoriesQuery);
         ArgumentNullException.ThrowIfNull(request);
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -51,8 +56,13 @@ public static class ProductListFiltersExtension
 
             if (categoryId is not null)
             {
-                var filterCategoryId = ProductCategoryId.From(categoryId.Value);
-                productsQuery = productsQuery.Where(p => p.CategoryId == filterCategoryId);
+                var selectedCategoryId = ProductCategoryId.From(categoryId.Value);
+
+                var categoryIds = categoriesQuery
+                    .Where(category => category.Id == selectedCategoryId || category.ParentId == selectedCategoryId)
+                    .Select(category => category.Id);
+
+                productsQuery = productsQuery.Where(product => categoryIds.Contains(product.CategoryId));
             }
         }
 
