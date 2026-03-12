@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Features.Products.GetById;
+using Catalog.Application.Features.Products.GetById;
 using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetList;
 using Catalog.Application.Features.Products.GetList.DTOs;
@@ -40,5 +40,4 @@ public sealed class ProductsController(ISender sender) : ControllerBase
 
         return this.ToActionResult(result);
     }
-
 }
