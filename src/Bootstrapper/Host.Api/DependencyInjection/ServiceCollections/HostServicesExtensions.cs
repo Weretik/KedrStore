@@ -35,6 +35,7 @@ public static class HostServicesExtensions
         services.AddModuleControllers();
 
         services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
         services.AddOpenApi();
 
         services.AddHealthChecks();
