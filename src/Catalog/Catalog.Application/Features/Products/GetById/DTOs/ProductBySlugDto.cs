@@ -1,6 +1,5 @@
 ﻿namespace Catalog.Application.Features.Products.GetById.DTOs;
 
-
 public record  ProductBySlugDto
 {
     public int Id { get; init; }
@@ -15,4 +14,6 @@ public record  ProductBySlugDto
     public int QuantityInPack { get; init; }
 
     public decimal? Price { get; init; }
+
+    public IReadOnlyList<CategoryBreadcrumbDto> Breadcrumbs { get; init; } = [];
 }

@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetById.Extensions;
 
@@ -24,6 +24,12 @@ public class GetProductBySlugQueryHandler(IReadCatalogDbContext catalogDbContext
 
         if (result is null)
             return Result.NotFound();
+
+        var breadcrumbs = await catalogDbContext.Categories
+            .AsNoTracking()
+            .BuildCategoryBreadcrumbsAsync(result.CategorySlug, cancellationToken);
+
+        result = result with { Breadcrumbs = breadcrumbs };
 
         return Result.Success(result);
     }
