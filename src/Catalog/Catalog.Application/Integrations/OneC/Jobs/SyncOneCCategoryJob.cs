@@ -6,6 +6,7 @@ using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
+using Unidecode.NET;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
