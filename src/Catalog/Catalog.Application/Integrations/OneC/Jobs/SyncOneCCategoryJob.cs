@@ -21,18 +21,19 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         var furnitureId = int.Parse(options.Value.HardwareRootCategoryId.TrimStart('0'));
         var doorsId = int.Parse(options.Value.DoorsRootCategoryId.TrimStart('0'));
 
-        var categoriesOneC = await oneC.GetCategoriesAsync(rootCategoryOneCId, cancellationToken);
-
-        if (categoriesOneC.Count == 0)
-            return;
-
-        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId, rootCategoryOneCId);
+        // Select the manual grouping config based on the current root category branch.
         IReadOnlyList<ManualCategoryGroupOption> manualGroups = [];
         if (rootCategoryId == furnitureId)
             manualGroups = options.Value.HardwareManualCategoryGroups;
         else if (rootCategoryId == doorsId)
             manualGroups = options.Value.DoorsManualCategoryGroups;
 
+        var categoriesOneC = await oneC.GetCategoriesAsync(rootCategoryOneCId, cancellationToken);
+
+        if (categoriesOneC.Count == 0 && manualGroups.Count == 0)
+            return;
+
+        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId, rootCategoryOneCId);
         if (manualGroups.Count > 0)
         {
             categories = ApplyManualHardwareHierarchy(
@@ -42,7 +43,18 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                 manualGroups);
         }
 
-        await DeleteMissingAsync(categories, rootCategoryOneCId, cancellationToken);
+        if (categoriesOneC.Count > 0)
+        {
+            await DeleteMissingAsync(categories, rootCategoryOneCId, cancellationToken);
+        }
+        else
+        {
+            // When 1C returns no categories, keep existing rows and upsert only root/manual groups.
+            logger.LogWarning(
+                "No categories from 1C for {Root}. DeleteMissing is skipped; only root/manual categories will be upserted.",
+                rootCategoryOneCId);
+        }
+
         await CreateOrUpsertCategoriesAsync(categories, rootCategoryOneCId, cancellationToken);
 
         logger.LogInformation("SyncOneCCategoryJob finished for {Root}", rootCategoryOneCId);
@@ -143,6 +155,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                 if (childId <= 0 || childId == rootCategoryId || childId == group.Id)
                     continue;
 
+                // Re-parent explicitly mapped categories under the configured manual parent.
                 if (categoryMap.TryGetValue(childId, out var childCategory))
                     childCategory.ParentId = group.Id;
             }
@@ -164,6 +177,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                 if (category.Id == rootCategoryId || category.Id == otherGroup.Id || manualGroupIds.Contains(category.Id))
                     continue;
 
+                // Any unmapped top-level category is moved under the fallback "Інше" group.
                 if (category.ParentId is null || category.ParentId == rootCategoryId || !manualGroupIds.Contains(category.ParentId.Value))
                 {
                     category.ParentId = otherGroup.Id;
@@ -176,6 +190,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             [rootCategoryId] = $"n{rootCategoryId}"
         };
 
+        // Rebuild hierarchical paths after manual re-parenting to keep tree invariants consistent.
         string BuildPath(int categoryId, HashSet<int> visiting)
         {
             if (pathCache.TryGetValue(categoryId, out var cachedPath))

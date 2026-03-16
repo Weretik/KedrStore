@@ -28,7 +28,7 @@ if (app.Environment.IsDevelopment())
     {
         app.Logger.LogError(ex, "SyncOneCCategoryJob failed during Development startup.");
     }
-    */
+*/
 }
 else
 {
