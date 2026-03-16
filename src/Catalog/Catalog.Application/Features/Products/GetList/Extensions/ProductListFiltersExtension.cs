@@ -58,8 +58,15 @@ public static class ProductListFiltersExtension
             {
                 var selectedCategoryId = ProductCategoryId.From(categoryId.Value);
 
+                var childCategoryIds = categoriesQuery
+                    .Where(category => category.ParentId == selectedCategoryId)
+                    .Select(category => category.Id);
+
                 var categoryIds = categoriesQuery
-                    .Where(category => category.Id == selectedCategoryId || category.ParentId == selectedCategoryId)
+                    .Where(category =>
+                        category.Id == selectedCategoryId ||
+                        category.ParentId == selectedCategoryId ||
+                        (category.ParentId.HasValue && childCategoryIds.Contains(category.ParentId.Value)))
                     .Select(category => category.Id);
 
                 productsQuery = productsQuery.Where(product => categoryIds.Contains(product.CategoryId));
