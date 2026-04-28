@@ -4,6 +4,7 @@ public interface IReadCatalogDbContext
 {
     DbSet<Product> Products { get; }
     DbSet<ProductPrice> ProductPrices { get; }
+    DbSet<ProductTranslation> ProductTranslations { get; }
     DbSet<ProductCategory> Categories { get; }
     DbSet<PriceType> PriceTypes { get; }
 }
