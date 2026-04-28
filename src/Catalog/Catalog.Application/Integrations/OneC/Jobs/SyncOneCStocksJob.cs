@@ -1,4 +1,3 @@
-using BuildingBlocks.Domain.Exceptions;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Specifications;
@@ -12,6 +11,8 @@ public sealed class SyncOneCStocksJob(
     ICatalogRepository<Product> productRepo,
     ILogger<SyncOneCStocksJob> logger)
 {
+    private const decimal HighStockWarningThreshold = 1000m;
+
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
         logger.LogInformation("[DEBUG_LOG] SyncOneCStocksJob started for {Root}", rootCategoryId);
@@ -44,31 +45,22 @@ public sealed class SyncOneCStocksJob(
         var spec = new ProductsByIdsSpec(stocks.Keys, productTypeIdOneC);
         var products = await productRepo.ListAsync(spec, cancellationToken);
 
-        var skipped = 0;
-
         foreach (var product in products)
         {
-            if (!stocks.TryGetValue(product.Id, out var stock))
-                continue;
+            if (stocks.TryGetValue(product.Id, out var stock))
+            {
+                if (stock > HighStockWarningThreshold)
+                {
+                    logger.LogWarning(
+                        "High stock value received from 1C for ProductId={ProductId}. Stock={Stock}.",
+                        product.Id.Value,
+                        stock);
+                }
 
-            try
-            {
                 product.UpdateStock(stock);
-            }
-            catch (DomainException ex)
-            {
-                skipped++;
-                logger.LogWarning(
-                    ex,
-                    "Stock update skipped for ProductId={ProductId}. Invalid stock value from 1C: {Stock}.",
-                    product.Id.Value,
-                    stock);
             }
         }
 
         await productRepo.SaveChangesAsync(cancellationToken);
-
-        if (skipped > 0)
-            logger.LogWarning("SyncOneCStocksJob skipped {SkippedCount} stock updates due to domain validation.", skipped);
     }
 }
