@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Contracts.Persistence;
+using System.Text;
+using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
@@ -11,9 +12,13 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 public sealed class SyncOneCProductDetailsJob(
     IOneCClient oneC,
     ICatalogRepository<Product> productRepo,
+    ICatalogRepository<ProductTranslation> translationRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
     ILogger<SyncOneCPricesJob> logger)
 {
+    private const string RuLanguage = "ru";
+    private const string TranslationFileRelativePath = "src/Catalog/Catalog.Application/Integrations/OneC/Translation/Imports/product-translations.ru.csv";
+
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
         logger.LogInformation("[DEBUG_LOG] SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
@@ -30,10 +35,12 @@ public sealed class SyncOneCProductDetailsJob(
         var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
-        await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
+        var syncedProductIds = await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
+        await UpsertTranslationsForSyncedProductsAsync(syncedProductIds, cancellationToken);
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
+
     private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         var importProductsIds = productDtos
@@ -41,11 +48,11 @@ public sealed class SyncOneCProductDetailsJob(
             .Distinct()
             .ToArray();
 
-        var spec  = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId,true);
+        var spec = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId, true);
         await productRepo.DeleteRangeAsync(spec, cancellationToken);
     }
 
-    private async Task CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
+    private async Task<IReadOnlyCollection<ProductId>> CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
     {
         var productIdsInBatch = productDtos.Select(x => ProductId.From(x.Id)).ToList();
         var existingProducts = await productRepo.ListAsync(new ProductsByIdsSpec(productIdsInBatch, rootCategoryId), cancellationToken);
@@ -94,6 +101,152 @@ public sealed class SyncOneCProductDetailsJob(
                 else existing.RemoveSale();
             }
         }
+
         await productRepo.SaveChangesAsync(cancellationToken);
+        return productIdsInBatch.Distinct().ToArray();
+    }
+
+    private async Task UpsertTranslationsForSyncedProductsAsync(
+        IReadOnlyCollection<ProductId> syncedProductIds,
+        CancellationToken cancellationToken)
+    {
+        if (syncedProductIds.Count == 0)
+            return;
+
+        var translationsById = ReadTranslationsFromCsv();
+
+        var existingTranslations = await translationRepo.ListAsync(
+            new ProductTranslationsByProductIdsAndLanguageSpec(syncedProductIds, RuLanguage),
+            cancellationToken);
+
+        var existingByProductId = existingTranslations.ToDictionary(x => x.ProductId.Value, x => x);
+        var now = DateTimeOffset.UtcNow;
+
+        var created = 0;
+        var updated = 0;
+        var deleted = 0;
+
+        foreach (var productId in syncedProductIds)
+        {
+            var hasTranslation = translationsById.TryGetValue(productId.Value, out var nameRu) &&
+                                 !string.IsNullOrWhiteSpace(nameRu);
+
+            if (!hasTranslation)
+            {
+                if (existingByProductId.TryGetValue(productId.Value, out var existingToDelete) && !existingToDelete.IsDeleted)
+                {
+                    existingToDelete.MarkAsDeleted(now);
+                    deleted++;
+                }
+
+                continue;
+            }
+
+            if (existingByProductId.TryGetValue(productId.Value, out var existing))
+            {
+                existing.Update(nameRu!, now);
+                updated++;
+                continue;
+            }
+
+            var createdTranslation = ProductTranslation.Create(productId, RuLanguage, nameRu!, now);
+            await translationRepo.AddAsync(createdTranslation, cancellationToken);
+            created++;
+        }
+
+        await translationRepo.SaveChangesAsync(cancellationToken);
+
+        logger.LogInformation(
+            "Product translations synced. Created: {Created}, Updated: {Updated}, Deleted: {Deleted}, TotalProducts: {TotalProducts}",
+            created, updated, deleted, syncedProductIds.Count);
+    }
+
+    private static Dictionary<int, string> ReadTranslationsFromCsv()
+    {
+        var filePath = ResolveTranslationFilePath();
+        if (!File.Exists(filePath))
+            return new Dictionary<int, string>();
+
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        using var reader = new StreamReader(filePath, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        _ = reader.ReadLine();
+
+        var result = new Dictionary<int, string>();
+        while (reader.ReadLine() is { } line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            var fields = ParseCsvLine(line);
+            if (fields.Count < 3)
+                continue;
+
+            if (!int.TryParse(fields[0].Trim(), out var productId) || productId <= 0)
+                continue;
+
+            var ruName = fields[2].Trim();
+            if (string.IsNullOrWhiteSpace(ruName))
+                continue;
+
+            result[productId] = ruName;
+        }
+
+        return result;
+    }
+
+    private static string ResolveTranslationFilePath()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (current is not null)
+        {
+            var candidate = Path.Combine(current.FullName, TranslationFileRelativePath);
+            if (File.Exists(candidate))
+                return candidate;
+
+            current = current.Parent;
+        }
+
+        return Path.GetFullPath(TranslationFileRelativePath);
+    }
+
+    private static List<string> ParseCsvLine(string line)
+    {
+        var fields = new List<string>();
+        var sb = new StringBuilder();
+        var inQuotes = false;
+
+        for (var i = 0; i < line.Length; i++)
+        {
+            var ch = line[i];
+
+            if (ch == '"')
+            {
+                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    sb.Append('"');
+                    i++;
+                }
+                else
+                {
+                    inQuotes = !inQuotes;
+                }
+
+                continue;
+            }
+
+            if (ch == ',' && !inQuotes)
+            {
+                fields.Add(sb.ToString());
+                sb.Clear();
+                continue;
+            }
+
+            sb.Append(ch);
+        }
+
+        fields.Add(sb.ToString());
+        return fields;
     }
 }
