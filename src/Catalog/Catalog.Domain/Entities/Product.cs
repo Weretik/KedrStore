@@ -111,7 +111,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     }
     private void SetStock(decimal stock)
     {
-        if (stock < 0m || stock > 1_000m)
+        if (stock < 0m || stock > 2_000m)
             throw new DomainException(ProductErrors.StockOutOfRange(stock));
 
         Stock = stock;
