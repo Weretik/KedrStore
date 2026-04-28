@@ -14,6 +14,11 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <CopyToPublishDirectory>Always</CopyToPublishDirectory>
       </Content>
+      <Content Include="..\..\..\Catalog\Catalog.Application\Integrations\OneC\Translation\Imports\product-translations.ru.csv">
+          <Link>Translation\Imports\product-translations.ru.csv</Link>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

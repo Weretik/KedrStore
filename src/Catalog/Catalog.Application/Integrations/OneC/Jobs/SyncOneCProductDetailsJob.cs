@@ -17,7 +17,7 @@ public sealed class SyncOneCProductDetailsJob(
     ILogger<SyncOneCPricesJob> logger)
 {
     private const string RuLanguage = "ru";
-    private const string TranslationFileRelativePath = "src/Catalog/Catalog.Application/Integrations/OneC/Translation/Imports/product-translations.ru.csv";
+    private const string TranslationFileRelativePath = "Translation/Imports/product-translations.ru.csv";
 
     public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
@@ -161,11 +161,16 @@ public sealed class SyncOneCProductDetailsJob(
             created, updated, deleted, syncedProductIds.Count);
     }
 
-    private static Dictionary<int, string> ReadTranslationsFromCsv()
+    private Dictionary<int, string> ReadTranslationsFromCsv()
     {
         var filePath = ResolveTranslationFilePath();
         if (!File.Exists(filePath))
+        {
+            logger.LogWarning(
+                "Product translations file was not found. Expected path: {FilePath}. Translations sync will be skipped for this run.",
+                filePath);
             return new Dictionary<int, string>();
+        }
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -197,18 +202,7 @@ public sealed class SyncOneCProductDetailsJob(
 
     private static string ResolveTranslationFilePath()
     {
-        var current = new DirectoryInfo(AppContext.BaseDirectory);
-
-        while (current is not null)
-        {
-            var candidate = Path.Combine(current.FullName, TranslationFileRelativePath);
-            if (File.Exists(candidate))
-                return candidate;
-
-            current = current.Parent;
-        }
-
-        return Path.GetFullPath(TranslationFileRelativePath);
+        return Path.Combine(AppContext.BaseDirectory, TranslationFileRelativePath);
     }
 
     private static List<string> ParseCsvLine(string line)
