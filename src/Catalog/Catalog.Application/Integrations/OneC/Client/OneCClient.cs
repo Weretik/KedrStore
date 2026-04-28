@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Integrations.OneC.Factory;
+using System.Globalization;
+using BuildingBlocks.Integrations.OneC.Factory;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 
@@ -18,9 +19,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
         return list.Select(x => new OneCPriceTypeDto(
             PriceTypeId: AsId(x.PriceTypeId),
             PriceTypeName: AsString(x.PriceTypeName))
-        ).ToArray();;
-
+        ).ToArray();
     }
+
     public async Task<IReadOnlyList<OneCCategoryDto>> GetCategoriesAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
         var client = factory.Create();
@@ -37,6 +38,7 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
                 CategoryPath: AsString(x.CategoryPath))
         ).ToArray();
     }
+
     public async Task<IReadOnlyList<OneCProductDto>> GetProductDetailsAsync(string rootCategoryId, CancellationToken cancellationToken)
     {
         var client = factory.Create();
@@ -69,7 +71,7 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 
         return list.Select(x => new OneCStockDto(
                 Id: AsId(x.id),
-                Stock: AsDecimal(x.Stock))
+                Stock: AsStockQuantity(x.Stock))
         ).ToArray();
     }
 
@@ -98,6 +100,7 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 
         return int.TryParse(s.TrimStart('0'), out var id) ? id : 0;
     }
+
     private static int? AsIdOrNull(object? value)
     {
         var s = value?.ToString()?.Trim();
@@ -107,6 +110,7 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 
         return int.TryParse(s.TrimStart('0'), out var id) ? id : 0;
     }
+
     private static string AsString(object? value) => value?.ToString()?.Trim() ?? string.Empty;
 
     private static bool AsBool(object? value)
@@ -125,4 +129,32 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 
     private static decimal AsDecimal(object? value)
         => decimal.TryParse(value?.ToString(), out var num) ? num : 0m;
+
+    private static decimal AsStockQuantity(object? value)
+    {
+        var text = value?.ToString()?.Trim();
+        if (string.IsNullOrWhiteSpace(text))
+            return 0m;
+
+        if (!TryParseDecimal(text, out var parsed))
+            return 0m;
+
+        return Math.Ceiling(parsed);
+    }
+
+    private static bool TryParseDecimal(string text, out decimal value)
+    {
+        const NumberStyles styles = NumberStyles.Number | NumberStyles.AllowLeadingSign;
+
+        if (decimal.TryParse(text, styles, CultureInfo.GetCultureInfo("uk-UA"), out value))
+            return true;
+
+        if (decimal.TryParse(text, styles, CultureInfo.GetCultureInfo("ru-RU"), out value))
+            return true;
+
+        if (decimal.TryParse(text, styles, CultureInfo.InvariantCulture, out value))
+            return true;
+
+        return false;
+    }
 }
