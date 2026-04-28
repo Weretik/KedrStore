@@ -19,6 +19,7 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         var productQuery = catalogDbContext.Products.AsNoTracking();
         var categoryQuery = catalogDbContext.Categories.AsNoTracking();
         var priceQuery = catalogDbContext.ProductPrices.AsNoTracking();
+        var translationQuery = catalogDbContext.ProductTranslations.AsNoTracking();
 
         productQuery = productQuery.ApplyProductListFilters(categoryQuery, request, hardwareRootCategoryId);
         var isIdSort = request.Sort is ProductSort.IdAsc or ProductSort.IdDesc;
@@ -31,7 +32,7 @@ public class GetProductListQueryHandler(IReadCatalogDbContext catalogDbContext, 
         }
 
         var productListWithPriceQuery = productQuery
-            .JoinPricesForList(priceQuery, request, hardwareRootCategoryId);
+            .JoinPricesForList(priceQuery, translationQuery, request, hardwareRootCategoryId);
 
         var productSortListQuery = isIdSort
             ? productListWithPriceQuery

@@ -18,6 +18,7 @@ public class GetProductBySlugQueryHandler(IReadCatalogDbContext catalogDbContext
             .JoinPricesAndCategoryForProductBySlug(
                 catalogDbContext.ProductPrices.AsNoTracking(),
                 catalogDbContext.Categories.AsNoTracking(),
+                catalogDbContext.ProductTranslations.AsNoTracking(),
                 request);
 
         var result = await queryResult.FirstOrDefaultAsync(cancellationToken);

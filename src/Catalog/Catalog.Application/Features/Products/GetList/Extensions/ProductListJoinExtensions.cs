@@ -8,27 +8,37 @@ public static class ProductListJoinExtensions
     public static IQueryable<ProductListRowDto> JoinPricesForList(
         this IQueryable<Product> productsQuery,
         IQueryable<ProductPrice> pricesQuery,
+        IQueryable<ProductTranslation> translationsQuery,
         GetProductsRequest request,
         string hardwareRootCategoryId)
     {
+        var language = NormalizeLanguage(request.Lang);
+        translationsQuery = translationsQuery.Where(t => t.Language == language);
+
+        var productsWithTranslations = productsQuery.LeftJoin(
+            translationsQuery,
+            product => product.Id,
+            translation => translation.ProductId,
+            (product, translation) => new { product, translation });
+
         pricesQuery = pricesQuery.Where(pr => pr.PriceTypeId == PriceTypeId.From(request.PriceTypeId));
 
-        var  productListQuery =
-            productsQuery.LeftJoin(pricesQuery,
-                p => p.Id,
+        var productListQuery =
+            productsWithTranslations.LeftJoin(pricesQuery,
+                row => row.product.Id,
                 pr => pr.ProductId,
-                (product, price) => new ProductListRowDto
+                (row, price) => new ProductListRowDto
                 {
-                    Id = product.Id.Value,
-                    Name = product.Name,
-                    Photo = product.Photo,
-                    ProductSlug = product.ProductSlug,
-                    CategoryId = product.CategoryId.Value,
-                    InStock = product.ProductTypeIdOneC == hardwareRootCategoryId
-                        ? product.Stock > 2
-                        : product.Stock > 0,
-                    IsSale = product.IsSale,
-                    IsNew = product.IsNew,
+                    Id = row.product.Id.Value,
+                    Name = row.translation != null ? row.translation.Name : row.product.Name,
+                    Photo = row.product.Photo,
+                    ProductSlug = row.product.ProductSlug,
+                    CategoryId = row.product.CategoryId.Value,
+                    InStock = row.product.ProductTypeIdOneC == hardwareRootCategoryId
+                        ? row.product.Stock > 2
+                        : row.product.Stock > 0,
+                    IsSale = row.product.IsSale,
+                    IsNew = row.product.IsNew,
                     Price = price != null ? price.Amount : null
 
                 });
@@ -45,4 +55,11 @@ public static class ProductListJoinExtensions
         return productListQuery;
     }
 
+    private static string NormalizeLanguage(string? lang)
+    {
+        if (string.Equals(lang, "ru", StringComparison.OrdinalIgnoreCase))
+            return "ru";
+
+        return "uk";
+    }
 }

@@ -50,6 +50,12 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductList
                 .When(x => x.Request.PriceTo.HasValue)
                 .WithMessage("Максимальна ціна не може бути менше 0.");
 
+            RuleFor(x => x.Request.Lang)
+                .Must(lang => string.IsNullOrWhiteSpace(lang) ||
+                              lang.Equals("uk", StringComparison.OrdinalIgnoreCase) ||
+                              lang.Equals("ru", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("Параметр lang може бути тільки 'uk' або 'ru'.");
+
             RuleFor(x => x.Request)
                 .Must(r => !r.PriceFrom.HasValue || !r.PriceTo.HasValue || r.PriceFrom <= r.PriceTo)
                 .WithMessage("Мінімальна ціна не може бути більшою за максимальну.");

@@ -3,6 +3,7 @@
 
 public sealed record GetProductsRequest
 {
+    public string Lang { get; init; } = "uk";
     public string? SearchTerm { get; init; }
     public string? CategorySlug { get; init; }
 

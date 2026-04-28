@@ -9,15 +9,26 @@ public static class ProductFiltersAndJoinPriceExtensions
         this IQueryable<Product> productsQuery,
         IQueryable<ProductPrice> pricesQuery,
         IQueryable<ProductCategory> categoriesQuery,
+        IQueryable<ProductTranslation> translationsQuery,
         GetProductBySlugRequest request)
     {
+        var language = NormalizeLanguage(request.Lang);
+        translationsQuery = translationsQuery.Where(t => t.Language == language);
+
         productsQuery = productsQuery.Where(p => p.ProductSlug == request.Slug);
 
-        var withCategory = productsQuery.LeftJoin(
+        var withCategoryAndTranslation = productsQuery.LeftJoin(
+            translationsQuery,
+            product => product.Id,
+            translation => translation.ProductId,
+            (product, translation) => new { product, translation }
+        );
+
+        var withCategory = withCategoryAndTranslation.LeftJoin(
             categoriesQuery,
-            product => product.CategoryId,
+            query => query.product.CategoryId,
             category => category.Id,
-            (product, category) => new { product, category }
+            (query, category) => new { query.product, query.translation, category }
         );
 
         var priceTypeId = PriceTypeId.From(request.PriceTypeId);
@@ -27,12 +38,12 @@ public static class ProductFiltersAndJoinPriceExtensions
             filteredPrices,
             query => query.product.Id,
             productPrice => productPrice.ProductId,
-            (query, productPrice) => new { query.product, query.category, productPrice }
+            (query, productPrice) => new { query.product, query.translation, query.category, productPrice }
         );
         return withCategoryAndPrice.Select(query => new ProductBySlugDto
         {
             Id = query.product.Id.Value,
-            Name = query.product.Name,
+            Name = query.translation != null ? query.translation.Name : query.product.Name,
             Photo = query.product.Photo,
             Scheme = query.product.Sсheme,
             Stock = query.product.Stock,
@@ -43,4 +54,11 @@ public static class ProductFiltersAndJoinPriceExtensions
         });
     }
 
+    private static string NormalizeLanguage(string? lang)
+    {
+        if (string.Equals(lang, "ru", StringComparison.OrdinalIgnoreCase))
+            return "ru";
+
+        return "uk";
+    }
 }
