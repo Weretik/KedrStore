@@ -18,13 +18,12 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     private ProductCategory(ProductCategoryId id, string productTypeIdOneC, string name, string slug, CategoryPath path,
         ProductCategoryId? parentId = null)
     {
-        SetCategoryId(id);
+        Id = id;
+        SetProductTypeIdOneC(productTypeIdOneC);
         SetName(name);
         SetSlug(slug);
         SetPath(path);
         SetParentId(parentId);
-
-        ProductTypeIdOneC = productTypeIdOneC;
     }
     #endregion
 
@@ -43,11 +42,12 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     #endregion
 
     #region Setters/Validation
-    private void SetCategoryId(ProductCategoryId id)
+    private void SetProductTypeIdOneC(string productTypeIdOneC)
     {
-        if (id.Value <= 0) throw new DomainException(CategoryErrors.IdMustBePositive());
-        Id = id;
+        ArgumentException.ThrowIfNullOrWhiteSpace(productTypeIdOneC);
+        ProductTypeIdOneC = productTypeIdOneC;
     }
+
     private void SetName(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new DomainException(CategoryErrors.NameIsRequired());
@@ -74,6 +74,13 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     #region ProductCategory API
     public void Rename(string name) => SetName(name);
     public void Repath(CategoryPath newPath) => SetPath(newPath);
+
+    public void Reparent(ProductCategoryId? newParentId, CategoryPath newParentPath)
+    {
+        GuardReparentInvariant(newParentPath);
+        SetParentId(newParentId);
+        SetPath(Concat(newParentPath, GetSelfSegment()));
+    }
     #endregion
 
     #region Internal rules
