@@ -1,5 +1,3 @@
-﻿using System.Globalization;
-
 namespace Catalog.Domain.Errors;
 
 public static class ProductErrors

@@ -1,5 +1,3 @@
-﻿using System.Globalization;
-
 namespace Catalog.Domain.Errors;
 
 public static class ProductPriceErrors
@@ -9,8 +7,9 @@ public static class ProductPriceErrors
             "Product price id is required");
 
     public static CatalogDomainError ProductIdRequired() =>
-        new("Catalog.ProductId.PriceType.Required",
+        new("Catalog.ProductPrice.ProductId.Required",
             "Product id type is required");
+
     public static CatalogDomainError PriceTypeRequired() =>
         new("Catalog.ProductPrice.PriceType.Required",
             "Price type is required");
@@ -23,7 +22,7 @@ public static class ProductPriceErrors
     public static CatalogDomainError AmountOutOfRange(decimal value) =>
         new(
             "Catalog.ProductPrice.Amount.OutOfRange",
-            $"Price amount must be between 0 and 5 000 000. Actual:{value}");
+            $"Price amount must be between 0 and 5 000 000. Actual: {value}");
 
     public static CatalogDomainError CurrencyCodeRequired() =>
         new("Catalog.ProductPrice.Currency.Code.Required",
@@ -32,11 +31,10 @@ public static class ProductPriceErrors
     public static CatalogDomainError CurrencyCodeLengthInvalid(string code) =>
         new(
             "Catalog.ProductPrice.Currency.Code.LengthInvalid",
-            $"Currency ISO code must be exactly 3 characters. Actual:{code}");
+            $"Currency ISO code must be exactly 3 characters. Actual: {code}");
 
     public static CatalogDomainError CurrencyCodeNonLetters(string code) =>
         new(
             "Catalog.ProductPrice.Currency.Code.NonLetters",
-            $"Currency ISO code must contain only letters. Actual:{code}");
-
+            $"Currency ISO code must contain only letters. Actual: {code}");
 }

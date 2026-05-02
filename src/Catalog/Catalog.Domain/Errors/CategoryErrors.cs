@@ -11,7 +11,7 @@ public static class CategoryErrors
         new("Catalog.Category.Name.Required", "Category name is required");
 
     public static CatalogDomainError SlugIsRequired() =>
-        new("Category.SlugIsRequired", "Category slug is required");
+        new("Catalog.Category.Slug.Required", "Category slug is required");
 
     public static CatalogDomainError NameLengthInvalid(int length) =>
         new("Catalog.Category.Name.LengthInvalid",
