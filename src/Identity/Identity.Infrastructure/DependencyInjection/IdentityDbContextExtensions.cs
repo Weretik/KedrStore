@@ -1,7 +1,8 @@
-﻿using Identity.Infrastructure.Contracts;
+using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Seeders;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 
 namespace Identity.Infrastructure.DependencyInjection;
 
@@ -15,7 +16,13 @@ public static class IdentityDbContextExtensions
             options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
 
-        services.AddIdentity<AppUser, AppRole>(options =>
+        services
+            .AddAuthentication(IdentityConstants.BearerScheme)
+            .AddBearerToken(IdentityConstants.BearerScheme);
+
+        services.AddAuthorization();
+
+        services.AddIdentityCore<AppUser>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 5;
@@ -23,8 +30,11 @@ public static class IdentityDbContextExtensions
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
             })
+            .AddRoles<AppRole>()
+            .AddSignInManager()
             .AddEntityFrameworkStores<AppIdentityDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddApiEndpoints();
 
         services.AddScoped<IIdentitySeeder, RoleSeeder>();
         services.AddScoped<IIdentitySeeder, IdentitySeeder>();

@@ -1,6 +1,3 @@
-﻿using Identity.Infrastructure.DataBase;
-using Identity.Infrastructure.Entities;
-
 namespace Identity.Infrastructure.DependencyInjection;
 
 public static class IdentityInfrastructureExtensions
@@ -10,8 +7,6 @@ public static class IdentityInfrastructureExtensions
         IConfiguration configuration)
     {
         services.AddIdentityDbContextServices(configuration);
-
         return services;
     }
 }
-

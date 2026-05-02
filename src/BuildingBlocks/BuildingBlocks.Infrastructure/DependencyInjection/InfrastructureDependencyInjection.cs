@@ -32,9 +32,10 @@ public static class InfrastructureDependencyInjection
         // JsonConvector
         services.AddScoped<IXmlToJsonConvector, XmlToJsonConvector>();
 
-        //Регистрация Fake Services
-        services.AddScoped<IPermissionService, FakePermissionService>();
-        services.AddScoped<ICurrentUserService, FakeCurrentUserService>();
+        // Identity context services
+        services.AddHttpContextAccessor();
+        services.AddScoped<IPermissionService, ClaimPermissionService>();
+        services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
 
         return services;
     }

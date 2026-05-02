@@ -1,13 +1,13 @@
-﻿using Identity.Domain.Constants;
+using Identity.Domain.Authorization;
 using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.Entities;
-using Infrastructure.Identity.Utils;
 
 namespace Identity.Infrastructure.Seeders;
 
 public class IdentitySeeder(
     UserManager<AppUser> userManager,
+    IConfiguration configuration,
     IOptions<AdminUserConfig> adminOptions,
     ILogger<IdentitySeeder> logger)
     : IIdentitySeeder
@@ -32,8 +32,12 @@ public class IdentitySeeder(
             return;
         }
 
-        var password = Environment.GetEnvironmentVariable("ADMIN_DEFAULT_PASSWORD")
-                       ?? SecurityUtils.GenerateSecurePassword();
+        var password = configuration["ADMIN_DEFAULT_PASSWORD"];
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            logger.LogError("ADMIN_DEFAULT_PASSWORD is not configured. Admin seeding is skipped.");
+            return;
+        }
 
         var user = new AppUser
         {
@@ -52,17 +56,11 @@ public class IdentitySeeder(
             return;
         }
 
-        result = await userManager.AddToRoleAsync(user, AppRoles.Admin);
+        result = await userManager.AddToRoleAsync(user, RoleNames.Admin);
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             logger.LogError("Помилка при призначенні ролі: {Errors}", errors);
-        }
-
-        if (string.IsNullOrWhiteSpace(_adminConfig.DefaultPassword) &&
-            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-        {
-            logger.LogWarning("Згенеровано пароль адміністратора: {Password}", password);
         }
 
         logger.LogInformation("Користувач-адміністратор успішно створено: {Email}", user.Email);

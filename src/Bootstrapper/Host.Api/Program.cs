@@ -44,7 +44,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGroup("/api/auth").MapIdentityApi<AppUser>();
 app.MapHealthChecks("/health");
 
 app.Run();
-

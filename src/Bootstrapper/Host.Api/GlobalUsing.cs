@@ -6,6 +6,7 @@ global using Host.Api.DependencyInjection.ServiceCollections;
 
 global using Identity.Infrastructure.Configuration;
 global using Identity.Infrastructure.DependencyInjection;
+global using Identity.Infrastructure.Entities;
 global using Catalog.Infrastructure.DependencyInjection;
 
 global using Serilog;

@@ -1,4 +1,4 @@
-using Identity.Domain.Constants;
+using Identity.Domain.Authorization;
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.Entities;
 
@@ -12,9 +12,9 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
 
         var roles = new List<AppRole>
         {
-            new() { Name = AppRoles.Admin, Description = "Адміністратор системи", Scope = "system", IsSystemRole = true, AccessLevel = 100 },
-            new() { Name = AppRoles.Manager, Description = "Контент-менеджер", Scope = "content", IsSystemRole = true, AccessLevel = 50 },
-            new() { Name = AppRoles.User, Description = "Звичайний користувач", Scope = "user", IsSystemRole = true, AccessLevel = 10 }
+            new() { Name = RoleNames.Admin, Description = "Адміністратор системи", Scope = "system", IsSystemRole = true, AccessLevel = 100 },
+            new() { Name = RoleNames.Manager, Description = "Контент-менеджер", Scope = "content", IsSystemRole = true, AccessLevel = 50 },
+            new() { Name = RoleNames.User, Description = "Звичайний користувач", Scope = "user", IsSystemRole = true, AccessLevel = 10 }
         };
 
         foreach (var role in roles)
@@ -37,5 +37,4 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
         }
     }
 }
-
 
