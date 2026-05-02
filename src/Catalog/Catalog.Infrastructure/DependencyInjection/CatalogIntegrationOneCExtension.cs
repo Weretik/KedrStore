@@ -1,9 +1,8 @@
-﻿using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Integrations.OneC.Client;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Infrastructure.Integrations.OneC.Client;
 
-namespace Catalog.Application.DependencyInjection;
+namespace Catalog.Infrastructure.DependencyInjection;
 
 public static class CatalogIntegrationOneCExtension
 {

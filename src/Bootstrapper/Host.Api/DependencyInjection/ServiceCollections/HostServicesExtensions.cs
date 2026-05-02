@@ -1,5 +1,5 @@
-﻿using Catalog.Application.DependencyInjection;
 using Catalog.Application.Integrations.OneC.Jobs;
+using Catalog.Infrastructure.DependencyInjection;
 using Host.Api.DependencyInjection.ServiceCollections.HostServices;
 
 namespace Host.Api.DependencyInjection.ServiceCollections;

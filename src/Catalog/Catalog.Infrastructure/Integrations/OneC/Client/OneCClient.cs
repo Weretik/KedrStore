@@ -3,7 +3,7 @@ using BuildingBlocks.Integrations.OneC.Factory;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 
-namespace Catalog.Application.Integrations.OneC.Client;
+namespace Catalog.Infrastructure.Integrations.OneC.Client;
 
 public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
 {
@@ -119,8 +119,8 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
             bool b => b,
             string s => s.Equals("true", StringComparison.OrdinalIgnoreCase)
                         || s == "1"
-                        || s.Equals("так", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("да", StringComparison.OrdinalIgnoreCase),
+                        || s.Equals("С‚Р°Рє", StringComparison.OrdinalIgnoreCase)
+                        || s.Equals("РґР°", StringComparison.OrdinalIgnoreCase),
             _ => bool.TryParse(value?.ToString(), out var b) && b
         };
 

@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
-using Catalog.Application.DependencyInjection;
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.DependencyInjection;
