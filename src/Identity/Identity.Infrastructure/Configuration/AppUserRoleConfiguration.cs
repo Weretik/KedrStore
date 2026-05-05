@@ -21,7 +21,9 @@ public class AppUserRoleConfiguration : IEntityTypeConfiguration<AppUserRole>
             .HasForeignKey(x => x.RoleId);
 
         builder.Property(x => x.AssignedAt).IsRequired();
-        builder.Property(x => x.AssignedByUserId).HasMaxLength(100);
+        builder.Property(x => x.AssignedBy)
+            .HasColumnName("AssignedByUserId")
+            .HasMaxLength(100);
         builder.Property(x => x.Notes).HasMaxLength(300).IsRequired(false);
         builder.Property(x => x.IsTemporary).IsRequired().HasDefaultValue(false);
         builder.Property(x => x.ExpiresAt).IsRequired(false);
