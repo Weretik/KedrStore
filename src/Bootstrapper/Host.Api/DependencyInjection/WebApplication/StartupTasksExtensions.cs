@@ -1,4 +1,4 @@
-﻿namespace Host.Api.DependencyInjection.WebApplications;
+namespace Host.Api.DependencyInjection.WebApp;
 
 public static class StartupTasksExtensions
 {

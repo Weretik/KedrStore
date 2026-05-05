@@ -1,10 +1,11 @@
-﻿using BuildingBlocks.Application;
+using BuildingBlocks.Application;
 using BuildingBlocks.Application.Behaviors;
 using Catalog.Application;
+using Identity.Application;
 
-namespace Host.Api.DependencyInjection.ServiceCollections.HostServices;
+namespace Host.Api.DependencyInjection.ServiceRegistration.Pipeline;
 
-public static class MediatorExtensions
+public static class MediatorRegistrationExtensions
 {
     public static IServiceCollection AddMediatorPipeline(
         this IServiceCollection services)
@@ -16,15 +17,16 @@ public static class MediatorExtensions
             options.Assemblies =
             [
                 typeof(CatalogApplicationAssemblyMarker).Assembly,
+                typeof(IdentityApplicationAssemblyMarker).Assembly,
                 typeof(ApplicationAssemblyMarker).Assembly
             ];
 
             options.PipelineBehaviors =
             [
                 typeof(RequestLoggingBehavior<,>),
+                typeof(ExceptionBehavior<,>),
                 typeof(PerformanceBehavior<,>),
                 typeof(ValidationBehavior<,>),
-                typeof(ExceptionBehavior<,>),
                 typeof(DomainEventDispatcherBehavior<,>)
             ];
         });

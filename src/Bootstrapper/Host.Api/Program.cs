@@ -1,5 +1,3 @@
-using Catalog.Application.Integrations.OneC.Jobs;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddSerilog();
@@ -37,14 +35,15 @@ else
     app.UseHsts();
 }
 
+app.UseForwardedHeaders();
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGroup("/api/auth").MapIdentityApi<AppUser>();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

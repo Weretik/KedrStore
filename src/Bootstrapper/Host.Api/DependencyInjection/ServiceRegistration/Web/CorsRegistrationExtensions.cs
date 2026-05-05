@@ -1,6 +1,6 @@
-﻿namespace Host.Api.DependencyInjection.ServiceCollections.HostServices;
+namespace Host.Api.DependencyInjection.ServiceRegistration.Web;
 
-public static class CorsExtensions
+public static class CorsRegistrationExtensions
 {
     public static IServiceCollection AddCorsService(
         this IServiceCollection services,
@@ -20,10 +20,10 @@ public static class CorsExtensions
                 }
 
                 policy.WithOrigins(allowedOrigins)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                // cookie-auth:
-                // policy.AllowCredentials();
+                    .WithHeaders("Content-Type", "Authorization", "X-CSRF-Token")
+                    .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                    .AllowCredentials()
+                    .SetPreflightMaxAge(TimeSpan.FromMinutes(30));
             });
         });
 

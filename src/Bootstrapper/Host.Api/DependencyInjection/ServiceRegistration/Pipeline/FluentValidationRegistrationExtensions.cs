@@ -2,9 +2,9 @@
 using FluentValidation;
 using Identity.Application;
 
-namespace Host.Api.DependencyInjection.ServiceCollections.HostServices;
+namespace Host.Api.DependencyInjection.ServiceRegistration.Pipeline;
 
-public static class FluentValidationExtension
+public static class FluentValidationRegistrationExtensions
 {
     public static IServiceCollection AddFluentValidation(this IServiceCollection services)
     {

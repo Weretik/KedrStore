@@ -1,4 +1,4 @@
-﻿namespace Host.Api.DependencyInjection.ServiceCollections;
+namespace Host.Api.DependencyInjection.ServiceRegistration.Observability;
 
 public static class SerilogExtensions
 {
