@@ -1,6 +1,7 @@
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Security;
 using Identity.Infrastructure.Seeders;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 
@@ -30,6 +31,7 @@ public static class IdentityDbContextExtensions
             })
             .AddRoles<AppRole>()
             .AddSignInManager()
+            .AddClaimsPrincipalFactory<AppUserClaimsPrincipalFactory>()
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders()
             .AddApiEndpoints();
