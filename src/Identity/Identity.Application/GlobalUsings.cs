@@ -1,9 +1,9 @@
-// System namespaces
 global using System;
+global using System.Threading;
+global using System.Threading.Tasks;
 
-// Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
 
-// External libraries
+global using Mediator;
+global using Ardalis.Result;
 global using Ardalis.Specification;
-

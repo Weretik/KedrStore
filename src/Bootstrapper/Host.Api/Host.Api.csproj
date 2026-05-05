@@ -30,6 +30,7 @@
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\..\Catalog\Catalog.Api\Catalog.Api.csproj" />
       <ProjectReference Include="..\..\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Api\Identity.Api\Identity.Api.csproj" />
       <ProjectReference Include="..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
     </ItemGroup>
 
