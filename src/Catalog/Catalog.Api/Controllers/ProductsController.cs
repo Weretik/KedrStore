@@ -2,17 +2,19 @@ using Catalog.Application.Features.Products.GetById;
 using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetList;
 using Catalog.Application.Features.Products.GetList.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;
 
 [ApiController]
 [Route("api/catalog/{lang}")]
-//[Authorize(Policy = "CatalogRead")]
+[AllowAnonymous]
 public sealed class ProductsController(ISender sender) : ControllerBase
 {
     [HttpGet("products")]
     [HttpGet("{categorySlug}/products")]
     [ProducesResponseType(typeof(PagedResult<List<ProductListRowDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PagedResult<List<ProductListRowDto>>>> Get(
         [FromQuery] GetProductsRequest request,
         [FromRoute] string lang,
@@ -29,6 +31,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
 
     [HttpGet("product/{productSlug}")]
     [ProducesResponseType(typeof(ProductBySlugDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductBySlugDto>> GetBySlug(
         [FromRoute] string lang,
