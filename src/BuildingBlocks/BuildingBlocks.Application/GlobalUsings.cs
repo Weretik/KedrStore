@@ -10,6 +10,7 @@ global using System.Text.Json;
 // Microsoft namespaces
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
@@ -21,4 +22,3 @@ global using FluentValidation.Results;
 global using Ardalis.Result;
 global using Ardalis.Result.FluentValidation;
 global using PhoneNumbers;
-

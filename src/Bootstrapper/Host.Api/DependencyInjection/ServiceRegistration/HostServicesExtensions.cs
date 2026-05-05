@@ -8,7 +8,7 @@ public static class HostServicesExtensions
     {
         services.AddModuleRegistrations(configuration);
         services.AddBackgroundJobRegistrations();
-        services.AddApplicationRegistrations();
+        services.AddApplicationRegistrations(configuration);
         services.AddApiRegistrations();
         services.AddSecurityRegistrations(configuration);
 

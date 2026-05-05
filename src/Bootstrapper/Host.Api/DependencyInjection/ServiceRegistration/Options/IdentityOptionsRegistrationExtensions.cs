@@ -1,4 +1,5 @@
 using Identity.Api.Options;
+using Identity.Infrastructure.Options;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration.Options;
 
@@ -22,6 +23,13 @@ public static class IdentityOptionsRegistrationExtensions
                      !string.IsNullOrWhiteSpace(o.CsrfCookiePath) &&
                      o.CsrfCookieTtlDays > 0,
                 "Identity:SessionCookies configuration is invalid.");
+
+        services
+            .AddOptions<IdentitySessionPerformanceOptions>()
+            .Bind(configuration.GetSection(IdentitySessionPerformanceOptions.SectionName))
+            .Validate(
+                o => o.SlowStepThresholdMs > 0,
+                "Identity:SessionPerformance configuration is invalid.");
 
         return services;
     }
