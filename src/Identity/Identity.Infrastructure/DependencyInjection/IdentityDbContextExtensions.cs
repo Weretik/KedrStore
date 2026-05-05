@@ -20,8 +20,6 @@ public static class IdentityDbContextExtensions
             .AddAuthentication(IdentityConstants.BearerScheme)
             .AddBearerToken(IdentityConstants.BearerScheme);
 
-        services.AddAuthorization();
-
         services.AddIdentityCore<AppUser>(options =>
             {
                 options.Password.RequireDigit = false;
