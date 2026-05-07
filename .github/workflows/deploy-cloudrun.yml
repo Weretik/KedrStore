@@ -9,9 +9,9 @@ permissions:
   id-token: write
 
 env:
-  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  GCP_REGION: ${{ vars.GCP_REGION }}
-  CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+  GCP_PROJECT_ID: classkedrproject
+  GCP_REGION: europe-central2
+  CLOUD_RUN_SERVICE: api
 
 jobs:
   deploy:
@@ -28,6 +28,12 @@ jobs:
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Validate deploy environment
+        run: |
+          test -n "${{ env.GCP_PROJECT_ID }}" || (echo "GCP_PROJECT_ID is empty" && exit 1)
+          test -n "${{ env.GCP_REGION }}" || (echo "GCP_REGION is empty" && exit 1)
+          test -n "${{ env.CLOUD_RUN_SERVICE }}" || (echo "CLOUD_RUN_SERVICE is empty" && exit 1)
 
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
