@@ -29,7 +29,19 @@ public static class IdentityOptionsRegistrationExtensions
             .Bind(configuration.GetSection(IdentitySessionPerformanceOptions.SectionName))
             .Validate(
                 o => o.SlowStepThresholdMs > 0,
-                "Identity:SessionPerformance configuration is invalid.");
+                "Identity:SessionPerformance configuration is invalid.")
+            .ValidateOnStart();
+
+        services
+            .AddOptions<IdentitySessionSecurityOptions>()
+            .Bind(configuration.GetSection(IdentitySessionSecurityOptions.SectionName))
+            .Validate(
+                o => o.AccessTokenLifetimeMinutes is >= 5 and <= 60 &&
+                     o.RefreshAbsoluteLifetimeDays is > 0 and <= 365 &&
+                     o.RefreshIdleTimeoutDays is > 0 &&
+                     o.RefreshIdleTimeoutDays <= o.RefreshAbsoluteLifetimeDays,
+                "Identity:SessionSecurity configuration is invalid.")
+            .ValidateOnStart();
 
         return services;
     }

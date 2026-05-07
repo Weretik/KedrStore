@@ -6,6 +6,8 @@ public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options
     : IdentityDbContext<AppUser, AppRole, int, IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>,
         IdentityRoleClaim<int>, IdentityUserToken<int>>(options)
 {
+    public DbSet<AppRefreshSession> RefreshSessions => Set<AppRefreshSession>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

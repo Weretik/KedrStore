@@ -1,6 +1,7 @@
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Options;
 using Identity.Infrastructure.Security;
 using Identity.Infrastructure.Seeders;
 using Microsoft.AspNetCore.Authentication.BearerToken;
@@ -13,13 +14,21 @@ public static class IdentityDbContextExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var sessionSecurityOptions = configuration
+            .GetSection(IdentitySessionSecurityOptions.SectionName)
+            .Get<IdentitySessionSecurityOptions>() ?? new IdentitySessionSecurityOptions();
+
         services.AddDbContext<AppIdentityDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
 
         services
             .AddAuthentication(IdentityConstants.BearerScheme)
-            .AddBearerToken(IdentityConstants.BearerScheme);
+            .AddBearerToken(IdentityConstants.BearerScheme, options =>
+            {
+                options.BearerTokenExpiration = TimeSpan.FromMinutes(sessionSecurityOptions.AccessTokenLifetimeMinutes);
+                options.RefreshTokenExpiration = TimeSpan.FromDays(sessionSecurityOptions.RefreshAbsoluteLifetimeDays);
+            });
 
         services.AddIdentityCore<AppUser>(options =>
             {
