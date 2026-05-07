@@ -8,7 +8,11 @@ public static class CorsRegistrationExtensions
     {
         var allowedOrigins = configuration
             .GetSection("Cors:AllowedOrigins")
-            .Get<string[]>() ?? [];
+            .Get<string[]>()?
+            .Select(origin => origin.Trim().TrimEnd('/'))
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray() ?? [];
 
         services.AddCors(options =>
         {
@@ -20,7 +24,8 @@ public static class CorsRegistrationExtensions
                 }
 
                 policy.WithOrigins(allowedOrigins)
-                    .WithHeaders("Content-Type", "Authorization", "X-CSRF-Token")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyHeader()
                     .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                     .AllowCredentials()
                     .SetPreflightMaxAge(TimeSpan.FromMinutes(30));
