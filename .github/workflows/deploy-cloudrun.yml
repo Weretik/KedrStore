@@ -1,4 +1,4 @@
-﻿name: Deploy to Cloud Run
+name: Deploy to Cloud Run
 
 on:
   push:
@@ -7,6 +7,11 @@ on:
 permissions:
   contents: read
   id-token: write
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
 
 jobs:
   deploy:
@@ -25,27 +30,27 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker europe-central2-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
       - name: Build & Push Host.Api image
         run: |
-          IMAGE="europe-central2-docker.pkg.dev/classkedrproject/api/api:${{ github.sha }}"
+          IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/api/api:${{ github.sha }}"
           docker build -f src/Bootstrapper/Host.Api/Dockerfile -t "$IMAGE" .
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
       - name: Build & Push Host.Jobs image
         run: |
-          JOBS_IMAGE="europe-central2-docker.pkg.dev/classkedrproject/api/host-jobs:${{ github.sha }}"
+          JOBS_IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/api/host-jobs:${{ github.sha }}"
           docker build -f src/Bootstrapper/Host.Jobs/Host.Jobs/Dockerfile -t "$JOBS_IMAGE" .
           docker push "$JOBS_IMAGE"
           echo "JOBS_IMAGE=$JOBS_IMAGE" >> $GITHUB_ENV
 
       - name: Deploy Host.Api to Cloud Run
         run: |
-          gcloud run deploy api \
+          gcloud run deploy "${{ env.CLOUD_RUN_SERVICE }}" \
             --image "${{ env.IMAGE }}" \
-            --region europe-central2 \
+            --region "${{ env.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
             --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,Identity__AdminUser__DefaultPassword=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest" \
@@ -56,6 +61,6 @@ jobs:
           for JOB in onec-prices onec-category onec-pricetypes onec-productdetails onec-stocks onec-full; do
             gcloud run jobs update "$JOB" \
               --image "${{ env.JOBS_IMAGE }}" \
-              --region europe-central2 \
+              --region "${{ env.GCP_REGION }}" \
               --quiet
           done
