@@ -6,13 +6,7 @@ public static class CorsRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var allowedOrigins = configuration
-            .GetSection("Cors:AllowedOrigins")
-            .Get<string[]>()?
-            .Select(origin => origin.Trim().TrimEnd('/'))
-            .Where(origin => !string.IsNullOrWhiteSpace(origin))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray() ?? [];
+        var allowedOrigins = GetAllowedOrigins(configuration);
 
         services.AddCors(options =>
         {
@@ -33,5 +27,22 @@ public static class CorsRegistrationExtensions
         });
 
         return services;
+    }
+
+    private static string[] GetAllowedOrigins(IConfiguration configuration)
+    {
+        var fromArray = configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? [];
+
+        var fromCsv = (configuration["Cors:AllowedOriginsCsv"] ?? string.Empty)
+            .Split([',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return fromArray
+            .Concat(fromCsv)
+            .Select(origin => origin.TrimEnd('/'))
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
 }
