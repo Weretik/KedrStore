@@ -1,10 +1,11 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["KedrStore.sln", "./"]
+COPY ["global.json", "./"]
 COPY ["src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj", "src/Bootstrapper/Host.Jobs/Host.Jobs/"]
 COPY ["src/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Catalog/Catalog.Application/"]
 COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]

@@ -7,6 +7,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["KedrStore.sln", "./"]
+COPY ["global.json", "./"]
 
 # BuildingBlocks
 COPY ["src/BuildingBlocks/BuildingBlocks.Api/BuildingBlocks.Api.csproj", "src/BuildingBlocks/BuildingBlocks.Api/"]
@@ -22,6 +23,7 @@ COPY ["src/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Catalog/Catalog.D
 COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]
 
 # Identity
+COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/Identity.Api/"]
 COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]
 COPY ["src/Identity/Identity.Domain/Identity.Domain.csproj", "src/Identity/Identity.Domain/"]
 COPY ["src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Identity/Identity.Infrastructure/"]
