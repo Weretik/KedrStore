@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Features\Catalog\" />
+      <Folder Include="Features\Customers\" />
+      <Folder Include="Features\Orders\" />
+      <Folder Include="Features\Pricing\" />
+    </ItemGroup>
+
+</Project>
