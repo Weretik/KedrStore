@@ -4,6 +4,13 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
+</PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\Sales.Application\Sales.Application.csproj" />
+      <ProjectReference Include="..\Sales.Domain\Sales.Domain.csproj" />
+    </ItemGroup>
 
 </Project>
