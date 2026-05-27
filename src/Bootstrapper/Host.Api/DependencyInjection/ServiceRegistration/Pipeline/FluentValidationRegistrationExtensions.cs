@@ -1,6 +1,7 @@
-﻿using Catalog.Application;
+using Catalog.Application;
 using FluentValidation;
 using Identity.Application;
+using Sales.Application;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration.Pipeline;
 
@@ -16,7 +17,10 @@ public static class FluentValidationRegistrationExtensions
             typeof(IdentityApplicationAssemblyMarker).Assembly,
             includeInternalTypes: true);
 
+        services.AddValidatorsFromAssembly(
+            typeof(SalesApplicationAssemblyMarker).Assembly,
+            includeInternalTypes: true);
+
         return services;
     }
 }
-

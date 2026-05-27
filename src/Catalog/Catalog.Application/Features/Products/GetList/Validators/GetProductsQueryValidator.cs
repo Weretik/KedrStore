@@ -36,9 +36,26 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductList
                 .MaximumLength(maxSearchTermLength)
                 .WithMessage($"Категорія не може перевищувати {maxSearchTermLength} символів.");
 
+            RuleFor(x => x.Request.CategoryId)
+                .GreaterThan(0)
+                .When(x => x.Request.CategoryId.HasValue)
+                .WithMessage("Некоректна категорія.");
+
             RuleFor(x => x.Request.PriceTypeId)
                 .GreaterThan(0)
+                .When(x => x.Request.PriceTypeId.HasValue)
                 .WithMessage("Некоректний тип ціни (PriceTypeId).");
+
+            RuleForEach(x => x.Request.PriceTypeRules).ChildRules(rule =>
+            {
+                rule.RuleFor(x => x.CategoryId)
+                    .GreaterThan(0)
+                    .WithMessage("Некоректна категорія для типу ціни.");
+
+                rule.RuleFor(x => x.PriceTypeId)
+                    .GreaterThan(0)
+                    .WithMessage("Некоректний тип ціни для категорії.");
+            });
 
             RuleFor(x => x.Request.PriceFrom)
                 .GreaterThanOrEqualTo(0)
