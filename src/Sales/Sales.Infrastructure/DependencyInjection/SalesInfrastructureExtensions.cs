@@ -6,11 +6,18 @@ public static class SalesInfrastructureExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("Default")
+                               ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
+
         services.Configure<CatalogPricingOptions>(
             configuration.GetSection(CatalogPricingOptions.SectionName));
 
-        services.AddScoped<ISalesCatalogPricePolicyProvider, DefaultSalesCatalogPricePolicyProvider>();
-        services.AddScoped<ISalesCatalogProductReader, CatalogSalesCatalogProductReader>();
+        services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
+        services.AddScoped<IDatabaseMigrator, DbMigrator<SalesDbContext>>();
+
+        services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();
+        services.AddScoped<ICatalogProductReader, CatalogProductReader>();
 
         return services;
     }
