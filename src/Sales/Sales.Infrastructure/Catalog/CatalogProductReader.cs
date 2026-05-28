@@ -8,7 +8,7 @@ internal sealed class CatalogProductReader(
         CatalogRequest request,
         CancellationToken cancellationToken)
     {
-        var pricePolicy = await pricePolicyProvider.GetPolicyAsync(request, cancellationToken);
+        var pricePolicy = await pricePolicyProvider.GetPolicyAsync(request.CounterpartyId, cancellationToken);
         var catalogRequest = new GetProductsRequest
         {
             Lang = request.Lang,

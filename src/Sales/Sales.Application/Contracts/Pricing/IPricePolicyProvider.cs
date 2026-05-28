@@ -2,7 +2,7 @@ namespace Sales.Application.Contracts.Pricing;
 
 public interface IPricePolicyProvider
 {
-    ValueTask<PricePolicy> GetPolicyAsync(
-        CatalogRequest request,
+    Task<PricePolicy> GetPolicyAsync(
+        string? counterpartyId,
         CancellationToken cancellationToken);
 }

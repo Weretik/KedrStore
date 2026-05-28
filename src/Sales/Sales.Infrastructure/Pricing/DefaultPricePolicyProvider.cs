@@ -4,16 +4,16 @@ internal sealed class DefaultPricePolicyProvider(
     IReadSalesDbContext salesDbContext,
     IOptionsSnapshot<CatalogPricingOptions> pricingOptions) : IPricePolicyProvider
 {
-    public ValueTask<PricePolicy> GetPolicyAsync(
-        CatalogRequest request,
+    public Task<PricePolicy> GetPolicyAsync(
+        string? counterpartyId,
         CancellationToken cancellationToken)
     {
-        return string.IsNullOrWhiteSpace(request.CounterpartyId)
-            ? ValueTask.FromResult(CreateRetailPolicy())
-            : GetCounterpartyPolicyAsync(request.CounterpartyId, cancellationToken);
+        return string.IsNullOrWhiteSpace(counterpartyId)
+            ? Task.FromResult(CreateRetailPolicy())
+            : GetCounterpartyPolicyAsync(counterpartyId, cancellationToken);
     }
 
-    private async ValueTask<PricePolicy> GetCounterpartyPolicyAsync(
+    private async Task<PricePolicy> GetCounterpartyPolicyAsync(
         string counterpartyId,
         CancellationToken cancellationToken)
     {
