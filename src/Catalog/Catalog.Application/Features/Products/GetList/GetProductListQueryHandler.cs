@@ -1,7 +1,6 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Products.GetList.DTOs;
 using Catalog.Application.Features.Products.GetList.Options;
-using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Domain.ValueObjects;
 
