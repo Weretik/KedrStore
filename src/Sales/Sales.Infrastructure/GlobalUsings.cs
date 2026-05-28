@@ -12,9 +12,8 @@ global using Microsoft.Extensions.Options;
 global using Ardalis.Result;
 global using Mediator;
 
-global using Catalog.Application.Features.Products.GetList;
-global using Catalog.Application.Features.Products.GetList.DTOs;
-global using Catalog.Application.Features.Products.GetList.Options;
+global using Catalog.Contracts.Pricing;
+global using Catalog.Contracts.Products.GetList;
 
 global using Sales.Application.Contracts.Catalog;
 global using Sales.Application.Contracts.Pricing;

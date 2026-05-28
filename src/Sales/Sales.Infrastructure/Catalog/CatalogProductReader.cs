@@ -1,7 +1,7 @@
 namespace Sales.Infrastructure.Catalog;
 
 internal sealed class CatalogProductReader(
-    ISender sender,
+    ICatalogProductListReader catalogProductListReader,
     IPricePolicyProvider pricePolicyProvider) : ICatalogProductReader
 {
     public async Task<Result<PagedResult<List<CatalogListItemDto>>>> GetListAsync(
@@ -25,7 +25,7 @@ internal sealed class CatalogProductReader(
             PageSize = request.PageSize
         };
 
-        var catalogResult = await sender.Send(new GetProductListQuery(catalogRequest), cancellationToken);
+        var catalogResult = await catalogProductListReader.GetListAsync(catalogRequest, cancellationToken);
 
         return catalogResult.Map(MapCatalogPage);
     }

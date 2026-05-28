@@ -1,7 +1,7 @@
 using Catalog.Application.Features.Products.GetById;
 using Catalog.Application.Features.Products.GetById.DTOs;
 using Catalog.Application.Features.Products.GetList;
-using Catalog.Application.Features.Products.GetList.DTOs;
+using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

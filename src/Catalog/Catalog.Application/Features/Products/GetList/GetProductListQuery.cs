@@ -1,4 +1,4 @@
-using Catalog.Application.Features.Products.GetList.DTOs;
+using Catalog.Contracts.Products.GetList;
 using Catalog.Application.Integrations.OneC.DTOs;
 
 namespace Catalog.Application.Features.Products.GetList;

@@ -1,4 +1,4 @@
-using Catalog.Application.Features.Products.GetList.Options;
+using Catalog.Contracts.Pricing;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

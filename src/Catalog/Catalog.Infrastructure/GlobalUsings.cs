@@ -26,11 +26,15 @@ global using BuildingBlocks.Infrastructure.Services;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
+global using Catalog.Contracts.Products.GetList;
 
 // Application namespaces
+global using Catalog.Application.Features.Products.GetList;
 
 // Services
+global using Ardalis.Result;
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
+global using Mediator;
 global using Telegram.Bot;
 global using Telegram.Bot.Types.Enums;
