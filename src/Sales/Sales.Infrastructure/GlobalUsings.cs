@@ -1,4 +1,7 @@
 global using BuildingBlocks.Infrastructure.Migrations;
+global using BuildingBlocks.Domain.Abstractions;
+
+global using Ardalis.Specification.EntityFrameworkCore;
 
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -21,3 +24,4 @@ global using Sales.Domain.Customers.Entities;
 global using Sales.Infrastructure.Catalog;
 global using Sales.Infrastructure.DataBase;
 global using Sales.Infrastructure.Pricing;
+global using Sales.Infrastructure.Repositories;

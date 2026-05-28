@@ -14,6 +14,7 @@ public static class SalesInfrastructureExtensions
 
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
+        services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IDatabaseMigrator, DbMigrator<SalesDbContext>>();
 
         services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();
