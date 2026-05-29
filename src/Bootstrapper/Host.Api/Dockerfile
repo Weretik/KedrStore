@@ -19,6 +19,7 @@ COPY ["src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integr
 # Catalog
 COPY ["src/Catalog/Catalog.Api/Catalog.Api.csproj", "src/Catalog/Catalog.Api/"]
 COPY ["src/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Catalog/Catalog.Application/"]
+COPY ["src/Catalog/Catalog.Contracts/Catalog.Contracts.csproj", "src/Catalog/Catalog.Contracts/"]
 COPY ["src/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Catalog/Catalog.Domain/"]
 COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]
 
@@ -27,6 +28,12 @@ COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identit
 COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]
 COPY ["src/Identity/Identity.Domain/Identity.Domain.csproj", "src/Identity/Identity.Domain/"]
 COPY ["src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Identity/Identity.Infrastructure/"]
+
+# Sales
+COPY ["src/Sales/Sales.Api/Sales.Api.csproj", "src/Sales/Sales.Api/"]
+COPY ["src/Sales/Sales.Application/Sales.Application.csproj", "src/Sales/Sales.Application/"]
+COPY ["src/Sales/Sales.Domain/Sales.Domain.csproj", "src/Sales/Sales.Domain/"]
+COPY ["src/Sales/Sales.Infrastructure/Sales.Infrastructure.csproj", "src/Sales/Sales.Infrastructure/"]
 
 # Bootstrapper
 COPY ["src/Bootstrapper/Host.Api/Host.Api.csproj", "src/Bootstrapper/Host.Api/"]
