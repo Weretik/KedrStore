@@ -21,6 +21,7 @@ namespace Catalog.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
@@ -103,6 +104,15 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Products_Name_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("CategoryId", "IsDeleted", "IsSale", "IsNew")
+                        .HasDatabaseName("IX_Products_ListFilters");
+
                     b.ToTable("Products", (string)null);
                 });
 
@@ -141,6 +151,91 @@ namespace Catalog.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
                     b.ToTable("ProductCategories", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductListProjection", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CategorySlug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("InStock")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsNew")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NameRu")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("NameUk")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ProductSlug")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal?>("RetailPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("SearchTextRu")
+                        .IsRequired()
+                        .HasMaxLength(700)
+                        .HasColumnType("character varying(700)");
+
+                    b.Property<string>("SearchTextUk")
+                        .IsRequired()
+                        .HasMaxLength(700)
+                        .HasColumnType("character varying(700)");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("IX_ProductListProjections_CategoryId");
+
+                    b.HasIndex("CategorySlug")
+                        .HasDatabaseName("IX_ProductListProjections_CategorySlug");
+
+                    b.HasIndex("RetailPrice")
+                        .HasDatabaseName("IX_ProductListProjections_RetailPrice");
+
+                    b.HasIndex("SearchTextRu")
+                        .HasDatabaseName("IX_ProductListProjections_SearchTextRu_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextRu"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextRu"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("SearchTextUk")
+                        .HasDatabaseName("IX_ProductListProjections_SearchTextUk_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextUk"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextUk"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("CategoryId", "InStock", "IsSale", "IsNew")
+                        .HasDatabaseName("IX_ProductListProjections_ListFilters");
+
+                    b.ToTable("ProductListProjections", (string)null);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>
@@ -214,6 +309,15 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_ProductTranslations_Name_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("Language", "IsDeleted")
+                        .HasDatabaseName("IX_ProductTranslations_Language_IsDeleted");
 
                     b.HasIndex("ProductId", "Language")
                         .IsUnique();

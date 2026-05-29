@@ -1,5 +1,7 @@
-﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Projections;
 using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Projections;
 using Catalog.Infrastructure.Repositories;
 
 namespace Catalog.Infrastructure.DependencyInjection;
@@ -10,13 +12,14 @@ public static class CatalogDbContextExtensions
         this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Default")
-                               ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");;
+                               ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
 
         services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
+        services.AddScoped<IProductListProjectionRebuilder, ProductListProjectionRebuilder>();
 
         services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();
 
