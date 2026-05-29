@@ -1,4 +1,6 @@
-﻿namespace Catalog.Application.Features.Products.GetList.Validators;
+using Catalog.Application.Features.Products.GetPricedList;
+
+namespace Catalog.Application.Features.Products.GetPricedList.Validators;
 
 public sealed class GetProductsQueryValidator : AbstractValidator<GetProductListQuery>
 {
@@ -10,72 +12,72 @@ public sealed class GetProductsQueryValidator : AbstractValidator<GetProductList
 
         RuleFor(x => x.Request)
             .NotNull()
-            .WithMessage("Request не може бути порожнім.");
+            .WithMessage("Request cannot be empty.");
 
         When(x => true, () =>
         {
             RuleFor(x => x.Request.SearchTerm)
                 .MaximumLength(maxSearchTermLength)
-                .WithMessage($"Пошуковий запит не може перевищувати {maxSearchTermLength} символів.");
+                .WithMessage($"Search term cannot exceed {maxSearchTermLength} characters.");
 
             RuleFor(x => x.Request.Sort)
                 .IsInEnum()
-                .WithMessage("Некоректний параметр сортування.");
+                .WithMessage("Invalid sort parameter.");
 
             RuleFor(x => x.Request.Page)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Номер сторінки має бути >= 1.");
+                .WithMessage("Page number must be >= 1.");
 
             RuleFor(x => x.Request.PageSize)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Розмір сторінки має бути >= 1.")
+                .WithMessage("Page size must be >= 1.")
                 .LessThanOrEqualTo(maxPageSize)
-                .WithMessage($"Розмір сторінки не може бути більше {maxPageSize}.");
+                .WithMessage($"Page size cannot exceed {maxPageSize}.");
 
             RuleFor(x => x.Request.CategorySlug)
                 .MaximumLength(maxSearchTermLength)
-                .WithMessage($"Категорія не може перевищувати {maxSearchTermLength} символів.");
+                .WithMessage($"Category cannot exceed {maxSearchTermLength} characters.");
 
             RuleFor(x => x.Request.CategoryId)
                 .GreaterThan(0)
                 .When(x => x.Request.CategoryId.HasValue)
-                .WithMessage("Некоректна категорія.");
+                .WithMessage("Invalid category.");
 
             RuleFor(x => x.Request.PriceTypeId)
                 .GreaterThan(0)
                 .When(x => x.Request.PriceTypeId.HasValue)
-                .WithMessage("Некоректний тип ціни (PriceTypeId).");
+                .WithMessage("Invalid price type.");
 
             RuleForEach(x => x.Request.PriceTypeRules).ChildRules(rule =>
             {
                 rule.RuleFor(x => x.CategoryId)
                     .GreaterThan(0)
-                    .WithMessage("Некоректна категорія для типу ціни.");
+                    .WithMessage("Invalid category for price type rule.");
 
                 rule.RuleFor(x => x.PriceTypeId)
                     .GreaterThan(0)
-                    .WithMessage("Некоректний тип ціни для категорії.");
+                    .WithMessage("Invalid price type for category rule.");
             });
 
             RuleFor(x => x.Request.PriceFrom)
                 .GreaterThanOrEqualTo(0)
                 .When(x => x.Request.PriceFrom.HasValue)
-                .WithMessage("Мінімальна ціна не може бути менше 0.");
+                .WithMessage("Minimum price cannot be less than 0.");
 
             RuleFor(x => x.Request.PriceTo)
                 .GreaterThanOrEqualTo(0)
                 .When(x => x.Request.PriceTo.HasValue)
-                .WithMessage("Максимальна ціна не може бути менше 0.");
+                .WithMessage("Maximum price cannot be less than 0.");
 
             RuleFor(x => x.Request.Lang)
                 .Must(lang => string.IsNullOrWhiteSpace(lang) ||
                               lang.Equals("uk", StringComparison.OrdinalIgnoreCase) ||
                               lang.Equals("ru", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("Параметр lang може бути тільки 'uk' або 'ru'.");
+                .WithMessage("Lang parameter can only be 'uk' or 'ru'.");
 
             RuleFor(x => x.Request)
                 .Must(r => !r.PriceFrom.HasValue || !r.PriceTo.HasValue || r.PriceFrom <= r.PriceTo)
-                .WithMessage("Мінімальна ціна не може бути більшою за максимальну.");
+                .WithMessage("Minimum price cannot be greater than maximum price.");
         });
     }
 }

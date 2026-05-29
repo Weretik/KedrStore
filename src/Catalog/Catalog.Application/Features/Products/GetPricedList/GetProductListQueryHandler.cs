@@ -4,7 +4,7 @@ using Catalog.Contracts.Products.GetList;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products.GetList;
+namespace Catalog.Application.Features.Products.GetPricedList;
 
 public class GetProductListQueryHandler(
     IReadCatalogDbContext catalogDbContext,
@@ -38,30 +38,59 @@ public class GetProductListQueryHandler(
                 : productQuery.OrderBy(p => p.Id);
         }
 
-        var productListWithPriceQuery = JoinPricesForList(
-            productQuery,
-            priceQuery,
-            translationQuery,
-            request,
-            retailPriceTypeId,
-            hardwareRootCategoryId);
-
-        var productSortListQuery = isIdSort
-            ? productListWithPriceQuery
-            : ApplySorting(productListWithPriceQuery, request.Sort);
-
-        var totalRecords  = await productListWithPriceQuery.CountAsync(cancellationToken);
         var pageNumber  = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 20 : request.PageSize;
 
         if (pageSize > MaxPageSize) pageSize = MaxPageSize;
 
-        var totalPages = (long)Math.Ceiling(totalRecords / (double)pageSize);
         var skip = (pageNumber - 1) * pageSize;
+        var hasPriceFilter = request.PriceFrom is not null || request.PriceTo is not null;
 
-        var productListQuery = productSortListQuery.Skip(skip).Take(pageSize);
+        long totalRecords;
+        List<ProductListRowDto> items;
 
-        var items = await productListQuery.ToListAsync(cancellationToken);
+        if (isIdSort && !hasPriceFilter)
+        {
+            totalRecords = await productQuery.LongCountAsync(cancellationToken);
+
+            var pagedProductsQuery = productQuery.Skip(skip).Take(pageSize);
+            var pagedRowsQuery = JoinPricesForList(
+                pagedProductsQuery,
+                priceQuery,
+                translationQuery,
+                request,
+                retailPriceTypeId,
+                hardwareRootCategoryId);
+
+            pagedRowsQuery = request.Sort == ProductSort.IdDesc
+                ? pagedRowsQuery.OrderByDescending(x => x.Id)
+                : pagedRowsQuery.OrderBy(x => x.Id);
+
+            items = await pagedRowsQuery.ToListAsync(cancellationToken);
+        }
+        else
+        {
+            var productListWithPriceQuery = JoinPricesForList(
+                productQuery,
+                priceQuery,
+                translationQuery,
+                request,
+                retailPriceTypeId,
+                hardwareRootCategoryId);
+
+            var productSortListQuery = isIdSort
+                ? productListWithPriceQuery
+                : ApplySorting(productListWithPriceQuery, request.Sort);
+
+            totalRecords = await productListWithPriceQuery.LongCountAsync(cancellationToken);
+
+            items = await productSortListQuery
+                .Skip(skip)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        var totalPages = (long)Math.Ceiling(totalRecords / (double)pageSize);
 
         var pagedInfo = new PagedInfo(
             pageNumber: pageNumber,
