@@ -4,7 +4,7 @@ public sealed class GetCatalogListQueryValidator : AbstractValidator<GetCatalogL
 {
     public GetCatalogListQueryValidator()
     {
-        RuleFor(x => x.Request.CounterpartyId).MaximumLength(64);
+        RuleFor(x => x.Request.IdentityUserId).NotEqual(Guid.Empty).When(x => x.Request.IdentityUserId.HasValue);
         RuleFor(x => x.Request.Page).GreaterThan(0);
         RuleFor(x => x.Request.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
     }

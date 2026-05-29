@@ -5,25 +5,24 @@ internal sealed class DefaultPricePolicyProvider(
     IOptionsSnapshot<CatalogPricingOptions> pricingOptions) : IPricePolicyProvider
 {
     public Task<PricePolicy> GetPolicyAsync(
-        string? counterpartyId,
+        Guid? identityUserId,
         CancellationToken cancellationToken)
     {
-        return string.IsNullOrWhiteSpace(counterpartyId)
+        return identityUserId is null
             ? Task.FromResult(CreateRetailPolicy())
-            : GetCounterpartyPolicyAsync(counterpartyId, cancellationToken);
+            : GetCounterpartyPolicyAsync(identityUserId.Value, cancellationToken);
     }
 
     private async Task<PricePolicy> GetCounterpartyPolicyAsync(
-        string counterpartyId,
+        Guid identityUserId,
         CancellationToken cancellationToken)
     {
-        var trimmedCounterpartyId = counterpartyId.Trim();
-
         var counterparty = await salesDbContext.Counterparties
             .AsNoTracking()
-            .Where(x => x.Id == trimmedCounterpartyId)
+            .Where(x => x.IdentityUserId == identityUserId)
             .Select(x => new
             {
+                x.Id,
                 x.DefaultPriceTypeId
             })
             .FirstOrDefaultAsync(cancellationToken);
@@ -35,7 +34,7 @@ internal sealed class DefaultPricePolicyProvider(
 
         var categoryPriceTypes = await salesDbContext.CounterpartyCategoryPriceTypes
             .AsNoTracking()
-            .Where(rule => rule.CounterpartyId == trimmedCounterpartyId)
+            .Where(rule => rule.CounterpartyId == counterparty.Id)
             .Select(rule => new CategoryPriceType(rule.CategoryId, rule.PriceTypeId))
             .ToArrayAsync(cancellationToken);
 

@@ -2,6 +2,7 @@ namespace Sales.Domain.Customers.Entities;
 
 public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, IAuditableEntity, ISoftDelete
 {
+    public Guid IdentityUserId { get; private set; }
     public string Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
     public string? Phone { get; private set; }
@@ -11,6 +12,7 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
 
     private Counterparty(
         string id,
+        Guid identityUserId,
         string name,
         string email,
         string? phone,
@@ -18,6 +20,7 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         DateTimeOffset createdAt)
     {
         SetId(id);
+        SetIdentityUserId(identityUserId);
         SetName(name);
         SetEmail(email);
         SetPhone(phone);
@@ -27,20 +30,23 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
 
     public static Counterparty Create(
         string id,
+        Guid identityUserId,
         string name,
         string email,
         string? phone,
         int defaultPriceTypeId,
         DateTimeOffset createdAt)
-        => new(id, name, email, phone, defaultPriceTypeId, createdAt);
+        => new(id, identityUserId, name, email, phone, defaultPriceTypeId, createdAt);
 
     public void Update(
+        Guid identityUserId,
         string name,
         string email,
         string? phone,
         int defaultPriceTypeId,
         DateTimeOffset updatedAt)
     {
+        SetIdentityUserId(identityUserId);
         SetName(name);
         SetEmail(email);
         SetPhone(phone);
@@ -56,6 +62,16 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         }
 
         Id = id.Trim();
+    }
+
+    private void SetIdentityUserId(Guid identityUserId)
+    {
+        if (identityUserId == Guid.Empty)
+        {
+            throw new DomainException(CounterpartyErrors.IdentityUserIdInvalid(identityUserId));
+        }
+
+        IdentityUserId = identityUserId;
     }
 
     private void SetName(string name)

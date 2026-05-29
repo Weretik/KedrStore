@@ -5,6 +5,9 @@ public static class CounterpartyErrors
     public static IDomainError IdRequired() =>
         new DomainError("sales.counterparty.id_required", "Counterparty id is required.");
 
+    public static IDomainError IdentityUserIdInvalid(Guid identityUserId) =>
+        new DomainError("sales.counterparty.identity_user_id_invalid", $"Identity user id is invalid: {identityUserId}.");
+
     public static IDomainError NameRequired() =>
         new DomainError("sales.counterparty.name_required", "Counterparty name is required.");
 

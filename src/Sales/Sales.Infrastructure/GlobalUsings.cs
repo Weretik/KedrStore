@@ -1,5 +1,8 @@
 global using BuildingBlocks.Infrastructure.Migrations;
+global using BuildingBlocks.Infrastructure.Seeding;
 global using BuildingBlocks.Domain.Abstractions;
+
+global using System.Data;
 
 global using Ardalis.Specification.EntityFrameworkCore;
 
@@ -7,6 +10,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 
 global using Ardalis.Result;
@@ -22,5 +26,7 @@ global using Sales.Application.Features.Catalog.GetList.DTOs;
 global using Sales.Domain.Customers.Entities;
 global using Sales.Infrastructure.Catalog;
 global using Sales.Infrastructure.DataBase;
+global using Sales.Infrastructure.Options;
 global using Sales.Infrastructure.Pricing;
 global using Sales.Infrastructure.Repositories;
+global using Sales.Infrastructure.Seeders;

@@ -3,7 +3,7 @@ namespace Sales.Application.Features.Catalog.GetList.DTOs;
 public sealed record CatalogRequest
 {
     public string Lang { get; init; } = "uk";
-    public string? CounterpartyId { get; init; }
+    public Guid? IdentityUserId { get; init; }
     public string? SearchTerm { get; init; }
     public int? CategoryId { get; init; }
     public bool? InStock { get; init; } = true;

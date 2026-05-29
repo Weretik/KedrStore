@@ -12,6 +12,9 @@ public sealed class CounterpartyConfiguration : IEntityTypeConfiguration<Counter
             .HasMaxLength(64)
             .ValueGeneratedNever();
 
+        builder.Property(counterparty => counterparty.IdentityUserId)
+            .IsRequired();
+
         builder.Property(counterparty => counterparty.Name)
             .HasMaxLength(300)
             .IsRequired();
@@ -27,6 +30,8 @@ public sealed class CounterpartyConfiguration : IEntityTypeConfiguration<Counter
             .IsRequired();
 
         builder.HasIndex(counterparty => counterparty.Email);
+        builder.HasIndex(counterparty => counterparty.IdentityUserId)
+            .IsUnique();
         builder.HasIndex(counterparty => counterparty.DefaultPriceTypeId);
         builder.HasQueryFilter(counterparty => !counterparty.IsDeleted);
     }
