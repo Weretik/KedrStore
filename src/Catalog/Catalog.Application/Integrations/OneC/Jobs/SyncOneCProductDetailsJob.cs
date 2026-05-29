@@ -1,5 +1,6 @@
 using System.Text;
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
@@ -14,12 +15,16 @@ public sealed class SyncOneCProductDetailsJob(
     ICatalogRepository<Product> productRepo,
     ICatalogRepository<ProductTranslation> translationRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
+    IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCPricesJob> logger)
 {
     private const string RuLanguage = "ru";
     private const string TranslationFileRelativePath = "Translation/Imports/product-translations.ru.csv";
 
-    public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
+    public async Task RunAsync(
+        string rootCategoryId,
+        CancellationToken cancellationToken,
+        bool rebuildProjection = true)
     {
         logger.LogInformation("[DEBUG_LOG] SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
 
@@ -33,10 +38,25 @@ public sealed class SyncOneCProductDetailsJob(
         var categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
 
         var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
+        logger.LogInformation(
+            "Mapped {MappedCount} products for root {Root}. Received: {ReceivedCount}.",
+            products.Count,
+            rootCategoryId,
+            productsOneC.Count);
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         var syncedProductIds = await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
+        logger.LogInformation(
+            "Synced {SyncedCount} products for root {Root}.",
+            syncedProductIds.Count,
+            rootCategoryId);
+
         await UpsertTranslationsForSyncedProductsAsync(syncedProductIds, cancellationToken);
+
+        if (rebuildProjection)
+        {
+            await productListProjectionRebuilder.RebuildAsync(cancellationToken);
+        }
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
