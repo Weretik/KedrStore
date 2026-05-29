@@ -29,6 +29,14 @@ public sealed class ProductTranslationConfiguration : IEntityTypeConfiguration<P
         builder.HasIndex(x => new { x.ProductId, x.Language })
             .IsUnique();
 
+        builder.HasIndex(x => x.Name)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_ProductTranslations_Name_trgm");
+
+        builder.HasIndex(x => new { x.Language, x.IsDeleted })
+            .HasDatabaseName("IX_ProductTranslations_Language_IsDeleted");
+
         builder.HasOne<Product>()
             .WithMany()
             .HasForeignKey(x => x.ProductId)
