@@ -126,7 +126,7 @@ public sealed class IdentitySessionService(
         LogStepDuration("Refresh.UnprotectToken", stepWatch.ElapsedMilliseconds);
 
         var userId = refreshTicket?.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!int.TryParse(userId, out var parsedUserId) || parsedUserId != refreshSession.UserId)
+        if (!Guid.TryParse(userId, out var parsedUserId) || parsedUserId != refreshSession.UserId)
         {
             await RevokeSessionAsync(refreshSession, now, "PrincipalMismatch", cancellationToken);
             logger.LogWarning("AUDIT: Refresh failed: principal mismatch for sessionId {SessionId}", refreshSession.Id);
@@ -264,7 +264,7 @@ public sealed class IdentitySessionService(
     }
 
     private async Task<AppRefreshSession> CreateRefreshSessionAsync(
-        int userId,
+        Guid userId,
         string refreshToken,
         DateTimeOffset now,
         DateTimeOffset absoluteExpiresAtUtc,
@@ -302,7 +302,7 @@ public sealed class IdentitySessionService(
     }
 
     private async Task RevokeAllActiveSessionsByUserAsync(
-        int userId,
+        Guid userId,
         DateTimeOffset now,
         string reason,
         CancellationToken cancellationToken)

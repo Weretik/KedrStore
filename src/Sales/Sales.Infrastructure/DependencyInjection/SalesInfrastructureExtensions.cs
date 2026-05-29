@@ -11,6 +11,8 @@ public static class SalesInfrastructureExtensions
 
         services.Configure<CatalogPricingOptions>(
             configuration.GetSection(CatalogPricingOptions.SectionName));
+        services.Configure<SalesTestCustomerOptions>(
+            configuration.GetSection(SalesTestCustomerOptions.SectionName));
 
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
@@ -19,6 +21,7 @@ public static class SalesInfrastructureExtensions
 
         services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();
         services.AddScoped<ICatalogProductReader, CatalogProductReader>();
+        services.AddScoped<ISeeder, SalesTestCustomerSeeder>();
 
         return services;
     }

@@ -9,8 +9,9 @@ public static class IdentityOptionsRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<AdminUserConfig>(
-            configuration.GetSection("Identity:AdminUser"));
+        services.Configure<AdminUserConfig>(configuration.GetSection("Identity:AdminUser"));
+        services.Configure<TestCustomerConfig>(configuration.GetSection("Identity:TestCustomer"));
+
         services
             .AddOptions<SessionCookieOptions>()
             .Bind(configuration.GetSection(SessionCookieOptions.SectionName))
