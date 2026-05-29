@@ -1,6 +1,6 @@
 namespace Identity.Infrastructure.Entities;
 
-public class AppUserRole : IdentityUserRole<int>
+public class AppUserRole : IdentityUserRole<Guid>
 {
     public AppUser User { get; set; } = null!;
     public AppRole Role { get; set; } = null!;

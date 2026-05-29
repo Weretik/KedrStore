@@ -1,6 +1,6 @@
 namespace Identity.Infrastructure.Entities;
 
-public class AppRole : IdentityRole<int>
+public class AppRole : IdentityRole<Guid>
 {
     public string Description { get; set; } = string.Empty;
     public string Scope { get; set; } = string.Empty;
