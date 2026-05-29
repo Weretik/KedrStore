@@ -5,9 +5,9 @@ global using Host.Api.DependencyInjection.WebApp;
 global using Host.Api.DependencyInjection.ServiceRegistration;
 global using Host.Api.DependencyInjection.ServiceRegistration.Observability;
 
-global using Identity.Infrastructure.Configuration;
 global using Identity.Infrastructure.DependencyInjection;
 global using Identity.Infrastructure.Entities;
+global using Identity.Infrastructure.Options;
 global using Catalog.Infrastructure.DependencyInjection;
 
 global using Serilog;

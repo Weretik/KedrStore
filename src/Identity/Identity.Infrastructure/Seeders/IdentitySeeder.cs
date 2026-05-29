@@ -1,20 +1,20 @@
 using Identity.Domain.Authorization;
-using Identity.Infrastructure.Configuration;
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Options;
 
 namespace Identity.Infrastructure.Seeders;
 
 public class IdentitySeeder(
     UserManager<AppUser> userManager,
     IConfiguration configuration,
-    IOptions<AdminUserConfig> adminOptions,
-    IOptions<TestCustomerConfig> testCustomerOptions,
+    IOptions<AdminUserOptions> adminOptions,
+    IOptions<TestCustomerOptions> testCustomerOptions,
     ILogger<IdentitySeeder> logger)
     : IIdentitySeeder
 {
-    private readonly AdminUserConfig _adminConfig = adminOptions.Value;
-    private readonly TestCustomerConfig _testCustomerConfig = testCustomerOptions.Value;
+    private readonly AdminUserOptions _adminOptions = adminOptions.Value;
+    private readonly TestCustomerOptions _testCustomerOptions = testCustomerOptions.Value;
 
     public async Task SeedAsync(IServiceProvider _, CancellationToken cancellationToken = default)
     {
@@ -28,10 +28,10 @@ public class IdentitySeeder(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var existingAdmin = await userManager.FindByEmailAsync(_adminConfig.Email);
+        var existingAdmin = await userManager.FindByEmailAsync(_adminOptions.Email);
         if (existingAdmin != null)
         {
-            logger.LogInformation("Admin user already exists: {Email}", _adminConfig.Email);
+            logger.LogInformation("Admin user already exists: {Email}", _adminOptions.Email);
             return;
         }
 
@@ -45,11 +45,11 @@ public class IdentitySeeder(
         var user = new AppUser
         {
             Id = Guid.NewGuid(),
-            UserName = _adminConfig.Email,
-            Email = _adminConfig.Email,
-            FullName = _adminConfig.FullName,
+            UserName = _adminOptions.Email,
+            Email = _adminOptions.Email,
+            FullName = _adminOptions.FullName,
             EmailConfirmed = true,
-            LockoutEnabled = _adminConfig.LockoutEnabled
+            LockoutEnabled = _adminOptions.LockoutEnabled
         };
 
         var result = await userManager.CreateAsync(user, password);
@@ -74,22 +74,22 @@ public class IdentitySeeder(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (_testCustomerConfig.IdentityUserId == Guid.Empty)
+        if (_testCustomerOptions.IdentityUserId == Guid.Empty)
         {
             logger.LogWarning("Identity:TestCustomer:IdentityUserId is not configured. Sales test customer user seeding is skipped.");
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_testCustomerConfig.Email))
+        if (string.IsNullOrWhiteSpace(_testCustomerOptions.Email))
         {
             logger.LogWarning("Identity:TestCustomer:Email is not configured. Sales test customer user seeding is skipped.");
             return;
         }
 
-        var user = await userManager.FindByEmailAsync(_testCustomerConfig.Email);
+        var user = await userManager.FindByEmailAsync(_testCustomerOptions.Email);
         if (user is null)
         {
-            if (string.IsNullOrWhiteSpace(_testCustomerConfig.DefaultPassword))
+            if (string.IsNullOrWhiteSpace(_testCustomerOptions.DefaultPassword))
             {
                 logger.LogWarning(
                     "Identity:TestCustomer:DefaultPassword is not configured. Sales test customer user seeding is skipped.");
@@ -98,15 +98,15 @@ public class IdentitySeeder(
 
             user = new AppUser
             {
-                Id = _testCustomerConfig.IdentityUserId,
-                UserName = _testCustomerConfig.Email,
-                Email = _testCustomerConfig.Email,
-                FullName = _testCustomerConfig.FullName,
+                Id = _testCustomerOptions.IdentityUserId,
+                UserName = _testCustomerOptions.Email,
+                Email = _testCustomerOptions.Email,
+                FullName = _testCustomerOptions.FullName,
                 EmailConfirmed = true,
-                LockoutEnabled = _testCustomerConfig.LockoutEnabled
+                LockoutEnabled = _testCustomerOptions.LockoutEnabled
             };
 
-            var createResult = await userManager.CreateAsync(user, _testCustomerConfig.DefaultPassword);
+            var createResult = await userManager.CreateAsync(user, _testCustomerOptions.DefaultPassword);
             if (!createResult.Succeeded)
             {
                 var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
