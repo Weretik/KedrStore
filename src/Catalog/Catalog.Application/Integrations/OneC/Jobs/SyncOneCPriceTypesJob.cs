@@ -43,7 +43,7 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
                     priceTypeName: item.PriceTypeName);
 
                 await priceTypeRepo.AddAsync(priceType, cancellationToken);
-                existingIds.Add(priceTypeId); // Добавляем в локальный кэш, чтобы не добавить дважды из одного списка 1С
+                existingIds.Add(priceTypeId);
                 logger.LogInformation("[DEBUG_LOG] Prepared new PriceType: {Name} (ID: {Id})", item.PriceTypeName, item.PriceTypeId);
             }
             else

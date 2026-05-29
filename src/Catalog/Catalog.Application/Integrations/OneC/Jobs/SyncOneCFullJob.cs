@@ -1,31 +1,36 @@
-﻿namespace Catalog.Application.Integrations.OneC.Jobs;
+using Catalog.Application.Contracts.Projections;
+
+namespace Catalog.Application.Integrations.OneC.Jobs;
 
 public sealed class SyncOneCFullJob(
-    IConfiguration cfg,
+    IConfiguration сonfiguration,
     SyncOneCPriceTypesJob priceTypes,
     SyncOneCStocksJob stocks,
     SyncOneCPricesJob prices,
     SyncOneCProductDetailsJob products,
-    SyncOneCCategoryJob categories)
+    SyncOneCCategoryJob categories,
+    IProductListProjectionRebuilder productListProjectionRebuilder)
 {
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        var doors = Required(cfg, "OneC:DoorsRootCategoryId");
-        var hardware = Required(cfg, "OneC:HardwareRootCategoryId");
+        var doors = Required(сonfiguration, "OneC:DoorsRootCategoryId");
+        var hardware = Required(сonfiguration, "OneC:HardwareRootCategoryId");
 
         await priceTypes.RunAsync(cancellationToken);
 
         await categories.RunAsync(doors, cancellationToken);
         await categories.RunAsync(hardware, cancellationToken);
 
-        await products.RunAsync(doors, cancellationToken);
-        await products.RunAsync(hardware, cancellationToken);
+        await products.RunAsync(doors, cancellationToken, rebuildProjection: false);
+        await products.RunAsync(hardware, cancellationToken, rebuildProjection: false);
 
         await stocks.RunAsync(doors, cancellationToken);
         await stocks.RunAsync(hardware, cancellationToken);
 
-        await prices.RunAsync(doors, cancellationToken);
-        await prices.RunAsync(hardware, cancellationToken);
+        await prices.RunAsync(doors, cancellationToken, rebuildProjection: false);
+        await prices.RunAsync(hardware, cancellationToken, rebuildProjection: false);
+
+        await productListProjectionRebuilder.RebuildAsync(cancellationToken);
     }
 
     private static string Required(IConfiguration cfg, string key)

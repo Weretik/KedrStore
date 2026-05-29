@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Specifications;
@@ -11,9 +12,13 @@ public sealed class SyncOneCPricesJob(
     IOneCClient oneC,
     ICatalogRepository<ProductPrice> priceRepo,
     ICatalogRepository<Product> productRepo,
+    IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCPricesJob> logger)
 {
-    public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
+    public async Task RunAsync(
+        string rootCategoryOneCId,
+        CancellationToken cancellationToken,
+        bool rebuildProjection = true)
     {
         logger.LogInformation("[DEBUG_LOG] SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
 
@@ -31,6 +36,11 @@ public sealed class SyncOneCPricesJob(
 
         await DeletePricesMissingAsync(deduped, rootCategoryOneCId, cancellationToken);
         await CreateOrUpsertPricesAsync(deduped, rootCategoryOneCId, cancellationToken);
+
+        if (rebuildProjection)
+        {
+            await productListProjectionRebuilder.RebuildAsync(cancellationToken);
+        }
 
         logger.LogInformation("SyncOneCPricesJob finished for {Root}", rootCategoryOneCId);
     }
