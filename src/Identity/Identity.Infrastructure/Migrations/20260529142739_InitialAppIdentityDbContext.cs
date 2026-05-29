@@ -16,8 +16,7 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Scope = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsSystemRole = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -35,8 +34,7 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -64,7 +62,7 @@ namespace Identity.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -80,12 +78,41 @@ namespace Identity.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AppRefreshSessions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TokenHash = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    CreatedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastUsedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    AbsoluteExpiresAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    RevokedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RevocationReason = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    ReplacedBySessionId = table.Column<int>(type: "integer", nullable: true),
+                    ReuseDetectedAtUtc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    CreatedByIp = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    UserAgent = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppRefreshSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AppRefreshSessions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -107,7 +134,7 @@ namespace Identity.Infrastructure.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -124,8 +151,8 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AssignedByUserId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     IsTemporary = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
@@ -153,7 +180,7 @@ namespace Identity.Infrastructure.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -168,6 +195,22 @@ namespace Identity.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppRefreshSessions_AbsoluteExpiresAtUtc",
+                table: "AppRefreshSessions",
+                column: "AbsoluteExpiresAtUtc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppRefreshSessions_TokenHash",
+                table: "AppRefreshSessions",
+                column: "TokenHash",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppRefreshSessions_UserId_RevokedAtUtc",
+                table: "AppRefreshSessions",
+                columns: new[] { "UserId", "RevokedAtUtc" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -210,6 +253,9 @@ namespace Identity.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AppRefreshSessions");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
