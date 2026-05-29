@@ -10,6 +10,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
     public DbSet<ProductTranslation> ProductTranslations => Set<ProductTranslation>();
+    public DbSet<ProductListProjection> ProductListProjections => Set<ProductListProjection>();
     public DbSet<PriceType> PriceTypes => Set<PriceType>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -23,6 +24,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasPostgresExtension("ltree");
+        modelBuilder.HasPostgresExtension("pg_trgm");
 
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(CatalogDbContext).Assembly,

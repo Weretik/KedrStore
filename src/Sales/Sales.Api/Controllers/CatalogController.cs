@@ -5,7 +5,7 @@ namespace Sales.Api.Controllers;
 [Authorize]
 public sealed class CatalogController(ISender sender) : ControllerBase
 {
-    [HttpPost("products/search")]
+    [HttpPost("products")]
     [ProducesResponseType(typeof(PagedResult<List<CatalogListItemDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
