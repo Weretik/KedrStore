@@ -1,6 +1,6 @@
-namespace Identity.Infrastructure.Configuration;
+namespace Identity.Infrastructure.Options;
 
-public class TestCustomerConfig
+public class TestCustomerOptions
 {
     public Guid IdentityUserId { get; set; }
     public string CounterpartyId { get; set; } = string.Empty;

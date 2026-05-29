@@ -1,6 +1,6 @@
-﻿namespace Identity.Infrastructure.Configuration;
+namespace Identity.Infrastructure.Options;
 
-public class AdminUserConfig
+public class AdminUserOptions
 {
     public string Email { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
