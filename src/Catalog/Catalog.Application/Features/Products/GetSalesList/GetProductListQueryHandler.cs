@@ -66,7 +66,20 @@ public class GetProductListQueryHandler(
                 ? pagedRowsQuery.OrderByDescending(x => x.Id)
                 : pagedRowsQuery.OrderBy(x => x.Id);
 
-            items = await pagedRowsQuery.ToListAsync(cancellationToken);
+            items = await pagedRowsQuery
+                .Select(row => new ProductListRowDto
+                {
+                    Id = row.Id.Value,
+                    Name = row.Name,
+                    Photo = row.Photo,
+                    ProductSlug = row.ProductSlug,
+                    CategoryId = row.CategoryId.HasValue ? row.CategoryId.Value.Value : null,
+                    InStock = row.InStock,
+                    IsSale = row.IsSale,
+                    IsNew = row.IsNew,
+                    Price = row.Price
+                })
+                .ToListAsync(cancellationToken);
         }
         else
         {
@@ -87,6 +100,18 @@ public class GetProductListQueryHandler(
             items = await productSortListQuery
                 .Skip(skip)
                 .Take(pageSize)
+                .Select(row => new ProductListRowDto
+                {
+                    Id = row.Id.Value,
+                    Name = row.Name,
+                    Photo = row.Photo,
+                    ProductSlug = row.ProductSlug,
+                    CategoryId = row.CategoryId.HasValue ? row.CategoryId.Value.Value : null,
+                    InStock = row.InStock,
+                    IsSale = row.IsSale,
+                    IsNew = row.IsNew,
+                    Price = row.Price
+                })
                 .ToListAsync(cancellationToken);
         }
 
@@ -195,7 +220,7 @@ public class GetProductListQueryHandler(
         return productsQuery.Where(product => categoryIds.Contains(product.CategoryId));
     }
 
-    private static IQueryable<ProductListRowDto> JoinPricesForList(
+    private static IQueryable<ProductListRowData> JoinPricesForList(
         IQueryable<Product> productsQuery,
         IQueryable<ProductPrice> pricesQuery,
         IQueryable<ProductTranslation> translationsQuery,
@@ -208,7 +233,7 @@ public class GetProductListQueryHandler(
         var defaultPriceTypeId = PriceTypeId.From(request.PriceTypeId ?? retailPriceTypeId);
         var priceTypeRules = NormalizePriceTypeRules(request.PriceTypeRules);
 
-        IQueryable<ProductListRowDto>? productListQuery = null;
+        IQueryable<ProductListRowData>? productListQuery = null;
 
         foreach (var priceTypeRule in priceTypeRules)
         {
@@ -260,7 +285,7 @@ public class GetProductListQueryHandler(
         return productListQuery;
     }
 
-    private static IQueryable<ProductListRowDto> JoinProductsWithPriceType(
+    private static IQueryable<ProductListRowData> JoinProductsWithPriceType(
         IQueryable<Product> productsQuery,
         IQueryable<ProductPrice> pricesQuery,
         IQueryable<ProductTranslation> translationsQuery,
@@ -279,13 +304,13 @@ public class GetProductListQueryHandler(
             pricesByType,
             row => row.product.Id,
             price => price.ProductId,
-            (row, price) => new ProductListRowDto
+            (row, price) => new ProductListRowData
             {
-                Id = row.product.Id.Value,
+                Id = row.product.Id,
                 Name = row.translation != null ? row.translation.Name : row.product.Name,
                 Photo = row.product.Photo,
                 ProductSlug = row.product.ProductSlug,
-                CategoryId = row.product.CategoryId.Value,
+                CategoryId = row.product.CategoryId,
                 InStock = row.product.ProductTypeIdOneC == hardwareRootCategoryId
                     ? row.product.Stock > 2
                     : row.product.Stock > 0,
@@ -305,7 +330,7 @@ public class GetProductListQueryHandler(
             .ToArray();
     }
 
-    private static IQueryable<ProductListRowDto> ApplySorting(IQueryable<ProductListRowDto> query, ProductSort sort)
+    private static IQueryable<ProductListRowData> ApplySorting(IQueryable<ProductListRowData> query, ProductSort sort)
     {
         return sort switch
         {
@@ -345,5 +370,18 @@ public class GetProductListQueryHandler(
         }
 
         return null;
+    }
+
+    private sealed class ProductListRowData
+    {
+        public ProductId Id { get; init; }
+        public string Name { get; init; } = null!;
+        public string ProductSlug { get; init; } = null!;
+        public string Photo { get; init; } = null!;
+        public ProductCategoryId? CategoryId { get; init; }
+        public bool InStock { get; init; }
+        public bool IsSale { get; init; }
+        public bool IsNew { get; init; }
+        public decimal? Price { get; init; }
     }
 }
