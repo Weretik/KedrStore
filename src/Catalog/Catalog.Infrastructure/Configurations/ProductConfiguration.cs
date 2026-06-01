@@ -28,6 +28,13 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(CatalogConverter.ProductCategoryIdConvert);
 
         builder.HasIndex(p => p.CategoryId);
+        builder.HasIndex(p => p.Name)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_Products_Name_trgm");
+
+        builder.HasIndex(p => new { p.CategoryId, p.IsDeleted, p.IsSale, p.IsNew })
+            .HasDatabaseName("IX_Products_ListFilters");
 
         builder.Property(p => p.Photo)
             .HasMaxLength(1000)
@@ -58,7 +65,5 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(p => !p.IsDeleted);
-
-
     }
 }
