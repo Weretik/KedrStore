@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Integrations.OneC.Jobs;
+using Catalog.Application.Integrations.OneC.Jobs;
+using Catalog.Application.Contracts.Projections;
 using Host.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,6 +79,10 @@ try
                 await scopeServiceProvider.GetRequiredService<SyncOneCPricesJob>().RunAsync(rid, cancellationToken);
             break;
 
+        case "rebuild-projections":
+            await scopeServiceProvider.GetRequiredService<IProductListProjectionRebuilder>().RebuildAsync(cancellationToken);
+            break;
+
         default:
             Console.WriteLine($"Unknown job: {jobKey}");
             return 1;
@@ -109,3 +114,4 @@ static List<string> GetArgs(string[] args, string name)
         .Where(v => !string.IsNullOrWhiteSpace(v))
         .ToList();
 }
+
