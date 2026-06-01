@@ -1,5 +1,5 @@
-using Catalog.Application.Features.Products.GetById;
-using Catalog.Application.Features.Products.GetById.DTOs;
+using Catalog.Application.Features.Products.GetBySlug;
+using Catalog.Application.Features.Products.GetBySlug.DTOs;
 using Catalog.Application.Features.Products.GetPublicList;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;

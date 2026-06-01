@@ -1,7 +1,7 @@
-﻿using Catalog.Application.Features.Products.GetById.DTOs;
+using Catalog.Application.Features.Products.GetBySlug.DTOs;
 using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products.GetById.Extensions;
+namespace Catalog.Application.Features.Products.GetBySlug.Extensions;
 
 public static class ProductFiltersAndJoinPriceExtensions
 {

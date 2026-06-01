@@ -1,8 +1,8 @@
 using Catalog.Application.Contracts.Persistence;
-using Catalog.Application.Features.Products.GetById.DTOs;
-using Catalog.Application.Features.Products.GetById.Extensions;
+using Catalog.Application.Features.Products.GetBySlug.DTOs;
+using Catalog.Application.Features.Products.GetBySlug.Extensions;
 
-namespace Catalog.Application.Features.Products.GetById;
+namespace Catalog.Application.Features.Products.GetBySlug;
 
 public class GetProductBySlugQueryHandler(IReadCatalogDbContext catalogDbContext)
     : IQueryHandler<GetProductBySlugQuery, Result<ProductBySlugDto>>

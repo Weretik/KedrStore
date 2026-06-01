@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Products.GetById.DTOs;
+namespace Catalog.Application.Features.Products.GetBySlug.DTOs;
 
 public record  ProductBySlugDto
 {

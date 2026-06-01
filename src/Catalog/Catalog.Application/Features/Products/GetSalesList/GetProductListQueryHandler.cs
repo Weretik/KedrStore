@@ -4,7 +4,7 @@ using Catalog.Contracts.Products.GetList;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products.GetPricedList;
+namespace Catalog.Application.Features.Products.GetSalesList;
 
 public class GetProductListQueryHandler(
     IReadCatalogDbContext catalogDbContext,

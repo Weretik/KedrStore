@@ -1,6 +1,6 @@
-using Catalog.Application.Features.Products.GetById.DTOs;
+using Catalog.Application.Features.Products.GetBySlug.DTOs;
 
-namespace Catalog.Application.Features.Products.GetById.Extensions;
+namespace Catalog.Application.Features.Products.GetBySlug.Extensions;
 
 public static class ProductCategoryBreadcrumbExtensions
 {

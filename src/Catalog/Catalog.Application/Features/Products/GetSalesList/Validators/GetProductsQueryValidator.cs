@@ -1,6 +1,6 @@
-using Catalog.Application.Features.Products.GetPricedList;
+using Catalog.Application.Features.Products.GetSalesList;
 
-namespace Catalog.Application.Features.Products.GetPricedList.Validators;
+namespace Catalog.Application.Features.Products.GetSalesList.Validators;
 
 public sealed class GetProductsQueryValidator : AbstractValidator<GetProductListQuery>
 {
