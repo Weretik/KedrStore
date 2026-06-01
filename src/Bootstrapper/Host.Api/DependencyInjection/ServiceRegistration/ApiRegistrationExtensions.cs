@@ -9,7 +9,7 @@ public static class ApiRegistrationsExtensions
         services.AddModuleControllers();
 
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerDocumentation();
         services.AddOpenApi();
 
         services.AddHealthChecks();

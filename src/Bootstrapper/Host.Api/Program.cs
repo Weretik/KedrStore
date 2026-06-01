@@ -12,7 +12,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 /*
     try
     {
