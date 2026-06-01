@@ -1,6 +1,6 @@
 using Catalog.Application.Features.Products.GetById;
 using Catalog.Application.Features.Products.GetById.DTOs;
-using Catalog.Application.Features.Products.GetList;
+using Catalog.Application.Features.Products.GetPublicList;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,7 +23,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
     {
         request = request with { CategorySlug = categorySlug, Lang = lang };
 
-        var query = new GetProductListQuery(request);
+        var query = new GetPublicProductListQuery(request);
         var result = await sender.Send(query, cancellationToken);
 
         return this.ToActionResult(result);
