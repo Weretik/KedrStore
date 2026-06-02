@@ -1,8 +1,11 @@
-namespace Host.Api.DependencyInjection.WebApp;
+using AspNetWebApplication = Microsoft.AspNetCore.Builder.WebApplication;
+
+namespace Host.Api.DependencyInjection.WebApplication;
+
 
 public static class StartupTasksExtensions
 {
-    public static async Task<WebApplication> RunStartupTasksAsync(this WebApplication app)
+    public static async Task<AspNetWebApplication> RunStartupTasksAsync(this AspNetWebApplication app)
     {
         await app.UseAppMigrations();
         await app.UseAppSeeders();
