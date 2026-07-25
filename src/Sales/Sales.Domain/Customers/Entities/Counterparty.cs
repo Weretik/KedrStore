@@ -54,6 +54,15 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         MarkAsUpdated(updatedAt);
     }
 
+    public void Restore(DateTimeOffset updatedAt)
+    {
+        if (!IsDeleted)
+            return;
+
+        IsDeleted = false;
+        MarkAsUpdated(updatedAt);
+    }
+
     private void SetId(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
