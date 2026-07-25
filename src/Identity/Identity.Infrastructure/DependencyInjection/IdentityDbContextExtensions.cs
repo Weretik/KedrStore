@@ -34,6 +34,7 @@ public static class IdentityDbContextExtensions
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 5;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
