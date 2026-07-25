@@ -15,7 +15,6 @@ public static class OneCSoapSmokeTest
         var client = factory.Create();
         var rootCategoryId = configuration["OneC:DoorsRootCategoryId"] ?? "000007226";
 
-        Console.WriteLine(client.Endpoint.Address.Uri);
         Console.WriteLine(client.Endpoint.Binding.GetType().FullName);
 
         var categories = await client.GetCategoriesAsync(rootCategoryId);
@@ -48,7 +47,7 @@ public static class OneCSoapSmokeTest
 
         var requestData = BuildCreateSiteRequest(configuration);
         var createSiteRequest = await client.CreateSiteRequestAsync(requestData);
-        Console.WriteLine($"CreateSiteRequest: DocId='{createSiteRequest?.DocId}', Comment='{createSiteRequest?.Comment}'");
+        Console.WriteLine($"CreateSiteRequest: completed={createSiteRequest is not null}");
     }
 
     private static RequestData BuildCreateSiteRequest(IConfiguration configuration)
