@@ -11,9 +11,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetPriceTypesAsync();
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCPriceTypeDto(
@@ -26,9 +26,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetCategoriesAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCCategoryDto(
@@ -43,9 +43,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductDetailsAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCProductDto(
@@ -64,9 +64,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductStocksAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCStockDto(
@@ -79,9 +79,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductPricesAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCPriceDto(
