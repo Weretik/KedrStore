@@ -9,7 +9,8 @@ public static class SalesInfrastructureExtensions
 {
     public static IServiceCollection AddSalesInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool includeCatalogReadServices = true)
     {
         var connectionString = configuration.GetConnectionString("Default")
                                ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
@@ -29,8 +30,11 @@ public static class SalesInfrastructureExtensions
         services.AddScoped<SyncOneCCounterpartiesJob>();
         services.AddScoped<SyncOneCCounterpartyCategoryPriceTypesJob>();
         services.AddScoped<SyncOneCSalesCustomersFullJob>();
-        services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();
-        services.AddScoped<ICatalogProductReader, CatalogProductReader>();
+        if (includeCatalogReadServices)
+        {
+            services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();
+            services.AddScoped<ICatalogProductReader, CatalogProductReader>();
+        }
 
         return services;
     }

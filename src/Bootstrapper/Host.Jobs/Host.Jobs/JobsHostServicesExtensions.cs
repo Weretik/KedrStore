@@ -16,8 +16,8 @@ public static class JobsHostServicesExtensions
         IConfiguration configuration)
     {
         services.AddCatalogDbContextServices(configuration);
-        services.AddCatalogServices(configuration);
-        services.AddSalesInfrastructureServices(configuration);
+        services.AddCatalogReferenceDataServices();
+        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
         services.AddIdentityInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();

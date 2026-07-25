@@ -16,6 +16,13 @@ public static class CatalogServicesExtension
         services.AddScoped<ITelegramNotifier, TelegramBotNotifier>();
         services.AddScoped<IOrderExcelExporter, OrderExcelExporter>();
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
+        services.AddCatalogReferenceDataServices();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCatalogReferenceDataServices(this IServiceCollection services)
+    {
         services.AddScoped<ICatalogReferenceDataReader, CatalogReferenceDataReader>();
 
         return services;
