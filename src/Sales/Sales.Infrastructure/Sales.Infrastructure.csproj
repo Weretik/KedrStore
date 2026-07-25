@@ -7,10 +7,17 @@
 </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Catalog\Catalog.Contracts\Catalog.Contracts.csproj" />
       <ProjectReference Include="..\Sales.Application\Sales.Application.csproj" />
       <ProjectReference Include="..\Sales.Domain\Sales.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="libphonenumber-csharp" Version="9.0.22" />
     </ItemGroup>
 
 </Project>

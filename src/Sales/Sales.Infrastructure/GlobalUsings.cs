@@ -26,7 +26,5 @@ global using Sales.Application.Features.Catalog.GetList.DTOs;
 global using Sales.Domain.Customers.Entities;
 global using Sales.Infrastructure.Catalog;
 global using Sales.Infrastructure.DataBase;
-global using Sales.Infrastructure.Options;
 global using Sales.Infrastructure.Pricing;
 global using Sales.Infrastructure.Repositories;
-global using Sales.Infrastructure.Seeders;

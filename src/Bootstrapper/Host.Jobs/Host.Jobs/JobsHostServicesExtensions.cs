@@ -1,10 +1,11 @@
-﻿using BuildingBlocks.Infrastructure.DependencyInjection;
+using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Sales.Infrastructure.DependencyInjection;
 
 namespace Host.Jobs;
 
@@ -15,6 +16,9 @@ public static class JobsHostServicesExtensions
         IConfiguration configuration)
     {
         services.AddCatalogDbContextServices(configuration);
+        services.AddCatalogServices(configuration);
+        services.AddSalesInfrastructureServices(configuration);
+        services.AddIdentityInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);

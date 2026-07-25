@@ -4,6 +4,7 @@ using Host.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Sales.Infrastructure.Integrations.OneC.Jobs;
 
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
 
@@ -24,7 +25,6 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var scopeServiceProvider = scope.ServiceProvider;
-
 
 var job = GetArg(args, "--job");
 var rootIds = GetArgs(args, "--rootId");
@@ -79,6 +79,18 @@ try
                 await scopeServiceProvider.GetRequiredService<SyncOneCPricesJob>().RunAsync(rid, cancellationToken);
             break;
 
+        case "counterparties":
+            await scopeServiceProvider.GetRequiredService<SyncOneCCounterpartiesJob>().RunAsync(cancellationToken);
+            break;
+
+        case "counterparty-category-price-types":
+            await scopeServiceProvider.GetRequiredService<SyncOneCCounterpartyCategoryPriceTypesJob>().RunAsync(cancellationToken);
+            break;
+
+        case "sales-customers-full":
+            await scopeServiceProvider.GetRequiredService<SyncOneCSalesCustomersFullJob>().RunAsync(cancellationToken);
+            break;
+
         case "rebuild-projections":
             await scopeServiceProvider.GetRequiredService<IProductListProjectionRebuilder>().RebuildAsync(cancellationToken);
             break;
@@ -114,4 +126,3 @@ static List<string> GetArgs(string[] args, string name)
         .Where(v => !string.IsNullOrWhiteSpace(v))
         .ToList();
 }
-
