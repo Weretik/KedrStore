@@ -50,6 +50,12 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         AssertOperationHasPathParameter(productBySlugGet, "lang");
         AssertOperationHasPathParameter(productBySlugGet, "productSlug");
 
+        Assert.True(paths.TryGetProperty("/api/admin/products", out var adminProducts));
+        Assert.True(adminProducts.TryGetProperty("get", out _));
+
+        Assert.True(paths.TryGetProperty("/api/admin/products/all", out var allAdminProducts));
+        Assert.True(allAdminProducts.TryGetProperty("get", out _));
+
         Assert.True(paths.TryGetProperty("/api/orders", out var orders));
         Assert.True(orders.TryGetProperty("post", out var ordersPost));
         Assert.True(ordersPost.TryGetProperty("requestBody", out _));
