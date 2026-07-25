@@ -17,6 +17,6 @@ operations/
 - Configure a machine or fix missing settings: [configuration and secrets](configuration/configuration-and-secrets.md)
 - Understand what startup changes in the database: [migrations and seeders](data/migrations-and-seeding.md)
 - Check a running API or reproduce an endpoint: [diagnostics](diagnostics/health-logs-swagger.md)
-- Run a OneC/import operation: [background jobs](jobs/one-c-jobs.md)
+- Run a OneC/import operation: [jobs and runbooks](jobs/README.md)
 
 Do not put a password, token, full connection string or production endpoint into this documentation.

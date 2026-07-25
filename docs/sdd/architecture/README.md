@@ -24,6 +24,7 @@ KedrStore is a modular ASP.NET Core backend on .NET 10. It uses Clean Architectu
 - [Mediator behaviors](runtime/mediator-behaviors.md)
 - [Cross-cutting pipeline](runtime/cross-cutting.md)
 - [Persistence and integrations](runtime/persistence-and-integrations.md)
+- [OneC integration](integrations/one-c/README.md)
 
 ### I need platform reference
 
