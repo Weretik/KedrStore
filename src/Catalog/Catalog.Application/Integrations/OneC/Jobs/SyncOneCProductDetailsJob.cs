@@ -44,6 +44,13 @@ public sealed class SyncOneCProductDetailsJob(
             rootCategoryId,
             productsOneC.Count);
 
+        if (products.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"OneC returned {productsOneC.Count} products for root {rootCategoryId}, but none passed mapping. " +
+                "Catalog data was not changed to prevent accidental deletion.");
+        }
+
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         var syncedProductIds = await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
         logger.LogInformation(

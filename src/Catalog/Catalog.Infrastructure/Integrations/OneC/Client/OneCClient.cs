@@ -114,15 +114,20 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     private static string AsString(object? value) => value?.ToString()?.Trim() ?? string.Empty;
 
     private static bool AsBool(object? value)
-        => value switch
-        {
-            bool b => b,
-            string s => s.Equals("true", StringComparison.OrdinalIgnoreCase)
-                        || s == "1"
-                        || s.Equals("С‚Р°Рє", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("РґР°", StringComparison.OrdinalIgnoreCase),
-            _ => bool.TryParse(value?.ToString(), out var b) && b
-        };
+    {
+        if (value is bool boolean)
+            return boolean;
+
+        var normalized = value?.ToString()?.Trim();
+        if (string.IsNullOrEmpty(normalized))
+            return false;
+
+        return normalized.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || normalized == "1"
+               || normalized.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("да", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("так", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static int AsInt(object? value)
         => int.TryParse(value?.ToString(), out var i) ? i : 0;
