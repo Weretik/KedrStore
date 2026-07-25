@@ -12,6 +12,7 @@ This section records the durable boundary between KedrStore and 1C. It documents
 
 - SOAP operations and value normalization: [client contract](client-contract.md)
 - Catalog import order, projection and visibility: [catalog import flow](catalog-import-flow.md)
+- Counterparty import and Identity user provisioning: [Sales/Identity flow](sales-counterparty-identity-sync.md)
 - Deletion semantics and safe operation: [data safety](data-safety.md)
 - Running and diagnosing jobs: [Host.Jobs runbooks](../../../operations/jobs/README.md)
 

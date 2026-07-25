@@ -2,6 +2,8 @@
 
 Sales has an independent sync boundary; it only shares low-level SOAP transport with Catalog.
 
+Before running it, read [the counterparty and Identity flow](../../architecture/integrations/one-c/sales-counterparty-identity-sync.md): this job creates, updates and can delete local Identity users as part of reconciliation.
+
 | Command | Operation |
 | --- | --- |
 | `--job=counterparties` | imports/updates/restores counterparties according to Sales service policy |
