@@ -17,23 +17,8 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
             new() { Name = RoleNames.User, Description = "Звичайний користувач", Scope = "user", IsSystemRole = true, AccessLevel = 10 }
         };
 
-        roles.Add(new AppRole
-        {
-            Name = RoleNames.Counterparty,
-            Description = "Контрагент",
-            Scope = "counterparty",
-            IsSystemRole = true,
-            AccessLevel = 10
-        });
-
         foreach (var role in roles)
         {
-            if (string.IsNullOrWhiteSpace(role.Name))
-            {
-                logger.LogError("Identity role seed skipped because role name is empty.");
-                continue;
-            }
-
             var exists = await roleManager.FindByNameAsync(role.Name);
             if (exists != null) continue;
 
@@ -52,3 +37,4 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
         }
     }
 }
+
