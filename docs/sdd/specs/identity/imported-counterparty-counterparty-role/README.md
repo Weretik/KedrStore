@@ -1,7 +1,7 @@
 # Imported counterparties receive the Counterparty role
 
 **Module:** cross-module (`Identity` + `Sales`)  
-**Status:** draft  
+**Status:** in progress  
 **Owner:** KedrStore backend  
 **Created:** 2026-07-26  
 **Related:** [counterparty and Identity import flow](../../../architecture/integrations/one-c/sales-counterparty-identity-sync.md)
@@ -52,7 +52,7 @@ The resulting declared role catalogue will be `Admin`, `Manager`, `User`, `Guest
 
 | Phase | Status | Required? | Outcome |
 | --- | --- | --- | --- |
-| [01 Domain](phases/01-domain.md) | draft | yes | stable role vocabulary and transition rule |
+| [01 Domain](phases/01-domain.md) | completed | yes | stable role vocabulary and transition rule |
 | [02 Infrastructure](phases/02-infrastructure.md) | draft | yes | seed, provisioning, reconciliation and tests |
 | 03 Application | not needed | no | current provisioning abstraction is sufficient |
 | 04 API | not needed | no | no controller, route or OpenAPI change |
@@ -75,3 +75,4 @@ The resulting declared role catalogue will be `Admin`, `Manager`, `User`, `Guest
 ## Change log
 
 - 2026-07-26 — Renamed planned role from `Client` to `Counterparty`; added it to the target role catalogue.
+- 2026-07-26 — Phase 01 completed: `RoleNames.Counterparty` added to the central role catalogue.

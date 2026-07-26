@@ -1,6 +1,6 @@
 # Phase 01 — role vocabulary
 
-**Status:** draft  
+**Status:** completed  
 **Depends on:** none
 
 ## Outcome
@@ -16,5 +16,10 @@ Add `RoleNames.Counterparty = "Counterparty"` and include it in the central allo
 
 ## Acceptance criteria
 
-- [ ] No duplicated role-name literals outside the role source of truth.
-- [ ] `Counterparty` is clearly least-privilege and does not inherit staff permissions.
+- [x] No duplicated role-name literals outside the role source of truth.
+- [x] `Counterparty` is clearly least-privilege and does not inherit staff permissions.
+
+## Verification result
+
+- No dedicated role-catalogue unit test project was found.
+- `dotnet build src/Identity/Identity.Domain/Identity.Domain.csproj --no-restore`
