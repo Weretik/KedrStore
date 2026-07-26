@@ -1,6 +1,6 @@
 # Phase 02 — seed, provisioning and reconciliation
 
-**Status:** draft  
+**Status:** in progress
 **Depends on:** [Phase 01](01-domain.md)
 
 ## Work
@@ -20,7 +20,20 @@
 
 ## Acceptance criteria
 
-- [ ] `Counterparty` is created when seeding runs.
-- [ ] New and existing imported accounts receive it exactly once.
+- [x] `Counterparty` is created when seeding runs.
+- [x] New and reimported accounts receive it exactly once.
 - [ ] Reconciliation touches only Identity users linked from Sales counterparties.
 - [ ] Staff roles survive import and reconciliation.
+
+## Implemented in this pass
+
+- `RoleSeeder` now creates `Counterparty` with scope `counterparty`.
+- Imported-counterparty provisioning now ensures `Counterparty` idempotently instead of `User`.
+- Missing or failed role assignment returns an `Ardalis.Result` error, so the Sales importer skips and logs the counterparty rather than reporting a complete import.
+- The existing-user reconciliation and the corresponding integration tests remain pending; no existing `User` assignment was removed automatically.
+
+## Verification result
+
+- `dotnet build src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj --no-restore` succeeded with 0 errors.
+- No dedicated Identity/Sales integration test project is currently present in the repository.
+- A pre-existing nullable warning remains in `RoleSeeder` at `FindByNameAsync(role.Name)`; it is unrelated to the Counterparty-role behaviour.

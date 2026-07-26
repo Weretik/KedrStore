@@ -25,6 +25,13 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!await roleManager.RoleExistsAsync(RoleNames.Counterparty))
+        {
+            const string error = "Required Counterparty role does not exist. Run Identity role seeding before importing counterparties.";
+            logger.LogError("Counterparty {CounterpartyId} cannot be provisioned because required role {Role} does not exist.", userData.CounterpartyId, RoleNames.Counterparty);
+            return Result.Error(error);
+        }
+
         AppUser? appUser = null;
 
         if (existingIdentityUserId.HasValue && existingIdentityUserId.Value != Guid.Empty)
@@ -55,7 +62,12 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
                 return Result.Error(FormatErrors(createResult.Errors));
             }
 
-            await EnsureUserRoleAsync(appUser);
+            var createdUserRoleResult = await EnsureCounterpartyRoleAsync(appUser);
+            if (!createdUserRoleResult.IsSuccess)
+            {
+                return Result.Error(createdUserRoleResult.Errors.FirstOrDefault() ?? "Could not assign Counterparty role.");
+            }
+
             logger.LogInformation(
                 "Imported AppUser {UserId} created for counterparty {CounterpartyId}",
                 appUser.Id,
@@ -82,7 +94,12 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
             return passwordResult;
         }
 
-        await EnsureUserRoleAsync(appUser);
+        var existingUserRoleResult = await EnsureCounterpartyRoleAsync(appUser);
+        if (!existingUserRoleResult.IsSuccess)
+        {
+            return Result.Error(existingUserRoleResult.Errors.FirstOrDefault() ?? "Could not assign Counterparty role.");
+        }
+
         return Result.Success(appUser.Id);
     }
 
@@ -126,23 +143,31 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
         return Result.Success(appUser.Id);
     }
 
-    private async Task EnsureUserRoleAsync(AppUser appUser)
+    private async Task<Result> EnsureCounterpartyRoleAsync(AppUser appUser)
     {
-        if (!await roleManager.RoleExistsAsync(RoleNames.User))
-            return;
+        if (!await roleManager.RoleExistsAsync(RoleNames.Counterparty))
+        {
+            const string error = "Required Counterparty role does not exist. Run Identity role seeding before importing counterparties.";
+            logger.LogError("AppUser {UserId} cannot receive role {Role}: {Error}", appUser.Id, RoleNames.Counterparty, error);
+            return Result.Error(error);
+        }
 
-        if (await userManager.IsInRoleAsync(appUser, RoleNames.User))
-            return;
+        if (await userManager.IsInRoleAsync(appUser, RoleNames.Counterparty))
+            return Result.Success();
 
-        var roleResult = await userManager.AddToRoleAsync(appUser, RoleNames.User);
+        var roleResult = await userManager.AddToRoleAsync(appUser, RoleNames.Counterparty);
         if (!roleResult.Succeeded)
         {
-            logger.LogWarning(
-                "AppUser {UserId} was synced, but assigning role {Role} failed: {Errors}",
+            logger.LogError(
+                "AppUser {UserId} could not receive required role {Role}: {Errors}",
                 appUser.Id,
-                RoleNames.User,
+                RoleNames.Counterparty,
                 FormatErrors(roleResult.Errors));
+
+            return Result.Error(FormatErrors(roleResult.Errors));
         }
+
+        return Result.Success();
     }
 
     private static string FormatErrors(IEnumerable<IdentityError> errors)
