@@ -103,7 +103,8 @@ public static class CatalogMapper
     public static IReadOnlyList<ProductRowOneCDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
         Dictionary<string, int> categoryNameDictionary,
-        string rootCategoryOneCId)
+        string rootCategoryOneCId,
+        int? fallbackCategoryId = null)
     {
         var productsDtos = new List<ProductRowOneCDto>();
         var helper = new SlugHelper();
@@ -115,7 +116,8 @@ public static class CatalogMapper
             var id = item.Id;
             var name = item.Name.Trim();
 
-            var categoryId = GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
+            var categoryId = fallbackCategoryId
+                ?? GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
 
             var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
             string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";

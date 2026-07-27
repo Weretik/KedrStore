@@ -4,6 +4,7 @@ using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
@@ -15,6 +16,7 @@ public sealed class SyncOneCProductDetailsJob(
     ICatalogRepository<Product> productRepo,
     ICatalogRepository<ProductTranslation> translationRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
+    IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCPricesJob> logger)
 {
@@ -34,10 +36,28 @@ public sealed class SyncOneCProductDetailsJob(
         if (productsOneC.Count == 0)
             return;
 
-        var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(), cancellationToken);
-        var categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
+        var isCosmosRoot = string.Equals(
+            rootCategoryId,
+            rootCategoryOptions.Value.CosmosRootCategoryId,
+            StringComparison.Ordinal);
+        var categoryNameDictionary = new Dictionary<string, int>();
+        int? fallbackCategoryId = null;
 
-        var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
+        if (isCosmosRoot)
+        {
+            fallbackCategoryId = rootCategoryOptions.Value.CosmosCategoryId;
+        }
+        else
+        {
+            var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(rootCategoryId), cancellationToken);
+            categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
+        }
+
+        var products = CatalogMapper.MapProduct(
+            productsOneC,
+            categoryNameDictionary,
+            rootCategoryId,
+            fallbackCategoryId);
         logger.LogInformation(
             "Mapped {MappedCount} products for root {Root}. Received: {ReceivedCount}.",
             products.Count,

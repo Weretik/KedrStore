@@ -5,10 +5,11 @@ namespace Catalog.Application.Integrations.OneC.Specifications;
 
 public sealed class CategoryIdSlugMapSpec: Specification<ProductCategory, CategoryIdAndNameRow>
 {
-    public CategoryIdSlugMapSpec()
+    public CategoryIdSlugMapSpec(string productTypeIdOneC)
     {
         Query
             .AsNoTracking()
+            .Where(c => c.ProductTypeIdOneC == productTypeIdOneC)
             .Select(c => new CategoryIdAndNameRow(c.Id, c.Name));
     }
 }
