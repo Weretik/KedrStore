@@ -17,15 +17,28 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
     {
         logger.LogInformation("SyncOneCCategoryJob started for {Root}", rootCategoryOneCId);
 
-        var rootCategoryId = int.Parse(rootCategoryOneCId.TrimStart('0'));
-        var furnitureId = int.Parse(options.Value.HardwareRootCategoryId.TrimStart('0'));
-        var doorsId = int.Parse(options.Value.DoorsRootCategoryId.TrimStart('0'));
+        if (string.Equals(rootCategoryOneCId, options.Value.CosmosRootCategoryId, StringComparison.Ordinal))
+        {
+            await EnsureCosmosCategoryAsync(cancellationToken);
+            logger.LogInformation("SyncOneCCategoryJob finished for virtual Cosmos root.");
+            return;
+        }
+
+        var hasNumericRootId = int.TryParse(rootCategoryOneCId.TrimStart('0'), out var rootCategoryId);
+        var isHardwareRoot = string.Equals(
+            rootCategoryOneCId,
+            options.Value.HardwareRootCategoryId,
+            StringComparison.Ordinal);
+        var isDoorsRoot = string.Equals(
+            rootCategoryOneCId,
+            options.Value.DoorsRootCategoryId,
+            StringComparison.Ordinal);
 
         // Select the manual grouping config based on the current root category branch.
         IReadOnlyList<ManualCategoryGroupOption> manualGroups = [];
-        if (rootCategoryId == furnitureId)
+        if (isHardwareRoot)
             manualGroups = options.Value.HardwareManualCategoryGroups;
-        else if (rootCategoryId == doorsId)
+        else if (isDoorsRoot)
             manualGroups = options.Value.DoorsManualCategoryGroups;
 
         var categoriesOneC = await oneC.GetCategoriesAsync(rootCategoryOneCId, cancellationToken);
@@ -33,7 +46,11 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         if (categoriesOneC.Count == 0 && manualGroups.Count == 0)
             return;
 
-        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId, rootCategoryOneCId);
+        var categories = CatalogMapper.MapCategory(
+            categoriesOneC,
+            hasNumericRootId ? rootCategoryId : null,
+            isHardwareRoot,
+            rootCategoryOneCId);
         if (manualGroups.Count > 0)
         {
             categories = ApplyManualHardwareHierarchy(
@@ -58,6 +75,38 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         await CreateOrUpsertCategoriesAsync(categories, rootCategoryOneCId, cancellationToken);
 
         logger.LogInformation("SyncOneCCategoryJob finished for {Root}", rootCategoryOneCId);
+    }
+
+    private async Task EnsureCosmosCategoryAsync(CancellationToken cancellationToken)
+    {
+        var cosmosCategoryId = ProductCategoryId.From(options.Value.CosmosCategoryId);
+        var cosmosRootId = options.Value.CosmosRootCategoryId;
+        var existing = await categoryRepo.GetByIdAsync(cosmosCategoryId, cancellationToken);
+        var path = CategoryPath.From($"n{cosmosCategoryId.Value}");
+
+        if (existing is null)
+        {
+            await categoryRepo.AddAsync(
+                ProductCategory.Create(
+                    cosmosCategoryId,
+                    cosmosRootId,
+                    "Космос",
+                    $"cosmos-{cosmosCategoryId.Value}",
+                    path),
+                cancellationToken);
+        }
+        else
+        {
+            if (!string.Equals(existing.ProductTypeIdOneC, cosmosRootId, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"CosmosCategoryId {cosmosCategoryId.Value} is already used by root {existing.ProductTypeIdOneC}.");
+            }
+
+            existing.Update("Космос", $"cosmos-{cosmosCategoryId.Value}", path);
+        }
+
+        await categoryRepo.SaveChangesAsync(cancellationToken);
     }
 
     private async Task DeleteMissingAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
