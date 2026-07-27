@@ -24,8 +24,8 @@ public sealed class SyncOneCFullJob(
         await products.RunAsync(doors, cancellationToken, rebuildProjection: false);
         await products.RunAsync(hardware, cancellationToken, rebuildProjection: false);
 
-        await stocks.RunAsync(doors, cancellationToken);
-        await stocks.RunAsync(hardware, cancellationToken);
+        await stocks.RunAsync(doors, cancellationToken, rebuildProjection: false);
+        await stocks.RunAsync(hardware, cancellationToken, rebuildProjection: false);
 
         await prices.RunAsync(doors, cancellationToken, rebuildProjection: false);
         await prices.RunAsync(hardware, cancellationToken, rebuildProjection: false);

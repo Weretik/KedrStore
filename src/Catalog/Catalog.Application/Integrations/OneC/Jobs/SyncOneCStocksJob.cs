@@ -1,4 +1,5 @@
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Domain.Entities;
@@ -9,11 +10,15 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 public sealed class SyncOneCStocksJob(
     IOneCClient oneC,
     ICatalogRepository<Product> productRepo,
+    IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCStocksJob> logger)
 {
     private const decimal HighStockWarningThreshold = 1000m;
 
-    public async Task RunAsync(string rootCategoryId, CancellationToken cancellationToken)
+    public async Task RunAsync(
+        string rootCategoryId,
+        CancellationToken cancellationToken,
+        bool rebuildProjection = true)
     {
         logger.LogInformation("[DEBUG_LOG] SyncOneCStocksJob started for {Root}", rootCategoryId);
 
@@ -33,6 +38,11 @@ public sealed class SyncOneCStocksJob(
             return;
 
         await UpdateStockAsync(stockByProductId, rootCategoryId, cancellationToken);
+
+        if (rebuildProjection)
+        {
+            await productListProjectionRebuilder.RebuildAsync(cancellationToken);
+        }
 
         logger.LogInformation("SyncOneCStocksJob finished for {Root}", rootCategoryId);
     }

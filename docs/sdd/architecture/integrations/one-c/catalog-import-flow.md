@@ -32,4 +32,4 @@ Category/product reconciliation can remove rows absent from a non-empty mapped s
 - public product list filters `ExportToSite == true`.
 - admin lists do not filter it and return `exportToSite`.
 
-`full` rebuilds the projection once at the end. `stocks` alone does not; use `rebuild-projections` after a stock-only run if list `InStock` must update.
+`full` suppresses intermediate rebuilds and rebuilds the projection once at the end. A targeted `stocks` job rebuilds the projection after updating stock, so list `InStock` is current.

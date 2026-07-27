@@ -11,7 +11,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | --- | --- | --- |
 | changed hierarchy | `category --rootId=<id>` | product details if needed, then rebuild projection |
 | details/visibility changed | `productdetails --rootId=<id>` | rebuild is automatic |
-| stock changed | `stocks --rootId=<id>` | `rebuild-projections` for list `InStock` |
+| stock changed | `stocks --rootId=<id>` | rebuild is automatic |
 | prices changed | `prices --rootId=<id>` | rebuild is automatic |
 | projection stale after DB repair | `rebuild-projections` | verify lists |
 
