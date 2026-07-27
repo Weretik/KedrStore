@@ -15,6 +15,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public decimal Stock { get; private set; }
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
+    public bool ExportToSite { get; private set; }
     public int QuantityInPack { get; private set; }
     #endregion
 
@@ -44,8 +45,30 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
         => new(id, productTypeIdOneC, name, productSlug, categoryId, photo, createdDate, stock, scheme, qtyInPack, isNew, isSale);
 
+    public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
+        string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale,
+        bool exportToSite)
+    {
+        var product = Create(
+            id,
+            productTypeIdOneC,
+            name,
+            productSlug,
+            categoryId,
+            photo,
+            scheme,
+            createdDate,
+            stock,
+            qtyInPack,
+            isNew,
+            isSale);
+
+        product.ExportToSite = exportToSite;
+        return product;
+    }
+
     public void Update(string name, string productSlug, ProductCategoryId categoryId,
-        string photo, int qtyInPack, string scheme, DateTimeOffset updatedDate)
+        string photo, int qtyInPack, string scheme, bool exportToSite, DateTimeOffset updatedDate)
     {
         SetName(name);
         SetProductSlug(productSlug);
@@ -53,6 +76,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         SetPhoto(photo);
         SetSсheme(scheme);
         SetQuantityInPack(qtyInPack);
+        ExportToSite = exportToSite;
         MarkAsUpdated(updatedDate);
     }
     #endregion

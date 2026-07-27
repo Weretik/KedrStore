@@ -56,6 +56,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(p => p.ExportToSite)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.Property(p => p.QuantityInPack)
             .HasDefaultValue(0);
 

@@ -123,6 +123,7 @@ public sealed class SyncOneCProductDetailsJob(
                     qtyInPack: item.QuantityInPack,
                     isNew: item.IsNew,
                     isSale: item.IsSale,
+                    exportToSite: item.ExportToSite,
                     createdDate: DateTimeOffset.UtcNow
                 );
                 await productRepo.AddAsync(product, cancellationToken);
@@ -139,6 +140,7 @@ public sealed class SyncOneCProductDetailsJob(
                     photo: item.Photo,
                     scheme: item.Scheme,
                     qtyInPack: item.QuantityInPack,
+                    exportToSite: item.ExportToSite,
                     updatedDate: DateTimeOffset.UtcNow);
 
                 if (item.IsNew) existing.MarkAsNew();

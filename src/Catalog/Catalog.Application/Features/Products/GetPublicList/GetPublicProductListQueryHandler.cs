@@ -19,7 +19,9 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         var request = query.Request;
         var language = NormalizeLanguage(request.Lang);
 
-        var projectionsQuery = catalogDbContext.ProductListProjections.AsNoTracking();
+        var projectionsQuery = catalogDbContext.ProductListProjections
+            .AsNoTracking()
+            .Where(projection => projection.ExportToSite);
         projectionsQuery = ApplyFilters(projectionsQuery, request, language);
         projectionsQuery = ApplySorting(projectionsQuery, request.Sort, language);
 

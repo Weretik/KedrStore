@@ -111,8 +111,6 @@ public static class CatalogMapper
 
         foreach (var item in productListOneC)
         {
-            if (!item.ExportToSite) continue;
-
             var id = item.Id;
             var name = item.Name.Trim();
 
@@ -138,6 +136,7 @@ public static class CatalogMapper
                 Stock: stock,
                 IsSale: isSale,
                 IsNew: isNew,
+                ExportToSite: item.ExportToSite,
                 QuantityInPack: qtyInPack)
             );
         }

@@ -11,6 +11,7 @@ public sealed record AdminProductListRowDto
     public bool InStock { get; init; }
     public bool IsSale { get; init; }
     public bool IsNew { get; init; }
+    public bool ExportToSite { get; init; }
     public decimal? Price { get; init; }
     public decimal Stock { get; init; }
     public int QuantityInPack { get; init; }

@@ -48,6 +48,10 @@ public sealed class ProductListProjectionConfiguration : IEntityTypeConfiguratio
         builder.Property(projection => projection.IsNew)
             .IsRequired();
 
+        builder.Property(projection => projection.ExportToSite)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.Property(projection => projection.RetailPrice)
             .HasPrecision(18, 2);
 

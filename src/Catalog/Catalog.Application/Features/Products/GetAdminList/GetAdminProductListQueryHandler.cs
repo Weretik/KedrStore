@@ -55,6 +55,7 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
                    InStock = projection.InStock,
                    IsSale = projection.IsSale,
                    IsNew = projection.IsNew,
+                   ExportToSite = projection.ExportToSite,
                    Price = projection.RetailPrice,
                    Stock = product.Stock,
                    QuantityInPack = product.QuantityInPack
