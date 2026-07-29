@@ -19,4 +19,21 @@ public sealed class CosmosProductMappingTests
         Assert.Equal(920000, item.CategoryId);
         Assert.Equal("Космос", item.ProductTypeIdOneC);
     }
+
+    [Fact]
+    public void MapProduct_DeduplicatesRepeatedOneCProductIds()
+    {
+        var product = new OneCProductDto(
+            26358, "Product", "Ignored", "", false, false, true, 1);
+
+        var mapped = CatalogMapper.MapProduct(
+            [product, product with { Name = "Repeated product" }],
+            new Dictionary<string, int>(),
+            "Космос",
+            fallbackCategoryId: 920000);
+
+        var item = Assert.Single(mapped);
+        Assert.Equal(26358, item.Id);
+        Assert.Equal("Product", item.Name);
+    }
 }
