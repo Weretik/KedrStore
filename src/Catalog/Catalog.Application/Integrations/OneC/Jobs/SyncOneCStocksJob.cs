@@ -59,6 +59,15 @@ public sealed class SyncOneCStocksJob(
         {
             if (stocks.TryGetValue(product.Id, out var stock))
             {
+                if (stock < 0)
+                {
+                    logger.LogWarning(
+                        "Skipping negative stock received from 1C for ProductId={ProductId}. Stock={Stock}.",
+                        product.Id.Value,
+                        stock);
+                    continue;
+                }
+
                 if (stock > HighStockWarningThreshold)
                 {
                     logger.LogWarning(

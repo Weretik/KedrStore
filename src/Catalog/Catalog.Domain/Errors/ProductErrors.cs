@@ -28,7 +28,7 @@ public static class ProductErrors
 
     public static CatalogDomainError StockOutOfRange(decimal value) =>
         new("Catalog.Product.Stock.OutOfRange",
-            $"Stock must be between 0 and 2000. Actual: {value}");
+            $"Stock must be between 0 and 10000. Actual: {value}");
 
     public static CatalogDomainError QuantityInPackNegative(int value) =>
         new("Catalog.Product.QuantityInPack.Negative",

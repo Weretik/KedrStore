@@ -5,6 +5,8 @@ namespace Catalog.Domain.Entities;
 
 public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 {
+    public const decimal MaximumStock = 10_000m;
+
     #region Properties
     public string ProductTypeIdOneC { get; private set; }
     public string Name { get; private set; } = null!;
@@ -135,7 +137,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     }
     private void SetStock(decimal stock)
     {
-        if (stock < 0m || stock > 2_000m)
+        if (stock < 0m || stock > MaximumStock)
             throw new DomainException(ProductErrors.StockOutOfRange(stock));
 
         Stock = stock;
