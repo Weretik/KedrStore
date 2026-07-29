@@ -116,7 +116,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine(ex);
+    Console.Error.WriteLine($"[ERROR] Job {jobKey} failed with {ex.GetType().Name}.");
     return 1;
 }
 

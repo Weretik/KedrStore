@@ -32,7 +32,10 @@ public class DbMigrator<TContext>(IServiceProvider services, ILogger<DbMigrator<
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "❌ {Context} migration error", typeof(TContext).Name);
+            logger.LogError(
+                "Migration for {Context} failed with {ExceptionType}.",
+                typeof(TContext).Name,
+                ex.GetType().Name);
             throw;
         }
     }

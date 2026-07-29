@@ -8,6 +8,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: cloud-run-production-deploy
+  cancel-in-progress: false
+
 env:
   GCP_PROJECT_ID: classkedrproject
   GCP_REGION: europe-central2
@@ -61,7 +65,11 @@ jobs:
             gcloud run jobs update "$MIGRATION_JOB" \
               --image "${{ env.JOBS_IMAGE }}" \
               --region "${{ env.GCP_REGION }}" \
-              --args "--job=migrate" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 30m \
+              --args=--job=migrate \
               --set-secrets "$MIGRATION_SECRETS" \
               --quiet
           else
@@ -71,7 +79,8 @@ jobs:
               --tasks 1 \
               --parallelism 1 \
               --max-retries 0 \
-              --args "--job=migrate" \
+              --task-timeout 30m \
+              --args=--job=migrate \
               --set-secrets "$MIGRATION_SECRETS" \
               --quiet
           fi
