@@ -121,7 +121,7 @@ jobs:
               gcloud run jobs update "$JOB_NAME" \
                 --image "${{ env.JOBS_IMAGE }}" \
                 --region "${{ env.GCP_REGION }}" \
-                --args "$JOB_ARG" \
+                --args="$JOB_ARG" \
                 --set-secrets "$JOB_SECRETS" \
                 --quiet
             else
@@ -131,7 +131,7 @@ jobs:
                 --tasks 1 \
                 --parallelism 1 \
                 --max-retries 1 \
-                --args "$JOB_ARG" \
+                --args="$JOB_ARG" \
                 --set-secrets "$JOB_SECRETS" \
                 --quiet
             fi
@@ -149,7 +149,7 @@ jobs:
               gcloud run jobs update "$JOB_NAME" \
                 --image "${{ env.JOBS_IMAGE }}" \
                 --region "${{ env.GCP_REGION }}" \
-                --args "$JOB_ARG" \
+                --args="$JOB_ARG" \
                 --set-secrets "$JOB_SECRETS" \
                 --quiet
             fi
