@@ -1,21 +1,12 @@
-# Engineering standards
+# Backend engineering rules
 
-These rules apply to every new backend feature. Read [feature delivery](workflow/feature-delivery.md) first, then use the sections relevant to the change.
+This directory contains the stable rules for every backend change. It does not contain frontend rules: the frontend is a separate project.
 
-```text
-standards/
-├── workflow/     SDD process and definition of done
-├── design/       code placement and responsibility boundaries
-├── contracts/    HTTP contracts, validation and Result/error rules
-├── operations/   data access, security and observability
-└── quality/      test selection and verification commands
-```
+- [Backend rules](backend-rules.md) — layers, CQRS, DDD, Mediator, and code organisation.
+- [API rules](api-rules.md) — HTTP contracts, validation, results, and errors.
+- [Database rules](database-rules.md) — EF Core, reads, transactions, migrations, and data.
+- [Security and observability rules](security-observability-rules.md) — authorization, privacy, Serilog, and diagnostics.
+- [Testing rules](testing-rules.md) — test selection and required verification commands.
+- [Delivery rules](delivery-rules.md) — SDD flow, scope, and definition of done.
 
-## By purpose
-
-- [Workflow: feature delivery and SDD](workflow/feature-delivery.md)
-- [Design: layer and code organisation](design/layer-code-organisation.md)
-- [Contracts: API and contracts](contracts/api-contracts.md)
-- [Contracts: validation, results and errors](contracts/validation-results.md)
-- [Operations: data, security and observability](operations/data-security-observability.md)
-- [Quality: testing](quality/testing.md)
+Feature specifications link to these rules rather than duplicating them.

@@ -1,39 +1,52 @@
-# Backend feature SDD template
+# <NNN> — <feature name>
 
-Use this template for a new business capability, CRUD resource or backend endpoint group. It creates one parent SDD and a separate SDD document for every implementation phase.
+**Module:** <module>
+**Type:** <feature | migration>
+**Status:** draft
+**Owner:** <team>
+**Created:** YYYY-MM-DD
 
-## Copy this structure
+<One paragraph describing the feature's value and boundaries.>
 
-~~~text
-docs/sdd/specs/<module>/<feature-slug>/
-├── README.md                       copy template-feature.md
-├── contracts/
-│   └── api-contract.md             copy when frontend/external consumer exists
-└── phases/
-    ├── 01-domain.md
-    ├── 02-infrastructure.md
-    ├── 03-application.md
-    ├── 04-api.md
-    ├── 05-swagger-manual-test.md
-    ├── 06-frontend-handoff.md
-    └── 99-custom-phase.md          only for an additional independent phase
-~~~
+## Specification-writing order
 
-## Phase dependency
+1. Create `docs/sdd/specs/<module>/<NNN>-<feature-slug>/` and complete this `README.md`: title, module, owner, goal, and scope.
+2. Complete `requirements/overview.md`, then create a separate `requirements/<topic>.md` for each independent business domain.
+3. Mark uncertainty as `[NEEDS CLARIFICATION: <question>]`; do not assume business rules, API behavior, or the data model.
+4. Resolve every `[NEEDS CLARIFICATION]` item or explicitly move it out of the feature scope.
+5. Complete `design/domain.md`, `design/infrastructure.md`, and `data-model.md`. Requirements answer “what”; design answers “how”.
+6. If an HTTP consumer exists, complete `contracts/api-contract.md`, agree `docs/sdd/contracts/<module>/<feature>.openapi.yaml`, and add it to `docs/sdd/contracts/openapi.yaml` before writing API code. Document non-HTTP integration contracts in `contracts/api-contract.md`; do not create OpenAPI solely for an internal integration.
+7. Complete [Specification readiness](checklist/spec-readiness.md). Do not create tasks while the specification contains unresolved model or contract decisions.
+8. Break implementation into concrete task IDs in `tasks/00-readiness.md`–`tasks/05-verification.md`: each task has an action, exact path, dependencies, and a phase checkpoint.
+9. Complete phases in sequence, mark completed tasks as `[x]`, and record verification results in the documentation.
+10. Before completion, complete [Delivery readiness](checklist/delivery-readiness.md), align the README, requirements, design, and contracts with the code, and prepare the delivery report.
 
-~~~text
-01 Domain
-   ↓
-02 Infrastructure ──┐
-                     ├──→ 03 Application → 04 API → 05 Swagger → 06 Frontend handoff
-API contract ────────┘
-~~~
+## Requirements
 
-The API contract may be drafted before implementation and refined through phases 03 and 04. Do not create empty phase files: copy only phases that apply, but record why a skipped phase is not needed in the parent README.
+- [Overview and scope](requirements/overview.md)
+- [<business domain>](requirements/topic.md)
 
-## Separation of responsibility
+## Technical design
 
-- README describes the feature goal, scope, scenarios, compatibility, ownership and the phase plan.
-- contracts contains consumer-facing API facts only.
-- phases contains implementation decisions, file plans, acceptance criteria and verification for that phase.
-- Do not place implementation notes in the API contract and do not place the full frontend payload description in a handler-phase document.
+- [Domain](design/domain.md)
+- [Infrastructure](design/infrastructure.md)
+- [Data model](data-model.md)
+
+## Delivery
+
+- [API/integration contract](contracts/api-contract.md)
+- [Specification readiness](checklist/spec-readiness.md)
+- [Delivery readiness](checklist/delivery-readiness.md)
+
+## AI implementation tasks
+
+AI performs only unfinished tasks in the current phase, marks completed tasks as `[x]`, and proceeds only after the checkpoint. `[P]` indicates safe parallel execution after dependencies are complete.
+
+| Phase | Result |
+| --- | --- |
+| [00 — Clarification](tasks/00-readiness.md) | agreed scope and contract |
+| [01 — Domain](tasks/01-domain.md) | model and unit tests |
+| [02 — Infrastructure](tasks/02-infrastructure.md) | persistence and migration |
+| [03 — Application](tasks/03-application.md) | CQRS use cases |
+| [04 — API](tasks/04-api.md) | endpoints and API tests |
+| [05 — Verification](tasks/05-verification.md) | delivery evidence |

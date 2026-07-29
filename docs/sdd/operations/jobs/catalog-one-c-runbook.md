@@ -3,8 +3,9 @@
 For a normal refresh run one `full` job; it uses the safe import order and rebuilds projections last.
 
 ```powershell
+Set-Location C:\Users\Віталій\RiderProjects\KedrStore\src\Bootstrapper\Host.Jobs\Host.Jobs
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=full
+dotnet run --project .\Host.Jobs.csproj -- --job=full
 ```
 
 | Situation | Job | Follow-up |

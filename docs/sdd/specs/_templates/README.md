@@ -1,33 +1,16 @@
-# SDD task templates
+# SDD templates
 
-Choose the folder by the type of work. Do not combine templates from different folders unless the parent specification explicitly needs both.
+For a new backend feature or migration, create `docs/sdd/specs/<module>/<NNN>-<feature-slug>/` and copy `feature/` into it. Do not create empty documents.
 
-~~~text
-_templates/
-├── feature/                 ordinary product/backend feature
-│   ├── README.md            phase model and target feature-folder layout
-│   ├── template-feature.md  parent feature specification
-│   ├── contracts/
-│   │   └── api-contract.md  client-visible API contract
-│   └── phases/
-│       ├── 01-domain.md through 06-frontend-handoff.md
-│       └── 99-custom-phase.md
-├── migration/               multi-phase structural/data/integration migration
-│   ├── template-migration.md
-│   └── phases/
-└── git/                     commit planning only
-    └── git-commit-batching.md
-~~~
+```text
+<NNN>-<feature-slug>/
+├── README.md                 feature orchestration
+├── requirements/             what is needed and why
+├── design/                   how the backend implements the feature
+├── data-model.md             entities, relations, and invariants
+├── contracts/                API and integration contracts
+├── tasks/                    phases and atomic AI tasks
+└── checklist/                quality gates
+```
 
-## Selection
-
-| Need | Start with |
-| --- | --- |
-| New command, query, endpoint or business capability | feature/README.md, then feature/template-feature.md |
-| API contract needs separate agreement | feature/contracts/api-contract.md |
-| Standard backend implementation phase | feature/phases/01-domain.md through 06-frontend-handoff.md |
-| Additional independent phase | feature/phases/99-custom-phase.md |
-| Data, module, integration or contract transition | migration/template-migration.md |
-| Intentional commit grouping | git/git-commit-batching.md |
-
-Copy templates into the feature folder before editing them. Never edit a template as a record of an implemented feature.
+`git/git-commit-batching.md` is a separate template for commit planning only. For a migration, use this same template: document the baseline and rollback in `design/`, and rollout and verification in `tasks/`.

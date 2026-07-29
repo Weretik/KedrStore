@@ -1,52 +1,7 @@
-# API change: <feature name>
+# <feature name> — API contract
 
-**Module:** <module>  
-**Status:** draft  
-**Contract status:** proposed | accepted | implemented
+**Status:** draft | agreed
 
-## Goal
+After agreement, create `docs/sdd/contracts/<module>/<feature>.openapi.yaml` and reference its operations from `docs/sdd/contracts/openapi.yaml`. This is the versioned machine-readable contract for the frontend, client generation, and contract testing; Swagger UI only renders the aggregate entry point.
 
-Describe the client-visible API change before implementation.
-
-## Route and method
-
-~~~http
-<HTTP method> /api/<path>
-~~~
-
-## Request
-
-- Route parameters:
-- Query parameters and defaults:
-- Body:
-- Validation and expected 400 errors:
-
-## Response
-
-- Success status and DTO:
-- Not found/conflict/invalid statuses:
-- Pagination, sorting and filter semantics:
-- Compatibility with existing consumers:
-
-## Security and side effects
-
-- Authentication/policy/AllowAnonymous:
-- Idempotency:
-- Rate limit, audit or logging impact:
-
-## Layer plan
-
-- API controller:
-- Application command/query and validator:
-- Domain:
-- Infrastructure/persistence:
-
-## Acceptance criteria
-
-- [ ]
-
-## Verification
-
-- OpenAPI:
-- Integration:
-- Manual request:
+Before agreement, define routes, methods, operation IDs, DTOs, examples, errors, security, idempotency, and the breaking-change migration path. Keep feature-specific consumer and rollout decisions in this document; do not duplicate the OpenAPI YAML under the feature folder.

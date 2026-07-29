@@ -10,6 +10,7 @@ KedrStore is a modular ASP.NET Core backend on .NET 10. It uses Clean Architectu
 - [Project structure](overview/project-structure.md) — solution tree and layer visualisation.
 - [Layer boundaries](overview/layers.md) — ownership and forbidden dependencies.
 - [Module map](overview/modules.md) — Catalog, Sales, Identity and BuildingBlocks ownership.
+- [Product glossary](../../product/glossary.md) — stable catalog, door, hardware, and Cosmos terminology.
 
 ### I need to place code in a layer
 

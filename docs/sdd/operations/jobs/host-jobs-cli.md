@@ -3,9 +3,9 @@
 `Host.Jobs` loads `appsettings.json` and environment variables. In Development it loads **its own** User Secrets (separate from `Host.Api`).
 
 ```powershell
-Set-Location C:\Users\Віталій\RiderProjects\KedrStore
+Set-Location C:\Users\Віталій\RiderProjects\KedrStore\src\Bootstrapper\Host.Jobs\Host.Jobs
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=<name>
+dotnet run --project .\Host.Jobs.csproj -- --job=<name>
 ```
 
 | Job | Argument | Purpose |
@@ -21,7 +21,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 Example:
 
 ```powershell
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
+dotnet run --project .\Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
 ```
 
 Repeat `--rootId` for multiple roots. Exit code `0` and `[SUCCESS] Job finished OK` mean no exception; still validate import counts. Code `1` means job/argument/runtime failure; code `2` means a root-dependent job lacked `--rootId`.
