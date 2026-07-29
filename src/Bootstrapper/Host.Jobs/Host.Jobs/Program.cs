@@ -35,7 +35,14 @@ if (string.IsNullOrWhiteSpace(job))
     return 1;
 }
 
-var cancellationToken = CancellationToken.None;
+using var cancellationTokenSource = new CancellationTokenSource();
+Console.CancelKeyPress += (_, eventArgs) =>
+{
+    eventArgs.Cancel = true;
+    cancellationTokenSource.Cancel();
+};
+
+var cancellationToken = cancellationTokenSource.Token;
 var jobKey = job.Trim().ToLowerInvariant();
 
 var needsRootId = jobKey is "category" or "prices" or "productdetails" or "stocks";
@@ -51,6 +58,10 @@ try
 
     switch (jobKey)
     {
+        case "migrate":
+            await scopeServiceProvider.GetRequiredService<DatabaseMigrationJob>().RunAsync(cancellationToken);
+            break;
+
         case "full":
             await scopeServiceProvider.GetRequiredService<SyncOneCFullJob>().RunAsync(cancellationToken);
             break;

@@ -52,6 +52,35 @@ jobs:
           docker push "$JOBS_IMAGE"
           echo "JOBS_IMAGE=$JOBS_IMAGE" >> $GITHUB_ENV
 
+      - name: Run database migrations
+        run: |
+          MIGRATION_JOB="database-migrate"
+          MIGRATION_SECRETS="ConnectionStrings__Default=db-connection:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest"
+
+          if gcloud run jobs describe "$MIGRATION_JOB" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+            gcloud run jobs update "$MIGRATION_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --args "--job=migrate" \
+              --set-secrets "$MIGRATION_SECRETS" \
+              --quiet
+          else
+            gcloud run jobs create "$MIGRATION_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --args "--job=migrate" \
+              --set-secrets "$MIGRATION_SECRETS" \
+              --quiet
+          fi
+
+          gcloud run jobs execute "$MIGRATION_JOB" \
+            --region "${{ env.GCP_REGION }}" \
+            --wait \
+            --quiet
+
       - name: Deploy Host.Api to Cloud Run
         run: |
           gcloud run deploy "${{ env.CLOUD_RUN_SERVICE }}" \
@@ -59,7 +88,7 @@ jobs:
             --region "${{ env.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,Identity__AdminUser__DefaultPassword=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest" \
+            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest" \
             --quiet
 
       - name: Update Cloud Run Jobs to new image

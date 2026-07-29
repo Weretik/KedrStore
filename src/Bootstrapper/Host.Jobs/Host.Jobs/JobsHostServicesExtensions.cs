@@ -23,6 +23,8 @@ public static class JobsHostServicesExtensions
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);
 
+        services.AddScoped<DatabaseMigrationJob>();
+
         services.AddScoped<SyncOneCFullJob>();
         services.AddScoped<SyncOneCPriceTypesJob>();
         services.AddScoped<SyncOneCCategoryJob>();
