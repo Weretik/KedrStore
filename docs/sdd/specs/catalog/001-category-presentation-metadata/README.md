@@ -2,7 +2,7 @@
 
 **Module:** catalog
 **Type:** feature
-**Status:** draft
+**Status:** verified
 **Owner:** backend team
 **Created:** 2026-07-27
 

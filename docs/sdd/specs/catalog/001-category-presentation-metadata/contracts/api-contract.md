@@ -1,6 +1,6 @@
 # Category presentation metadata — API and integration contract
 
-**Status:** no HTTP contract in scope
+**Status:** verified application consumer contract; no HTTP contract in scope
 
 ## Existing integration contract
 
