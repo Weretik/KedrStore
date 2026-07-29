@@ -182,7 +182,9 @@ components:
         inStock: { type: boolean }
         isSale: { type: boolean }
         isNew: { type: boolean }
-        exportToSite: { type: boolean }
+        exportToSite:
+          type: boolean
+          description: Whether the product is marked for export to the website by the 1C import.
         price: { type: [number, 'null'] }
         stock: { type: number }
         quantityInPack: { type: integer }

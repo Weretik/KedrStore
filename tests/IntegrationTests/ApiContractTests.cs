@@ -61,6 +61,26 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(ordersPost.TryGetProperty("requestBody", out _));
     }
 
+    [Fact]
+    public async Task OpenApi_AdminProductRow_Contains_ExportToSite_Flag()
+    {
+        using var client = _factory.CreateClient();
+        using var response = await client.GetAsync("/openapi/v1.json");
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+
+        var properties = doc.RootElement
+            .GetProperty("components")
+            .GetProperty("schemas")
+            .GetProperty("AdminProductListRowDto")
+            .GetProperty("properties");
+
+        Assert.True(properties.TryGetProperty("exportToSite", out var exportToSite));
+        Assert.Equal("boolean", exportToSite.GetProperty("type").GetString());
+    }
+
     private static void AssertOperationHasPathParameter(JsonElement operation, string name)
     {
         Assert.True(operation.TryGetProperty("parameters", out var parameters));
