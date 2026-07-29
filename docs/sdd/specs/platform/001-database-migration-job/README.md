@@ -2,15 +2,15 @@
 
 **Module:** platform
 **Type:** migration
-**Status:** draft
+**Status:** in-progress
 **Owner:** backend team
 **Created:** 2026-07-29
 
-Move EF Core schema migration execution out of the Cloud Run API startup path and into the root `Host.Jobs` executable. Restore the deployed Identity migration lineage so production PostgreSQL recognizes its existing Identity tables, then create only forward migrations for real schema changes. The API must start without attempting to alter a database schema.
+Move EF Core schema migration execution out of the Cloud Run API startup path and into the root `Host.Jobs` executable. The approved production path resets the non-critical Identity schema and migration history, then recreates it through the current Guid-based initial migration. The API must start without attempting to alter a database schema.
 
 ## Scope
 
-- Restore source-controlled Identity migration IDs that match the production `__EFMigrationsHistory` baseline.
+- Reset only the approved non-critical Identity tables and their historical migration rows after a fresh backup.
 - Add an explicit, one-shot `--job=migrate` mode to `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` and its executable.
 - Run migrations serially for all registered contexts with structured logs and a non-zero exit code on failure.
 - Remove automatic migration execution from `Host.Api` startup.
@@ -19,7 +19,7 @@ Move EF Core schema migration execution out of the Cloud Run API startup path an
 ## Out of scope
 
 - Changing application HTTP contracts or domain behavior.
-- Recreating, deleting, or manually editing production tables.
+- Recreating, deleting, or manually editing Catalog or Sales production tables.
 - Changing unrelated 1C import jobs.
 
 ## Requirements
@@ -31,6 +31,7 @@ Move EF Core schema migration execution out of the Cloud Run API startup path an
 
 - [Domain and ownership](design/domain.md)
 - [Infrastructure and rollout](design/infrastructure.md)
+- [Approved Identity reset SQL](design/identity-reset.sql.md)
 - [Data model](data-model.md)
 
 ## Delivery
