@@ -1,5 +1,7 @@
 # Phase 03 — Application
 
+**Status:** completed and verified
+
 - [x] T013 Update `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs` to resolve and apply approved metadata after final hierarchy construction, calculate levels, and retain the empty-response deletion guard. **Dependencies:** T009, T011.
 - [x] T014 Preserve and extend the virtual Cosmos path in `SyncOneCCategoryJob.cs` so it applies approved metadata but does not call `GetCategories`; verify `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs` still assigns `CosmosCategoryId` directly. **Dependencies:** T010, T011.
 - [x] T015 Update the no-tracking category read projection in `src/Catalog/Catalog.Application/Features/Category/GetList/` to build a deterministic `SortOrder`-first tree and include metadata only as required by the agreed consumer boundary. **Dependencies:** T003, T011.

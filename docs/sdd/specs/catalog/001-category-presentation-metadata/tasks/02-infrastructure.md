@@ -1,5 +1,7 @@
 # Phase 02 — Infrastructure
 
+**Status:** completed and verified
+
 - [x] T009 Add the agreed typed presentation-options model in `src/Catalog/Catalog.Application/Integrations/OneC/Options/` and bind it in `src/Catalog/Catalog.Infrastructure/DependencyInjection/CatalogIntegrationOneCExtension.cs` or the existing composition point. **Dependencies:** T002, T008.
 - [x] T010 Add the approved identical configuration records to `src/Bootstrapper/Host.Api/appsettings.json` and `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`. **Dependencies:** T009.
 - [x] T011 Configure fields and any agreed ordering index in `src/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs`; create a new migration in `src/Catalog/Catalog.Infrastructure/Migrations/`. **Dependencies:** T005, T006, T002.

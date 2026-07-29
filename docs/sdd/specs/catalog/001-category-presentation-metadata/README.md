@@ -2,11 +2,15 @@
 
 **Module:** catalog
 **Type:** feature
-**Status:** verified
+**Status:** completed and verified
 **Owner:** backend team
 **Created:** 2026-07-27
 
 The Catalog backend will own localized category presentation metadata—short Ukrainian and Russian labels, display order and hierarchy level—while retaining the original 1C name and all existing identifiers. The feature also preserves the backend-owned virtual Cosmos category so that Cosmos product import never calls the unavailable 1C categories operation. It does not change storefront code, public routes, generated SOAP code, or existing category IDs and slugs.
+
+## Completion status
+
+All applicable phases and task IDs are complete and verified. Delivery evidence, known test limitations, and the resolved historical import blocker are recorded in [Phase 05](tasks/05-verification.md).
 
 ## Source baseline
 

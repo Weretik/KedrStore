@@ -1,5 +1,7 @@
 # Phase 00 — Clarification and readiness
 
+**Status:** completed and verified
+
 - [x] T001 Read the frozen constants/translation snapshots, requirements, design, data model, contract, and checklist; record contradictions in this file without changing source values. **Paths:** `catalog-category-slugs.constants.ts.md`, `translate.md`, `requirements/`, `design/`, `data-model.md`, `contracts/`. **Dependencies:** none.
 - [x] T002 Agree the stable matching key, complete metadata mapping, short-label limits, unconfigured-category fallback, `SortOrder` uniqueness scope, and Cosmos short labels/order. **Paths:** approved configuration source and `requirements/`. **Dependencies:** T001.
 - [x] T003 Decide whether an HTTP consumer is in scope. If yes, agree and add `docs/sdd/contracts/catalog/category-presentation-metadata.openapi.yaml`, then reference it from `docs/sdd/contracts/openapi.yaml`; if no, mark API tasks not applicable and state the consuming boundary. **Paths:** `contracts/api-contract.md`, `docs/sdd/contracts/`. **Dependencies:** T002.

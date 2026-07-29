@@ -1,5 +1,7 @@
 # Phase 01 — Domain
 
+**Status:** completed and verified
+
 - [x] T005 Modify `ProductCategory` in `src/Catalog/Catalog.Domain/Entities/ProductCategory.cs` to own localized short names, sort order, and level without changing existing identity, name, slug, parent, or path semantics. **Dependencies:** T002.
 - [x] T006 Add explicit domain errors and enforce short-label, sort-order, and non-negative-level invariants in `src/Catalog/Catalog.Domain/Errors/` and the aggregate API. **Dependencies:** T005.
 - [x] T007 [P] Add focused aggregate tests under `tests/UnitTests/` following the existing category test convention. **Dependencies:** T005, T006.

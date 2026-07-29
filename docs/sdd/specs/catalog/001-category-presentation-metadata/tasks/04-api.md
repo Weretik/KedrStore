@@ -1,5 +1,7 @@
 # Phase 04 — API
 
+**Status:** completed and verified (not applicable: no HTTP API is in scope)
+
 - [x] T018 Not applicable: T003 excludes HTTP exposure from this feature. No OpenAPI-derived DTOs are required. **Dependencies:** T003, T017.
 - [x] T019 Not applicable: no category-tree endpoint/controller is in scope. **Dependencies:** T018.
 - [x] T020 Not applicable: no HTTP authorization, error mapping, or response contract is introduced. **Dependencies:** T019.

@@ -1,5 +1,7 @@
 # Phase 05 — Verification
 
+**Status:** completed and verified
+
 - [x] T023 Run `dotnet restore KedrStore.sln` and record the result. **Dependencies:** T017, T022.
 - [x] T024 Run `dotnet build KedrStore.sln --no-restore` and record the result. **Dependencies:** T023.
 - [x] T025 Run `dotnet test KedrStore.sln --no-build` and record the result, distinguishing pre-existing failures from introduced failures. **Dependencies:** T024.
