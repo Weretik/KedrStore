@@ -8,33 +8,33 @@ public static class CatalogMapper
 {
     public static IReadOnlyList<CategoryDto> MapCategory(
         IReadOnlyList<OneCCategoryDto> categoryListOneC,
-        int rootCategoryId,
-        int furnitureId,
+        int? rootCategoryId,
+        bool isHardwareRoot,
         string rootCategoryOneCId)
     {
         var categoryDtos = new List<CategoryDto>();
         var helper = new SlugHelper();
 
-        string nameRootCategory = rootCategoryId == furnitureId ? "Фурнітра" : "Двері";
-
-        categoryDtos.Add(new CategoryDto(
-            rootCategoryId,
-            rootCategoryOneCId,
-            nameRootCategory ,
-            nameRootCategory.SlugGenerate(rootCategoryId, "category", helper),
-            null,
-            $"n{rootCategoryId}")
-        );
+        if (rootCategoryId is { } configuredRootId)
+        {
+            var rootName = isHardwareRoot ? "Фурнітра" : "Двері";
+            categoryDtos.Add(new CategoryDto(
+                configuredRootId,
+                rootCategoryOneCId,
+                rootName,
+                rootName.SlugGenerate(configuredRootId, "category", helper),
+                null,
+                $"n{configuredRootId}"));
+        }
 
         var categoriesById = categoryListOneC
             .Where(category => category.CategoryId > 0)
             .GroupBy(category => category.CategoryId)
             .ToDictionary(group => group.Key, group => group.First());
 
-        var pathCache = new Dictionary<int, string>
-        {
-            [rootCategoryId] = $"n{rootCategoryId}"
-        };
+        var pathCache = new Dictionary<int, string>();
+        if (rootCategoryId is { } rootId)
+            pathCache[rootId] = $"n{rootId}";
 
         string BuildPath(int categoryId, HashSet<int> visiting)
         {
@@ -42,14 +42,14 @@ public static class CatalogMapper
                 return cachedPath;
 
             if (!categoriesById.TryGetValue(categoryId, out var category))
-                return $"n{rootCategoryId}.n{categoryId}";
+                return RootPath(categoryId);
 
             var parentId = category.ParentId;
             string path;
 
             if (parentId is null || parentId <= 0 || parentId == categoryId)
             {
-                path = $"n{rootCategoryId}.n{categoryId}";
+                path = RootPath(categoryId);
             }
             else if (parentId == rootCategoryId)
             {
@@ -57,7 +57,7 @@ public static class CatalogMapper
             }
             else if (!visiting.Add(categoryId))
             {
-                path = $"n{rootCategoryId}.n{categoryId}";
+                path = RootPath(categoryId);
             }
             else
             {
@@ -69,6 +69,11 @@ public static class CatalogMapper
             pathCache[categoryId] = path;
             return path;
         }
+
+        string RootPath(int categoryId)
+            => rootCategoryId is { } rootId
+                ? $"n{rootId}.n{categoryId}"
+                : $"n{categoryId}";
 
         foreach (var item in categoryListOneC)
         {
@@ -82,7 +87,7 @@ public static class CatalogMapper
                 continue;
 
             var slug = name.SlugGenerate(item.CategoryId,"category", helper);
-            var mappedParentId = item.ParentId is > 0
+            int? mappedParentId = item.ParentId is > 0
                 ? item.ParentId.Value
                 : rootCategoryId;
 
@@ -98,19 +103,19 @@ public static class CatalogMapper
     public static IReadOnlyList<ProductRowOneCDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
         Dictionary<string, int> categoryNameDictionary,
-        string rootCategoryOneCId)
+        string rootCategoryOneCId,
+        int? fallbackCategoryId = null)
     {
         var productsDtos = new List<ProductRowOneCDto>();
         var helper = new SlugHelper();
 
         foreach (var item in productListOneC)
         {
-            if (!item.ExportToSite) continue;
-
             var id = item.Id;
             var name = item.Name.Trim();
 
-            var categoryId = GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
+            var categoryId = fallbackCategoryId
+                ?? GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
 
             var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
             string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";
@@ -131,10 +136,14 @@ public static class CatalogMapper
                 Stock: stock,
                 IsSale: isSale,
                 IsNew: isNew,
+                ExportToSite: item.ExportToSite,
                 QuantityInPack: qtyInPack)
             );
         }
-        return productsDtos;
+        return productsDtos
+            .GroupBy(product => product.Id)
+            .Select(group => group.First())
+            .ToList();
     }
 
     private static int GetCategoryIdForCategoryName(string categoryName, Dictionary<string,int> categoryNameDictionary)

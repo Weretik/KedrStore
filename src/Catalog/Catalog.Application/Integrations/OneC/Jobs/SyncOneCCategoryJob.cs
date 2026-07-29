@@ -11,21 +11,36 @@ using Unidecode.NET;
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
 public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<ProductCategory> categoryRepo,
-    IOptionsSnapshot<RootCategoryId> options, ILogger<SyncOneCCategoryJob> logger)
+    IOptionsSnapshot<RootCategoryId> options,
+    IOptionsSnapshot<CategoryPresentationOptions> presentationOptions,
+    ILogger<SyncOneCCategoryJob> logger)
 {
     public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
     {
         logger.LogInformation("SyncOneCCategoryJob started for {Root}", rootCategoryOneCId);
 
-        var rootCategoryId = int.Parse(rootCategoryOneCId.TrimStart('0'));
-        var furnitureId = int.Parse(options.Value.HardwareRootCategoryId.TrimStart('0'));
-        var doorsId = int.Parse(options.Value.DoorsRootCategoryId.TrimStart('0'));
+        if (string.Equals(rootCategoryOneCId, options.Value.CosmosRootCategoryId, StringComparison.Ordinal))
+        {
+            await EnsureCosmosCategoryAsync(cancellationToken);
+            logger.LogInformation("SyncOneCCategoryJob finished for virtual Cosmos root.");
+            return;
+        }
+
+        var hasNumericRootId = int.TryParse(rootCategoryOneCId.TrimStart('0'), out var rootCategoryId);
+        var isHardwareRoot = string.Equals(
+            rootCategoryOneCId,
+            options.Value.HardwareRootCategoryId,
+            StringComparison.Ordinal);
+        var isDoorsRoot = string.Equals(
+            rootCategoryOneCId,
+            options.Value.DoorsRootCategoryId,
+            StringComparison.Ordinal);
 
         // Select the manual grouping config based on the current root category branch.
         IReadOnlyList<ManualCategoryGroupOption> manualGroups = [];
-        if (rootCategoryId == furnitureId)
+        if (isHardwareRoot)
             manualGroups = options.Value.HardwareManualCategoryGroups;
-        else if (rootCategoryId == doorsId)
+        else if (isDoorsRoot)
             manualGroups = options.Value.DoorsManualCategoryGroups;
 
         var categoriesOneC = await oneC.GetCategoriesAsync(rootCategoryOneCId, cancellationToken);
@@ -33,7 +48,11 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         if (categoriesOneC.Count == 0 && manualGroups.Count == 0)
             return;
 
-        var categories = CatalogMapper.MapCategory(categoriesOneC, rootCategoryId, furnitureId, rootCategoryOneCId);
+        var categories = CatalogMapper.MapCategory(
+            categoriesOneC,
+            hasNumericRootId ? rootCategoryId : null,
+            isHardwareRoot,
+            rootCategoryOneCId);
         if (manualGroups.Count > 0)
         {
             categories = ApplyManualHardwareHierarchy(
@@ -58,6 +77,40 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         await CreateOrUpsertCategoriesAsync(categories, rootCategoryOneCId, cancellationToken);
 
         logger.LogInformation("SyncOneCCategoryJob finished for {Root}", rootCategoryOneCId);
+    }
+
+    private async Task EnsureCosmosCategoryAsync(CancellationToken cancellationToken)
+    {
+        var cosmosCategoryId = ProductCategoryId.From(options.Value.CosmosCategoryId);
+        var cosmosRootId = options.Value.CosmosRootCategoryId;
+        var existing = await categoryRepo.GetByIdAsync(cosmosCategoryId, cancellationToken);
+        var path = CategoryPath.From($"n{cosmosCategoryId.Value}");
+        var presentation = ResolvePresentation(cosmosRootId, cosmosCategoryId.Value, "Космос", path);
+
+        if (existing is null)
+        {
+            var category = ProductCategory.Create(
+                cosmosCategoryId,
+                cosmosRootId,
+                "Космос",
+                $"cosmos-{cosmosCategoryId.Value}",
+                path);
+            ApplyPresentation(category, presentation);
+            await categoryRepo.AddAsync(category, cancellationToken);
+        }
+        else
+        {
+            if (!string.Equals(existing.ProductTypeIdOneC, cosmosRootId, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"CosmosCategoryId {cosmosCategoryId.Value} is already used by root {existing.ProductTypeIdOneC}.");
+            }
+
+            existing.Update("Космос", $"cosmos-{cosmosCategoryId.Value}", path);
+            ApplyPresentation(existing, presentation);
+        }
+
+        await categoryRepo.SaveChangesAsync(cancellationToken);
     }
 
     private async Task DeleteMissingAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
@@ -93,6 +146,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                     path: path,
                     parentId: parentId
                 );
+                ApplyPresentation(productCategory, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path));
                 await categoryRepo.AddAsync(productCategory, cancellationToken);
             }
             else
@@ -102,10 +156,29 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                     slug: item.Slug,
                     path: path,
                     parentId: parentId);
+                ApplyPresentation(existing, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path));
             }
         }
         await categoryRepo.SaveChangesAsync(cancellationToken);
     }
+
+    private ResolvedCategoryPresentation ResolvePresentation(
+        string rootCategoryOneCId,
+        int categoryId,
+        string sourceName,
+        CategoryPath path)
+    {
+        var level = path.Value.Count(character => character == '.');
+        return new CategoryPresentationResolver(presentationOptions.Value)
+            .Resolve(rootCategoryOneCId, categoryId, sourceName, level);
+    }
+
+    private static void ApplyPresentation(ProductCategory category, ResolvedCategoryPresentation presentation)
+        => category.UpdatePresentationMetadata(
+            presentation.ShortNameUk,
+            presentation.ShortNameRu,
+            presentation.SortOrder,
+            presentation.Level);
 
     private static IReadOnlyList<CategoryDto> ApplyManualHardwareHierarchy(
         IReadOnlyList<CategoryDto> categories,

@@ -1,3 +1,10 @@
 namespace Catalog.Application.Features.Category.GetList.DTOs;
 
-public sealed record CategoryTreeDto(int Id, string Name, IReadOnlyList<CategoryTreeDto> Children);
+public sealed record CategoryTreeDto(
+    int Id,
+    string Name,
+    string ShortNameUk,
+    string ShortNameRu,
+    int SortOrder,
+    int Level,
+    IReadOnlyList<CategoryTreeDto> Children);

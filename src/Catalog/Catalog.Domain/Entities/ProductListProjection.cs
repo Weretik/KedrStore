@@ -16,6 +16,7 @@ public sealed class ProductListProjection
     public bool InStock { get; private set; }
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
+    public bool ExportToSite { get; private set; }
     public decimal? RetailPrice { get; private set; }
     public string SearchTextUk { get; private set; } = null!;
     public string SearchTextRu { get; private set; } = null!;
@@ -35,6 +36,7 @@ public sealed class ProductListProjection
         bool inStock,
         bool isSale,
         bool isNew,
+        bool exportToSite,
         decimal? retailPrice)
     {
         SetProductId(productId);
@@ -48,6 +50,7 @@ public sealed class ProductListProjection
         InStock = inStock;
         IsSale = isSale;
         IsNew = isNew;
+        ExportToSite = exportToSite;
         RetailPrice = retailPrice;
         SearchTextUk = BuildSearchText(productId, NameUk);
         SearchTextRu = BuildSearchText(productId, NameRu);
@@ -66,6 +69,7 @@ public sealed class ProductListProjection
         bool inStock,
         bool isSale,
         bool isNew,
+        bool exportToSite,
         decimal? retailPrice)
         => new(
             productId,
@@ -78,6 +82,7 @@ public sealed class ProductListProjection
             inStock,
             isSale,
             isNew,
+            exportToSite,
             retailPrice);
     #endregion
 

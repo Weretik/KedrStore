@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Integrations.OneC.Factory;
@@ -13,25 +13,65 @@ public static class OneCSoapSmokeTest
     {
         var factory = new OneCSoapClientFactory(configuration);
         var client = factory.Create();
+        var rootCategoryId = configuration["OneC:DoorsRootCategoryId"] ?? "000007226";
 
-        Console.WriteLine(client.Endpoint.Address.Uri);
         Console.WriteLine(client.Endpoint.Binding.GetType().FullName);
-        // 1) категории
 
-        var categories = await client.GetCategoriesAsync("000007226");
-        Console.WriteLine($"Categories: {categories?.Body?.@return?.Count ?? 0}");
+        var categories = await client.GetCategoriesAsync(rootCategoryId);
+        Console.WriteLine($"Categories: {categories?.@return?.Length ?? 0}");
 
+        var stocks = await client.GetProductStocksAsync(rootCategoryId);
+        Console.WriteLine($"Stocks: {stocks?.@return?.Length ?? 0}");
 
-        // 2) остатки
-        var stocks = await client.GetProductStocksAsync("000007226");
-        Console.WriteLine($"Stocks: {stocks?.Body?.@return?.Count ?? 0}");
+        var details = await client.GetProductDetailsAsync(rootCategoryId);
+        Console.WriteLine($"Details: {details?.@return?.Length ?? 0}");
 
-        // 3) товары (детали)
-        var details = await client.GetProductDetailsAsync("000007226");
-        Console.WriteLine($"Details: {details?.Body?.@return?.Count ?? 0}");
+        var prices = await client.GetProductPricesAsync(rootCategoryId);
+        Console.WriteLine($"Prices: {prices?.@return?.Length ?? 0}");
 
-        // 4) цены
-        var prices = await client.GetProductPricesAsync("000007226");
-        Console.WriteLine($"Prices: {prices?.Body?.@return?.Count ?? 0}");
+        var priceTypes = await client.GetPriceTypesAsync();
+        Console.WriteLine($"PriceTypes: {priceTypes?.@return?.Length ?? 0}");
+
+        var counterparties = await client.GetCounterpartiesAsync();
+        Console.WriteLine($"Counterparties: {counterparties?.@return?.Length ?? 0}");
+
+        var counterpartyCategoryPriceTypes = await client.GetCounterpartyCategoryPriceTypesAsync();
+        Console.WriteLine($"CounterpartyCategoryPriceTypes: {counterpartyCategoryPriceTypes?.@return?.Length ?? 0}");
+
+        var runCreateSiteRequest = bool.TryParse(configuration["OneCSoap:RunCreateSiteRequest"], out var enabled) && enabled;
+        if (!runCreateSiteRequest)
+        {
+            Console.WriteLine("CreateSiteRequest: skipped (set OneCSoap:RunCreateSiteRequest=true to execute write smoke test)");
+            return;
+        }
+
+        var requestData = BuildCreateSiteRequest(configuration);
+        var createSiteRequest = await client.CreateSiteRequestAsync(requestData);
+        Console.WriteLine($"CreateSiteRequest: completed={createSiteRequest is not null}");
+    }
+
+    private static RequestData BuildCreateSiteRequest(IConfiguration configuration)
+    {
+        var counterpartyId = configuration["OneCSoap:CreateSiteRequest:CounterpartyId"] ?? "test-counterparty";
+        var comment = configuration["OneCSoap:CreateSiteRequest:Comment"] ?? "SOAP smoke test";
+        var orderId = configuration["OneCSoap:CreateSiteRequest:OrderId"] ?? $"smoke-{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var productId = configuration["OneCSoap:CreateSiteRequest:ProductId"] ?? "1";
+
+        return new RequestData
+        {
+            CounterpartyId = counterpartyId,
+            Comment = comment,
+            OrderId = orderId,
+            Date = DateTime.UtcNow,
+            Items =
+            [
+                new Item
+                {
+                    ProductId = productId,
+                    Quantity = "1",
+                    Amount = 0m
+                }
+            ]
+        };
     }
 }

@@ -59,6 +59,7 @@ internal sealed class ProductListProjectionRebuilder(
                     : product.Stock > 0,
                 isSale: product.IsSale,
                 isNew: product.IsNew,
+                exportToSite: product.ExportToSite,
                 retailPrice: retailPrices.GetValueOrDefault(product.Id)))
             .ToArray();
 

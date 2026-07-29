@@ -4,6 +4,7 @@ using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Integrations.OneC.Specifications;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
@@ -15,6 +16,7 @@ public sealed class SyncOneCProductDetailsJob(
     ICatalogRepository<Product> productRepo,
     ICatalogRepository<ProductTranslation> translationRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
+    IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCPricesJob> logger)
 {
@@ -34,15 +36,62 @@ public sealed class SyncOneCProductDetailsJob(
         if (productsOneC.Count == 0)
             return;
 
-        var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(), cancellationToken);
-        var categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
+        var isCosmosRoot = string.Equals(
+            rootCategoryId,
+            rootCategoryOptions.Value.CosmosRootCategoryId,
+            StringComparison.Ordinal);
+        var categoryNameDictionary = new Dictionary<string, int>();
+        int? fallbackCategoryId = null;
 
-        var products = CatalogMapper.MapProduct(productsOneC, categoryNameDictionary, rootCategoryId);
+        if (isCosmosRoot)
+        {
+            fallbackCategoryId = rootCategoryOptions.Value.CosmosCategoryId;
+        }
+        else
+        {
+            var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(rootCategoryId), cancellationToken);
+            categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
+        }
+
+        var products = CatalogMapper.MapProduct(
+            productsOneC,
+            categoryNameDictionary,
+            rootCategoryId,
+            fallbackCategoryId);
+
+        if (products.Count < productsOneC.Count)
+        {
+            logger.LogWarning(
+                "OneC returned duplicate product IDs for root {Root}. Duplicates were ignored. Received: {ReceivedCount}; distinct: {DistinctCount}.",
+                rootCategoryId,
+                productsOneC.Count,
+                products.Count);
+        }
+
+        if (isCosmosRoot)
+        {
+            products = await ExcludeProductsOwnedByOtherRootsAsync(products, rootCategoryId, cancellationToken);
+        }
+
         logger.LogInformation(
             "Mapped {MappedCount} products for root {Root}. Received: {ReceivedCount}.",
             products.Count,
             rootCategoryId,
             productsOneC.Count);
+
+        if (products.Count == 0)
+        {
+            if (isCosmosRoot)
+            {
+                logger.LogWarning(
+                    "All mapped Cosmos products are already owned by another root. Catalog data was not changed.");
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"OneC returned {productsOneC.Count} products for root {rootCategoryId}, but none passed mapping. " +
+                "Catalog data was not changed to prevent accidental deletion.");
+        }
 
         await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
         var syncedProductIds = await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
@@ -59,6 +108,32 @@ public sealed class SyncOneCProductDetailsJob(
         }
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
+    }
+
+    private async Task<IReadOnlyList<ProductRowOneCDto>> ExcludeProductsOwnedByOtherRootsAsync(
+        IReadOnlyList<ProductRowOneCDto> products,
+        string cosmosRootId,
+        CancellationToken cancellationToken)
+    {
+        if (products.Count == 0)
+            return products;
+
+        var productIds = products.Select(product => ProductId.From(product.Id)).ToArray();
+        var conflicts = await productRepo.ListAsync(
+            new ProductsByIdsFromOtherRootsSpec(productIds, cosmosRootId),
+            cancellationToken);
+        var conflictingIds = conflicts.Select(product => product.Id.Value).ToHashSet();
+
+        if (conflictingIds.Count == 0)
+            return products;
+
+        logger.LogWarning(
+            "Skipping {ConflictCount} Cosmos products because their IDs are already owned by another root.",
+            conflictingIds.Count);
+
+        return products
+            .Where(product => !conflictingIds.Contains(product.Id))
+            .ToList();
     }
 
     private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
@@ -96,6 +171,7 @@ public sealed class SyncOneCProductDetailsJob(
                     qtyInPack: item.QuantityInPack,
                     isNew: item.IsNew,
                     isSale: item.IsSale,
+                    exportToSite: item.ExportToSite,
                     createdDate: DateTimeOffset.UtcNow
                 );
                 await productRepo.AddAsync(product, cancellationToken);
@@ -112,6 +188,7 @@ public sealed class SyncOneCProductDetailsJob(
                     photo: item.Photo,
                     scheme: item.Scheme,
                     qtyInPack: item.QuantityInPack,
+                    exportToSite: item.ExportToSite,
                     updatedDate: DateTimeOffset.UtcNow);
 
                 if (item.IsNew) existing.MarkAsNew();

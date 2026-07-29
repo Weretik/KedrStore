@@ -70,3 +70,49 @@ jobs:
               --region "${{ env.GCP_REGION }}" \
               --quiet
           done
+
+          JOB_SECRETS="ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest"
+
+          # Primary customer-sync job. This is the only customer job that should be used for routine execution.
+          for JOB_DEF in \
+            "onec-sales-customers-full|--job=sales-customers-full"
+          do
+            IFS='|' read -r JOB_NAME JOB_ARG <<< "$JOB_DEF"
+
+            if gcloud run jobs describe "$JOB_NAME" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+              gcloud run jobs update "$JOB_NAME" \
+                --image "${{ env.JOBS_IMAGE }}" \
+                --region "${{ env.GCP_REGION }}" \
+                --args "$JOB_ARG" \
+                --set-secrets "$JOB_SECRETS" \
+                --quiet
+            else
+              gcloud run jobs create "$JOB_NAME" \
+                --image "${{ env.JOBS_IMAGE }}" \
+                --region "${{ env.GCP_REGION }}" \
+                --tasks 1 \
+                --parallelism 1 \
+                --max-retries 1 \
+                --args "$JOB_ARG" \
+                --set-secrets "$JOB_SECRETS" \
+                --quiet
+            fi
+          done
+
+          # Manual fallback jobs for diagnostics or one-off recovery. Keep them updated if they already exist,
+          # but do not auto-create them to avoid encouraging split execution instead of the composite job.
+          for JOB_DEF in \
+            "onec-counterparties|--job=counterparties" \
+            "onec-counterparty-category-price-types|--job=counterparty-category-price-types"
+          do
+            IFS='|' read -r JOB_NAME JOB_ARG <<< "$JOB_DEF"
+
+            if gcloud run jobs describe "$JOB_NAME" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+              gcloud run jobs update "$JOB_NAME" \
+                --image "${{ env.JOBS_IMAGE }}" \
+                --region "${{ env.GCP_REGION }}" \
+                --args "$JOB_ARG" \
+                --set-secrets "$JOB_SECRETS" \
+                --quiet
+            fi
+          done

@@ -1,0 +1,75 @@
+openapi: 3.1.0
+info: { title: KedrStore Session API, version: 0.1.0 }
+paths:
+  /api/auth/session/login:
+    post:
+      operationId: loginSession
+      summary: Create an authenticated session
+      tags: [Session]
+      security: []
+      description: Rate-limited by the AuthLogin policy. On success sets `kedr.rt` (HTTP-only) and `kedr.csrf` cookies.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
+      responses:
+        '200': { description: Authenticated session, headers: { Set-Cookie: { schema: { type: string }, description: Refresh and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
+        '401': { description: Invalid credentials }
+        '429': { description: Login rate limit exceeded }
+  /api/auth/session/refresh:
+    post:
+      operationId: refreshSession
+      summary: Refresh an authenticated session
+      tags: [Session]
+      security: []
+      description: Rate-limited by the AuthRefresh policy. Send refresh cookies with credentials included and header `X-CSRF-Token` equal to the `kedr.csrf` cookie value. Rotates both cookies.
+      parameters:
+        - name: X-CSRF-Token
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Refreshed session, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
+        '400': { description: Missing or invalid CSRF token }
+        '401': { description: 'Missing, expired, or invalid refresh cookie' }
+        '429': { description: Refresh rate limit exceeded }
+  /api/auth/session/logout:
+    post:
+      operationId: logoutSession
+      summary: End the current session
+      tags: [Session]
+      security: [{ bearerAuth: [] }]
+      description: Revokes the current authenticated session and expires refresh/CSRF cookies.
+      responses:
+        '204': { description: Logged out }
+        '401': { description: Missing or invalid access token }
+  /api/auth/session/me:
+    get:
+      operationId: getCurrentSession
+      summary: Get the current user
+      tags: [Session]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Current user, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMeResponse' } } } }
+        '401': { description: Missing or invalid access token }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+  schemas:
+    SessionLoginRequest:
+      type: object
+      required: [email, password]
+      properties: { email: { type: string, format: email }, password: { type: string, format: password } }
+    SessionTokenResponse:
+      type: object
+      required: [tokenType, accessToken, expiresIn]
+      properties:
+        tokenType: { type: string, example: Bearer }
+        accessToken: { type: string }
+        expiresIn: { type: integer, description: Access-token lifetime in seconds }
+    SessionMeResponse:
+      type: object
+      required: [userId, email, roles]
+      properties:
+        userId: { type: string }
+        email: { type: string, format: email }
+        roles: { type: array, items: { type: string } }

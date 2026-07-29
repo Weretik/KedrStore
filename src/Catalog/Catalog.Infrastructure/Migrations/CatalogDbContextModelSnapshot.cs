@@ -50,6 +50,11 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("ExportToSite")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -121,6 +126,9 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -138,10 +146,23 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<string>("ShortNameRu")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ShortNameUk")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -149,6 +170,9 @@ namespace Catalog.Infrastructure.Migrations
                         .HasDatabaseName("IX_ProductCategories_Path_gist");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
+
+                    b.HasIndex("ParentId", "SortOrder", "Id")
+                        .HasDatabaseName("IX_ProductCategories_ParentId_SortOrder_Id");
 
                     b.ToTable("ProductCategories", (string)null);
                 });
@@ -165,6 +189,11 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("ExportToSite")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("InStock")
                         .HasColumnType("boolean");

@@ -5,12 +5,18 @@ namespace Catalog.Domain.Entities;
 
 public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 {
+    public const int ShortNameMaxLength = 100;
+
     #region Properties
     public string ProductTypeIdOneC { get; private set; }
     public string Name { get; private set; } = null!;
     public string Slug { get; private set; } = null!;
     public ProductCategoryId? ParentId { get; private set; }
     public CategoryPath  Path { get; private set; }
+    public string ShortNameUk { get; private set; } = null!;
+    public string ShortNameRu { get; private set; } = null!;
+    public int SortOrder { get; private set; }
+    public int Level { get; private set; }
     #endregion
 
     #region Constructors
@@ -24,6 +30,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         SetSlug(slug);
         SetPath(path);
         SetParentId(parentId);
+        UpdatePresentationMetadata(Name, Name, int.MaxValue, GetLevelFromPath(path));
     }
     #endregion
 
@@ -38,6 +45,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         SetSlug(slug);
         SetPath(path);
         SetParentId(parentId);
+        Level = GetLevelFromPath(path);
     }
     #endregion
 
@@ -69,17 +77,73 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     {
         ParentId = parentId;
     }
+
+    private static string ValidateShortName(
+        string shortName,
+        Func<CatalogDomainError> requiredError,
+        Func<int, CatalogDomainError> invalidLengthError)
+    {
+        if (string.IsNullOrWhiteSpace(shortName))
+            throw new DomainException(requiredError());
+
+        var trimmed = shortName.Trim();
+        if (trimmed.Length > ShortNameMaxLength)
+            throw new DomainException(invalidLengthError(trimmed.Length));
+
+        return trimmed;
+    }
+
+    private static void GuardSortOrder(int sortOrder)
+    {
+        if (sortOrder < 0)
+            throw new DomainException(CategoryErrors.SortOrderNegative(sortOrder));
+    }
+
+    private void GuardLevel(int level)
+    {
+        if (level < 0)
+            throw new DomainException(CategoryErrors.LevelNegative(level));
+
+        var pathLevel = GetLevelFromPath(Path);
+        if (level != pathLevel)
+            throw new DomainException(CategoryErrors.LevelDoesNotMatchPath(level, pathLevel));
+    }
     #endregion
 
     #region ProductCategory API
     public void Rename(string name) => SetName(name);
-    public void Repath(CategoryPath newPath) => SetPath(newPath);
+    public void Repath(CategoryPath newPath)
+    {
+        SetPath(newPath);
+        Level = GetLevelFromPath(Path);
+    }
+
+    public void UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder, int level)
+    {
+        var validatedShortNameUk = ValidateShortName(
+            shortNameUk,
+            CategoryErrors.ShortNameUkIsRequired,
+            CategoryErrors.ShortNameUkLengthInvalid);
+        var validatedShortNameRu = ValidateShortName(
+            shortNameRu,
+            CategoryErrors.ShortNameRuIsRequired,
+            CategoryErrors.ShortNameRuLengthInvalid);
+
+        GuardSortOrder(sortOrder);
+        GuardLevel(level);
+
+        ShortNameUk = validatedShortNameUk;
+        ShortNameRu = validatedShortNameRu;
+        SortOrder = sortOrder;
+        Level = level;
+    }
 
     public void Reparent(ProductCategoryId? newParentId, CategoryPath newParentPath)
     {
         GuardReparentInvariant(newParentPath);
         SetParentId(newParentId);
         SetPath(Concat(newParentPath, GetSelfSegment()));
+        Level = GetLevelFromPath(Path);
     }
     #endregion
 
@@ -134,5 +198,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 
     private static int SegmentCount(CategoryPath path)
         => 1 + path.Value.Count(ch => ch == '.');
+
+    private static int GetLevelFromPath(CategoryPath path)
+        => SegmentCount(path) - 1;
     #endregion
 }

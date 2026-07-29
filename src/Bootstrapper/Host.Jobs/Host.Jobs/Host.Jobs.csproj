@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -25,6 +25,7 @@
       <ProjectReference Include="..\..\..\Catalog\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\..\..\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
       <ProjectReference Include="..\..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\..\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
       <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
     </ItemGroup>

@@ -11,9 +11,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetPriceTypesAsync();
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCPriceTypeDto(
@@ -26,9 +26,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetCategoriesAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCCategoryDto(
@@ -43,9 +43,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductDetailsAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCProductDto(
@@ -64,9 +64,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductStocksAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCStockDto(
@@ -79,9 +79,9 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     {
         var client = factory.Create();
         var resp = await client.GetProductPricesAsync(rootCategoryId);
-        var list = resp?.Body?.@return;
+        var list = resp?.@return;
 
-        if (list is null || list.Count == 0)
+        if (list is null || list.Length == 0)
             return [];
 
         return list.Select(x => new OneCPriceDto(
@@ -114,15 +114,20 @@ public class OneCClient(OneCSoapClientFactory factory) : IOneCClient
     private static string AsString(object? value) => value?.ToString()?.Trim() ?? string.Empty;
 
     private static bool AsBool(object? value)
-        => value switch
-        {
-            bool b => b,
-            string s => s.Equals("true", StringComparison.OrdinalIgnoreCase)
-                        || s == "1"
-                        || s.Equals("С‚Р°Рє", StringComparison.OrdinalIgnoreCase)
-                        || s.Equals("РґР°", StringComparison.OrdinalIgnoreCase),
-            _ => bool.TryParse(value?.ToString(), out var b) && b
-        };
+    {
+        if (value is bool boolean)
+            return boolean;
+
+        var normalized = value?.ToString()?.Trim();
+        if (string.IsNullOrEmpty(normalized))
+            return false;
+
+        return normalized.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || normalized == "1"
+               || normalized.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("да", StringComparison.OrdinalIgnoreCase)
+               || normalized.Equals("так", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static int AsInt(object? value)
         => int.TryParse(value?.ToString(), out var i) ? i : 0;

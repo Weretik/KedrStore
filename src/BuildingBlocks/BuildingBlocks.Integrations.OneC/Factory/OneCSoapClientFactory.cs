@@ -15,25 +15,14 @@ public sealed class OneCSoapClientFactory(IConfiguration configuration)
         var password = configuration["OneCSoap:Password"]
                        ?? throw new InvalidOperationException("OneCSoap:Password is missing");
 
-        Console.WriteLine($"[DEBUG_LOG] OneC Endpoint: '{endpoint}'");
-        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(endpoint))
+        if (string.IsNullOrWhiteSpace(endpoint) || endpoint == "FROM_APPSETTINGS")
         {
-            Console.WriteLine("[DEBUG_LOG] ERROR: OneC Credentials or Endpoint are empty!");
-        }
-        else
-        {
-             Console.WriteLine($"[DEBUG_LOG] OneC Auth Check: User starts with '{(username.Length > 0 ? username[0] : "")}', Pass starts with '{(password.Length > 0 ? password[0] : "")}'");
-        }
-
-
-        if (string.IsNullOrEmpty(endpoint) || endpoint == "FROM_APPSETTINGS")
-        {
-            throw new InvalidOperationException("OneCSoap:Endpoint is not configured. Please set a valid URI in appsettings.json or environment variables.");
+            throw new InvalidOperationException("OneCSoap:Endpoint is not configured.");
         }
 
         if (!Uri.TryCreate(endpoint, UriKind.Absolute, out var uri))
         {
-            throw new InvalidOperationException($"OneCSoap:Endpoint '{endpoint}' is not a valid absolute URI.");
+            throw new InvalidOperationException("OneCSoap:Endpoint must be a valid absolute URI.");
         }
 
         var isHttps = uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);

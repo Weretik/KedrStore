@@ -9,48 +9,72 @@
 
 namespace BuildingBlocks.Integrations.OneC.Generated
 {
-    using System.Runtime.Serialization;
     
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ProductDetails", Namespace="http://www.sample-package.org", ItemName="goods")]
-    public class ProductDetails : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.good>
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.sample-package.org", ConfigurationName="BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType")]
+    public interface Kontra1PortType
     {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductDetails", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductStocks", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetCategories", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductPrices", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetPriceTypes", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> GetPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:CreateSiteRequest", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [return: System.ServiceModel.MessageParameterAttribute(Name="return")]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.RequestDataOut> CreateSiteRequestAsync(BuildingBlocks.Integrations.OneC.Generated.RequestData RequestData);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetCounterparties", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesResponse> GetCounterpartiesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetCounterpartyCategoryPriceTypes", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesResponse> GetCounterpartyCategoryPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesRequest request);
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="good", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
-    public partial class good : object
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class good
     {
         
         private object idField;
         
         private object nameField;
         
-        private object CategoryPathField;
+        private object categoryPathField;
         
-        private object ManufacturerField;
+        private object manufacturerField;
         
-        private object IsSaleField;
+        private object isSaleField;
         
-        private object IsNewField;
+        private object isNewField;
         
-        private object ExportToSiteField;
+        private object exportToSiteField;
         
-        private object QuantityInPackField;
+        private object quantityInPackField;
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
         public object id
         {
             get
@@ -63,7 +87,8 @@ namespace BuildingBlocks.Integrations.OneC.Generated
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
         public object name
         {
             get
@@ -76,398 +101,643 @@ namespace BuildingBlocks.Integrations.OneC.Generated
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=2)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
         public object CategoryPath
         {
             get
             {
-                return this.CategoryPathField;
+                return this.categoryPathField;
             }
             set
             {
-                this.CategoryPathField = value;
+                this.categoryPathField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=3)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
         public object Manufacturer
         {
             get
             {
-                return this.ManufacturerField;
+                return this.manufacturerField;
             }
             set
             {
-                this.ManufacturerField = value;
+                this.manufacturerField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=4)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
         public object IsSale
         {
             get
             {
-                return this.IsSaleField;
+                return this.isSaleField;
             }
             set
             {
-                this.IsSaleField = value;
+                this.isSaleField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=5)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
         public object IsNew
         {
             get
             {
-                return this.IsNewField;
+                return this.isNewField;
             }
             set
             {
-                this.IsNewField = value;
+                this.isNewField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=6)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
         public object ExportToSite
         {
             get
             {
-                return this.ExportToSiteField;
+                return this.exportToSiteField;
             }
             set
             {
-                this.ExportToSiteField = value;
+                this.exportToSiteField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=7)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
         public object QuantityInPack
         {
             get
             {
-                return this.QuantityInPackField;
+                return this.quantityInPackField;
             }
             set
             {
-                this.QuantityInPackField = value;
+                this.quantityInPackField = value;
             }
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="Categories", Namespace="http://www.sample-package.org", ItemName="Categorys")]
-    public class Categories : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.Category>
-    {
-    }
-    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Category", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
-    public partial class Category : object
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class CounterpartyCategoryPriceType
     {
         
-        private object CategoryIdField;
+        private string counterpartyIdField;
         
-        private object ParentIdField;
+        private string categoryIdField;
         
-        private object CategoryNameField;
+        private string priceTypeIdField;
         
-        private object CategoryPathField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
-        public object CategoryId
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string CounterpartyId
         {
             get
             {
-                return this.CategoryIdField;
+                return this.counterpartyIdField;
             }
             set
             {
-                this.CategoryIdField = value;
+                this.counterpartyIdField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
-        public object ParentId
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string CategoryId
         {
             get
             {
-                return this.ParentIdField;
+                return this.categoryIdField;
             }
             set
             {
-                this.ParentIdField = value;
+                this.categoryIdField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=2)]
-        public object CategoryName
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public string PriceTypeId
         {
             get
             {
-                return this.CategoryNameField;
+                return this.priceTypeIdField;
             }
             set
             {
-                this.CategoryNameField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=3)]
-        public object CategoryPath
-        {
-            get
-            {
-                return this.CategoryPathField;
-            }
-            set
-            {
-                this.CategoryPathField = value;
+                this.priceTypeIdField = value;
             }
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="SNomOst", Namespace="http://www.sample-package.org", ItemName="goods")]
-    public class SNomOst : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.goodost>
-    {
-    }
-    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="goodost", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
-    public partial class goodost : object
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class Counterpartie
     {
         
-        private object idField;
+        private string counterpartyIdField;
         
-        private object StockField;
+        private string counterpartyNameField;
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
-        public object id
+        private string emailField;
+        
+        private string phoneField;
+        
+        private string defaultPriceTypeIdField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string CounterpartyId
         {
             get
             {
-                return this.idField;
+                return this.counterpartyIdField;
             }
             set
             {
-                this.idField = value;
+                this.counterpartyIdField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=1)]
-        public object Stock
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string CounterpartyName
         {
             get
             {
-                return this.StockField;
+                return this.counterpartyNameField;
             }
             set
             {
-                this.StockField = value;
+                this.counterpartyNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public string Email
+        {
+            get
+            {
+                return this.emailField;
+            }
+            set
+            {
+                this.emailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public string Phone
+        {
+            get
+            {
+                return this.phoneField;
+            }
+            set
+            {
+                this.phoneField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        public string DefaultPriceTypeId
+        {
+            get
+            {
+                return this.defaultPriceTypeIdField;
+            }
+            set
+            {
+                this.defaultPriceTypeIdField = value;
             }
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="ProductPricess", Namespace="http://www.sample-package.org", ItemName="ProductPrices")]
-    public class ProductPricess : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.ProductPrice>
-    {
-    }
-    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ProductPrice", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceType))]
-    public partial class ProductPrice : object
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class RequestDataOut
     {
         
-        private object idField;
+        private string docIdField;
         
-        private object PriceTypeIdField;
+        private string commentField;
         
-        private object PriceField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
-        public object id
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string DocId
         {
             get
             {
-                return this.idField;
+                return this.docIdField;
             }
             set
             {
-                this.idField = value;
+                this.docIdField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=1)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string Comment
+        {
+            get
+            {
+                return this.commentField;
+            }
+            set
+            {
+                this.commentField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class Item
+    {
+        
+        private string productIdField;
+        
+        private string quantityField;
+        
+        private decimal amountField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string ProductId
+        {
+            get
+            {
+                return this.productIdField;
+            }
+            set
+            {
+                this.productIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=1)]
+        public string Quantity
+        {
+            get
+            {
+                return this.quantityField;
+            }
+            set
+            {
+                this.quantityField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public decimal Amount
+        {
+            get
+            {
+                return this.amountField;
+            }
+            set
+            {
+                this.amountField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class RequestData
+    {
+        
+        private string counterpartyIdField;
+        
+        private string commentField;
+        
+        private string orderIdField;
+        
+        private System.DateTime dateField;
+        
+        private Item[] itemsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string CounterpartyId
+        {
+            get
+            {
+                return this.counterpartyIdField;
+            }
+            set
+            {
+                this.counterpartyIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string Comment
+        {
+            get
+            {
+                return this.commentField;
+            }
+            set
+            {
+                this.commentField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public string OrderId
+        {
+            get
+            {
+                return this.orderIdField;
+            }
+            set
+            {
+                this.orderIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public System.DateTime Date
+        {
+            get
+            {
+                return this.dateField;
+            }
+            set
+            {
+                this.dateField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Items", Order=4)]
+        public Item[] Items
+        {
+            get
+            {
+                return this.itemsField;
+            }
+            set
+            {
+                this.itemsField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class PriceType
+    {
+        
+        private object priceTypeIdField;
+        
+        private object priceTypeNameField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
         public object PriceTypeId
         {
             get
             {
-                return this.PriceTypeIdField;
+                return this.priceTypeIdField;
             }
             set
             {
-                this.PriceTypeIdField = value;
+                this.priceTypeIdField = value;
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false, Order=2)]
-        public object Price
-        {
-            get
-            {
-                return this.PriceField;
-            }
-            set
-            {
-                this.PriceField = value;
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.CollectionDataContractAttribute(Name="PriceTypess", Namespace="http://www.sample-package.org", ItemName="PriceTypes")]
-    public class PriceTypess : System.Collections.Generic.List<BuildingBlocks.Integrations.OneC.Generated.PriceType>
-    {
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="PriceType", Namespace="http://www.sample-package.org")]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductDetails))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.good))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Categories))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.Category))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.SNomOst))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.goodost))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPricess))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.ProductPrice))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(BuildingBlocks.Integrations.OneC.Generated.PriceTypess))]
-    public partial class PriceType : object
-    {
-        
-        private object PriceTypeIdField;
-        
-        private object PriceTypeNameField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
-        public object PriceTypeId
-        {
-            get
-            {
-                return this.PriceTypeIdField;
-            }
-            set
-            {
-                this.PriceTypeIdField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, EmitDefaultValue=false)]
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
         public object PriceTypeName
         {
             get
             {
-                return this.PriceTypeNameField;
+                return this.priceTypeNameField;
             }
             set
             {
-                this.PriceTypeNameField = value;
+                this.priceTypeNameField = value;
             }
         }
     }
     
+    /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.sample-package.org", ConfigurationName="BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType")]
-    public interface Kontra1PortType
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class ProductPrice
     {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductDetails", ReplyAction="*")]
-        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest request);
+        private object idField;
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductStocks", ReplyAction="*")]
-        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest request);
+        private object priceTypeIdField;
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetCategories", ReplyAction="*")]
-        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest request);
+        private object priceField;
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetProductPrices", ReplyAction="*")]
-        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest request);
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public object id
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.sample-package.org#Kontra1:GetPriceTypes", ReplyAction="*")]
-        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> GetPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest request);
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public object PriceTypeId
+        {
+            get
+            {
+                return this.priceTypeIdField;
+            }
+            set
+            {
+                this.priceTypeIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public object Price
+        {
+            get
+            {
+                return this.priceField;
+            }
+            set
+            {
+                this.priceField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class goodost
+    {
+        
+        private object idField;
+        
+        private object stockField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public object id
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public object Stock
+        {
+            get
+            {
+                return this.stockField;
+            }
+            set
+            {
+                this.stockField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.sample-package.org")]
+    public partial class Category
+    {
+        
+        private object categoryIdField;
+        
+        private object parentIdField;
+        
+        private object categoryNameField;
+        
+        private object categoryPathField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public object CategoryId
+        {
+            get
+            {
+                return this.categoryIdField;
+            }
+            set
+            {
+                this.categoryIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public object ParentId
+        {
+            get
+            {
+                return this.parentIdField;
+            }
+            set
+            {
+                this.parentIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public object CategoryName
+        {
+            get
+            {
+                return this.categoryNameField;
+            }
+            set
+            {
+                this.categoryNameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public object CategoryPath
+        {
+            get
+            {
+                return this.categoryPathField;
+            }
+            set
+            {
+                this.categoryPathField = value;
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductDetails", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductDetailsRequest
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductDetails", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string RootCategoryId;
         
         public GetProductDetailsRequest()
         {
         }
         
-        public GetProductDetailsRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductDetailsRequestBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public string RootCategoryId;
-        
-        public GetProductDetailsRequestBody()
-        {
-        }
-        
-        public GetProductDetailsRequestBody(string RootCategoryId)
+        public GetProductDetailsRequest(string RootCategoryId)
         {
             this.RootCategoryId = RootCategoryId;
         }
@@ -476,38 +746,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductDetailsResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductDetailsResponse
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductDetailsResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponseBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("goods", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.good[] @return;
         
         public GetProductDetailsResponse()
         {
         }
         
-        public GetProductDetailsResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponseBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductDetailsResponseBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.ProductDetails @return;
-        
-        public GetProductDetailsResponseBody()
-        {
-        }
-        
-        public GetProductDetailsResponseBody(BuildingBlocks.Integrations.OneC.Generated.ProductDetails @return)
+        public GetProductDetailsResponse(BuildingBlocks.Integrations.OneC.Generated.good[] @return)
         {
             this.@return = @return;
         }
@@ -516,38 +767,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductStocks", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductStocksRequest
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductStocks", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string RootCategoryId;
         
         public GetProductStocksRequest()
         {
         }
         
-        public GetProductStocksRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductStocksRequestBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public string RootCategoryId;
-        
-        public GetProductStocksRequestBody()
-        {
-        }
-        
-        public GetProductStocksRequestBody(string RootCategoryId)
+        public GetProductStocksRequest(string RootCategoryId)
         {
             this.RootCategoryId = RootCategoryId;
         }
@@ -556,38 +788,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductStocksResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductStocksResponse
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductStocksResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponseBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("goods", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.goodost[] @return;
         
         public GetProductStocksResponse()
         {
         }
         
-        public GetProductStocksResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponseBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductStocksResponseBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.SNomOst @return;
-        
-        public GetProductStocksResponseBody()
-        {
-        }
-        
-        public GetProductStocksResponseBody(BuildingBlocks.Integrations.OneC.Generated.SNomOst @return)
+        public GetProductStocksResponse(BuildingBlocks.Integrations.OneC.Generated.goodost[] @return)
         {
             this.@return = @return;
         }
@@ -596,38 +809,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCategories", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetCategoriesRequest
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCategories", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string RootCategoryId;
         
         public GetCategoriesRequest()
         {
         }
         
-        public GetCategoriesRequest(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetCategoriesRequestBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public string RootCategoryId;
-        
-        public GetCategoriesRequestBody()
-        {
-        }
-        
-        public GetCategoriesRequestBody(string RootCategoryId)
+        public GetCategoriesRequest(string RootCategoryId)
         {
             this.RootCategoryId = RootCategoryId;
         }
@@ -636,38 +830,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCategoriesResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetCategoriesResponse
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetCategoriesResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponseBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Categorys", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.Category[] @return;
         
         public GetCategoriesResponse()
         {
         }
         
-        public GetCategoriesResponse(BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponseBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetCategoriesResponseBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.Categories @return;
-        
-        public GetCategoriesResponseBody()
-        {
-        }
-        
-        public GetCategoriesResponseBody(BuildingBlocks.Integrations.OneC.Generated.Categories @return)
+        public GetCategoriesResponse(BuildingBlocks.Integrations.OneC.Generated.Category[] @return)
         {
             this.@return = @return;
         }
@@ -676,38 +851,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductPrices", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductPricesRequest
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductPrices", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true)]
+        public string RootCategoryId;
         
         public GetProductPricesRequest()
         {
         }
         
-        public GetProductPricesRequest(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductPricesRequestBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=0)]
-        public string RootCategoryId;
-        
-        public GetProductPricesRequestBody()
-        {
-        }
-        
-        public GetProductPricesRequestBody(string RootCategoryId)
+        public GetProductPricesRequest(string RootCategoryId)
         {
             this.RootCategoryId = RootCategoryId;
         }
@@ -716,38 +872,19 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetProductPricesResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetProductPricesResponse
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetProductPricesResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponseBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("ProductPrices", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.ProductPrice[] @return;
         
         public GetProductPricesResponse()
         {
         }
         
-        public GetProductPricesResponse(BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponseBody Body)
-        {
-            this.Body = Body;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetProductPricesResponseBody
-    {
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.ProductPricess @return;
-        
-        public GetProductPricesResponseBody()
-        {
-        }
-        
-        public GetProductPricesResponseBody(BuildingBlocks.Integrations.OneC.Generated.ProductPricess @return)
+        public GetProductPricesResponse(BuildingBlocks.Integrations.OneC.Generated.ProductPrice[] @return)
         {
             this.@return = @return;
         }
@@ -756,70 +893,97 @@ namespace BuildingBlocks.Integrations.OneC.Generated
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetPriceTypes", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetPriceTypesRequest
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetPriceTypes", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody Body;
         
         public GetPriceTypesRequest()
         {
         }
-        
-        public GetPriceTypesRequest(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody Body)
-        {
-            this.Body = Body;
-        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute()]
-    public partial class GetPriceTypesRequestBody
-    {
-        
-        public GetPriceTypesRequestBody()
-        {
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetPriceTypesResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
     public partial class GetPriceTypesResponse
     {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="GetPriceTypesResponse", Namespace="http://www.sample-package.org", Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponseBody Body;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("PriceTypes", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.PriceType[] @return;
         
         public GetPriceTypesResponse()
         {
         }
         
-        public GetPriceTypesResponse(BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponseBody Body)
+        public GetPriceTypesResponse(BuildingBlocks.Integrations.OneC.Generated.PriceType[] @return)
         {
-            this.Body = Body;
+            this.@return = @return;
         }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.Runtime.Serialization.DataContractAttribute(Namespace="http://www.sample-package.org")]
-    public partial class GetPriceTypesResponseBody
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCounterparties", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
+    public partial class GetCounterpartiesRequest
     {
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public BuildingBlocks.Integrations.OneC.Generated.PriceTypess @return;
+        public GetCounterpartiesRequest()
+        {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCounterpartiesResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
+    public partial class GetCounterpartiesResponse
+    {
         
-        public GetPriceTypesResponseBody()
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Counterparties", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.Counterpartie[] @return;
+        
+        public GetCounterpartiesResponse()
         {
         }
         
-        public GetPriceTypesResponseBody(BuildingBlocks.Integrations.OneC.Generated.PriceTypess @return)
+        public GetCounterpartiesResponse(BuildingBlocks.Integrations.OneC.Generated.Counterpartie[] @return)
+        {
+            this.@return = @return;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCounterpartyCategoryPriceTypes", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
+    public partial class GetCounterpartyCategoryPriceTypesRequest
+    {
+        
+        public GetCounterpartyCategoryPriceTypesRequest()
+        {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="GetCounterpartyCategoryPriceTypesResponse", WrapperNamespace="http://www.sample-package.org", IsWrapped=true)]
+    public partial class GetCounterpartyCategoryPriceTypesResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://www.sample-package.org", Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("CounterpartyCategoryPriceTypes", IsNullable=false)]
+        public BuildingBlocks.Integrations.OneC.Generated.CounterpartyCategoryPriceType[] @return;
+        
+        public GetCounterpartyCategoryPriceTypesResponse()
+        {
+        }
+        
+        public GetCounterpartyCategoryPriceTypesResponse(BuildingBlocks.Integrations.OneC.Generated.CounterpartyCategoryPriceType[] @return)
         {
             this.@return = @return;
         }
@@ -877,8 +1041,7 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsResponse> GetProductDetailsAsync(string RootCategoryId)
         {
             BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequest();
-            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductDetailsRequestBody();
-            inValue.Body.RootCategoryId = RootCategoryId;
+            inValue.RootCategoryId = RootCategoryId;
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductDetailsAsync(inValue);
         }
         
@@ -891,8 +1054,7 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductStocksResponse> GetProductStocksAsync(string RootCategoryId)
         {
             BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequest();
-            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductStocksRequestBody();
-            inValue.Body.RootCategoryId = RootCategoryId;
+            inValue.RootCategoryId = RootCategoryId;
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductStocksAsync(inValue);
         }
         
@@ -905,8 +1067,7 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCategoriesResponse> GetCategoriesAsync(string RootCategoryId)
         {
             BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequest();
-            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetCategoriesRequestBody();
-            inValue.Body.RootCategoryId = RootCategoryId;
+            inValue.RootCategoryId = RootCategoryId;
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetCategoriesAsync(inValue);
         }
         
@@ -919,8 +1080,7 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetProductPricesResponse> GetProductPricesAsync(string RootCategoryId)
         {
             BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequest();
-            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetProductPricesRequestBody();
-            inValue.Body.RootCategoryId = RootCategoryId;
+            inValue.RootCategoryId = RootCategoryId;
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetProductPricesAsync(inValue);
         }
         
@@ -933,8 +1093,36 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesResponse> GetPriceTypesAsync()
         {
             BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequest();
-            inValue.Body = new BuildingBlocks.Integrations.OneC.Generated.GetPriceTypesRequestBody();
             return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetPriceTypesAsync(inValue);
+        }
+        
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.RequestDataOut> CreateSiteRequestAsync(BuildingBlocks.Integrations.OneC.Generated.RequestData RequestData)
+        {
+            return base.Channel.CreateSiteRequestAsync(RequestData);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetCounterpartiesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesRequest request)
+        {
+            return base.Channel.GetCounterpartiesAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesResponse> GetCounterpartiesAsync()
+        {
+            BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetCounterpartiesRequest();
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetCounterpartiesAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesResponse> BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType.GetCounterpartyCategoryPriceTypesAsync(BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesRequest request)
+        {
+            return base.Channel.GetCounterpartyCategoryPriceTypesAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesResponse> GetCounterpartyCategoryPriceTypesAsync()
+        {
+            BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesRequest inValue = new BuildingBlocks.Integrations.OneC.Generated.GetCounterpartyCategoryPriceTypesRequest();
+            return ((BuildingBlocks.Integrations.OneC.Generated.Kontra1PortType)(this)).GetCounterpartyCategoryPriceTypesAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

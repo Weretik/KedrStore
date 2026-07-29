@@ -1,0 +1,66 @@
+openapi: 3.1.0
+info: { title: KedrStore Sales Catalog API, version: 0.1.0 }
+paths:
+  /api/sales/{lang}/catalog/products:
+    post:
+      operationId: getSalesCatalogProducts
+      summary: List products with prices for the current user
+      tags: [Sales catalog]
+      security: [{ bearerAuth: [] }]
+      description: Returns prices determined for the authenticated user. `search` is a query parameter; all filters and paging are in the optional JSON body.
+      parameters:
+        - name: lang
+          in: path
+          required: true
+          schema: { type: string, enum: [uk, ru] }
+        - name: search
+          in: query
+          schema: { type: string, maxLength: 100 }
+      requestBody:
+        required: false
+        content: { application/json: { schema: { $ref: '#/components/schemas/CatalogProductsRequest' } } }
+      responses:
+        '200': { description: Product page for current user, content: { application/json: { schema: { $ref: '#/components/schemas/SalesCatalogPage' } } } }
+        '400': { description: Input validation failed }
+        '401': { description: Missing or invalid access token }
+        '403': { description: Authenticated user is forbidden }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+  schemas:
+    CatalogProductsRequest:
+      type: object
+      properties:
+        categoryId: { type: [integer, 'null'] }
+        inStock: { type: [boolean, 'null'], default: true }
+        isSale: { type: [boolean, 'null'] }
+        isNew: { type: [boolean, 'null'] }
+        page: { type: integer, minimum: 1, default: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    SalesCatalogPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/SalesCatalogItem' } }
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer, format: int64 }
+        totalRecords: { type: integer, format: int64 }
+    SalesCatalogItem:
+      type: object
+      required: [productId, categoryId, name, productSlug, inStock, isSale, isNew]
+      properties:
+        productId: { type: integer }
+        categoryId: { type: integer }
+        name: { type: string }
+        productSlug: { type: string }
+        photo: { type: [string, 'null'] }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        price: { type: [number, 'null'] }

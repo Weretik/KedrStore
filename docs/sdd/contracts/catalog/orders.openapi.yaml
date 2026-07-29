@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info: { title: KedrStore Orders API, version: 0.1.0 }
+paths:
+  /api/orders:
+    post:
+      operationId: createQuickOrder
+      summary: Create a quick order
+      tags: [Orders]
+      security: []
+      description: Creates a quick order. This endpoint is currently anonymous and does not implement an Idempotency-Key contract; disable duplicate submission in the frontend.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateOrderRequest' }
+      responses:
+        '200': { description: Created order, content: { application/json: { schema: { $ref: '#/components/schemas/QuickOrderResponse' } } } }
+        '400': { description: Input validation failed }
+        '409': { description: Business conflict, content: { application/json: { schema: { type: array, items: { type: string } } } } }
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required: [firstName, phone, lines]
+      properties:
+        firstName: { type: string, maxLength: 30 }
+        phone: { type: string, maxLength: 20 }
+        lines: { type: array, minItems: 1, items: { $ref: '#/components/schemas/CreateOrderLineRequest' } }
+    CreateOrderLineRequest:
+      type: object
+      required: [productId, title, unitPrice, quantity]
+      properties:
+        productId: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        unitPrice: { type: number }
+        quantity: { type: integer, minimum: 1, maximum: 1000 }
+    QuickOrderResponse:
+      type: object
+      required: [orderId]
+      properties: { orderId: { type: string, format: uuid } }
