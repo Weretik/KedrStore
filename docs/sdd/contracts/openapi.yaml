@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: KedrStore API
+  version: 0.1.0
+  description: >-
+    Aggregate OpenAPI entry point. Feature contracts are added under this
+    document through $ref after their API contract is agreed.
+servers:
+  - url: /
+    description: Deployment origin
+paths:
+  /api/catalog/{lang}/products:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1products
+  /api/catalog/{lang}/{categorySlug}/products:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1products
+  /api/catalog/{lang}/product/{productSlug}:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1product~1{productSlug}
+  /api/admin/products:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products
+  /api/admin/products/all:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1all
+  /api/orders:
+    $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
+  /api/auth/session/login:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1login
+  /api/auth/session/refresh:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1refresh
+  /api/auth/session/logout:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1logout
+  /api/auth/session/me:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1me
+  /api/sales/{lang}/catalog/products:
+    $ref: ./sales/catalog.openapi.yaml#/paths/~1api~1sales~1{lang}~1catalog~1products
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Opaque

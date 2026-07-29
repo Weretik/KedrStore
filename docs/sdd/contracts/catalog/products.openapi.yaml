@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog API
+  version: 0.1.0
+paths:
+  /api/catalog/{lang}/products:
+    get:
+      operationId: getPublicProducts
+      summary: List public products
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/CategoryId'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceTypeId'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/ProductSort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: Product page, content: { application/json: { schema: { $ref: '#/components/schemas/ProductPage' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/catalog/{lang}/{categorySlug}/products:
+    get:
+      operationId: getPublicProductsByCategorySlug
+      summary: List public products in a category
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: categorySlug
+          in: path
+          required: true
+          schema: { type: string, maxLength: 100 }
+        - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/CategoryId'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceTypeId'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/ProductSort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: Product page, content: { application/json: { schema: { $ref: '#/components/schemas/ProductPage' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/catalog/{lang}/product/{productSlug}:
+    get:
+      operationId: getPublicProductBySlug
+      summary: Get a public product by slug
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: productSlug
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/PriceTypeId'
+      responses:
+        '200': { description: Product, content: { application/json: { schema: { $ref: '#/components/schemas/ProductDetails' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Product not found }
+  /api/admin/products:
+    get:
+      operationId: getAdminProducts
+      summary: List admin product rows
+      tags: [Admin products]
+      security: []
+      description: Current controller explicitly allows anonymous access; restrict this route before exposing it outside an internal frontend.
+      parameters:
+        - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/CategorySlug'
+        - $ref: '#/components/parameters/CategoryId'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/ProductSort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: Admin product page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductPage' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/admin/products/all:
+    get:
+      operationId: getAllAdminProducts
+      summary: List all admin product rows
+      tags: [Admin products]
+      security: []
+      description: Current controller explicitly allows anonymous access; this returns the unpaged admin row model.
+      responses:
+        '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
+components:
+  parameters:
+    Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }
+    SearchTerm: { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
+    CategorySlug: { name: categorySlug, in: query, schema: { type: string, maxLength: 100 } }
+    CategoryId: { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
+    InStock: { name: inStock, in: query, schema: { type: boolean, default: true } }
+    IsSale: { name: isSale, in: query, schema: { type: boolean } }
+    IsNew: { name: isNew, in: query, schema: { type: boolean } }
+    PriceTypeId: { name: priceTypeId, in: query, schema: { type: integer, minimum: 1, default: 11 } }
+    PriceFrom: { name: priceFrom, in: query, schema: { type: number, minimum: 0 } }
+    PriceTo: { name: priceTo, in: query, schema: { type: number, minimum: 0 } }
+    ProductSort: { name: sort, in: query, schema: { type: string, enum: [IdAsc, IdDesc, NameAsc, NameDesc, PriceAsc, PriceDesc], default: IdAsc } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+  responses:
+    ValidationError: { description: Input validation failed, content: { application/json: { schema: { $ref: '#/components/schemas/ValidationErrors' } } } }
+  schemas:
+    ValidationErrors: { type: array, items: { type: object, additionalProperties: true } }
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer, format: int64 }
+        totalRecords: { type: integer, format: int64 }
+    ProductPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/ProductListItem' } }
+    AdminProductPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } }
+    ProductListItem:
+      type: object
+      required: [id, name, productSlug, photo, inStock, isSale, isNew]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        productSlug: { type: string }
+        photo: { type: string }
+        categoryId: { type: [integer, 'null'] }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        price: { type: [number, 'null'] }
+    ProductDetails:
+      type: object
+      required: [id, name, photo, scheme, stock, categoryName, categorySlug, quantityInPack, breadcrumbs]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        photo: { type: string }
+        scheme: { type: string }
+        stock: { type: number }
+        categoryName: { type: string }
+        categorySlug: { type: string }
+        quantityInPack: { type: integer }
+        price: { type: [number, 'null'] }
+        breadcrumbs: { type: array, items: { $ref: '#/components/schemas/Breadcrumb' } }
+    Breadcrumb:
+      type: object
+      required: [id, name, slug]
+      properties: { id: { type: integer }, name: { type: string }, slug: { type: string } }
+    AdminProduct:
+      type: object
+      required: [id, nameUk, nameRu, productSlug, photo, inStock, isSale, isNew, exportToSite, stock, quantityInPack]
+      properties:
+        id: { type: integer }
+        nameUk: { type: string }
+        nameRu: { type: string }
+        productSlug: { type: string }
+        photo: { type: string }
+        categoryId: { type: [integer, 'null'] }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        exportToSite: { type: boolean }
+        price: { type: [number, 'null'] }
+        stock: { type: number }
+        quantityInPack: { type: integer }
