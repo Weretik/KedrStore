@@ -1,100 +1,142 @@
-# 🛍️ KedrStore — Modular E-commerce Platform
+# KedrStore
 
-**KedrStore** is a production-level B2B/B2C e-commerce application developed for Kedr.  
-It is built using **.NET 8**, **Blazor Web App**, and follows a **Clean Architecture** pattern with layered structure and modular monolith principles.
+KedrStore is a modular-monolith backend for the **Kedr** e-commerce platform. It provides product-catalog management, customer and pricing capabilities, authentication and authorization, and integration with 1C.
 
-[📚 Full documentation is available in the `/docs` directory](/docs/architecture.md)
----
+> Status: actively developed. This repository contains the public API, background jobs, and technical documentation.
 
-## ⚙️ Tech Stack
+## Features
 
-- **.NET 8**, **ASP.NET Core**, **Blazor Web App**
-- **Entity Framework Core** + **PostgreSQL**
-- **MediatR** (CQRS), **AutoMapper**, **FluentValidation**
-- **ASP.NET Identity** (custom `AppUser`)
-- **Redis** (caching/session), **Serilog**
-- **Tailwind CSS**, **DaisyUI**, **MudBlazor**
-- **Docker-ready configuration**
+- Product catalog, categories, prices, translations, and read projections.
+- Catalog and sales-data synchronization with 1C over SOAP.
+- Customers/contractors and sales pricing rules.
+- Session-based authentication, roles, and access policies powered by ASP.NET Core Identity.
+- Versioned OpenAPI contracts, Swagger UI, and health-check endpoints.
+- A separate CLI host for imports and operational background jobs.
 
----
+## Technology stack
 
-## 📐 Project Structure
+- .NET 10 and ASP.NET Core
+- PostgreSQL and Entity Framework Core
+- ASP.NET Core Identity
+- Mediator/CQRS and FluentValidation
+- Serilog
+- OpenAPI and Swagger
 
-```
-/Web            - Razor UI (Pages, Components, Admin Area)
-/Application    - UseCases, DTOs, CQRS Handlers, Validation
-/Domain         - Core business logic and contracts
-/Infrastructure - EF Core setup, Repositories, External services
-```
+## Architecture
 
-Supports strict separation of concerns and one-way dependencies:  
-`UI → Application → Domain → Infrastructure`
+KedrStore is built as a modular monolith following Clean Architecture. Business modules are isolated, while dependencies point toward the domain:
 
----
+```text
+Host.Api / Host.Jobs
+        |
+        +-- <Module>.Api ----------> <Module>.Application --> <Module>.Domain
+        +-- <Module>.Infrastructure -----------------------> <Module>.Application + Domain
 
-## 🚀 Features (in progress)
-
-- 🛒 Product catalog with filtering, sorting, pagination  
-- 📦 Cart system  
-- 🔐 Admin panel (product management, users)  
-- 🧾 Contact & order request form  
-- 📱 API planned for .NET MAUI (mobile client)
-
----
-
-## 🧰 Dev Highlights
-
-- Modular monolith structure  
-- CQRS with MediatR  
-- Razor UI components (no JS)  
-- Structured logging with Serilog  
-- Integrated Redis for performance  
-- SEO-friendly frontend with Tailwind + MudBlazor
-
----
-
-## 📌 Project Status
-
-✅ Architecture & layering complete  
-✅ Catalog UI in progress  
-✅ Filtering & pagination done  
-🔜 Basket logic  
-🔜 Admin CRUD for orders  
-🔜 Mobile API (.NET MAUI)
-
----
-
-## 🚀 Project launch
-
-### Preliminary requirements
-- .NET 8 SDK
-- PostgreSQL 15+
-- Redis (optional for production)
-
-### Local development
-```bash
-# Repository cloning
-git clone https://github.com/kedr/kedrstore.git
-cd kedrstore
-
-# Dependency recovery and startup
-dotnet restore
-dotnet run --project src/Web/Web.csproj
+BuildingBlocks.* — shared technical primitives without business rules
 ```
 
-### Docker
-```bash
-docker-compose up -d
+Main modules:
+
+| Module | Responsibility |
+| --- | --- |
+| `Catalog` | Products, categories, prices, translations, projections, and catalog synchronization with 1C |
+| `Sales` | Contractors, customers, and pricing rules |
+| `Identity` | Users, roles, sessions, authorization, and seed data |
+| `BuildingBlocks` | Shared abstractions and infrastructure components |
+
+```text
+src/
+  Bootstrapper/Host.Api/       HTTP API and composition root
+  Bootstrapper/Host.Jobs/      CLI for background jobs and imports
+  Catalog/                     Catalog module
+  Sales/                       Sales module
+  Identity/                    Identity module
+  BuildingBlocks/              Shared components
+tests/                         Unit, integration, and architecture tests
+docs/sdd/                      Current technical documentation
 ```
 
-### Customizing the environment
-To configure the parameters, refer to the following. [Setup Guide](/docs/dev-guide/configuration.md).
+## Quick start
 
----
+### Prerequisites
 
-## 🔒 License
+- .NET SDK 10 (the exact version is pinned in [`global.json`](global.json));
+- PostgreSQL available through `ConnectionStrings:Default`;
+- Local secrets for the database and, if needed, external integrations.
 
-This source code is proprietary and developed for Kedr.  
-Copying or distribution without permission is prohibited.
+### Run the API
 
-© 2025 Vitalii Tsiupin / Kedr
+```powershell
+git clone <repository-url>
+cd KedrStore
+
+dotnet restore KedrStore.sln
+dotnet run --project src/Bootstrapper/Host.Api/Host.Api.csproj --launch-profile https
+```
+
+After startup, the following endpoints are available:
+
+- API: `https://localhost:7230`
+- Health check: `https://localhost:7230/health`
+- Swagger UI (Development only): `https://localhost:7230/swagger`
+
+HTTPS is required to fully test authorization because the refresh cookie is marked as `Secure`.
+
+### Configure local secrets
+
+Do not commit passwords, tokens, or live connection strings to `appsettings*.json` or Git. For local development, use User Secrets:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=kedrdb;Username=<user>;Password=<password>" --project src/Bootstrapper/Host.Api/Host.Api.csproj
+dotnet user-secrets set "ADMIN_DEFAULT_PASSWORD" "<local-only-password>" --project src/Bootstrapper/Host.Api/Host.Api.csproj
+```
+
+On startup, the API automatically applies migrations and seeds data. Do not point it at a database that must not be modified.
+
+## Background jobs and 1C import
+
+`Host.Jobs` is a standalone CLI host. It has its own User Secrets and uses `appsettings.json` and environment variables.
+
+```powershell
+$env:DOTNET_ENVIRONMENT = 'Development'
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=full
+```
+
+Examples:
+
+```powershell
+# Refresh stock levels for a specific 1C root
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
+
+# Rebuild the catalog read model
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=rebuild-projections
+```
+
+For the complete command list and safe-run guidelines, see the [Host.Jobs documentation](docs/sdd/operations/jobs/host-jobs-cli.md).
+
+## Development and verification
+
+```powershell
+# Build the solution
+dotnet build KedrStore.sln
+
+# Run all tests
+dotnet test KedrStore.sln
+```
+
+Before making changes, review the [engineering standards](docs/sdd/standards/README.md). For API work, review the [contracts](docs/sdd/contracts/README.md).
+
+## Documentation
+
+- [Architecture and modules](docs/sdd/architecture/README.md)
+- [Local setup](docs/sdd/operations/local-development/run-api.md)
+- [Configuration and secrets](docs/sdd/operations/configuration/configuration-and-secrets.md)
+- [Migrations and seeding](docs/sdd/operations/data/migrations-and-seeding.md)
+- [Diagnostics, health checks, and Swagger](docs/sdd/operations/diagnostics/health-logs-swagger.md)
+- [OpenAPI contracts](docs/sdd/contracts/README.md)
+
+`docs/legacy` contains historical ADRs and materials. Use `docs/sdd` as the source of truth for new work.
+
+## License
+
+This project is licensed under the PolyForm Noncommercial License 1.0.0. Commercial use is not permitted. See [LICENSE.txt](LICENSE.txt).
