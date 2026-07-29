@@ -21,6 +21,20 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(c => c.ShortNameUk)
+            .HasMaxLength(ProductCategory.ShortNameMaxLength)
+            .IsRequired();
+
+        builder.Property(c => c.ShortNameRu)
+            .HasMaxLength(ProductCategory.ShortNameMaxLength)
+            .IsRequired();
+
+        builder.Property(c => c.SortOrder)
+            .IsRequired();
+
+        builder.Property(c => c.Level)
+            .IsRequired();
+
         builder.Property(c => c.Slug)
             .HasMaxLength(100)
             .IsRequired();
@@ -46,5 +60,8 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
         builder.HasIndex(c => c.Path)
             .HasMethod("gist")
             .HasDatabaseName($"IX_ProductCategories_Path_gist");
+
+        builder.HasIndex(c => new { c.ParentId, c.SortOrder, c.Id })
+            .HasDatabaseName("IX_ProductCategories_ParentId_SortOrder_Id");
     }
 }

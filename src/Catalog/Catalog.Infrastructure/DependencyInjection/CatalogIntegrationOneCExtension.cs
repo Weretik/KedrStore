@@ -11,6 +11,7 @@ public static class CatalogIntegrationOneCExtension
         IConfiguration configuration)
     {
         services.Configure<RootCategoryId>(configuration.GetSection("OneC"));
+        services.Configure<CategoryPresentationOptions>(configuration.GetSection("OneC:CategoryPresentation"));
         services.AddScoped<IOneCClient, OneCClient>();
         return services;
     }

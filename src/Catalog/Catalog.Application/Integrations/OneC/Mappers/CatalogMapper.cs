@@ -140,7 +140,10 @@ public static class CatalogMapper
                 QuantityInPack: qtyInPack)
             );
         }
-        return productsDtos;
+        return productsDtos
+            .GroupBy(product => product.Id)
+            .Select(group => group.First())
+            .ToList();
     }
 
     private static int GetCategoryIdForCategoryName(string categoryName, Dictionary<string,int> categoryNameDictionary)

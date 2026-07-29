@@ -27,7 +27,11 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
             {
                 Id = c.Id.Value,
                 c.Name,
-                Path = c.Path.ToString()
+                c.ShortNameUk,
+                c.ShortNameRu,
+                c.SortOrder,
+                c.Level,
+                Path = c.Path.Value
             })
             .ToList();
 
@@ -41,9 +45,15 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
         IReadOnlyList<CategoryTreeDto> BuildBranch(string? parentKey)
         {
             return lookup[parentKey]
+                .OrderBy(i => i.SortOrder)
+                .ThenBy(i => i.Id)
                 .Select(i => new CategoryTreeDto(
                     Id: i.Id,
                     Name: i.Name,
+                    ShortNameUk: i.ShortNameUk,
+                    ShortNameRu: i.ShortNameRu,
+                    SortOrder: i.SortOrder,
+                    Level: i.Level,
                     Children: BuildBranch(i.Path)
                 ))
                 .ToList();

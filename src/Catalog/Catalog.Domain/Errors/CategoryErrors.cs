@@ -17,6 +17,32 @@ public static class CategoryErrors
         new("Catalog.Category.Name.LengthInvalid",
             $"Category name length must be between 1 and 100 characters, Actual:{length}");
 
+    public static CatalogDomainError ShortNameUkIsRequired() =>
+        new("Catalog.Category.ShortNameUk.Required", "Ukrainian category short name is required");
+
+    public static CatalogDomainError ShortNameUkLengthInvalid(int length) =>
+        new("Catalog.Category.ShortNameUk.LengthInvalid",
+            $"Ukrainian category short name length must be between 1 and 100 characters. Actual:{length}");
+
+    public static CatalogDomainError ShortNameRuIsRequired() =>
+        new("Catalog.Category.ShortNameRu.Required", "Russian category short name is required");
+
+    public static CatalogDomainError ShortNameRuLengthInvalid(int length) =>
+        new("Catalog.Category.ShortNameRu.LengthInvalid",
+            $"Russian category short name length must be between 1 and 100 characters. Actual:{length}");
+
+    public static CatalogDomainError SortOrderNegative(int value) =>
+        new("Catalog.Category.SortOrder.Negative",
+            $"Category sort order cannot be negative. Actual:{value}");
+
+    public static CatalogDomainError LevelNegative(int value) =>
+        new("Catalog.Category.Level.Negative",
+            $"Category level cannot be negative. Actual:{value}");
+
+    public static CatalogDomainError LevelDoesNotMatchPath(int level, int pathLevel) =>
+        new("Catalog.Category.Level.PathMismatch",
+            $"Category level must match its path depth. Actual:{level}; Expected:{pathLevel}");
+
     public static CatalogDomainError PathIsRequired() =>
         new("Catalog.Category.Path.Required", "Category path is required");
 

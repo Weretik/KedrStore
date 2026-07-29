@@ -58,6 +58,21 @@ public sealed class SyncOneCProductDetailsJob(
             categoryNameDictionary,
             rootCategoryId,
             fallbackCategoryId);
+
+        if (products.Count < productsOneC.Count)
+        {
+            logger.LogWarning(
+                "OneC returned duplicate product IDs for root {Root}. Duplicates were ignored. Received: {ReceivedCount}; distinct: {DistinctCount}.",
+                rootCategoryId,
+                productsOneC.Count,
+                products.Count);
+        }
+
+        if (isCosmosRoot)
+        {
+            products = await ExcludeProductsOwnedByOtherRootsAsync(products, rootCategoryId, cancellationToken);
+        }
+
         logger.LogInformation(
             "Mapped {MappedCount} products for root {Root}. Received: {ReceivedCount}.",
             products.Count,
@@ -66,6 +81,13 @@ public sealed class SyncOneCProductDetailsJob(
 
         if (products.Count == 0)
         {
+            if (isCosmosRoot)
+            {
+                logger.LogWarning(
+                    "All mapped Cosmos products are already owned by another root. Catalog data was not changed.");
+                return;
+            }
+
             throw new InvalidOperationException(
                 $"OneC returned {productsOneC.Count} products for root {rootCategoryId}, but none passed mapping. " +
                 "Catalog data was not changed to prevent accidental deletion.");
@@ -86,6 +108,32 @@ public sealed class SyncOneCProductDetailsJob(
         }
 
         logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
+    }
+
+    private async Task<IReadOnlyList<ProductRowOneCDto>> ExcludeProductsOwnedByOtherRootsAsync(
+        IReadOnlyList<ProductRowOneCDto> products,
+        string cosmosRootId,
+        CancellationToken cancellationToken)
+    {
+        if (products.Count == 0)
+            return products;
+
+        var productIds = products.Select(product => ProductId.From(product.Id)).ToArray();
+        var conflicts = await productRepo.ListAsync(
+            new ProductsByIdsFromOtherRootsSpec(productIds, cosmosRootId),
+            cancellationToken);
+        var conflictingIds = conflicts.Select(product => product.Id.Value).ToHashSet();
+
+        if (conflictingIds.Count == 0)
+            return products;
+
+        logger.LogWarning(
+            "Skipping {ConflictCount} Cosmos products because their IDs are already owned by another root.",
+            conflictingIds.Count);
+
+        return products
+            .Where(product => !conflictingIds.Contains(product.Id))
+            .ToList();
     }
 
     private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)

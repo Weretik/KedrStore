@@ -11,7 +11,9 @@ using Unidecode.NET;
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
 public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<ProductCategory> categoryRepo,
-    IOptionsSnapshot<RootCategoryId> options, ILogger<SyncOneCCategoryJob> logger)
+    IOptionsSnapshot<RootCategoryId> options,
+    IOptionsSnapshot<CategoryPresentationOptions> presentationOptions,
+    ILogger<SyncOneCCategoryJob> logger)
 {
     public async Task RunAsync(string rootCategoryOneCId, CancellationToken cancellationToken)
     {
@@ -83,17 +85,18 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         var cosmosRootId = options.Value.CosmosRootCategoryId;
         var existing = await categoryRepo.GetByIdAsync(cosmosCategoryId, cancellationToken);
         var path = CategoryPath.From($"n{cosmosCategoryId.Value}");
+        var presentation = ResolvePresentation(cosmosRootId, cosmosCategoryId.Value, "Космос", path);
 
         if (existing is null)
         {
-            await categoryRepo.AddAsync(
-                ProductCategory.Create(
-                    cosmosCategoryId,
-                    cosmosRootId,
-                    "Космос",
-                    $"cosmos-{cosmosCategoryId.Value}",
-                    path),
-                cancellationToken);
+            var category = ProductCategory.Create(
+                cosmosCategoryId,
+                cosmosRootId,
+                "Космос",
+                $"cosmos-{cosmosCategoryId.Value}",
+                path);
+            ApplyPresentation(category, presentation);
+            await categoryRepo.AddAsync(category, cancellationToken);
         }
         else
         {
@@ -104,6 +107,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             }
 
             existing.Update("Космос", $"cosmos-{cosmosCategoryId.Value}", path);
+            ApplyPresentation(existing, presentation);
         }
 
         await categoryRepo.SaveChangesAsync(cancellationToken);
@@ -142,6 +146,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                     path: path,
                     parentId: parentId
                 );
+                ApplyPresentation(productCategory, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path));
                 await categoryRepo.AddAsync(productCategory, cancellationToken);
             }
             else
@@ -151,10 +156,29 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                     slug: item.Slug,
                     path: path,
                     parentId: parentId);
+                ApplyPresentation(existing, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path));
             }
         }
         await categoryRepo.SaveChangesAsync(cancellationToken);
     }
+
+    private ResolvedCategoryPresentation ResolvePresentation(
+        string rootCategoryOneCId,
+        int categoryId,
+        string sourceName,
+        CategoryPath path)
+    {
+        var level = path.Value.Count(character => character == '.');
+        return new CategoryPresentationResolver(presentationOptions.Value)
+            .Resolve(rootCategoryOneCId, categoryId, sourceName, level);
+    }
+
+    private static void ApplyPresentation(ProductCategory category, ResolvedCategoryPresentation presentation)
+        => category.UpdatePresentationMetadata(
+            presentation.ShortNameUk,
+            presentation.ShortNameRu,
+            presentation.SortOrder,
+            presentation.Level);
 
     private static IReadOnlyList<CategoryDto> ApplyManualHardwareHierarchy(
         IReadOnlyList<CategoryDto> categories,
