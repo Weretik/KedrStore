@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\src\Bootstrapper\Host.Jobs\Host.Jobs\Host.Jobs.csproj" />
     </ItemGroup>
 
     <ItemGroup>
