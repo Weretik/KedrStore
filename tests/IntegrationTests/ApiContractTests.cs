@@ -36,6 +36,21 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
 
         var paths = root.GetProperty("paths");
 
+        Assert.True(paths.TryGetProperty("/api/catalog/{lang}/categories", out var categoryTree));
+        Assert.True(categoryTree.TryGetProperty("get", out var categoryTreeGet));
+        AssertOperationHasPathParameter(categoryTreeGet, "lang");
+
+        Assert.True(paths.TryGetProperty("/api/catalog/{lang}/categories/by-slug/{categorySlug}", out var categoryBySlug));
+        Assert.True(categoryBySlug.TryGetProperty("get", out var categoryBySlugGet));
+        AssertOperationHasPathParameter(categoryBySlugGet, "lang");
+        AssertOperationHasPathParameter(categoryBySlugGet, "categorySlug");
+
+        Assert.True(paths.TryGetProperty("/api/categories", out var adminCategories));
+        Assert.True(adminCategories.TryGetProperty("get", out _));
+        Assert.True(paths.TryGetProperty("/api/categories/{id}", out var adminCategory));
+        Assert.True(adminCategory.TryGetProperty("get", out var adminCategoryGet));
+        AssertOperationHasPathParameter(adminCategoryGet, "id");
+
         Assert.True(paths.TryGetProperty("/api/catalog/{lang}/products", out var catalogProducts));
         Assert.True(catalogProducts.TryGetProperty("get", out var catalogProductsGet));
         AssertOperationHasPathParameter(catalogProductsGet, "lang");
