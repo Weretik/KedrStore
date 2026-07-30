@@ -66,7 +66,8 @@ public sealed class CategoryPresentationApplicationTests
 
         Assert.True(result.IsSuccess);
         var tree = Assert.Single(result.Value);
-        Assert.Equal("Root", tree.Name);
+        Assert.Equal("Root uk", tree.Name);
+        Assert.Equal("category-5513", tree.Slug);
         Assert.Equal([900001, 900002], tree.Children.Select(child => child.Id));
         Assert.Equal("First uk", tree.Children[0].ShortNameUk);
         Assert.Equal(1, tree.Children[0].Level);
