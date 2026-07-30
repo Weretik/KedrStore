@@ -9,12 +9,20 @@ servers:
   - url: /
     description: Deployment origin
 paths:
+  /api/catalog/{lang}/categories:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1catalog~1{lang}~1categories
+  /api/catalog/{lang}/categories/by-slug/{categorySlug}:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1catalog~1{lang}~1categories~1by-slug~1{categorySlug}
   /api/catalog/{lang}/products:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1products
   /api/catalog/{lang}/{categorySlug}/products:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1products
   /api/catalog/{lang}/product/{productSlug}:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1product~1{productSlug}
+  /api/categories:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories
+  /api/categories/{id}:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}
   /api/admin/products:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products
   /api/admin/products/all:

@@ -17,7 +17,7 @@ docs/sdd/contracts/
 
 - [Frontend integration guide](frontend-integration.md) explains authentication, CSRF, paging, errors, and endpoint ownership.
 - [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers every currently registered controller.
-- Module contracts: [catalog](catalog/products.openapi.yaml), [identity](identity/session.openapi.yaml), and [sales](sales/catalog.openapi.yaml).
+- Module contracts: [catalog products](catalog/products.openapi.yaml), [catalog categories](catalog/category-read.openapi.yaml), [identity](identity/session.openapi.yaml), and [sales](sales/catalog.openapi.yaml).
 
 The OpenAPI files are a source contract for the code as it exists today. They do not grant public access to an endpoint: the authorization annotations and the host fallback policy remain authoritative.
 

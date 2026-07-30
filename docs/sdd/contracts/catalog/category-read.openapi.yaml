@@ -1,0 +1,190 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog Category Read API
+  version: 0.1.0
+paths:
+  /api/catalog/{lang}/categories:
+    get:
+      operationId: getCategoryTree
+      summary: Get the localized category navigation tree
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Ordered forest of category roots and their recursive children; may be empty before category import.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CategoryTreeNode' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/catalog/{lang}/categories/by-slug/{categorySlug}:
+    get:
+      operationId: getCategoryBySlug
+      summary: Get one localized category, its descendants, and breadcrumbs
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - $ref: '#/components/parameters/CategorySlug'
+      responses:
+        '200':
+          description: Requested category with ordered recursive children and root-to-category breadcrumbs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategoryDetails' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Category not found }
+  /api/categories:
+    get:
+      operationId: getAdminCategories
+      summary: List categories for catalog administration
+      tags: [Admin categories]
+      security: []
+      responses:
+        '200':
+          description: Unpaged depth-first category rows; may be empty before category import.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AdminCategory' }
+  /api/categories/{id}:
+    get:
+      operationId: getAdminCategoryById
+      summary: Get one category for catalog administration
+      tags: [Admin categories]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '200':
+          description: Category administration row.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCategory' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Category not found }
+components:
+  parameters:
+    Lang:
+      name: lang
+      in: path
+      required: true
+      schema: { type: string, enum: [uk, ru] }
+    CategorySlug:
+      name: categorySlug
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 100 }
+    CategoryId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+  responses:
+    ValidationError:
+      description: Input validation failed.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationErrors' }
+  schemas:
+    ValidationErrors:
+      type: array
+      items: { type: object, additionalProperties: true }
+    CategoryTreeNode:
+      type: object
+      required: [id, slug, name, parentId, sortOrder, level, children]
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          description: Backend category identity; use as the stable client-side key.
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Public route key for retrieving the category; do not generate it from name.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Localized short display name selected by the lang path parameter.
+        parentId:
+          type: [integer, 'null']
+          minimum: 1
+          description: Immediate parent identity, or null for a root category.
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: Backend-owned sibling order; siblings are returned ascending by this value, then id.
+        level:
+          type: integer
+          minimum: 0
+          description: Number of edges from the root category.
+        children:
+          type: array
+          description: Direct descendants, recursively using this same schema and already in display order.
+          items: { $ref: '#/components/schemas/CategoryTreeNode' }
+      example:
+        id: 5513
+        slug: furnitura-5513
+        name: Фурнітура
+        parentId: null
+        sortOrder: 0
+        level: 0
+        children:
+          - id: 900001
+            slug: zavisy-900001
+            name: Завіси
+            parentId: 5513
+            sortOrder: 0
+            level: 1
+            children: []
+    CategoryBreadcrumb:
+      type: object
+      required: [id, slug, name]
+      properties:
+        id: { type: integer, minimum: 1 }
+        slug: { type: string, minLength: 1, maxLength: 100 }
+        name: { type: string, minLength: 1, maxLength: 100 }
+    CategoryDetails:
+      allOf:
+        - $ref: '#/components/schemas/CategoryTreeNode'
+        - type: object
+          required: [breadcrumbs]
+          properties:
+            breadcrumbs:
+              type: array
+              description: Inclusive root-to-current-category path, ordered from root to the requested category.
+              items: { $ref: '#/components/schemas/CategoryBreadcrumb' }
+    AdminCategory:
+      type: object
+      required: [id, name, shortNameUk, shortNameRu, slug, productTypeIdOneC, parentId, sortOrder, level]
+      properties:
+        id: { type: integer, minimum: 1 }
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Original source category name.
+        shortNameUk:
+          type: string
+          minLength: 1
+          maxLength: 100
+        shortNameRu:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug: { type: string, minLength: 1, maxLength: 100 }
+        productTypeIdOneC:
+          type: string
+          minLength: 1
+          description: Imported 1C root/source key.
+        parentId:
+          type: [integer, 'null']
+          minimum: 1
+        sortOrder: { type: integer, minimum: 0 }
+        level: { type: integer, minimum: 0 }

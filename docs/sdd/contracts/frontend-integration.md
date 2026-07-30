@@ -23,9 +23,13 @@ The host has an authenticated fallback policy. The endpoints explicitly marked a
 | Area | Operation | Access |
 | --- | --- | --- |
 | Public catalog | `GET /api/catalog/{lang}/products`, product details | Anonymous |
+| Public category navigation | `GET /api/catalog/{lang}/categories`, `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | Anonymous |
+| Admin category read | `GET /api/categories`, `GET /api/categories/{id}` | Anonymous (temporary internal UI surface) |
 | Admin product read model | `GET /api/admin/products`, `/all` | Anonymous in current code; treat as an internal/admin UI surface |
 | Quick order | `POST /api/orders` | Anonymous |
 | Session | login, refresh, logout, current user | Mixed; see identity contract |
 | Sales catalog | `POST /api/sales/{lang}/catalog/products` | Bearer token required |
 
-`lang` accepts `uk` or `ru` for the catalog read APIs. Product list page sizes are limited to 100. The backend currently normalizes invalid lower page values at runtime, but frontend clients should always send `page >= 1` and `pageSize` from 1 through 100.
+`lang` accepts `uk` or `ru` for the catalog read APIs. The category collection is an unpaged recursive navigation tree: use its backend-provided `id`, `slug`, `parentId`, `sortOrder`, `level`, and `children`; do not recreate order or hierarchy from names. Category names are already localized for `lang`; category detail adds root-to-current breadcrumbs. Product list page sizes are limited to 100. The backend currently normalizes invalid lower page values at runtime, but frontend clients should always send `page >= 1` and `pageSize` from 1 through 100.
+
+The admin category list is an unpaged flat, depth-first hierarchy. It returns the source `name`, both localized short names, `productTypeIdOneC`, and structure fields; build admin trees from `parentId` and keep the supplied order. The admin item route uses the numeric `id`, not a slug.
