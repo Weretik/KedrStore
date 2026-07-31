@@ -4,6 +4,7 @@ using Host.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Sales.Infrastructure.Integrations.OneC.Jobs;
 
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
@@ -25,6 +26,7 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var scopeServiceProvider = scope.ServiceProvider;
+var logger = scopeServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Host.Jobs");
 
 var job = GetArg(args, "--job");
 var rootIds = GetArgs(args, "--rootId");
@@ -116,7 +118,7 @@ try
 }
 catch (Exception ex)
 {
-    Console.Error.WriteLine($"[ERROR] Job {jobKey} failed with {ex.GetType().Name}.");
+    logger.LogError(ex, "Job {JobKey} failed.", jobKey);
     return 1;
 }
 

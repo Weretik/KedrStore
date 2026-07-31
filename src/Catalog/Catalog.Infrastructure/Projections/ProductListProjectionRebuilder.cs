@@ -8,7 +8,7 @@ using Catalog.Infrastructure.DataBase;
 namespace Catalog.Infrastructure.Projections;
 
 internal sealed class ProductListProjectionRebuilder(
-    CatalogDbContext catalogDbContext,
+    IDbContextFactory<CatalogDbContext> catalogDbContextFactory,
     IOptionsSnapshot<CatalogPricingOptions> pricingOptions,
     IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     ILogger<ProductListProjectionRebuilder> logger)
@@ -18,6 +18,8 @@ internal sealed class ProductListProjectionRebuilder(
 
     public async Task RebuildAsync(CancellationToken cancellationToken = default)
     {
+        await using var catalogDbContext = await catalogDbContextFactory.CreateDbContextAsync(cancellationToken);
+
         var retailPriceTypeId = PriceTypeId.From(pricingOptions.Value.RetailPriceTypeId);
         var hardwareRootCategoryId = rootCategoryOptions.Value.HardwareRootCategoryId;
 
