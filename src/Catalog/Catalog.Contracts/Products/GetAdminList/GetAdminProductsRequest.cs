@@ -8,7 +8,7 @@ public sealed record GetAdminProductsRequest
     public string? CategorySlug { get; init; }
     public int? CategoryId { get; init; }
 
-    public bool? InStock { get; init; } = true;
+    public bool? InStock { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
 
