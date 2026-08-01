@@ -20,7 +20,10 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
         var pageNumber = query.Request.Page < 1 ? 1 : query.Request.Page;
         var pageSize = query.Request.PageSize < 1 ? 20 : Math.Min(query.Request.PageSize, MaxPageSize);
         var productsQuery = ApplySorting(
-            ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), query.Request),
+            ApplyFilters(
+                catalogDbContext.ProductListProjections.AsNoTracking(),
+                catalogDbContext.Categories.AsNoTracking(),
+                query.Request),
             query.Request.Sort);
 
         var totalRecords = await productsQuery.LongCountAsync(cancellationToken);
@@ -64,6 +67,7 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
     private static IQueryable<ProductListProjection> ApplyFilters(
         IQueryable<ProductListProjection> productsQuery,
+        IQueryable<ProductCategory> categoriesQuery,
         GetAdminProductsRequest request)
     {
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -83,8 +87,10 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
         if (request.CategoryId is not null)
         {
-            var categoryId = ProductCategoryId.From(request.CategoryId.Value);
-            productsQuery = productsQuery.Where(projection => projection.CategoryId == categoryId);
+            productsQuery = ApplyCategoryFilter(
+                productsQuery,
+                categoriesQuery,
+                ProductCategoryId.From(request.CategoryId.Value));
         }
         else if (!string.IsNullOrWhiteSpace(request.CategorySlug))
         {
@@ -107,6 +113,25 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
             productsQuery = productsQuery.Where(projection => projection.RetailPrice != null && projection.RetailPrice <= request.PriceTo.Value);
 
         return productsQuery;
+    }
+
+    private static IQueryable<ProductListProjection> ApplyCategoryFilter(
+        IQueryable<ProductListProjection> productsQuery,
+        IQueryable<ProductCategory> categoriesQuery,
+        ProductCategoryId selectedCategoryId)
+    {
+        var childCategoryIds = categoriesQuery
+            .Where(category => category.ParentId == selectedCategoryId)
+            .Select(category => category.Id);
+
+        var categoryIds = categoriesQuery
+            .Where(category =>
+                category.Id == selectedCategoryId ||
+                category.ParentId == selectedCategoryId ||
+                (category.ParentId.HasValue && childCategoryIds.Contains(category.ParentId.Value)))
+            .Select(category => category.Id);
+
+        return productsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
     }
 
     private static IQueryable<ProductListProjection> ApplySorting(
