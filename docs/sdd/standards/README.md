@@ -3,6 +3,7 @@
 This directory contains the stable rules for every backend change. It does not contain frontend rules: the frontend is a separate project.
 
 - [Backend rules](backend-rules.md) — layers, CQRS, DDD, Mediator, and code organisation.
+- [Identifier strategy](identifier-strategy.md) — mandatory ID-selection rules before creating or changing an entity.
 - [API rules](api-rules.md) — HTTP contracts, validation, results, and errors.
 - [Database rules](database-rules.md) — EF Core, reads, transactions, migrations, and data.
 - [Security and observability rules](security-observability-rules.md) — authorization, privacy, Serilog, and diagnostics.

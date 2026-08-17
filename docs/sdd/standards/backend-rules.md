@@ -9,6 +9,10 @@ Follow the dependency direction `API → Application → Domain`. Infrastructure
 - Infrastructure contains persistence and integration adapters; it does not own business rules.
 - API performs only HTTP binding, authorization, and result mapping; it contains no EF or business logic.
 
+## Entity identifiers
+
+Before creating or changing an entity identifier, follow [Identifier strategy](identifier-strategy.md). Do not default to `Guid`; select an ID from its creation and integration lifecycle. In the Domain, always wrap the selected scalar in a typed value object/readonly struct; do not use raw primitive IDs in `BaseEntity`, `BaseAuditableEntity`, or Domain foreign keys.
+
 ## CQRS, Mediator, and code
 
 Use feature-by-folder within Application. Keep the command/query, handler, validator, and private DTOs together by scenario. One Mediator handler owns one use case; commands change state, and queries do not.

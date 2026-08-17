@@ -5,7 +5,7 @@ These instructions apply to changes in `docs/`. Follow the root `AGENTS.md` firs
 ## Navigation
 
 1. For backend architecture, read `sdd/architecture/README.md`.
-2. For stable rules, read `sdd/standards/README.md` and choose only the relevant rules.
+2. For stable rules, read `sdd/standards/README.md` and choose only the relevant rules. Before creating or changing an entity identifier, read `sdd/standards/identifier-strategy.md`.
 3. For a new feature or migration, read `sdd/specs/_templates/README.md` and create or update the feature specification before code.
 4. For startup, configuration, migrations, diagnostics, or jobs, read `sdd/operations/README.md`.
 5. For stable catalog and door-industry terms, read `product/glossary.md`.

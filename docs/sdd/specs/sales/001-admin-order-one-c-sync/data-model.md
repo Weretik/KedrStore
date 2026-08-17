@@ -1,0 +1,58 @@
+# Admin order and 1C synchronization — data model
+
+## Context
+
+Sales needs a durable manager order and durable delivery state so delivery survives HTTP completion, process restarts, Cloud Run scale-to-zero, and transient 1C failures.
+
+## Model
+
+```text
+Counterparty (existing Sales aggregate; Id = 1C counterparty ID)
+└── 1..* Order
+    ├── Id (OrderId: typed value object over long; database bigint primary key)
+    ├── OrderNumber (unique human-readable number, e.g. SO-YYYYMMDD-NNNN; 1C external key)
+    ├── CounterpartyId (required FK/logical reference)
+    ├── CreatedAtUtc
+    ├── Comment (optional; exact rules pending)
+    └── 1..* OrderLine
+        ├── ProductId (required external 1C/catalog identifier)
+        ├── ProductName (required snapshot for the failure-notification Excel file)
+        ├── Quantity (positive integer)
+        └── Amount (total amount for the complete line; decimal(18,2))
+
+Order
+└── 1..1 OneCOrderSync
+    ├── Id (OneCOrderSyncId: typed value object over long; database bigint primary key)
+    ├── OrderId (typed, unique)
+    ├── Status
+    ├── AttemptCount
+    ├── NextAttemptAtUtc
+    ├── LastAttemptAtUtc
+    ├── LastHttpStatus
+    ├── LastErrorCode / LastErrorMessage
+    ├── OneCRequestPayloadHash
+    ├── OneCResponseBody (sanitized and bounded)
+    └── AcceptedAtUtc
+
+OrderIdempotencyRecord (Infrastructure persistence record, not Domain entity)
+├── IdempotencyKey (opaque client UUID, unique within create-order operation)
+├── RequestHash (required; comparison without storing raw request)
+├── OrderId (required long EF column, unique reference to Order; persistence-only record)
+├── CreatedAtUtc
+└── ExpiresAtUtc (retention cleanup after 24 hours)
+```
+
+## Invariants and integrity
+
+- `Order.CounterpartyId` references one existing, non-deleted Sales counterparty at creation time.
+- `Order.OrderNumber` is unique and immutable. Sales generates it with a database-backed daily sequence to avoid duplicates under concurrent requests.
+- The order stores only `CounterpartyId`; `Counterparty.Name`, phone, and email are never duplicated as order snapshots. Counterparty remains their single source of truth.
+- `OrderLine` has a non-blank product identifier, product-name snapshot, and positive quantity; an order cannot have zero lines.
+- `OneCOrderSync.OrderId` is unique, ensuring one delivery lifecycle per order.
+- `OrderIdempotencyRecord.IdempotencyKey` is unique for the create-order operation. A repeated key is accepted only when its `RequestHash` matches; otherwise the creation command returns a conflict.
+- Creation persists `Order`, `OneCOrderSync`, and `OrderIdempotencyRecord` in one transaction. A cleanup job may remove expired idempotency records after 24 hours; it must never delete the order or synchronization record.
+- `Status` is constrained to the documented state set; terminal accepted/dead-letter states cannot become pending through an automatic retry.
+- Due-record selection requires an index suited to `Status` and `NextAttemptAtUtc`; claiming must be concurrency-safe.
+- Error text and response body have explicit length limits and are sanitized. Request payloads are represented only by a non-sensitive hash.
+- `Amount` is the total amount for the complete line and persists as `decimal(18,2)`. Duplicate product rows remain separate lines because they preserve manager input; the 1C mapping sends them as separate SOAP `Item` entries.
+- Orders use a restrictive foreign-key relationship to Counterparty; a counterparty with orders must not be physically deleted. Sales soft-delete filtering prevents creating new orders for a deleted counterparty.
