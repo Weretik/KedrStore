@@ -9,7 +9,7 @@
 ```text
 <Aggregate/Table>
 ├── <field>
-└── <relation>
+└── <connection>
 ```
 
 ## Invariants and integrity

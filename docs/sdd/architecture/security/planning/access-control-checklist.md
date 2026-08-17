@@ -1,6 +1,6 @@
 # Access-control feature checklist
 
-Use this checklist in a feature folder created from [the feature template](../../../specs/_templates/feature/template-feature.md).
+Use this checklist in a feature folder created from [the feature template](../../../specs/_templates/feature/README.md).
 
 ## Decision path
 

@@ -6,6 +6,6 @@
 
 ## Migration and rollout
 
-<Whether a migration is required, test database, rollback.>
+<Requires/does not require migration, test database, rollback.>
 
-Do not duplicate tables here: they belong in `data-model.md`.
+Do not duplicate tables: they belong in `data-model.md`.

@@ -2,6 +2,10 @@
 
 **Status:** draft | agreed
 
-After agreement, create `docs/sdd/contracts/<module>/<feature>.openapi.yaml` and reference its operations from `docs/sdd/contracts/openapi.yaml`. This is the versioned machine-readable contract for the frontend, client generation, and contract testing; Swagger UI only renders the aggregate entry point.
+This document contains solutions for people: contract boundaries, consumers, compatibility, security, errors, idempotency, and deployment.
 
-Before agreement, define routes, methods, operation IDs, DTOs, examples, errors, security, idempotency, and the breaking-change migration path. Keep feature-specific consumer and rollout decisions in this document; do not duplicate the OpenAPI YAML under the feature folder.
+Once agreed, create a machine-readable OpenAPI contract for the frontend in `docs/sdd/contracts/<module>/<feature>.openapi.yaml`. Do not store `.openapi.yaml` in this feature folder. Add `$ref` from the aggregated `docs/sdd/contracts/openapi.yaml` to the contract within the same change. It is a single versioned source for frontend, client generation and contract tests; Swagger UI only displays it.
+
+Rules for the structure and support of contracts are given in [`docs/sdd/contracts/README.md`](../../../../contracts/README.md).
+
+Define routes, HTTP methods, operation identifiers, DTOs, examples, errors, security, idempotence for side-effect records, and a migration path for incompatible changes prior to approval.

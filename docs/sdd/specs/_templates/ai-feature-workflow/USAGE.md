@@ -1,12 +1,12 @@
-# Як запускати AI для однієї фази feature
+# Як запускати AI для одного файла фази feature
 
-Спочатку створіть і погодьте специфікацію за шаблоном `feature`. Потім
-надсилайте AI одну фазу за раз:
+Спочатку створіть і погодьте специфікацію за
+[шаблоном feature](../feature/USAGE.md). Потім надсилайте AI одну фазу за раз:
 
 ```text
 Працюй за регламентом `docs/sdd/specs/_templates/ai-feature-workflow/`.
 Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
-Поточна фаза: `<00 | 01 | 02 | 03 | 04 | 05>`.
+Поточний файл фази: `<tasks/00-readiness.md | tasks/application/03.2-create.md | …>`.
 ```
 
 Приклад:
@@ -14,25 +14,26 @@ Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
 ```text
 Працюй за регламентом `docs/sdd/specs/_templates/ai-feature-workflow/`.
 Feature: `docs/sdd/specs/catalog/002-product-archive`.
-Поточна фаза: `01`.
+Поточний файл фази: `tasks/domain/01.1-aggregate.md`.
 ```
 
-Фази виконуються лише в такому порядку:
+Головні фази виконуються в такому порядку, але кожна з них створює лише потрібні
+окремі підфази. AI виконує одну підфазу за раз:
 
 | Фаза | Результат |
 | --- | --- |
-| `00` | scope, data model та OpenAPI/integration contract погоджені |
-| `01` | domain model, інваріанти й unit-тести |
-| `02` | persistence або integration, migration та integration tests |
-| `03` | CQRS request/handler, validation і application tests |
-| `04` | API endpoint, authorization, OpenAPI та API tests |
-| `05` | restore/build/test, ручні сценарії, documentation і delivery report |
+| `00` | створює `00.N` підфази для scope, CQRS use cases та tooling |
+| `01` | створює `01.N` Domain-підфази |
+| `02` | створює `02.N` Infrastructure-підфази |
+| `03` | створює `03.N` Application-підфази |
+| `04` | створює `04.N` API-підфази для HTTP/integration feature |
+| `05` | створює `05.N` Verification-підфази |
 
-Для наступної фази надсилайте окрему команду:
+Після головної фази назвіть точний створений файл підфази. Наприклад:
 
 ```text
-Переходь до фази 02.
+Працюй з `tasks/application/03.2-create.md`.
 ```
 
-Без цієї команди AI не переходить до наступної фази. Якщо попередня фаза має
-незакриті задачі або blocker, спершу усуньте їх чи явно змініть scope.
+Без цієї команди AI не переходить до наступного файла. Якщо залежна фаза або
+підфаза має незакриті задачі чи blocker, спершу усуньте їх або явно змініть scope.

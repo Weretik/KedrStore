@@ -14,7 +14,7 @@ https://localhost:7230/swagger
 
 The Swagger bearer scheme expects the access token returned by `POST /api/auth/session/login`. Paste the access token into Swagger authorization; do not paste or expose a refresh token.
 
-For a feature-specific reproducible test, fill in [the Swagger manual-test phase](../../specs/_templates/feature/phases/05-swagger-manual-test.md). It must record route, prerequisites, input, expected status and error cases.
+For a feature-specific reproducible test, create an API-test subphase from [the API test template](../../specs/_templates/feature/tasks/api/04.NN-tests.template.md). It must record the route, prerequisites, input, expected status, and error cases.
 
 ## Logs and startup failures
 

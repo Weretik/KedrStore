@@ -1,14 +1,14 @@
-# <feature name> — overview and scope
+# <feature name> — overview and boundaries
 
 ## Goal
 
-As a <role>, I want to <action>, so that <outcome>.
+As <role>, I want <action> to <result>.
 
-## In scope
+## Within
 
-- <behavior>
+- <behaviour>
 
-## Out of scope
+## Out of bounds
 
 - <deferred behavior>
 
@@ -16,4 +16,4 @@ As a <role>, I want to <action>, so that <outcome>.
 
 - [NEEDS CLARIFICATION: <specific question>]
 
-Do not describe EF, handlers, controllers, migrations, or file structure here.
+Do not describe EF, handlers, controllers, migrations or file structure here.

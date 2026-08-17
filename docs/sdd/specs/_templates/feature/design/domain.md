@@ -4,10 +4,10 @@
 
 <Aggregate, value objects, domain rules.>
 
-## Cross-module interaction
+## Intermodule interaction
 
 <Abstraction, event, idempotency, consistency.>
 
 ## Risks
 
-<Concurrency, historical data, or another risk.>
+<Concurrency, historical data or other risk.>

@@ -1,13 +1,13 @@
-# <feature name> — <business domain>
+# <feature name> is <subject area>
 
 ## Behavior
 
-- <user action and system outcome>
+- <user action and system result>
 
 ## Rules and invariants
 
-- <testable rule>
+- <tested rule>
 
 ## Acceptance scenarios
 
-1. Given <state>, when <action>, then <outcome>.
+1. Provided <state>, when <action>, then <result>.

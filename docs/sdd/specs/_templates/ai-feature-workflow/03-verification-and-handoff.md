@@ -1,12 +1,12 @@
-# Verification and Phase Handoff
+# Verification and phase handoff
 
-## Verify the Result
+## Verify the result
 
-1. Run the checks explicitly required by the phase, applicable `AGENTS.md`
-   files, and `docs/sdd/standards/testing-rules.md` when they are relevant to
-   the changed files.
-2. Start with the narrowest check: targeted unit, integration, or API tests.
-   For phase `05`, always run:
+1. Run checks explicitly required by the phase, applicable `AGENTS.md` files,
+   and `docs/sdd/standards/testing-rules.md` when relevant to the changed files.
+2. Start with the narrowest relevant check: targeted unit, integration, or API
+   tests. For build/test subphase `05.N`, run the agreed CLI commands, for
+   example:
 
    ```powershell
    dotnet restore KedrStore.sln
@@ -14,29 +14,27 @@
    dotnet test KedrStore.sln --no-build
    ```
 
-3. If a command cannot be run or fails, record the exact command, failure
-   point, and whether the issue was introduced by the current change or already
-   existed.
+3. If a command cannot run or fails, record the exact command, point of
+   failure, and whether the issue was introduced by the current change or was
+   already present.
 4. Review `git diff` for your own changes. They must match the current phase;
    do not change or discard unrelated working-tree changes.
 
-## Completion Condition
+## Completion condition
 
-A phase is complete only when all its checkbox tasks are closed, its checkpoint
-is satisfied, blockers are absent or have an explicit user decision, and the
-code, contracts, and documentation do not contradict each other. For phase
-`05`, `checklist/delivery-readiness.md` must also be completed and a delivery
-report prepared.
+The current file is complete only when all its checkbox tasks are closed, its
+checkpoint is satisfied, blockers are absent or have an explicit user decision,
+and code, contracts, and documentation agree. Subphase `05.N` additionally
+requires `checklist/delivery-readiness.md` and a delivery report.
 
-## Final Report Format
+## Final report format
 
-1. **Completed** — task IDs and a short result.
+1. **Completed** — task IDs and a concise result.
 2. **Changed files** — only changes from the current phase.
 3. **Verification** — commands, results, and manual scenarios.
-4. **Not verified / blockers** — the exact reason; state that there are none if
-   applicable.
+4. **Not verified / blockers** — the exact reason; state when there are none.
 5. **Risks / manual verification** — only real remaining items.
-6. **Status** — `Phase <number> is complete. Waiting for the command “Move to phase <next number>.”`
+6. **Status** — `Phase file <path> is complete. Waiting for a command naming the next exact phase file.`
 
-After reporting, do not start the next phase or make further changes until the
-user explicitly names its number.
+After the report, do not start the next phase file or make new changes until the
+user explicitly names its number or path.

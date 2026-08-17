@@ -1,8 +1,8 @@
 # <feature name> — checklist: specification readiness
 
-- [ ] Requirements are complete, testable, and non-contradictory.
-- [ ] Every `[NEEDS CLARIFICATION]` item is resolved or moved out of scope.
-- [ ] Every requirement has a design decision or a deferred status.
-- [ ] The data model contains no speculative data or relations.
-- [ ] Every requirement is covered by a task ID; tasks do not exceed scope.
-- [ ] Contract, security, idempotency, and integration dependencies are agreed.
+- [ ] The requirements are complete, tested and do not contradict each other.
+- [ ] Each `[NEEDS CLARIFICATION]` is closed or out of scope.
+- [ ] Each requirement has a design solution or a "deferred" status.
+- [ ] data model does not contain speculative data/relations.
+- [ ] Each requirement is covered by task ID; tasks do not go beyond the scope.
+- [ ] Contract, security, idempotency and integration dependencies are agreed; path `docs/sdd/contracts/<module>/<feature>.openapi.yaml` is defined for the HTTP contract.
