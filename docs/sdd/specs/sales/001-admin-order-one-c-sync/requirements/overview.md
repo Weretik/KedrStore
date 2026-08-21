@@ -16,7 +16,7 @@ As a sales manager, I want to create an order for a selected existing counterpar
 
 - The anonymous Catalog `POST /api/orders` quick-order flow, including its Excel export and Telegram notification.
 - Creating or importing counterparties during manager order creation.
-- Editing, cancelling, viewing, or manually resending manager orders; these are future use cases unless added by a change note.
+- Editing, cancelling, viewing, or manually resending manager orders; these are future use cases unless added by a change note. T135 adds only a single-order delivery-status API so the frontend can show 1C acceptance and document number. A broader order list/details UI remains separate work.
 - Changes to the generated SOAP proxy or to the 1C WSDL.
 - Frontend implementation and Cloud Scheduler/Cloud Run deployment configuration. The job must be schedulable by the existing host, but infrastructure-as-code is not part of this feature.
 

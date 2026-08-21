@@ -5,6 +5,8 @@
 - [ ] [T130 — OpenAPI contract](api/04.3-openapi.md)
 - [ ] [T140 — API integration tests](api/04.4-api-tests.md)
 
+- [ ] [T135 — Admin order sync-status read API](api/04.5-order-sync-status.md)
+
 ## Checkpoint
 
 `POST /api/admin/orders` is protected with `PolicyNames.CanManageOrders`, documented in the versioned OpenAPI contract, and verified through HTTP integration tests.

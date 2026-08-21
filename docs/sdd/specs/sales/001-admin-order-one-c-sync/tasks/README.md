@@ -12,6 +12,10 @@ The feature follows the standard `00 → 05` sequence. Each phase has concrete, 
 
 ## Existing concrete subphases
 
+- [05.3 — Persist the 1C document number](jobs/05.3-persist-one-c-document-number.md)
+- [04.5 — Admin order sync-status read API](api/04.5-order-sync-status.md)
+- [06.3 — Manual live 1C SOAP write smoke verification](test/06.3-one-c-write-smoke-test.md)
+
 - [00.1 — Confirm the implementation baseline](readiness/00.1-scope-contracts.md)
 - [00.2 — Discover CLI and generators](readiness/00.2-tooling.md)
 

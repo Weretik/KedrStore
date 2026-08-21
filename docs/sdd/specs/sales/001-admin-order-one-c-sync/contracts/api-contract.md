@@ -40,6 +40,12 @@ The endpoint is `[AllowAnonymous]` temporarily. The request requires an `Idempot
 
 After agreement, create `docs/sdd/contracts/sales/admin-order-one-c-sync.openapi.yaml` and add its `$ref` to `docs/sdd/contracts/openapi.yaml`.
 
+## Future admin order read contract
+
+The current feature has no order read/status endpoint. T135 adds one after the route and authorization are agreed. Its response must include `orderId`, `orderNumber`, `syncStatus`, nullable `oneCDocumentNumber`, and nullable `acceptedAtUtc`. `oneCDocumentNumber` is mapped from `OneCOrderSync.OneCDocumentNumber`; the frontend shows it only after 1C has accepted the order. Internal SOAP diagnostics are never returned.
+
+**[NEEDS CLARIFICATION: choose the route and access rule for the single-order status endpoint. Recommended candidates are `GET /api/admin/orders/{orderId}/sync-status` with `PolicyNames.CanManageOrders`, or an existing protected order-details endpoint if that is introduced first.]**
+
 ## Existing SOAP operation
 
 No WSDL change is needed. The generated client exposes:
@@ -59,6 +65,6 @@ RequestDataOut:
   Comment: string
 ```
 
-`RequestData.OrderId` always receives the stable local `OrderNumber`, not the technical GUID. The same number is reused for retries, so a manager can find the 1C document by its displayed number. `Item.Amount` maps from the request line `amount`, which is the total for the complete line quantity. A non-empty `RequestDataOut.DocId` maps to `Accepted`; an empty `DocId` returned without SOAP/transport failure maps to `BusinessError`, using a sanitized bounded `Comment` as diagnostic data.
+`RequestData.OrderId` always receives the stable local `OrderNumber`, not the technical GUID. The same number is reused for retries, so a manager can find the 1C document by its displayed number. `Item.Amount` maps from the request line `amount`, which is the total for the complete line quantity. A confirmed created-document `RequestDataOut.DocId` maps to `Accepted` and is saved as `OneCDocumentNumber`; a response whose `DocId` says that the document was not created maps to `BusinessError`, even if it is non-empty. An empty `DocId` returned without SOAP/transport failure also maps to `BusinessError`, using a sanitized bounded `Comment` as diagnostic data.
 
 The future machine-readable OpenAPI document explicitly declares `Idempotency-Key` as a required UUID header parameter, including the successful replay and `409 Conflict` responses.

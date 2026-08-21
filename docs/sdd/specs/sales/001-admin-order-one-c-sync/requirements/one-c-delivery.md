@@ -5,7 +5,7 @@
 - `Host.Jobs` runs `SyncOneCOrdersJob` through `--job=sync-one-c-orders`; each run selects a small batch of synchronization records due for delivery (`NextAttemptAtUtc <= now`).
 - For each record, Infrastructure maps the persisted order to the existing `CreateSiteRequest` SOAP operation and calls 1C outside the creating HTTP request.
 - The request contains the selected counterparty's 1C ID, stable local `OrderId`, order date, agreed comment and item rows. Each row maps to 1C `ProductId`, `Quantity`, and `Amount`.
-- The same job checks the synchronous `CreateSiteRequest` response after each send: a non-empty `DocId` finishes delivery, a transient transport failure schedules a retry, and a business failure is retained for diagnosis without aggressive retries.
+- The same job checks the synchronous `CreateSiteRequest` response after each send: a confirmed created-document `DocId` finishes delivery and is stored as `OneCDocumentNumber`; a response such as `Не создан...` is a business failure even if `DocId` is non-empty. A transient transport failure schedules a retry, and a business failure is retained for diagnosis without aggressive retries.
 
 ## Rules and invariants
 
@@ -19,9 +19,10 @@
 
 ## Acceptance scenarios
 
-1. Given a due pending synchronization record inside the allowed window, when 1C accepts it, then the record is `Accepted`, includes acceptance time and sanitized response data, and will not be retried.
+1. Given a due pending synchronization record inside the allowed window, when 1C accepts it, then the record is `Accepted`, includes acceptance time and the returned 1C document number, and will not be retried.
 2. Given a timeout, network failure, or gateway failure, when the job sends an order, then it records a transport failure and schedules the next retry using the configured backoff.
 3. Given an empty 1C `DocId`, when the job sends an order, then it records `BusinessError` with a sanitized `Comment` and does not schedule aggressive automatic retries.
 4. Given a record outside the allowed window, when the job runs, then it makes no SOAP call and schedules the record for the next allowed Kyiv time.
 5. Given repeated transient failures beyond the configured maximum, when the next attempt is evaluated, then the record transitions to `DeadLetter` for manual processing.
 6. Given a record moves to `DeadLetter`, when the transition is saved, then the system sends one Telegram alert with the client, order ID, final error, and an Excel file containing the order lines.
+7. Given an accepted order is later returned by an admin order read/status API, then its response includes `oneCDocumentNumber`; the value is `null` while delivery has not been accepted.

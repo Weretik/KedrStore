@@ -4,7 +4,7 @@
 
 `Sales.Domain` gains an `Order` aggregate with encapsulated order lines and a required `CounterpartyId`. The aggregate owns input-independent order invariants: a non-empty line collection, positive quantities, valid product identifiers, and immutable identity/counterparty binding after creation.
 
-`OneCOrderSync` is a separate Sales aggregate root, linked one-to-one to `Order` by the typed `OrderId` value object (backed by database `bigint`). It owns only delivery-state transitions: attempt count, scheduled time, terminal states, sanitized diagnostics, and acceptance metadata. Its record is created atomically with the order and safely claimed by the background job.
+`OneCOrderSync` is a separate Sales aggregate root, linked one-to-one to `Order` by the typed `OrderId` value object (backed by database `bigint`). It owns only delivery-state transitions: attempt count, scheduled time, terminal states, sanitized diagnostics, and acceptance metadata. On a confirmed successful response it records the 1C document number returned in `DocId`; the local `OrderNumber` remains the outbound idempotency key. Its record is created atomically with the order and safely claimed by the background job.
 
 The Domain has no SOAP, HTTP, EF Core, scheduler, or Cloud Run dependency. No domain event is required for the initial flow: the durable `Pending` record is the hand-off to the scheduled job.
 

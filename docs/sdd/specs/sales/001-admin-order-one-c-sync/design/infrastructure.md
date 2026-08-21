@@ -4,6 +4,8 @@
 
 `Sales.Infrastructure` maps `Order`, `OrderLine`, and `OneCOrderSync` through EF Core in `SalesDbContext`. It supplies repositories/query abstractions required by Application and a transaction boundary that persists the order with the initial `Pending` delivery record atomically.
 
+Due-record claiming uses PostgreSQL's `xmin` optimistic concurrency token on `OneCOrderSync`. A worker changes a due record to `Sent` and saves before issuing SOAP; a `DbUpdateConcurrencyException` means another worker won the claim and the worker skips that record. This keeps the claim provider-native and prevents concurrent SOAP sends for the same delivery record.
+
 A new Sales write adapter wraps `OneCSoapClientFactory` and the generated `CreateSiteRequestAsync(RequestData)` operation. The adapter maps from an Application-owned delivery DTO to generated WCF types at the Infrastructure boundary; `Generated/Reference.cs` remains unedited. It interprets the agreed accepted and business-error response forms, translates transport exceptions, and never logs credentials or raw sensitive payloads.
 
 `SyncOneCOrdersJob` is registered in Sales Infrastructure and invoked by the existing one-run `Host.Jobs` host. It claims due records safely, obeys the Kyiv delivery window, sends the configured batch with pacing, records outcomes, and applies the configured retry schedule. Its structured logs include `OrderId`, `AttemptCount`, `Status`, and correlation context; metrics cover accepted, transport/business errors, retry queue, and dead-letter queue.

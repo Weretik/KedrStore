@@ -46,4 +46,6 @@ The specification defines concrete tasks for Phases 00–05. Execute them in ord
 
 ## Change log
 
+- 2026-08-19 — Added durable storage of the 1C-created document number after an accepted SOAP write. A future admin order read API must expose it to the frontend.
+
 - 2026-08-17 — Initial draft. Public Catalog quick orders are explicitly excluded; the existing `CreateSiteRequest` SOAP operation is the intended 1C write operation.
