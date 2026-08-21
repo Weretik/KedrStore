@@ -6,7 +6,7 @@ internal sealed class OrderIdempotencyRecord
     public string Operation { get; set; } = null!;
     public string IdempotencyKey { get; set; } = null!;
     public string RequestHash { get; set; } = null!;
-    public long OrderId { get; set; }
+    public OrderId OrderId { get; set; }
     public DateTimeOffset CreatedAtUtc { get; set; }
     public DateTimeOffset ExpiresAtUtc { get; set; }
 }

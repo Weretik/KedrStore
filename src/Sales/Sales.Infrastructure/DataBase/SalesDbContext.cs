@@ -6,6 +6,10 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     public DbSet<Counterparty> Counterparties => Set<Counterparty>();
     public DbSet<CounterpartyCategoryPriceType> CounterpartyCategoryPriceTypes =>
         Set<CounterpartyCategoryPriceType>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderLine> OrderLines => Set<OrderLine>();
+    public DbSet<OneCOrderSync> OneCOrderSyncs => Set<OneCOrderSync>();
+    internal DbSet<OrderIdempotencyRecord> OrderIdempotencyRecords => Set<OrderIdempotencyRecord>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
