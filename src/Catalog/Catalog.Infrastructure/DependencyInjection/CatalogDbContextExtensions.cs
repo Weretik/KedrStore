@@ -14,7 +14,9 @@ public static class CatalogDbContextExtensions
         var connectionString = configuration.GetConnectionString("Default")
                                ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
 
-        services.AddDbContext<CatalogDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<CatalogDbContext>(
+            options => options.UseNpgsql(connectionString),
+            optionsLifetime: ServiceLifetime.Singleton);
         services.AddDbContextFactory<CatalogDbContext>(options => options.UseNpgsql(connectionString));
         services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 
