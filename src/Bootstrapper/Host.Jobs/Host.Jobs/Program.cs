@@ -1,6 +1,8 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Contracts.Projections;
 using Host.Jobs;
+using Sales.Application.Integrations.OneC.Contracts;
+using Sales.Application.Integrations.OneC.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -104,6 +106,20 @@ try
             await scopeServiceProvider.GetRequiredService<SyncOneCSalesCustomersFullJob>().RunAsync(cancellationToken);
             break;
 
+        case "one-c-smoke-write":
+            var smokeRequest = CreateOneCSmokeRequest(args);
+            var smokeResult = await scopeServiceProvider
+                .GetRequiredService<ISalesOneCWriteClient>()
+                .SendOrderAsync(smokeRequest, cancellationToken);
+
+            Console.WriteLine(
+                $"[RESULT] 1C write outcome={smokeResult.Outcome}; orderNumber={smokeRequest.OrderNumber}; " +
+                $"documentId={smokeResult.OneCDocumentId ?? "<none>"}");
+
+            if (smokeResult.Outcome != OneCOrderDeliveryOutcome.Accepted)
+                return 3;
+            break;
+
         case "rebuild-projections":
             await scopeServiceProvider.GetRequiredService<IProductListProjectionRebuilder>().RebuildAsync(cancellationToken);
             break;
@@ -139,3 +155,36 @@ static List<string> GetArgs(string[] args, string name)
         .Where(v => !string.IsNullOrWhiteSpace(v))
         .ToList();
 }
+
+static OneCOrderDeliveryRequest CreateOneCSmokeRequest(string[] args)
+{
+    var counterpartyId = RequireArg(args, "--counterpartyId");
+    var productId = RequireArg(args, "--productId");
+    var orderNumber = RequireArg(args, "--orderNumber");
+    var comment = RequireArg(args, "--comment");
+    var quantity = ParsePositiveInt(RequireArg(args, "--quantity"), "--quantity");
+    var amount = ParseNonNegativeDecimal(RequireArg(args, "--amount"), "--amount");
+
+    return new OneCOrderDeliveryRequest(
+        counterpartyId,
+        orderNumber,
+        DateTimeOffset.UtcNow,
+        comment,
+        [new OneCOrderDeliveryLineDto(productId, quantity, amount)]);
+}
+
+static string RequireArg(string[] args, string name)
+    => GetArg(args, name) is { Length: > 0 } value
+        ? value
+        : throw new ArgumentException($"{name} is required for --job=one-c-smoke-write.");
+
+static int ParsePositiveInt(string value, string name)
+    => int.TryParse(value, out var parsed) && parsed > 0
+        ? parsed
+        : throw new ArgumentException($"{name} must be a positive integer.");
+
+static decimal ParseNonNegativeDecimal(string value, string name)
+    => decimal.TryParse(value, System.Globalization.NumberStyles.Number,
+            System.Globalization.CultureInfo.InvariantCulture, out var parsed) && parsed >= 0m
+        ? parsed
+        : throw new ArgumentException($"{name} must be a non-negative invariant decimal.");

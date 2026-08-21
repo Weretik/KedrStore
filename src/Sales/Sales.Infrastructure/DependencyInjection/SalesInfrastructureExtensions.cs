@@ -24,6 +24,8 @@ public static class SalesInfrastructureExtensions
         services.AddScoped<IDatabaseMigrator, DbMigrator<SalesDbContext>>();
 
         services.AddScoped<ISalesOneCReadClient, SalesOneCReadClient>();
+        services.AddScoped<IOneCSiteRequestSender, OneCSiteRequestSender>();
+        services.AddScoped<ISalesOneCWriteClient, SalesOneCWriteClient>();
         services.AddScoped<CounterpartyContactNormalizer>();
         services.AddScoped<OneCCounterpartiesSyncService>();
         services.AddScoped<OneCCounterpartyCategoryPriceTypesSyncService>();
