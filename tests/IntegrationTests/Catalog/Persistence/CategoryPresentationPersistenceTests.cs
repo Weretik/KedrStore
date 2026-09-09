@@ -3,7 +3,7 @@ using Catalog.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace IntegrationTests;
+namespace IntegrationTests.Catalog.Persistence;
 
 public sealed class CategoryPresentationPersistenceTests
 {

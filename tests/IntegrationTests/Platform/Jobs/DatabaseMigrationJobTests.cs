@@ -1,9 +1,11 @@
+extern alias JobsHost;
+
 using BuildingBlocks.Infrastructure.Migrations;
 using BuildingBlocks.Infrastructure.Seeding;
-using Host.Jobs;
 using Microsoft.Extensions.Logging.Abstractions;
+using DatabaseMigrationJob = JobsHost::Host.Jobs.DatabaseMigrationJob;
 
-namespace UnitTests;
+namespace IntegrationTests.Platform.Jobs;
 
 public sealed class DatabaseMigrationJobTests
 {

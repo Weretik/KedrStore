@@ -1,8 +1,11 @@
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Sales.Application.Contracts.Orders;
 
-namespace IntegrationTests;
+namespace IntegrationTests.Platform.Api;
 
 public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -10,7 +13,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
 
     public ApiContractTests(WebApplicationFactory<Program> factory)
     {
-        _factory = factory.WithWebHostBuilder(_ => { });
+        _factory = factory.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            services.AddScoped<IOrderNumberGenerator, TestOrderNumberGenerator>()));
     }
 
     [Fact]
@@ -74,6 +78,24 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/orders", out var orders));
         Assert.True(orders.TryGetProperty("post", out var ordersPost));
         Assert.True(ordersPost.TryGetProperty("requestBody", out _));
+
+        Assert.True(paths.TryGetProperty("/api/admin/orders", out var adminOrders));
+        Assert.True(adminOrders.TryGetProperty("post", out var adminOrdersPost));
+        Assert.True(adminOrdersPost.TryGetProperty("requestBody", out _));
+        AssertOperationHasHeaderParameter(adminOrdersPost, "Idempotency-Key");
+
+        Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}/sync/retry", out var retryOrderSync));
+        Assert.True(retryOrderSync.TryGetProperty("post", out var retryOrderSyncPost));
+        Assert.True(retryOrderSyncPost.TryGetProperty("requestBody", out _));
+        Assert.True(retryOrderSyncPost.GetProperty("responses").TryGetProperty("202", out _));
+        AssertOperationHasPathParameter(retryOrderSyncPost, "orderId");
+    }
+
+    private static void AssertOperationHasHeaderParameter(JsonElement operation, string name)
+    {
+        Assert.True(operation.TryGetProperty("parameters", out var parameters));
+        Assert.Contains(parameters.EnumerateArray(), parameter =>
+            parameter.GetProperty("name").GetString() == name && parameter.GetProperty("in").GetString() == "header");
     }
 
     [Fact]
@@ -107,5 +129,11 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
             parameterIn.GetString() == "path");
 
         Assert.True(exists, $"Expected path parameter '{name}' was not found.");
+    }
+
+    private sealed class TestOrderNumberGenerator : IOrderNumberGenerator
+    {
+        public Task<string> GenerateAsync(DateTimeOffset createdAtUtc, CancellationToken cancellationToken)
+            => Task.FromResult("SO-TEST-0001");
     }
 }

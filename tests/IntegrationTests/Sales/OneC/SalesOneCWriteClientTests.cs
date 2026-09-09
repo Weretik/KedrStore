@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Sales.Application.Integrations.OneC.DTOs;
 using Sales.Infrastructure.Integrations.OneC;
 
-namespace IntegrationTests;
+namespace IntegrationTests.Sales.OneC;
 
 public sealed class SalesOneCWriteClientTests
 {
@@ -36,7 +36,7 @@ public sealed class SalesOneCWriteClientTests
     }
 
     [Fact]
-    public async Task SendOrderAsync_ReturnsBusinessErrorAndDoesNotLogRequestData()
+    public async Task SendOrderAsync_ReturnsBusinessErrorAndDoesNotLogRequestOrResponseData()
     {
         var sender = new FakeSiteRequestSender(_ => new RequestDataOut
         {
@@ -56,7 +56,7 @@ public sealed class SalesOneCWriteClientTests
 
         Assert.Equal(OneCOrderDeliveryOutcome.BusinessError, result.Outcome);
         Assert.Equal("OneCRejectedRequest", result.Diagnostic);
-        Assert.Contains("Unknown product", loggerProvider.Messages);
+        Assert.DoesNotContain("Unknown product", loggerProvider.Messages);
         Assert.DoesNotContain("sensitive-counterparty", loggerProvider.Messages);
         Assert.DoesNotContain("sensitive-request-comment", loggerProvider.Messages);
         Assert.DoesNotContain("sensitive-product", loggerProvider.Messages);
@@ -79,8 +79,9 @@ public sealed class SalesOneCWriteClientTests
         Assert.Equal(OneCOrderDeliveryOutcome.BusinessError, result.Outcome);
         Assert.Null(result.OneCDocumentId);
         Assert.Equal("OneCDocumentWasNotCreated", result.Diagnostic);
-        Assert.Contains("Не создан", loggerProvider.Messages);
-        Assert.Contains(oneCInternalError, loggerProvider.Messages);
+        Assert.Contains("OneCDocumentWasNotCreated", loggerProvider.Messages);
+        Assert.DoesNotContain("Не создан", loggerProvider.Messages);
+        Assert.DoesNotContain(oneCInternalError, loggerProvider.Messages);
     }
 
     [Fact]

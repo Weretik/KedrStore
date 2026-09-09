@@ -4,7 +4,7 @@ using Sales.Domain.Customers.Entities;
 using Sales.Domain.Orders.Entities;
 using Sales.Infrastructure.DataBase;
 
-namespace IntegrationTests;
+namespace IntegrationTests.Sales.Persistence;
 
 public sealed class SalesOrderPersistenceTests
 {
@@ -33,6 +33,16 @@ public sealed class SalesOrderPersistenceTests
         var counterpartyForeignKey = order.GetForeignKeys().Single(foreignKey =>
             foreignKey.PrincipalEntityType.ClrType == typeof(Counterparty));
         Assert.Equal(DeleteBehavior.Restrict, counterpartyForeignKey.DeleteBehavior);
+
+        var documentNumber = sync.FindProperty(nameof(OneCOrderSync.OneCDocumentNumber));
+        Assert.NotNull(documentNumber);
+        Assert.True(documentNumber!.IsNullable);
+        Assert.Equal(128, documentNumber.GetMaxLength());
+
+        var concurrencyToken = sync.FindProperty("xmin");
+        Assert.NotNull(concurrencyToken);
+        Assert.True(concurrencyToken!.IsConcurrencyToken);
+        Assert.Equal(ValueGenerated.OnAddOrUpdate, concurrencyToken.ValueGenerated);
     }
 
     [Fact]
@@ -46,6 +56,12 @@ public sealed class SalesOrderPersistenceTests
         Assert.Contains(
             dbContext.Database.GetMigrations(),
             migration => migration.EndsWith("_AddSalesOrdersAndOneCOrderSync", StringComparison.Ordinal));
+        Assert.Contains(
+            dbContext.Database.GetMigrations(),
+            migration => migration.EndsWith("_PersistOneCDocumentNumber", StringComparison.Ordinal));
+        Assert.Contains(
+            dbContext.Database.GetMigrations(),
+            migration => migration.EndsWith("_AddOrderSyncRetryAudit", StringComparison.Ordinal));
     }
 
     private static SalesDbContext CreateDbContext()

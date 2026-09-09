@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace UnitTests;
+namespace IntegrationTests.Identity.Persistence;
 
 public sealed class IdentityMigrationLineageTests
 {
