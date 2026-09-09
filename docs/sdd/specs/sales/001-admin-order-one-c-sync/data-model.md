@@ -43,10 +43,16 @@ OrderIdempotencyRecord (Infrastructure persistence record, not Domain entity)
 └── ExpiresAtUtc (retention cleanup after 24 hours)
 ```
 
+OrderSyncRetryAudit (Infrastructure audit record)
+- OneCOrderSyncId / OrderId / OrderNumber
+- PreviousStatus / PreviousAttemptCount
+- PreviousErrorCode / PreviousErrorMessage
+- Reason / RequestedBy / RequestedAtUtc
+
 ## Invariants and integrity
 
 - `Order.CounterpartyId` references one existing, non-deleted Sales counterparty at creation time.
-- `Order.OrderNumber` is unique and immutable. Sales generates it with a database-backed daily sequence to avoid duplicates under concurrent requests.
+- `Order.OrderNumber` is unique and immutable. After the database assigns the technical `OrderId`, Sales assigns `SO-YYYYMMDD-{OrderId}` in the same transaction; no separate daily sequence is required.
 - The order stores only `CounterpartyId`; `Counterparty.Name`, phone, and email are never duplicated as order snapshots. Counterparty remains their single source of truth.
 - `OrderLine` has a non-blank product identifier, product-name snapshot, and positive quantity; an order cannot have zero lines.
 - `OneCOrderSync.OrderId` is unique, ensuring one delivery lifecycle per order.
@@ -58,3 +64,4 @@ OrderIdempotencyRecord (Infrastructure persistence record, not Domain entity)
 - Error text and response body have explicit length limits and are sanitized. Request payloads are represented only by a non-sensitive hash.
 - `Amount` is the total amount for the complete line and persists as `decimal(18,2)`. Duplicate product rows remain separate lines because they preserve manager input; the 1C mapping sends them as separate SOAP `Item` entries.
 - Orders use a restrictive foreign-key relationship to Counterparty; a counterparty with orders must not be physically deleted. Sales soft-delete filtering prevents creating new orders for a deleted counterparty.
+- Each manual retry appends an `OrderSyncRetryAudit` row before resetting the current delivery cycle. The audit row has a restrictive foreign key to `OneCOrderSync` and is retained with the order history.

@@ -17,6 +17,7 @@ dotnet run --project .\Host.Jobs.csproj -- --job=<name>
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer price rules |
 | `sales-customers-full` | — | counterparties, then price rules |
+| `sync-one-c-orders` | — | one due batch of persisted Sales manager orders |
 
 Example:
 
@@ -25,6 +26,8 @@ dotnet run --project .\Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
 ```
 
 Repeat `--rootId` for multiple roots. Exit code `0` and `[SUCCESS] Job finished OK` mean no exception; still validate import counts. Code `1` means job/argument/runtime failure; code `2` means a root-dependent job lacked `--rootId`.
+
+For order-delivery prerequisites, result interpretation, stopping, and dead-letter handling, follow the [Sales OneC runbook](sales-one-c-runbook.md#manager-order-delivery).
 
 ## Manual 1C write smoke test
 

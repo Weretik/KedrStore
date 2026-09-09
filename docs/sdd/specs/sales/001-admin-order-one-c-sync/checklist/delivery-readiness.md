@@ -1,9 +1,9 @@
 # Admin order and 1C synchronization — checklist: readiness for delivery
 
-- [ ] Domain invariants and type boundaries are tested.
-- [ ] Persistence constraints, migration generation, empty-database application, and rollout/rollback are verified.
-- [ ] The API conforms to `docs/sdd/contracts/sales/admin-order-one-c-sync.openapi.yaml`, including errors, authorization, and idempotency.
-- [ ] SOAP adapter mapping covers acceptance, business failure, transport failure, duplicate retry, and sanitized diagnostics.
-- [ ] Scheduled delivery covers time-window deferral, batch limiting, retry backoff, maximum attempts, and concurrent claim safety.
-- [ ] `dotnet restore KedrStore.sln`, `dotnet build KedrStore.sln --no-restore`, and `dotnet test KedrStore.sln --no-build` have run or their failures are recorded.
-- [ ] Documentation, OpenAPI registry, implementation tasks, and code agree; residual risks and operational configuration are recorded in the delivery report.
+- [x] Domain invariants and type boundaries are tested. Evidence: [T030](../tasks/domain/01.3-order-domain-tests.md) and [T170](../tasks/verification/06.1-build-tests.md).
+- [x] Persistence constraints, migration generation, empty-database application, and rollout/rollback are verified. Evidence: [T050](../tasks/infrastructure/02.2-sales-migration.md) and [T170](../tasks/verification/06.1-build-tests.md).
+- [x] The API conforms to [`admin-order-one-c-sync.openapi.yaml`](../../../../contracts/sales/admin-order-one-c-sync.openapi.yaml), including errors, the temporary authorization decision, and idempotency. Evidence: [T130](../tasks/api/04.3-openapi.md), [T136](../tasks/api/04.6-manual-sync-retry.md), and [T170](../tasks/verification/06.1-build-tests.md).
+- [x] SOAP adapter mapping covers acceptance, business failure, transport failure, duplicate retry, and sanitized diagnostics. Evidence: [T060](../tasks/infrastructure/02.3-one-c-write-adapter.md), [T080](../tasks/infrastructure/02.5-infrastructure-tests.md), and [T185](../tasks/test/06.3-one-c-write-smoke-test.md).
+- [x] Scheduled delivery covers time-window deferral, batch limiting, retry backoff, maximum attempts, and concurrent claim safety. Evidence: [T150](../tasks/jobs/05.1-sync-one-c-orders-job.md) and [T170](../tasks/verification/06.1-build-tests.md).
+- [x] `dotnet restore KedrStore.sln`, `dotnet build KedrStore.sln --no-restore`, and `dotnet test KedrStore.sln --no-build --no-restore` passed on 2026-09-09. Evidence: [T170](../tasks/verification/06.1-build-tests.md).
+- [x] Documentation, OpenAPI registry, implementation tasks, and code agree; residual risks and operational configuration are recorded in the [delivery report](../delivery-report.md).

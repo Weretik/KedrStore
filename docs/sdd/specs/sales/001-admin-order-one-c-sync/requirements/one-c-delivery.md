@@ -6,6 +6,7 @@
 - For each record, Infrastructure maps the persisted order to the existing `CreateSiteRequest` SOAP operation and calls 1C outside the creating HTTP request.
 - The request contains the selected counterparty's 1C ID, stable local `OrderId`, order date, agreed comment and item rows. Each row maps to 1C `ProductId`, `Quantity`, and `Amount`.
 - The same job checks the synchronous `CreateSiteRequest` response after each send: a confirmed created-document `DocId` finishes delivery and is stored as `OneCDocumentNumber`; a response such as `Не создан...` is a business failure even if `DocId` is non-empty. A transient transport failure schedules a retry, and a business failure is retained for diagnosis without aggressive retries.
+- OneC ignores a repeated request with an existing stable `OrderNumber`. A `Sent` record whose attempt has had no persisted outcome for 15 minutes is therefore safe to claim again with the same `OrderNumber`; a newer `Sent` record remains protected from concurrent delivery.
 
 ## Rules and invariants
 
@@ -16,6 +17,8 @@
 - The job runs once, processes its batch, and exits. Cloud Scheduler cadence is an operator-managed deployment setting and is outside this feature's code and workflow scope.
 - The same stable `OrderId` is sent on every retry, preventing duplicate 1C documents.
 - Secrets, authorization headers, raw sensitive request payloads, and unbounded raw responses must not be persisted or logged.
+- A manager may manually schedule a new delivery cycle only from `BusinessError` or `DeadLetter`. The API persists the reason and audit context, reuses the immutable `OrderNumber`, and returns before any SOAP call.
+- `Accepted`, `Sent`, `Pending`, `TransportError`, and `RetryScheduled` cannot be manually retried. Concurrent retry requests are resolved through the synchronization concurrency token.
 
 ## Acceptance scenarios
 
@@ -26,3 +29,5 @@
 5. Given repeated transient failures beyond the configured maximum, when the next attempt is evaluated, then the record transitions to `DeadLetter` for manual processing.
 6. Given a record moves to `DeadLetter`, when the transition is saved, then the system sends one Telegram alert with the client, order ID, final error, and an Excel file containing the order lines.
 7. Given an accepted order is later returned by an admin order read/status API, then its response includes `oneCDocumentNumber`; the value is `null` while delivery has not been accepted.
+8. Given a `BusinessError` or `DeadLetter` order and a non-empty reason, when a manager requests a retry, then the previous failure is audited, the record becomes due `RetryScheduled`, and the HTTP request makes no 1C call.
+9. Given an order in any other status, when a manager requests a retry, then the API returns a conflict and does not change delivery state.

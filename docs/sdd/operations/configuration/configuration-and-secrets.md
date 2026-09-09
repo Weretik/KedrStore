@@ -14,6 +14,7 @@ Environment-variable keys use double underscores, for example `ConnectionStrings
 | `ADMIN_DEFAULT_PASSWORD` | Password used only if the bootstrap administrator must be created | yes |
 | `OneCSoap:Endpoint`, `Username`, `Password` | OneC SOAP integration | endpoint is environment-specific; credentials are secret |
 | `Telegram:BotToken`, `ChatId` | Telegram integration | yes |
+| `Sales:OneCOrderSync` | order-delivery batch size, pacing, attempt limit, Kyiv sending window, and stale-`Sent` recovery delay | no |
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Browser origins allowed to call the API | no, but deployment-specific |
 | `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure` and SameSite rules | no |
 | `Identity:SessionSecurity` | Access/refresh token lifetime limits | no |

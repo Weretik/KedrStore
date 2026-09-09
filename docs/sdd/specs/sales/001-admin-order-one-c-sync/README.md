@@ -2,7 +2,7 @@
 
 **Module:** Sales  
 **Type:** feature  
-**Status:** draft  
+**Status:** ready for controlled deployment
 **Owner:** Sales team  
 **Created:** 2026-08-17
 
@@ -25,6 +25,7 @@ Manager-created orders are a separate Sales capability. A manager creates an ord
 - [HTTP and SOAP contract](contracts/api-contract.md)
 - [Specification readiness](checklist/spec-readiness.md)
 - [Delivery readiness](checklist/delivery-readiness.md)
+- [Delivery report](delivery-report.md)
 
 ## AI implementation tasks
 
@@ -45,6 +46,8 @@ The specification defines concrete tasks for Phases 00–05. Execute them in ord
 - [Sales → 1C delivery instruction](../../../../../SALES_1C_SYNC_INSTRUCTION.txt)
 
 ## Change log
+
+- 2026-09-09 — Completed T170, T180, and T185 delivery verification. Added the sync-status and audited manual-retry API extensions, configurable order-sync execution, stale-claim recovery, and final delivery evidence.
 
 - 2026-08-19 — Added durable storage of the 1C-created document number after an accepted SOAP write. A future admin order read API must expose it to the frontend.
 

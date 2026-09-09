@@ -10,7 +10,7 @@ As a sales manager, I want to create an order for a selected existing counterpar
 - Selection of a locally known, active Sales `Counterparty` by its 1C identifier supplied by the frontend.
 - Local persistence of the order, its lines, and a pending 1C delivery record in one transaction.
 - Asynchronous delivery through the existing SOAP `CreateSiteRequest` operation, retry scheduling, delivery states, observability, and time-window rules from `SALES_1C_SYNC_INSTRUCTION.txt`.
-- A protected HTTP endpoint and its versioned OpenAPI contract.
+- A temporarily anonymous HTTP endpoint and its versioned OpenAPI contract; Manager/Admin authorization is a required production follow-up.
 
 ## Out of bounds
 

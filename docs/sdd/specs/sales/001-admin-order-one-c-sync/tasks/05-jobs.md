@@ -1,10 +1,10 @@
 # Phase 05 — Background delivery job
 
-- [ ] [T145 — Dead-letter Telegram notification and Excel export](jobs/05.0-dead-letter-telegram.md)
-- [ ] [T150 — `SyncOneCOrdersJob`: send and check 1C requests](jobs/05.1-sync-one-c-orders-job.md)
-- [ ] [T160 — Cloud Run Job deployment and scheduling](jobs/05.2-cloud-run-order-sync.md)
+- [x] [T145 — Dead-letter Telegram notification and Excel export](jobs/05.0-dead-letter-telegram.md)
+- [x] [T150 — `SyncOneCOrdersJob`: send and check 1C requests](jobs/05.1-sync-one-c-orders-job.md)
+- [x] [T160 — Cloud Run Job deployment and scheduling](jobs/05.2-cloud-run-order-sync.md)
 
-- [ ] [T155 — Persist the 1C document number](jobs/05.3-persist-one-c-document-number.md)
+- [x] [T155 — Persist the 1C document number](jobs/05.3-persist-one-c-document-number.md)
 
 ## Checkpoint
 

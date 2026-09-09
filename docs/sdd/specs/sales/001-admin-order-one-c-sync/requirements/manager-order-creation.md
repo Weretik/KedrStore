@@ -2,7 +2,7 @@
 
 ## Behavior
 
-- The frontend sends the selected customer's 1C identifier and the order data to the protected Sales endpoint.
+- The frontend sends the selected customer's 1C identifier and the order data to the temporarily anonymous Sales endpoint. Manager/Admin authorization is required before production use.
 - The application verifies that the counterparty exists in Sales and is not soft-deleted before an order can be created.
 - The system assigns its own immutable order identifier. The manager does not supply the identifier used as the 1C external key.
 - The command stores the order, order lines, and one `OneCOrderSync` record in `Pending` state atomically. The HTTP request does not wait for a 1C call.
@@ -15,6 +15,8 @@
 - Each line contains `Amount`: the total amount for the whole requested quantity, not the unit price.
 - `OrderId` is stable for the full order lifetime and is used unchanged in every SOAP retry.
 - A failed local transaction creates neither a persisted order nor a synchronization record.
+
+`OrderLine.ProductName` is a local Catalog snapshot resolved by `productId` during creation. The admin client does not supply a product name; an unknown local product makes the request invalid before order persistence.
 
 ## Acceptance scenarios
 

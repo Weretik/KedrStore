@@ -1,7 +1,7 @@
 # Phase 03 — Application
 
-- [ ] [T090 — Application contracts](application/03.1-order-contracts.md)
-- [ ] [T100 — Create manager order command](application/03.2-create-order.md)
+- [x] [T090 — Application contracts](application/03.1-order-contracts.md)
+- [x] [T100 — Create manager order command](application/03.2-create-order.md)
 
 ## Checkpoint
 

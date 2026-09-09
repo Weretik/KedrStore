@@ -1,6 +1,6 @@
 # Background jobs and import runbooks
 
-`Host.Jobs` is a console host: it builds DI, makes one scope, executes one named operation and exits. It has no internal scheduler, queue, retry/backoff, distributed locking or recurring execution.
+`Host.Jobs` is a console host: it builds DI, makes one scope, executes one named operation and exits. The host has no internal scheduler, queue, or recurring execution. Individual jobs may coordinate through persisted state; for example, Sales order delivery stores retry timing and uses optimistic concurrency in PostgreSQL.
 
 ```text
 operator / cron / CI → Host.Jobs (--job=...) → scoped Catalog/Sales job → PostgreSQL
