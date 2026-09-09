@@ -21,6 +21,13 @@ docs/sdd/contracts/
 
 The OpenAPI files are a source contract for the code as it exists today. They do not grant public access to an endpoint: the authorization annotations and the host fallback policy remain authoritative.
 
-Each feature SDD keeps `contracts/api-contract.md` for human decisions: scope, consumers, compatibility, security, errors, idempotency, and rollout. When a machine-readable contract is agreed, that document links to `docs/sdd/contracts/<module>/<feature>.openapi.yaml` and the aggregate `openapi.yaml` is updated in the same change.
+Each feature SDD keeps `contracts/api-contract.md` for human decisions: scope,
+consumers, compatibility, security, errors, idempotency, and rollout. For new
+or changed HTTP behavior, agree those decisions and create or update the
+machine-readable contract before transport implementation when practical. Add
+focused contract/API Red tests from that agreement, then implement the
+transport. The feature document links to
+`docs/sdd/contracts/<module>/<feature>.openapi.yaml`, and the aggregate
+`openapi.yaml` is updated in the same change.
 
 Do not create a public OpenAPI document for an internal-only change. Before adding an HTTP contract, agree the route, method, operation ID, DTOs, examples, errors, security, idempotency for side-effecting writes, and breaking-change migration path.

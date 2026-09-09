@@ -29,6 +29,12 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1all
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
+  /api/admin/orders:
+    $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders
+  /api/admin/orders/{orderId}/sync-status:
+    $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync-status
+  /api/admin/orders/{orderId}/sync/retry:
+    $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync~1retry
   /api/auth/session/login:
     $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1login
   /api/auth/session/refresh:

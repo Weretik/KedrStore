@@ -1,0 +1,154 @@
+openapi: 3.1.0
+info:
+  title: Sales admin order API
+  version: 1.0.0
+paths:
+  /api/admin/orders:
+    post:
+      summary: Create an admin order for asynchronous 1C delivery
+      description: >-
+        Temporarily anonymous. Before production, protect with
+        PolicyNames.CanManageOrders (Manager and Admin).
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Reuse only for a retry of the same create action.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminOrderRequest'
+            example:
+              counterpartyId: '000000000'
+              comment: Optional manager comment
+              lines:
+                - productId: '101'
+                  quantity: 2
+                  amount: 12500.00
+      responses:
+        '200':
+          description: Idempotent replay of the original result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateOrderResponse' }
+        '201':
+          description: Order persisted with Pending 1C delivery.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateOrderResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFoundError' }
+        '409': { $ref: '#/components/responses/ConflictError' }
+        '401': { description: Returned after production authorization is enabled. }
+        '403': { description: Returned after production authorization is enabled. }
+  /api/admin/orders/{orderId}/sync-status:
+    get:
+      summary: Get the current 1C delivery status for an admin order
+      description: >-
+        Temporarily anonymous. Before production, protect with
+        PolicyNames.CanManageOrders (Manager and Admin).
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: Current order delivery state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderSyncStatusResponse' }
+        '404': { description: Order not found. }
+        '401': { description: Returned after production authorization is enabled. }
+        '403': { description: Returned after production authorization is enabled. }
+  /api/admin/orders/{orderId}/sync/retry:
+    post:
+      summary: Schedule a failed order for another 1C delivery cycle
+      description: >-
+        Allowed only for BusinessError and DeadLetter. The request records an
+        audit entry and changes the state to RetryScheduled; it does not call
+        1C synchronously. Temporarily anonymous. Before production, protect
+        with PolicyNames.CanManageOrders (Manager and Admin).
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, minimum: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RetryOrderSyncRequest' }
+      responses:
+        '202':
+          description: Retry was persisted for background delivery.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RetryOrderSyncResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Order not found. }
+        '409': { description: Current synchronization status cannot be retried. }
+        '401': { description: Returned after production authorization is enabled. }
+        '403': { description: Returned after production authorization is enabled. }
+components:
+  schemas:
+    CreateAdminOrderRequest:
+      type: object
+      required: [counterpartyId, lines]
+      properties:
+        counterpartyId: { type: string, maxLength: 64 }
+        comment: { type: [string, 'null'], maxLength: 1000 }
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateAdminOrderLine' }
+    CreateAdminOrderLine:
+      type: object
+      required: [productId, quantity, amount]
+      properties:
+        productId: { type: string, maxLength: 64 }
+        quantity: { type: integer, minimum: 1 }
+        amount: { type: number, minimum: 0, multipleOf: 0.01 }
+    CreateOrderResponse:
+      type: object
+      required: [orderId, orderNumber, syncStatus]
+      properties:
+        orderId: { type: integer, format: int64, example: 12345 }
+        orderNumber: { type: string, example: SO-20260817-0001 }
+        syncStatus: { type: string, enum: [Pending], example: Pending }
+    OrderSyncStatusResponse:
+      type: object
+      required: [orderId, orderNumber, syncStatus, oneCDocumentNumber, acceptedAtUtc]
+      properties:
+        orderId: { type: integer, format: int64, example: 12345 }
+        orderNumber: { type: string, example: SO-20260817-0001 }
+        syncStatus:
+          type: string
+          enum: [Pending, Sent, Accepted, BusinessError, TransportError, RetryScheduled, DeadLetter]
+        oneCDocumentNumber: { type: [string, 'null'], maxLength: 128, example: 1C-123 }
+        acceptedAtUtc: { type: [string, 'null'], format: date-time }
+    RetryOrderSyncRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, minLength: 1, maxLength: 500 }
+    RetryOrderSyncResponse:
+      type: object
+      required: [orderId, orderNumber, syncStatus]
+      properties:
+        orderId: { type: integer, format: int64, example: 12345 }
+        orderNumber: { type: string, example: SO-20260817-0001 }
+        syncStatus: { type: string, enum: [RetryScheduled], example: RetryScheduled }
+    Error:
+      type: object
+      properties:
+        errors: { type: object, additionalProperties: { type: array, items: { type: string } } }
+  responses:
+    ValidationError: { description: Invalid request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotFoundError: { description: Counterparty not found, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    ConflictError: { description: Idempotency key reused with different data, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
