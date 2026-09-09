@@ -1,7 +1,7 @@
 using BuildingBlocks.Domain.Exceptions;
 using Sales.Domain.Orders.Entities;
 
-namespace UnitTests;
+namespace UnitTests.Sales.Domain;
 
 public sealed class SalesOrderTests
 {

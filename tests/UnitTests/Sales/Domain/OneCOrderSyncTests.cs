@@ -2,7 +2,7 @@ using Sales.Domain.Orders.Entities;
 using Sales.Domain.Orders.Enums;
 using Sales.Domain.Orders.ValueObjects;
 
-namespace UnitTests;
+namespace UnitTests.Sales.Domain;
 
 public sealed class OneCOrderSyncTests
 {
@@ -19,6 +19,27 @@ public sealed class OneCOrderSyncTests
         Assert.Equal(OneCOrderSyncStatus.Accepted, sync.Status);
         Assert.Equal(1, sync.AttemptCount);
         Assert.NotNull(sync.AcceptedAtUtc);
+        Assert.Equal("document-created", sync.OneCDocumentNumber);
+    }
+
+    [Fact]
+    public void Accept_DoesNotAllowChangingAssignedDocumentNumber()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var sync = OneCOrderSync.Create(OrderId.Create(1), now);
+
+        sync.Accept(now, "document-created");
+
+        Assert.Throws<InvalidOperationException>(() => sync.Accept(now.AddMinutes(1), "another-document"));
+        Assert.Equal("document-created", sync.OneCDocumentNumber);
+    }
+
+    [Fact]
+    public void Accept_RequiresDocumentNumber()
+    {
+        var sync = OneCOrderSync.Create(OrderId.Create(1), DateTimeOffset.UtcNow);
+
+        Assert.Throws<ArgumentException>(() => sync.Accept(DateTimeOffset.UtcNow, " "));
     }
 
     [Fact]
@@ -77,5 +98,34 @@ public sealed class OneCOrderSyncTests
 
         Assert.Equal(OneCOrderSyncStatus.RetryScheduled, sync.Status);
         Assert.Equal(nextWindow, sync.NextAttemptAtUtc);
+    }
+
+    [Fact]
+    public void ScheduleManualRetry_ResetsTerminalFailureForANewAttemptCycle()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var sync = OneCOrderSync.Create(OrderId.Create(1), now.AddMinutes(-10));
+        sync.StartAttempt(now.AddMinutes(-9), "payload-hash");
+        sync.MarkBusinessError(now.AddMinutes(-8), "Counterparty not found");
+
+        sync.ScheduleManualRetry(now);
+
+        Assert.Equal(OneCOrderSyncStatus.RetryScheduled, sync.Status);
+        Assert.Equal(0, sync.AttemptCount);
+        Assert.Equal(now, sync.NextAttemptAtUtc);
+        Assert.Null(sync.LastAttemptAtUtc);
+        Assert.Null(sync.LastErrorMessage);
+    }
+
+    [Fact]
+    public void ScheduleManualRetry_RejectsAcceptedOrder()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var sync = OneCOrderSync.Create(OrderId.Create(1), now);
+        sync.Accept(now, "1C-123");
+
+        Assert.Throws<InvalidOperationException>(() => sync.ScheduleManualRetry(now.AddMinutes(1)));
+        Assert.Equal(OneCOrderSyncStatus.Accepted, sync.Status);
+        Assert.Equal("1C-123", sync.OneCDocumentNumber);
     }
 }

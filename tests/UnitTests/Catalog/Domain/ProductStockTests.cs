@@ -2,7 +2,7 @@ using BuildingBlocks.Domain.Exceptions;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
-namespace UnitTests;
+namespace UnitTests.Catalog.Domain;
 
 public sealed class ProductStockTests
 {

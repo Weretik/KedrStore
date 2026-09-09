@@ -1,7 +1,7 @@
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 
-namespace UnitTests;
+namespace UnitTests.Catalog.Application;
 
 public sealed class CosmosProductMappingTests
 {

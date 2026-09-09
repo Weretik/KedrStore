@@ -3,7 +3,7 @@ using Xunit;
 using Catalog.Application.Integrations.OneC.DTOs;
 using System.Collections.Generic;
 
-namespace UnitTests;
+namespace UnitTests.Catalog.Application;
 
 public class SlugTests
 {

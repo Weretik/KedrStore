@@ -6,7 +6,7 @@ using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
-namespace UnitTests;
+namespace UnitTests.Catalog.Application;
 
 public sealed class CategoryPresentationApplicationTests
 {
