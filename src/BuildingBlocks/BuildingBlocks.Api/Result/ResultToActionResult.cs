@@ -10,6 +10,7 @@ public static class ResultToActionResult
         => result.Status switch
         {
             ResultStatus.Ok => c.Ok(result.Value),
+            ResultStatus.Created => c.StatusCode(StatusCodes.Status201Created, result.Value),
             ResultStatus.NotFound => c.NotFound(),
             ResultStatus.Invalid => c.BadRequest(result.ValidationErrors),
             ResultStatus.Conflict => c.Conflict(result.Errors),
