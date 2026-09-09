@@ -1,23 +1,25 @@
-# Phase 01 — Domain planning
+# Phase 01 — Domain task planning
 
-> This phase only creates and orders subphases. Do not implement the entire Domain layer in this file.
+> Create only the Domain `TS-*` files required by scenarios. Do not implement
+> the whole feature in this orchestration file.
 
-- [ ] T005 Check `design/domain.md` and `data-model.md`; determine the necessary aggregate roots, value objects, invariants and permissible state transitions.
-- [ ] T006 Determine whether domain events are required for side effects between aggregates; do not create them for a simple internal call.
-- [ ] T007 View the subphase templates in the [Domain Templates](#domain-templates) section and select only the required Domain slices.
-- [ ] T008 Copy each desired template to `tasks/domain/` as a separate file of the actual subphase: `01.1-<name>.md`, `01.2-<name>.md` and so on; replace `NN' with a number, placeholders with specific names and paths.
+- [ ] Review scenario rules, `design/domain.md`, and `data-model.md`.
+- [ ] Identify aggregates, value objects, invariants, and state transitions.
+- [ ] Determine whether domain events are required for cross-aggregate effects.
+- [ ] Create one small Domain task per responsibility from the relevant template.
+- [ ] Give each task a `TS-*` ID, `Covers: SC-*`, dependencies, exact paths, test
+      level, and checkpoint.
+- [ ] Map every Domain task into `traceability.md`.
 
-## Domain templates
+## Templates
 
-- [01.NN — Aggregate and invariants](domain/01.NN-aggregate.template.md)
-- [01.NN — Value object](domain/01.NN-value-object.template.md)
-- [01.NN — Domain events](domain/01.NN-domain-events.template.md)
-- [01.NN — Domain tests](domain/01.NN-domain-tests.template.md)
+- [Aggregate and invariants](domain/01.NN-aggregate.template.md)
+- [Value object](domain/01.NN-value-object.template.md)
+- [Domain events](domain/01.NN-domain-events.template.md)
+- [Domain coverage](domain/01.NN-domain-tests.template.md)
 
 ## Checkpoint
 
-A separate `01.N' subphase file is created for each required Domain solution; Domain does not depend on Infrastructure.
-
-## The next phase
-
-After all created sub-phases of `01.N` are completed, go to [02 — Infrastructure Planning](02-infrastructure.md).
+Every required Domain responsibility has one traceable technical task. Domain
+does not depend on Application, Infrastructure, or API. Scenarios without new
+Domain behavior explicitly use `—` in the matrix.

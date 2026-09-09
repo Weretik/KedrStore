@@ -1,24 +1,28 @@
-# Phase 02 — Infrastructure planning
+# Phase 02 — Infrastructure and enabler task planning
 
-> This phase only creates and orders subphases. Do not implement the entire Infrastructure layer in this file.
+> Create only the Infrastructure `TS-*` and shared `EN-*` files required by
+> scenarios.
 
-- [ ] T009 Check `design/infrastructure.md` and `data-model.md`; define the required persistence mapping, constraints, indexes, migration and read model.
-- [ ] T010 Determine whether there is an external integration, integration event, outbox, file, cache, or other Infrastructure adapter in scope.
-- [ ] T011 View the subphase templates in the [Infrastructure Templates](#infrastructure-templates) section and select only the necessary Infrastructure slices.
-- [ ] T012 Copy each required template to `tasks/infrastructure/` as a separate file of the actual subphase: `02.1-<name>.md`, `02.2-<name>.md` and so on; replace `NN' with a number, placeholders with specific names and paths.
+- [ ] Review scenarios, `design/infrastructure.md`, and `data-model.md`.
+- [ ] Identify persistence, constraints, migrations, read models, integrations,
+      outbox behavior, configuration, and operational prerequisites.
+- [ ] Use `TS-*` for directly testable behavior and `EN-*` for shared or
+      prerequisite work with a documented test-first exception.
+- [ ] Add `Covers` or `Enables`, dependencies, exact paths, verification, and a
+      checkpoint to every created task.
+- [ ] Map every task into `traceability.md`.
 
-## Templates Infrastructure
+## Templates
 
-- [02.NN — Persistence mapping](infrastructure/02.NN-persistence-mapping.template.md)
-- [02.NN — Migration via EF Core CLI](infrastructure/02.NN-migration.template.md)
-- [02.NN — Read model](infrastructure/02.NN-read-model.template.md)
-- [02.NN — Integration or outbox](infrastructure/02.NN-integration-outbox.template.md)
-- [02.NN — Infrastructure tests](infrastructure/02.NN-infrastructure-tests.template.md)
+- [Shared enabler](enablers/EN-NNN-enabler.template.md)
+- [Persistence mapping](infrastructure/02.NN-persistence-mapping.template.md)
+- [Migration](infrastructure/02.NN-migration.template.md)
+- [Read model](infrastructure/02.NN-read-model.template.md)
+- [Integration or outbox](infrastructure/02.NN-integration-outbox.template.md)
+- [Infrastructure coverage](infrastructure/02.NN-infrastructure-tests.template.md)
 
 ## Checkpoint
 
-A separate `02.N' subphase file is created for each required Infrastructure solution; applied migrations are not edited.
-
-## The next phase
-
-After all created sub-phases of `02.N` are completed, go to [03 - Application](03-application.md).
+Every required Infrastructure responsibility or shared prerequisite is mapped
+to scenarios. Applied migrations are not edited, generated work uses the
+repository CLI, and every `EN-*` exception has replacement verification.

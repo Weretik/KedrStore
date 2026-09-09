@@ -1,35 +1,45 @@
 # Execution and result recording
 
-## Completing checkbox tasks
+## Execute a testable technical task
 
-1. Complete tasks in the order of the current phase or subphase file, except
-   explicitly marked independent `[P]` tasks whose dependencies are complete.
-2. Read a file's current contents before changing it; preserve its encoding,
-   style, and unrelated user changes.
-3. Make the smallest change that fully completes the task. Follow the
-   dependency direction `API -> Application -> Domain`; Infrastructure depends
-   only on inner layers.
-4. Implement use cases with CQRS through Mediator. Domain owns invariants;
-   Application owns orchestration and FluentValidation; API owns HTTP mapping;
-   Infrastructure owns persistence and external adapters.
-5. Use CLI-first: for migrations, SQL scripts, OpenAPI validation, restore,
-   build, tests, and generators, first find and run the repository's accepted
-   command or script. Change output manually only when a generator cannot
-   express the required result correctly, and record why.
-6. After local verification, change only the task marker from `- [ ]` to
-   `- [x]`. Do not mark a partially complete, blocked, or unverified task.
+1. Confirm the task's `TS-*`, `Covers`, dependencies, exact paths, test level,
+   and checkpoint.
+2. **Red**: add the smallest focused test for the selected rule or scenario.
+   Run it and confirm that it fails because the behavior is absent or wrong.
+3. **Green**: implement the smallest complete change that passes that test.
+   Preserve the dependency direction `API -> Application -> Domain`;
+   Infrastructure implements interfaces owned by inner layers.
+4. **Refactor**: improve structure within the agreed design and rerun the
+   focused tests.
+5. **Regression**: run the affected suite and record the result.
+6. Mark checklist steps only after their evidence exists. Update the scenario
+   row in `traceability.md`, then select the next ready in-scope task.
+
+Do not accept a compilation failure, broken fixture, missing dependency, or
+unrelated test failure as valid Red evidence.
+
+## Execute an enabler or exception
+
+For an `EN-*` task, record why Red-first behavior is not meaningful, which
+scenarios it enables, the accepted command or generator, and replacement
+verification. Generated output is inspected but changed manually only when the
+generator cannot express the agreed result; record that reason.
 
 ## Where to record results
 
 | Event | Record it in |
 | --- | --- |
-| Completed task ID | The current main-phase or subphase file: `- [ ]` to `- [x]`. |
-| Clarified scope or requirement | `README.md` or the relevant `requirements/` file. |
-| Domain, persistence, or integration decision | `design/domain.md`, `design/infrastructure.md`, or `data-model.md`. |
-| Clarified HTTP/integration contract | `contracts/api-contract.md` and, once agreed, `docs/sdd/contracts/<module>/<feature>.openapi.yaml`. |
-| Completed check or discovered blocker | The current phase or delivery report, when the task requires one. |
+| Red/Green/refactor/regression evidence | Current `TS-*` file |
+| Enabler exception and replacement check | Current `EN-*` file |
+| Completed technical task | Current task file and `traceability.md` |
+| Completed acceptance scenario | `traceability.md` |
+| Clarified behavior | `README.md` or relevant `requirements/` file |
+| Technical decision | Relevant design or data-model document |
+| Contract change | Feature contract and versioned OpenAPI |
+| Blocker or deviation | Current task and affected scenario row |
 
-A main phase creates the required subphase files from templates, replacing `NN`,
-placeholders, and task IDs; it does not implement those subphases in the same
-turn. Do not mark future phases complete or fill in the delivery checklist
-before subphase `05.N` unless the current task explicitly requires it.
+## Scope discipline
+
+Make the smallest change that fully completes the current task. Do not perform
+incidental refactors or upgrades. After completion, continue to the next ready
+task only while it remains inside the user's authorized scope.

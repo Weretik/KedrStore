@@ -1,23 +1,26 @@
-# Phase 04 — API
+# Phase 04 — API and contract task planning
 
-> This phase only creates and orders subphases. Do not implement the entire API layer in this file.
+> Create these tasks only for HTTP or integration behavior.
 
-- [ ] T017 If the feature has an HTTP/integration surface, view [API Templates](#api-templates) and select the required subphases.
-- [ ] T018 Copy each required template to `tasks/api/` as a separate file of the actual subphase: `04.1-<name>.md`, `04.2-<name>.md` and so on; replace `NN' with a number and placeholders with specific names and paths.
-- [ ] T019 Execute API subphases in the order: controllers/endpoints → HTTP contracts, authorization and Result mapping → OpenAPI → API tests.
-- [ ] T020 Do not create API subphases only for feature without HTTP or integration API.
+- [ ] Map every changed operation to its `SC-*` scenarios.
+- [ ] Plan the human-readable contract and versioned OpenAPI update before
+      transport implementation.
+- [ ] Plan focused Red tests before each new transport behavior.
+- [ ] Create separate tasks for contract, endpoint, HTTP/security mapping, and
+      final API acceptance/regression coverage where each is independently reviewable.
+- [ ] Give every task a `TS-*` ID, dependencies, exact paths, test level, and checkpoint.
+- [ ] Map every API task into `traceability.md`.
 
-## API Templates
+## Templates
 
-- [04.NN — Controllers and endpoints](api/04.NN-controllers.template.md)
-- [04.NN — HTTP contracts, rights and Result mapping](api/04.NN-http-behavior.template.md)
-- [04.NN — OpenAPI documentation](api/04.NN-contract-documentation.template.md)
-- [04.NN — API/integration tests](api/04.NN-tests.template.md)
+1. [OpenAPI contract](api/04.NN-contract-documentation.template.md)
+2. [Controllers and endpoints](api/04.NN-controllers.template.md)
+3. [HTTP behavior, authorization, and Result mapping](api/04.NN-http-behavior.template.md)
+4. [API acceptance and regression tests](api/04.NN-tests.template.md)
 
 ## Checkpoint
 
-For the HTTP/integration feature, the API layer has separate `04.N` subphase files for controllers, HTTP behavior, documentation, and integration tests.
-
-## The next phase
-
-[05 — Verification](05-verification.md)
+Changed API behavior is contract-first where practical. Each endpoint and HTTP
+rule has a planned focused Red test, implementation task, and acceptance or
+contract evidence. Features without an HTTP/integration surface use `—` in the
+traceability matrix.

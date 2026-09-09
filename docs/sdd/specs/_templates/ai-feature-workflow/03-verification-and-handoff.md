@@ -1,40 +1,40 @@
-# Verification and phase handoff
+# Verification and handoff
 
-## Verify the result
+## Verify each task and scenario
 
-1. Run checks explicitly required by the phase, applicable `AGENTS.md` files,
-   and `docs/sdd/standards/testing-rules.md` when relevant to the changed files.
-2. Start with the narrowest relevant check: targeted unit, integration, or API
-   tests. For build/test subphase `05.N`, run the agreed CLI commands, for
-   example:
+1. Run the focused check required by the current task.
+2. Run the affected regression tests required by
+   `docs/sdd/standards/testing-rules.md` and applicable `AGENTS.md` files.
+3. When the last task for an `SC-*` scenario is complete, run its acceptance
+   verification and update `traceability.md` to `verified`.
+4. For full-feature scope, run the agreed restore/build/test commands and
+   complete `checklist/delivery-readiness.md`.
+5. Review `git diff` for the current scope and preserve unrelated user changes.
 
-   ```powershell
-   dotnet restore KedrStore.sln
-   dotnet build KedrStore.sln --no-restore
-   dotnet test KedrStore.sln --no-build
-   ```
+If a command fails, record the exact command, failure point, and whether the
+failure was introduced by the change or was already present.
 
-3. If a command cannot run or fails, record the exact command, point of
-   failure, and whether the issue was introduced by the current change or was
-   already present.
-4. Review `git diff` for your own changes. They must match the current phase;
-   do not change or discard unrelated working-tree changes.
+## Completion conditions
 
-## Completion condition
+A technical task is complete only when its checklist, checkpoint, and evidence
+are complete. A scenario is complete only when every required `TS-*`/`EN-*`
+task and its acceptance evidence are complete. A feature is complete only when
+all in-scope scenarios and delivery gates are complete.
 
-The current file is complete only when all its checkbox tasks are closed, its
-checkpoint is satisfied, blockers are absent or have an explicit user decision,
-and code, contracts, and documentation agree. Subphase `05.N` additionally
-requires `checklist/delivery-readiness.md` and a delivery report.
+## Progress and final report
 
-## Final report format
+During an authorized multi-task run, report material findings and continue; do
+not pause only because a file or layer boundary was crossed.
 
-1. **Completed** — task IDs and a concise result.
-2. **Changed files** — only changes from the current phase.
-3. **Verification** — commands, results, and manual scenarios.
-4. **Not verified / blockers** — the exact reason; state when there are none.
-5. **Risks / manual verification** — only real remaining items.
-6. **Status** — `Phase file <path> is complete. Waiting for a command naming the next exact phase file.`
+The final report contains:
 
-After the report, do not start the next phase file or make new changes until the
-user explicitly names its number or path.
+1. **Completed scope** — scenarios and technical task IDs.
+2. **Behavior delivered** — observable result.
+3. **Changed files** — files changed in the authorized scope.
+4. **TDD evidence** — Red, Green, and regression commands/results, plus any
+   justified `EN-*` exceptions.
+5. **Not verified or blocked** — exact reason and next step.
+6. **Residual risks** — only real remaining risks.
+
+End when the authorized scope is complete or blocked. Do not say that a command
+naming the next task file is required when the next task is already authorized.

@@ -1,19 +1,27 @@
-# Phase 00 — Refinement and Readiness
+# Phase 00 — Behavior and readiness planning
 
-> This phase only creates and orders subphases. Do not execute all readiness decisions in this file.
+> This phase creates the behavior-first foundation and required readiness tasks.
 
-- [ ] T001 View subphase templates in the section [Readiness Templates](#readiness-templates) and select the desired ones.
-- [ ] T002 Copy each required template to `tasks/readiness/` as a separate file of the actual subphase: `00.1-<name>.md`, `00.2-<name>.md` and so on; replace `NN' with a number, placeholders with specific data.
+- [ ] Confirm the feature goal, actors, scope, and exclusions.
+- [ ] Assign stable `R-*` IDs to business rules and `SC-*` IDs to acceptance scenarios.
+- [ ] Add relevant happy-path, negative, and boundary examples.
+- [ ] Resolve `[NEEDS CLARIFICATION]` items or move them out of scope.
+- [ ] Select and create only the required readiness files.
+- [ ] Initialize `traceability.md` with one row per in-scope scenario.
 
 ## Readiness templates
 
-- [00.NN — Scope, solutions and CQRS use cases](readiness/00.NN-scope.template.md)
-- [00.NN — CLI, scripts and generators](readiness/00.NN-tooling.template.md)
+- [Scope and scenario discovery](readiness/00.NN-scope.template.md)
+- [Test strategy](readiness/00.NN-test-strategy.template.md)
+- [CLI, scripts, and generators](readiness/00.NN-tooling.template.md)
 
 ## Checkpoint
 
-Do not start the Domain until all created sub-phases `00.N` are completed, model decisions are agreed, a complete list of required and excluded use cases and integration/API-operations is completed. CLI/scripts are defined for automated operations; a complete machine-readable contract is not a condition of this checkpoint for a code-first workflow.
+Every changed behavior has a stable scenario ID and unambiguous observable
+outcome. Test levels are planned, open product decisions are resolved or out of
+scope, and the traceability matrix contains every scenario.
 
-## The next phase
+## Next planning step
 
-After completing all created sub-phases `00.N`, go to [01 - Domain Planning](01-domain.md).
+Plan the technical tasks required by the scenario graph. Planning may inspect
+all layers before implementation begins.

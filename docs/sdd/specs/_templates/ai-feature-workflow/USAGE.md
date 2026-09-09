@@ -1,39 +1,86 @@
-# Як запускати AI для одного файла фази feature
+# Як дати AI задачу на реалізацію feature
 
-Спочатку створіть і погодьте специфікацію за
-[шаблоном feature](../feature/USAGE.md). Потім надсилайте AI одну фазу за раз:
+Цей файл призначений для користувача. Він містить готові запити для старту або
+продовження реалізації прийнятої SDD-специфікації.
+
+## Що потрібно вказати
+
+У запиті завжди зазначайте:
+
+- точний шлях до feature;
+- дозволений scope: уся feature, фаза, сценарії `SC-*` або задачі `TS-*`/`EN-*`;
+- додаткове обмеження, якщо частину scope не можна змінювати.
+
+Окремо давати команду для кожного task-файлу не потрібно. У межах дозволеного
+scope AI сам переходить до наступної готової задачі за `Depends on` і
+`traceability.md`.
+
+## Реалізувати всю feature
 
 ```text
-Працюй за регламентом `docs/sdd/specs/_templates/ai-feature-workflow/`.
+Працюй за `docs/sdd/specs/_templates/ai-feature-workflow/`.
 Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
-Поточний файл фази: `<tasks/00-readiness.md | tasks/application/03.2-create.md | …>`.
+Scope: уся прийнята feature.
+
+Виконуй усі готові задачі за залежностями до delivery checkpoint.
+Не зупиняйся лише через перехід до іншого task-файлу або шару.
 ```
 
-Приклад:
+## Реалізувати одну фазу
 
 ```text
-Працюй за регламентом `docs/sdd/specs/_templates/ai-feature-workflow/`.
-Feature: `docs/sdd/specs/catalog/002-product-archive`.
-Поточний файл фази: `tasks/domain/01.1-aggregate.md`.
+Працюй за `docs/sdd/specs/_templates/ai-feature-workflow/`.
+Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
+Scope: фаза `<00 | 01 | 02 | 03 | 04 | 05>`.
+
+Виконай усі готові задачі цієї фази та потрібні перевірки.
+Не переходь до задач поза цим scope.
 ```
 
-Головні фази виконуються в такому порядку, але кожна з них створює лише потрібні
-окремі підфази. AI виконує одну підфазу за раз:
-
-| Фаза | Результат |
-| --- | --- |
-| `00` | створює `00.N` підфази для scope, CQRS use cases та tooling |
-| `01` | створює `01.N` Domain-підфази |
-| `02` | створює `02.N` Infrastructure-підфази |
-| `03` | створює `03.N` Application-підфази |
-| `04` | створює `04.N` API-підфази для HTTP/integration feature |
-| `05` | створює `05.N` Verification-підфази |
-
-Після головної фази назвіть точний створений файл підфази. Наприклад:
+## Реалізувати вибрані сценарії
 
 ```text
-Працюй з `tasks/application/03.2-create.md`.
+Працюй за `docs/sdd/specs/_templates/ai-feature-workflow/`.
+Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
+Scope: `SC-001`, `SC-002` та їхні обов'язкові `EN-*` залежності.
+
+Виконай усі технічні задачі, потрібні для цих сценаріїв, і запиши evidence у
+task-файлах та `traceability.md`. Не реалізовуй інші сценарії.
 ```
 
-Без цієї команди AI не переходить до наступного файла. Якщо залежна фаза або
-підфаза має незакриті задачі чи blocker, спершу усуньте їх або явно змініть scope.
+## Виконати конкретні задачі
+
+```text
+Працюй за `docs/sdd/specs/_templates/ai-feature-workflow/`.
+Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
+Scope: `TS-004`, `TS-005`.
+
+Перевір їхні залежності, виконай задачі та checkpoint-и. Не розширюй scope.
+```
+
+## Продовжити перервану роботу
+
+```text
+Продовжуй роботу за `docs/sdd/specs/_templates/ai-feature-workflow/`.
+Feature: `docs/sdd/specs/<module>/<NNN>-<feature-slug>`.
+Scope: <попередній scope або нове точне обмеження>.
+
+Перевір поточні task markers, `traceability.md`, git diff і результати
+verification. Продовжуй із першої готової незавершеної задачі. Не повторюй
+виконану роботу та не відкидай сторонні зміни робочого дерева.
+```
+
+## Які файли вказувати
+
+Обов'язково вкажіть:
+
+- каталог feature у `docs/sdd/specs/<module>/...`;
+- workflow `docs/sdd/specs/_templates/ai-feature-workflow/`.
+
+Якщо задача вузька, корисно додати шлях до конкретного task-файлу. Додавати
+окремо requirements, design, contracts і standards не потрібно: workflow
+зобов'язує AI знайти та прочитати релевантні документи.
+
+AI зупиняється після завершення дозволеного scope або через конкретний blocker:
+невідоме бізнес-рішення, незакриту залежність, потрібний зовнішній доступ чи
+іншу дію, для якої немає дозволу.

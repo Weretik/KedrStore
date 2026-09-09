@@ -1,45 +1,52 @@
-# Context and scope
+# Context, scope, and task selection
 
-## Identify the current phase file
+## Resolve the authorized scope
 
-- Execute **only** the exact file provided by the user: a main phase
-  `tasks/00-*.md`–`tasks/05-*.md` or a subphase such as
-  `tasks/application/03.2-create.md`.
-- If the user provides only a number, find one matching actual file. If there
-  are several (for example, `03.1` and `03.2`), ask for the exact path or name.
-- A main file `00`–`05` only selects and creates subphases. After it is
-  complete, do not start any generated subphase until the user explicitly names
-  its file.
-- You may read future phases only to understand dependencies. Do not modify
-  their tasks, code, or checks without an explicit user command.
+The user's request may authorize a complete feature, a phase, one or more
+`SC-*` scenarios, or named `TS-*`/`EN-*` tasks. Use the broadest scope clearly
+authorized by the request. Do not shrink feature-level authorization to one
+file, and do not expand a named-task request to the full feature.
+
+Within the authorized scope, no separate instruction is required to open and
+execute the next ready task file.
 
 ## Read before changing anything
 
-1. Find every applicable `AGENTS.md` from the repository root to each file you
-   plan to change, and follow all applicable instructions.
-2. Read `<feature>/README.md`, `tasks/README.md`, the current phase file, and
-   the applicable documents in `requirements/`, `design/`, `data-model.md`,
-   `contracts/`, and `checklist/` in full.
-3. For main phase `00` and subphase `00.N`, read the entire feature package,
-   including `checklist/spec-readiness.md`. For an HTTP or integration consumer,
-   also read `contracts/api-contract.md` and the corresponding file in
-   `docs/sdd/contracts/<module>/`.
-4. Check dependencies: the prior main phase and every required generated
-   subphase must be `[x]`, and the checkpoint must contain no unresolved
-   blocker.
-5. Read only the relevant stable rules: `docs/sdd/architecture/README.md`,
-   `docs/sdd/standards/README.md`, and the necessary domain, database, API,
-   security, or testing rules.
-6. Inspect existing code, tests, and configuration only as much as the current
-   phase requires.
+1. Find every applicable `AGENTS.md` from the repository root to each planned
+   change.
+2. Read the feature `README.md`, `requirements/`, `traceability.md`,
+   `tasks/README.md`, selected task files, and relevant design, data-model,
+   contract, and checklist documents.
+3. For HTTP or integration behavior, read both the human-readable contract and
+   corresponding versioned OpenAPI file.
+4. Read only the relevant architecture and standards documents, including
+   `docs/sdd/standards/testing-rules.md`.
+5. Inspect existing code, tests, commands, and configuration needed to verify
+   that the next task is ready.
+
+## Select the next task
+
+A task is ready when its dependencies are complete, its covered scenarios are
+unambiguous, its paths and checkpoint are concrete, and the required test level
+can be executed or has a valid documented exception.
+
+Prefer this order within a scenario:
+
+1. shared `EN-*` prerequisites;
+2. inner-layer `TS-*` behavior required by outer layers;
+3. Application orchestration;
+4. persistence or external adapters;
+5. API contract and transport behavior;
+6. scenario acceptance and regression verification.
+
+This dependency order does not require finishing all tasks in one layer across
+the entire feature.
 
 ## When to stop
 
-Do not invent a business rule, endpoint, DTO field, role, data schema, file
-path, or requirement that is absent from the specification or current code. If a
-decision is missing, record `[NEEDS CLARIFICATION: <question>]` in the relevant
-feature document, leave the task open, explain the blocker briefly, and wait for
-a decision.
-
-Do not make incidental refactors, dependency upgrades, or changes outside the
-scope of the current phase.
+Stop only when the authorized scope is complete or when progress requires an
+unresolved product decision, a failed prerequisite, external authorization, a
+destructive action outside the authorized scope, or another concrete blocker.
+Record `[NEEDS CLARIFICATION: <question>]` in the relevant document when product
+behavior is missing. Do not invent a rule, endpoint, DTO field, role, schema, or
+requirement.

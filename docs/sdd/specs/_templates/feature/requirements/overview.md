@@ -2,18 +2,22 @@
 
 ## Goal
 
-As <role>, I want <action> to <result>.
+As <role>, I want <action> so that <observable result>.
 
-## Within
+## In scope
 
-- <behaviour>
+- <observable behavior>
 
-## Out of bounds
+## Out of scope
 
 - <deferred behavior>
 
+## Actors and external systems
+
+- <actor or system>: <responsibility>
+
 ## Open questions
 
-- [NEEDS CLARIFICATION: <specific question>]
+- [NEEDS CLARIFICATION: <specific product question>]
 
-Do not describe EF, handlers, controllers, migrations or file structure here.
+Do not describe EF, handlers, controllers, migrations, or file structure here.

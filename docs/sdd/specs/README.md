@@ -1,34 +1,28 @@
 # Feature specifications
 
-Every non-trivial change starts here before implementation.
-
-Reusable task templates are in [_templates](_templates/). Read its README first and choose the folder by work type.
+This directory contains feature-specific requirements, design, contracts,
+task records, and verification evidence. Every non-trivial behavior change
+updates its specification before implementation.
 
 ## Layout
 
-~~~text
-docs/specs/
-  <module>/
-    <feature-slug>/
-      README.md                    parent SDD
-      contracts/
-        api-contract.md            feature-specific consumer and rollout decisions
-  contracts/
-    openapi.yaml                   aggregate public API contract
-    <module>/<feature>.openapi.yaml module feature contract referenced by the aggregate
-  _templates/
-    feature/                feature specification and task templates
-    ai-feature-workflow/    AI phase-execution guidance
-~~~
+```text
+docs/sdd/specs/
+├── <module>/<NNN>-<feature>/     one feature specification
+└── _templates/                   reusable structure and AI workflow
+```
 
-Use a module folder such as catalog, sales, identity, platform or cross-module. Use lowercase kebab-case feature and phase names.
-
-For an ordinary backend feature, start with [the feature template](_templates/feature/README.md), then follow [the AI workflow](_templates/ai-feature-workflow/README.md). The template contains six orchestration phases and focused subphase templates. Do not create files for inapplicable work; record the reason in the parent SDD. Link to architecture and standards rather than copying them. For HTTP changes, keep the human agreement in the feature's `contracts/api-contract.md`, then create the machine-readable contract under `docs/sdd/contracts/<module>/` and reference it from `docs/sdd/contracts/openapi.yaml`.
-
-For catalog work involving doors, hardware, Cosmos, or 1C product data, use the [product glossary](../../product/glossary.md) for stable terminology. Keep feature-specific rules and mappings in that feature's specification.
+- Start new work with the [template catalog](_templates/README.md).
+- Migrate existing specifications with the
+  [incremental migration guide](_templates/MIGRATION.md).
+- Keep machine-readable public API contracts in
+  [`docs/sdd/contracts/`](../contracts/README.md).
+- For catalog terms involving doors, hardware, Cosmos, or 1C product data, use
+  the [product glossary](../../product/glossary.md).
 
 ## Lifecycle
 
-Draft → accepted → in-progress → verified → completed.
+Draft -> accepted -> in-progress -> verified -> completed.
 
-An implementation must not silently diverge from an accepted specification. Add a dated change note with the reason, scope impact and new verification when it does.
+An implementation must not silently diverge from an accepted specification.
+Record a dated change note with the reason, scope impact, and new verification.

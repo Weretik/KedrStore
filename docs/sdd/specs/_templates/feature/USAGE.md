@@ -1,45 +1,82 @@
-# Як створити та реалізувати feature
+# Як створити нову feature-специфікацію
 
-Надішліть AI це повідомлення для підготовки специфікації:
+Цей файл призначений для користувача. Він пояснює, що написати AI для
+створення нової SDD-специфікації. Не копіюйте `USAGE.md` до каталогу створеної
+feature.
+
+## Що потрібно визначити
+
+Передайте AI:
+
+- модуль: `catalog`, `sales`, `identity`, `platform` або інший наявний модуль;
+- номер і коротку назву feature у kebab-case;
+- мету як спостережуваний результат для користувача або бізнесу;
+- поведінку, що входить до scope;
+- поведінку, що явно не входить до scope;
+- відомі бізнес-правила, обмеження та зовнішні системи;
+- посилання на попередню feature, контракт або інший релевантний документ.
+
+Якщо частина поведінки невідома, не вигадуйте її. AI має записати конкретне
+`[NEEDS CLARIFICATION]` і поставити запитання.
+
+## Мінімальний запит до AI
 
 ```text
 Працюй за шаблоном `docs/sdd/specs/_templates/feature/`.
-Створи специфікацію feature `<NNN>-<feature-slug>` у модулі `<Identity | Catalog | Reference | Accounting | Crm>`.
-Мета: `<що має змінитися для користувача або бізнесу>`.
-Scope: `<що входить і що явно не входить>`.
+Створи feature `<NNN>-<feature-slug>` у модулі `<module>`.
+
+Мета: <що зміниться для користувача або бізнесу>.
+Scope: <що входить до feature>.
+Поза scope: <що не потрібно реалізовувати>.
+
+Спочатку підготуй SDD-специфікацію. Код не реалізовуй.
+Невідомі бізнес-рішення познач як `[NEEDS CLARIFICATION]`.
 ```
 
-Приклад:
+## Розширений запит із контекстом
 
 ```text
 Працюй за шаблоном `docs/sdd/specs/_templates/feature/`.
-Створи специфікацію feature `002-product-archive` у модулі `Catalog`.
-Мета: адміністратор може архівувати товар, щоб прибрати його з активного каталогу без втрати історії.
-Scope: доменна модель, EF Core migration, CQRS-команда, HTTP endpoint, OpenAPI та тести; UI не входить у scope.
+Створи feature `<NNN>-<feature-slug>` у модулі `<module>`.
+
+Мета: <результат>.
+Актори: <користувачі або зовнішні системи>.
+Scope: <включена поведінка>.
+Поза scope: <виключена поведінка>.
+Відомі правила: <правила та обмеження>.
+Пов'язані документи: <точні шляхи>.
+
+Сформулюй правила `R-*` і acceptance-сценарії `SC-*`.
+Після узгодження поведінки підготуй design, contracts, `traceability.md`,
+малі технічні задачі `TS-*`/`EN-*` та readiness checklist.
+Код не реалізовуй.
 ```
 
-AI має скопіювати `feature/` до
-`docs/sdd/specs/<module>/<NNN>-<feature-slug>/`, замінити всі плейсхолдери,
-заповнити вимоги й дизайн та закрити `checklist/spec-readiness.md` **до**
-реалізації коду. Головні фази `00–05` є лише orchestration. AI має створити
-тільки потрібні окремі підфази: `00.N` у `tasks/readiness/`, `01.N` у
-`tasks/domain/`, `02.N` у `tasks/infrastructure/`, `03.N` у
-`tasks/application/`, `04.N` у `tasks/api/` та `05.N` у `tasks/verification/`.
-Не додавайте всю реалізацію в головний файл фази. Для HTTP або integration API
-виконуйте підфази `04.N` у порядку: controllers → HTTP behavior → OpenAPI →
-API tests.
+## Які файли вказувати
 
-Якщо feature має HTTP endpoint або integration API, ці фази є обов'язковими:
-controllers → HTTP contracts/authorization/result mapping → OpenAPI → API tests →
-Verification. AI не має пропускати потрібні підфази 04.NN.
+Обов'язково вкажіть точний шлях до шаблону:
 
-AI має працювати за правилом CLI-first: для migration, SQL scripts, OpenAPI
-validation/generation, restore, build, tests та інших автоматизованих операцій
-спочатку знайти й виконати наявну команду або script проєкту. Ручне створення чи
-редагування допускається лише коли generator не може коректно виразити потрібну
-зміну, і причина має бути зафіксована в задачі.
+- `docs/sdd/specs/_templates/feature/`.
 
-Для виконання вже підготовленої feature по одній фазі використовуйте
-[AI workflow для feature](../ai-feature-workflow/USAGE.md). Не просіть AI
-одночасно створювати специфікацію та реалізовувати всі фази: це ускладнює
-перевірку scope, data model і API-контракту.
+За наявності додайте точні шляхи до:
+
+- попередньої або пов'язаної feature у `docs/sdd/specs/`;
+- OpenAPI-контракту в `docs/sdd/contracts/`;
+- інтеграційного або архітектурного документа;
+- `docs/product/glossary.md`, якщо feature використовує предметні терміни.
+
+Окремо перелічувати кожен task-template не потрібно. AI читає
+`docs/AGENTS.md`, каталог шаблону та релевантні standards самостійно.
+
+## Очікуваний результат
+
+До реалізації мають бути підготовлені:
+
+- requirements із правилами `R-*` та сценаріями `SC-*`;
+- потрібні design, data-model і contract документи;
+- `traceability.md`;
+- малі Domain, Application, Infrastructure, API та verification задачі;
+- `spec-readiness.md` без невирішених blocker-ів.
+
+Після прийняття специфікації запускайте реалізацію за
+[`ai-feature-workflow/USAGE.md`](../ai-feature-workflow/USAGE.md).
