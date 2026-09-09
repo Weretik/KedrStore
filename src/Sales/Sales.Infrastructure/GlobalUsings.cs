@@ -23,6 +23,7 @@ global using Sales.Application.Contracts.Catalog;
 global using Sales.Application.Contracts.Pricing;
 global using Sales.Application.Contracts.Persistence;
 global using Sales.Application.Features.Catalog.GetList.DTOs;
+global using Sales.Application.Features.Orders.DeliveryFailure;
 global using Sales.Domain.Customers.Entities;
 global using Sales.Domain.Orders.Entities;
 global using Sales.Domain.Orders.ValueObjects;

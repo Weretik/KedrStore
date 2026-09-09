@@ -32,6 +32,14 @@ public sealed class Order : BaseAuditableEntity<OrderId>, IAggregateRoot, IAudit
     public static Order Create(string orderNumber, string counterpartyId, string? comment, IEnumerable<OrderLine> lines, DateTimeOffset createdAt)
         => new(orderNumber, counterpartyId, comment, lines, createdAt);
 
+    public void AssignOrderNumber(string orderNumber)
+    {
+        if (!OrderNumber.StartsWith("P", StringComparison.Ordinal))
+            throw new InvalidOperationException("Order number is already assigned.");
+
+        OrderNumber = Required(orderNumber, OrderErrors.OrderNumberRequired());
+    }
+
     private static string Required(string value, IDomainError error)
         => string.IsNullOrWhiteSpace(value) ? throw new DomainException(error) : value.Trim();
 

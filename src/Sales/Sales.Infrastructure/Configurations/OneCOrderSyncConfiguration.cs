@@ -15,12 +15,12 @@ public sealed class OneCOrderSyncConfiguration : IEntityTypeConfiguration<OneCOr
 
         builder.HasKey(sync => sync.Id);
         builder.Property(sync => sync.Id)
-            .HasConversion(id => id.Value, value => OneCOrderSyncId.Create(value))
+            .HasConversion(id => id.Value, value => OneCOrderSyncId.FromStorage(value))
             .HasColumnType("bigint")
             .ValueGeneratedOnAdd();
 
         builder.Property(sync => sync.OrderId)
-            .HasConversion(id => id.Value, value => OrderId.Create(value))
+            .HasConversion(id => id.Value, value => OrderId.FromStorage(value))
             .HasColumnType("bigint")
             .IsRequired();
 
@@ -38,6 +38,8 @@ public sealed class OneCOrderSyncConfiguration : IEntityTypeConfiguration<OneCOr
         builder.Property(sync => sync.LastErrorMessage).HasMaxLength(1_000);
         builder.Property(sync => sync.OneCRequestPayloadHash).HasMaxLength(128);
         builder.Property(sync => sync.OneCResponseBody).HasMaxLength(2_000);
+        builder.Property(sync => sync.OneCDocumentNumber).HasMaxLength(128);
+        builder.Property(sync => sync.DeadLetterNotificationLastError).HasMaxLength(1_000);
 
         builder.HasIndex(sync => sync.OrderId).IsUnique();
         builder.HasIndex(sync => new { sync.Status, sync.NextAttemptAtUtc });

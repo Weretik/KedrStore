@@ -13,4 +13,7 @@ public readonly record struct OneCOrderSyncId
 
         return new OneCOrderSyncId(value);
     }
+
+    // EF Core uses negative temporary keys before PostgreSQL assigns the real identity value.
+    public static OneCOrderSyncId FromStorage(long value) => new(value);
 }

@@ -13,4 +13,7 @@ public readonly record struct OrderId
 
         return new OrderId(value);
     }
+
+    // EF Core uses negative temporary keys before PostgreSQL assigns the real identity value.
+    public static OrderId FromStorage(long value) => new(value);
 }

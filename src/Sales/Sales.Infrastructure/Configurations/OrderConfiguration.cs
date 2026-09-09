@@ -11,7 +11,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.HasKey(order => order.Id);
         builder.Property(order => order.Id)
-            .HasConversion(id => id.Value, value => OrderId.Create(value))
+            .HasConversion(id => id.Value, value => OrderId.FromStorage(value))
             .HasColumnType("bigint")
             .ValueGeneratedOnAdd();
 

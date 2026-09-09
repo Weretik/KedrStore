@@ -10,6 +10,7 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     public DbSet<OrderLine> OrderLines => Set<OrderLine>();
     public DbSet<OneCOrderSync> OneCOrderSyncs => Set<OneCOrderSync>();
     internal DbSet<OrderIdempotencyRecord> OrderIdempotencyRecords => Set<OrderIdempotencyRecord>();
+    internal DbSet<OrderSyncRetryAudit> OrderSyncRetryAudits => Set<OrderSyncRetryAudit>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

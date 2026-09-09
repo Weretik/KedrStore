@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Sales.Infrastructure.DataBase;
@@ -11,9 +12,11 @@ using Sales.Infrastructure.DataBase;
 namespace Sales.Infrastructure.Migrations
 {
     [DbContext(typeof(SalesDbContext))]
-    partial class SalesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902083749_AddDeadLetterTelegramNotificationRetry")]
+    partial class AddDeadLetterTelegramNotificationRetry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,10 +148,6 @@ namespace Sales.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("NextAttemptAtUtc")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("OneCDocumentNumber")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("OneCRequestPayloadHash")
                         .HasMaxLength(128)
@@ -307,65 +306,6 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderIdempotencyRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderSyncRetryAudit", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("OneCOrderSyncId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("OrderNumber")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<int>("PreviousAttemptCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PreviousErrorCode")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("PreviousErrorMessage")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("PreviousStatus")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTimeOffset>("RequestedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("RequestedBy")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OneCOrderSyncId");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("RequestedAtUtc");
-
-                    b.ToTable("OrderSyncRetryAudits", (string)null);
-                });
-
             modelBuilder.Entity("Sales.Domain.Orders.Entities.OneCOrderSync", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.Entities.Order", null)
@@ -398,15 +338,6 @@ namespace Sales.Infrastructure.Migrations
                     b.HasOne("Sales.Domain.Orders.Entities.Order", null)
                         .WithOne()
                         .HasForeignKey("Sales.Infrastructure.DataBase.Entities.OrderIdempotencyRecord", "OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderSyncRetryAudit", b =>
-                {
-                    b.HasOne("Sales.Domain.Orders.Entities.OneCOrderSync", null)
-                        .WithMany()
-                        .HasForeignKey("OneCOrderSyncId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
