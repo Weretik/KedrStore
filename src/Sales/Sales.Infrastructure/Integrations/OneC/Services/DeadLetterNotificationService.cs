@@ -149,7 +149,7 @@ public sealed class DeadLetterNotificationService(
     {
         var order = await salesDbContext.Orders
             .Include(order => order.Lines)
-            .FirstOrDefaultAsync(order => order.Id.Value == sync.OrderId.Value, cancellationToken);
+            .FirstOrDefaultAsync(order => order.Id == sync.OrderId, cancellationToken);
 
         if (order is null)
         {

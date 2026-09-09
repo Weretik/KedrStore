@@ -1,5 +1,6 @@
 using Sales.Application.Contracts.Orders;
 using Sales.Domain.Orders.Enums;
+using Sales.Domain.Orders.ValueObjects;
 using Sales.Infrastructure.DataBase.Entities;
 
 namespace Sales.Infrastructure.Orders;
@@ -18,7 +19,7 @@ internal sealed class OrderSyncRetryStore(
         var candidate = await (
                 from order in dbContext.Orders
                 join sync in dbContext.OneCOrderSyncs on order.Id equals sync.OrderId
-                where order.Id.Value == orderId
+                where order.Id == OrderId.FromStorage(orderId)
                 select new { Order = order, Sync = sync })
             .SingleOrDefaultAsync(cancellationToken);
 

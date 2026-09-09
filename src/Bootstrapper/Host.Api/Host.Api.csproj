@@ -13,6 +13,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+        <PackageReference Include="Microsoft.OpenApi" Version="2.8.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
           <PrivateAssets>all</PrivateAssets>
@@ -23,7 +24,7 @@
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
         <PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
-        <PackageReference Include="Scriban" Version="7.2.0" />
+        <PackageReference Include="Scriban" Version="7.2.7" />
     </ItemGroup>
 
     <ItemGroup>

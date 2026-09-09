@@ -4,7 +4,7 @@ namespace Catalog.Domain.Entities;
 
 public class PriceType : BaseEntity<PriceTypeId>, IAggregateRoot
 {
-    public string PriceTypeName { get; private set; }
+    public string PriceTypeName { get; private set; } = null!;
 
     private PriceType() { }
     private PriceType(PriceTypeId id, string priceTypeName)

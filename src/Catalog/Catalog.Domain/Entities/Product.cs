@@ -8,12 +8,12 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public const decimal MaximumStock = 10_000m;
 
     #region Properties
-    public string ProductTypeIdOneC { get; private set; }
+    public string ProductTypeIdOneC { get; private set; } = null!;
     public string Name { get; private set; } = null!;
     public string ProductSlug { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
     public string Photo { get; private set; } = null!;
-    public string Sсheme {get; private set;}
+    public string Sсheme { get; private set; } = null!;
     public decimal Stock { get; private set; }
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
@@ -123,13 +123,8 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         Photo = photo.Trim();
     }
 
-    private void SetSсheme(string? scheme)
+    private void SetSсheme(string scheme)
     {
-        if (scheme is null)
-        {
-            Sсheme = null;
-            return;
-        }
         if (string.IsNullOrWhiteSpace(scheme))
             throw new DomainException(ProductErrors.SchemeInvalid());
 

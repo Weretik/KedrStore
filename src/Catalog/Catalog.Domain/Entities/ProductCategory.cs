@@ -8,7 +8,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     public const int ShortNameMaxLength = 100;
 
     #region Properties
-    public string ProductTypeIdOneC { get; private set; }
+    public string ProductTypeIdOneC { get; private set; } = null!;
     public string Name { get; private set; } = null!;
     public string Slug { get; private set; } = null!;
     public ProductCategoryId? ParentId { get; private set; }

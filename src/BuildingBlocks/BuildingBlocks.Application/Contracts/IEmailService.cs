@@ -8,12 +8,12 @@
         /// <summary>
         /// Email отправителя
         /// </summary>
-        public string From { get; set; }
+        public required string From { get; set; }
 
         /// <summary>
         /// Имя отправителя
         /// </summary>
-        public string FromName { get; set; }
+        public required string FromName { get; set; }
 
         /// <summary>
         /// Адреса получателей
@@ -33,12 +33,12 @@
         /// <summary>
         /// Тема письма
         /// </summary>
-        public string Subject { get; set; }
+        public required string Subject { get; set; }
 
         /// <summary>
         /// Тело письма
         /// </summary>
-        public string Body { get; set; }
+        public required string Body { get; set; }
 
         /// <summary>
         /// Флаг, указывающий, является ли тело письма HTML
@@ -59,17 +59,17 @@
         /// <summary>
         /// Имя файла
         /// </summary>
-        public string FileName { get; set; }
+        public required string FileName { get; set; }
 
         /// <summary>
         /// Содержимое файла в виде массива байтов
         /// </summary>
-        public byte[] Content { get; set; }
+        public required byte[] Content { get; set; }
 
         /// <summary>
         /// MIME-тип содержимого
         /// </summary>
-        public string ContentType { get; set; }
+        public required string ContentType { get; set; }
     }
 
     /// <summary>
@@ -85,12 +85,12 @@
         /// <summary>
         /// Сообщение об ошибке (если есть)
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         /// <summary>
         /// Идентификатор отправленного письма
         /// </summary>
-        public string MessageId { get; set; }
+        public string? MessageId { get; set; }
     }
 
     /// <summary>

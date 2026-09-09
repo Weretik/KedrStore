@@ -19,10 +19,11 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
 
         foreach (var role in roles)
         {
-            var exists = await roleManager.FindByNameAsync(role.Name);
+            var roleName = role.Name ?? throw new InvalidOperationException("Seed roles must have a name.");
+            var exists = await roleManager.FindByNameAsync(roleName);
             if (exists != null) continue;
 
-            role.NormalizedName = role.Name.ToUpperInvariant();
+            role.NormalizedName = roleName.ToUpperInvariant();
 
             var result = await roleManager.CreateAsync(role);
             if (!result.Succeeded)
@@ -37,4 +38,3 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
         }
     }
 }
-
