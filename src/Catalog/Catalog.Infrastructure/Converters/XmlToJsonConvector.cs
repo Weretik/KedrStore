@@ -4,7 +4,7 @@ using Catalog.Application.Contracts.Json;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace BuildingBlocks.Infrastructure.Services;
+namespace Catalog.Infrastructure.Converters;
 
 public sealed class XmlToJsonConvector(ILogger<XmlToJsonConvector> logger) : IXmlToJsonConvector
 {

@@ -153,7 +153,9 @@ public static class CatalogMapper
     {
         var ascii = (s ?? string.Empty).Unidecode();
 
-        var slugPart = helper.GenerateSlug(ascii).Trim('-');
+        var slugPart = helper.GenerateSlug(ascii)
+            .Replace('.', '-')
+            .Trim('-');
 
         if (string.IsNullOrWhiteSpace(slugPart))
             slugPart = fallbackSlugBase.Trim('-');

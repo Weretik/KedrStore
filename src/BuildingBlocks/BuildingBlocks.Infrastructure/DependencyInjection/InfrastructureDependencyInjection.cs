@@ -2,7 +2,6 @@
 using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Infrastructure.DomainEvents;
 using BuildingBlocks.Infrastructure.Services;
-using Catalog.Application.Contracts.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,7 +13,22 @@ public static class InfrastructureDependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        //Telegram Service
+        services.AddTelegramServices(configuration);
+
+        // Domain Events
+        services.AddScoped<IDomainEventContext, EfDomainEventContext>();
+        services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
+
+        // Identity context services
+        services.AddHttpContextAccessor();
+        services.AddScoped<IPermissionService, ClaimPermissionService>();
+        services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddTelegramServices(this IServiceCollection services, IConfiguration configuration)
+    {
         services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
         services.AddHttpClient("telegram")
             .AddTypedClient<ITelegramBotClient>((http, sp) =>
@@ -24,18 +38,6 @@ public static class InfrastructureDependencyInjection
                     throw new InvalidOperationException("Telegram:BotToken is not set (ENV Telegram__BotToken).");
                 return new TelegramBotClient(new TelegramBotClientOptions(opts.BotToken), http);
             });
-
-        // Domain Events
-        services.AddScoped<IDomainEventContext, EfDomainEventContext>();
-        services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
-
-        // JsonConvector
-        services.AddScoped<IXmlToJsonConvector, XmlToJsonConvector>();
-
-        // Identity context services
-        services.AddHttpContextAccessor();
-        services.AddScoped<IPermissionService, ClaimPermissionService>();
-        services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
 
         return services;
     }
