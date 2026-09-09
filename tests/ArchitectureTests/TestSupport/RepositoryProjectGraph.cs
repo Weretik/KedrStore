@@ -31,7 +31,7 @@ internal sealed class RepositoryProjectGraph
             var references = document.Descendants("ProjectReference")
                 .Select(element => element.Attribute("Include")?.Value)
                 .Where(value => !string.IsNullOrWhiteSpace(value))
-                .Select(value => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, value!)))
+                .Select(value => NormalizeProjectReferencePath(projectPath, value!))
                 .Select(path => knownPaths.TryGetValue(path, out var canonicalPath) ? canonicalPath : path)
                 .Select(path => Path.GetFileNameWithoutExtension(path)!)
                 .OrderBy(name => name, StringComparer.Ordinal)
@@ -66,6 +66,15 @@ internal sealed class RepositoryProjectGraph
     private static bool HasBuildOutputSegment(string path)
         => path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
             .Any(segment => segment is "bin" or "obj");
+
+    private static string NormalizeProjectReferencePath(string projectPath, string reference)
+    {
+        var normalizedReference = reference
+            .Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+
+        return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectPath)!, normalizedReference));
+    }
 }
 
 internal sealed record ProjectNode(
