@@ -4,6 +4,12 @@
 
 Public routes, action names, and response fields are stable by default. Prefer additive changes. Document an incompatible change, affected clients, migration path, and rollout plan in the feature specification and contract.
 
+For new or changed HTTP behavior, link each operation to its `SC-*` acceptance
+scenarios. Agree the human-readable contract and versioned OpenAPI document
+before transport implementation when practical. Derive focused contract/API
+Red tests from the agreement, implement the transport, then verify the runtime
+behavior against OpenAPI before consumer handoff.
+
 Use task-specific DTOs. Do not expose entities, persistence types, secrets, or internal exceptions. For write operations that risk repeated execution, define `Idempotency-Key` semantics before implementation.
 
 ## Controllers
