@@ -35,13 +35,10 @@ public sealed class SalesOneCWriteClient(
                 : "OneCDocumentWasNotCreated";
 
             logger.LogWarning(
-                "1C rejected order delivery {OrderNumber} with outcome {Outcome} and diagnostic {Diagnostic}. " +
-                "1C response document id: {OneCDocumentId}. 1C response comment: {OneCComment}",
+                "1C rejected order delivery {OrderNumber} with outcome {Outcome} and diagnostic {Diagnostic}",
                 request.OrderNumber,
                 OneCOrderDeliveryOutcome.BusinessError,
-                diagnostic,
-                documentId ?? "<empty>",
-                Normalize(response?.Comment, 4_000) ?? "<empty>");
+                diagnostic);
             return OneCOrderDeliveryResult.BusinessError(diagnostic);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
