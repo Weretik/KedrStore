@@ -106,6 +106,10 @@ try
             await scopeServiceProvider.GetRequiredService<SyncOneCSalesCustomersFullJob>().RunAsync(cancellationToken);
             break;
 
+        case "sync-one-c-orders":
+            await scopeServiceProvider.GetRequiredService<SyncOneCOrdersJob>().RunAsync(cancellationToken);
+            break;
+
         case "one-c-smoke-write":
             var smokeRequest = CreateOneCSmokeRequest(args);
             var smokeResult = await scopeServiceProvider

@@ -6,6 +6,7 @@ using Identity.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Infrastructure.DependencyInjection;
+using Sales.Infrastructure.Integrations.OneC.Jobs;
 
 namespace Host.Jobs;
 
@@ -15,6 +16,7 @@ public static class JobsHostServicesExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddTelegramServices(configuration);
         services.AddCatalogDbContextServices(configuration);
         services.AddCatalogReferenceDataServices();
         services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
@@ -31,6 +33,7 @@ public static class JobsHostServicesExtensions
         services.AddScoped<SyncOneCProductDetailsJob>();
         services.AddScoped<SyncOneCStocksJob>();
         services.AddScoped<SyncOneCPricesJob>();
+        services.AddScoped<SyncOneCOrdersJob>();
 
         return services;
     }
