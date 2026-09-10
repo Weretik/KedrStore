@@ -80,9 +80,32 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(ordersPost.TryGetProperty("requestBody", out _));
 
         Assert.True(paths.TryGetProperty("/api/admin/orders", out var adminOrders));
+        Assert.True(adminOrders.TryGetProperty("get", out var adminOrdersGet));
+        AssertOperationHasQueryParameter(adminOrdersGet, "counterpartyId");
+        AssertOperationHasQueryParameter(adminOrdersGet, "page");
+        AssertOperationHasQueryParameter(adminOrdersGet, "pageSize");
         Assert.True(adminOrders.TryGetProperty("post", out var adminOrdersPost));
         Assert.True(adminOrdersPost.TryGetProperty("requestBody", out _));
         AssertOperationHasHeaderParameter(adminOrdersPost, "Idempotency-Key");
+
+        Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}", out var adminOrder));
+        Assert.True(adminOrder.TryGetProperty("get", out var adminOrderGet));
+        AssertOperationHasPathParameter(adminOrderGet, "orderId");
+        Assert.True(adminOrderGet.GetProperty("responses").TryGetProperty("404", out _));
+
+        Assert.True(paths.TryGetProperty("/api/admin/customers", out var adminCustomers));
+        Assert.True(adminCustomers.TryGetProperty("get", out var adminCustomersGet));
+        AssertOperationHasQueryParameter(adminCustomersGet, "page");
+        AssertOperationHasQueryParameter(adminCustomersGet, "pageSize");
+        Assert.False(adminCustomersGet.GetProperty("responses").TryGetProperty("401", out _));
+        Assert.False(adminCustomersGet.GetProperty("responses").TryGetProperty("403", out _));
+
+        Assert.True(paths.TryGetProperty("/api/admin/customers/{counterpartyId}", out var adminCustomer));
+        Assert.True(adminCustomer.TryGetProperty("get", out var adminCustomerGet));
+        AssertOperationHasPathParameter(adminCustomerGet, "counterpartyId");
+        Assert.True(adminCustomerGet.GetProperty("responses").TryGetProperty("404", out _));
+        Assert.False(adminCustomerGet.GetProperty("responses").TryGetProperty("401", out _));
+        Assert.False(adminCustomerGet.GetProperty("responses").TryGetProperty("403", out _));
 
         Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}/sync/retry", out var retryOrderSync));
         Assert.True(retryOrderSync.TryGetProperty("post", out var retryOrderSyncPost));
@@ -96,6 +119,13 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(operation.TryGetProperty("parameters", out var parameters));
         Assert.Contains(parameters.EnumerateArray(), parameter =>
             parameter.GetProperty("name").GetString() == name && parameter.GetProperty("in").GetString() == "header");
+    }
+
+    private static void AssertOperationHasQueryParameter(JsonElement operation, string name)
+    {
+        Assert.True(operation.TryGetProperty("parameters", out var parameters));
+        Assert.Contains(parameters.EnumerateArray(), parameter =>
+            parameter.GetProperty("name").GetString() == name && parameter.GetProperty("in").GetString() == "query");
     }
 
     [Fact]
