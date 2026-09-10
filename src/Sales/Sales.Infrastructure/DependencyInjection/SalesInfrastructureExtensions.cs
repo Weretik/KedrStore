@@ -1,9 +1,11 @@
-using Sales.Application.Integrations.OneC.Contracts;
+using Sales.Application.Contracts.Customers;
 using Sales.Application.Contracts.Orders;
+using Sales.Application.Integrations.OneC.Contracts;
+using Sales.Infrastructure.Customers;
+using Sales.Infrastructure.Exports;
 using Sales.Infrastructure.Integrations.OneC;
 using Sales.Infrastructure.Integrations.OneC.Jobs;
 using Sales.Infrastructure.Integrations.OneC.Services;
-using Sales.Infrastructure.Exports;
 using Sales.Infrastructure.Notifications;
 using Sales.Infrastructure.Orders;
 
@@ -29,6 +31,8 @@ public static class SalesInfrastructureExtensions
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();
         services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
+        services.AddScoped<IOrderReadService, OrderReadService>();
+        services.AddScoped<ICustomerReadService, CustomerReadService>();
         services.AddScoped<IOrderSyncStatusReader, OrderSyncStatusReader>();
         services.AddScoped<IOrderSyncRetryStore, OrderSyncRetryStore>();
         services.AddScoped<IOrderProductReader, OrderProductReader>();
