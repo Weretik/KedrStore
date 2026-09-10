@@ -14,15 +14,26 @@ public sealed class SalesPostgresCollection : ICollectionFixture<SalesPostgresFi
 
 public sealed class SalesPostgresFixture : IAsyncLifetime
 {
+    public const string ExternalConnectionStringEnvironmentVariable = "KEDR_SALES_TEST_POSTGRES_CONNECTION";
+
     private PostgreSqlContainer? _container;
+    private string? _externalConnectionString;
 
     public string? UnavailableReason { get; private set; }
 
-    public string ConnectionString => _container?.GetConnectionString()
+    public string ConnectionString => _externalConnectionString ?? _container?.GetConnectionString()
         ?? throw new InvalidOperationException(UnavailableReason ?? "PostgreSQL fixture is not initialized.");
 
     public async Task InitializeAsync()
     {
+        _externalConnectionString = Environment.GetEnvironmentVariable(ExternalConnectionStringEnvironmentVariable);
+        if (!string.IsNullOrWhiteSpace(_externalConnectionString))
+        {
+            await using var externalDb = CreateContext();
+            await externalDb.Database.MigrateAsync();
+            return;
+        }
+
         try
         {
             _container = new PostgreSqlBuilder("postgres:18-alpine")
@@ -51,11 +62,11 @@ public sealed class SalesPostgresFixture : IAsyncLifetime
 
     public SalesDbContext CreateContext(params IInterceptor[] interceptors)
     {
-        if (_container is null)
+        if (_container is null && string.IsNullOrWhiteSpace(_externalConnectionString))
             throw new InvalidOperationException(UnavailableReason ?? "PostgreSQL fixture is not initialized.");
 
         var options = new DbContextOptionsBuilder<SalesDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
+            .UseNpgsql(ConnectionString)
             .AddInterceptors(interceptors)
             .Options;
         return new SalesDbContext(options);
