@@ -7,6 +7,8 @@
 - [ ] Identify aggregates, value objects, invariants, and state transitions.
 - [ ] Determine whether domain events are required for cross-aggregate effects.
 - [ ] Create one small Domain task per responsibility from the relevant template.
+- [ ] Order each behavior task explicitly as Red, Green, Refactor, Regression,
+      then evidence recording; put the focused failing test before Domain code.
 - [ ] Give each task a `TS-*` ID, `Covers: SC-*`, dependencies, exact paths, test
       level, and checkpoint.
 - [ ] Map every Domain task into `traceability.md`.

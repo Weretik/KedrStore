@@ -27,6 +27,10 @@
 - [Specification readiness](checklist/spec-readiness.md)
 - [Delivery readiness](checklist/delivery-readiness.md)
 
+Behavior tasks use the mandatory lifecycle `Red -> Green -> Refactor ->
+Regression -> evidence`. The task graph defines cross-task order through
+`Depends on`; phase numbers describe ownership and planning.
+
 ## Change notes
 
 - YYYY-MM-DD — <reason, scope impact, and required verification>

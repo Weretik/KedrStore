@@ -6,6 +6,9 @@
 - [ ] Plan the human-readable contract and versioned OpenAPI update before
       transport implementation.
 - [ ] Plan focused Red tests before each new transport behavior.
+- [ ] Require each endpoint/HTTP behavior task to run its focused API Red test
+      before controller or mapping implementation, then Green, refactor,
+      regression, and evidence.
 - [ ] Create separate tasks for contract, endpoint, HTTP/security mapping, and
       final API acceptance/regression coverage where each is independently reviewable.
 - [ ] Give every task a `TS-*` ID, dependencies, exact paths, test level, and checkpoint.

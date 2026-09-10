@@ -78,5 +78,11 @@ Scope: <включена поведінка>.
 - малі Domain, Application, Infrastructure, API та verification задачі;
 - `spec-readiness.md` без невирішених blocker-ів.
 
+Кожна `TS-*` задача, що реалізує поведінку, має явно виконуватися в порядку
+`Red -> Green -> Refactor -> Regression -> evidence`: спочатку створити й
+запустити focused test та підтвердити очікуване падіння, лише потім писати
+production code. Для підготовчої `EN-*` задачі без осмисленого Red-тесту треба
+записати причину винятку та replacement verification.
+
 Після прийняття специфікації запускайте реалізацію за
 [`ai-feature-workflow/USAGE.md`](../ai-feature-workflow/USAGE.md).

@@ -8,6 +8,9 @@
       test level, and checkpoint.
 - [ ] Keep validation, result behavior, orchestration, and focused tests in the
       same use-case task where practical.
+- [ ] In each behavior task, write and run the focused handler/validator Red
+      test before implementing the use case; finish with refactor, regression,
+      and recorded evidence.
 - [ ] Map every Application task into `traceability.md`.
 
 ## Templates

@@ -7,6 +7,8 @@
 - [ ] The API conforms to the agreed OpenAPI contract, including errors and security.
 - [ ] Each behavior-implementing `TS-*` task records valid Red, Green, refactor,
       and regression evidence.
+- [ ] Task records confirm that the focused Red test ran before production code
+      for that behavior; every exception belongs to an `EN-*` and has replacement verification.
 - [ ] Every `EN-*` exception records its reason and replacement verification.
 - [ ] Restore/build/test ran or the exact failure and ownership are documented.
 - [ ] Documentation, contracts, implementation, and test names agree.

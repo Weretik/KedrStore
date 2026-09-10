@@ -33,6 +33,11 @@ Scope: <included and explicitly excluded behavior>.
 Prepare the specification; do not implement code yet.
 ```
 
+Every behavior-implementing `TS-*` task must be authored and later executed in
+the explicit order `Red -> Green -> Refactor -> Regression -> evidence`.
+Planning and contract `EN-*` tasks may use a documented test-first exception;
+they must name the replacement verification.
+
 ## Implement an accepted specification
 
 Follow [the AI feature workflow](ai-feature-workflow/README.md). Authorize the

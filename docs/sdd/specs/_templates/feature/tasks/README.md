@@ -25,6 +25,27 @@ identifiers used by `traceability.md`.
 The phase numbers organize planning. Implementation follows task dependencies
 scenario by scenario; it does not require completing an entire layer first.
 
+## Mandatory behavior-task lifecycle
+
+Every `TS-*` task that creates or changes observable behavior must author and
+execute its checklist in this order:
+
+```text
+write the smallest focused test
+-> run it and confirm the expected behavioral Red
+-> implement the minimum behavior for Green
+-> rerun and confirm Green
+-> refactor while tests stay Green
+-> run the affected regression suite
+-> record actual Red, Green, refactor, and regression evidence
+```
+
+Do not treat a compilation error, broken fixture, or unrelated failure as Red.
+Work bullets describe scope, but the generated task file must arrange them in
+the lifecycle above. An `EN-*` task may omit Red only when behavior cannot be
+tested meaningfully before the prerequisite exists; record the reason and
+replacement verification in that task.
+
 ## Selected technical tasks
 
 | ID | Responsibility | File |

@@ -15,3 +15,6 @@
       tasks; tasks do not exceed scope.
 - [ ] Every task has exact paths, dependencies, a checkpoint, and planned
       Red/Green/regression evidence or a justified test-first exception.
+- [ ] Every behavior-implementing task orders its work explicitly as Red ->
+      Green -> Refactor -> Regression -> evidence; production code does not
+      precede the focused Red test.

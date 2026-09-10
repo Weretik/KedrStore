@@ -8,6 +8,8 @@
       outbox behavior, configuration, and operational prerequisites.
 - [ ] Use `TS-*` for directly testable behavior and `EN-*` for shared or
       prerequisite work with a documented test-first exception.
+- [ ] In each behavior `TS-*`, create and run the focused integration Red test
+      before persistence, read-model, adapter, or outbox implementation.
 - [ ] Add `Covers` or `Enables`, dependencies, exact paths, verification, and a
       checkpoint to every created task.
 - [ ] Map every task into `traceability.md`.
