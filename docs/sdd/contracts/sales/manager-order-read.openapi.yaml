@@ -1,0 +1,152 @@
+openapi: 3.1.0
+info:
+  title: Sales manager order read API
+  version: 1.0.0
+servers:
+  - url: /
+    description: Deployment origin
+paths:
+  /api/admin/orders:
+    get:
+      operationId: getAdminOrders
+      summary: Browse persisted manager orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: counterpartyId
+          in: query
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 64, pattern: '.*\S.*' }
+          description: Exact Sales counterparty identifier.
+        - name: page
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: A newest-first page; unknown counterparties produce an empty page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ManagerOrderPage' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Authentication is missing or invalid. }
+        '403': { description: The caller does not satisfy CanManageOrders. }
+  /api/admin/orders/{orderId}:
+    get:
+      operationId: getAdminOrderById
+      summary: Get one persisted manager order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: Full approved manager-order detail.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ManagerOrderDetail' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Authentication is missing or invalid. }
+        '403': { description: The caller does not satisfy CanManageOrders. }
+        '404': { description: No manager order exists for the supplied identifier. }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Opaque
+  schemas:
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer, format: int64, minimum: 1 }
+        pageSize: { type: integer, format: int64, minimum: 1, maximum: 100 }
+        totalPages: { type: integer, format: int64, minimum: 0 }
+        totalRecords: { type: integer, format: int64, minimum: 0 }
+    ManagerOrderPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value:
+          type: array
+          items: { $ref: '#/components/schemas/ManagerOrderListItem' }
+    ManagerOrderListItem:
+      type: object
+      required:
+        - orderId
+        - orderNumber
+        - counterpartyId
+        - counterpartyName
+        - createdAtUtc
+        - lineCount
+        - totalAmount
+        - syncStatus
+        - oneCDocumentNumber
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1, example: 12345 }
+        orderNumber: { type: string, maxLength: 32, example: SO-20260817-12345 }
+        counterpartyId: { type: string, maxLength: 64, example: '000000000' }
+        counterpartyName: { type: string, maxLength: 300, example: Клієнт }
+        createdAtUtc: { type: string, format: date-time }
+        lineCount: { type: integer, minimum: 1, example: 2 }
+        totalAmount: { type: number, format: double, minimum: 0, multipleOf: 0.01, example: 25000.00 }
+        syncStatus: { $ref: '#/components/schemas/OrderSyncStatus' }
+        oneCDocumentNumber: { type: [string, 'null'], maxLength: 128, example: '000000123' }
+    ManagerOrderDetail:
+      type: object
+      required: [orderId, orderNumber, createdAtUtc, counterparty, comment, lines, totalAmount, sync]
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1, example: 12345 }
+        orderNumber: { type: string, maxLength: 32, example: SO-20260817-12345 }
+        createdAtUtc: { type: string, format: date-time }
+        counterparty: { $ref: '#/components/schemas/OrderCounterparty' }
+        comment: { type: [string, 'null'], maxLength: 1000 }
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/ManagerOrderLine' }
+        totalAmount: { type: number, format: double, minimum: 0, multipleOf: 0.01 }
+        sync: { $ref: '#/components/schemas/ManagerOrderSync' }
+    OrderCounterparty:
+      type: object
+      required: [counterpartyId, name, phone]
+      properties:
+        counterpartyId: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 300 }
+        phone: { type: [string, 'null'], maxLength: 50 }
+    ManagerOrderLine:
+      type: object
+      required: [productId, productName, quantity, amount]
+      properties:
+        productId: { type: string, maxLength: 64 }
+        productName: { type: string, maxLength: 512 }
+        quantity: { type: integer, minimum: 1 }
+        amount: { type: number, format: double, minimum: 0, multipleOf: 0.01 }
+    ManagerOrderSync:
+      type: object
+      required: [status, oneCDocumentNumber, acceptedAtUtc]
+      properties:
+        status: { $ref: '#/components/schemas/OrderSyncStatus' }
+        oneCDocumentNumber: { type: [string, 'null'], maxLength: 128 }
+        acceptedAtUtc: { type: [string, 'null'], format: date-time }
+    OrderSyncStatus:
+      type: string
+      enum: [Pending, Sent, Accepted, BusinessError, TransportError, RetryScheduled, DeadLetter]
+    ValidationErrors:
+      type: object
+      additionalProperties: true
+  responses:
+    ValidationError:
+      description: Input validation failed.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationErrors' }
