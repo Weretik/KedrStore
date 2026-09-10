@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: Sales customer read API
+  version: 1.0.0
+servers:
+  - url: /
+    description: Deployment origin
+paths:
+  /api/admin/customers:
+    get:
+      operationId: getAdminCustomers
+      summary: Browse active Sales customers
+      security: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: A name-ordered page of active Sales customers.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomerPage' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/admin/customers/{counterpartyId}:
+    get:
+      operationId: getAdminCustomerById
+      summary: Get one active Sales customer
+      security: []
+      parameters:
+        - name: counterpartyId
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64, pattern: '.*\S.*' }
+      responses:
+        '200':
+          description: The approved current customer profile.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomerDetail' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: No active customer exists for the supplied identifier. }
+components:
+  schemas:
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer, format: int64, minimum: 1 }
+        pageSize: { type: integer, format: int64, minimum: 1, maximum: 100 }
+        totalPages: { type: integer, format: int64, minimum: 0 }
+        totalRecords: { type: integer, format: int64, minimum: 0 }
+    CustomerPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value:
+          type: array
+          items: { $ref: '#/components/schemas/CustomerListItem' }
+    CustomerListItem:
+      type: object
+      required: [counterpartyId, name, phone]
+      properties:
+        counterpartyId: { type: string, maxLength: 64, example: '000000000' }
+        name: { type: string, maxLength: 300, example: Customer }
+        phone: { type: [string, 'null'], maxLength: 50, example: '+380000000000' }
+    CustomerDetail:
+      type: object
+      required: [counterpartyId, name, phone, email, defaultPriceTypeId, categoryPriceTypes]
+      properties:
+        counterpartyId: { type: string, maxLength: 64, example: '000000000' }
+        name: { type: string, maxLength: 300, example: Customer }
+        phone: { type: [string, 'null'], maxLength: 50, example: '+380000000000' }
+        email: { type: string, maxLength: 320, example: client@example.com }
+        defaultPriceTypeId: { type: integer, minimum: 1 }
+        categoryPriceTypes:
+          type: array
+          items: { $ref: '#/components/schemas/CustomerCategoryPriceType' }
+    CustomerCategoryPriceType:
+      type: object
+      required: [categoryId, priceTypeId]
+      properties:
+        categoryId: { type: integer, minimum: 1 }
+        priceTypeId: { type: integer, minimum: 1 }
+    ValidationErrors:
+      type: object
+      additionalProperties: true
+  responses:
+    ValidationError:
+      description: Input validation failed.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationErrors' }

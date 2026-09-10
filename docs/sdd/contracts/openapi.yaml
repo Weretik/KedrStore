@@ -30,11 +30,20 @@ paths:
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:
-    $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders
+    get:
+      $ref: ./sales/manager-order-read.openapi.yaml#/paths/~1api~1admin~1orders/get
+    post:
+      $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders/post
+  /api/admin/orders/{orderId}:
+    $ref: ./sales/manager-order-read.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}
   /api/admin/orders/{orderId}/sync-status:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync-status
   /api/admin/orders/{orderId}/sync/retry:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync~1retry
+  /api/admin/customers:
+    $ref: ./sales/customer-read.openapi.yaml#/paths/~1api~1admin~1customers
+  /api/admin/customers/{counterpartyId}:
+    $ref: ./sales/customer-read.openapi.yaml#/paths/~1api~1admin~1customers~1{counterpartyId}
   /api/auth/session/login:
     $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1login
   /api/auth/session/refresh:
