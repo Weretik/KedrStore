@@ -35,7 +35,10 @@ public sealed class CreateOrderCommandHandlerTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(42, result.Value.OrderId);
-        Assert.Equal("SO-20260902-0001", result.Value.OrderNumber);
+        Assert.Equal($"SO-{store.PersistedOrder!.CreatedAt:yyyyMMdd}-42", result.Value.OrderNumber);
+        Assert.Equal(store.PersistedOrder.OrderNumber, result.Value.OrderNumber);
+        Assert.Matches("^SO-[0-9]{8}-[0-9]+$", result.Value.OrderNumber);
+        Assert.False(result.Value.OrderNumber.StartsWith("P", StringComparison.Ordinal));
         Assert.Equal(OneCOrderSyncStatus.Pending, result.Value.SyncStatus);
         Assert.True(store.Persisted);
     }
@@ -74,6 +77,8 @@ public sealed class CreateOrderCommandHandlerTests
         Assert.True(initial.IsSuccess);
         Assert.True(replay.IsSuccess);
         Assert.Equal(initial.Value, replay.Value);
+        Assert.False(initial.Value.OrderNumber.StartsWith("P", StringComparison.Ordinal));
+        Assert.False(replay.Value.OrderNumber.StartsWith("P", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -88,7 +93,8 @@ public sealed class CreateOrderCommandHandlerTests
 
     private sealed class NumberGenerator : IOrderNumberGenerator
     {
-        public Task<string> GenerateAsync(DateTimeOffset createdAtUtc, CancellationToken cancellationToken) => Task.FromResult("SO-20260902-0001");
+        public Task<string> GenerateAsync(DateTimeOffset createdAtUtc, CancellationToken cancellationToken)
+            => Task.FromResult("P761a150f609e44eaad6ae75f087860c");
     }
 
     private sealed class ProductReader : IOrderProductReader
@@ -102,6 +108,7 @@ public sealed class CreateOrderCommandHandlerTests
         public bool CounterpartyExists { get; init; } = true;
         public bool ThrowOnPersist { get; init; }
         public bool Persisted { get; private set; }
+        public Order? PersistedOrder { get; private set; }
         public CreateOrderIdempotencyRecord? Existing { get; set; }
         public CreateOrderIdempotencyRecord? LastIdempotency { get; private set; }
         public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken) => Task.FromResult(CounterpartyExists);
@@ -112,7 +119,9 @@ public sealed class CreateOrderCommandHandlerTests
                 throw new InvalidOperationException("Simulated transaction failure.");
 
             typeof(Order).GetProperty("Id", BindingFlags.Instance | BindingFlags.Public)!.SetValue(order, OrderId.Create(42));
+            order.AssignOrderNumber($"SO-{order.CreatedAt:yyyyMMdd}-{order.Id.Value}");
             LastIdempotency = idempotencyRecordFactory(order.Id);
+            PersistedOrder = order;
             Persisted = true;
             return Task.CompletedTask;
         }
