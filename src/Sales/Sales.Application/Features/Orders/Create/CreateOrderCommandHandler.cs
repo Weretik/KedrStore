@@ -55,10 +55,10 @@ public sealed class CreateOrderCommandHandler(
             order,
             orderId => OneCOrderSync.Create(orderId, now),
             orderId => new CreateOrderIdempotencyRecord(
-                Operation, idempotencyKey, requestHash, orderId, orderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)),
+                Operation, idempotencyKey, requestHash, orderId, order.OrderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)),
             cancellationToken);
 
-        return Result.Created(new CreateOrderResult(order.Id.Value, orderNumber, OneCOrderSyncStatus.Pending));
+        return Result.Created(new CreateOrderResult(order.Id.Value, order.OrderNumber, OneCOrderSyncStatus.Pending));
     }
 
     private static string CalculateRequestHash(CreateOrderRequest request)
