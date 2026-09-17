@@ -6,7 +6,7 @@
 | SC-002 | R-002, R-004, R-005 | Application, API, integration | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetByIdAsync_ReturnsSafeDetailForSoftDeletedCounterpartyWithoutChangingSync`; `ManagerOrderReadApiTests.GetById_ReturnsApprovedDetailAndDoesNotCallOneC` | verified |
 | SC-003 | R-003, R-005 | Application, API, integration | — | EN-002, TS-002 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetListAsync_AppliesExactCounterpartyScopeAndPaging`; `ManagerOrderReadApiTests.GetList_ReturnsEmptyPageForUnknownCounterparty` | verified |
 | SC-004 | R-002, R-005 | Application, API | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `GetOrderByIdQueryHandlerTests.Handle_PreservesNotFoundAndReadFailure`; `ManagerOrderReadApiTests.GetById_ReturnsNotFoundForUnknownOrder` | verified |
-| SC-005 | R-005 | API | — | — | — | EN-003, TS-004, TS-005 | `ManagerOrderReadApiTests.ReadRoutes_ReturnUnauthorizedWithoutAuthentication`; `ManagerOrderReadApiTests.ReadRoutes_ReturnForbiddenForAuthenticatedUser` | verified |
+| SC-005 | R-005 | API | — | — | — | EN-003, TS-004, TS-005 | `ManagerOrderReadApiTests.ReadRoutes_AllowAnonymousAccess` | verified |
 
 ## Shared enablers
 

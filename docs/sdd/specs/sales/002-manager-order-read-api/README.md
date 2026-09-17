@@ -39,9 +39,10 @@ Sales managers need to browse persisted manager orders, open one order with its 
 - 2026-09-10 — Initial draft for manager-order list, detail, and counterparty-scoped list reads. No code or machine-readable contract is added.
 - 2026-09-10 — Agreed compact list/full detail DTOs, counterparty filtering, paging/order, historical soft-deleted-customer behavior, and `CanManageOrders` access.
 - 2026-09-10 — Delivered list/detail queries, PostgreSQL projections, `CanManageOrders` HTTP endpoints, versioned OpenAPI, and focused/full regression evidence.
+- 2026-09-17 — Temporarily allowed anonymous access to the list and detail routes; production authorization remains a required follow-up.
 
 ## Delivery report
 
-SC-001 through SC-005 and EN-001 through EN-003 / TS-001 through TS-006 are complete. `GET /api/admin/orders` returns a newest-first compact page with optional exact counterparty filtering; `GET /api/admin/orders/{orderId}` returns the approved detail projection. Both routes require `PolicyNames.CanManageOrders` and preserve existing create, sync-status, and retry routes.
+SC-001 through SC-005 and EN-001 through EN-003 / TS-001 through TS-006 are complete. `GET /api/admin/orders` returns a newest-first compact page with optional exact counterparty filtering; `GET /api/admin/orders/{orderId}` returns the approved detail projection. Both routes temporarily allow anonymous access and preserve existing create, sync-status, and retry routes.
 
 The delivery gate passed restore, a warning-free build, 59 Unit tests, 10 Architecture tests, and 67 Integration tests. PostgreSQL checks ran in isolated schemas that were removed after verification. TS-001's first Red attempt was skipped when Docker was unavailable; later focused and regression tests executed against PostgreSQL 18 with no failures or skips. Repository-wide aggregate Redocly lint still reports pre-existing errors in the older admin-order sync contract; this feature's contract validates, and focused aggregate plus runtime checks pass.

@@ -25,9 +25,9 @@ When `counterpartyId` is supplied to the common order-list operation, the system
 
 Order read operations neither call 1C nor alter local persistence, including `OneCOrderSync` attempt, retry, notification, and audit fields.
 
-### R-005 — Read access is restricted
+### R-005 — Read access is temporarily anonymous
 
-Every operation requires `PolicyNames.CanManageOrders` and allows Manager and Admin. Authorized callers can read all manager orders; no row-level assignment restriction applies.
+The list and detail operations temporarily allow anonymous access. Callers can read all manager orders; no row-level assignment restriction applies. Authorization must be restored before production rollout.
 
 ### R-006 — Collection and detail have separate payload sizes
 
@@ -40,7 +40,6 @@ The collection is paged and contains compact summaries without line arrays or co
 **Covers:** R-001, R-005, R-006
 
 Given persisted manager orders exist
-And the caller has the agreed read permission
 When the caller requests the manager-order list
 Then the result contains only persisted manager orders within the agreed list scope
 And it does not contain Catalog quick orders
@@ -52,7 +51,6 @@ And rows are paged and ordered newest first according to R-006.
 **Covers:** R-002, R-004, R-005
 
 Given a persisted manager order has lines and a current 1C synchronization record
-And the caller has the agreed read permission
 When the caller requests that order
 Then the result contains the agreed order information, its persisted lines, and current delivery state
 And every line's `amount` represents the complete line quantity
@@ -64,7 +62,6 @@ And no 1C call or local state change occurs.
 **Covers:** R-003, R-005
 
 Given orders exist for more than one counterparty
-And the caller has the agreed read permission
 When the caller requests orders for one counterparty identifier
 Then every returned order belongs to that counterparty
 And no order for another counterparty is returned.
@@ -74,18 +71,17 @@ And no order for another counterparty is returned.
 **Covers:** R-002, R-005
 
 Given no manager order exists for the requested identifier
-When an authorized caller requests the order detail
+When a caller requests the order detail
 Then the system returns the agreed not-found result
 And no 1C call or local state change occurs.
 
-### SC-005 — Reject an unauthorized read
+### SC-005 — Allow an anonymous read
 
 **Covers:** R-005
 
-Given a caller does not satisfy the agreed Sales order-read access policy
+Given a caller is not authenticated
 When the caller requests an order list or detail
-Then the system rejects access using the agreed authentication or authorization result
-And it exposes no order data.
+Then the system returns the requested read result without an authentication challenge.
 
 ## Deferred scenarios
 

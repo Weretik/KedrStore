@@ -4,7 +4,7 @@
 
 ## Consumers and compatibility
 
-The consumer is the Sales administration frontend. This additive read API does not change `POST /api/admin/orders`, the sync-status/retry routes, or Catalog `POST /api/orders`. Every operation requires `PolicyNames.CanManageOrders`, which permits Manager and Admin. An authorized caller can read all Sales manager orders; no row-level assignment restriction applies.
+The consumer is the Sales administration frontend. This additive read API does not change `POST /api/admin/orders`, the sync-status/retry routes, or Catalog `POST /api/orders`. The list and detail operations temporarily allow anonymous access and do not apply a row-level assignment restriction.
 
 ## List manager orders
 
@@ -94,11 +94,9 @@ The response excludes email, `IdentityUserId`, soft-delete/audit fields, SOAP bo
 
 - `200 OK`: filled or empty list, or existing detail.
 - `400 Bad Request`: invalid paging, counterparty identifier, or order identifier input.
-- `401 Unauthorized`: missing or invalid authentication.
-- `403 Forbidden`: authenticated caller does not satisfy `PolicyNames.CanManageOrders`.
 - `404 Not Found`: no manager order exists for a valid `orderId`.
 
-Read operations have no idempotency requirement and never call 1C or mutate persistence.
+Read operations have no idempotency requirement and never call 1C or mutate persistence. Anonymous access is temporary and must be replaced with the agreed authorization policy before production rollout.
 
 ## OpenAPI and rollout
 

@@ -27,9 +27,9 @@ As a Sales manager, I want to view manager orders and inspect an individual orde
 
 ## Agreed decisions
 
-- Manager and Admin access is enforced through `PolicyNames.CanManageOrders`; no row-level assignment filter applies.
+- The list and detail routes temporarily allow anonymous access; no row-level assignment filter applies. Authorization must be restored before production rollout.
 - `GET /api/admin/orders` provides one paged collection with an optional exact `counterpartyId` filter; there is no duplicate nested customer-orders endpoint.
 - The list returns compact order summaries. `GET /api/admin/orders/{orderId}` returns the complete approved order detail.
 - Paging defaults to page `1` and page size `20`, with maximum page size `100`; ordering is newest first by `createdAtUtc`, then `orderId`.
-- Historical orders remain visible when their counterparty is soft-deleted. The current stored counterparty name and phone may be shown in the authorized order detail.
+- Historical orders remain visible when their counterparty is soft-deleted. The current stored counterparty name and phone may be shown in the order detail.
 - Search and additional filters are outside this feature.
