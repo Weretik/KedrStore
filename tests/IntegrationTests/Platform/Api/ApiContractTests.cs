@@ -85,6 +85,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         AssertOperationHasQueryParameter(adminOrdersGet, "counterpartyId");
         AssertOperationHasQueryParameter(adminOrdersGet, "page");
         AssertOperationHasQueryParameter(adminOrdersGet, "pageSize");
+        Assert.False(adminOrdersGet.GetProperty("responses").TryGetProperty("401", out _));
+        Assert.False(adminOrdersGet.GetProperty("responses").TryGetProperty("403", out _));
         Assert.True(adminOrders.TryGetProperty("post", out var adminOrdersPost));
         AssertOperationId(adminOrdersPost, "createAdminOrder");
         Assert.True(adminOrdersPost.TryGetProperty("requestBody", out _));
@@ -94,6 +96,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(adminOrder.TryGetProperty("get", out var adminOrderGet));
         AssertOperationId(adminOrderGet, "getAdminOrderById");
         AssertOperationHasPathParameter(adminOrderGet, "orderId");
+        Assert.False(adminOrderGet.GetProperty("responses").TryGetProperty("401", out _));
+        Assert.False(adminOrderGet.GetProperty("responses").TryGetProperty("403", out _));
         Assert.True(adminOrderGet.GetProperty("responses").TryGetProperty("404", out _));
 
         Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}/sync-status", out var orderSyncStatus));

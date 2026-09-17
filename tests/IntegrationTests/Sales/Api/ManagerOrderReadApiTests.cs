@@ -108,27 +108,14 @@ public sealed class ManagerOrderReadApiTests
     [Theory]
     [InlineData("/api/admin/orders")]
     [InlineData("/api/admin/orders/42")]
-    public async Task ReadRoutes_ReturnUnauthorizedWithoutAuthentication(string route)
+    public async Task ReadRoutes_AllowAnonymousAccess(string route)
     {
         using var factory = CreateFactory(CreateState());
         using var client = factory.CreateClient();
 
         using var response = await client.GetAsync(route);
 
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-    }
-
-    [Theory]
-    [InlineData("/api/admin/orders")]
-    [InlineData("/api/admin/orders/42")]
-    public async Task ReadRoutes_ReturnForbiddenForAuthenticatedUser(string route)
-    {
-        using var factory = CreateFactory(CreateState());
-        using var client = CreateAuthenticatedClient(factory, "User");
-
-        using var response = await client.GetAsync(route);
-
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     private static TestOrderReadState CreateState()

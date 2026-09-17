@@ -19,7 +19,9 @@ public sealed class ManagerOrderReadContractTests
         Assert.Contains("operationId: getAdminOrders", featureContract, StringComparison.Ordinal);
         Assert.Contains("operationId: getAdminOrderById", featureContract, StringComparison.Ordinal);
         Assert.Contains("maximum: 100", featureContract, StringComparison.Ordinal);
-        Assert.Contains("bearerAuth: []", featureContract, StringComparison.Ordinal);
+        Assert.DoesNotContain("bearerAuth", featureContract, StringComparison.Ordinal);
+        Assert.DoesNotContain("'401':", featureContract, StringComparison.Ordinal);
+        Assert.DoesNotContain("'403':", featureContract, StringComparison.Ordinal);
         Assert.Contains("ManagerOrderPage:", featureContract, StringComparison.Ordinal);
         Assert.Contains("ManagerOrderDetail:", featureContract, StringComparison.Ordinal);
         Assert.Contains("type: [string, 'null']", featureContract, StringComparison.Ordinal);

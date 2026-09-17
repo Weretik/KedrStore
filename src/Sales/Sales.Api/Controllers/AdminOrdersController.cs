@@ -1,4 +1,3 @@
-using Identity.Application.Security.Policies;
 using Sales.Api.Contracts.Orders;
 using Sales.Application.Features.Orders.Create;
 using Sales.Application.Features.Orders.Create.DTOs;
@@ -87,11 +86,9 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpGet(Name = "getAdminOrders")]
-    [Authorize(Policy = PolicyNames.CanManageOrders)]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedResult<List<GetAdminOrderListItemResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult> GetList(
         [FromQuery] GetAdminOrdersRequest request,
         CancellationToken cancellationToken)
@@ -113,11 +110,9 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{orderId:long}", Name = "getAdminOrderById")]
-    [Authorize(Policy = PolicyNames.CanManageOrders)]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(GetAdminOrderDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> GetById(long orderId, CancellationToken cancellationToken)
     {

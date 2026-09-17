@@ -10,8 +10,6 @@ paths:
     get:
       operationId: getAdminOrders
       summary: Browse persisted manager orders
-      security:
-        - bearerAuth: []
       parameters:
         - name: counterpartyId
           in: query
@@ -33,14 +31,10 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ManagerOrderPage' }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '401': { description: Authentication is missing or invalid. }
-        '403': { description: The caller does not satisfy CanManageOrders. }
   /api/admin/orders/{orderId}:
     get:
       operationId: getAdminOrderById
       summary: Get one persisted manager order
-      security:
-        - bearerAuth: []
       parameters:
         - name: orderId
           in: path
@@ -53,15 +47,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ManagerOrderDetail' }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '401': { description: Authentication is missing or invalid. }
-        '403': { description: The caller does not satisfy CanManageOrders. }
         '404': { description: No manager order exists for the supplied identifier. }
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: Opaque
   schemas:
     PagedInfo:
       type: object
