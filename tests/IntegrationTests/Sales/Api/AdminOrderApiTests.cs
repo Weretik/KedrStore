@@ -202,6 +202,7 @@ public sealed class AdminOrderApiTests
         var contract = File.ReadAllText(contractPath);
 
         Assert.Contains("/api/admin/orders:", contract, StringComparison.Ordinal);
+        Assert.Contains("operationId: createAdminOrder", contract, StringComparison.Ordinal);
         Assert.Contains("name: Idempotency-Key", contract, StringComparison.Ordinal);
         Assert.Contains("'201':", contract, StringComparison.Ordinal);
         Assert.Contains("'200':", contract, StringComparison.Ordinal);
@@ -210,7 +211,9 @@ public sealed class AdminOrderApiTests
         Assert.Contains("'409':", contract, StringComparison.Ordinal);
         Assert.Contains("syncStatus: { type: string, enum: [Pending]", contract, StringComparison.Ordinal);
         Assert.Contains("/api/admin/orders/{orderId}/sync-status:", contract, StringComparison.Ordinal);
+        Assert.Contains("operationId: getAdminOrderSyncStatus", contract, StringComparison.Ordinal);
         Assert.Contains("/api/admin/orders/{orderId}/sync/retry:", contract, StringComparison.Ordinal);
+        Assert.Contains("operationId: retryAdminOrderSync", contract, StringComparison.Ordinal);
         Assert.Contains("RetryOrderSyncRequest:", contract, StringComparison.Ordinal);
         Assert.Contains("'202':", contract, StringComparison.Ordinal);
         Assert.Contains("OrderSyncStatusResponse:", contract, StringComparison.Ordinal);

@@ -81,17 +81,25 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
 
         Assert.True(paths.TryGetProperty("/api/admin/orders", out var adminOrders));
         Assert.True(adminOrders.TryGetProperty("get", out var adminOrdersGet));
+        AssertOperationId(adminOrdersGet, "getAdminOrders");
         AssertOperationHasQueryParameter(adminOrdersGet, "counterpartyId");
         AssertOperationHasQueryParameter(adminOrdersGet, "page");
         AssertOperationHasQueryParameter(adminOrdersGet, "pageSize");
         Assert.True(adminOrders.TryGetProperty("post", out var adminOrdersPost));
+        AssertOperationId(adminOrdersPost, "createAdminOrder");
         Assert.True(adminOrdersPost.TryGetProperty("requestBody", out _));
         AssertOperationHasHeaderParameter(adminOrdersPost, "Idempotency-Key");
 
         Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}", out var adminOrder));
         Assert.True(adminOrder.TryGetProperty("get", out var adminOrderGet));
+        AssertOperationId(adminOrderGet, "getAdminOrderById");
         AssertOperationHasPathParameter(adminOrderGet, "orderId");
         Assert.True(adminOrderGet.GetProperty("responses").TryGetProperty("404", out _));
+
+        Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}/sync-status", out var orderSyncStatus));
+        Assert.True(orderSyncStatus.TryGetProperty("get", out var orderSyncStatusGet));
+        AssertOperationId(orderSyncStatusGet, "getAdminOrderSyncStatus");
+        AssertOperationHasPathParameter(orderSyncStatusGet, "orderId");
 
         Assert.True(paths.TryGetProperty("/api/admin/customers", out var adminCustomers));
         Assert.True(adminCustomers.TryGetProperty("get", out var adminCustomersGet));
@@ -109,6 +117,7 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
 
         Assert.True(paths.TryGetProperty("/api/admin/orders/{orderId}/sync/retry", out var retryOrderSync));
         Assert.True(retryOrderSync.TryGetProperty("post", out var retryOrderSyncPost));
+        AssertOperationId(retryOrderSyncPost, "retryAdminOrderSync");
         Assert.True(retryOrderSyncPost.TryGetProperty("requestBody", out _));
         Assert.True(retryOrderSyncPost.GetProperty("responses").TryGetProperty("202", out _));
         AssertOperationHasPathParameter(retryOrderSyncPost, "orderId");
@@ -119,6 +128,12 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(operation.TryGetProperty("parameters", out var parameters));
         Assert.Contains(parameters.EnumerateArray(), parameter =>
             parameter.GetProperty("name").GetString() == name && parameter.GetProperty("in").GetString() == "header");
+    }
+
+    private static void AssertOperationId(JsonElement operation, string expected)
+    {
+        Assert.True(operation.TryGetProperty("operationId", out var operationId));
+        Assert.Equal(expected, operationId.GetString());
     }
 
     private static void AssertOperationHasQueryParameter(JsonElement operation, string name)

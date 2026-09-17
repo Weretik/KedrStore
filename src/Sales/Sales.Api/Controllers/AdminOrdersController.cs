@@ -17,7 +17,7 @@ namespace Sales.Api.Controllers;
 [Route("api/admin/orders")]
 public sealed class AdminOrdersController(ISender sender) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost(Name = "createAdminOrder")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(CreateAdminOrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CreateAdminOrderResponse), StatusCodes.Status201Created)]
@@ -47,7 +47,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
         };
     }
 
-    [HttpGet("{orderId:long}/sync-status")]
+    [HttpGet("{orderId:long}/sync-status", Name = "getAdminOrderSyncStatus")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(GetAdminOrderSyncStatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -61,7 +61,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
             : this.ToActionResult(result).Result!;
     }
 
-    [HttpPost("{orderId:long}/sync/retry")]
+    [HttpPost("{orderId:long}/sync/retry", Name = "retryAdminOrderSync")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(RetryAdminOrderSyncResponse), StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -86,7 +86,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
             : this.ToActionResult(result).Result!;
     }
 
-    [HttpGet]
+    [HttpGet(Name = "getAdminOrders")]
     [Authorize(Policy = PolicyNames.CanManageOrders)]
     [ProducesResponseType(typeof(PagedResult<List<GetAdminOrderListItemResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -112,7 +112,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
         return Ok(new PagedResult<List<GetAdminOrderListItemResponse>>(result.Value.PagedInfo, rows));
     }
 
-    [HttpGet("{orderId:long}")]
+    [HttpGet("{orderId:long}", Name = "getAdminOrderById")]
     [Authorize(Policy = PolicyNames.CanManageOrders)]
     [ProducesResponseType(typeof(GetAdminOrderDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

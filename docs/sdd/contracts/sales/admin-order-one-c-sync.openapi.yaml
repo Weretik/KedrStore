@@ -5,6 +5,7 @@ info:
 paths:
   /api/admin/orders:
     post:
+      operationId: createAdminOrder
       summary: Create an admin order for asynchronous 1C delivery
       description: >-
         Temporarily anonymous. Before production, protect with
@@ -48,6 +49,7 @@ paths:
         '403': { description: Returned after production authorization is enabled. }
   /api/admin/orders/{orderId}/sync-status:
     get:
+      operationId: getAdminOrderSyncStatus
       summary: Get the current 1C delivery status for an admin order
       description: >-
         Temporarily anonymous. Before production, protect with
@@ -68,6 +70,7 @@ paths:
         '403': { description: Returned after production authorization is enabled. }
   /api/admin/orders/{orderId}/sync/retry:
     post:
+      operationId: retryAdminOrderSync
       summary: Schedule a failed order for another 1C delivery cycle
       description: >-
         Allowed only for BusinessError and DeadLetter. The request records an
