@@ -3,6 +3,7 @@ using Catalog.Application.Contracts.Projections;
 using Catalog.Infrastructure.DataBase;
 using Catalog.Infrastructure.Projections;
 using Catalog.Infrastructure.Repositories;
+using Catalog.Infrastructure.Products;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 
@@ -23,6 +24,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
         services.AddScoped<IProductListProjectionRebuilder, ProductListProjectionRebuilder>();
+        services.AddScoped<IProductPhotoCheckStore, ProductPhotoCheckStore>();
 
         services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();
 

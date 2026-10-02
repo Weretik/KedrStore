@@ -5,6 +5,9 @@ using Catalog.Infrastructure.Exports;
 using Catalog.Infrastructure.Notifications;
 using Catalog.Infrastructure.Products;
 using Catalog.Infrastructure.ReferenceData;
+using Catalog.Application.Contracts.Integrations;
+using Catalog.Application.Jobs.ProductPhotos;
+using Catalog.Infrastructure.Integrations.ProductPhotos;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 
@@ -17,6 +20,24 @@ public static class CatalogServicesExtension
         services.AddScoped<IOrderExcelExporter, OrderExcelExporter>();
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
         services.AddCatalogReferenceDataServices();
+        services.AddProductPhotoCheckServices(configuration);
+
+        return services;
+    }
+
+    public static IServiceCollection AddProductPhotoCheckServices(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<ProductPhotoCheckOptions>(
+            configuration.GetSection(ProductPhotoCheckOptions.SectionName));
+        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<CheckProductPhotosJob>();
+        services.AddHttpClient<IProductPhotoProbe, ProductPhotoProbe>()
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            });
 
         return services;
     }

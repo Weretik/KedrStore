@@ -18,6 +18,7 @@ public sealed class SyncOneCProductDetailsJob(
     ICatalogRepository<ProductCategory> categoryRepo,
     IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     IProductListProjectionRebuilder productListProjectionRebuilder,
+    IProductPhotoCheckStore productPhotoCheckStore,
     ILogger<SyncOneCPricesJob> logger)
 {
     private const string RuLanguage = "ru";
@@ -99,6 +100,12 @@ public sealed class SyncOneCProductDetailsJob(
             "Synced {SyncedCount} products for root {Root}.",
             syncedProductIds.Count,
             rootCategoryId);
+
+        await productPhotoCheckStore.ReconcileAsync(
+            products
+                .Select(product => new ProductPhotoCandidate(ProductId.From(product.Id), product.Photo))
+                .ToArray(),
+            cancellationToken);
 
         await UpsertTranslationsForSyncedProductsAsync(syncedProductIds, cancellationToken);
 
