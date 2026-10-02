@@ -99,6 +99,21 @@ paths:
       description: Current controller explicitly allows anonymous access; this returns the unpaged admin row model.
       responses:
         '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
+  /api/admin/products/missing-photos:
+    get:
+      operationId: getAdminProductsWithUnavailablePhotos
+      summary: List active products whose latest photo check is unavailable
+      tags: [Admin products]
+      security: []
+      description: >-
+        Temporarily anonymous. Reads persisted photo-check state only and does
+        not contact the CDN while handling the request.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: Unavailable product-photo page, content: { application/json: { schema: { $ref: '#/components/schemas/MissingProductPhotoPage' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
 components:
   parameters:
     Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }
@@ -138,6 +153,12 @@ components:
       properties:
         pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
         value: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } }
+    MissingProductPhotoPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/MissingProductPhoto' } }
     ProductListItem:
       type: object
       required: [id, name, productSlug, photo, inStock, isSale, isNew]
@@ -188,3 +209,13 @@ components:
         price: { type: [number, 'null'] }
         stock: { type: number }
         quantityInPack: { type: integer }
+    MissingProductPhoto:
+      allOf:
+        - $ref: '#/components/schemas/AdminProduct'
+        - type: object
+          required: [photoAvailable, photoStatus, photoCheckedAtUtc, photoHttpStatusCode]
+          properties:
+            photoAvailable: { type: boolean, const: false }
+            photoStatus: { type: string, enum: [Missing, InvalidContentType, CheckFailed] }
+            photoCheckedAtUtc: { type: string, format: date-time }
+            photoHttpStatusCode: { type: [integer, 'null'], minimum: 100, maximum: 599 }

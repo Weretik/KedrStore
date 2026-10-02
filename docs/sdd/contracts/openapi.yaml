@@ -27,6 +27,8 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products
   /api/admin/products/all:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1all
+  /api/admin/products/missing-photos:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1missing-photos
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:
