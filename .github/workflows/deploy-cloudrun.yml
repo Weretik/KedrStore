@@ -175,6 +175,34 @@ jobs:
               --quiet
           fi
 
+          PHOTO_CHECK_JOB="catalog-product-photo-check"
+          PHOTO_CHECK_ARGS="--job=check-product-photos"
+          PHOTO_CHECK_SECRETS="ConnectionStrings__Default=db-connection:latest"
+
+          if gcloud run jobs describe "$PHOTO_CHECK_JOB" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+            gcloud run jobs update "$PHOTO_CHECK_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 30m \
+              --args="$PHOTO_CHECK_ARGS" \
+              --set-secrets "$PHOTO_CHECK_SECRETS" \
+              --quiet
+          else
+            gcloud run jobs create "$PHOTO_CHECK_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 30m \
+              --args="$PHOTO_CHECK_ARGS" \
+              --set-secrets "$PHOTO_CHECK_SECRETS" \
+              --quiet
+          fi
+
           # Primary customer-sync job. This is the only customer job that should be used for routine execution.
           for JOB_DEF in \
             "onec-sales-customers-full|--job=sales-customers-full"

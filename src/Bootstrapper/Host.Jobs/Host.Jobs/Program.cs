@@ -1,5 +1,6 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Contracts.Projections;
+using Catalog.Application.Jobs.ProductPhotos;
 using Host.Jobs;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;
@@ -126,6 +127,10 @@ try
 
         case "rebuild-projections":
             await scopeServiceProvider.GetRequiredService<IProductListProjectionRebuilder>().RebuildAsync(cancellationToken);
+            break;
+
+        case "check-product-photos":
+            await scopeServiceProvider.GetRequiredService<CheckProductPhotosJob>().RunAsync(cancellationToken);
             break;
 
         default:

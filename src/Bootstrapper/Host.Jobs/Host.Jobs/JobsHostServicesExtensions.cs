@@ -19,6 +19,7 @@ public static class JobsHostServicesExtensions
         services.AddTelegramServices(configuration);
         services.AddCatalogDbContextServices(configuration);
         services.AddCatalogReferenceDataServices();
+        services.AddProductPhotoCheckServices(configuration);
         services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
         services.AddIdentityInfrastructureServices(configuration);
 
