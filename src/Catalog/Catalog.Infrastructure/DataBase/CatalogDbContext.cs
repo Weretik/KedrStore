@@ -11,6 +11,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
     public DbSet<ProductTranslation> ProductTranslations => Set<ProductTranslation>();
     public DbSet<ProductListProjection> ProductListProjections => Set<ProductListProjection>();
+    public DbSet<ProductPhotoCheck> ProductPhotoChecks => Set<ProductPhotoCheck>();
     public DbSet<PriceType> PriceTypes => Set<PriceType>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
