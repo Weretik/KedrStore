@@ -75,6 +75,14 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/admin/products/all", out var allAdminProducts));
         Assert.True(allAdminProducts.TryGetProperty("get", out _));
 
+        Assert.True(paths.TryGetProperty("/api/admin/products/missing-photos", out var missingPhotoProducts));
+        Assert.True(missingPhotoProducts.TryGetProperty("get", out var missingPhotoProductsGet));
+        AssertOperationId(missingPhotoProductsGet, "getAdminProductsWithUnavailablePhotos");
+        AssertOperationHasQueryParameter(missingPhotoProductsGet, "page");
+        AssertOperationHasQueryParameter(missingPhotoProductsGet, "pageSize");
+        Assert.False(missingPhotoProductsGet.GetProperty("responses").TryGetProperty("401", out _));
+        Assert.False(missingPhotoProductsGet.GetProperty("responses").TryGetProperty("403", out _));
+
         Assert.True(paths.TryGetProperty("/api/orders", out var orders));
         Assert.True(orders.TryGetProperty("post", out var ordersPost));
         Assert.True(ordersPost.TryGetProperty("requestBody", out _));
