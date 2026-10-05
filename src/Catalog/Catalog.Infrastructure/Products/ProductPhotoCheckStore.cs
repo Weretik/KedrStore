@@ -13,8 +13,8 @@ public sealed class ProductPhotoCheckStore(CatalogDbContext dbContext) : IProduc
         CancellationToken cancellationToken)
     {
         return await dbContext.Products
+            .FromSqlInterpolated($"SELECT * FROM \"Products\" WHERE \"Id\" > {afterProductId}")
             .AsNoTracking()
-            .Where(product => product.Id.Value > afterProductId)
             .OrderBy(product => product.Id)
             .Take(take)
             .Select(product => new ProductPhotoCandidate(product.Id, product.Photo))

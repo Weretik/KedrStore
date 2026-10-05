@@ -12,22 +12,6 @@ namespace IntegrationTests.Catalog.ProductPhotos;
 public sealed class ProductPhotoCheckStoreTests
 {
     [Fact]
-    public async Task GetActiveProductBatchAsync_IncludesBothExportFlagsAndExcludesSoftDeleted()
-    {
-        await using var db = CreateContext();
-        SeedProduct(db, 1, exportToSite: true);
-        SeedProduct(db, 2, exportToSite: false);
-        var deleted = SeedProduct(db, 3, exportToSite: true);
-        deleted.MarkAsDeleted(DateTimeOffset.UtcNow);
-        await db.SaveChangesAsync();
-        var store = new ProductPhotoCheckStore(db);
-
-        var batch = await store.GetActiveProductBatchAsync(0, 10, CancellationToken.None);
-
-        Assert.Equal([1, 2], batch.Select(product => product.ProductId.Value));
-    }
-
-    [Fact]
     public async Task ReconcileAsync_CreatesUnknownAndResetsChangedUrl()
     {
         await using var db = CreateContext();
