@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore PR Handoff"
+  short_description: "Prepare review-ready delivery handoff"
+  default_prompt: "Use $kedrstore-pr-handoff for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Code Audit"
+  short_description: "Audit architecture and implementation"
+  default_prompt: "Use $kedrstore-code-audit for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

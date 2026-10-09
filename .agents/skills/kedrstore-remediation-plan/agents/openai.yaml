@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Remediation Plan"
+  short_description: "Plan systemic architecture remediation"
+  default_prompt: "Use $kedrstore-remediation-plan for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

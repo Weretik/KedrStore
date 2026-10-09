@@ -1,25 +1,22 @@
-# Як доручити AI створити коміти
+# Git-коміти
 
-Надішліть AI це повідомлення:
+## Запропонувати поділ
 
 ```text
-Працюй за регламентом `docs/sdd/specs/_templates/git/git-commit-batching.md`.
-Створи логічні коміти лише з таких змін: `<опишіть зміни або вкажіть шляхи>`.
-Не виконуй push і не створюй PR.
+За docs/sdd/specs/_templates/git/git-commit-batching.md запропонуй малі reviewable commits для поточного diff. Нічого не коміть.
 ```
 
-Приклад для усіх незакомічених змін:
+## Створити погоджені commits
 
 ```text
-Працюй за регламентом `docs/sdd/specs/_templates/git/git-commit-batching.md`.
-Створи логічні коміти з усіх моїх поточних незакомічених змін.
-Не виконуй push і не створюй PR.
+Створи погоджені commits за git-commit-batching.md.
+Scope: <точні шляхи або feature>.
+Не включай сторонні зміни й не push.
 ```
 
-Приклад для частини змін:
+## Підготувати PR handoff
 
 ```text
-Працюй за регламентом `docs/sdd/specs/_templates/git/git-commit-batching.md`.
-Створи коміти лише зі змін у `src/Modules/Catalog` і `docs/sdd/specs/catalog/002-product-archive`.
-Не включай інші файли, не виконуй push і не створюй PR.
+Use $kedrstore-pr-handoff.
+Підготуй branch name, PR title, description і verification evidence. PR не створюй.
 ```

@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Documentation Sync"
+  short_description: "Repair confirmed documentation drift"
+  default_prompt: "Use $kedrstore-docs-sync for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

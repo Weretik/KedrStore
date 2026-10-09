@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Change Verification"
+  short_description: "Run risk-appropriate backend checks"
+  default_prompt: "Use $kedrstore-change-verification for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

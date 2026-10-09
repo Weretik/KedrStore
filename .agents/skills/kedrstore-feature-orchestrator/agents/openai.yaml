@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Feature Orchestrator"
+  short_description: "Coordinate multi-agent feature delivery"
+  default_prompt: "Use $kedrstore-feature-orchestrator for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

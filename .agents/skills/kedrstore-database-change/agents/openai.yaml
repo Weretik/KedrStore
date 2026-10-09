@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore Database Change"
+  short_description: "Deliver safe EF and seed changes"
+  default_prompt: "Use $kedrstore-database-change for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true

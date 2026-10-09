@@ -1,0 +1,6 @@
+interface:
+  display_name: "KedrStore API Contract Sync"
+  short_description: "Align HTTP behavior and OpenAPI"
+  default_prompt: "Use $kedrstore-api-contract-sync for the requested KedrStore work."
+policy:
+  allow_implicit_invocation: true
