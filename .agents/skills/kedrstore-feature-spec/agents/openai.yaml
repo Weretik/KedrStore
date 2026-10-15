@@ -1,6 +1,0 @@
-interface:
-  display_name: "KedrStore Feature Specification"
-  short_description: "Create backend feature specifications"
-  default_prompt: "Use $kedrstore-feature-spec for the requested KedrStore work."
-policy:
-  allow_implicit_invocation: true
