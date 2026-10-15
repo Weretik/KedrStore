@@ -1,10 +1,10 @@
-# Customer read API — data model
+# API читання клієнтів — модель даних
 
-## Context
+## Контекст
 
-The feature reads the existing local Sales customer projection produced by existing synchronization. It introduces no stored data and does not alter the relationship to Identity or 1C.
+Фіча читає наявну локальну проєкцію клієнтів Sales, яку створює чинна синхронізація. Вона не додає збережених даних і не змінює зв'язок з Identity або 1C.
 
-## Model
+## Модель
 
 ```text
 Counterparty (existing Sales aggregate; Id: string)
@@ -20,10 +20,10 @@ Counterparty (existing Sales aggregate; Id: string)
     └── PriceTypeId
 ```
 
-## Invariants and integrity
+## Інваріанти та цілісність
 
-- `Counterparty.Id` is the existing stable Sales/1C counterparty identifier and is the detail lookup key.
-- `Counterparty` is soft-deletable; normal reads exclude `IsDeleted` records.
-- `CounterpartyCategoryPriceType` is keyed by `CounterpartyId` and `CategoryId`; it represents a category-specific rule that may override the counterparty’s default price type.
-- `IdentityUserId` remains an Identity reference. It is not a customer-facing identifier and must not be exposed unless the agreed API contract requires it.
-- No migration or new persistence structure is planned. Implementation verification must inspect active-customer paging ordered by `Name` and `Id`; add an index only if representative PostgreSQL evidence shows it is required.
+- `Counterparty.Id` — наявний стабільний ідентифікатор контрагента Sales/1C і ключ пошуку деталей.
+- `Counterparty` підтримує логічне видалення; звичайне читання виключає записи з `IsDeleted`.
+- Ключ `CounterpartyCategoryPriceType` складається з `CounterpartyId` і `CategoryId`; цей запис представляє правило для окремої категорії, яке може перевизначати типовий тип ціни контрагента.
+- `IdentityUserId` залишається посиланням на Identity. Це не ідентифікатор для споживачів API клієнтів, і його не можна відкривати, якщо цього не вимагає погоджений контракт API.
+- Міграцію чи нову структуру збереження даних не заплановано. Під час перевірки реалізації потрібно дослідити посторінковий вивід активних клієнтів з упорядкуванням за `Name` і `Id`; індекс слід додавати лише тоді, коли показові вимірювання в PostgreSQL підтвердять його необхідність.

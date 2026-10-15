@@ -1,13 +1,13 @@
-# Security and observability rules
+# Правила безпеки та спостережуваності
 
-## Security and privacy
+## Безпека й приватність
 
-Use least privilege. The host fallback policy requires authentication; mark intentionally public endpoints with `AllowAnonymous`. Preserve existing role and policy conventions. For the model details, see [Identity and access controls](../architecture/security/README.md).
+Застосовуй мінімально потрібні права. Fallback policy host вимагає автентифікації; свідомо публічні endpoints позначай `AllowAnonymous`. Зберігай чинні правила ролей і policies. Подробиці моделі — в [Identity та контролі доступу](../architecture/security/README.md).
 
-Do not log tokens, passwords, connection strings, PII, or sensitive payloads. Do not return internal exception details in production responses.
+Не записуй у логи токени, паролі, рядки підключення, персональні дані або чутливі payloads. Не повертай внутрішні деталі винятків у production-відповідях.
 
-## Logs and diagnostics
+## Логи й діагностика
 
-Use structured Serilog messages with stable, useful properties. Preserve correlation, cancellation, and error diagnostics. Log at the appropriate level without noise.
+Використовуй структуровані повідомлення Serilog зі сталими й корисними властивостями. Зберігай кореляцію, cancellation і діагностику помилок. Обирай доречний рівень логування без зайвого шуму.
 
-Handle transient failures explicitly and observably. Do not introduce implicit retries for write operations that may duplicate side effects.
+Тимчасові збої обробляй явно й спостережувано. Не додавай прихованих повторів запису, які можуть дублювати побічні ефекти.

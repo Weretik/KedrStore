@@ -1,11 +1,11 @@
-# Phase 04 — API and contract
+# Фаза 04 — API та контракт
 
-## Ordered tasks
+## Впорядковані задачі
 
-1. After EN-001, [EN-003 — Publish manager-order read OpenAPI contract](api/EN-003-openapi-contract.md) may run in parallel with EN-002 and TS-001–TS-003.
-2. After TS-002, TS-003, and EN-003, execute [TS-004 — Add manager-order read endpoints](api/TS-004-order-read-endpoints.md).
-3. Execute [TS-005 — Verify manager-order HTTP and contract behavior](api/TS-005-order-read-api-tests.md).
+1. Після EN-001 [EN-003 — опублікувати OpenAPI-контракт читання замовлень менеджера](api/EN-003-openapi-contract.md) можна виконувати паралельно з EN-002 та TS-001–TS-003.
+2. Після TS-002, TS-003 і EN-003 виконати [TS-004 — додати маршрути читання замовлень менеджера](api/TS-004-order-read-endpoints.md).
+3. Виконати [TS-005 — перевірити HTTP-поведінку й контракт замовлень менеджера](api/TS-005-order-read-api-tests.md).
 
-## Checkpoint
+## Контрольна точка
 
-All runtime routes, DTOs, statuses, and authorization behavior match the aggregate versioned OpenAPI contract, and existing order creation/synchronization routes remain intact.
+Усі runtime-маршрути, DTO, статуси та поведінка авторизації відповідають агрегованому версіонованому контракту OpenAPI; чинні маршрути створення й синхронізації замовлень не порушені.

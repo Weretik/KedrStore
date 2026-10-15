@@ -1,21 +1,21 @@
-# KedrStore documentation
+# Документація KedrStore
 
-This directory contains versioned engineering documentation for KedrStore. Backend documentation is maintained as docs-as-code alongside code changes.
+Тут зберігається версійна інженерна документація KedrStore. Документи backend підтримують разом зі змінами коду. [Вхід до backend SDD](sdd/README.md) пояснює роль кожного розділу.
 
 ## Backend SDD
 
-- [Architecture](sdd/architecture/README.md) — the actual backend topology, modules, and layer boundaries.
-- [Engineering rules](sdd/standards/README.md) — backend, API, data, security, testing, and delivery rules.
-- [Operations](sdd/operations/README.md) — local startup, configuration, data, diagnostics, and jobs.
-- [Specifications](sdd/specs/README.md) — feature specifications and SDD templates.
-- [Product glossary](product/glossary.md) — stable catalog and door-industry terms.
+- [Архітектура](sdd/architecture/README.md) — фактична топологія, модулі та межі шарів.
+- [Інженерні правила](sdd/standards/README.md) — backend, API, дані, безпека, тести й delivery.
+- [Операції](sdd/operations/README.md) — локальний запуск, конфігурація, дані, діагностика та jobs.
+- [Специфікації](sdd/specs/README.md) — вимоги й свідчення для окремих фіч.
+- [Продуктовий словник](product/glossary.md) — сталі терміни каталогу, дверей і фурнітури.
 
-- [API contracts](sdd/contracts/README.md) — versioned OpenAPI contracts and frontend integration guidance.
+- [API-контракти](sdd/contracts/README.md) — версійні OpenAPI-контракти та взаємодія з frontend.
 
-## Legacy documentation
+## Історична документація
 
-[docs/legacy/](legacy/README.md) preserves ADRs, historical architecture notes, client PDFs, and feature notes that predate the SDD documentation set. It is retained for context and migration reference, but it is not the source of truth for new work.
+[Архів](legacy/README.md) зберігає старі ADR, архітектурні нотатки, клієнтські PDF і матеріали фіч до чинного набору SDD. Це контекст і джерело для звіряння, а не автоматичне джерело правил для нової роботи.
 
-## Placement principle
+## Розміщення відомостей
 
-A stable rule belongs in `sdd/architecture` or `sdd/standards`. Decisions, requirements, contracts, tasks, and verification evidence for a specific feature belong in its folder under `sdd/specs/`.
+Сталий опис системи належить до `sdd/architecture`, нормативне правило — до `sdd/standards`. Рішення, вимоги, контракти, завдання й свідчення перевірки конкретної фічі належать до її папки в `sdd/specs/`.

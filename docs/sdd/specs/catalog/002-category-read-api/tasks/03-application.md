@@ -1,8 +1,8 @@
-# Phase 03 — Application
+# Фаза 03 — Application
 
-- [x] T013 Implemented the localized public tree projection and empty-list success response.
-- [x] T014 Implemented `GetBySlug` query, validator, descendants, and breadcrumbs.
-- [x] T015 Implemented admin list and id queries, validators, and complete admin projection.
-- [x] T016 Reused no-tracking specification; ordering is `SortOrder`, then `Id`, with guarded tree traversal.
-- [x] T017 Updated category application coverage in `CategoryPresentationApplicationTests.cs`; targeted tests passed 5/5.
-- [x] T018 Handlers pass cancellation tokens and use read repositories/`Ardalis.Result` only.
+- [x] T013 Реалізовано локалізовану публічну проєкцію дерева та успішну відповідь із порожнім списком.
+- [x] T014 Реалізовано запит `GetBySlug`, валідатор, нащадків і breadcrumbs.
+- [x] T015 Реалізовано запити списку та id адміністратора, валідатори й повну проєкцію адміністратора.
+- [x] T016 Повторно використано no-tracking специфікацію; порядок — `SortOrder`, потім `Id`, із захищеним обходом дерева.
+- [x] T017 Оновлено покриття Application категорій у `CategoryPresentationApplicationTests.cs`; цільові тести пройшли 5/5.
+- [x] T018 Обробники передають токени скасування та використовують лише репозиторії читання/`Ardalis.Result`.

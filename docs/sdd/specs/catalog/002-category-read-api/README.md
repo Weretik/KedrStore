@@ -1,53 +1,53 @@
-# 002 — Category read API
+# 002 — API читання категорій
 
-**Module:** Catalog
-**Type:** feature
-**Status:** specified
-**Owner:** Catalog team
-**Created:** 2026-07-31
+**Модуль:** Catalog
+**Тип:** feature
+**Статус:** specified
+**Власник:** команда Catalog
+**Створено:** 2026-07-31
 
-Expose the backend-owned category navigation model to the storefront through public read endpoints. The contract gives the frontend a localized, deterministic category tree and a single-category view, including identity, slug, parent relation, display order, depth, descendants, and breadcrumbs. It does not change category import, persistence, or any frontend UI.
+Надає вітрині модель навігації категоріями, якою керує backend, через публічні ендпоїнти читання. Контракт надає frontend локалізоване, детерміноване дерево категорій і представлення окремої категорії з ідентифікатором, slug, зв’язком із батьківською категорією, порядком відображення, рівнем, нащадками та ланцюжком предків. Імпорт категорій, зберігання даних і будь-який інтерфейс frontend не змінюються.
 
-## Specification-writing order
+## Порядок написання специфікації
 
-1. Create `docs/sdd/specs/<module>/<NNN>-<feature-slug>/` and complete this `README.md`: title, module, owner, goal, and scope.
-2. Complete `requirements/overview.md`, then create a separate `requirements/<topic>.md` for each independent business domain.
-3. Mark uncertainty as `[NEEDS CLARIFICATION: <question>]`; do not assume business rules, API behavior, or the data model.
-4. Resolve every `[NEEDS CLARIFICATION]` item or explicitly move it out of the feature scope.
-5. Complete `design/domain.md`, `design/infrastructure.md`, and `data-model.md`. Requirements answer “what”; design answers “how”.
-6. If an HTTP consumer exists, complete `contracts/api-contract.md`, agree `docs/sdd/contracts/<module>/<feature>.openapi.yaml`, and add it to `docs/sdd/contracts/openapi.yaml` before writing API code. Document non-HTTP integration contracts in `contracts/api-contract.md`; do not create OpenAPI solely for an internal integration.
-7. Complete [Specification readiness](checklist/spec-readiness.md). Do not create tasks while the specification contains unresolved model or contract decisions.
-8. Break implementation into concrete task IDs in `tasks/00-readiness.md`–`tasks/05-verification.md`: each task has an action, exact path, dependencies, and a phase checkpoint.
-9. Complete phases in sequence, mark completed tasks as `[x]`, and record verification results in the documentation.
-10. Before completion, complete [Delivery readiness](checklist/delivery-readiness.md), align the README, requirements, design, and contracts with the code, and prepare the delivery report.
+1. Створіть `docs/sdd/specs/<module>/<NNN>-<feature-slug>/` і заповніть цей `README.md`: назва, модуль, власник, мета й обсяг.
+2. Заповніть `requirements/overview.md`, а потім створіть окремий `requirements/<topic>.md` для кожної незалежної бізнес-області.
+3. Позначайте невизначеність як `[NEEDS CLARIFICATION: <question>]`; не робіть припущень щодо бізнес-правил, поведінки API чи моделі даних.
+4. Усуньте кожен пункт `[NEEDS CLARIFICATION]` або явно винесіть його за межі обсягу фічі.
+5. Заповніть `design/domain.md`, `design/infrastructure.md` і `data-model.md`. Вимоги відповідають на запитання «що»; проєктування — «як».
+6. Якщо є споживач HTTP, заповніть `contracts/api-contract.md`, узгодьте `docs/sdd/contracts/<module>/<feature>.openapi.yaml` і додайте його до `docs/sdd/contracts/openapi.yaml` до написання коду API. Документуйте контракти інтеграцій, що не використовують HTTP, у `contracts/api-contract.md`; не створюйте OpenAPI лише для внутрішньої інтеграції.
+7. Заповніть [Готовність специфікації](checklist/spec-readiness.md). Не створюйте завдань, поки в специфікації залишаються невирішені рішення щодо моделі чи контракту.
+8. Розбийте реалізацію на конкретні ID завдань у `tasks/00-readiness.md`–`tasks/05-verification.md`: кожне завдання має містити дію, точний шлях, залежності та контрольну точку фази.
+9. Виконуйте фази послідовно, позначайте завершені завдання як `[x]` і фіксуйте результати перевірок у документації.
+10. Перед завершенням заповніть [Готовність до постачання](checklist/delivery-readiness.md), узгодьте README, вимоги, проєктування та контракти з кодом і підготуйте звіт про постачання.
 
-## Requirements
+## Вимоги
 
-- [Overview and scope](requirements/overview.md)
-- [Category navigation](requirements/category-navigation.md)
-- [Admin category read](requirements/admin-category-read.md)
+- [Огляд та обсяг](requirements/overview.md)
+- [Навігація категоріями](requirements/category-navigation.md)
+- [Читання категорій адміністраторами](requirements/admin-category-read.md)
 
-## Technical design
+## Технічне проєктування
 
-- [Domain](design/domain.md)
-- [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
+- [Домен](design/domain.md)
+- [Інфраструктура](design/infrastructure.md)
+- [Модель даних](data-model.md)
 
-## Delivery
+## Постачання
 
-- [API/integration contract](contracts/api-contract.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [Контракт API/інтеграції](contracts/api-contract.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність до постачання](checklist/delivery-readiness.md)
 
-## AI implementation tasks
+## Завдання реалізації для AI
 
-AI performs only unfinished tasks in the current phase, marks completed tasks as `[x]`, and proceeds only after the checkpoint. `[P]` indicates safe parallel execution after dependencies are complete.
+AI виконує лише незавершені завдання поточної фази, позначає завершені як `[x]` і переходить далі лише після контрольної точки. `[P]` позначає безпечне паралельне виконання після завершення залежностей.
 
-| Phase | Result |
+| Фаза | Результат |
 | --- | --- |
-| [00 — Clarification](tasks/00-readiness.md) | agreed scope and contract |
-| [01 — Domain](tasks/01-domain.md) | model and unit tests |
-| [02 — Infrastructure](tasks/02-infrastructure.md) | persistence and migration |
-| [03 — Application](tasks/03-application.md) | CQRS use cases |
-| [04 — API](tasks/04-api.md) | endpoints and API tests |
-| [05 — Verification](tasks/05-verification.md) | delivery evidence |
+| [00 — Уточнення](tasks/00-readiness.md) | узгоджені обсяг і контракт |
+| [01 — Домен](tasks/01-domain.md) | модель і модульні тести |
+| [02 — Інфраструктура](tasks/02-infrastructure.md) | зберігання та міграція |
+| [03 — Application](tasks/03-application.md) | сценарії CQRS |
+| [04 — API](tasks/04-api.md) | ендпоїнти й тести API |
+| [05 — Перевірка](tasks/05-verification.md) | докази постачання |

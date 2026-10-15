@@ -1,52 +1,35 @@
-# KedrStore: instructions for AI
+# AI-навігація: KedrStore
 
-These instructions apply to the whole repository.
+Це коротка точка входу для роботи в backend-репозиторії. Фактичні правила, архітектуру, інструменти й команди визначають його код і документація. Читай джерела, потрібні для конкретного завдання. Цей файл діє в усьому репозиторії, якщо вкладений `AGENTS.md` не уточнює окрему ділянку.
 
-## Repository navigation
+## Контекст проєкту
 
-1. Read `docs/sdd/architecture/README.md` before changing module or layer boundaries.
-2. Read the relevant files from `docs/sdd/standards/README.md`. Before creating or changing an entity identifier, read `docs/sdd/standards/identifier-strategy.md`.
-3. For a new feature or migration, create or update its specification under `docs/sdd/specs/` before implementation.
-4. For public HTTP behavior, follow `docs/sdd/contracts/README.md` and keep the feature contract, versioned OpenAPI, runtime behavior, and tests aligned.
-5. For startup, configuration, migrations, diagnostics, or jobs, read `docs/sdd/operations/README.md`.
-6. Use `docs/product/glossary.md` for stable product terminology.
+- [Архітектура](docs/sdd/architecture/README.md) — модулі, шари та межі залежностей.
+- [Стандарти](docs/sdd/standards/README.md) — сталі правила розробки, delivery та перевірок.
+- [Специфікації](docs/sdd/specs/README.md) — вимоги, рішення, завдання й докази виконання фіч.
+- [Контракти](docs/sdd/contracts/README.md) — публічна API-поведінка та її синхронізація.
+- [Операційна документація](docs/sdd/operations/README.md) — запуск, конфігурація, міграції, seed/jobs і діагностика.
+- [Глосарій](docs/product/glossary.md) — сталі бізнес-терміни.
 
-## Architecture and delivery
+Визнач модуль і зачеплені документи за запитом та кодом; не припускай однакової реалізації в іншому backend-проєкті.
 
-- Preserve the modular-monolith boundaries: business modules do not depend on one another's internals, and dependencies point toward Domain.
-- Keep business rules out of controllers, EF mappings, hosts, and `BuildingBlocks`.
-- Implement accepted behavior through dependency-ready `TS-*` and `EN-*` tasks. Apply Red -> Green -> Refactor -> Regression and record fresh evidence.
-- A normal `Host.Api` start applies migrations and seeders. Treat startup and database changes as state-changing operations and never point them at an unapproved database.
-- Keep documentation and contracts in the same change set as the behavior they describe.
-- Preserve unrelated user changes in a dirty worktree.
+## Маршрутизація завдань
 
-## AI execution scope
+| Завдання | Навичка | Джерело правил проєкту |
+| --- | --- | --- |
+| Нова або змінена фіча: специфікація | `$backend-feature-spec` | [Правила delivery](docs/sdd/standards/delivery-rules.md) |
+| Реалізація прийнятої специфікації | `$backend-feature-delivery` | [Правила delivery](docs/sdd/standards/delivery-rules.md) |
+| Кілька агентів на прямий запит користувача | `$backend-feature-orchestrator` | [Специфікації та залежності](docs/sdd/specs/README.md) |
+| Аудит коду / план системного виправлення | `$backend-code-audit` / `$backend-remediation-plan` | [Архітектура](docs/sdd/architecture/README.md) і [стандарти](docs/sdd/standards/README.md) |
+| HTTP/API та зовнішні контракти | `$backend-api-contract-sync` | [Контракти](docs/sdd/contracts/README.md) |
+| Схема БД, міграції та seed-дані | `$backend-database-change` | [Правила БД](docs/sdd/standards/database-rules.md) і [операції з даними](docs/sdd/operations/data/migrations-and-seeding.md) |
+| Перевірка змін / передача на review | `$backend-change-verification` / `$backend-pr-handoff` | [Правила тестування](docs/sdd/standards/testing-rules.md) |
+| Розбіжності між кодом і документацією | `$backend-docs-sync` | [Індекс стандартів](docs/sdd/standards/README.md) |
 
-When the user authorizes a feature, phase, scenario, or ordered task set, continue through all ready in-scope work without requesting a separate command for every task. Stop at the authorized boundary, an unresolved product decision, a documented blocker, or an action requiring new authority.
+## Межі роботи й перевірка
 
-## Git
+Виконуй усі готові завдання в погодженому обсязі фічі, фази, сценарію або завдання без окремої команди для кожного файла; зупиняйся на межі обсягу, невирішеному продуктовому рішенні чи конкретній перешкоді. Детальний порядок — у [правилах delivery](docs/sdd/standards/delivery-rules.md). Обирай перевірки за [правилами тестування](docs/sdd/standards/testing-rules.md) і конфігурацією зачеплених проєктів. Для нових ідентифікаторів читай [стратегію ID](docs/sdd/standards/identifier-strategy.md).
 
-- Do not commit, push, create a pull request, or alter remote state unless the user explicitly requests it.
-- When commits are requested, follow `docs/sdd/specs/_templates/git/git-commit-batching.md`: use small reviewable commits by intent, keep inseparable model/configuration/migration changes together, and do not include unrelated worktree changes.
+Запуск `Host.Api` і робота з БД можуть змінювати стан; перед ними звіряй [проєктний порядок міграцій і seed](docs/sdd/operations/data/migrations-and-seeding.md) та дозволене середовище.
 
-## Repo-local skills
-
-Use the matching skill from `.agents/skills/` when its trigger applies:
-
-- `kedrstore-feature-spec` — create or update a feature specification before code.
-- `kedrstore-feature-delivery` — implement an accepted specification.
-- `kedrstore-feature-orchestrator` — coordinate explicitly requested multi-agent delivery.
-- `kedrstore-change-verification` — select and run risk-appropriate checks.
-- `kedrstore-code-audit` — audit architecture and implementation evidence.
-- `kedrstore-remediation-plan` — plan systemic architecture remediation.
-- `kedrstore-api-contract-sync` — keep HTTP behavior and OpenAPI aligned.
-- `kedrstore-database-change` — design and verify EF Core migration or seed changes.
-- `kedrstore-pr-handoff` — prepare a review-ready handoff.
-- `kedrstore-docs-sync` — find and repair confirmed documentation drift.
-
-## Documentation rules
-
-- `docs/sdd/architecture/` and `docs/sdd/standards/` contain durable rules; feature-specific decisions belong in `docs/sdd/specs/<module>/<NNN>-<feature>/`.
-- Keep machine-readable public API contracts in `docs/sdd/contracts/`.
-- One document serves one responsibility. Do not create empty, duplicate, or monolithic files.
-- Verify relative Markdown links after moving or renaming files.
+Коміти, push, створення гілки чи PR та інші дії зі станом remote виконуй лише за прямим дорученням користувача. Зберігай сторонні зміни робочого дерева. Усі посилання тут ведуть лише до файлів цього репозиторію; назви навичок доступні глобально за іменем; локальних копій навичок у репозиторії немає.

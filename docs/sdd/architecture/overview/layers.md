@@ -1,29 +1,29 @@
-# Layer boundaries
+# Межі шарів
 
-## Domain
+## Шар Domain
 
-Owns aggregates, entities, value objects, domain errors and domain events. Business invariants belong here and must be enforced by constructors, factories or behaviour methods. Domain has no transport DTO, EF, HTTP, logging, configuration or infrastructure dependency.
+Містить агрегати, сутності, об'єкти-значення, доменні помилки й події. Бізнес-інваріанти належать сюди й забезпечуються конструкторами, фабриками або методами поведінки. Domain не залежить від DTO транспортного рівня, EF, HTTP, логування, конфігурації чи Infrastructure.
 
-Use value objects for validated conceptual identifiers and values. Do not make an entity a public request/response model.
+Використовуй value objects для перевірених ідентифікаторів і значень. Не перетворюй сутність на публічну request/response модель.
 
-## Application
+## Шар Application
 
-Owns use cases, commands, queries, handlers, validators and abstractions that adapters implement. Each mediator handler implements one use case. Commands change state; queries do not change state and use no-tracking/read projections where possible.
+Містить сценарії використання, команди, запити, обробники, валідатори й абстракції, які реалізують адаптери. Кожен обробник Mediator виконує один сценарій використання. Команди змінюють стан; запити не змінюють його й за можливості використовують читання без відстеження змін і проєкції.
 
-Application returns Ardalis.Result contracts. It defines persistence/integration interfaces such as read contexts or repositories, but never constructs their implementations.
+Application повертає контракти Ardalis.Result. Вона визначає інтерфейси збереження даних та інтеграцій, наприклад контексти читання або репозиторії, але не створює їхніх реалізацій.
 
-## Contracts
+## Шар Contracts
 
-Module.Contracts is a stable cross-module/client contract boundary for request and response DTOs that need to be consumed outside the module. Keep contracts task-specific; do not use entities as contracts.
+Module.Contracts — стала міжмодульна/клієнтська межа для request і response DTO, які споживають поза модулем. Контракти мають бути конкретними для завдання; не використовуй сутності як контракти.
 
-## Infrastructure
+## Шар Infrastructure
 
-Owns EF Core DbContexts, entity configurations, migrations, repository implementations, external clients (1C, Telegram), exports, persistence projections and adapter registrations. It may depend on inner layers; inner layers may not depend on it.
+Містить EF Core `DbContext`, конфігурації сутностей, міграції, реалізації репозиторіїв, зовнішніх клієнтів (1C, Telegram), експорт, проєкції збережених даних і реєстрацію адаптерів. Може залежати від внутрішніх шарів; вони від неї не залежать.
 
-## API
+## Шар API
 
-Controllers are thin transports: bind input, dispatch one mediator request with the cancellation token, and map Result through the established API mapping. Controllers do not contain business rules, EF queries or transaction orchestration.
+Контролери — тонкий транспортний рівень: прив'язують вхід, відправляють один запит Mediator із токеном скасування та відображають Result через чинне перетворення API. Вони не містять бізнес-правил, EF-запитів або координації транзакцій.
 
-## Bootstrapper
+## Рівень Bootstrapper
 
-Hosts compose modules, configure middleware and register cross-cutting services. They are not a place for use-case logic.
+Хости складають модулі, налаштовують проміжне ПЗ й реєструють наскрізні сервіси. Логіка сценарію використання їм не належить.

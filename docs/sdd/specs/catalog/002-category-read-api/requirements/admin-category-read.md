@@ -1,21 +1,21 @@
-# Category read API — admin category read
+# API читання категорій — читання категорій адміністратором
 
-## Behavior
+## Поведінка
 
-- The internal admin UI requests `GET /api/categories` anonymously and receives every category as a flat array for tables, selectors, and hierarchy editors.
-- The internal admin UI requests `GET /api/categories/{id}` anonymously and receives one category by its numeric backend identity.
-- An admin row exposes `id`, `name`, `shortNameUk`, `shortNameRu`, `slug`, `productTypeIdOneC`, nullable `parentId`, `sortOrder`, and `level`. Technical `Path` remains internal.
+- Внутрішній UI адміністратора анонімно викликає `GET /api/categories` і отримує всі категорії пласким масивом для таблиць, селекторів і редакторів ієрархії.
+- Внутрішній UI адміністратора анонімно викликає `GET /api/categories/{id}` і отримує одну категорію за її числовою backend-ідентичністю.
+- Рядок адміністратора надає `id`, `name`, `shortNameUk`, `shortNameRu`, `slug`, `productTypeIdOneC`, nullable `parentId`, `sortOrder` і `level`. Технічний `Path` залишається внутрішнім.
 
-## Rules and invariants
+## Правила та інваріанти
 
-- Both operations are temporarily anonymous, consistent with the current admin-products read surface. They remain an internal UI surface and must be protected by a future access-control change before external exposure.
-- The list is unpaged because it is the finite category reference set used by the administration UI. It is a depth-first flattening of the hierarchy; each sibling set is ordered by `sortOrder`, then `id`. `parentId`, `level`, and `sortOrder` remain available for the client to build its own tree.
-- `id` is a positive integer. A non-positive id is a `400` validation error. An absent positive id returns bodyless `404`.
-- The endpoints are safe read-only GET operations and need neither a request body nor an idempotency key.
+- Обидві операції тимчасово доступні анонімно, як і наявна поверхня читання продуктів адміністратора. Вони залишаються внутрішньою поверхнею UI; до зовнішнього оприлюднення майбутня зміна контролю доступу має їх захистити.
+- Список не має пагінації, оскільки це скінченний довідник категорій для інтерфейсу адміністрування. Це обхід ієрархії в глибину; кожна група сусідів упорядкована за `sortOrder`, потім за `id`. `parentId`, `level` і `sortOrder` залишаються доступними клієнту для побудови власного дерева.
+- `id` — додатне ціле число. Недодатний id є помилкою валідації `400`. Відсутній додатний id повертає `404` без тіла.
+- Ендпоїнти — безпечні GET-запити лише для читання; їм не потрібні ані тіло запиту, ані ключ ідемпотентності.
 
-## Acceptance scenarios
+## Сценарії приймання
 
-1. Given an anonymous request, when `GET /api/categories` is requested, then the response is `200` with all category rows and both Ukrainian and Russian short names.
-2. Given an anonymous request, when either admin route is requested, then it is not challenged or forbidden by endpoint authorization.
-3. Given an existing category id, when `GET /api/categories/{id}` is requested anonymously, then it returns that full admin row.
-4. Given a positive category id not present in the catalog, when the item route is requested, then it returns `404` with no body.
+1. За анонімного запиту, коли викликається `GET /api/categories`, відповідь має бути `200` з усіма рядками категорій та короткими назвами українською й російською.
+2. За анонімного запиту, коли викликається будь-який маршрут адміністратора, endpoint authorization не має повертати вимогу автентифікації чи заборону доступу.
+3. За наявного id категорії, коли анонімно викликається `GET /api/categories/{id}`, він повертає повний рядок адміністратора.
+4. За додатного id категорії, якого немає в каталозі, коли викликається маршрут елемента, він повертає `404` без тіла.

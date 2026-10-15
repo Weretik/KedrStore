@@ -1,9 +1,9 @@
-# Category read API — design: Infrastructure
+# API читання категорій — проєктування: Infrastructure
 
-## Persistence and integrations
+## Зберігання та інтеграції
 
-Reuse the existing `ProductCategory` EF mapping and category read repository. Add read specifications under `Catalog.Application/Features/Category/` for the public tree/slug reads and admin list/id reads; all use no tracking and request only the fields required by their DTO. Add a public `CategoriesController` under `Catalog.Api/Controllers` with route prefix `api/catalog/{lang}`, and an `AdminCategoriesController` with route prefix `api/categories`. Both controllers are temporarily anonymous; admin routes are limited to the internal UI until a future access-control feature protects them. Both map HTTP to Mediator, preserve cancellation tokens, and use the established Ardalis.Result mapping.
+Повторно використати наявне відображення EF для `ProductCategory` і репозиторій читання категорій. Додати специфікації читання в `Catalog.Application/Features/Category/` для публічного читання дерева/slug та адміністративного читання списку/id; усі вони працюють без відстеження змін і запитують лише поля, потрібні їхнім DTO. Додати публічний `CategoriesController` у `Catalog.Api/Controllers` із префіксом маршруту `api/catalog/{lang}` та `AdminCategoriesController` із префіксом `api/categories`. Обидва контролери тимчасово доступні анонімно; маршрути адміністратора обмежені внутрішнім UI, доки майбутня функція контролю доступу не захистить їх. Обидва перетворюють HTTP-запити на Mediator, передають токени скасування та використовують усталене відображення Ardalis.Result.
 
-## Migration and rollout
+## Міграція та розгортання
 
-No migration, backfill, external adapter, or configuration change is required. Rollout is additive: deploy the controller and application queries together with the OpenAPI contract. Rollback removes only the new routes; it does not alter stored categories or existing product routes.
+Міграція, backfill, зовнішній адаптер чи зміна конфігурації не потрібні. Розгортання є адитивним: розгортати контролер і запити Application разом із контрактом OpenAPI. Відкат видаляє лише нові маршрути; збережені категорії та наявні маршрути продуктів не змінюються.

@@ -1,28 +1,21 @@
-# Feature specifications
+# Специфікації функціональності
 
-This directory contains feature-specific requirements, design, contracts,
-task records, and verification evidence. Every non-trivial behavior change
-updates its specification before implementation.
+Цей каталог містить вимоги, проєктні рішення, контракти, записи завдань і докази перевірки окремих змін. Для нетривіальної зміни поведінки оновлюйте її специфікацію до реалізації. Статус або план у специфікації сам по собі не доводить, що поведінка вже є в коді.
 
-## Layout
+## Структура
 
 ```text
 docs/sdd/specs/
-├── <module>/<NNN>-<feature>/     one feature specification
-└── _templates/                   reusable structure and AI workflow
+└── <module>/<NNN>-<feature>/     специфікація окремої функціональності
 ```
 
-- Start new work with the [template catalog](_templates/README.md).
-- Migrate existing specifications with the
-  [incremental migration guide](_templates/MIGRATION.md).
-- Keep machine-readable public API contracts in
-  [`docs/sdd/contracts/`](../contracts/README.md).
-- For catalog terms involving doors, hardware, Cosmos, or 1C product data, use
-  the [product glossary](../../product/glossary.md).
+- Починайте нову роботу з навички `backend-feature-spec` та відповідних [правил реалізації](../standards/delivery-rules.md). Каталог функціональності фіксує спостережувану мету, обсяг, правила, сценарії, дизайн, контракти, завдання й докази перевірки. Створюйте лише потрібні для цієї зміни артефакти.
+- Якщо змінюється поведінка в чинній специфікації, зберігайте ідентифікатори завершених завдань та історію перевірки. Призначайте `R-*` і `SC-*` зміненій поведінці, додавайте трасування змінених сценаріїв і регресійних залежностей, а новим завданням — `TS-*` або `EN-*`. Залишайте завершені старі файли завдань як історію; не перенумеровуйте їх і не переписуйте їхні докази. Переносьте всю стару специфікацію на новий формат лише на окремий запит користувача.
+- Машинозчитувані публічні API-контракти зберігайте в [`docs/sdd/contracts/`](../contracts/README.md).
+- Для термінів каталогу, пов'язаних із дверима, фурнітурою, Cosmos або даними товарів 1C, використовуйте [глосарій товарів](../../product/glossary.md).
 
-## Lifecycle
+## Життєвий цикл
 
-Draft -> accepted -> in-progress -> verified -> completed.
+Чернетка → прийнято → в роботі → перевірено → завершено.
 
-An implementation must not silently diverge from an accepted specification.
-Record a dated change note with the reason, scope impact, and new verification.
+Реалізація не повинна непомітно розходитися з прийнятою специфікацією. Записуйте датовану примітку про зміну із причиною, впливом на обсяг і новою перевіркою.

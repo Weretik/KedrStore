@@ -1,20 +1,20 @@
-# Missing product photos — checklist: delivery readiness
+# Відсутні фотографії товарів — чеклист готовності постачання
 
-- [x] Every in-scope `SC-*` row in `traceability.md` is verified or explicitly deferred.
-- [x] Domain state transitions and URL-staleness boundaries are tested.
-- [x] Job orchestration, result classification, paging, validation, and result behavior are tested.
-- [x] PostgreSQL constraints, migration/backfill, and index are verified; physical provider lifecycle checks are owned by CI.
-- [x] CDN adapter verifies HEAD, fallback GET, media type, timeout, redirects, and bounded body handling.
-- [x] The anonymous API conforms to the agreed OpenAPI contract.
-- [x] Host.Jobs exposes the documented command and cancellation behavior.
-- [x] Cloud Run workflow creates or updates the job without executing or scheduling it.
-- [x] Every behavior task records Red, Green, refactor, regression, and evidence.
-- [x] Every enabler records its exception reason and replacement verification.
-- [x] Restore, build, test, workflow validation, and focused checks pass or have documented ownership.
-- [x] Operations documentation, contracts, implementation, and names agree.
-- [x] All task IDs are closed and residual risks have an owner and next step.
+- [x] Кожен сценарій `SC-*` у межах роботи з `traceability.md` перевірено або явно відкладено.
+- [x] Переходи domain-стану й межі застарівання URL перевірено тестами.
+- [x] Оркестрацію задачі, класифікацію результатів, сторінкову навігацію, валідацію та поведінку результату перевірено тестами.
+- [x] Обмеження PostgreSQL, міграцію/заповнення даних та індекс перевірено; перевірки життєвого циклу фізичного провайдера належать CI.
+- [x] Адаптер CDN перевіряє HEAD, резервний GET, тип медіа, таймаут, перенаправлення й обмежену обробку тіла відповіді.
+- [x] Анонімний API відповідає погодженому OpenAPI-контракту.
+- [x] Host.Jobs надає задокументовану команду й поведінку скасування.
+- [x] Workflow Cloud Run створює або оновлює задачу, не виконуючи й не плануючи її.
+- [x] Кожна задача поведінки фіксує Red, Green, refactor, regression і свідчення.
+- [x] Кожен enabler записує причину винятку й замінну перевірку.
+- [x] Restore, build, test, перевірка workflow та цільові перевірки проходять або мають задокументованого відповідального.
+- [x] Операційна документація, контракти, реалізація й назви узгоджені.
+- [x] Усі ID задач закрито, а залишкові ризики мають відповідального й наступний крок.
 
-Residual verification ownership: CI must run the three PostgreSQL lifecycle
-tests with Docker available. Optional `actionlint`/`yamllint` checks remain a CI
-tooling concern; the repository static workflow test verifies the feature's
-exact deployment behavior.
+Відповідальність за залишкову перевірку: CI має запустити три тести життєвого циклу
+PostgreSQL за доступного Docker. Необов'язкові перевірки `actionlint`/`yamllint`
+залишаються питанням інструментарію CI; статичний тест workflow у репозиторії
+перевіряє точну поведінку розгортання цієї функціональності.

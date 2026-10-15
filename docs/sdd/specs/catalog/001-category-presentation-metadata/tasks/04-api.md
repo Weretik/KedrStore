@@ -1,13 +1,13 @@
-# Phase 04 — API
+# Етап 04 — API
 
-**Status:** completed and verified (not applicable: no HTTP API is in scope)
+**Статус:** завершено й перевірено (не застосовується: HTTP API не входить до меж роботи)
 
-- [x] T018 Not applicable: T003 excludes HTTP exposure from this feature. No OpenAPI-derived DTOs are required. **Dependencies:** T003, T017.
-- [x] T019 Not applicable: no category-tree endpoint/controller is in scope. **Dependencies:** T018.
-- [x] T020 Not applicable: no HTTP authorization, error mapping, or response contract is introduced. **Dependencies:** T019.
-- [x] T021 Not applicable: no API/integration contract tests are required without an HTTP contract. **Dependencies:** T018–T020.
-- [x] T022 No HTTP contract is approved. T018–T021 are not applicable; the Catalog Application `GetCategoriesQuery` / `CategoryTreeDto` boundary is recorded in `contracts/api-contract.md`. **Dependencies:** T003, T021.
+- [x] T018 Не застосовується: T003 виключає HTTP-доступ із цієї функціональності. DTO, похідні від OpenAPI, не потрібні. **Залежності:** T003, T017.
+- [x] T019 Не застосовується: endpoint/контролер дерева категорій не входить до меж роботи. **Залежності:** T018.
+- [x] T020 Не застосовується: HTTP-авторизація, відображення помилок і контракт відповіді не додаються. **Залежності:** T019.
+- [x] T021 Не застосовується: без HTTP-контракту тести API/інтеграційного контракту не потрібні. **Залежності:** T018–T020.
+- [x] T022 HTTP-контракт не затверджено. T018–T021 не застосовуються; межу Catalog Application `GetCategoriesQuery` / `CategoryTreeDto` зафіксовано в `contracts/api-contract.md`. **Залежності:** T003, T021.
 
-## Checkpoint
+## Контрольна точка
 
-API work starts only from an agreed contract. Existing routes and response fields are unchanged unless an explicit additive contract says otherwise.
+Робота над API починається лише з погодженого контракту. Наявні маршрути й поля відповіді не змінюються без явного адитивного контракту, який визначає інше.

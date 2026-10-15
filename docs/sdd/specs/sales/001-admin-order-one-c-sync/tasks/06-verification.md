@@ -1,10 +1,10 @@
-# Phase 06 — Verification
+# Фаза 06 — перевірка
 
-- [x] [T170 — Build, tests, migration, and job verification](verification/06.1-build-tests.md)
-- [x] [T180 — Delivery documentation and operational handoff](verification/06.2-delivery.md)
+- [x] [T170 — перевірка збірки, тестів, міграції та задачі](verification/06.1-build-tests.md)
+- [x] [T180 — документація постачання та операційна передача](verification/06.2-delivery.md)
 
-- [x] [T185 — Manual live 1C SOAP write smoke verification](test/06.3-one-c-write-smoke-test.md)
+- [x] [T185 — ручна smoke-перевірка запису через SOAP у живу 1С](test/06.3-one-c-write-smoke-test.md)
 
-## Checkpoint
+## Контрольна точка
 
-Build, tests, migration checks, job invocation, OpenAPI registration, deployment configuration, and delivery documentation have recorded evidence.
+Збірка, тести, перевірки міграції, виклик задачі, реєстрація OpenAPI, конфігурація розгортання й документація постачання мають зафіксовані докази.

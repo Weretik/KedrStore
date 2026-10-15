@@ -1,6 +1,6 @@
 # BuildingBlocks.Domain
 
-## Structure
+## Структура
 
 ~~~text
 BuildingBlocks.Domain/
@@ -17,16 +17,16 @@ BuildingBlocks.Domain/
     └── DomainException
 ~~~
 
-## Available approaches
+## Наявні підходи
 
-- BaseEntity<TId> provides identity, equality by concrete type plus non-transient ID, and domain-event collection methods.
-- BaseAuditableEntity<TId> adds CreatedAt, UpdatedAt, IsDeleted and explicit mark methods.
-- DomainError is the standard code/message error value.
-- DomainException carries an IDomainError. ExceptionBehavior maps it to Result.Invalid for Result-based handlers.
-- IAggregateRoot is a marker for aggregate roots; IHasDomainEvents is the event lifecycle contract.
+- `BaseEntity<TId>` містить ідентичність, порівняння за конкретним типом і неперехідним ID та методи накопичення доменних подій.
+- `BaseAuditableEntity<TId>` додає `CreatedAt`, `UpdatedAt`, `IsDeleted` і явні методи позначення змін.
+- `DomainError` — стандартне значення помилки з кодом і повідомленням.
+- `DomainException` несе `IDomainError`; `ExceptionBehavior` відображає його в `Result.Invalid` для handlers, що повертають Result.
+- `IAggregateRoot` позначає корені aggregates; `IHasDomainEvents` задає контракт життєвого циклу подій.
 
-## Use
+## Використання
 
-Derive an aggregate/entity from the appropriate base only when its ID and event lifecycle fit. Raise an event with AddDomainEvent inside a completed domain operation. Do not dispatch it in Domain.
+Успадковуй aggregate/сутність від відповідної бази лише коли підходять її ID і життєвий цикл подій. Створюй подію через `AddDomainEvent` після завершеної доменної операції. Не dispatch-уй її в Domain.
 
-Do not add EF attributes, HTTP concepts, repository implementations or transport DTOs here.
+Не додавай сюди EF-атрибути, HTTP-поняття, реалізації репозиторіїв або DTO транспортного рівня.

@@ -1,8 +1,8 @@
-# Database migration job — checklist: specification readiness
+# Job міграції БД — чеклист готовності специфікації
 
-- [x] Production failure and migration-history mismatch are evidenced by Cloud Run logs and `__EFMigrationsHistory` output.
-- [x] The legacy Identity migration IDs that must remain compatible are known.
-- [x] No public HTTP contract is in scope; the internal CLI and deployment contracts are documented.
-- [x] Rollout and rollback require an explicit Cloud SQL backup.
-- [x] Every stated requirement is covered by a task ID.
-- [x] The dedicated root Jobs service is explicitly in scope.
+- [x] Production-збій і розбіжність історії міграцій підтверджено логами Cloud Run та виводом `__EFMigrationsHistory`.
+- [x] Відомі legacy ID міграцій Identity, сумісність яких потрібно зберегти.
+- [x] Публічний HTTP-контракт поза обсягом; внутрішні контракти CLI та розгортання описано.
+- [x] Rollout і rollback потребують явного backup Cloud SQL.
+- [x] Кожну заявлену вимогу покриває ID завдання.
+- [x] Окремий кореневий сервіс Jobs явно входить до обсягу.

@@ -1,20 +1,20 @@
-# BuildingBlocks usage rules
+# Правила використання BuildingBlocks
 
-## Reuse before creating
+## Перевикористання перед створенням
 
-| Need | Use first | Do not do |
+| Потреба | Спершу застосуй | Не роби |
 | --- | --- | --- |
-| Expected use-case failure | Ardalis.Result and existing Result mapping | throw ordinary validation/not-found exceptions |
-| Input validation | FluentValidation plus ValidationBehavior | validate only in controller |
-| Business invariant | DomainError and DomainException or aggregate behavior | move domain rule into a behavior |
-| Current user/permissions | ICurrentUserService or IPermissionService | inject IHttpContextAccessor into Application |
-| Domain event | BaseEntity collection plus dispatcher behavior | publish directly from controller |
-| DB migration/seeding | IDatabaseMigrator/ISeeder startup extensions | migrate/seed inside a handler |
-| 1C SOAP | OneCSoapClientFactory | duplicate SOAP authentication setup |
-| Request diagnostics | existing behaviors/log helpers | log raw sensitive payloads |
+| Очікувана помилка сценарію використання | Ardalis.Result і чинне відображення Result | Кидати звичайні винятки валідації або відсутності даних |
+| Валідація входу | FluentValidation і ValidationBehavior | Валідувати лише в controller |
+| Бізнес-інваріант | DomainError і DomainException або поведінка aggregate | Переносити доменне правило в behavior |
+| Поточний користувач/дозволи | ICurrentUserService або IPermissionService | Інжектити IHttpContextAccessor в Application |
+| Доменна подія | Колекція BaseEntity і dispatcher behavior | Публікувати безпосередньо з controller |
+| Міграція/seed БД | IDatabaseMigrator/ISeeder через окремий `Host.Jobs --job=migrate` | Виконувати міграції/сидери всередині handler |
+| 1C SOAP | OneCSoapClientFactory | Дублювати налаштування SOAP-автентифікації |
+| Діагностика запитів | Наявні behaviors/log helpers | Логувати сирі чутливі payloads |
 
-## Extension rule
+## Правило розширення
 
-Add a shared primitive only when at least two modules need the same stable technical abstraction. A feature-specific abstraction stays in its owning Application module. A business concept never moves to BuildingBlocks.
+Додавай спільний примітив лише коли щонайменше два модулі потребують однакової сталої технічної абстракції. Абстракція окремої фічі залишається в її Application-модулі. Бізнес-поняття не переносять до BuildingBlocks.
 
-Document an addition or order change to cross-cutting infrastructure in an ADR and in the feature specification.
+Додавання або зміну порядку наскрізної інфраструктури документуй в [ADR](../../decisions/README.md) і специфікації фічі.

@@ -1,10 +1,10 @@
-# OneC client contract and normalization
+# Контракт клієнта 1C і нормалізація
 
-`OneCSoapClientFactory` creates the generated SOAP/WCF client; `BasicAuthEndpointBehavior` attaches Basic authentication. Neither endpoint, Authorization header, username nor password may be logged or documented.
+`OneCSoapClientFactory` створює згенерований SOAP/WCF-клієнт; `BasicAuthEndpointBehavior` додає Basic authentication. Endpoint, Authorization header, username і пароль не записують у логи чи документацію.
 
-`Catalog.Infrastructure.Integrations.OneC.Client.OneCClient` implements the Application abstraction `IOneCClient`. Every method creates a SOAP client, calls one generated operation and maps return values to module DTOs.
+`Catalog.Infrastructure.Integrations.OneC.Client.OneCClient` реалізує абстракцію Application `IOneCClient`. Кожен метод створює SOAP-клієнт, викликає одну згенеровану операцію й відображає значення в DTO модуля.
 
-| Application method | Generated SOAP operation | Consumer |
+| Метод Application | Згенерована SOAP-операція | Споживач |
 | --- | --- | --- |
 | `GetPriceTypesAsync()` | `GetPriceTypesAsync` | `SyncOneCPriceTypesJob` |
 | `GetCategoriesAsync(rootId)` | `GetCategoriesAsync` | `SyncOneCCategoryJob` |
@@ -12,18 +12,18 @@
 | `GetProductStocksAsync(rootId)` | `GetProductStocksAsync` | `SyncOneCStocksJob` |
 | `GetProductPricesAsync(rootId)` | `GetProductPricesAsync` | `SyncOneCPricesJob` |
 
-`rootId` remains the original 1C string identifier, including leading zeroes.
+`rootId` зберігає вихідний рядковий ID 1C, включно з початковими нулями.
 
-## Normalization at the Infrastructure boundary
+## Нормалізація на межі Infrastructure
 
-| Value | Current handling | Empty/invalid |
+| Значення | Поточна обробка | Порожнє/некоректне |
 | --- | --- | --- |
-| ID | trim leading zeroes; parse integer | `0`, optional parent ID is `null` |
-| text | trim | empty string |
-| boolean | `true`, `1`, `yes`, Ukrainian/Russian affirmative value | `false` |
-| price | decimal parsing | `0m` |
-| stock | Ukrainian, Russian, then invariant decimal parsing; ceiling | `0m` |
+| ID | Прибрати початкові нулі; розібрати ціле число | `0`, необов'язковий parent ID — `null` |
+| Текст | Обрізати пробіли | Порожній рядок |
+| Boolean | `true`, `1`, `yes`, українське/російське ствердне значення | `false` |
+| Ціна | Розібрати decimal | `0m` |
+| Залишок | Decimal за українською, російською, потім invariant cultural convention; округлення вгору | `0m` |
 
-The mapper preserves `ExportToSite=false`: it means hidden from public catalogue, not excluded from local storage.
+Mapper зберігає `ExportToSite=false`: товар приховано з публічного каталогу, але він залишається в локальному сховищі.
 
-When adding a field: confirm source semantics, map to a module DTO (not a WCF type), define invalid-value behaviour, update the import-safety docs, and add a mapping/integration test where supported.
+Коли додаєш поле, підтвердь його семантику в джерелі, відобрази в DTO модуля (не WCF-тип), визнач поведінку для некоректного значення, онови [безпеку імпорту](data-safety.md) й додай mapping/інтеграційний тест, де це підтримується.

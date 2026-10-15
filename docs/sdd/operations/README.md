@@ -1,22 +1,22 @@
-# Operations
+# Операційна документація
 
-This section explains how the running backend is configured, started and diagnosed. It describes operational facts, not feature design; feature-specific manual checks remain in the feature specification.
+Розділ пояснює, як налаштувати, запустити й діагностувати backend. Тут описано операційні факти; ручні перевірки конкретної фічі зберігаються в її специфікації.
 
 ```text
 operations/
-├── local-development/  run the API and use local URLs
-├── configuration/      configuration sources and secret handling
-├── data/               automatic migrations and seeders
-├── diagnostics/        health, Swagger and logs
-└── jobs/               Host.Jobs and OneC import commands
+├── local-development/  запуск API та локальні адреси
+├── configuration/      джерела конфігурації й секрети
+├── data/               окремий migration job і seed-дані
+├── diagnostics/        health, Swagger і логи
+└── jobs/               команди Host.Jobs та імпорту 1C
 ```
 
-## Read by task
+## Навігація за завданням
 
-- Start the backend locally: [local development](local-development/run-api.md)
-- Configure a machine or fix missing settings: [configuration and secrets](configuration/configuration-and-secrets.md)
-- Understand what startup changes in the database: [migrations and seeders](data/migrations-and-seeding.md)
-- Check a running API or reproduce an endpoint: [diagnostics](diagnostics/health-logs-swagger.md)
-- Run a OneC/import operation: [jobs and runbooks](jobs/README.md)
+- Локально запустити backend: [локальна розробка](local-development/run-api.md)
+- Налаштувати середовище: [конфігурація й секрети](configuration/configuration-and-secrets.md)
+- Підготувати БД окремим job: [міграції та seed-дані](data/migrations-and-seeding.md)
+- Перевірити API або відтворити HTTP-запит: [діагностика](diagnostics/health-logs-swagger.md)
+- Виконати 1C/import операцію: [jobs і runbooks](jobs/README.md)
 
-Do not put a password, token, full connection string or production endpoint into this documentation.
+Не записуй тут паролі, токени, повні рядки підключення або production endpoints.

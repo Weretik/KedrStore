@@ -1,15 +1,15 @@
-# Phase 02 — Root migration job
+# Фаза 02 — Кореневе завдання міграції
 
-- [x] T008 Add a dedicated migration orchestration service in `src/Bootstrapper/Host.Jobs/Host.Jobs/` that invokes registered `IDatabaseMigrator` instances in the approved deterministic order. **Dependencies:** T004.
-- [x] T009 Add `--job=migrate` dispatch to `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`; it must require no root IDs, propagate cancellation, log context-safe progress, and return non-zero on failure. **Dependencies:** T008.
-- [x] T010 Confirm `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` contains all required project references and publish content for the new migration job; add only missing root-job dependencies. **Dependencies:** T008.
-- [x] T011 Add unit/integration coverage for command dispatch, ordering, failure stop, and idempotent re-execution. **Dependencies:** T009, T010.
+- [x] T008 Додати окремий сервіс координації міграцій у `src/Bootstrapper/Host.Jobs/Host.Jobs/`, який викликає зареєстровані `IDatabaseMigrator` у погодженому визначеному порядку. **Залежності:** T004.
+- [x] T009 Додати dispatch `--job=migrate` у `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`; він не потребує root IDs, передає cancellation, логує безпечний контекст і повертає ненульовий код за помилки. **Залежності:** T008.
+- [x] T010 Підтвердити, що `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` містить потрібні project references і publish content для нового job; додати лише відсутні залежності кореневого job. **Залежності:** T008.
+- [x] T011 Додати покриття модульними й інтеграційними тестами для диспетчеризації команди, порядку, зупинки за помилки й ідемпотентного повтору. **Залежності:** T009, T010.
 
-## Completion record (2026-07-29)
+## Запис завершення (2026-07-29)
 
-- `DatabaseMigrationJob` runs registered migrators deterministically, stops before seeding on the first failure, and runs existing seeders after all migrations succeed.
-- `Host.Jobs.csproj` already referenced all contexts and infrastructure dependencies; no new package or project reference was required for production code.
+- `DatabaseMigrationJob` запускає зареєстровані migrators у визначеному порядку, зупиняється до seeding за першої помилки й запускає наявні сидери після успіху всіх міграцій.
+- `Host.Jobs.csproj` уже посилався на всі contexts та інфраструктурні залежності; нових пакетів або project references для production-коду не знадобилося.
 
-## Checkpoint
+## Контрольна точка
 
-The migration job must be runnable locally against a disposable database before deployment orchestration changes.
+До змін процесу розгортання координаційне завдання міграції має запускатися локально на одноразовій БД.

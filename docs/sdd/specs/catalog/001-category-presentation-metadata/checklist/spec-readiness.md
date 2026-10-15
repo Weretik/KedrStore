@@ -1,13 +1,13 @@
-# Category presentation metadata — checklist: specification readiness
+# Метадані представлення категорій — чеклист готовності специфікації
 
-- [x] Requirements are complete, testable, and non-contradictory.
-- [x] Every `[NEEDS CLARIFICATION]` item is resolved or moved out of scope.
-- [x] Every stated requirement has a design decision or a deferred status.
-- [x] The data model contains no speculative data or relations.
-- [x] Every requirement is covered by a task ID; tasks do not exceed scope.
-- [x] Contract, security, idempotency, and integration dependencies are agreed.
+- [x] Вимоги повні, перевірні й не суперечать одна одній.
+- [x] Кожен пункт `[NEEDS CLARIFICATION]` розв'язано або винесено за межі роботи.
+- [x] Для кожної сформульованої вимоги є проєктне рішення або статус відкладеної роботи.
+- [x] Модель даних не містить гіпотетичних даних чи зв'язків.
+- [x] Кожну вимогу покриває ID задачі; задачі не виходять за межі роботи.
+- [x] Контракт, безпеку, ідемпотентність та інтеграційні залежності погоджено.
 
-## Resolved decisions
+## Ухвалені рішення
 
-- The stable key, complete frozen-snapshot mapping, unconfigured fallback, short-label validation, and Cosmos metadata are recorded in `tasks/00-readiness.md` (T002).
-- The consumer boundary is the Catalog Application read model; no HTTP contract is in scope (T003).
+- Стабільний ключ, повне відображення із зафіксованого знімка, fallback для неналаштованих категорій, перевірку коротких назв і метадані Cosmos записано в `tasks/00-readiness.md` (T002).
+- Межею споживача є модель читання Catalog Application; HTTP-контракт не входить до меж роботи (T003).

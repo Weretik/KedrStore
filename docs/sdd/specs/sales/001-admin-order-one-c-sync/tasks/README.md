@@ -1,22 +1,22 @@
-# Phases of feature implementation
+# Фази реалізації функціональності
 
-The feature follows the standard `00 → 05` sequence. Each phase has concrete, ordered task files with ownership boundaries, exact target paths, dependencies, and checkpoints.
+Функціональність дотримується стандартної послідовності `00 → 05`. Кожна фаза має конкретні впорядковані файли задач із межами відповідальності, точними цільовими шляхами, залежностями й контрольними точками.
 
-- [00 — Readiness](00-readiness.md)
-- [01 — Domain planning](01-domain.md)
-- [02 — Infrastructure planning](02-infrastructure.md)
-- [03 — Application planning](03-application.md)
-- [04 — API planning](04-api.md)
-- [05 — Background delivery job](05-jobs.md)
-- [06 — Verification](06-verification.md)
+- [00 — готовність](00-readiness.md)
+- [01 — планування Domain](01-domain.md)
+- [02 — планування Infrastructure](02-infrastructure.md)
+- [03 — планування Application](03-application.md)
+- [04 — планування API](04-api.md)
+- [05 — фонова задача передавання](05-jobs.md)
+- [06 — перевірка](06-verification.md)
 
-## Existing concrete subphases
+## Наявні конкретні підфази
 
-- [05.3 — Persist the 1C document number](jobs/05.3-persist-one-c-document-number.md)
-- [04.5 — Admin order sync-status read API](api/04.5-order-sync-status.md)
-- [06.3 — Manual live 1C SOAP write smoke verification](test/06.3-one-c-write-smoke-test.md)
+- [05.3 — зберегти номер документа 1С](jobs/05.3-persist-one-c-document-number.md)
+- [04.5 — API читання стану синхронізації замовлення адміністратора](api/04.5-order-sync-status.md)
+- [06.3 — ручна smoke-перевірка запису через SOAP у живу 1С](test/06.3-one-c-write-smoke-test.md)
 
-- [00.1 — Confirm the implementation baseline](readiness/00.1-scope-contracts.md)
-- [00.2 — Discover CLI and generators](readiness/00.2-tooling.md)
+- [00.1 — підтвердити вихідний стан реалізації](readiness/00.1-scope-contracts.md)
+- [00.2 — дослідити CLI та генератори](readiness/00.2-tooling.md)
 
-API subphases follow the required order: controller → HTTP behavior/security → OpenAPI → API tests.
+Підфази API дотримуються обов'язкового порядку: контролер → HTTP-поведінка/безпека → OpenAPI → тести API.

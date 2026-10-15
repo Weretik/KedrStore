@@ -1,48 +1,48 @@
-# 002 — Manager order read API
+# 002 — API читання замовлень менеджера
 
-- **Module:** Sales
-- **Type:** feature
-- **Status:** delivered
-- **Owner:** Sales team
-- **Created:** 2026-09-10
+- **Модуль:** Sales
+- **Тип:** функціональність
+- **Статус:** поставлено
+- **Власник:** команда Sales
+- **Створено:** 2026-09-10
 
-Sales managers need to browse persisted manager orders, open one order with its lines and delivery state, and browse orders for one counterparty. This feature exposes read-only projections of the existing Sales order model; it does not change order creation, 1C delivery, or customer synchronization.
+Менеджерам Sales потрібно переглядати збережені замовлення менеджерів, відкривати окреме замовлення з його позиціями та станом доставки й переглядати замовлення певного контрагента. Ця функціональність надає проєкції читання наявної моделі замовлень Sales; вона не змінює створення замовлень, передачу до 1С або синхронізацію клієнтів.
 
-## Requirements
+## Вимоги
 
-- [Overview and boundaries](requirements/overview.md)
-- [Order reading](requirements/order-reading.md)
+- [Огляд і межі](requirements/overview.md)
+- [Читання замовлень](requirements/order-reading.md)
 
-## Technical design
+## Технічне проєктування
 
 - [Domain](design/domain.md)
 - [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
-- [API contract](contracts/api-contract.md)
-- [Versioned OpenAPI](../../../contracts/sales/manager-order-read.openapi.yaml)
+- [Модель даних](data-model.md)
+- [Контракт API](contracts/api-contract.md)
+- [Версіонований OpenAPI](../../../contracts/sales/manager-order-read.openapi.yaml)
 
-## Planning and delivery
+## Планування та постачання
 
-- [Scenario traceability](traceability.md)
-- [Task graph](tasks/README.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [Простежуваність сценаріїв](traceability.md)
+- [Граф задач](tasks/README.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність постачання](checklist/delivery-readiness.md)
 
-## Related documentation
+## Пов'язана документація
 
-- [Admin order and 1C synchronization](../001-admin-order-one-c-sync/README.md)
-- [Current aggregate API contract](../../../contracts/openapi.yaml)
-- [Sales module ownership](../../../architecture/overview/modules.md)
+- [Замовлення адміністратора та синхронізація з 1С](../001-admin-order-one-c-sync/README.md)
+- [Чинний агрегований контракт API](../../../contracts/openapi.yaml)
+- [Відповідальність модуля Sales](../../../architecture/overview/modules.md)
 
-## Change notes
+## Історія змін
 
-- 2026-09-10 — Initial draft for manager-order list, detail, and counterparty-scoped list reads. No code or machine-readable contract is added.
-- 2026-09-10 — Agreed compact list/full detail DTOs, counterparty filtering, paging/order, historical soft-deleted-customer behavior, and `CanManageOrders` access.
-- 2026-09-10 — Delivered list/detail queries, PostgreSQL projections, `CanManageOrders` HTTP endpoints, versioned OpenAPI, and focused/full regression evidence.
-- 2026-09-17 — Temporarily allowed anonymous access to the list and detail routes; production authorization remains a required follow-up.
+- 2026-09-10 — Початкова чернетка читання списку та деталей замовлень менеджера й списку за контрагентом. Код і машиночитаний контракт ще не додано.
+- 2026-09-10 — Погоджено компактні DTO списку та повних деталей, фільтр за контрагентом, пагінацію і порядок, поведінку для історичних замовлень видаленого контрагента та доступ `CanManageOrders`.
+- 2026-09-10 — Поставлено запити списку й деталей, проєкції PostgreSQL, HTTP-маршрути з `CanManageOrders`, версіонований OpenAPI та докази цільової й повної регресійної перевірки.
+- 2026-09-17 — Тимчасово дозволено анонімний доступ до маршрутів списку й деталей; авторизація production залишається обов'язковим наступним кроком.
 
-## Delivery report
+## Звіт про постачання
 
-SC-001 through SC-005 and EN-001 through EN-003 / TS-001 through TS-006 are complete. `GET /api/admin/orders` returns a newest-first compact page with optional exact counterparty filtering; `GET /api/admin/orders/{orderId}` returns the approved detail projection. Both routes temporarily allow anonymous access and preserve existing create, sync-status, and retry routes.
+Сценарії SC-001–SC-005, задачі EN-001–EN-003 і TS-001–TS-006 завершено. `GET /api/admin/orders` повертає компактну сторінку від найновіших замовлень з необов'язковим точним фільтром за контрагентом; `GET /api/admin/orders/{orderId}` повертає погоджену проєкцію деталей. Обидва маршрути тимчасово дозволяють анонімний доступ і зберігають чинні маршрути створення, стану синхронізації та повторної спроби.
 
-The delivery gate passed restore, a warning-free build, 59 Unit tests, 10 Architecture tests, and 67 Integration tests. PostgreSQL checks ran in isolated schemas that were removed after verification. TS-001's first Red attempt was skipped when Docker was unavailable; later focused and regression tests executed against PostgreSQL 18 with no failures or skips. Repository-wide aggregate Redocly lint still reports pre-existing errors in the older admin-order sync contract; this feature's contract validates, and focused aggregate plus runtime checks pass.
+Контроль постачання пройшов restore, збірку без попереджень, 59 unit-тестів, 10 архітектурних і 67 інтеграційних тестів. Перевірки PostgreSQL виконувалися в ізольованих схемах, які видалили після перевірки. Першу спробу Red для TS-001 пропустили через недоступність Docker; пізніше цільові та регресійні тести виконали на PostgreSQL 18 без помилок і пропусків. Загальний Redocly lint репозиторію досі повідомляє про раніше наявні помилки в старішому контракті синхронізації замовлень адміністратора; контракт цієї функціональності валідний, а цільові перевірки агрегату та runtime пройшли.

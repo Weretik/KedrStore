@@ -1,19 +1,19 @@
-# Missing product photos — traceability
+# Відсутні фотографії товарів — простежуваність
 
-| Scenario | Rules | Design | Tasks | Test level | Verification evidence |
+| Сценарій | Правила | Дизайн | Задачі | Рівень тесту | Свідчення перевірки |
 | --- | --- | --- | --- | --- | --- |
-| SC-001 | R-001, R-002, R-004, R-005 | Domain state; CDN adapter; job | TS-001, TS-003, TS-004 | Unit + integration | Domain 12/12; probe image HEAD; job/store suites passed |
-| SC-002 | R-003, R-005, R-007 | CDN adapter; read query/API | TS-003, TS-005, TS-006 | Integration + API | 404/410 classification and paged API tests passed |
-| SC-003 | R-002, R-003 | CDN adapter and status state | TS-001, TS-003, TS-005 | Unit + integration | Missing/non-image content-type variants passed |
-| SC-004 | R-003, R-006 | Job orchestration | TS-003, TS-004, TS-005 | Application + integration | Timeout, remote failure isolation, persistence, and list inclusion passed |
-| SC-005 | R-004 | CDN adapter | TS-003 | Integration | 405/501 fallback and unconsumed response-body tests passed |
-| SC-006 | R-001 | Domain state and import reconciliation | TS-001, TS-004 | Unit + application | URL reset, import reconciliation, and stale-result discard passed |
-| SC-007 | R-005, R-008 | EF relationship and active joins | EN-001, TS-002, TS-004, TS-005 | PostgreSQL integration | EF constraints/migration script and active joins verified; 3 physical PostgreSQL checks deferred to CI because local Docker is unavailable |
-| SC-008 | R-007, R-009 | Read query and controller | TS-005, TS-006 | Application + API | Anonymous `200`, filtered ID order, and database-only query passed |
-| SC-009 | R-007 | Validator and HTTP mapping | TS-005, TS-006 | Unit + API | Paging boundaries, empty page, and `400` passed |
-| SC-010 | R-010 | Host and deployment | TS-004, EN-002 | CLI/static deployment verification | Host dispatch compiled; exact create/update static test passed 1/1 |
-| SC-011 | R-005 | Job selection | TS-004 | Application | Both `ExportToSite` values selected in store tests |
+| SC-001 | R-001, R-002, R-004, R-005 | Domain-стан; адаптер CDN; задача | TS-001, TS-003, TS-004 | Unit + інтеграційний | Domain 12/12; перевірка зображення HEAD; набори тестів задачі/сховища пройшли |
+| SC-002 | R-003, R-005, R-007 | Адаптер CDN; запит читання/API | TS-003, TS-005, TS-006 | Інтеграційний + API | Класифікація 404/410 і тести сторінкового API пройшли |
+| SC-003 | R-002, R-003 | Адаптер CDN і стан статусу | TS-001, TS-003, TS-005 | Unit + інтеграційний | Варіанти відсутнього/не-графічного content-type пройшли |
+| SC-004 | R-003, R-006 | Оркестрація задачі | TS-003, TS-004, TS-005 | Application + інтеграційний | Таймаут, ізоляція віддаленого збою, збереження й включення до списку пройшли |
+| SC-005 | R-004 | Адаптер CDN | TS-003 | Інтеграційний | Fallback для 405/501 і тести невичитаного тіла відповіді пройшли |
+| SC-006 | R-001 | Domain-стан і узгодження імпорту | TS-001, TS-004 | Unit + application | Скидання URL, узгодження імпорту й відкидання застарілого результату пройшли |
+| SC-007 | R-005, R-008 | Зв'язок EF і з'єднання активних записів | EN-001, TS-002, TS-004, TS-005 | Інтеграційний PostgreSQL | Обмеження EF/скрипт міграції й з'єднання активних записів перевірено; 3 фізичні перевірки PostgreSQL відкладено до CI через відсутність локального Docker |
+| SC-008 | R-007, R-009 | Запит читання й контролер | TS-005, TS-006 | Application + API | Анонімний `200`, порядок відфільтрованих ID і запит лише до бази даних пройшли |
+| SC-009 | R-007 | Валідатор і HTTP-відображення | TS-005, TS-006 | Unit + API | Межі сторінкової навігації, порожня сторінка й `400` пройшли |
+| SC-010 | R-010 | Хост і розгортання | TS-004, EN-002 | Перевірка CLI/статичного розгортання | Диспетчеризація хоста зібралася; точний статичний тест create/update пройшов 1/1 |
+| SC-011 | R-005 | Вибір задачі | TS-004 | Application | Обидва значення `ExportToSite` вибрано в тестах сховища |
 
-All scenarios have implementation evidence. SC-007's physical PostgreSQL
-lifecycle tests are committed and mandatory in CI; they were skipped locally
-because Docker is unavailable.
+Усі сценарії мають свідчення реалізації. Фізичні тести життєвого циклу PostgreSQL
+для SC-007 додано до репозиторію й вони обов'язкові в CI; локально їх пропущено
+через недоступність Docker.

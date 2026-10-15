@@ -1,19 +1,19 @@
-# Manager order read API — data model
+# API читання замовлень менеджера — модель даних
 
-## Context
+## Контекст
 
-The feature reads the already-persisted Sales order graph. It introduces no new stored data and must keep the original ownership established by feature 001.
+Функціональність читає вже збережений граф замовлення Sales. Вона не вводить нових збережених даних і має зберігати початковий розподіл відповідальності, визначений функціональністю 001.
 
-## Model
+## Модель
 
 ```text
-Counterparty (existing; Id: string)
+Counterparty (наявний; Id: string)
 └── 0..* Order
     ├── Id (OrderId: long)
     ├── OrderNumber
     ├── CounterpartyId
     ├── Comment
-    ├── CreatedAtUtc / audit timestamps
+    ├── CreatedAtUtc / часові позначки аудиту
     ├── 1..* OrderLine
     │   ├── ProductId
     │   ├── ProductName
@@ -23,13 +23,13 @@ Counterparty (existing; Id: string)
         ├── Status
         ├── AttemptCount
         ├── OneCDocumentNumber
-        └── AcceptedAtUtc and bounded diagnostics
+        └── AcceptedAtUtc і обмежена діагностика
 ```
 
-## Invariants and integrity
+## Інваріанти та цілісність
 
-- `Order.CounterpartyId` is the Sales counterparty identifier used for counterparty-scoped reads.
-- Each order retains one or more persisted `OrderLine` records and exactly one `OneCOrderSync` record, as defined by feature 001.
-- The read API must treat `OneCOrderSync` as the source of current delivery status; it must not reconstruct status from job history.
-- Internal sync diagnostics, request hashes, SOAP response body, dead-letter notification data, and retry-audit records are excluded from public responses unless explicitly agreed.
-- No migration or new persistence structure is planned. The existing index on `Orders.CounterpartyId` supports exact customer filtering. Implementation verification must inspect the newest-first paged query and add an index only if representative PostgreSQL evidence shows it is required.
+- `Order.CounterpartyId` — ідентифікатор контрагента Sales, який використовують для читання за контрагентом.
+- Кожне замовлення зберігає один або більше записів `OrderLine` і рівно один запис `OneCOrderSync`, як визначено функціональністю 001.
+- API читання має вважати `OneCOrderSync` джерелом поточного стану передавання; він не повинен відновлювати стан з історії задач.
+- Внутрішню діагностику синхронізації, хеші запитів, тіло SOAP-відповіді, дані dead-letter-сповіщень і записи аудиту повторних спроб виключено з публічних відповідей, якщо інше явно не погоджено.
+- Міграцій або нових структур зберігання не заплановано. Наявний індекс `Orders.CounterpartyId` підтримує точний фільтр за клієнтом. Під час перевірки реалізації потрібно дослідити запит сторінки від найновіших замовлень і додавати індекс лише за наявності репрезентативних доказів PostgreSQL.

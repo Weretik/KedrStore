@@ -1,27 +1,26 @@
-# TS-005 — Repository verification
+# TS-005 — Перевірка репозиторію
 
-- **Covers:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** TS-004
-- **Exact paths:** `KedrStore.sln`, `tests`, `.github/workflows/deploy-cloudrun.yml`
-- **Test level:** regression
+- **Покриває:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** TS-004
+- **Точні шляхи:** `KedrStore.sln`, `tests`, `.github/workflows/deploy-cloudrun.yml`
+- **Рівень тесту:** регресія
 
-## Verification evidence
+## Свідчення перевірки
 
-- Restore command and result: `dotnet restore KedrStore.sln` passed.
-- Build command and result: `dotnet build KedrStore.sln --no-restore --configuration Release` passed with 28 pre-existing compiler and package-vulnerability warnings.
-- Unit command and result: Release plus `XPlat Code Coverage` passed 41 tests.
-- Integration command and result: Release plus `XPlat Code Coverage` passed 44 tests and skipped 1 because Docker is unavailable.
-- Architecture command and result: Release plus `XPlat Code Coverage` passed 10 tests after the final dependency rule was added.
-- Known limitation: Docker is not installed on the current workstation; the
-  PostgreSQL test is expected to report a descriptive skip locally and run in CI.
+- Команда відновлення залежностей і результат: `dotnet restore KedrStore.sln` пройшла.
+- Команда збірки й результат: `dotnet build KedrStore.sln --no-restore --configuration Release` пройшла з 28 попередніми попередженнями компілятора та про вразливості пакетів.
+- Команда модульних тестів і результат: збірка Release з `XPlat Code Coverage` пройшла 41 тест.
+- Команда інтеграційних тестів і результат: збірка Release з `XPlat Code Coverage` пройшла 44 тести й пропустила 1 через недоступність Docker.
+- Команда архітектурних тестів і результат: збірка Release з `XPlat Code Coverage` пройшла 10 тестів після додавання останнього правила залежностей.
+- Відоме обмеження: Docker не встановлено на поточій робочій станції; PostgreSQL-тест має локально пропускатися з поясненням і виконуватися в CI.
 
-## Work
+## Робота
 
-- [x] Run `dotnet restore KedrStore.sln`.
-- [x] Run `dotnet build KedrStore.sln --no-restore --configuration Release`.
-- [x] Run every test project with coverage collection.
-- [x] Inspect the final diff and update traceability and readiness evidence.
+- [x] Виконати `dotnet restore KedrStore.sln`.
+- [x] Виконати `dotnet build KedrStore.sln --no-restore --configuration Release`.
+- [x] Запустити кожен тестовий проєкт зі збором покриття тестами.
+- [x] Переглянути підсумковий diff та оновити traceability і свідчення готовності.
 
-## Checkpoint
+## Контрольна точка
 
-All locally executable checks pass and the Docker limitation is explicit.
+Усі доступні локально перевірки проходять, а обмеження Docker описано явно.

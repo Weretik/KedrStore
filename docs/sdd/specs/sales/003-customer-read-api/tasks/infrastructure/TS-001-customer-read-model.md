@@ -1,29 +1,29 @@
-# TS-001 — Implement customer read model
+# TS-001 — Реалізувати модель читання клієнтів
 
-- **Task ID:** TS-001
-- **Covers:** SC-001, SC-002, SC-003
-- **Depends on:** EN-002
-- **Exact paths:** `src/Sales/Sales.Infrastructure/Customers/CustomerReadService.cs`, `src/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructureExtensions.cs`, `tests/IntegrationTests/Sales/Persistence/SalesCustomerReadModelTests.cs`
-- **Test level:** Infrastructure integration
+- **ID завдання:** TS-001
+- **Охоплює:** SC-001, SC-002, SC-003
+- **Залежить від:** EN-002
+- **Точні шляхи:** `src/Sales/Sales.Infrastructure/Customers/CustomerReadService.cs`, `src/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructureExtensions.cs`, `tests/IntegrationTests/Sales/Persistence/SalesCustomerReadModelTests.cs`
+- **Рівень тестування:** інтеграційні тести інфраструктури
 
-## Evidence
+## Свідчення
 
-- **Focused test:** `SalesCustomerReadModelTests`
-- **Red:** focused PostgreSQL run failed 1/1 with `ICustomerReadService` not registered, confirming missing read behavior.
-- **Green:** same focused run passed 4/4 against an isolated PostgreSQL schema, no skips.
-- **Refactor:** retained one no-tracking projection service, global soft-delete filtering, deterministic ordering, and bounded DTO projections; 4/4 remained Green.
-- **Regression:** combined `Sales.Persistence`, `Sales.Api`, and `Platform.Api` run passed 55/55 against an isolated PostgreSQL schema.
+- **Цільовий тест:** `SalesCustomerReadModelTests`
+- **Red:** цільовий запуск PostgreSQL завершився невдачею 1/1 через незареєстрований `ICustomerReadService`, підтвердивши відсутність поведінки читання.
+- **Green:** той самий цільовий запуск пройшов 4/4 на ізольованій схемі PostgreSQL без пропусків.
+- **Рефакторинг:** залишено одну службу проєкцій без відстеження змін, глобальну фільтрацію логічно видалених записів, детермінований порядок і обмежені проєкції DTO; 4/4 залишилися Green.
+- **Регресія:** спільний запуск `Sales.Persistence`, `Sales.Api` і `Platform.Api` пройшов 55/55 на ізольованій схемі PostgreSQL.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest PostgreSQL integration test for the SC-001 active-customer list and run it to confirm the expected missing-behavior failure.
-- [x] **Red:** add focused failing cases for detail, unknown/deleted identifiers, empty results, privacy exclusions, and optional price rules required by SC-002/SC-003.
-- [x] **Green:** implement only enough no-tracking list/detail projection behavior to pass the current failing case.
-- [x] **Green:** apply the active-counterparty predicate, agreed ordering/search/pagination, optional price-rule loading, and register the abstraction one increment at a time.
-- [x] **Refactor:** remove redundant loading, keep excluded fields outside projections, and inspect indexes only if an agreed performance target requires it.
-- [x] **Regression:** run all `Sales.Persistence` integration tests and verify no Identity/1C calls or tracked modifications.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший інтеграційний тест PostgreSQL для списку активних клієнтів SC-001 і запустити його, щоб підтвердити очікувану помилку через відсутню поведінку.
+- [x] **Red:** додати цільові випадки, що мають падати, для деталей, невідомих і видалених ID, порожніх результатів, виключення приватних даних і необов'язкових правил цін, яких вимагають SC-002/SC-003.
+- [x] **Green:** реалізувати лише достатню для проходження поточного тесту поведінку проєкцій списку й деталей без відстеження змін.
+- [x] **Green:** поступово застосувати предикат активного контрагента, погоджені порядок, пошук і посторінковий вивід, необов'язкове завантаження правил цін та зареєструвати абстракцію.
+- [x] **Рефакторинг:** прибрати зайве завантаження, не включати заборонені поля до проєкцій і досліджувати індекси лише за наявності погодженої цілі швидкодії.
+- [x] **Регресія:** запустити всі інтеграційні тести `Sales.Persistence` і перевірити відсутність викликів Identity/1C та відстежуваних змін.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Свідчення».
 
-## Checkpoint
+## Контрольна точка
 
-The projection returns only active customers and only agreed fields.
+Проєкція повертає лише активних клієнтів і лише погоджені поля.

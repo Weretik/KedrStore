@@ -1,31 +1,30 @@
-# Migrations and seeders
+# Міграції та seed-дані
 
-## Startup order
+## Поточний порядок запуску
 
-`Host.Api` calls `RunStartupTasksAsync()` before middleware and endpoints begin serving requests.
+Станом на 2026-10-15 `Host.Api` **не запускає** міграції й сидери під час старту: у `src/Bootstrapper/Host.Api/Program.cs` немає виклику `RunStartupTasksAsync()`, `UseAppMigrations()` або `UseAppSeeders()`. Сервісні extension-методи для міграцій і сидерів залишаються в `BuildingBlocks.Infrastructure`, але сама їхня наявність не означає виклик з API.
 
-```text
-Host.Api startup
-  -> UseAppMigrations()
-       -> every registered IDatabaseMigrator / DbContext
-  -> UseAppSeeders()
-       -> every registered ISeeder (one instance per seeder type)
-  -> HTTP host starts
+Міграцію та seed-дані виконує окрема команда `Host.Jobs`:
+
+```powershell
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=migrate
 ```
 
-Registered module contexts include Catalog, Identity and Sales. Thus a normal API start can change the database schema and insert/update seed data. Do not point a local process at a database unless that effect is intended.
+`src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs` послідовно викликає зареєстровані `IDatabaseMigrator`, а після них — унікальні за типом `ISeeder`. За помилки `Host.Jobs/Program.cs` повертає ненульовий код. Звичайний запуск API більше не підготовлює базу автоматично. Команда `--job=migrate` змінює схему й дані; перевір конфігурацію та цільову БД до запуску.
 
-## Current Identity seeders
+Поточний `.github/workflows/deploy-cloudrun.yml` створює або оновлює Cloud Run Job `database-migrate`, запускає його й очікує успіху перед новою API-ревізією. Це опис коду процесу розгортання, а не підтвердження фактичного стану будь-якого середовища. Порядок і ризики першого розгортання Identity описані в [специфікації завдання міграції](../../specs/platform/001-database-migration-job/README.md).
 
-- `RoleSeeder` ensures Admin, Manager and User roles exist.
-- `IdentitySeeder` creates the configured administrator only when it is missing and `ADMIN_DEFAULT_PASSWORD` is configured.
+## Поточні Identity-сидери
 
-The password is not read from the `Identity:AdminUser:DefaultPassword` field; the seeder reads `ADMIN_DEFAULT_PASSWORD`. A missing value skips administrator creation and logs the condition.
+- `RoleSeeder` забезпечує ролі Admin, Manager і User.
+- `IdentitySeeder` створює налаштованого адміністратора лише коли його немає і задано `ADMIN_DEFAULT_PASSWORD`.
 
-## Change rules
+Пароль не читається з поля `Identity:AdminUser:DefaultPassword`: сидер використовує `ADMIN_DEFAULT_PASSWORD`. Без нього створення адміністратора пропускається з записом у лог. Не записуй значення пароля в документацію чи журнал виконання.
 
-- Create a migration only when the feature changes persistent schema or data contract.
-- Put migration design and rollout/verification steps in the [migration template](../../specs/_templates/migration/template-migration.md).
-- Do not edit an already-applied migration to alter production history.
-- Treat seed changes as data changes: document idempotency, existing-data behaviour and rollback/recovery approach.
-- Check application startup logs after a migration or seeder change.
+## Правила змін
+
+- Додавай міграцію лише коли фіча змінює постійну схему або контракт даних.
+- Занось дизайн міграції, порядок розгортання, відкату або відновлення й перевірки до відповідної [специфікації фічі](../../specs/README.md) за [правилами БД](../../standards/database-rules.md). Додавай `data-model.md` і `design/infrastructure.md`, якщо вони потрібні для цієї зміни.
+- Не переписуй уже застосовану міграцію, змінюючи історію production.
+- Зміну seed-даних розглядай як зміну даних: документуй ідемпотентність, поведінку для наявних записів і відновлення.
+- Після зміни міграції чи сидера перевір результат окремого `--job=migrate` і логи; сам старт API не доводить, що міграція пройшла.

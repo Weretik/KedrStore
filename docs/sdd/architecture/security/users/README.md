@@ -1,5 +1,5 @@
-# Users module
+# Користувачі
 
-Use this module for bootstrap accounts, imported counterparties, registration, invitations and user-management features.
+Цей розділ стосується початкових облікових записів, імпортованих контрагентів, реєстрації, запрошень і фіч керування користувачами.
 
-- [Provisioning and registration](provisioning-and-registration.md)
+- [Створення облікових записів і реєстрація](provisioning-and-registration.md)

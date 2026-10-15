@@ -1,29 +1,29 @@
-# Cross-cutting pipeline
+# Наскрізний pipeline
 
 ## Mediator
 
-Host.Api scans the Catalog, Identity, Sales and BuildingBlocks Application assemblies. The configured pipeline order is:
+`Host.Api` сканує Application assemblies Catalog, Identity, Sales і BuildingBlocks. Налаштований порядок pipeline:
 
-1. request logging;
-2. exception handling;
-3. performance measurement;
+1. логування запиту;
+2. обробка винятків;
+3. вимірювання продуктивності;
 4. FluentValidation;
-5. domain-event dispatch after the handler succeeds.
+5. dispatch доменних подій після успішного handler.
 
-All use-case entry points go through Mediator unless an existing module has an explicitly documented exception.
+Усі точки входу use cases проходять через Mediator, якщо наявний модуль не має явно задокументованого винятку.
 
-## Validation and errors
+## Валідація й помилки
 
-Validators live beside their use case in Validators and validate input shape: required values, ranges, enum values, string length and coherent combinations such as PriceFrom <= PriceTo.
+Валідатори розташовані поряд зі своїм сценарієм використання у `Validators` і перевіряють форму входу: обов'язкові значення, діапазони, значення переліків, довжину рядка й узгоджені комбінації на зразок `PriceFrom <= PriceTo`.
 
-Domain code validates business invariants and state transitions. Do not duplicate a rule across layers without a deliberate defensive reason.
+Domain-код перевіряє бізнес-інваріанти й переходи стану. Не дублюй правило між шарами без свідомої причини для захисної перевірки.
 
-ValidationBehavior converts validation failures to Ardalis.Result.Invalid when the response is Result or Result<T>. Controllers preserve the existing result-to-HTTP mapping.
+`ValidationBehavior` перетворює помилки валідації на `Ardalis.Result.Invalid`, коли відповідь має тип `Result` або `Result<T>`. Controllers зберігають чинне HTTP-відображення результату.
 
-## Domain events
+## Доменні події
 
-Entities collect events through IHasDomainEvents. The dispatcher behaviour collects, clears and publishes them through Mediator after successful handler execution. Follow the existing collect → dispatch → clear lifecycle; do not publish events directly from controllers.
+Сутності накопичують події через `IHasDomainEvents`. Dispatcher behavior збирає, очищає й публікує їх через Mediator після успішного виконання handler. Дотримуйся циклу `collect → dispatch → clear`; не публікуй події безпосередньо з controllers.
 
-## Observability and security
+## Спостережуваність і безпека
 
-Use structured Serilog templates without secrets, tokens, connection strings or sensitive payloads. Preserve correlation and cancellation. Authorization is configured as policies in the host; an anonymous endpoint requires explicit AllowAnonymous because the host has an authenticated fallback policy.
+Використовуй структуровані шаблони Serilog без секретів, токенів, рядків підключення чи чутливих даних запитів. Зберігай кореляцію й можливість скасування. Авторизація налаштована правилами в хості; анонімна кінцева точка потребує явного `AllowAnonymous`, оскільки хост має резервне правило, що вимагає автентифікації.

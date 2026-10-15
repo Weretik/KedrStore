@@ -1,11 +1,11 @@
-# Phase 00 — Behavior and readiness planning
+# Етап 00 — Планування поведінки та готовності
 
-- [x] Goal, actors, included behavior, and exclusions are agreed.
-- [x] Rules `R-001`–`R-010` and scenarios `SC-001`–`SC-011` are stable.
-- [x] Anonymous access, all-active-product scope, status semantics, HTTP fallback, and operator-owned scheduling are resolved.
-- [x] Domain, PostgreSQL, HTTP adapter, application, API, deployment, and verification risks have selected test levels.
-- [x] `traceability.md` contains every in-scope scenario.
+- [x] Мету, учасників, включену поведінку й винятки погоджено.
+- [x] Правила `R-001`–`R-010` і сценарії `SC-001`–`SC-011` стабільні.
+- [x] Анонімний доступ, охоплення всіх активних товарів, семантику статусів, HTTP fallback і планування під відповідальністю оператора визначено.
+- [x] Для ризиків Domain, PostgreSQL, HTTP-адаптера, Application, API, розгортання й перевірки обрано рівні тестування.
+- [x] `traceability.md` містить кожен сценарій у межах роботи.
 
-## Checkpoint
+## Контрольна точка
 
-The specification is ready. No production change belongs to this phase.
+Специфікація готова. Зміни production не належать до цього етапу.

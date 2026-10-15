@@ -1,81 +1,55 @@
-# Test architecture — scope and acceptance scenarios
+# Архітектура тестів — обсяг і приймальні сценарії
 
-## Scope
+## Обсяг
 
-The repository needs a test layout that remains understandable as Catalog,
-Sales, Identity, BuildingBlocks, and host behavior grow. Test ownership must be
-visible from paths and namespaces, database-specific risks must run against
-PostgreSQL, architectural boundaries must fail the build when violated, and
-deployment must depend on successful verification.
+Репозиторію потрібна структура тестів, зрозуміла зі зростанням Catalog, Sales, Identity, BuildingBlocks і хостів. Відповідальність тесту має бути видима за шляхом та простором імен; ризики, специфічні для БД, перевіряють на PostgreSQL; порушення архітектурних меж має зупиняти збірку; розгортання залежить від успішної перевірки.
 
-Included:
+Входить до обсягу:
 
-- module and layer folders in every test project;
-- focused test classes and reusable test support;
-- migration of infrastructure and job tests out of `UnitTests`;
-- PostgreSQL integration fixtures based on Testcontainers;
-- a real concurrent `xmin` claim test using separate EF Core contexts;
-- executable architecture tests for project and assembly dependencies;
-- CI restore, build, tests, coverage collection, and artifact publication
-  before Cloud Run deployment;
-- deletion of the placeholder test.
+- папки модулів і шарів у кожному тестовому проєкті;
+- цільові класи тестів і спільний test support;
+- перенесення тестів Infrastructure та jobs із `UnitTests`;
+- інтеграційні PostgreSQL fixtures на Testcontainers;
+- реальний конкурентний тест claim через `xmin` з окремими EF Core contexts;
+- виконувані архітектурні тести залежностей проєктів та assemblies;
+- відновлення залежностей у CI, збірка, тести, збір покриття й публікація артефакту до розгортання Cloud Run;
+- видалення тесту-заглушки.
 
-Excluded:
+Поза обсягом:
 
-- production behavior changes;
-- browser end-to-end tests;
-- replacement of xUnit or hand-written fakes;
-- a repository-wide coverage threshold until a measured baseline is reviewed.
+- зміна production-поведінки;
+- наскрізні браузерні тести;
+- заміна xUnit або написаних вручну fakes;
+- поріг покриття для всього репозиторію до перевірки виміряного початкового рівня.
 
-## Rules
+## Правила
 
-- **R-001:** Unit tests reference only the production assemblies needed for
-  domain and application behavior; infrastructure and host behavior belongs in
-  integration tests.
-- **R-002:** Test paths and namespaces identify the owning module and tested
-  layer or adapter category.
-- **R-003:** Provider-specific persistence and concurrency behavior is proved
-  against a temporary PostgreSQL database with migrations applied.
-- **R-004:** Architecture tests enforce the documented layer direction and
-  prohibit direct dependencies between business modules except through an
-  explicitly allowed contract or application abstraction.
-- **R-005:** Production deployment starts only after restore, build, unit,
-  integration, and architecture tests succeed.
-- **R-006:** CI collects Cobertura coverage and publishes it as a build
-  artifact; coverage is observable without inventing an unreviewed threshold.
-- **R-007:** Testcontainers-dependent tests report an explicit skip when Docker
-  is unavailable locally and execute normally on Docker-enabled CI runners.
+- **R-001:** Unit-тести посилаються лише на production assemblies, потрібні для поведінки Domain і Application; поведінку Infrastructure та hosts перевіряють integration тести.
+- **R-002:** Шляхи й namespaces тестів визначають відповідальний модуль та перевірюваний шар або категорію адаптера.
+- **R-003:** Залежну від провайдера поведінку збереження даних і конкурентності доводять на тимчасовій PostgreSQL-БД із застосованими міграціями.
+- **R-004:** Архітектурні тести забезпечують задокументований напрям шарів і забороняють прямі залежності між бізнес-модулями, крім явно дозволеного контракту або абстракції Application.
+- **R-005:** Розгортання у продукційному середовищі стартує лише після успіху відновлення залежностей, збірки, модульних, інтеграційних та архітектурних тестів.
+- **R-006:** CI збирає покриття у форматі Cobertura й публікує як артефакт збірки; покриття видно без вигаданого непогодженого порогу.
+- **R-007:** Тести на Testcontainers явно пропускаються, якщо Docker локально недоступний, і виконуються звичайно в CI runners із Docker.
 
-## Acceptance scenarios
+## Приймальні сценарії
 
-### SC-001 — Test ownership is visible
+### SC-001 — Відповідальність тесту видима
 
-**Given** the repository test projects, **when** a contributor locates a test,
-**then** its path and namespace identify its module and responsibility, shared
-setup is under `TestSupport`, and no placeholder test remains.
+**Дано** тестові проєкти репозиторію, **коли** учасник знаходить тест, **тоді** шлях і namespace визначають модуль та відповідальність, спільне налаштування міститься в `TestSupport`, а тестів-заглушок немає.
 
-### SC-002 — Unit tests stay inside inner layers
+### SC-002 — Unit-тести залишаються у внутрішніх шарах
 
-**Given** the `UnitTests` project, **when** its project references are inspected,
-**then** it does not reference Infrastructure, Bootstrapper, or EF Core
-InMemory, while domain and application tests continue to pass.
+**Дано** проєкт `UnitTests`, **коли** перевіряють його project references, **тоді** він не посилається на Infrastructure, Bootstrapper або EF Core InMemory, а тести Domain і Application проходять.
 
-### SC-003 — PostgreSQL proves order-sync concurrency
+### SC-003 — PostgreSQL доводить конкурентність синхронізації замовлення
 
-**Given** one due Sales order synchronization row and two independently scoped
-workers, **when** both workers race to claim it, **then** PostgreSQL `xmin`
-optimistic concurrency permits only one 1C send and persists one accepted
-state.
+**Дано** один готовий запис синхронізації замовлення Sales і два незалежні scoped workers, **коли** обидва одночасно намагаються його захопити, **тоді** optimistic concurrency PostgreSQL через `xmin` дозволяє лише одне надсилання до 1C і зберігає один прийнятий стан.
 
-### SC-004 — Architecture drift fails tests
+### SC-004 — Порушення архітектури спричиняє збій тестів
 
-**Given** the documented solution boundaries, **when** project references and
-compiled type dependencies are checked, **then** forbidden inward-to-outward
-layer dependencies and forbidden business-module dependencies fail with the
-offending projects or types named.
+**Дано** задокументовані межі solution, **коли** перевіряють project references і залежності скомпільованих типів, **тоді** заборонені залежності від внутрішніх до зовнішніх шарів або між бізнес-модулями дають збій із назвами проєктів чи типів-порушників.
 
-### SC-005 — Verification gates deployment
+### SC-005 — Перевірка керує допуском до розгортання
 
-**Given** a push to `master`, **when** the Cloud Run workflow executes, **then**
-deployment waits for restore, build, all test projects, PostgreSQL tests, and
-coverage collection, and the coverage artifact is retained for inspection.
+**Дано** надсилання змін до `master`, **коли** виконується процес Cloud Run, **тоді** розгортання очікує відновлення залежностей, збірку, усі тестові проєкти, PostgreSQL-тести й збір покриття, а артефакт покриття зберігається для перевірки.

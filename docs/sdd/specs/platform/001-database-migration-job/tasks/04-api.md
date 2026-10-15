@@ -1,3 +1,3 @@
-# Phase 04 — API contract
+# Фаза 04 — API-контракт
 
-- [x] T016 Not applicable: this change introduces no public HTTP route, DTO, OpenAPI operation, or frontend behavior. The `Host.Jobs` CLI/deployment contract is recorded in `contracts/api-contract.md`. **Dependencies:** T004.
+- [x] T016 Не застосовується: зміна не додає публічного HTTP-маршруту, DTO, OpenAPI-операції або поведінки клієнта. Контракт CLI й розгортання `Host.Jobs` записано в `contracts/api-contract.md`. **Залежності:** T004.

@@ -1,13 +1,13 @@
-# Phase 00 — Behavior and readiness
+# Фаза 00 — поведінка та готовність
 
-## Ordered tasks
+## Впорядковані задачі
 
-1. [x] [EN-001 — Agree manager-order read behavior](readiness/EN-001-contract-decisions.md).
+1. [x] [EN-001 — погодити поведінку читання замовлень менеджера](readiness/EN-001-contract-decisions.md).
 
-## Checkpoint
+## Контрольна точка
 
-- All `[NEEDS CLARIFICATION]` decisions are resolved or explicitly moved out of scope.
-- Requirements, `SC-*` scenarios, authorization, routes, DTO boundary, errors, ordering, and pagination are unambiguous.
-- `checklist/spec-readiness.md` is complete.
+- Усі рішення з позначкою `[NEEDS CLARIFICATION]` визначено або явно винесено за межі функціональності.
+- Вимоги, сценарії `SC-*`, авторизація, маршрути, межа DTO, помилки, порядок і пагінація однозначні.
+- `checklist/spec-readiness.md` завершено.
 
-EN-001 is complete. EN-002 and EN-003 are ready when implementation is authorized.
+EN-001 завершено. EN-002 та EN-003 готові після дозволу на реалізацію.

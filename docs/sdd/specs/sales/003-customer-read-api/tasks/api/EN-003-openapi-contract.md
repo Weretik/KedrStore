@@ -1,29 +1,29 @@
-# EN-003 — Publish customer-read OpenAPI contract
+# EN-003 — Опублікувати контракт OpenAPI для читання клієнтів
 
-- **Task ID:** EN-003
-- **Enables:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** EN-001
-- **Exact paths:** `docs/sdd/specs/sales/003-customer-read-api/contracts/api-contract.md`, `docs/sdd/contracts/sales/customer-read.openapi.yaml`, `docs/sdd/contracts/openapi.yaml`
-- **Test level:** API contract
+- **ID завдання:** EN-003
+- **Забезпечує:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** EN-001
+- **Точні шляхи:** `docs/sdd/specs/sales/003-customer-read-api/contracts/api-contract.md`, `docs/sdd/contracts/sales/customer-read.openapi.yaml`, `docs/sdd/contracts/openapi.yaml`
+- **Рівень тестування:** контракт API
 
-## Why this is an enabler
+## Чому це спільна передумова
 
-The versioned contract fixes the public and personal-data boundary before transport implementation.
+Версійний контракт визначає межу публічних і персональних даних до реалізації транспортного шару.
 
-## Work
+## Робота
 
-- [x] Mark the human contract agreed with final routes, operation IDs, parameters, schemas, examples, anonymous access, and errors.
-- [x] Create `customer-read.openapi.yaml` for list/detail operations.
-- [x] Add aggregate `$ref` entries without duplicating operations or schemas.
-- [x] Describe paging/search bounds, IDs, nullable/contact fields, price rules, empty collections, and every response.
-- [x] Add focused static contract assertions in a dedicated customer API test.
+- [x] Позначити текстовий контракт погодженим після остаточного визначення маршрутів, ID операцій, параметрів, схем, прикладів, анонімного доступу й помилок.
+- [x] Створити `customer-read.openapi.yaml` для операцій списку й деталей.
+- [x] Додати посилання `$ref` до зведеного контракту без дублювання операцій або схем.
+- [x] Описати межі посторінкового виводу й пошуку, ID, необов'язкові поля й контактні дані, правила цін, порожні колекції та кожну відповідь.
+- [x] Додати цільові статичні перевірки контракту до окремого тесту API клієнтів.
 
-## Test-first exception and replacement verification
+## Виняток із підходу «спочатку тест» і замінна перевірка
 
-- **Reason:** OpenAPI is the test oracle preceding transport behavior.
-- **Replacement check:** parse YAML and run static contract assertions.
-- **Result:** Redocly validated the feature contract with only the advisory `info-license` warning; `CustomerReadContractTests` passed 1/1 and aggregate/runtime references passed in API regression.
+- **Причина:** OpenAPI є еталоном для тестів, який передує транспортній поведінці.
+- **Замінна перевірка:** розібрати YAML і запустити статичні перевірки контракту.
+- **Результат:** Redocly підтвердив коректність контракту фічі з лише рекомендаційним попередженням `info-license`; `CustomerReadContractTests` пройшов 1/1, а зведені посилання й посилання під час виконання пройшли регресійну перевірку API.
 
-## Checkpoint
+## Контрольна точка
 
-Every customer-read operation resolves from aggregate OpenAPI and describes SC-001–SC-004.
+Кожна операція читання клієнтів доступна зі зведеного OpenAPI й описує SC-001–SC-004.

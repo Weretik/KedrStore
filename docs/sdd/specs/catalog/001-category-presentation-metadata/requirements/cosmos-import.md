@@ -1,21 +1,21 @@
-# Category presentation metadata — Cosmos import safety
+# Метадані представлення категорій — безпека імпорту Cosmos
 
-## Behavior
+## Поведінка
 
-- The backend owns one virtual category for the configured Cosmos root.
-- When the category job runs for Cosmos, it ensures that category exists or is updated and returns without calling 1C `GetCategories`.
-- When the product-details job runs for Cosmos, every mapped product receives the virtual category ID.
-- The virtual category receives the same presentation metadata rules as other configured root categories.
+- Backend володіє однією віртуальною категорією для налаштованого кореня Cosmos.
+- Коли задача категорій запускається для Cosmos, вона забезпечує існування або оновлення цієї категорії й завершується без виклику 1C `GetCategories`.
+- Коли задача деталей товарів запускається для Cosmos, кожен відображений товар отримує ID віртуальної категорії.
+- До віртуальної категорії застосовуються ті самі правила метаданих представлення, що й до інших налаштованих кореневих категорій.
 
-## Rules and invariants
+## Правила та інваріанти
 
-- The virtual category ID is stable and may not be owned by another root.
-- A Cosmos run must not delete categories belonging to another root.
-- Empty-response deletion protection remains in place for category and product imports.
-- The feature must preserve current full-job ordering and projection rebuild behavior.
+- ID віртуальної категорії стабільний і не може належати іншому кореню.
+- Запуск Cosmos не має видаляти категорії, що належать іншому кореню.
+- Захист від видалення за порожньої відповіді залишається чинним для імпорту категорій і товарів.
+- Функціональність має зберігати поточний порядок повної задачі й поведінку перебудови проєкції.
 
-## Acceptance scenarios
+## Сценарії прийняття
 
-1. Given the Cosmos root, when the category job runs, then no 1C categories operation is invoked and the configured virtual category exists with its presentation metadata.
-2. Given Cosmos product details, when products are mapped, then each product uses the configured virtual category ID regardless of the source category name.
-3. Given the virtual category ID is already associated with another root, when the Cosmos category job runs, then it fails explicitly and makes no conflicting reassignment.
+1. Якщо задача категорій запускається для кореня Cosmos, операція категорій 1C не викликається, а налаштована віртуальна категорія існує разом зі своїми метаданими представлення.
+2. Якщо відображаються деталі товарів Cosmos, кожен товар використовує налаштований ID віртуальної категорії незалежно від вихідної назви категорії.
+3. Якщо ID віртуальної категорії вже пов'язаний з іншим коренем, задача категорій Cosmos явно завершується помилкою й не виконує суперечливого перепризначення.

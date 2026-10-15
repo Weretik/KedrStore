@@ -1,29 +1,24 @@
-# TS-002 — Prove PostgreSQL concurrent order-sync claims
+# TS-002 — Довести конкурентне захоплення замовлень у PostgreSQL
 
-- **Covers:** SC-003
-- **Depends on:** EN-001
-- **Exact paths:** `tests/IntegrationTests/Sales/OneC`, `tests/IntegrationTests/TestSupport/Sales`
-- **Test level:** PostgreSQL integration
+- **Покриває:** SC-003
+- **Залежить від:** EN-001
+- **Точні шляхи:** `tests/IntegrationTests/Sales/OneC`, `tests/IntegrationTests/TestSupport/Sales`
+- **Рівень тесту:** PostgreSQL integration
 
-## Work
+## Робота
 
-- [x] Seed one due synchronization in PostgreSQL.
-- [x] Start two services with separate `SalesDbContext` instances.
-- [x] Coordinate both workers so their claim operations overlap.
-- [x] Assert one outbound 1C call and one persisted accepted state.
-- [x] Remove the simulated `xmin` mutation test.
+- [x] Створити один готовий запис синхронізації в PostgreSQL.
+- [x] Запустити два сервіси з окремими екземплярами `SalesDbContext`.
+- [x] Скоординувати workers так, щоб їхні операції захоплення перекрилися.
+- [x] Перевірити один вихідний виклик 1C і один збережений стан accepted.
+- [x] Прибрати імітований тест мутації `xmin`.
 
-## Verification-only exception and evidence
+## Виняток для суто перевірки й свідчення
 
-- Red/Green are not applicable because this task adds provider verification for
-  existing production behavior and does not change that behavior.
-- Local result: `TwoWorkers_SendOrderOnlyOnce` was discovered and explicitly
-  skipped because Docker is unavailable.
-- Acceptance disposition: local discovery plus the explicit environment skip
-  satisfies local delivery. CI executes the test as a mandatory gate; any
-  future CI failure is handled as a separate incident.
+- Red/Green не застосовуються: завдання додає provider-перевірку наявної production-поведінки й не змінює її.
+- Локальний результат: `TwoWorkers_SendOrderOnlyOnce` виявлено й явно пропущено через недоступність Docker.
+- Висновок приймання: локальне виявлення плюс явний виняток середовища відповідають локальному delivery. У CI тест є обов'язковою перевіркою; майбутній збій CI розглядається як окремий інцидент.
 
-## Checkpoint
+## Контрольна точка
 
-The test fails if both workers send the same order and passes using real
-PostgreSQL optimistic concurrency.
+Тест падає, якщо обидва workers надсилають те саме замовлення, і проходить із реальною optimistic concurrency PostgreSQL.

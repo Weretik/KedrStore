@@ -1,11 +1,11 @@
-# Phase 05 — Background delivery job
+# Фаза 05 — фонова задача передавання
 
-- [x] [T145 — Dead-letter Telegram notification and Excel export](jobs/05.0-dead-letter-telegram.md)
-- [x] [T150 — `SyncOneCOrdersJob`: send and check 1C requests](jobs/05.1-sync-one-c-orders-job.md)
-- [x] [T160 — Cloud Run Job deployment and scheduling](jobs/05.2-cloud-run-order-sync.md)
+- [x] [T145 — сповіщення Telegram про dead-letter та експорт Excel](jobs/05.0-dead-letter-telegram.md)
+- [x] [T150 — `SyncOneCOrdersJob`: надіслати й перевірити запити до 1С](jobs/05.1-sync-one-c-orders-job.md)
+- [x] [T160 — розгортання та розклад Cloud Run Job](jobs/05.2-cloud-run-order-sync.md)
 
-- [x] [T155 — Persist the 1C document number](jobs/05.3-persist-one-c-document-number.md)
+- [x] [T155 — зберегти номер документа 1С](jobs/05.3-persist-one-c-document-number.md)
 
-## Checkpoint
+## Контрольна точка
 
-`Host.Jobs` can execute `--job=sync-one-c-orders`; each run safely sends due orders, evaluates the synchronous 1C response, records the delivery state, alerts Telegram once when a record becomes dead-letter, and is deployed as a dedicated Cloud Run Job.
+`Host.Jobs` може виконати `--job=sync-one-c-orders`; кожний запуск безпечно надсилає готові до передавання замовлення, оцінює синхронну відповідь 1С, фіксує стан передавання, один раз сповіщає Telegram, коли запис стає dead-letter, і розгортається як окрема Cloud Run Job.

@@ -1,20 +1,20 @@
-# Category presentation metadata — design: Infrastructure
+# Метадані представлення категорій — дизайн Infrastructure
 
-## Persistence and integrations
+## Збереження та інтеграції
 
-EF Core mapping in `src/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs` persists the metadata defined in [the data model](../data-model.md). The migration is added under `src/Catalog/Catalog.Infrastructure/Migrations/`; applied migrations are never edited.
+Відображення EF Core у `src/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs` зберігає метадані, визначені в [моделі даних](../data-model.md). Міграція додається до `src/Catalog/Catalog.Infrastructure/Migrations/`; застосовані міграції ніколи не редагуються.
 
-A typed options model, adjacent to `RootCategoryId` in `src/Catalog/Catalog.Application/Integrations/OneC/Options/`, holds approved presentation records. Both host configuration files bind identical approved metadata:
+Типізована модель options поруч із `RootCategoryId` у `src/Catalog/Catalog.Application/Integrations/OneC/Options/` зберігає затверджені записи представлення. Обидва конфігураційні файли хостів прив'язують однакові затверджені метадані:
 
 - `src/Bootstrapper/Host.Api/appsettings.json`
 - `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`
 
-`SyncOneCCategoryJob` resolves metadata after its manual hierarchy has been built, upserts categories, and keeps the current empty-response deletion guard. Its existing Cosmos branch continues to create/update the local virtual category without invoking the SOAP categories method. `SyncOneCProductDetailsJob` continues to assign the configured Cosmos category ID directly.
+`SyncOneCCategoryJob` визначає метадані після побудови ручної ієрархії, створює або оновлює категорії та зберігає наявний захист від видалення за порожньої відповіді. Його наявна гілка Cosmos і надалі створює/оновлює локальну віртуальну категорію без виклику SOAP-методу категорій. `SyncOneCProductDetailsJob` і надалі безпосередньо призначає налаштований ID категорії Cosmos.
 
-## Migration and rollout
+## Міграція та розгортання
 
-The migration adds the new columns with an explicit, reversible backfill policy. Existing rows receive `Name` as a temporary short-name fallback only where no approved configured value exists. `SortOrder` and `Level` must receive deterministic values before columns become non-nullable, if that is the agreed model.
+Міграція додає нові стовпці з явною зворотною політикою заповнення наявних даних. Наявні рядки тимчасово отримують `Name` як коротку назву лише там, де немає затвердженого налаштованого значення. `SortOrder` і `Level` мають отримати детерміновані значення до переходу стовпців у non-nullable, якщо погоджено саме таку модель.
 
-Deploy the migration before the first import that writes metadata. Run one non-overlapping full import, validate all three roots against the frozen snapshots, and retain storefront constants until the agreed consumer contract is live. Test migration application against a disposable PostgreSQL database.
+Розгорніть міграцію перед першим імпортом, що записує метадані. Запустіть один повний імпорт без перекриття з іншими запусками, перевірте всі три корені за зафіксованими знімками й зберігайте константи storefront, доки погоджений контракт споживача не запрацює. Перевірте застосування міграції на тимчасовій базі PostgreSQL.
 
-Do not duplicate fields or relationships here; they belong in `data-model.md`.
+Не дублюйте тут поля чи зв'язки; вони належать до `data-model.md`.

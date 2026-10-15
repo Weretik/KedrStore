@@ -1,9 +1,9 @@
-# Phase 04 — API and deployment task planning
+# Етап 04 — Планування задач API та розгортання
 
-- [x] Execute [TS-006 — OpenAPI and HTTP endpoint](api/04.1-missing-photo-endpoint.md).
-- [x] Execute [EN-002 — Host.Jobs and Cloud Run wiring](enablers/EN-002-cloud-run-job.md).
+- [x] Виконати [TS-006 — OpenAPI та HTTP endpoint](api/04.1-missing-photo-endpoint.md).
+- [x] Виконати [EN-002 — підключення Host.Jobs і Cloud Run](enablers/EN-002-cloud-run-job.md).
 
-## Checkpoint
+## Контрольна точка
 
-The anonymous HTTP operation matches its versioned contract, and deployment
-creates or updates the one-shot Cloud Run Job without executing or scheduling it.
+Анонімна HTTP-операція відповідає своєму версіонованому контракту, а розгортання
+створює або оновлює одноразову Cloud Run Job, не запускаючи й не плануючи її виконання.

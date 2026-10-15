@@ -1,81 +1,81 @@
-# Customer read API — customer reading
+# API читання клієнтів — читання даних клієнтів
 
-## Behavior
+## Поведінка
 
-- The system returns current, non-deleted Sales counterparties within the agreed list scope.
-- The system returns the agreed current profile for an existing active counterparty.
-- Read requests do not invoke 1C, modify counterparty data, or alter category price-type rules.
+- Система повертає поточних контрагентів Sales, яких не видалено, у межах погодженого списку.
+- Система повертає погоджений поточний профіль наявного активного контрагента.
+- Запити на читання не викликають 1C, не змінюють дані контрагента чи правила типів цін для категорій.
 
-## Business rules
+## Бізнес-правила
 
-### R-001 — Customer identity uses the Sales counterparty identifier
+### R-001 — Для ідентифікації клієнта використовується ідентифікатор контрагента Sales
 
-Customer list and detail operations identify a customer by existing `Counterparty.Id`, which is the Sales/1C counterparty identifier. This feature does not create or replace identifiers.
+Операції читання списку й деталей ідентифікують клієнта за наявним `Counterparty.Id` — ідентифікатором контрагента Sales/1C. Ця фіча не створює й не замінює ідентифікаторів.
 
-### R-002 — Normal reads exclude soft-deleted counterparties
+### R-002 — Звичайне читання виключає логічно видалених контрагентів
 
-Customer list and detail exclude `Counterparty.IsDeleted = true`; a soft-deleted customer is unavailable through detail and produces the same not-found result as an unknown identifier.
+Список і деталі клієнтів виключають записи з `Counterparty.IsDeleted = true`; деталі логічно видаленого клієнта недоступні й дають той самий результат «не знайдено», що й невідомий ідентифікатор.
 
-### R-003 — Detail exposes only agreed customer data
+### R-003 — Деталі відкривають лише погоджені дані клієнта
 
-The list exposes counterparty ID, name, and phone. Detail exposes counterparty ID, name, phone, email, default price type, and category price-type rules ordered by category ID. `IdentityUserId`, deletion/audit state, and order identifiers/details are excluded.
+Список відкриває ID контрагента, ім'я й телефон. Деталі відкривають ID контрагента, ім'я, телефон, електронну пошту, типовий тип ціни та правила типів цін для категорій, упорядковані за ID категорії. `IdentityUserId`, стан видалення й дані аудиту, а також ідентифікатори й деталі замовлень виключено.
 
-### R-004 — Reads have no side effects
+### R-004 — Читання не має побічних ефектів
 
-Customer read operations neither call 1C nor create, update, restore, soft-delete, or otherwise alter `Counterparty` or `CounterpartyCategoryPriceType` records.
+Операції читання клієнтів не викликають 1C і не створюють, не оновлюють, не відновлюють, не видаляють логічно й не змінюють іншим чином записи `Counterparty` або `CounterpartyCategoryPriceType`.
 
-### R-005 — Customer reads allow anonymous access
+### R-005 — Читання клієнтів дозволяє анонімний доступ
 
-Both operations allow anonymous callers. No authentication, role, policy, or row-level assignment restriction applies during the current rollout stage.
+Обидві операції доступні анонімним викликачам. На поточному етапі розгортання не діє обмежень за автентифікацією, роллю, політикою чи призначенням на рівні рядків.
 
-### R-006 — Collection and detail have separate payload sizes
+### R-006 — Список і деталі мають окремі обсяги даних
 
-The paged collection contains only counterparty ID, name, and phone. Detail contains the approved profile and category price rules but no orders or order IDs. Collection paging defaults to page 1 and page size 20, accepts at most 100 rows, and orders by name then counterparty ID.
+Посторінковий список містить лише ID контрагента, ім'я й телефон. Деталі містять погоджений профіль і правила цін для категорій, але не містять замовлень чи їхніх ID. Для списку типові значення — сторінка 1 і розмір сторінки 20; допускається не більш ніж 100 рядків на сторінці. Упорядкування — за іменем, потім за ID контрагента.
 
-## Acceptance scenarios
+## Приймальні сценарії
 
-### SC-001 — Browse active customers
+### SC-001 — Перегляд активних клієнтів
 
-**Covers:** R-001, R-002, R-005, R-006
+**Охоплює:** R-001, R-002, R-005, R-006
 
-Given active and soft-deleted Sales counterparties exist
-And the caller may be anonymous
-When the caller requests the customer list
-Then the result contains active counterparties in the agreed list scope
-And it does not contain soft-deleted counterparties
-And each row contains only counterparty ID, name, and phone
-And rows are paged and ordered according to R-006.
+За умови, що існують активні й логічно видалені контрагенти Sales
+І викликач може бути анонімним
+Коли викликач запитує список клієнтів
+Тоді результат містить активних контрагентів у межах погодженого списку
+І не містить логічно видалених контрагентів
+І кожен рядок містить лише ID контрагента, ім'я й телефон
+І рядки виведено посторінково та впорядковано згідно з R-006.
 
-### SC-002 — Open an active customer
+### SC-002 — Відкриття активного клієнта
 
-**Covers:** R-001, R-003, R-004, R-005
+**Охоплює:** R-001, R-003, R-004, R-005
 
-Given an active Sales counterparty exists
-And the caller may be anonymous
-When the caller requests that customer by counterparty identifier
-Then the result contains the agreed current customer information
-And category price rules are ordered by category ID
-And the result contains no order IDs or order details
-And no 1C call or local state change occurs.
+За умови, що існує активний контрагент Sales
+І викликач може бути анонімним
+Коли викликач запитує клієнта за ідентифікатором контрагента
+Тоді результат містить погоджені поточні дані клієнта
+І правила цін для категорій упорядковано за ID категорії
+І результат не містить ID чи деталей замовлень
+І не відбувається виклику 1C чи зміни локального стану.
 
-### SC-003 — Request an unknown or deleted customer
+### SC-003 — Запит невідомого або видаленого клієнта
 
-**Covers:** R-002, R-005
+**Охоплює:** R-002, R-005
 
-Given no active counterparty exists for a requested identifier
-When any caller requests customer detail
-Then the system returns the agreed not-found result
-And no customer data is exposed.
+За умови, що для запитаного ідентифікатора немає активного контрагента
+Коли будь-який викликач запитує деталі клієнта
+Тоді система повертає погоджений результат «не знайдено»
+І не розкриває даних клієнта.
 
-### SC-004 — Allow an anonymous read
+### SC-004 — Дозвіл на анонімне читання
 
-**Covers:** R-005
+**Охоплює:** R-005
 
-Given a caller has no authentication token
-When the caller requests a customer list or detail
-Then the system returns the same approved response available to an authenticated caller
-And the response remains within the agreed customer-data boundary.
+За умови, що викликач не має токена автентифікації
+Коли він запитує список або деталі клієнта
+Тоді система повертає ту саму погоджену відповідь, що доступна автентифікованому викликачу
+І відповідь залишається в межах погодженого набору даних клієнта.
 
-## Deferred scenarios
+## Відкладені сценарії
 
-- Customer create/update/delete/restore operations, customer history, search, price calculation, embedded customer-order aggregates, and exports are deferred until separately agreed.
+- Операції створення, оновлення, видалення й відновлення клієнтів, історію клієнтів, пошук, обчислення цін, вбудовані сукупні дані про замовлення клієнтів та експорт відкладено до окремого погодження.

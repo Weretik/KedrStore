@@ -1,11 +1,11 @@
-# Phase 04 — API and contract
+# Фаза 04 — API та контракт
 
-## Ordered tasks
+## Завдання за порядком
 
-1. After EN-001, [EN-003 — Publish customer-read OpenAPI contract](api/EN-003-openapi-contract.md) may run in parallel with EN-002 and TS-001–TS-003.
-2. After TS-002, TS-003, and EN-003, execute [TS-004 — Add customer-read endpoints](api/TS-004-customer-read-endpoints.md).
-3. Execute [TS-005 — Verify customer HTTP and contract behavior](api/TS-005-customer-read-api-tests.md).
+1. Після EN-001 [EN-003 — Опублікувати контракт OpenAPI для читання клієнтів](api/EN-003-openapi-contract.md) можна виконувати паралельно з EN-002 і TS-001–TS-003.
+2. Після TS-002, TS-003 і EN-003 виконати [TS-004 — Додати маршрути читання клієнтів](api/TS-004-customer-read-endpoints.md).
+3. Виконати [TS-005 — Перевірити HTTP-поведінку й контракт читання клієнтів](api/TS-005-customer-read-api-tests.md).
 
-## Checkpoint
+## Контрольна точка
 
-All runtime routes, DTOs, statuses, anonymous access, and privacy behavior match the aggregate versioned OpenAPI contract.
+Усі маршрути під час виконання, DTO, статуси, анонімний доступ і поведінка щодо приватності відповідають зведеному версійному контракту OpenAPI.

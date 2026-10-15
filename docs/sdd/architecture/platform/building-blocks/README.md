@@ -1,25 +1,25 @@
-# BuildingBlocks reference
+# Довідник BuildingBlocks
 
-BuildingBlocks is the shared technical foundation. It defines cross-module primitives and implementations, but never owns Catalog, Sales or Identity business rules.
+BuildingBlocks — спільна технічна основа. Вона визначає міжмодульні примітиви та реалізації, але не володіє бізнес-правилами Catalog, Sales чи Identity.
 
-## Project map
+## Карта проєктів
 
 ~~~text
 src/BuildingBlocks/
-├── BuildingBlocks.Domain/            entity, audit, error and event primitives
-├── BuildingBlocks.Application/       Mediator behaviors, contracts, notifications and logging
-├── BuildingBlocks.Infrastructure/    shared adapter implementations, migrations and seeders
-├── BuildingBlocks.Api/               Ardalis.Result to MVC mapping
-└── BuildingBlocks.Integrations.OneC/ shared SOAP client factory and authentication behavior
+├── BuildingBlocks.Domain/            примітиви сутностей, аудиту, помилок і подій
+├── BuildingBlocks.Application/       Mediator behaviors, контракти, notifications і логи
+├── BuildingBlocks.Infrastructure/    спільні адаптери, міграції й сидери
+├── BuildingBlocks.Api/               MVC-відображення Ardalis.Result
+└── BuildingBlocks.Integrations.OneC/ спільний SOAP client factory та автентифікація
 ~~~
 
-## Read in this order
+## Порядок читання
 
-1. [Domain primitives](domain.md)
-2. [Application primitives and behaviors](application.md)
-3. [Infrastructure services and startup](infrastructure.md)
-4. [API result mapping](api.md)
-5. [1C integration foundation](one-c.md)
-6. [Usage rules and availability](usage-rules.md)
+1. [Примітиви Domain](domain.md)
+2. [Примітиви Application і behaviors](application.md)
+3. [Сервіси Infrastructure та запуск](infrastructure.md)
+4. [Відображення результату API](api.md)
+5. [Основа інтеграції з 1C](one-c.md)
+6. [Правила використання](usage-rules.md)
 
-Do not create another shared base type, behavior or service abstraction before checking this reference.
+Перед створенням нового спільного базового типу, behavior або сервісної абстракції звір цей довідник.

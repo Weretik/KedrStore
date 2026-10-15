@@ -1,28 +1,25 @@
-# TS-003 — Enforce project and assembly boundaries
+# TS-003 — Забезпечити межі проєктів і assemblies
 
-- **Covers:** SC-002, SC-004
-- **Depends on:** TS-001
-- **Exact paths:** `tests/ArchitectureTests`, production `.csproj` files
-- **Test level:** architecture
+- **Покриває:** SC-002, SC-004
+- **Залежить від:** TS-001
+- **Точні шляхи:** `tests/ArchitectureTests`, production `.csproj` файли
+- **Рівень тесту:** architecture
 
-## Work
+## Робота
 
-- [x] Convert `ArchitectureTests` into an xUnit test project.
-- [x] Test project-reference direction for Domain, Application, API, Infrastructure, hosts, and test projects.
-- [x] Test compiled Domain and Application type dependencies.
-- [x] Test business-module isolation with documented explicit allowances.
-- [x] Prevent shared BuildingBlocks projects from referencing business modules.
-- [x] Include actionable failure messages naming violations.
+- [x] Перетворити `ArchitectureTests` на xUnit-тестовий проєкт.
+- [x] Перевірити напрям project references для Domain, Application, API, Infrastructure, hosts і тестових проєктів.
+- [x] Перевірити залежності скомпільованих типів Domain і Application.
+- [x] Перевірити ізоляцію бізнес-модулів із явно описаними дозволеними винятками.
+- [x] Заборонити references із спільних проєктів BuildingBlocks до бізнес-модулів.
+- [x] Додати повідомлення про збої з назвами порушень, придатні для виправлення.
 
-## TDD evidence
+## Свідчення TDD
 
-- Red: current project contains no test SDK and `dotnet test` executes no architecture tests.
-- Green/refactor: removed the unused `Identity.Api -> Identity.Infrastructure`
-  project reference, moved the XML-to-JSON adapter into Catalog to remove
-  `BuildingBlocks.Infrastructure -> Catalog.Application`, and refined host classification.
-- Regression: `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-build --configuration Release` passed 10 tests.
+- Red: поточний проєкт не містив test SDK, а `dotnet test` не виконував architecture тестів.
+- Зелена фаза й рефакторинг: прибрано невикористане посилання на проєкт `Identity.Api -> Identity.Infrastructure`, адаптер XML-to-JSON перенесено до Catalog для усунення `BuildingBlocks.Infrastructure -> Catalog.Application`, а класифікацію хоста уточнено.
+- Регресія: `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-build --configuration Release` пройшов 10 тестів.
 
-## Checkpoint
+## Контрольна точка
 
-ArchitectureTests executes in `dotnet test KedrStore.sln` and all encoded rules
-match the documented current architecture.
+ArchitectureTests виконуються в `dotnet test KedrStore.sln`, а всі закодовані правила відповідають поточній задокументованій архітектурі.

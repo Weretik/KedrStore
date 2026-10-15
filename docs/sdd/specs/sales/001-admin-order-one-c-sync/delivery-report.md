@@ -1,84 +1,84 @@
-# Admin order and 1C synchronization — delivery report
+# Замовлення адміністратора та синхронізація з 1C — звіт про постачання
 
-**Delivery status:** Ready for controlled deployment
+**Статус постачання:** готово до контрольованого розгортання
 
-**Prepared:** 2026-09-09
+**Підготовлено:** 2026-09-09
 
-**Completed verification tasks:** T170, T180, T185
+**Завершені завдання перевірки:** T170, T180, T185
 
-## Delivered behavior
+## Реалізована поведінка
 
-- `POST /api/admin/orders` persists a manager order and its durable 1C synchronization state without waiting for SOAP delivery.
-- `GET /api/admin/orders/{orderId}/sync-status` exposes the safe delivery status and the accepted 1C document number.
-- `POST /api/admin/orders/{orderId}/sync/retry` schedules an audited retry from `BusinessError` or `DeadLetter`; the regular job performs the SOAP call later.
-- `sync-one-c-orders` processes due records in bounded batches, respects the Kyiv sending window, paces SOAP calls, retries transport failures, recovers stale `Sent` claims, prevents concurrent double-send, and handles dead-letter notifications.
-- The SOAP adapter distinguishes accepted, business-error, and transport-error outcomes and stores only bounded sanitized diagnostics.
+- `POST /api/admin/orders` зберігає замовлення менеджера та його надійно збережений стан синхронізації з 1C, не чекаючи передавання через SOAP.
+- `GET /api/admin/orders/{orderId}/sync-status` повертає безпечний для розкриття статус передавання й номер документа, прийнятого в 1C.
+- `POST /api/admin/orders/{orderId}/sync/retry` планує повтор із аудитом зі стану `BusinessError` або `DeadLetter`; звичайне завдання виконує SOAP-виклик пізніше.
+- `sync-one-c-orders` обробляє записи, термін яких настав, обмеженими пакетами, дотримується київського вікна надсилання, робить паузи між SOAP-викликами, повторює спроби після транспортних збоїв, відновлює завислі захоплення `Sent`, запобігає одночасному подвійному надсиланню й обробляє сповіщення про невдалі доставки.
+- Адаптер SOAP розрізняє прийняття, бізнес-помилки й транспортні помилки та зберігає лише очищені діагностичні дані з обмеженням довжини.
 
-## Changed implementation areas
+## Змінені ділянки реалізації
 
-- Domain: `src/Sales/Sales.Domain/Orders/Entities/Order.cs` and `OneCOrderSync.cs`, including delivery transitions, stable identifiers, retry scheduling, and immutable 1C document numbers.
-- Application: `src/Sales/Sales.Application/Features/Orders/` and `Contracts/`, including create, status, and retry commands plus persistence and 1C boundaries.
-- API: `src/Sales/Sales.Api/Controllers/AdminOrdersController.cs` and `Contracts/Orders/`.
-- Infrastructure: Sales EF configurations, `SalesDbContext`, migrations through `20260909154836_AddOrderSyncRetryAudit`, the order stores, SOAP adapter, job services, notification service, and validated `Sales:OneCOrderSync` options.
-- Hosts and deployment: `Host.Jobs` registration/configuration and `.github/workflows/deploy-cloudrun.yml`.
-- Tests: Sales suites under `tests/UnitTests/Sales/` and `tests/IntegrationTests/Sales/`, live OpenAPI checks, and architecture tests.
-- Documentation: this feature specification, the Sales OpenAPI contract and root registry, configuration reference, Host.Jobs reference, and Sales 1C runbook.
+- Domain: `src/Sales/Sales.Domain/Orders/Entities/Order.cs` і `OneCOrderSync.cs`, зокрема переходи стану передавання, незмінні ідентифікатори, планування повторів і незмінні номери документів 1C.
+- Application: `src/Sales/Sales.Application/Features/Orders/` і `Contracts/`, зокрема команди створення, отримання статусу й повтору, а також межі зберігання даних та інтеграції з 1C.
+- API: `src/Sales/Sales.Api/Controllers/AdminOrdersController.cs` і `Contracts/Orders/`.
+- Infrastructure: конфігурації EF для Sales, `SalesDbContext`, міграції до `20260909154836_AddOrderSyncRetryAudit` включно, сховища замовлень, адаптер SOAP, сервіси завдань, сервіс сповіщень і перевірені параметри `Sales:OneCOrderSync`.
+- Хости й розгортання: реєстрація/конфігурація `Host.Jobs` і `.github/workflows/deploy-cloudrun.yml`.
+- Тести: набори Sales у `tests/UnitTests/Sales/` і `tests/IntegrationTests/Sales/`, перевірки чинного OpenAPI та архітектурні тести.
+- Документація: ця специфікація фічі, контракт OpenAPI для Sales і кореневий реєстр, довідник конфігурації, довідник Host.Jobs і операційна інструкція Sales 1C.
 
-## Completed task IDs
+## ID завершених завдань
 
-- Readiness checklist: T001, T002, T005–T010; domain: T010, T020, T030.
-- Persistence and integration: T040, T050, T060, T080.
-- Application and API: T090, T100, T110, T120, T130, T135, T136, T140.
-- Background delivery: T145, T150, T155, T160.
-- Verification and handoff: T170, T180, T185.
+- Контрольний список готовності: T001, T002, T005–T010; домен: T010, T020, T030.
+- Зберігання даних та інтеграція: T040, T050, T060, T080.
+- Application та API: T090, T100, T110, T120, T130, T135, T136, T140.
+- Фонове передавання: T145, T150, T155, T160.
+- Перевірка й передача результату: T170, T180, T185.
 
-The detailed task state remains in the phase files under [`tasks/`](tasks/README.md).
+Докладні стани завдань залишаються у файлах фаз у [`tasks/`](tasks/README.md).
 
-## Verification evidence
+## Свідчення перевірки
 
-| Check | Result |
+| Перевірка | Результат |
 | --- | --- |
-| `dotnet restore KedrStore.sln` | Passed on 2026-09-09. |
-| `dotnet build KedrStore.sln --no-restore` | Passed with 0 errors. |
-| `dotnet test KedrStore.sln --no-build --no-restore` | UnitTests 50 passed; ArchitectureTests 10 passed; IntegrationTests 49 passed and 2 skipped because Docker was unavailable locally. |
-| Sales EF database update | Passed; the configured local PostgreSQL database contains all migrations through `20260909154836_AddOrderSyncRetryAudit`. |
-| EF pending-model check | Passed; no model changes remain outside migrations. |
-| Controlled `sync-one-c-orders` execution | Passed with accepted, business-error, and transport-error records; details are in [T170](tasks/verification/06.1-build-tests.md). |
-| Live test 1C SOAP write | Three accepted test documents are recorded in [T185](tasks/test/06.3-one-c-write-smoke-test.md). |
-| Delivery checklist | Complete in [`checklist/delivery-readiness.md`](checklist/delivery-readiness.md). |
+| `dotnet restore KedrStore.sln` | Успішно виконано 2026-09-09. |
+| `dotnet build KedrStore.sln --no-restore` | Успішно виконано з 0 помилок. |
+| `dotnet test KedrStore.sln --no-build --no-restore` | UnitTests: 50 успішних; ArchitectureTests: 10 успішних; IntegrationTests: 49 успішних і 2 пропущених, оскільки Docker був недоступний локально. |
+| Оновлення бази даних Sales EF | Успішно виконано; налаштована локальна база PostgreSQL містить усі міграції до `20260909154836_AddOrderSyncRetryAudit` включно. |
+| Перевірка незастосованих змін моделі EF | Успішно виконано; поза міграціями змін моделі немає. |
+| Контрольований запуск `sync-one-c-orders` | Успішно виконано для записів із прийняттям, бізнес-помилкою й транспортною помилкою; подробиці — у [T170](tasks/verification/06.1-build-tests.md). |
+| Справжній тестовий запис у 1C через SOAP | Три прийняті тестові документи зафіксовано у [T185](tasks/test/06.3-one-c-write-smoke-test.md). |
+| Контрольний список готовності до постачання | Заповнено в [`checklist/delivery-readiness.md`](checklist/delivery-readiness.md). |
 
-The skipped tests use PostgreSQL Testcontainers to prove concurrent worker exclusion and atomic manual-retry audit persistence. They fail instead of skipping when `CI=true`, so CI with Docker must pass before production promotion.
+Пропущені тести використовують PostgreSQL Testcontainers, щоб перевірити виключення одночасної роботи обробників і атомарне збереження аудиту ручного повтору. За `CI=true` вони завершуються помилкою замість пропуску, тому перед просуванням у продукційне середовище CI з Docker має пройти успішно.
 
-## Runtime and Cloud Run configuration
+## Конфігурація виконання та Cloud Run
 
-The deployment workflow maintains Cloud Run Job `onec-orders-sync` with the current `Host.Jobs` image, `--job=sync-one-c-orders`, one task, parallelism `1`, platform retries `0`, and a 10-minute timeout. It binds database, 1C, and Telegram values from Secret Manager. It does not execute the order job during deployment.
+Процес розгортання підтримує Cloud Run Job `onec-orders-sync` з поточним образом `Host.Jobs`, аргументом `--job=sync-one-c-orders`, одним завданням, паралелізмом `1`, кількістю повторів платформи `0` і таймаутом 10 хвилин. Він підключає значення для бази даних, 1C і Telegram із Secret Manager. Під час розгортання завдання замовлень не запускається.
 
-| Setting | Delivered default |
+| Параметр | Типове значення після постачання |
 | --- | --- |
 | `Sales:OneCOrderSync:BatchSize` | `20` |
 | `Sales:OneCOrderSync:InterCallDelay` | `00:00:05` |
 | `Sales:OneCOrderSync:MaximumAttempts` | `10` |
 | `Sales:OneCOrderSync:SendingWindowStart` | `07:00:00` Europe/Kyiv |
-| `Sales:OneCOrderSync:SendingWindowEnd` | `20:00:00` Europe/Kyiv, exclusive |
+| `Sales:OneCOrderSync:SendingWindowEnd` | `20:00:00` Europe/Kyiv, верхня межа не включається |
 | `Sales:OneCOrderSync:StaleSentRecoveryDelay` | `00:15:00` |
 
-The operator configures Cloud Scheduler cadence and its service account manually. Dead-letter diagnosis, notification handling, stopping delivery, and manager retry are documented in the [Sales 1C runbook](../../../operations/jobs/sales-one-c-runbook.md).
+Оператор вручну налаштовує періодичність Cloud Scheduler і його сервісний обліковий запис. Діагностику невдалих доставок, обробку сповіщень, зупинення передавання й повтор за запитом менеджера задокументовано в [операційній інструкції Sales 1C](../../../operations/jobs/sales-one-c-runbook.md).
 
-## Deployment order
+## Порядок розгортання
 
-1. Ensure the database, 1C, and Telegram secrets exist in Secret Manager.
-2. Run the migration job and verify Sales migrations through `20260909154836_AddOrderSyncRetryAudit`.
-3. Deploy the API and `Host.Jobs` image; let the workflow create or update `onec-orders-sync` without executing it.
-4. Verify the runtime configuration and execute one controlled non-production job pass.
-5. Configure or resume Cloud Scheduler with the intended cadence and service account.
-6. Confirm status, retry, logs, metrics, and Telegram dead-letter notification behavior before production promotion.
+1. Переконатися, що секрети для бази даних, 1C і Telegram існують у Secret Manager.
+2. Запустити завдання міграції та перевірити міграції Sales до `20260909154836_AddOrderSyncRetryAudit` включно.
+3. Розгорнути API й образ `Host.Jobs`; дозволити процесу розгортання створити або оновити `onec-orders-sync` без його запуску.
+4. Перевірити конфігурацію виконання й здійснити один контрольований запуск завдання поза продукційним середовищем.
+5. Налаштувати або відновити роботу Cloud Scheduler із запланованою періодичністю та сервісним обліковим записом.
+6. Перед просуванням у продукційне середовище перевірити стан, повторні спроби, журнали, метрики й поведінку сповіщень Telegram про невдалі доставки.
 
-Rollback starts by pausing Cloud Scheduler. Roll back the API/job image while retaining the additive Sales tables and delivery records so queued orders and audit history remain recoverable.
+Відкат починається з призупинення Cloud Scheduler. Відкотити образ API/завдання, зберігши додані таблиці Sales і записи передавання, щоб замовлення в черзі та історію аудиту можна було відновити.
 
-## Residual risks and production gates
+## Залишкові ризики та умови виходу в продукційне середовище
 
-- Admin order create, status, and retry endpoints remain intentionally `[AllowAnonymous]`. Before public production exposure, apply `PolicyNames.CanManageOrders` and add authenticated, unauthenticated, and forbidden API tests.
-- Cloud Scheduler cadence and service account are operator-managed and cannot be verified from this repository.
-- The two PostgreSQL Testcontainers tests were skipped in the local run because Docker was unavailable; CI with Docker must pass them.
-- NuGet reports known vulnerabilities for `Microsoft.OpenApi` 2.3.0 and `Scriban` 7.2.0. Dependency upgrades remain a separate platform task.
-- T185 proves the configured test 1C accepted real writes on 2026-08-18 and 2026-08-21. The 1C team still owns business verification of created document contents.
+- Endpoints створення замовлення адміністратора, отримання статусу й повтору навмисно залишаються з `[AllowAnonymous]`. Перед публічним доступом у продукційному середовищі застосувати `PolicyNames.CanManageOrders` і додати тести API для автентифікованого, неавтентифікованого та забороненого доступу.
+- Періодичністю Cloud Scheduler і сервісним обліковим записом керує оператор; перевірити їх із цього репозиторію неможливо.
+- Два тести PostgreSQL Testcontainers було пропущено під час локального запуску через недоступність Docker; вони мають успішно пройти в CI з Docker.
+- NuGet повідомляє про відомі вразливості `Microsoft.OpenApi` 2.3.0 і `Scriban` 7.2.0. Оновлення залежностей залишається окремим завданням платформи.
+- T185 підтверджує, що налаштована тестова 1C прийняла реальні записи 2026-08-18 і 2026-08-21. Бізнес-перевірка вмісту створених документів залишається за командою 1C.

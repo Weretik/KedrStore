@@ -1,22 +1,22 @@
-# Manager order read API — scenario traceability
+# API читання замовлень менеджера — простежуваність сценаріїв
 
-| Scenario | Rules | Test level | Domain | Application | Infrastructure | API/contract | Acceptance evidence | Status |
+| Сценарій | Правила | Рівень тесту | Domain | Application | Infrastructure | API/контракт | Докази приймання | Статус |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| SC-001 | R-001, R-005, R-006 | Application, API, integration | — | EN-002, TS-002 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetListAsync_ProjectsPersistedOrdersNewestFirst`; `ManagerOrderReadApiTests.GetList_ReturnsCompactPageAndPassesExactFilter` | verified |
-| SC-002 | R-002, R-004, R-005 | Application, API, integration | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetByIdAsync_ReturnsSafeDetailForSoftDeletedCounterpartyWithoutChangingSync`; `ManagerOrderReadApiTests.GetById_ReturnsApprovedDetailAndDoesNotCallOneC` | verified |
-| SC-003 | R-003, R-005 | Application, API, integration | — | EN-002, TS-002 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetListAsync_AppliesExactCounterpartyScopeAndPaging`; `ManagerOrderReadApiTests.GetList_ReturnsEmptyPageForUnknownCounterparty` | verified |
-| SC-004 | R-002, R-005 | Application, API | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `GetOrderByIdQueryHandlerTests.Handle_PreservesNotFoundAndReadFailure`; `ManagerOrderReadApiTests.GetById_ReturnsNotFoundForUnknownOrder` | verified |
-| SC-005 | R-005 | API | — | — | — | EN-003, TS-004, TS-005 | `ManagerOrderReadApiTests.ReadRoutes_AllowAnonymousAccess` | verified |
+| SC-001 | R-001, R-005, R-006 | Application, API, інтеграція | — | EN-002, TS-002 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetListAsync_ProjectsPersistedOrdersNewestFirst`; `ManagerOrderReadApiTests.GetList_ReturnsCompactPageAndPassesExactFilter` | перевірено |
+| SC-002 | R-002, R-004, R-005 | Application, API, інтеграція | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetByIdAsync_ReturnsSafeDetailForSoftDeletedCounterpartyWithoutChangingSync`; `ManagerOrderReadApiTests.GetById_ReturnsApprovedDetailAndDoesNotCallOneC` | перевірено |
+| SC-003 | R-003, R-005 | Application, API, інтеграція | — | EN-002, TS-002 | TS-001 | EN-003, TS-004, TS-005 | `SalesOrderReadModelTests.GetListAsync_AppliesExactCounterpartyScopeAndPaging`; `ManagerOrderReadApiTests.GetList_ReturnsEmptyPageForUnknownCounterparty` | перевірено |
+| SC-004 | R-002, R-005 | Application, API | — | EN-002, TS-003 | TS-001 | EN-003, TS-004, TS-005 | `GetOrderByIdQueryHandlerTests.Handle_PreservesNotFoundAndReadFailure`; `ManagerOrderReadApiTests.GetById_ReturnsNotFoundForUnknownOrder` | перевірено |
+| SC-005 | R-005 | API | — | — | — | EN-003, TS-004, TS-005 | `ManagerOrderReadApiTests.ReadRoutes_AllowAnonymousAccess` | перевірено |
 
-## Shared enablers
+## Спільні підготовчі задачі
 
-| Enabler | Enables | Reason | Verification |
+| Підготовча задача | Підтримує | Причина | Перевірка |
 | --- | --- | --- | --- |
-| EN-001 | SC-001–SC-005 | Agree routes, DTO boundary, authorization, list semantics, and customer-history visibility | Specification readiness checklist is complete before implementation |
-| EN-002 | SC-001–SC-004 | Establish query projections without coupling Application to EF | Application build and focused test fixtures pass |
-| EN-003 | SC-001–SC-005 | Establish the versioned HTTP oracle before transport implementation | Redocly validation, aggregate `$ref`, static assertions, and runtime route checks pass |
+| EN-001 | SC-001–SC-005 | Погодити маршрути, межу DTO, авторизацію, семантику списку та видимість історії клієнта | Контрольний список готовності специфікації завершено до реалізації |
+| EN-002 | SC-001–SC-004 | Визначити проєкції запитів без зв'язування Application з EF | Збірка Application і цільові тестові фікстури проходять |
+| EN-003 | SC-001–SC-005 | Визначити версіонований HTTP-еталон до реалізації transport | Валідація Redocly, агреговані `$ref`, статичні твердження та перевірки runtime-маршрутів проходять |
 
-## Notes and justified omissions
+## Примітки та обґрунтовані пропуски
 
-- No Domain task is planned because all scenarios query existing aggregates without changing domain behavior.
-- No migration is planned; its omission must be re-evaluated only if an agreed performance target requires a new index.
+- Задачі Domain не заплановано, оскільки всі сценарії запитують наявні агрегати без зміни доменної поведінки.
+- Міграцію не заплановано; її відсутність потрібно переглянути лише тоді, коли погоджений показник продуктивності вимагатиме нового індексу.

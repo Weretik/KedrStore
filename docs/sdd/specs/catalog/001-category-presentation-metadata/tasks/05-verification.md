@@ -1,34 +1,34 @@
-# Phase 05 — Verification
+# Етап 05 — Перевірка
 
-**Status:** completed and verified
+**Статус:** завершено й перевірено
 
-- [x] T023 Run `dotnet restore KedrStore.sln` and record the result. **Dependencies:** T017, T022.
-- [x] T024 Run `dotnet build KedrStore.sln --no-restore` and record the result. **Dependencies:** T023.
-- [x] T025 Run `dotnet test KedrStore.sln --no-build` and record the result, distinguishing pre-existing failures from introduced failures. **Dependencies:** T024.
-- [x] T026 Apply the migration to a disposable PostgreSQL database, run a non-overlapping full 1C import, and record migration/import logs without sensitive values. **Dependencies:** T025.
-- [x] T027 Compare doors, hardware, and Cosmos category labels, order, and levels against `catalog-category-slugs.constants.ts.md` and `translate.md`; verify storefront constants remain until consumer cutover. **Dependencies:** T026.
-- [x] T028 Complete `checklist/delivery-readiness.md`, update the specification and contract to match code, and prepare the delivery report. **Dependencies:** T027.
+- [x] T023 Запустити `dotnet restore KedrStore.sln` і зафіксувати результат. **Залежності:** T017, T022.
+- [x] T024 Запустити `dotnet build KedrStore.sln --no-restore` і зафіксувати результат. **Залежності:** T023.
+- [x] T025 Запустити `dotnet test KedrStore.sln --no-build` і зафіксувати результат, відділивши наявні раніше збої від нових. **Залежності:** T024.
+- [x] T026 Застосувати міграцію до тимчасової бази PostgreSQL, запустити повний імпорт 1C без перекриття запусків і зафіксувати журнали міграції/імпорту без чутливих значень. **Залежності:** T025.
+- [x] T027 Порівняти назви, порядок і рівні категорій дверей, фурнітури та Cosmos із `catalog-category-slugs.constants.ts.md` і `translate.md`; перевірити, що константи storefront залишаються до переходу споживача. **Залежності:** T026.
+- [x] T028 Завершити `checklist/delivery-readiness.md`, узгодити специфікацію та контракт із кодом і підготувати звіт про постачання. **Залежності:** T027.
 
-## T026-T028 completion record (2026-07-29)
+## Запис про завершення T026–T028 (2026-07-29)
 
-- The migration was applied to a disposable PostgreSQL database and a non-overlapping full 1C import completed successfully. The initial endpoint-configuration blocker is resolved; no endpoint, credential, connection string, or other sensitive value is recorded here.
-- Manual verification confirmed the persisted hardware, doors, and backend-owned Cosmos category metadata: Ukrainian/Russian short labels, sibling order, and derived levels match the frozen constants and translation snapshots. The frozen storefront constants remain in place until a separate consumer-cutover change.
-- The Catalog Application consumer contract now records the additive `ShortNameUk`, `ShortNameRu`, `SortOrder`, and `Level` fields returned by `CategoryTreeDto`. No HTTP route or OpenAPI contract was introduced.
+- Міграцію застосовано до тимчасової бази PostgreSQL, а повний імпорт 1C без перекриття запусків успішно завершено. Початкову перешкоду конфігурації endpoint усунено; endpoint, облікові дані, рядок підключення чи інші чутливі значення тут не записано.
+- Ручна перевірка підтвердила збережені метадані категорій фурнітури, дверей і Cosmos, якою володіє backend: українські/російські короткі назви, порядок дочірніх категорій і виведені рівні збігаються із зафіксованими знімками констант і перекладів. Зафіксовані константи storefront залишаються до окремої зміни переходу споживача.
+- Контракт споживача Catalog Application тепер фіксує додаткові поля `ShortNameUk`, `ShortNameRu`, `SortOrder` і `Level`, які повертає `CategoryTreeDto`. HTTP-маршрут чи OpenAPI-контракт не додавалися.
 
-## Delivery report
+## Звіт про постачання
 
-- Delivered category presentation metadata through the domain model, EF Core migration, typed 1C configuration, import flow, Cosmos safety path, and deterministic application tree projection.
-- Automated restore and build succeeded. The previously recorded full-solution test failures are outside this feature; targeted feature coverage and the manual migration/import verification passed.
-- No rollout blocker remains. A future HTTP consumer must introduce an additive API contract before exposing the application read model.
+- Метадані представлення категорій постачено через domain-модель, міграцію EF Core, типізовану конфігурацію 1C, потік імпорту, безпечний шлях Cosmos і детерміновану application-проєкцію дерева.
+- Автоматизовані restore і build завершилися успішно. Раніше зафіксовані збої тестів усього solution перебувають поза межами цієї функціональності; цільове покриття функціональності й ручна перевірка міграції/імпорту пройшли.
+- Перешкод для розгортання не залишилося. Майбутній HTTP-споживач має запровадити адитивний API-контракт до відкриття application-моделі читання.
 
-## Verification record (2026-07-29)
+## Запис перевірки (2026-07-29)
 
-- `dotnet restore KedrStore.sln` — succeeded. Existing NuGet vulnerability warnings remain for `Microsoft.OpenApi` and `Scriban`.
-- `dotnet build KedrStore.sln --no-restore` — succeeded with the existing package vulnerability warnings and one nullable warning in `Identity.Infrastructure`.
-- `dotnet test KedrStore.sln --no-build` — failed only outside this feature: `UnitTests.SlugTests.MapProduct_Should_Clean_Slugs` fails its existing slug expectation. All four integration tests completed successfully.
+- `dotnet restore KedrStore.sln` — успішно. Залишаються наявні попередження про вразливості NuGet-пакетів `Microsoft.OpenApi` і `Scriban`.
+- `dotnet build KedrStore.sln --no-restore` — успішно з наявними попередженнями про вразливості пакетів та одним nullable-попередженням в `Identity.Infrastructure`.
+- `dotnet test KedrStore.sln --no-build` — збій лише поза межами цієї функціональності: `UnitTests.SlugTests.MapProduct_Should_Clean_Slugs` не відповідає наявному очікуванню щодо slug. Усі чотири інтеграційні тести успішно завершилися.
 
-## T026 historical blocker (resolved)
+## Історична перешкода T026 (усунута)
 
-The migration was applied successfully after PostgreSQL was started. A subsequent full import attempt used the supported `Host.Jobs --job=full` command, but stopped before category import at `SyncOneCPriceTypesJob`: `OneCSoap:Endpoint is not configured`. No category metadata import ran during that attempt.
+Міграцію успішно застосовано після запуску PostgreSQL. Подальша спроба повного імпорту використовувала підтримувану команду `Host.Jobs --job=full`, але зупинилася до імпорту категорій на `SyncOneCPriceTypesJob`: `OneCSoap:Endpoint is not configured`. Під час тієї спроби імпорт метаданих категорій не запускався.
 
-T026–T028 require a usable non-production `OneCSoap:Endpoint` (and its credentials, if applicable) supplied through environment variables or user secrets. Once configured, run the full import again from the `Host.Jobs` directory and compare the persisted category metadata.
+T026–T028 потребують придатного непродукційного `OneCSoap:Endpoint` (і його облікових даних, якщо застосовно), переданого через змінні середовища або user secrets. Після налаштування повторіть повний імпорт із каталогу `Host.Jobs` і порівняйте збережені метадані категорій.

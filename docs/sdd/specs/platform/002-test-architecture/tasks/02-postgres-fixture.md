@@ -1,32 +1,27 @@
 # EN-001 — PostgreSQL Testcontainers fixture
 
-- **Enables:** SC-003, SC-005
-- **Depends on:** TS-001
-- **Exact paths:** `tests/IntegrationTests/TestSupport/Database`, `tests/IntegrationTests/IntegrationTests.csproj`
-- **Test level:** integration infrastructure
+- **Забезпечує:** SC-003, SC-005
+- **Залежить від:** TS-001
+- **Точні шляхи:** `tests/IntegrationTests/TestSupport/Database`, `tests/IntegrationTests/IntegrationTests.csproj`
+- **Рівень тесту:** integration infrastructure
 
-## Why this is an enabler
+## Навіщо потрібна передумова
 
-`xmin`, SQL, transactions, constraints, and migrations cannot be proved by EF
-Core InMemory. A reusable real-provider lifecycle is required before those
-risks have meaningful tests.
+`xmin`, SQL, транзакції, обмеження й міграції не можна довести через EF Core InMemory. Для змістовних тестів цих ризиків потрібен спільний життєвий цикл справжнього provider.
 
-## Work
+## Робота
 
-- [x] Add Testcontainers.PostgreSql 4.15.0 without introducing a vulnerable transitive package.
-- [x] Start one temporary PostgreSQL container through an xUnit fixture.
-- [x] Apply Sales migrations and provide independently scoped contexts.
-- [x] Skip only when the local Docker endpoint is unavailable; fail instead when `CI=true`.
+- [x] Додати Testcontainers.PostgreSql 4.15.0 без вразливого транзитивного пакета.
+- [x] Запускати один тимчасовий PostgreSQL container через xUnit fixture.
+- [x] Застосувати міграції Sales і надати contexts із незалежними scopes.
+- [x] Пропускати тест лише за недоступної локальної кінцевої точки Docker; за `CI=true` вважати це помилкою.
 
-## Test-first exception and replacement verification
+## Виняток із test-first і замінна перевірка
 
-- Reason: container lifecycle is prerequisite infrastructure rather than observable production behavior.
-- Replacement command/check: focused PostgreSQL integration test.
-- Result: the fixture compiled and produced the expected local skip because
-  Docker is unavailable. This is the accepted local environment exception;
-  Docker-enabled CI treats unavailable container infrastructure as a failure.
+- Причина: життєвий цикл контейнера — інфраструктурна передумова, а не спостережувана production-поведінка.
+- Замінна команда/перевірка: цільовий PostgreSQL integration тест.
+- Результат: fixture компілювався й дав очікуваний локальний пропуск через недоступність Docker. Це погоджений виняток локального середовища; CI з Docker вважає недоступність container infrastructure помилкою.
 
-## Checkpoint
+## Контрольна точка
 
-Docker-enabled environments run migrations against temporary PostgreSQL;
-Docker-less local environments receive a descriptive skip.
+Середовища з Docker запускають міграції на тимчасовому PostgreSQL; локальне середовище без Docker отримує пропуск із поясненням.

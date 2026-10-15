@@ -1,18 +1,18 @@
-# System map
+# Карта системи
 
-## Executable hosts
+## Виконувані hosts
 
-- src/Bootstrapper/Host.Api composes DI, middleware, controllers, authentication and OpenAPI.
-- src/Bootstrapper/Host.Jobs/Host.Jobs runs scheduled/background integration work.
+- `src/Bootstrapper/Host.Api` складає DI, middleware, controllers, автентифікацію та OpenAPI.
+- `src/Bootstrapper/Host.Jobs/Host.Jobs` виконує одну явно задану команду `--job=...` і завершується. Зовнішній планувальник або CI може запускати цей хост; внутрішнього постійного планувальника в ньому немає. Команда `--job=migrate` виконує міграції й сидери.
 
-## Business modules
+## Бізнес-модулі
 
-- Catalog owns categories, products, translations, prices, projections and 1C catalogue synchronization.
-- Sales owns sales customers, counterparties, pricing policy and sales-facing catalogue reads.
-- Identity owns ASP.NET Identity, roles, policies, current-user/session integration and seeders.
-- BuildingBlocks owns shared abstractions and cross-cutting implementation; it must not acquire business rules.
+- Catalog відповідає за категорії, товари, переклади, ціни, проєкції та синхронізацію каталогу з 1C.
+- Sales відповідає за клієнтів і контрагентів продажів, цінову політику та читання каталогу для продажів.
+- Identity відповідає за ASP.NET Identity, ролі, правила авторизації, інтеграцію сесії/поточного користувача та сидери.
+- BuildingBlocks містить спільні абстракції й наскрізну реалізацію; бізнес-правила до нього не додавай.
 
-## Dependency direction
+## Напрям залежностей
 
 ~~~text
 Host.Api / Host.Jobs
@@ -20,7 +20,7 @@ Host.Api / Host.Jobs
         ├── Module.Api ──► Module.Application ──► Module.Domain
         └── Module.Infrastructure ─────────────► Module.Application + Module.Domain
 
-BuildingBlocks.* supplies shared primitives; it does not depend on business modules.
+BuildingBlocks.* постачає спільні примітиви й не залежить від бізнес-модулів.
 ~~~
 
-There is no direct dependency from Domain to Application or Infrastructure, and no Application dependency on a concrete DbContext, HTTP client, scheduler or EF repository.
+Доменний шар не залежить безпосередньо від прикладного чи інфраструктурного шару. Прикладний шар не залежить від конкретного `DbContext`, HTTP-клієнта, планувальника або EF-репозиторію.

@@ -1,9 +1,9 @@
-# Phase 05 — Verification and delivery
+# Фаза 05 — перевірка й завершення
 
-## Ordered tasks
+## Завдання за порядком
 
-1. After TS-005, execute [TS-006 — Verify and close customer-read delivery](verification/TS-006-verification.md).
+1. Після TS-005 виконати [TS-006 — Перевірити й завершити фічу читання клієнтів](verification/TS-006-verification.md).
 
-## Checkpoint
+## Контрольна точка
 
-Every SC-001–SC-004 row is verified with named evidence, required checks pass, documentation matches behavior, and `checklist/delivery-readiness.md` is complete.
+Кожен рядок SC-001–SC-004 перевірено з поіменними свідченнями, обов'язкові перевірки пройшли, документація відповідає поведінці, а `checklist/delivery-readiness.md` заповнено.

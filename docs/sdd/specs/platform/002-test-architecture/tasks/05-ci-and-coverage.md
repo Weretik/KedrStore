@@ -1,26 +1,24 @@
-# TS-004 — Gate deployment and publish coverage
+# TS-004 — Перевірка перед розгортанням і публікація покриття тестами
 
-- **Covers:** SC-005
-- **Depends on:** TS-002, TS-003
-- **Exact paths:** `.github/workflows/deploy-cloudrun.yml`
-- **Test level:** workflow configuration
+- **Покриває:** SC-005
+- **Залежить від:** TS-002, TS-003
+- **Точні шляхи:** `.github/workflows/deploy-cloudrun.yml`
+- **Рівень тесту:** конфігурація процесу CI
 
-## Work
+## Робота
 
-- [x] Add a verification job before deployment.
-- [x] Restore and build the solution once.
-- [x] Run unit, architecture, and PostgreSQL integration tests.
-- [x] Collect Cobertura coverage and upload the results artifact.
-- [x] Make deployment depend on successful verification.
+- [x] Додати завдання перевірки перед розгортанням.
+- [x] Один раз відновити залежності й зібрати рішення.
+- [x] Запустити unit, architecture і PostgreSQL integration тести.
+- [x] Зібрати покриття тестами у форматі Cobertura й завантажити артефакт результатів.
+- [x] Поставити розгортання в залежність від успішної перевірки.
 
-## Test-first exception and replacement verification
+## Виняток із test-first і замінна перевірка
 
-- Reason: GitHub Actions orchestration cannot be meaningfully Red-tested by the local test suite.
-- Replacement check: parse YAML, inspect job dependency, and run equivalent local commands where Docker permits.
-- Result: `yaml-lint` passed; equivalent local Release commands created three
-  Cobertura reports. The workflow configuration is accepted as delivery
-  evidence; runtime CI failures, if any, are handled separately.
+- Причина: координацію GitHub Actions не можна змістовно перевірити Red-тестом у локальному наборі.
+- Замінна перевірка: розібрати YAML, перевірити залежність jobs і запустити відповідні локальні команди, де Docker дозволяє.
+- Результат: `yaml-lint` пройшов; відповідні локальні Release-команди створили три звіти Cobertura. Конфігурацію процесу CI прийнято як свідчення передачі; збої CI під час виконання, якщо виникнуть, обробляються окремо.
 
-## Checkpoint
+## Контрольна точка
 
-No Cloud Run deployment step can begin when verification fails.
+Жоден крок розгортання Cloud Run не може початися після помилки перевірки.

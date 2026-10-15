@@ -1,29 +1,29 @@
-# TS-003 — Get manager order by ID
+# TS-003 — отримувати замовлення менеджера за ID
 
-- **Task ID:** TS-003
-- **Covers:** SC-002, SC-004
-- **Depends on:** TS-001
-- **Exact paths:** `src/Sales/Sales.Application/Features/Orders/GetById/`, `tests/UnitTests/Sales/Application/GetOrderByIdQueryHandlerTests.cs`
-- **Test level:** Application
+- **ID задачі:** TS-003
+- **Покриває:** SC-002, SC-004
+- **Залежить від:** TS-001
+- **Точні шляхи:** `src/Sales/Sales.Application/Features/Orders/GetById/`, `tests/UnitTests/Sales/Application/GetOrderByIdQueryHandlerTests.cs`
+- **Рівень тесту:** Application
 
-## Evidence
+## Докази
 
-- **Focused test:** `GetOrderByIdQueryHandlerTests`
-- **Red:** combined focused handler run compiled and failed 2 detail/not-found delegation assertions against the absent orchestration while its 2 validator cases passed.
-- **Green:** combined `GetOrderListQueryHandlerTests|GetOrderByIdQueryHandlerTests` run passed 9/9.
-- **Refactor:** reran the same focused suite after simplifying delegation; 9/9 passed.
-- **Regression:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application`; 21 passed, 0 failed.
+- **Цільовий тест:** `GetOrderByIdQueryHandlerTests`
+- **Red:** спільний цільовий запуск обробників скомпілювався й провалив 2 перевірки делегування для деталей/відсутності через відсутню оркестрацію; 2 перевірки валідатора пройшли.
+- **Green:** спільний запуск `GetOrderListQueryHandlerTests|GetOrderByIdQueryHandlerTests` пройшов 9/9.
+- **Рефакторинг:** той самий цільовий набір повторно запущено після спрощення делегування; 9/9 пройшли.
+- **Регресія:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application`; 21 пройшов, 0 помилок.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest handler test for SC-002 and run it to confirm failure because detail orchestration is absent.
-- [x] **Red:** add focused cases for invalid ID, not found, read failure, and cancellation required by SC-002/SC-004.
-- [x] **Green:** add the detail query, agreed result DTO, and identifier validation.
-- [x] **Green:** return the agreed projection or explicit not-found through `IOrderReadService`, rerunning the focused test.
-- [x] **Refactor:** simplify mapping while keeping internal diagnostics, EF types, and Domain entities outside the result.
-- [x] **Regression:** run the Sales Application test subset.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший тест обробника для SC-002 і запустити його, щоб підтвердити помилку через відсутність оркестрації деталей.
+- [x] **Red:** додати потрібні SC-002/SC-004 цільові випадки некоректного ID, відсутності, помилки читання та скасування.
+- [x] **Green:** додати запит деталей, погоджений DTO результату й валідацію ідентифікатора.
+- [x] **Green:** повертати погоджену проєкцію або явну відсутність через `IOrderReadService`, повторюючи цільовий тест.
+- [x] **Рефакторинг:** спростити мапінг, не включаючи до результату внутрішню діагностику, типи EF і сутності Domain.
+- [x] **Регресія:** запустити піднабір тестів Sales Application.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Докази».
 
-## Checkpoint
+## Контрольна точка
 
-The use case returns the exact detail projection and distinguishes a missing order from success.
+Сценарій повертає точну проєкцію деталей і відрізняє відсутнє замовлення від успіху.

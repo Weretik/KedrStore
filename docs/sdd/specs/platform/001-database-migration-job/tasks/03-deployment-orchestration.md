@@ -1,16 +1,16 @@
-# Phase 03 — API startup and deployment orchestration
+# Фаза 03 — Старт API та координація розгортання
 
-- [x] T012 Remove automatic migration execution from `src/Bootstrapper/Host.Api/Program.cs` and separate any remaining seeding behavior explicitly. **Dependencies:** T009.
-- [x] T013 Update `.github/workflows/deploy-cloudrun.yml` to update/execute a dedicated `database-migrate` Cloud Run Job with the Jobs image and database secret, wait for completion, then deploy the API. **Dependencies:** T009, T012.
-- [ ] T014 Verify Cloud Run IAM and service-account permissions follow least privilege for the migration job, Artifact Registry, Cloud SQL, and Secret Manager. **Dependencies:** T013.
-- [x] T015 Add deployment-level checks that prevent API rollout when the migration job exits non-zero. **Dependencies:** T013.
+- [x] T012 Прибрати автоматичні міграції з `src/Bootstrapper/Host.Api/Program.cs` і явно відокремити будь-який залишковий seeding. **Залежності:** T009.
+- [x] T013 Оновити `.github/workflows/deploy-cloudrun.yml`: оновити/запустити окремий Cloud Run Job `database-migrate` з образом Jobs і секретом БД, дочекатися завершення, тоді розгорнути API. **Залежності:** T009, T012.
+- [ ] T014 Перевірити, що IAM Cloud Run і дозволи service account відповідають мінімальним привілеям для migration job, Artifact Registry, Cloud SQL та Secret Manager. **Залежності:** T013.
+- [x] T015 Додати перевірки рівня розгортання, які не допускають оновлення API за ненульового коду завдання міграції. **Залежності:** T013.
 
-## Completion record (2026-07-29)
+## Запис завершення (2026-07-29)
 
-- API startup no longer invokes migrations or seeders.
-- The workflow updates or creates `database-migrate`, runs `--job=migrate` with `--wait`, and only deploys the API after that command succeeds.
-- T014 remains open because Cloud Run and hosting IAM cannot be inspected from the current local account.
+- Старт API більше не викликає міграцій або сидерів.
+- Процес розгортання оновлює або створює `database-migrate`, виконує `--job=migrate` із `--wait` і розгортає API лише після успіху команди.
+- T014 залишається відкритим, оскільки Cloud Run та IAM середовища неможливо перевірити з поточного локального облікового запису.
 
-## Checkpoint
+## Контрольна точка
 
-The API may be deployed only after the migration job succeeds for the same image revision and target database.
+API можна розгортати лише після успіху завдання міграції для тієї самої ревізії образу й цільової БД.

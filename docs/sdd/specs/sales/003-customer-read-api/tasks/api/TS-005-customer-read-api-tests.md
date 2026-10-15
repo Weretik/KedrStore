@@ -1,27 +1,27 @@
-# TS-005 — Verify customer HTTP and contract behavior
+# TS-005 — Перевірити HTTP-поведінку й контракт читання клієнтів
 
-- **Task ID:** TS-005
-- **Covers:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** TS-004
-- **Exact paths:** `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`, `tests/IntegrationTests/Platform/Api/ApiContractTests.cs`, `docs/sdd/contracts/sales/customer-read.openapi.yaml`
-- **Test level:** API verification
+- **ID завдання:** TS-005
+- **Охоплює:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** TS-004
+- **Точні шляхи:** `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`, `tests/IntegrationTests/Platform/Api/ApiContractTests.cs`, `docs/sdd/contracts/sales/customer-read.openapi.yaml`
+- **Рівень тестування:** перевірка API
 
-## Verification evidence
+## Свідчення перевірки
 
-- **Source behavior task:** TS-004 Red/Green evidence.
-- **Distinct risks:** PII leakage, soft-delete leakage, serialization, anonymous-route drift, and OpenAPI drift.
-- **Command/result:** after the anonymous-access amendment, the focused customer/runtime contract run passed 15/15; full regression evidence is recorded in TS-006.
-- **Remaining gap:** none for the accepted scope; soft-delete behavior is proven at PostgreSQL projection level and HTTP not-found mapping is tested for both unknown/deleted cases.
+- **Завдання з реалізації поведінки:** свідчення Red/Green для TS-004.
+- **Окремі ризики:** витік персональних даних, витік логічно видалених записів, серіалізація, розбіжність анонімних маршрутів і розбіжність OpenAPI.
+- **Команда/результат:** після зміни щодо анонімного доступу цільовий запуск перевірок клієнтів і контракту під час виконання пройшов 15/15; результати повної регресії зафіксовано в TS-006.
+- **Залишкова прогалина:** у погодженому обсязі немає; поведінку логічного видалення доведено на рівні проєкції PostgreSQL, а HTTP-відображення результату «не знайдено» перевірено для невідомого й видаленого клієнтів.
 
-## Work
+## Робота
 
-- [x] Test list success/empty/invalid input and detail success/unknown/deleted customer.
-- [x] Test successful unauthenticated access for every route.
-- [x] Assert the approved DTO omits disallowed PII, `IdentityUserId`, audit/deletion state, and Domain entities.
-- [x] Verify identifier, nullable contact, price-rule, and paging serialization against OpenAPI.
-- [x] Verify runtime routes match versioned and aggregate OpenAPI.
-- [x] Verify reads neither call 1C/Identity nor mutate Sales persistence.
+- [x] Перевірити успішну відповідь, порожній список і некоректні вхідні дані для списку, а також успішну відповідь, невідомого й видаленого клієнта для деталей.
+- [x] Перевірити успішний доступ без автентифікації до кожного маршруту.
+- [x] Переконатися, що погоджений DTO не містить заборонених персональних даних, `IdentityUserId`, стану аудиту й видалення та доменних сутностей.
+- [x] Звірити з OpenAPI серіалізацію ідентифікатора, необов'язкових контактних даних, правил цін і посторінкового виводу.
+- [x] Перевірити відповідність маршрутів під час виконання версійному та зведеному OpenAPI.
+- [x] Перевірити, що читання не викликає 1C/Identity і не змінює сховище Sales.
 
-## Checkpoint
+## Контрольна точка
 
-Focused tests prove every scenario, privacy boundary, and runtime contract.
+Цільові тести підтверджують кожен сценарій, межу приватності й контракт під час виконання.

@@ -1,21 +1,21 @@
-# Database migration job — integration contract
+# Job міграції БД — інтеграційний контракт
 
-**Status:** internal process contract; no HTTP API is in scope
+**Статус:** контракт внутрішнього процесу; HTTP API поза обсягом
 
-## Host.Jobs CLI
+## CLI Host.Jobs
 
 ```text
 dotnet Host.Jobs.dll --job=migrate
 ```
 
-| Result | Exit code | Contract |
+| Результат | Код виходу | Контракт |
 | --- | --- | --- |
-| All contexts migrated or already current | `0` | logs successful completion per context |
-| Invalid job arguments | non-zero | prints a concise argument error |
-| Migration failure | non-zero | logs the failing context and rethrows the sanitized failure path |
+| Усі contexts мігровано або вони вже актуальні | `0` | Логує успішне завершення кожного context |
+| Некоректні аргументи job | Ненульовий | Друкує стислу помилку аргументу |
+| Помилка міграції | Ненульовий | Логує context помилки й передає далі очищений від секретів шлях збою |
 
-The command reads the standard configuration and secret-provided `ConnectionStrings__Default`. It does not accept connection strings as CLI arguments and must not print secrets.
+Команда читає стандартну конфігурацію й `ConnectionStrings__Default` зі сховища секретів. Вона не приймає рядків підключення як CLI-аргументи й не друкує секретів.
 
-## Deployment contract
+## Контракт розгортання
 
-The deployment workflow must execute the dedicated Cloud Run migration job and wait for success before `gcloud run deploy api`. A failed migration job blocks the API deployment.
+Процес розгортання має запустити окреме завдання міграції Cloud Run і дочекатися успіху до `gcloud run deploy api`. Помилка завдання міграції блокує розгортання API.

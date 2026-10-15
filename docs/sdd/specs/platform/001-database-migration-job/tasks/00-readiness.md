@@ -1,16 +1,16 @@
-# Phase 00 — Readiness and production baseline
+# Фаза 00 — Готовність і production-baseline
 
-- [x] T001 Export and record the production `__EFMigrationsHistory` for Catalog, Identity, and Sales without sensitive values. **Dependencies:** none.
-- [x] T002 Verify the production Identity table definitions against the historical migrations `20260118230934_InitialAppIdentityDbContext` and `20260507141045_AddRefreshSessionStore`. **Dependencies:** T001.
-- [ ] T003 Create and verify a Cloud SQL backup; record backup identifier and restore owner without credentials. **Dependencies:** T001.
-- [ ] T004 Agree the explicit migrator context order and the Cloud Run Job name/permissions. **Dependencies:** T001, T002.
+- [x] T001 Експортувати й записати production `__EFMigrationsHistory` для Catalog, Identity і Sales без чутливих значень. **Залежності:** немає.
+- [x] T002 Звірити production-таблиці Identity з історичними міграціями `20260118230934_InitialAppIdentityDbContext` і `20260507141045_AddRefreshSessionStore`. **Залежності:** T001.
+- [ ] T003 Створити й перевірити backup Cloud SQL; записати ID backup і відповідального за відновлення без credentials. **Залежності:** T001.
+- [ ] T004 Погодити явний порядок migrator contexts і назву/дозволи Cloud Run Job. **Залежності:** T001, T002.
 
-## Checkpoint
+## Контрольна точка
 
-Do not restore migration files or execute a migration against production until T001-T004 are complete.
+Не відновлюй файли міграцій і не запускай міграцію в production, доки T001–T004 не завершено.
 
-## Baseline record (2026-07-29)
+## Запис baseline (2026-07-29)
 
-- Production history contains `20260118230828_InitialCatalogDbContext`, `20260428115404_Add Translate`, `20260118230934_InitialAppIdentityDbContext`, and `20260507141045_AddRefreshSessionStore`.
-- Identity tables are present. `AspNetRoles.Id` is `integer`, confirming the old int-key Identity baseline and the incompatibility with the current Guid model.
-- The owner approved the destructive reset of non-critical Identity data. T003 remains open until a fresh pre-reset backup is created and verified; T004 remains open until hosting IAM is verified.
+- Історія продукційного середовища містить `20260118230828_InitialCatalogDbContext`, `20260428115404_Add Translate`, `20260118230934_InitialAppIdentityDbContext` і `20260507141045_AddRefreshSessionStore`.
+- Таблиці Identity наявні. `AspNetRoles.Id` має тип `integer`, що підтверджує старий baseline Identity з int-ключами та несумісність із поточною Guid-моделлю.
+- Власник погодив руйнівний reset некритичних даних Identity. T003 залишається відкритим до створення й перевірки свіжого backup перед reset; T004 — до перевірки IAM середовища.

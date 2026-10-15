@@ -1,8 +1,8 @@
-# Database migration job — checklist: delivery readiness
+# Job міграції БД — чеклист готовності delivery
 
-- [ ] Historical migration lineage and snapshot are restored without altering applied IDs.
-- [ ] Forward migration SQL is reviewed against a disposable production-like database.
-- [ ] `Host.Jobs --job=migrate` is covered by focused tests and is idempotent.
-- [ ] `Host.Api` starts without applying migrations or seeders.
-- [ ] Cloud Run migration job runs before API deployment and blocks on failure.
-- [ ] Backup, rollout logs, restore procedure, and known limitations are recorded.
+- [ ] Історичну послідовність міграцій і snapshot відновлено без зміни застосованих ID.
+- [ ] SQL forward-міграції перевірено на одноразовій БД, подібній до production.
+- [ ] `Host.Jobs --job=migrate` покрито цільовими тестами й він ідемпотентний.
+- [ ] `Host.Api` стартує без застосування міграцій або сидерів.
+- [ ] Завдання міграції Cloud Run виконується до розгортання API й блокує його за помилки.
+- [ ] Резервну копію, логи розгортання, процедуру відновлення й відомі обмеження записано.

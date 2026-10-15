@@ -1,9 +1,9 @@
-# Manager order read API — checklist: delivery readiness
+# API читання замовлень менеджера — контрольний список готовності постачання
 
-- [x] Every in-scope scenario is verified in `traceability.md`.
-- [x] Query projections and application results are covered by focused tests.
-- [x] Persistence query behavior is checked against representative order-line data on PostgreSQL 18.
-- [x] API conforms to the approved OpenAPI contract, including access and errors.
-- [x] No read operation invokes 1C or mutates Sales persistence.
-- [x] Targeted and regression test commands have passed and are recorded.
-- [x] Documentation, aggregate OpenAPI references, implementation, and tests agree.
+- [x] Кожний сценарій у межах функціональності підтверджено в `traceability.md`.
+- [x] Проєкції запитів і результати Application покрито цільовими тестами.
+- [x] Поведінку запитів до сховища перевірено на репрезентативних даних позицій замовлень у PostgreSQL 18.
+- [x] API відповідає погодженому контракту OpenAPI, зокрема щодо доступу та помилок.
+- [x] Жодна операція читання не звертається до 1С і не змінює дані Sales.
+- [x] Команди цільових і регресійних тестів пройшли й зафіксовані.
+- [x] Документація, посилання агрегованого OpenAPI, реалізація й тести узгоджені.

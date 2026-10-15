@@ -1,9 +1,9 @@
-# Category presentation metadata — checklist: delivery readiness
+# Метадані представлення категорій — чеклист готовності постачання
 
-- [x] Domain invariants and type boundaries are verified by tests.
-- [x] Persistence constraints and migration are verified where applicable.
-- [x] No HTTP/OpenAPI contract is in scope; the Catalog Application consumer boundary is documented.
-- [x] Restore, build, and tests have run; unrelated test failures are documented in `tasks/05-verification.md`.
-- [x] Documentation, contract, and code are aligned.
-- [x] All applicable task IDs are closed; no blocker remains.
-- [x] A non-overlapping full 1C import and manual comparison with both frozen snapshots are recorded in `tasks/05-verification.md`.
+- [x] Domain-інваріанти й межі типів перевірено тестами.
+- [x] Обмеження збереження та міграцію перевірено там, де вони застосовні.
+- [x] HTTP/OpenAPI-контракт не входить до меж роботи; межу споживача Catalog Application задокументовано.
+- [x] Restore, build і тести запускалися; не пов'язані з роботою збої тестів описано в `tasks/05-verification.md`.
+- [x] Документацію, контракт і код узгоджено.
+- [x] Усі застосовні ID задач закрито; перешкод не залишилося.
+- [x] Повний імпорт 1C без перекриття запусків і ручне порівняння з обома зафіксованими знімками записано в `tasks/05-verification.md`.

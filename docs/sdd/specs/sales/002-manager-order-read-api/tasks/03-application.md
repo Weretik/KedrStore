@@ -1,13 +1,13 @@
-# Phase 03 — Application
+# Фаза 03 — Application
 
-## Ordered tasks
+## Впорядковані задачі
 
-1. After EN-001, execute [EN-002 — Define manager-order query contracts](application/EN-002-query-contracts.md).
-2. Wait for Infrastructure TS-001.
-3. Execute these independent tasks in parallel when TS-001 is complete:
-   - [TS-002 — Get manager-order lists](application/TS-002-get-order-list.md);
-   - [TS-003 — Get manager order by ID](application/TS-003-get-order-by-id.md).
+1. Після EN-001 виконати [EN-002 — визначити контракти запитів замовлень менеджера](application/EN-002-query-contracts.md).
+2. Дочекатися TS-001 в Infrastructure.
+3. Після завершення TS-001 виконати паралельно незалежні задачі:
+   - [TS-002 — отримувати списки замовлень менеджерів](application/TS-002-get-order-list.md);
+   - [TS-003 — отримувати замовлення менеджера за ID](application/TS-003-get-order-by-id.md).
 
-## Checkpoint
+## Контрольна точка
 
-Both list and detail use cases return explicit Ardalis.Result outcomes, pass cancellation, expose only agreed DTOs, and have focused Application evidence.
+Сценарії списку й деталей повертають явні результати Ardalis.Result, передають скасування, відкривають лише погоджені DTO й мають цільові докази Application.

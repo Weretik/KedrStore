@@ -1,15 +1,13 @@
-# Backend engineering rules
+# Інженерні правила backend
 
-This directory contains the stable rules for every backend change. It does not contain frontend rules: the frontend is a separate project.
+Тут зберігаються сталі правила для змін backend. Правила frontend належать окремому проєкту.
 
-- [Backend rules](backend-rules.md) — layers, CQRS, DDD, Mediator, and code organisation.
-- [Identifier strategy](identifier-strategy.md) — mandatory ID-selection rules before creating or changing an entity.
-- [API rules](api-rules.md) — HTTP contracts, validation, results, and errors.
-- [Database rules](database-rules.md) — EF Core, reads, transactions, migrations, and data.
-- [Security and observability rules](security-observability-rules.md) — authorization, privacy, Serilog, and diagnostics.
-- [Testing rules](testing-rules.md) — scenario coverage, Red -> Green -> Refactor,
-  test selection, exceptions, and required verification commands.
-- [Delivery rules](delivery-rules.md) — behavior-first SDD flow, traceability,
-  scope, and definition of done.
+- [Правила backend](backend-rules.md) — шари, CQRS, DDD, Mediator і організація коду.
+- [Стратегія ідентифікаторів](identifier-strategy.md) — обов'язковий вибір ID до створення або зміни сутності.
+- [Правила API](api-rules.md) — HTTP-контракти, валідація, результати й помилки.
+- [Правила БД](database-rules.md) — EF Core, читання, транзакції, міграції й дані.
+- [Безпека та спостережуваність](security-observability-rules.md) — авторизація, приватність, Serilog і діагностика.
+- [Правила тестування](testing-rules.md) — покриття сценаріїв, Red -> Green -> Refactor, вибір тестів, винятки й команди перевірки.
+- [Правила delivery](delivery-rules.md) — поведінковий SDD, traceability, обсяг і definition of done.
 
-Feature specifications link to these rules rather than duplicating them.
+Специфікації фіч посилаються на ці правила замість дублювання. Якщо правило змінено, перевір пов'язані [архітектурні рішення](../architecture/decisions/README.md) та прийняті специфікації.

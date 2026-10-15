@@ -1,16 +1,16 @@
-# Phase 01 — Domain
+# Етап 01 — Domain
 
-**Status:** completed and verified
+**Статус:** завершено й перевірено
 
-- [x] T005 Modify `ProductCategory` in `src/Catalog/Catalog.Domain/Entities/ProductCategory.cs` to own localized short names, sort order, and level without changing existing identity, name, slug, parent, or path semantics. **Dependencies:** T002.
-- [x] T006 Add explicit domain errors and enforce short-label, sort-order, and non-negative-level invariants in `src/Catalog/Catalog.Domain/Errors/` and the aggregate API. **Dependencies:** T005.
-- [x] T007 [P] Add focused aggregate tests under `tests/UnitTests/` following the existing category test convention. **Dependencies:** T005, T006.
-- [x] T008 Run the targeted category domain tests and record the command/result here. **Dependencies:** T007.
+- [x] T005 Змінити `ProductCategory` у `src/Catalog/Catalog.Domain/Entities/ProductCategory.cs`, щоб він володів локалізованими короткими назвами, порядком сортування та рівнем без зміни семантики наявних ідентичності, назви, slug, батьківської категорії чи шляху. **Залежності:** T002.
+- [x] T006 Додати явні domain-помилки й забезпечити інваріанти коротких назв, порядку сортування та невід'ємного рівня у `src/Catalog/Catalog.Domain/Errors/` й API агрегата. **Залежності:** T005.
+- [x] T007 [P] Додати цільові тести агрегата в `tests/UnitTests/` за наявною домовленістю тестування категорій. **Залежності:** T005, T006.
+- [x] T008 Запустити цільові domain-тести категорій і записати тут команду та результат. **Залежності:** T007.
 
-## T008 verification (2026-07-29)
+## Перевірка T008 (2026-07-29)
 
-- `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~ProductCategoryPresentationMetadataTests` — passed: 8/8.
+- `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~ProductCategoryPresentationMetadataTests` — успішно: 8/8.
 
-## Checkpoint
+## Контрольна точка
 
-Domain has no Infrastructure dependency, original 1C name cannot be replaced by a display label, and aggregate invariants are covered by tests.
+Domain не залежить від Infrastructure, оригінальну назву 1C не можна замінити назвою для відображення, а інваріанти агрегата покрито тестами.

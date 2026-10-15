@@ -1,9 +1,9 @@
-# Customer read API — checklist: delivery readiness
+# API читання клієнтів — контрольний список: готовність виконання
 
-- [x] Every in-scope scenario is verified in `traceability.md`.
-- [x] Query projections and application results are covered by focused tests.
-- [x] Soft-delete and personal-data response boundaries are verified.
-- [x] API conforms to the approved OpenAPI contract, including access and errors.
-- [x] No read operation invokes 1C or mutates Sales persistence.
-- [x] Targeted and regression test commands have passed and are recorded.
-- [x] Documentation, aggregate OpenAPI references, implementation, and tests agree.
+- [x] Кожен сценарій у межах фічі перевірено й позначено в `traceability.md`.
+- [x] Проєкції запитів і результати Application охоплено цільовими тестами.
+- [x] Перевірено межі відповіді щодо логічного видалення й персональних даних.
+- [x] API відповідає погодженому контракту OpenAPI, зокрема щодо доступу й помилок.
+- [x] Жодна операція читання не викликає 1C і не змінює сховище Sales.
+- [x] Цільові й регресійні тестові команди виконано успішно, а результати зафіксовано.
+- [x] Документація, посилання у зведеному OpenAPI, реалізація й тести узгоджені.

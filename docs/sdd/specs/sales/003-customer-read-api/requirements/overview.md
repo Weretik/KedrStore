@@ -1,39 +1,39 @@
-# Customer read API — overview and boundaries
+# API читання клієнтів — огляд і межі
 
-## Goal
+## Мета
 
-As a customer-read API consumer, I want to browse customers and open one customer’s details so that I can identify the counterparty used for sales work.
+Як споживач API читання клієнтів, я хочу переглядати клієнтів і відкривати деталі окремого клієнта, щоб визначити контрагента для роботи з продажами.
 
-## In scope
+## У межах фічі
 
-- Retrieve a list of current Sales customers.
-- Retrieve one current Sales customer by its `Counterparty.Id`.
-- Read existing counterparty profile data and its existing category price-type rules in customer detail.
-- Exclude soft-deleted counterparties from normal read results unless an agreed administrative history requirement states otherwise.
+- Отримання списку поточних клієнтів Sales.
+- Отримання поточного клієнта Sales за його `Counterparty.Id`.
+- Читання наявних даних профілю контрагента та його правил типів цін для категорій у деталях клієнта.
+- Виключення логічно видалених контрагентів зі звичайних результатів читання, якщо окремо не погоджено вимогу до адміністративної історії.
 
-## Out of scope
+## Поза межами фічі
 
-- Creating, editing, deleting, restoring, or synchronizing customers.
-- Changing Identity users, roles, sessions, or customer authentication.
-- Calculating catalog prices or modifying counterparty category price-type rules.
-- Returning order history; manager-order reading is specified separately in feature 002.
-- New domain entities, identifiers, migrations, or database schema changes unless an agreed performance requirement proves they are necessary.
+- Створення, редагування, видалення, відновлення чи синхронізація клієнтів.
+- Зміна користувачів Identity, ролей, сеансів або автентифікації клієнтів.
+- Обчислення цін каталогу чи зміна правил типів цін контрагента для категорій.
+- Повернення історії замовлень; читання замовлень для менеджера окремо визначено у фічі 002.
+- Нові доменні сутності, ідентифікатори, міграції чи зміни схеми бази даних, якщо їхню необхідність не доведе погоджена вимога до швидкодії.
 
-## Actors and external systems
+## Учасники та зовнішні системи
 
-- Administration frontend: consumes the customer read API without authentication during the current rollout stage.
-- Anonymous API caller: can read the approved customer projections.
-- Sales database: authoritative local projection for counterparties and their category price-type rules.
-- 1C: is not called by these read operations.
-- Identity: owns the referenced identity user; this feature must not disclose identity data unless explicitly agreed.
+- Адміністративний інтерфейс: споживає API читання клієнтів без автентифікації на поточному етапі розгортання.
+- Анонімний викликач API: може читати погоджені проєкції клієнтів.
+- База даних Sales: авторитетна локальна проєкція контрагентів і їхніх правил типів цін для категорій.
+- 1C: ці операції читання її не викликають.
+- Identity: володіє користувачем, на якого є посилання; ця фіча не повинна розкривати дані Identity без окремого погодження.
 
-## Agreed decisions
+## Погоджені рішення
 
-- Both customer-read routes allow anonymous access during the current rollout stage; no row-level assignment filter applies.
-- Routes are `GET /api/admin/customers` and `GET /api/admin/customers/{counterpartyId}`, using the existing Sales/1C string identifier.
-- The compact list contains `counterpartyId`, `name`, and `phone`. Detail adds email, default price type, and ordered category price-type rules.
-- `IdentityUserId`, soft-delete/audit fields, order IDs, counts, and details are never returned by this feature.
-- Paging defaults to page `1` and page size `20`, with maximum page size `100`; ordering is by name, then counterparty ID.
-- Soft-deleted counterparties are excluded from list and detail; detail returns not found.
-- A customer page loads detail and `GET /api/admin/orders?counterpartyId=...` independently, and may issue both requests in parallel.
-- Search and additional filters are outside this feature.
+- Обидва маршрути читання клієнтів дозволяють анонімний доступ на поточному етапі розгортання; фільтр призначення на рівні рядків не застосовується.
+- Маршрути: `GET /api/admin/customers` і `GET /api/admin/customers/{counterpartyId}`; вони використовують наявний рядковий ідентифікатор Sales/1C.
+- Стислий список містить `counterpartyId`, `name` і `phone`. Деталі додатково містять електронну пошту, типовий тип ціни та впорядковані правила типів цін для категорій.
+- Ця фіча ніколи не повертає `IdentityUserId`, поля логічного видалення й аудиту, ID замовлень, їх кількість чи деталі.
+- Типові значення: сторінка `1`, розмір сторінки `20`; максимальний розмір — `100`. Порядок — за іменем, потім за ID контрагента.
+- Логічно видалені контрагенти не потрапляють у список і деталі; запит деталей повертає результат «не знайдено».
+- Сторінка клієнта завантажує деталі й `GET /api/admin/orders?counterpartyId=...` незалежно; обидва запити можна виконувати паралельно.
+- Пошук і додаткові фільтри не входять до цієї фічі.

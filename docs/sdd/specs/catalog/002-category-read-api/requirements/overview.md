@@ -1,27 +1,27 @@
-# Category read API — overview and scope
+# API читання категорій — огляд та обсяг
 
-## Goal
+## Мета
 
-As a storefront or administration frontend, I want to read the current category hierarchy through a contract appropriate to my access level, so that I can render public navigation and administer catalog data without duplicating category constants.
+Як frontend вітрини або адміністрування, я хочу читати поточну ієрархію категорій за контрактом, що відповідає моєму рівню доступу, щоб відображати публічну навігацію й адмініструвати дані каталогу без дублювання констант категорій.
 
-## In scope
+## У межах обсягу
 
-- Anonymous `GET /api/catalog/{lang}/categories` returning every public root and its recursive children.
-- Anonymous `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` returning the requested category, its recursive descendants, and its root-to-category breadcrumbs.
-- Temporarily anonymous `GET /api/categories` and `GET /api/categories/{id}` for the internal administration UI, returning an unlocalized flat read model with both display names and source metadata.
-- A frontend DTO containing `id`, `slug`, localized `name`, nullable `parentId`, `sortOrder`, `level`, and `children`; the single-category DTO also contains `breadcrumbs`.
-- Deterministic sibling ordering by `sortOrder`, then numeric `id`; `lang` selects the localized short display name.
-- Versioned OpenAPI contract, aggregate-contract reference, controller/handler tests, and frontend integration-guide update.
+- Анонімний `GET /api/catalog/{lang}/categories`, що повертає всі публічні кореневі категорії та їхніх рекурсивних нащадків.
+- Анонімний `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}`, що повертає запитану категорію, її рекурсивних нащадків і breadcrumbs від кореня до категорії.
+- Тимчасово анонімні `GET /api/categories` і `GET /api/categories/{id}` для внутрішнього UI адміністрування, що повертають нелокалізовану пласку модель читання з обома назвами відображення та метаданими джерела.
+- DTO frontend із `id`, `slug`, локалізованим `name`, nullable `parentId`, `sortOrder`, `level` і `children`; DTO окремої категорії також містить `breadcrumbs`.
+- Детермінований порядок сусідів за `sortOrder`, потім за числовим `id`; `lang` вибирає локалізовану коротку назву для відображення.
+- Версійований контракт OpenAPI, посилання зі зведеного контракту, тести контролерів/обробників і оновлення посібника інтеграції frontend.
 
-## Out of scope
+## Поза межами обсягу
 
-- Category create, update, delete, reordering, or import changes.
-- Product filtering, product-count aggregation, images, descriptions, SEO metadata, or category-specific promotions.
-- Pagination or lazy-loading of the navigation tree; the existing catalog hierarchy is delivered as one finite tree.
-- Frontend implementation or removal of its existing constants before consumer cutover.
+- Створення, оновлення, видалення, зміна порядку чи імпорту категорій.
+- Фільтрація продуктів, агрегація кількості продуктів, зображення, описи, SEO-метадані чи акції для окремих категорій.
+- Пагінація або відкладене завантаження дерева навігації; наявна ієрархія каталогу надається як одне скінченне дерево.
+- Реалізація frontend або видалення наявних у ньому констант до переходу споживачів.
 
-## Open questions
+## Відкриті питання
 
-- None. Public and admin routes, access policies, DTOs, ordering, and error semantics are agreed in [the API contract](../contracts/api-contract.md).
+- Немає. Публічні й адміністративні маршрути, політики доступу, DTO, порядок і семантику помилок узгоджено в [контракті API](../contracts/api-contract.md).
 
-Do not describe EF, handlers, controllers, migrations, or file structure here.
+Не описуйте тут EF, обробники, контролери, міграції чи структуру файлів.

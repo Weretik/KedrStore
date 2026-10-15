@@ -1,24 +1,24 @@
-# Category presentation metadata — category presentation
+# Метадані представлення категорій — відображення категорій
 
-## Behavior
+## Поведінка
 
-- On category import, the system stores the 1C-provided full category name in `Name` without substituting a presentation label.
-- For every configured category, the system applies approved `ShortNameUk`, `ShortNameRu`, `SortOrder`, and `Level` deterministically.
-- Root categories have level `0`; each descendant level is one greater than its parent.
-- A category tree requested by the Catalog Application consumer is ordered by `SortOrder` and then by numeric category ID.
-- Existing category IDs, slugs, paths, parent links, and current response fields remain compatible.
+- Під час імпорту категорій система зберігає повну назву категорії, отриману з 1C, у `Name` без підміни назвою для відображення.
+- Для кожної налаштованої категорії система детерміновано застосовує затверджені `ShortNameUk`, `ShortNameRu`, `SortOrder` і `Level`.
+- Кореневі категорії мають рівень `0`; рівень кожного нащадка на одиницю більший за рівень його батьківської категорії.
+- Дерево категорій, яке запитує споживач Catalog Application, впорядковується за `SortOrder`, а потім за числовим ID категорії.
+- Наявні ID категорій, slug, шляхи, зв'язки з батьківськими категоріями та поточні поля відповіді залишаються сумісними.
 
-## Rules and invariants
+## Правила та інваріанти
 
-- `Name`, `ShortNameUk`, and `ShortNameRu` represent different concepts; an import must not overwrite `Name` with either short label.
-- `Level` is non-negative and agrees with the final parent/path hierarchy after import.
-- Metadata matching uses the existing `(ProductTypeIdOneC, CategoryId)` pair, never localized display text alone.
-- The configuration is the source of configured labels and order; the two snapshots are frozen migration inputs only.
-- `ShortNameUk` and `ShortNameRu` are required, trimmed, non-blank, and at most 100 characters.
-- `SortOrder` is non-negative and unique among siblings. Snapshot order is zero-based; an unconfigured category uses `Int32.MaxValue` and both of its short labels fall back to its original `Name`.
+- `Name`, `ShortNameUk` і `ShortNameRu` представляють різні поняття; імпорт не має перезаписувати `Name` жодною з коротких назв.
+- `Level` є невід'ємним і відповідає остаточній ієрархії батьківських категорій/шляхів після імпорту.
+- Метадані зіставляються за наявною парою `(ProductTypeIdOneC, CategoryId)`, а не лише за локалізованим текстом відображення.
+- Конфігурація є джерелом налаштованих назв і порядку; два знімки — лише зафіксовані вхідні дані міграції.
+- `ShortNameUk` і `ShortNameRu` є обов'язковими, обрізаними від пробілів, непорожніми й мають не більше ніж 100 символів.
+- `SortOrder` є невід'ємним та унікальним серед дочірніх категорій одного батька. Порядок у знімку починається з нуля; неналаштована категорія використовує `Int32.MaxValue`, а обидві її короткі назви беруться з оригінального `Name`.
 
-## Acceptance scenarios
+## Сценарії прийняття
 
-1. Given a configured 1C category, when the category job imports it, then the stored `Name` equals the original 1C value and its two configured short labels, order, and level are stored independently.
-2. Given the doors or hardware root and its direct presentation groups, when the tree is imported, then the root has level `0` and each direct group has level `1`.
-3. Given an unconfigured 1C category, when it is imported, then the approved fallback labels and order are applied without changing its stable ID, slug, path, or parent.
+1. Якщо задача імпортує налаштовану категорію 1C, збережене `Name` дорівнює оригінальному значенню 1C, а дві налаштовані короткі назви, порядок і рівень зберігаються окремо.
+2. Якщо імпортується дерево кореня дверей або фурнітури з його безпосередніми групами представлення, корінь має рівень `0`, а кожна безпосередня група — рівень `1`.
+3. Якщо імпортується неналаштована категорія 1C, затверджені fallback-назви й порядок застосовуються без зміни її стабільного ID, slug, шляху чи батьківської категорії.

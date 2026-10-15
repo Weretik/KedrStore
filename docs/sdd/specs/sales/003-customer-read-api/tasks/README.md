@@ -1,17 +1,17 @@
-# Customer read API — task graph
+# API читання клієнтів — граф завдань
 
-Scenario definitions are in [customer-reading requirements](../requirements/customer-reading.md). The complete dependency graph has been delivered through TS-006.
+Визначення сценаріїв наведено у [вимогах до читання даних клієнтів](../requirements/customer-reading.md). Увесь граф залежностей виконано до TS-006 включно.
 
-## Phase orchestrators
+## Координація фаз
 
-1. [Phase 00 — Readiness](00-readiness.md)
-2. [Phase 01 — Domain](01-domain.md)
-3. [Phase 02 — Infrastructure](02-infrastructure.md)
-4. [Phase 03 — Application](03-application.md)
-5. [Phase 04 — API](04-api.md)
-6. [Phase 05 — Verification](05-verification.md)
+1. [Фаза 00 — Готовність](00-readiness.md)
+2. [Фаза 01 — Домен](01-domain.md)
+3. [Фаза 02 — Інфраструктура](02-infrastructure.md)
+4. [Фаза 03 — Application](03-application.md)
+5. [Фаза 04 — API](04-api.md)
+6. [Фаза 05 — Перевірка](05-verification.md)
 
-Phase numbers organize task ownership. Actual execution follows `Depends on` in this order:
+Номери фаз визначають відповідальність за завдання. Фактичний порядок виконання відповідає полю «Залежить від»:
 
 ```text
 EN-001
@@ -20,27 +20,27 @@ EN-001
 └── EN-003 ─────────────────────┴→ TS-004 → TS-005 → TS-006
 ```
 
-After EN-001, EN-002 and EN-003 may run in parallel. After TS-001, TS-002 and TS-003 may run in parallel. TS-004 starts only when both application queries and the OpenAPI contract are complete.
+Після EN-001 можна паралельно виконувати EN-002 та EN-003. Після TS-001 можна паралельно виконувати TS-002 та TS-003. TS-004 починається лише після завершення обох запитів Application і контракту OpenAPI.
 
-Within every behavior-implementing `TS-*`, execute work in this mandatory order:
+У кожному завданні `TS-*`, що реалізує поведінку, роботу потрібно виконувати в такому обов'язковому порядку:
 
 ```text
-write focused test → run and confirm expected Red → implement minimum behavior
-→ run and confirm Green → refactor → run regression → record evidence
+написати цільовий тест → запустити й підтвердити очікуваний Red → реалізувати мінімальну поведінку
+→ запустити й підтвердити Green → виконати рефакторинг → запустити регресію → зафіксувати свідчення
 ```
 
-## Selected tasks
+## Вибрані завдання
 
-| ID | Responsibility | Scenarios | Depends on | File |
+| ID | Відповідальність | Сценарії | Залежить від | Файл |
 | --- | --- | --- | --- | --- |
-| EN-001 | Resolve product, privacy, and API decisions | SC-001–SC-004 | — | [task](readiness/EN-001-contract-decisions.md) |
-| EN-002 | Define Application query contracts | SC-001–SC-003 | EN-001 | [task](application/EN-002-query-contracts.md) |
-| TS-001 | Implement the no-tracking customer read model | SC-001–SC-003 | EN-002 | [task](infrastructure/TS-001-customer-read-model.md) |
-| TS-002 | Implement active-customer list query | SC-001 | TS-001 | [task](application/TS-002-get-customer-list.md) |
-| TS-003 | Implement customer-detail query | SC-002, SC-003 | TS-001 | [task](application/TS-003-get-customer-by-id.md) |
-| EN-003 | Publish and validate the OpenAPI contract | SC-001–SC-004 | EN-001 | [task](api/EN-003-openapi-contract.md) |
-| TS-004 | Add endpoints and agreed HTTP behavior | SC-001–SC-004 | TS-002, TS-003, EN-003 | [task](api/TS-004-customer-read-endpoints.md) |
-| TS-005 | Verify API behavior and OpenAPI conformance | SC-001–SC-004 | TS-004 | [task](api/TS-005-customer-read-api-tests.md) |
-| TS-006 | Run regression and close delivery evidence | SC-001–SC-004 | TS-005 | [task](verification/TS-006-verification.md) |
+| EN-001 | Ухвалити продуктові рішення, рішення щодо приватності й API | SC-001–SC-004 | — | [завдання](readiness/EN-001-contract-decisions.md) |
+| EN-002 | Визначити контракти запитів Application | SC-001–SC-003 | EN-001 | [завдання](application/EN-002-query-contracts.md) |
+| TS-001 | Реалізувати модель читання клієнтів без відстеження змін | SC-001–SC-003 | EN-002 | [завдання](infrastructure/TS-001-customer-read-model.md) |
+| TS-002 | Реалізувати запит списку активних клієнтів | SC-001 | TS-001 | [завдання](application/TS-002-get-customer-list.md) |
+| TS-003 | Реалізувати запит деталей клієнта | SC-002, SC-003 | TS-001 | [завдання](application/TS-003-get-customer-by-id.md) |
+| EN-003 | Опублікувати й перевірити контракт OpenAPI | SC-001–SC-004 | EN-001 | [завдання](api/EN-003-openapi-contract.md) |
+| TS-004 | Додати маршрути й погоджену HTTP-поведінку | SC-001–SC-004 | TS-002, TS-003, EN-003 | [завдання](api/TS-004-customer-read-endpoints.md) |
+| TS-005 | Перевірити поведінку API та відповідність OpenAPI | SC-001–SC-004 | TS-004 | [завдання](api/TS-005-customer-read-api-tests.md) |
+| TS-006 | Запустити регресію й завершити збір свідчень | SC-001–SC-004 | TS-005 | [завдання](verification/TS-006-verification.md) |
 
-Implementation followed dependencies scenario by scenario. Every behavior task records Red, Green, refactor, and regression results according to the repository testing standard. All selected tasks are complete.
+Реалізацію виконано за залежностями, сценарій за сценарієм. Кожне завдання з реалізації поведінки фіксує результати Red, Green, рефакторингу й регресії відповідно до стандарту тестування репозиторію. Усі вибрані завдання завершено.

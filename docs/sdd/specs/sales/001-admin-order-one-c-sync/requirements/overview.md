@@ -1,29 +1,29 @@
-# Admin order and 1C synchronization — overview and boundaries
+# Замовлення адміністратора та синхронізація з 1C — огляд і межі
 
-## Goal
+## Мета
 
-As a sales manager, I want to create an order for a selected existing counterparty so that it is retained in Sales and reliably sent to 1C without creating duplicate 1C documents.
+Як менеджер із продажів, я хочу створити замовлення для вибраного наявного контрагента, щоб воно зберігалося в Sales і надійно передавалося до 1C без створення дублікатів документів у 1C.
 
-## Within
+## У межах фічі
 
-- A new manager/admin order flow in the Sales module.
-- Selection of a locally known, active Sales `Counterparty` by its 1C identifier supplied by the frontend.
-- Local persistence of the order, its lines, and a pending 1C delivery record in one transaction.
-- Asynchronous delivery through the existing SOAP `CreateSiteRequest` operation, retry scheduling, delivery states, observability, and time-window rules from `SALES_1C_SYNC_INSTRUCTION.txt`.
-- A temporarily anonymous HTTP endpoint and its versioned OpenAPI contract; Manager/Admin authorization is a required production follow-up.
+- Новий сценарій замовлення менеджера/адміністратора в модулі Sales.
+- Вибір відомого локальній системі активного контрагента Sales `Counterparty` за його ідентифікатором у 1C, переданим frontend.
+- Локальне збереження замовлення, його рядків і запису очікування передавання до 1C в одній транзакції.
+- Асинхронне передавання через наявну SOAP-операцію `CreateSiteRequest`, планування повторних спроб, стани передавання, спостережуваність і правила часових вікон із `SALES_1C_SYNC_INSTRUCTION.txt`.
+- Тимчасово анонімний HTTP endpoint і його версійний контракт OpenAPI; авторизація Manager/Admin обов'язкова перед використанням у продукційному середовищі.
 
-## Out of bounds
+## Поза межами фічі
 
-- The anonymous Catalog `POST /api/orders` quick-order flow, including its Excel export and Telegram notification.
-- Creating or importing counterparties during manager order creation.
-- Editing, cancelling, viewing, or manually resending manager orders; these are future use cases unless added by a change note. T135 adds only a single-order delivery-status API so the frontend can show 1C acceptance and document number. A broader order list/details UI remains separate work.
-- Changes to the generated SOAP proxy or to the 1C WSDL.
-- Frontend implementation and Cloud Scheduler/Cloud Run deployment configuration. The job must be schedulable by the existing host, but infrastructure-as-code is not part of this feature.
+- Анонімний сценарій швидкого замовлення Catalog `POST /api/orders`, зокрема експорт до Excel і сповіщення через Telegram.
+- Створення або імпорт контрагентів під час створення замовлення менеджером.
+- Редагування, скасування, перегляд або ручне повторне надсилання замовлень менеджера; це майбутні сценарії, якщо їх не додано приміткою про зміну. T135 додає лише API статусу передавання одного замовлення, щоб frontend міг показати прийняття в 1C і номер документа. Ширший інтерфейс списку й деталей замовлень залишається окремою роботою.
+- Зміни згенерованого SOAP-проксі або WSDL 1C.
+- Реалізація frontend і конфігурація розгортання Cloud Scheduler/Cloud Run. Наявний host має підтримувати запуск завдання за розкладом, але інфраструктура як код не входить до цієї фічі.
 
-## Agreed baseline decisions
+## Узгоджені базові рішення
 
-- `Item.Amount` receives the total amount for the complete order line. For a quantity of 10, `Amount` is the amount for all 10 units, not the price of one unit.
-- The endpoint is `POST /api/admin/orders` and is temporarily anonymous. Manager/Admin authorization is a required follow-up before production use.
-- `Idempotency-Key` is required on create requests. The frontend creates an opaque UUID for one button action and reuses it only if that same action is retried. Sales keeps a separate idempotency record with a canonical request hash and original result: the same key/hash returns the original order result; the same key with another hash returns `409 Conflict`.
-- A non-empty `RequestDataOut.DocId` means `Accepted`. An empty `DocId` returned without a SOAP or transport failure means `BusinessError`; its `Comment` is stored only in sanitized and bounded form.
-- Runtime defaults are: `MaxAttempts = 10`, batch size `20`, inter-request delay `5 seconds`, sending window `07:00–20:00 Europe/Kyiv`, and retry schedule `5m → 15m → 30m → 60m → 3h`. Cloud Scheduler cadence is configured manually by the operator after deployment.
+- `Item.Amount` отримує загальну суму всього рядка замовлення. Якщо кількість дорівнює 10, `Amount` — це сума за всі 10 одиниць, а не ціна однієї одиниці.
+- Endpoint — `POST /api/admin/orders`, тимчасово анонімний. Перед використанням у продукційному середовищі потрібна авторизація Manager/Admin.
+- Для запитів створення обов'язковий `Idempotency-Key`. Frontend створює непрозорий UUID для однієї дії натискання кнопки й повторно використовує його лише для повторної спроби тієї самої дії. Sales зберігає окремий запис ідемпотентності з канонічним хешем запиту й початковим результатом: той самий ключ і хеш повертають початковий результат замовлення; той самий ключ з іншим хешем повертає `409 Conflict`.
+- Непорожній `RequestDataOut.DocId` означає `Accepted`. Порожній `DocId`, повернутий без помилки SOAP або транспорту, означає `BusinessError`; його `Comment` зберігається лише після очищення та з обмеженням довжини.
+- Типові значення під час виконання: `MaxAttempts = 10`, розмір пакета `20`, затримка між запитами `5 seconds`, вікно надсилання `07:00–20:00 Europe/Kyiv` і графік повторів `5m → 15m → 30m → 60m → 3h`. Після розгортання оператор вручну налаштовує періодичність Cloud Scheduler.

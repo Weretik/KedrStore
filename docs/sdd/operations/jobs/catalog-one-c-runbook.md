@@ -1,19 +1,19 @@
-# Catalog OneC runbook
+# Операційна інструкція з інтеграції Catalog із 1C
 
-For a normal refresh run one `full` job; it uses the safe import order and rebuilds projections last.
+Для звичайного оновлення виконай один job `full`: він використовує безпечний порядок імпорту й наприкінці перебудовує проєкції.
 
 ```powershell
-Set-Location C:\Users\Віталій\RiderProjects\KedrStore\src\Bootstrapper\Host.Jobs\Host.Jobs
+# Виконувати з кореня репозиторію
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project .\Host.Jobs.csproj -- --job=full
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=full
 ```
 
-| Situation | Job | Follow-up |
+| Ситуація | Job | Наступна дія |
 | --- | --- | --- |
-| changed hierarchy | `category --rootId=<id>` | product details if needed, then rebuild projection |
-| details/visibility changed | `productdetails --rootId=<id>` | rebuild is automatic |
-| stock changed | `stocks --rootId=<id>` | rebuild is automatic |
-| prices changed | `prices --rootId=<id>` | rebuild is automatic |
-| projection stale after DB repair | `rebuild-projections` | verify lists |
+| Змінилася ієрархія | `category --rootId=<id>` | За потреби онови деталі товарів, потім перебудуй проєкцію |
+| Змінилися деталі/видимість | `productdetails --rootId=<id>` | Проєкція перебудовується автоматично |
+| Змінилися залишки | `stocks --rootId=<id>` | Проєкція перебудовується автоматично |
+| Змінилися ціни | `prices --rootId=<id>` | Проєкція перебудовується автоматично |
+| Проєкція застаріла після ремонту БД | `rebuild-projections` | Перевір списки |
 
-After a run: check final success line and received/mapped/synced counts. Verify a known `exportToSite:false` product exists in `/api/admin/products/all` and is absent from the public product list after projection rebuild. Do not overlap targeted jobs with `full` for the same root.
+Після виконання перевір фінальний рядок успіху й лічильники received/mapped/synced. Після перебудови проєкції переконайся, що відомий товар з `exportToSite:false` є в `/api/admin/products/all` і відсутній у публічному списку. Не запускай цільові jobs паралельно з `full` для того самого root.

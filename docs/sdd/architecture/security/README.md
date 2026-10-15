@@ -1,34 +1,34 @@
-# Identity, authentication and authorization
+# Identity, автентифікація й авторизація
 
-This is the architecture area for user identity, authentication, authorization and access-control planning. It is deliberately outside `platform`: platform describes technologies; this section describes how the application uses them.
+Це архітектурний розділ для облікових записів, автентифікації, авторизації та планування контролю доступу. Він розміщений окремо від `platform`: платформа описує технології, а тут описано їх використання застосунком.
 
 ```text
 security/
-├── authentication/  login, bearer tokens, refresh, logout and CSRF
-├── authorization/   fallback protection, roles and named policies
-├── users/           bootstrap users, import provisioning and registration design
-└── planning/        SDD checklist for a feature with access control
+├── authentication/  login, bearer tokens, refresh, logout і CSRF
+├── authorization/   fallback-захист, ролі й названі policies
+├── users/           початкові користувачі, імпорт і дизайн реєстрації
+└── planning/        SDD-чеклист фічі з контролем доступу
 ```
 
-## Read by task
+## Навігація за завданням
 
-- A session, token or refresh issue: [authentication](authentication/README.md)
-- Protecting an endpoint, adding a policy or role: [authorization](authorization/README.md)
-- Creating users, registration or invitation: [users](users/README.md)
-- Planning a feature with permissions: [planning checklist](planning/access-control-checklist.md)
+- Проблема сесії, токена чи refresh: [автентифікація](authentication/README.md)
+- Захист кінцевої точки, додавання правила авторизації чи ролі: [авторизація](authorization/README.md)
+- Створення користувача, реєстрація чи запрошення: [користувачі](users/README.md)
+- Планування фічі з дозволами: [чеклист](planning/access-control-checklist.md)
 
-## Ownership
+## Відповідальність
 
 ```text
-Identity.Api             HTTP session and future identity endpoints
+Identity.Api             HTTP-сесія та майбутні endpoints Identity
         |
-Identity.Application     commands/queries, validators and service contracts
+Identity.Application     commands/queries, validators і контракти сервісів
         |
-Identity.Infrastructure  ASP.NET Core Identity, tokens, sessions, AppIdentityDbContext
+Identity.Infrastructure  ASP.NET Core Identity, токени, сесії, AppIdentityDbContext
         |
-Identity.Domain          role names
+Identity.Domain          назви ролей
 
-Host.Api                 authentication middleware and authorization policies
+Host.Api                 authentication middleware та authorization policies
 ```
 
-Identity owns accounts and credentials. A business module may protect its endpoint with a policy, but it must not create users, validate passwords or access `UserManager<AppUser>` directly.
+Identity відповідає за облікові записи й облікові дані. Бізнес-модуль може захищати свою кінцеву точку через правило авторизації, але не створює користувачів, не перевіряє паролі й не звертається безпосередньо до `UserManager<AppUser>`.

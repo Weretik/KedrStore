@@ -1,18 +1,18 @@
-# Category presentation metadata — design: Domain
+# Метадані представлення категорій — дизайн Domain
 
-## Responsibility
+## Відповідальність
 
-`ProductCategory` remains the aggregate that owns category identity, original 1C name, slug, parent relation, and `CategoryPath`. It will also own short localized names, sort order, and level. Its factory/update API must make the distinction between source name and presentation metadata explicit and enforce required/length constraints plus `Level >= 0`.
+`ProductCategory` залишається агрегатом, що володіє ідентичністю категорії, оригінальною назвою 1C, slug, зв'язком із батьківською категорією та `CategoryPath`. Він також володітиме короткими локалізованими назвами, порядком сортування й рівнем. Його API створення/оновлення має явно розділяти вихідну назву й метадані представлення та забезпечувати обов'язковість, обмеження довжини й `Level >= 0`.
 
-`Path` and `ParentId` remain the structural source of truth. The application import flow computes the level only after the final hierarchy, including configured manual groups, is known; the aggregate rejects an invalid level but does not need to know the complete imported tree.
+`Path` і `ParentId` залишаються структурним джерелом істини. Application-потік імпорту обчислює рівень лише після визначення остаточної ієрархії, зокрема налаштованих ручних груп; агрегат відхиляє недопустимий рівень, але не мусить знати повне імпортоване дерево.
 
-## Cross-module interaction
+## Взаємодія між модулями
 
-The 1C import jobs in Catalog Application read typed configuration through an Application abstraction and update the aggregate. Infrastructure provides persistence and options binding. No domain dependency on EF Core, configuration, generated SOAP types, or API DTOs is introduced.
+Задачі імпорту 1C у Catalog Application читають типізовану конфігурацію через абстракцію Application та оновлюють агрегат. Infrastructure забезпечує збереження й прив'язування options. Залежності Domain від EF Core, конфігурації, згенерованих SOAP-типів чи API DTO не додаються.
 
-The existing `GetCategoriesQuery` remains a query. If metadata is exposed, it uses a no-tracking projection and returns additive fields; it performs no import or write operation.
+Наявний `GetCategoriesQuery` залишається запитом. Якщо метадані надаються споживачам, він використовує проєкцію без відстеження та повертає додаткові поля; імпорту або запису не виконує.
 
-## Risks
+## Ризики
 
-- Imported historical paths or manually configured groups can be malformed or cyclic; level calculation must fail safely or use the agreed documented fallback rather than persist inconsistent metadata.
-- Existing `ProductCategory.Update` is used by import. Its signature change must keep all current callers correct and prevent a missing configuration entry from erasing previously approved metadata unintentionally.
+- Імпортовані історичні шляхи або налаштовані вручну групи можуть бути некоректними чи циклічними; обчислення рівня має безпечно завершуватися помилкою або використовувати погоджений задокументований fallback, а не зберігати неузгоджені метадані.
+- Імпорт використовує наявний `ProductCategory.Update`. Зміна його сигнатури має зберегти правильну роботу всіх поточних викликів і не допустити випадкового стирання раніше затверджених метаданих через відсутній конфігураційний запис.

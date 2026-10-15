@@ -1,30 +1,30 @@
-# EN-003 — Publish manager-order read OpenAPI contract
+# EN-003 — опублікувати OpenAPI-контракт читання замовлень менеджера
 
-- **Task ID:** EN-003
-- **Enables:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** EN-001
-- **Exact paths:** `docs/sdd/specs/sales/002-manager-order-read-api/contracts/api-contract.md`, `docs/sdd/contracts/sales/manager-order-read.openapi.yaml`, `docs/sdd/contracts/openapi.yaml`
-- **Test level:** API contract
+- **ID задачі:** EN-003
+- **Підтримує:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** EN-001
+- **Точні шляхи:** `docs/sdd/specs/sales/002-manager-order-read-api/contracts/api-contract.md`, `docs/sdd/contracts/sales/manager-order-read.openapi.yaml`, `docs/sdd/contracts/openapi.yaml`
+- **Рівень тесту:** контракт API
 
-## Why this is an enabler
+## Чому це підготовча задача
 
-The versioned contract fixes the HTTP boundary before controllers and supplies the source for frontend generation and conformance tests.
+Версіонований контракт визначає HTTP-межу до створення контролерів і є джерелом для генерації frontend та тестів відповідності.
 
-## Work
+## Робота
 
-- [x] Mark the human contract agreed with final routes, methods, operation IDs, parameters, schemas, examples, security, and errors.
-- [x] Create `manager-order-read.openapi.yaml` for every agreed operation.
-- [x] Add one aggregate `$ref` per operation without duplicating schemas.
-- [x] Describe paging/filter bounds, empty collections, IDs, decimals, timestamps, nullable values, and every response.
-- [x] Add focused static contract assertions in `AdminOrderApiTests` or a dedicated contract test.
+- [x] Позначити людський контракт погодженим із фінальними маршрутами, методами, ID операцій, параметрами, схемами, прикладами, безпекою та помилками.
+- [x] Створити `manager-order-read.openapi.yaml` для кожної погодженої операції.
+- [x] Додати по одному агрегованому `$ref` на операцію без дублювання схем.
+- [x] Описати межі пагінації й фільтра, порожні колекції, ID, десяткові числа, часові позначки, nullable-значення та кожну відповідь.
+- [x] Додати цільові статичні перевірки контракту в `AdminOrderApiTests` або окремому контрактному тесті.
 
-## Test-first exception and replacement verification
+## Виняток із test-first та замінна перевірка
 
-- **Reason:** OpenAPI is the test oracle preceding transport behavior.
-- **Replacement check:** parse YAML and run static contract assertions.
-- **Result:** completed 2026-09-10; `ManagerOrderReadContractTests` passed and `npx --yes @redocly/cli lint docs/sdd/contracts/sales/manager-order-read.openapi.yaml` reported a valid API description with one non-blocking repository-style license warning.
-- **Aggregate lint note:** `npx --yes @redocly/cli lint docs/sdd/contracts/openapi.yaml` still reports pre-existing `security-defined` errors from `sales/admin-order-one-c-sync.openapi.yaml` and existing repository warnings. Focused aggregate `$ref` assertions and runtime route checks pass for this feature.
+- **Причина:** OpenAPI є еталоном тестів до появи transport-поведінки.
+- **Замінна перевірка:** розібрати YAML і виконати статичні перевірки контракту.
+- **Результат:** завершено 2026-09-10; `ManagerOrderReadContractTests` пройшли, а `npx --yes @redocly/cli lint docs/sdd/contracts/sales/manager-order-read.openapi.yaml` повідомила про валідний опис API з одним неблокувальним попередженням щодо ліцензії в стилі репозиторію.
+- **Примітка про lint агрегату:** `npx --yes @redocly/cli lint docs/sdd/contracts/openapi.yaml` досі повідомляє про раніше наявні помилки `security-defined` у `sales/admin-order-one-c-sync.openapi.yaml` і наявні попередження репозиторію. Цільові перевірки агрегованого `$ref` і runtime-маршрутів для цієї функціональності проходять.
 
-## Checkpoint
+## Контрольна точка
 
-Every agreed operation resolves from aggregate OpenAPI and fully describes SC-001–SC-005.
+Кожна погоджена операція визначається з агрегованого OpenAPI й повністю описує SC-001–SC-005.

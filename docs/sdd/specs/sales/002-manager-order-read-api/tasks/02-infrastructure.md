@@ -1,12 +1,12 @@
-# Phase 02 — Infrastructure
+# Фаза 02 — Infrastructure
 
-## Ordered tasks
+## Впорядковані задачі
 
-1. Wait for [EN-002 — Define manager-order query contracts](application/EN-002-query-contracts.md).
-2. Execute [TS-001 — Implement manager-order read model](infrastructure/TS-001-order-read-model.md), beginning with its PostgreSQL Red test before creating the read service.
+1. Дочекатися [EN-002 — визначити контракти запитів замовлень менеджера](application/EN-002-query-contracts.md).
+2. Виконати [TS-001 — реалізувати модель читання замовлень менеджера](infrastructure/TS-001-order-read-model.md), почавши з Red-тесту PostgreSQL до створення сервісу читання.
 
-## Checkpoint
+## Контрольна точка
 
-The no-tracking read service implements the agreed Application contract, scopes counterparty results exactly, excludes internal diagnostics, and has PostgreSQL integration evidence.
+Сервіс читання без відстеження змін реалізує погоджений контракт Application, точно обмежує результати за контрагентом, виключає внутрішню діагностику й має докази інтеграційної перевірки PostgreSQL.
 
-No migration task is planned. Add one only if the agreed performance target and query-plan evidence require a new index.
+Задачу міграції не заплановано. Додавайте її лише тоді, коли погоджений показник продуктивності й докази плану запиту вимагатимуть нового індексу.

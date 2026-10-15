@@ -1,39 +1,42 @@
-# Backend architecture
+# Архітектура backend
 
-KedrStore is a modular ASP.NET Core backend on .NET 10. It uses Clean Architecture, DDD, CQRS, Mediator, FluentValidation, Ardalis.Result, EF Core/PostgreSQL and Serilog.
+KedrStore — модульний backend на ASP.NET Core і .NET 10. Поточні підходи: Clean Architecture, DDD, CQRS, Mediator, FluentValidation, Ardalis.Result, EF Core/PostgreSQL і Serilog. Перелік прямих пакетів та їхніх оголошених версій є в [каталозі NuGet](platform/nuget-packages.md).
 
-## Choose by question
+## Навігація за питанням
 
-### I need the big picture
+### Загальна картина
 
-- [System map](overview/system-map.md) — hosts, modules and dependency direction.
-- [Project structure](overview/project-structure.md) — solution tree and layer visualisation.
-- [Layer boundaries](overview/layers.md) — ownership and forbidden dependencies.
-- [Module map](overview/modules.md) — Catalog, Sales, Identity and BuildingBlocks ownership.
-- [Product glossary](../../product/glossary.md) — stable catalog, door, hardware, and Cosmos terminology.
+- [Карта системи](overview/system-map.md) — hosts, модулі та напрям залежностей.
+- [Структура проєкту](overview/project-structure.md) — дерево solution і шари.
+- [Межі шарів](overview/layers.md) — відповідальність і заборонені залежності.
+- [Карта модулів](overview/modules.md) — відповідальність Catalog, Sales, Identity та BuildingBlocks.
+- [Продуктовий словник](../../product/glossary.md) — терміни каталогу, дверей, фурнітури й Cosmos.
 
-### I need to place code in a layer
+### Розміщення коду за шарами
 
 - [Domain](layers/domain-structure.md)
 - [Application](layers/application-structure.md)
 - [Infrastructure](layers/infrastructure-structure.md)
-- [API and Host](layers/api-host-structure.md)
+- [API та Host](layers/api-host-structure.md)
 
-### I need to understand execution
+### Виконання запиту й інтеграцій
 
-- [Use-case flow](runtime/use-case-flow.md)
+- [Шлях сценарію використання](runtime/use-case-flow.md)
 - [Mediator behaviors](runtime/mediator-behaviors.md)
-- [Cross-cutting pipeline](runtime/cross-cutting.md)
-- [Persistence and integrations](runtime/persistence-and-integrations.md)
-- [OneC integration](integrations/one-c/README.md)
+- [Наскрізний pipeline](runtime/cross-cutting.md)
+- [Дані й інтеграції](runtime/persistence-and-integrations.md)
+- [Інтеграція з 1C](integrations/one-c/README.md)
 
-### I need platform reference
+### Платформа
 
-- [Technology stack](platform/technology-stack.md)
-- [BuildingBlocks reference](platform/building-blocks/README.md)
+- [Технологічний стек](platform/technology-stack.md)
+- [Прямі NuGet-залежності](platform/nuget-packages.md)
+- [Інструменти збірки й доставки](platform/tooling-and-delivery.md)
+- [Довідник BuildingBlocks](platform/building-blocks/README.md)
+- [Архітектурні рішення](decisions/README.md)
 
-### I need identity or access control
+### Identity та контроль доступу
 
-- [Identity, authentication and authorization](security/README.md)
+- [Identity, автентифікація й авторизація](security/README.md)
 
-Architecture documents describe durable rules. A planned change belongs in docs/specs, not here, unless it changes a durable rule.
+Цей розділ описує поточну архітектуру й сталі межі. Запланована зміна спершу належить до [специфікації](../specs/README.md); після прийняття й реалізації сталого рішення онови відповідний архітектурний документ і, за потреби, [ADR](decisions/README.md).

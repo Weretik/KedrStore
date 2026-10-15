@@ -1,61 +1,44 @@
-# Catalog product-photo check
+# Перевірка фото товарів Catalog
 
-`check-product-photos` performs one pass over every active Catalog product and
-then exits. It ignores `ExportToSite`, stock, category, sale, and new-product
-flags. Host.Jobs contains no scheduler; configure the recurring invocation of
-the Cloud Run Job separately.
+`check-product-photos` один раз проходить усі активні товари Catalog і завершується. Він ігнорує `ExportToSite`, залишок, категорію та прапорці розпродажу й новинки. `Host.Jobs` не має планувальника; повторний запуск Cloud Run Job налаштовують окремо.
 
-## Local execution
+## Локальний запуск
 
 ```powershell
-Set-Location C:\Users\Віталій\RiderProjects\KedrStore
+# Виконувати з кореня репозиторію
 $env:DOTNET_ENVIRONMENT = 'Development'
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=check-product-photos
 ```
 
-Supply `ConnectionStrings__Default` through Host.Jobs User Secrets or an
-environment variable. The command needs no 1C or Telegram secret and no
-`--rootId`.
+Надай `ConnectionStrings__Default` через User Secrets `Host.Jobs` або змінну середовища. Команда не потребує секретів 1C чи Telegram і аргументу `--rootId`.
 
-## Configuration
+## Конфігурація
 
-`ProductPhotoCheck` supports:
+`ProductPhotoCheck` підтримує:
 
-| Setting | Default | Constraint |
+| Параметр | Типове значення | Обмеження |
 | --- | ---: | --- |
 | `BatchSize` | 500 | 1–5000 |
 | `MaxConcurrency` | 16 | 1–100 |
 | `RequestTimeoutSeconds` | 5 | 1–120 |
 | `MaxRedirects` | 3 | 0–10 |
-| `AllowedHosts` | `images-kedr.cdn.express` | at least one non-empty host |
+| `AllowedHosts` | `images-kedr.cdn.express` | Принаймні один непорожній host |
 
-Keep the allow-list limited to the CDN. Redirects outside HTTPS and the allowed
-host are rejected without sending a follow-up request.
+Обмежуй allow-list потрібним CDN. Redirect за межі HTTPS або дозволеного host відхиляється без наступного запиту.
 
-## Result interpretation
+## Тлумачення результату
 
-- `Available`: final `2xx` response with `Content-Type: image/*`.
-- `Missing`: `404` or `410`.
-- `InvalidContentType`: final `2xx` without an image media type.
-- `CheckFailed`: timeout, network/DNS problem, invalid URL, `429`, `5xx`, or
-  another non-success result.
+- `Available`: фінальна відповідь `2xx` із `Content-Type: image/*`.
+- `Missing`: `404` або `410`.
+- `InvalidContentType`: фінальна відповідь `2xx` без типу медіа image.
+- `CheckFailed`: timeout, збій мережі/DNS, некоректний URL, `429`, `5xx` або інший неуспішний результат.
 
-The anonymous unavailable-photo API includes the final three statuses.
-Individual CDN failures do not fail the job. A database, invalid configuration,
-cancellation, or unexpected orchestration failure exits non-zero.
+Анонімний API недоступних фото включає останні три статуси. Окремі збої CDN не завершують завдання помилкою. Збій БД, некоректна конфігурація, скасування або непередбачений збій координації дають ненульовий код виходу.
 
-The final structured log reports examined, available, missing,
-invalid-content, check-failed, stale-result, and elapsed counts. Expected remote
-failures never log response bodies or credentials.
+Фінальний структурований лог містить лічильники examined, available, missing, invalid-content, check-failed, stale-result і тривалість. Очікувані віддалені збої не записують тіла відповіді або credentials.
 
 ## Cloud Run
 
-Deployment creates or updates `catalog-product-photo-check` with one task,
-parallelism one, platform retries zero, and a 30-minute timeout. Deployment does
-not execute it and does not create Cloud Scheduler. Configure or pause its
-schedule in Google Cloud separately.
+Процес розгортання створює або оновлює `catalog-product-photo-check` з одним завданням, паралелізмом 1, нульовою кількістю повторних запусків платформи й обмеженням часу 30 хвилин. Процес розгортання не виконує його й не створює Cloud Scheduler. Розклад у Google Cloud налаштовують або зупиняють окремо.
 
-Before the first successful run, existing backfilled records remain `Unknown`
-and do not appear in the unavailable list. If a run is cancelled, already
-committed batches remain valid and the next scheduled run checks the full active
-catalog again.
+До першого успішного запуску наявні backfilled-записи залишаються `Unknown` і не з'являються у списку недоступних. Якщо виконання скасовано, вже committed batches залишаються чинними, а наступний запланований запуск знову перевіряє весь активний каталог.

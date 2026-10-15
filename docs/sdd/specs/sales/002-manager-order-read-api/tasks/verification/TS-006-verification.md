@@ -1,26 +1,26 @@
-# TS-006 — Verify and close manager-order read delivery
+# TS-006 — перевірити й завершити постачання читання замовлень менеджера
 
-- **Task ID:** TS-006
-- **Covers:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** TS-005
-- **Exact paths:** `KedrStore.sln`, `tests/UnitTests/`, `tests/IntegrationTests/`, `docs/sdd/specs/sales/002-manager-order-read-api/`, `docs/sdd/contracts/`
-- **Test level:** Regression and delivery
+- **ID задачі:** TS-006
+- **Покриває:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** TS-005
+- **Точні шляхи:** `KedrStore.sln`, `tests/UnitTests/`, `tests/IntegrationTests/`, `docs/sdd/specs/sales/002-manager-order-read-api/`, `docs/sdd/contracts/`
+- **Рівень тесту:** регресія та постачання
 
-## Verification evidence
+## Докази перевірки
 
-- **Restore:** `dotnet restore KedrStore.sln`; passed, all projects up to date.
-- **Build:** `dotnet build KedrStore.sln --no-restore`; passed with 0 warnings and 0 errors.
-- **Test:** `dotnet test KedrStore.sln --no-build` with `KEDR_SALES_TEST_POSTGRES_CONNECTION` targeting an isolated PostgreSQL 18 schema; Unit 59/59, Architecture 10/10, Integration 67/67, no skips.
-- **Known limitation:** TS-001's initially authored Red could not execute because Docker was unavailable; the gap is documented in TS-001. Focused and full Green/regression provider checks later passed against local PostgreSQL 18. Repository-wide aggregate Redocly lint retains pre-existing errors in the older admin-order sync contract; the new feature contract validates and its aggregate/runtime references are tested.
+- **Відновлення залежностей:** `dotnet restore KedrStore.sln`; пройшло, усі проєкти актуальні.
+- **Збірка:** `dotnet build KedrStore.sln --no-restore`; пройшла з 0 попереджень і 0 помилок.
+- **Тести:** `dotnet test KedrStore.sln --no-build` із `KEDR_SALES_TEST_POSTGRES_CONNECTION`, спрямованим на ізольовану схему PostgreSQL 18; unit 59/59, архітектурні 10/10, інтеграційні 67/67, без пропусків.
+- **Відоме обмеження:** спочатку написаний Red у TS-001 неможливо було виконати через недоступність Docker; пробіл задокументовано в TS-001. Пізніше цільові та повні Green/регресійні перевірки провайдера пройшли на локальному PostgreSQL 18. Загальний Redocly lint репозиторію зберігає раніше наявні помилки в старішому контракті синхронізації замовлень адміністратора; новий контракт функціональності валідний, а його агреговані/runtime-посилання перевірено тестами.
 
-## Work
+## Робота
 
-- [x] Run restore, build, focused Sales tests, and agreed regression suite.
-- [x] Record Red/Green/refactor/regression evidence in every behavior task.
-- [x] Mark each traceability scenario with named passing evidence.
-- [x] Reconcile requirements, design, data model, contracts, code, and tests.
-- [x] Complete delivery checklist and add a delivery report with residual risks.
+- [x] Запустити відновлення залежностей, збірку, цільові тести Sales і погоджений регресійний набір.
+- [x] Зафіксувати докази Red/Green/рефакторингу/регресії в кожній поведінковій задачі.
+- [x] Позначити кожний сценарій простежуваності іменованими успішними доказами.
+- [x] Звірити вимоги, проєктування, модель даних, контракти, код і тести.
+- [x] Завершити контрольний список постачання й додати звіт із залишковими ризиками.
 
-## Checkpoint
+## Контрольна точка
 
-All scenarios have reviewable evidence and delivery documentation matches behavior.
+Усі сценарії мають придатні до рев'ю докази, а документація постачання відповідає поведінці.

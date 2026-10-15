@@ -1,6 +1,6 @@
-# API and host structure
+# Структура API та host
 
-## API module structure
+## Структура API-модуля
 
 ~~~text
 <Module>.Api/
@@ -10,9 +10,9 @@
 └── <Module>.Api.csproj
 ~~~
 
-Controllers bind HTTP input, call ISender.Send with CancellationToken and return the established Result mapping. They do not query EF, construct repositories or contain domain rules.
+Controllers прив'язують HTTP-вхід, викликають `ISender.Send` із `CancellationToken` і повертають результат через чинне відображення Result. Вони не виконують EF-запитів, не створюють репозиторіїв і не містять доменних правил.
 
-## Host structure
+## Структура host
 
 ~~~text
 Bootstrapper/Host.Api/
@@ -27,16 +27,16 @@ Bootstrapper/Host.Api/
 └── appsettings*.json
 ~~~
 
-## Request pipeline
+## Конвеєр запиту
 
 ~~~text
 HTTP
-  → exception / developer diagnostics
+  → обробка винятків / діагностика Development
   → CORS, HTTPS, Serilog request logging, rate limiter
-  → authentication → authorization
+  → автентифікація → авторизація
   → controller → ISender
-  → request logging → exception → performance → validation → domain events
-  → handler → Result-to-HTTP mapping
+  → логування запиту → винятки → продуктивність → валідація → доменні події
+  → handler → HTTP-відображення Result
 ~~~
 
-Host is the composition root. It may register modules and middleware but must not implement a business use case.
+Хост — корінь композиції. Він реєструє модулі й проміжне ПЗ, але не реалізує бізнес-сценарій. `Host.Api` не виконує міграції при старті; їх запускає окреме [завдання міграції](../../operations/data/migrations-and-seeding.md).

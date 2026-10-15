@@ -1,8 +1,8 @@
-# Category read API — checklist: specification readiness
+# API читання категорій — контрольний список: готовність специфікації
 
-- [x] Requirements are complete, testable, and non-contradictory.
-- [x] Every `[NEEDS CLARIFICATION]` item is resolved or moved out of scope.
-- [x] Every requirement has a design decision or a deferred status.
-- [x] The data model contains no speculative data or relations.
-- [x] Every requirement is covered by a task ID; tasks do not exceed scope.
-- [x] Contract, security, idempotency, and integration dependencies are agreed.
+- [x] Вимоги повні, придатні до тестування та несуперечливі.
+- [x] Усі пункти `[NEEDS CLARIFICATION]` вирішено або винесено за межі обсягу.
+- [x] Для кожної вимоги є рішення з проєктування або статус відкладеної.
+- [x] Модель даних не містить спекулятивних даних чи зв’язків.
+- [x] Кожну вимогу покриває ID завдання; завдання не виходять за межі обсягу.
+- [x] Узгоджено залежності контракту, безпеки, ідемпотентності та інтеграції.

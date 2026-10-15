@@ -1,9 +1,9 @@
-# Phase 03 — Application task planning
+# Етап 03 — Планування задач Application
 
-- [x] Execute [TS-004 — check job and import reconciliation](application/03.1-check-product-photos.md).
-- [x] Execute [TS-005 — unavailable-photo query](application/03.2-get-unavailable-products.md).
+- [x] Виконати [TS-004 — задача перевірки й узгодження імпорту](application/03.1-check-product-photos.md).
+- [x] Виконати [TS-005 — запит недоступних фотографій](application/03.2-get-unavailable-products.md).
 
-## Checkpoint
+## Контрольна точка
 
-Catalog Application can reconcile current URLs, run one bounded check cycle,
-and return a paged database-only unavailable list.
+Catalog Application може узгодити поточні URL, виконати один обмежений цикл перевірки
+й повернути сторінковий список недоступних фотографій лише з бази даних.

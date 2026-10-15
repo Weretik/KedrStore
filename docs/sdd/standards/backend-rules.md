@@ -1,26 +1,26 @@
-# Backend rules
+# Правила backend
 
-## Layers and dependencies
+## Шари й залежності
 
-Follow the dependency direction `API → Application → Domain`. Infrastructure depends on the inner layers, never the reverse.
+Дотримуйся напряму залежностей `API → Application → Domain`. Infrastructure залежить від внутрішніх шарів, а не навпаки.
 
-- Domain owns business invariants, entities, value objects, and domain services; it contains no transport DTOs or Infrastructure dependencies.
-- Application orchestrates use cases through abstractions, not Infrastructure implementations.
-- Infrastructure contains persistence and integration adapters; it does not own business rules.
-- API performs only HTTP binding, authorization, and result mapping; it contains no EF or business logic.
+- Доменний шар містить бізнес-інваріанти, сутності, об'єкти-значення й доменні сервіси; у ньому немає DTO транспортного рівня або залежностей від інфраструктурного шару.
+- Прикладний шар координує сценарії використання через абстракції, а не реалізації інфраструктурного шару.
+- Інфраструктурний шар містить засоби збереження даних та інтеграційні адаптери; бізнес-правила йому не належать.
+- Шар API виконує лише прив'язку HTTP-запитів, авторизацію й відображення результатів; у ньому немає EF або бізнес-логіки.
 
-## Entity identifiers
+## Ідентифікатори сутностей
 
-Before creating or changing an entity identifier, follow [Identifier strategy](identifier-strategy.md). Do not default to `Guid`; select an ID from its creation and integration lifecycle. In the Domain, always wrap the selected scalar in a typed value object/readonly struct; do not use raw primitive IDs in `BaseEntity`, `BaseAuditableEntity`, or Domain foreign keys.
+Перед створенням або зміною ідентифікатора сутності застосуй [стратегію ідентифікаторів](identifier-strategy.md). Не обирай `Guid` автоматично: тип ID залежить від життєвого циклу створення й інтеграції. У Domain обгортай вибраний скаляр типізованим value object/readonly struct; не використовуй сирі примітивні ID у `BaseEntity`, `BaseAuditableEntity` або зовнішніх ключах Domain.
 
-## CQRS, Mediator, and code
+## CQRS, Mediator і структура коду
 
-Use feature-by-folder within Application. Keep the command/query, handler, validator, and private DTOs together by scenario. One Mediator handler owns one use case; commands change state, and queries do not.
+У прикладному шарі групуй код за фічами. Команду або запит, обробник, валідатор і приватні DTO одного сценарію тримай разом. Один обробник Mediator відповідає за один сценарій використання; команди змінюють стан, запити — ні.
 
-Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in pipeline behaviors; do not move business rules into behaviors.
+Передавай `CancellationToken` через увесь потік. Наскрізні аспекти залишай у поведінках конвеєра Mediator, але не перенось туди бізнес-правила.
 
-Use explicit names: `CreateOrderCommand`, `GetPublicProductListQuery`, `GetAdminProductListQueryHandler`. Do not create generic folders or names such as `Common`, `Misc`, `Helper`, `Utils`, or `Manager`. Do not add abstractions without a concrete need.
+Використовуй конкретні назви: `CreateOrderCommand`, `GetPublicProductListQuery`, `GetAdminProductListQueryHandler`. Не створюй розмитих папок або назв на зразок `Common`, `Misc`, `Helper`, `Utils`, `Manager`. Не додавай абстракцій без конкретної потреби.
 
-## Domain events and transactions
+## Доменні події й транзакції
 
-Follow the existing domain-event lifecycle: `collect → dispatch → clear`. Use cases with multiple aggregate changes coordinate the transaction through the existing `IUnitOfWork`.
+Дотримуйся чинного циклу доменної події: `collect → dispatch → clear`. Сценарії використання, які змінюють кілька агрегатів, координують транзакцію через наявний `IUnitOfWork`.

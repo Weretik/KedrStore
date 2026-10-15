@@ -1,40 +1,40 @@
-# Phase 00 — Clarification and readiness
+# Етап 00 — Уточнення та готовність
 
-**Status:** completed and verified
+**Статус:** завершено й перевірено
 
-- [x] T001 Read the frozen constants/translation snapshots, requirements, design, data model, contract, and checklist; record contradictions in this file without changing source values. **Paths:** `catalog-category-slugs.constants.ts.md`, `translate.md`, `requirements/`, `design/`, `data-model.md`, `contracts/`. **Dependencies:** none.
-- [x] T002 Agree the stable matching key, complete metadata mapping, short-label limits, unconfigured-category fallback, `SortOrder` uniqueness scope, and Cosmos short labels/order. **Paths:** approved configuration source and `requirements/`. **Dependencies:** T001.
-- [x] T003 Decide whether an HTTP consumer is in scope. If yes, agree and add `docs/sdd/contracts/catalog/category-presentation-metadata.openapi.yaml`, then reference it from `docs/sdd/contracts/openapi.yaml`; if no, mark API tasks not applicable and state the consuming boundary. **Paths:** `contracts/api-contract.md`, `docs/sdd/contracts/`. **Dependencies:** T002.
-- [x] T004 Mark the applicable items in `checklist/spec-readiness.md`. **Dependencies:** T002, T003.
+- [x] T001 Прочитати зафіксовані знімки констант/перекладів, вимоги, дизайн, модель даних, контракт і чеклист; записати суперечності в цьому файлі, не змінюючи вихідних значень. **Шляхи:** `catalog-category-slugs.constants.ts.md`, `translate.md`, `requirements/`, `design/`, `data-model.md`, `contracts/`. **Залежності:** немає.
+- [x] T002 Погодити стабільний ключ зіставлення, повне відображення метаданих, обмеження коротких назв, fallback для неналаштованих категорій, межу унікальності `SortOrder` і короткі назви/порядок Cosmos. **Шляхи:** затверджене джерело конфігурації та `requirements/`. **Залежності:** T001.
+- [x] T003 Вирішити, чи входить HTTP-споживач до меж роботи. Якщо так, погодити й додати `docs/sdd/contracts/catalog/category-presentation-metadata.openapi.yaml`, потім послатися на нього з `docs/sdd/contracts/openapi.yaml`; якщо ні, позначити API-задачі як незастосовні й визначити межу споживання. **Шляхи:** `contracts/api-contract.md`, `docs/sdd/contracts/`. **Залежності:** T002.
+- [x] T004 Позначити застосовні пункти в `checklist/spec-readiness.md`. **Залежності:** T002, T003.
 
-## T001 review record (2026-07-29)
+## Запис огляду T001 (2026-07-29)
 
-Reviewed the frozen category constants and translations, all requirement and design documents, the data model, the API contract, and both readiness checklists. No source snapshot values were changed.
+Переглянуто зафіксовані константи й переклади категорій, усі документи вимог і дизайну, модель даних, API-контракт та обидва чеклисти готовності. Значення вихідних знімків не змінено.
 
-### Findings resolved by T002/T003
+### Знахідки, усунуті рішеннями T002/T003
 
-- The frozen snapshots identify category entries by `slug`, whereas the specification prohibits relying on localized labels and does not approve whether `slug`, numeric category ID, or a key scoped by `ProductTypeIdOneC` is the stable configuration key. The snapshot alone cannot resolve this because it does not contain product-type ownership for every entry.
-- The snapshots provide Ukrainian labels and Russian translations, but do not define configuration records, short-label length limits, blank-value policy, unconfigured-category labels, or a deterministic fallback `SortOrder`.
-- The snapshots imply presentation hierarchy and order, but do not establish the required uniqueness scope for `SortOrder` (per parent/root versus globally stable), nor prove that their displayed hierarchy always matches the final imported `ParentId`/`Path` hierarchy.
-- Cosmos must receive configured root metadata, but neither frozen snapshot supplies its Ukrainian/Russian short labels or order.
-- `GetCategoriesQuery` and `CategoryTreeDto` exist at the application boundary, while no HTTP endpoint, route, security policy, localization-selection rule, or OpenAPI contract exists. The feature cannot safely infer whether HTTP exposure is in scope.
+- Зафіксовані знімки ідентифікують записи категорій за `slug`, тоді як специфікація забороняє покладатися на локалізовані назви й не визначає, що є стабільним ключем конфігурації: `slug`, числовий ID категорії чи ключ у межах `ProductTypeIdOneC`. Сам знімок не розв'язує це питання, бо не містить належності до типу товару для кожного запису.
+- Знімки містять українські назви й російські переклади, але не визначають записи конфігурації, обмеження довжини коротких назв, політику порожніх значень, назви неналаштованих категорій чи детермінований fallback `SortOrder`.
+- Знімки задають ієрархію та порядок представлення, але не встановлюють потрібну межу унікальності `SortOrder` (для одного батька/кореня чи глобально) і не доводять, що відображена ієрархія завжди збігається з остаточною імпортованою ієрархією `ParentId`/`Path`.
+- Cosmos має отримати налаштовані метадані кореня, але жоден зафіксований знімок не містить його української/російської короткої назви чи порядку.
+- `GetCategoriesQuery` і `CategoryTreeDto` існують на межі Application, але HTTP endpoint, маршруту, політики безпеки, правила вибору локалізації та OpenAPI-контракту немає. Із цього не можна безпечно вивести, чи входить HTTP-доступ до меж функціональності.
 
-The decisions below resolve T002 and T003. T004 is completed in `checklist/spec-readiness.md`.
+Рішення нижче розв'язують T002 і T003. T004 завершено в `checklist/spec-readiness.md`.
 
-## T002 approved decisions (2026-07-29)
+## Затверджені рішення T002 (2026-07-29)
 
-- The stable configuration key is `(ProductTypeIdOneC, CategoryId)`. `CategoryId` is the existing numeric 1C/category identifier: its value is the numeric suffix of each frozen slug; `ProductTypeIdOneC` is the configured root ID. This does not use a localized name or a generated slug as a matching key.
-- The approved configuration source is a typed `OneC:CategoryPresentation` options section, duplicated identically in both hosts during Phase 02. It contains one record for every root, manual group, and child listed in the frozen snapshots. Each record supplies the two short names and `SortOrder`; `Level` is calculated from the final imported `Path`/`ParentId` hierarchy and persisted, not hand-maintained in configuration.
-- The complete mapping is the paired frozen inputs: `catalog-category-slugs.constants.ts.md` supplies each entry's category ID, Ukrainian short label, parent/order sequence, and hierarchy; `translate.md` supplies the matching Russian short label by the same root/section/item position. Root IDs are `5513` (hardware) and `7226` (doors), as configured by the existing `OneC` options. Manual groups are the existing IDs `900001`–`900006` and `910001`–`910002`; their child IDs are already explicitly configured in both hosts.
-- `ShortNameUk` and `ShortNameRu` are required, trimmed, non-blank values with a maximum length of 100 characters. This matches the existing category-name storage limit and makes migration backfill deterministic.
-- `SortOrder` is a non-negative integer unique among siblings with the same `ParentId`; root categories form the `ParentId = null` sibling set. Snapshot declaration order is zero-based within each sibling set. `Level` is zero for roots and otherwise derived from the final hierarchy.
-- An unconfigured category retains its original 1C `Name`; both short-name fields receive that `Name`, and it receives `SortOrder = Int32.MaxValue` within its sibling set. Ties are ordered by existing numeric category ID. This preserves deterministic output without changing IDs, slugs, paths, or parents.
-- Cosmos is the backend-owned root `(ProductTypeIdOneC = "Космос", CategoryId = 920000)`. Its short labels are `Космос` in both languages, its root `SortOrder` is `2` (after hardware `0` and doors `1`), and its level is `0`.
+- Стабільний ключ конфігурації — `(ProductTypeIdOneC, CategoryId)`. `CategoryId` є наявним числовим ідентифікатором 1C/категорії: його значення становить числовий суфікс кожного зафіксованого slug; `ProductTypeIdOneC` є налаштованим ID кореня. Локалізована назва чи згенерований slug не використовуються як ключ зіставлення.
+- Затверджене джерело конфігурації — типізований розділ options `OneC:CategoryPresentation`, однаково продубльований в обох хостах під час етапу 02. Він містить по одному запису для кожного кореня, ручної групи й дочірньої категорії із зафіксованих знімків. Кожен запис задає дві короткі назви й `SortOrder`; `Level` обчислюється з остаточної імпортованої ієрархії `Path`/`ParentId` і зберігається, а не підтримується вручну в конфігурації.
+- Повне відображення визначає пара зафіксованих вхідних джерел: `catalog-category-slugs.constants.ts.md` задає ID категорії, українську коротку назву, послідовність батьків/порядку й ієрархію кожного запису; `translate.md` задає відповідну російську коротку назву за тією самою позицією кореня/розділу/елемента. ID коренів — `5513` (фурнітура) і `7226` (двері), як визначено наявними options `OneC`. Ручні групи мають наявні ID `900001`–`900006` і `910001`–`910002`; ID їхніх дочірніх категорій уже явно налаштовані в обох хостах.
+- `ShortNameUk` і `ShortNameRu` є обов'язковими, обрізаними від пробілів, непорожніми значеннями з максимальною довжиною 100 символів. Це відповідає наявному обмеженню зберігання назв категорій і робить заповнення міграцією детермінованим.
+- `SortOrder` є невід'ємним цілим числом, унікальним серед дочірніх категорій з однаковим `ParentId`; кореневі категорії утворюють набір із `ParentId = null`. Порядок оголошення в знімку починається з нуля в межах кожного набору дочірніх категорій. `Level` дорівнює нулю для коренів, а в інших випадках виводиться з остаточної ієрархії.
+- Неналаштована категорія зберігає оригінальне `Name` із 1C; обидва поля коротких назв отримують це `Name`, а `SortOrder = Int32.MaxValue` у наборі дочірніх категорій того самого батька. Однакові значення сортуються за наявним числовим ID категорії. Це забезпечує детермінований результат без зміни ID, slug, шляхів чи батьківських зв'язків.
+- Cosmos — корінь `(ProductTypeIdOneC = "Космос", CategoryId = 920000)`, яким володіє backend. Його короткі назви обома мовами — `Космос`, кореневий `SortOrder` дорівнює `2` (після фурнітури `0` і дверей `1`), а рівень дорівнює `0`.
 
-## T003 consumer decision (2026-07-29)
+## Рішення T003 щодо споживача (2026-07-29)
 
-No HTTP consumer is in scope for this feature. The repository has no category endpoint that dispatches `GetCategoriesQuery`; the existing consuming boundary is the Catalog Application `GetCategoriesQuery` / `CategoryTreeDto` read model. Phase 03 may add the agreed metadata fields to that projection, while Phase 04 tasks T018–T022 are not applicable. No OpenAPI file or route is created.
+HTTP-споживач не входить до меж цієї функціональності. У репозиторії немає endpoint категорій, який відправляє `GetCategoriesQuery`; наявною межею споживання є модель читання Catalog Application `GetCategoriesQuery` / `CategoryTreeDto`. На етапі 03 можна додати погоджені поля метаданих до цієї проєкції, тоді як задачі етапу 04 T018–T022 не застосовуються. Файл OpenAPI чи маршрут не створюються.
 
-## Checkpoint
+## Контрольна точка
 
-Do not start Domain until T002 is complete. Do not start API until T003 has an agreed contract.
+Не починайте Domain до завершення T002. Не починайте API, доки для T003 не погоджено контракт.

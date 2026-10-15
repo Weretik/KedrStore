@@ -1,42 +1,41 @@
-# Missing product photos — API and integration contract
+# Відсутні фотографії товарів — API та інтеграційний контракт
 
-**Status:** agreed
+**Статус:** погоджено
 
-## HTTP operation
+## HTTP-операція
 
 ```http
 GET /api/admin/products/missing-photos?page=1&pageSize=20
 ```
 
-- **Operation ID:** `getAdminProductsWithUnavailablePhotos`
-- **Security:** explicitly anonymous (`AllowAnonymous`, no security scheme)
-- **Idempotency:** safe read-only GET; no idempotency key
-- **Data source:** PostgreSQL only; no CDN request occurs in the request path
-- **Ordering:** product `id` ascending
-- **Paging:** `page` defaults to `1`; `pageSize` defaults to `20` and is limited
-  to `1..100`
+- **ID операції:** `getAdminProductsWithUnavailablePhotos`
+- **Безпека:** явно анонімний доступ (`AllowAnonymous`, без схеми безпеки)
+- **Ідемпотентність:** безпечний GET лише для читання; ключ ідемпотентності не потрібний
+- **Джерело даних:** лише PostgreSQL; на шляху запиту немає звернення до CDN
+- **Порядок:** `id` товару за зростанням
+- **Сторінкова навігація:** `page` за замовчуванням `1`; `pageSize` за замовчуванням `20` та обмежений
+  діапазоном `1..100`
 
-The route is additive under the existing `AdminProductsController`. Before API
-implementation, add it to
-`docs/sdd/contracts/catalog/products.openapi.yaml` and add the operation path
-reference to `docs/sdd/contracts/openapi.yaml`.
+Маршрут адитивно додається до наявного `AdminProductsController`. До реалізації
+API додайте його в `docs/sdd/contracts/catalog/products.openapi.yaml` і посилання
+на шлях операції в `docs/sdd/contracts/openapi.yaml`.
 
-## Response
+## Відповідь
 
-`200 OK` returns the established `PagedResult` envelope. Each row contains all
-fields of the existing `AdminProduct` contract plus:
+`200 OK` повертає усталену обгортку `PagedResult`. Кожен рядок містить усі
+поля наявного контракту `AdminProduct` і додатково:
 
-| Field | Type | Meaning |
+| Поле | Тип | Значення |
 | --- | --- | --- |
-| `photoAvailable` | boolean | Always `false` for this endpoint. |
-| `photoStatus` | enum | `Missing`, `InvalidContentType`, or `CheckFailed`. |
-| `photoCheckedAtUtc` | string/date-time | Completion time of the latest check. |
-| `photoHttpStatusCode` | integer or null | Final HTTP status when a response existed. |
+| `photoAvailable` | boolean | Для цього endpoint завжди `false`. |
+| `photoStatus` | enum | `Missing`, `InvalidContentType` або `CheckFailed`. |
+| `photoCheckedAtUtc` | string/date-time | Час завершення останньої перевірки. |
+| `photoHttpStatusCode` | integer або null | Кінцевий HTTP-статус, якщо відповідь було отримано. |
 
-The existing `photo` field remains the URL that was checked. Internal diagnostic
-messages, exception text, headers, and response bodies are not returned.
+Наявне поле `photo` залишається URL, який перевіряли. Внутрішні діагностичні
+повідомлення, текст винятків, заголовки й тіла відповідей не повертаються.
 
-Example:
+Приклад:
 
 ```json
 {
@@ -70,32 +69,33 @@ Example:
 }
 ```
 
-An empty result is `200` with an empty `value` and zero totals. Invalid paging
-returns the established `400` validation-error body. The operation does not use
-`404`, and CDN failures never become an HTTP error for this read endpoint.
+Порожній результат — це `200` з порожнім `value` і нульовими підсумками.
+Некоректна сторінкова навігація повертає усталене тіло помилки валідації `400`.
+Операція не використовує `404`, а збої CDN ніколи не стають HTTP-помилкою
+цього endpoint читання.
 
-## Host.Jobs CLI contract
+## CLI-контракт Host.Jobs
 
 ```text
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=check-product-photos
 ```
 
-The command accepts no `rootId`, runs one full active-product cycle, logs its
-summary, and exits `0` when orchestration and persistence complete. Per-product
-remote failures are saved as `CheckFailed` and do not make the process fail.
-Invalid configuration, database failure, cancellation, or an unhandled failure
-returns the host's non-zero failure exit.
+Команда не приймає `rootId`, виконує один повний цикл для активних товарів,
+записує підсумок у журнал і завершується кодом `0` після оркестрації та
+збереження. Віддалені збої окремих товарів зберігаються як `CheckFailed`
+і не призводять до помилки процесу. Некоректна конфігурація, збій бази даних,
+скасування чи необроблена помилка повертають ненульовий код помилки хоста.
 
-## Cloud Run integration contract
+## Інтеграційний контракт Cloud Run
 
-The workflow creates or updates `catalog-product-photo-check` from the current
-Host.Jobs image with the CLI argument above, one task, parallelism one, platform
-retries zero, `30m` timeout, and only the Catalog database secret. Deployment
-does not execute or schedule it.
+Workflow створює або оновлює `catalog-product-photo-check` із поточного образу
+Host.Jobs з наведеним вище аргументом CLI, однією задачею, паралелізмом один,
+нульовою кількістю повторів платформи, таймаутом `30m` і лише секретом бази даних
+Catalog. Розгортання не виконує й не планує запуск цієї задачі.
 
-## Compatibility and rollout
+## Сумісність і розгортання
 
-The HTTP route, table, command, and Cloud Run Job are additive. Existing product
-routes and DTOs do not change. Consumers may adopt the endpoint after the first
-completed job run; before that, `Unknown` rows are intentionally absent.
-Authorization is explicitly deferred and will be a future contract change.
+HTTP-маршрут, таблиця, команда й Cloud Run Job додаються без порушення наявного.
+Поточні маршрути товарів і DTO не змінюються. Споживачі можуть перейти на endpoint
+після першого завершеного запуску задачі; до того рядки `Unknown` навмисно відсутні.
+Авторизацію явно відкладено; вона потребуватиме майбутньої зміни контракту.

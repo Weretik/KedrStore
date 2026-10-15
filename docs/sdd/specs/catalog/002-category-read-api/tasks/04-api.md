@@ -1,7 +1,7 @@
-# Phase 04 — API
+# Фаза 04 — API
 
-- [x] T019 Added category transport DTOs and mappings without exposing `ProductCategory` or `CategoryPath`.
-- [x] T020 Added `CategoriesController` and `AdminCategoriesController` with all four agreed routes.
-- [x] T021 Added explicit anonymous access and response metadata to both controllers, cancellation tokens, and standard result mapping. Admin authorization is intentionally deferred.
-- [x] T022 Extended `ApiContractTests.cs` with all public/admin category paths and path parameters; targeted tests passed 3/3. Admin routes are intentionally anonymous.
-- [x] T023 Compared controller routes and generated runtime OpenAPI with the aggregate contract; frontend guide and contract match implementation.
+- [x] T019 Додано транспортні DTO категорій і зіставлення без розкриття `ProductCategory` чи `CategoryPath`.
+- [x] T020 Додано `CategoriesController` і `AdminCategoriesController` з усіма чотирма узгодженими маршрутами.
+- [x] T021 Додано явний анонімний доступ і метадані відповідей для обох контролерів, токени скасування та стандартне зіставлення результатів. Авторизацію адміністратора навмисно відкладено.
+- [x] T022 Розширено `ApiContractTests.cs` усіма публічними/адміністративними шляхами категорій і параметрами шляху; цільові тести пройшли 3/3. Маршрути адміністратора навмисно анонімні.
+- [x] T023 Зіставлено маршрути контролерів і згенерований OpenAPI середовища виконання зі зведеним контрактом; frontend-посібник і контракт відповідають реалізації.

@@ -1,27 +1,27 @@
-# TS-005 — Verify manager-order HTTP and contract behavior
+# TS-005 — перевірити HTTP-поведінку й контракт замовлень менеджера
 
-- **Task ID:** TS-005
-- **Covers:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** TS-004
-- **Exact paths:** `tests/IntegrationTests/Sales/Api/AdminOrderApiTests.cs`, `tests/IntegrationTests/Platform/Api/ApiContractTests.cs`, `docs/sdd/contracts/sales/manager-order-read.openapi.yaml`
-- **Test level:** API verification
+- **ID задачі:** TS-005
+- **Покриває:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** TS-004
+- **Точні шляхи:** `tests/IntegrationTests/Sales/Api/AdminOrderApiTests.cs`, `tests/IntegrationTests/Platform/Api/ApiContractTests.cs`, `docs/sdd/contracts/sales/manager-order-read.openapi.yaml`
+- **Рівень тесту:** перевірка API
 
-## Verification evidence
+## Докази перевірки
 
-- **Source behavior task:** TS-004 Red/Green evidence.
-- **Distinct risks:** serialization, status codes, authorization, route collision, OpenAPI drift.
-- **Command/result:** combined `AdminOrderApiTests|ManagerOrderReadApiTests|ApiContractTests|ManagerOrderReadContractTests` run passed 30/30; full solution run passed 59 Unit, 10 Architecture, and 67 Integration tests with no skips when pointed at an isolated PostgreSQL 18 schema.
-- **Remaining gap:** none.
+- **Задача реалізації поведінки:** докази Red/Green у TS-004.
+- **Окремі ризики:** серіалізація, коди стану, авторизація, конфлікт маршрутів, розходження з OpenAPI.
+- **Команда/результат:** спільний запуск `AdminOrderApiTests|ManagerOrderReadApiTests|ApiContractTests|ManagerOrderReadContractTests` пройшов 30/30; повний запуск рішення пройшов 59 unit-, 10 архітектурних і 67 інтеграційних тестів без пропусків на ізольованій схемі PostgreSQL 18.
+- **Залишковий пробіл:** немає.
 
-## Work
+## Робота
 
-- [x] Test list success/empty/counterparty scope/invalid parameters and detail success/not-found.
-- [x] Test unauthenticated and forbidden responses for every route.
-- [x] Assert approved DTOs omit Domain entities, SOAP bodies, diagnostics, notification state, and retry audits.
-- [x] Verify decimal, timestamp, enum, nullable, and line-array serialization against OpenAPI.
-- [x] Verify runtime routes match versioned and aggregate OpenAPI.
-- [x] Verify reads neither call 1C nor alter sync state.
+- [x] Перевірити успішний/порожній список, обмеження за контрагентом, некоректні параметри та успішні/відсутні деталі.
+- [x] Перевірити відповіді для неавтентифікованого користувача й забороненого доступу для кожного маршруту.
+- [x] Переконатися, що погоджені DTO не містять сутностей Domain, тіл SOAP, діагностики, стану сповіщень і аудиту повторів.
+- [x] Звірити з OpenAPI серіалізацію десяткових чисел, часових позначок, enum, nullable-значень і масиву позицій.
+- [x] Переконатися, що runtime-маршрути відповідають версіонованому й агрегованому OpenAPI.
+- [x] Переконатися, що читання не звертається до 1С і не змінює стан синхронізації.
 
-## Checkpoint
+## Контрольна точка
 
-Focused tests prove each scenario and runtime contract conformance.
+Цільові тести доводять кожний сценарій і відповідність runtime контракту.

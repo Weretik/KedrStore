@@ -1,54 +1,58 @@
-# 001 — Admin order and 1C synchronization
+# 001 — Замовлення адміністратора та синхронізація з 1C
 
-**Module:** Sales  
-**Type:** feature  
-**Status:** ready for controlled deployment
-**Owner:** Sales team  
-**Created:** 2026-08-17
+**Модуль:** Sales
 
-Manager-created orders are a separate Sales capability. A manager creates an order for an existing counterparty; the order is stored locally and then delivered to 1C reliably in the background. This feature does not alter the anonymous public quick-order flow in Catalog or its Telegram/Excel notification.
+**Тип:** фіча
 
-## Goal and scope
+**Статус:** готова до контрольованого розгортання
 
-- [Overview and boundaries](requirements/overview.md)
-- [Manager order creation](requirements/manager-order-creation.md)
-- [1C delivery](requirements/one-c-delivery.md)
+**Відповідальна команда:** Sales
 
-## Technical design
+**Створено:** 2026-08-17
 
-- [Domain](design/domain.md)
-- [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
+Замовлення, які створює менеджер, є окремою можливістю модуля Sales. Менеджер створює замовлення для наявного контрагента; замовлення зберігається локально, а потім надійно передається до 1C у фоновому режимі. Ця фіча не змінює анонімний публічний сценарій швидкого замовлення в Catalog і його сповіщення через Telegram/Excel.
 
-## Delivery
+## Мета й обсяг
 
-- [HTTP and SOAP contract](contracts/api-contract.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
-- [Delivery report](delivery-report.md)
+- [Огляд і межі](requirements/overview.md)
+- [Створення замовлення менеджером](requirements/manager-order-creation.md)
+- [Передавання до 1C](requirements/one-c-delivery.md)
 
-## AI implementation tasks
+## Технічний дизайн
 
-The specification defines concrete tasks for Phases 00–05. Execute them in order and keep the specification-readiness checklist complete before changing code.
+- [Домен](design/domain.md)
+- [Інфраструктура](design/infrastructure.md)
+- [Модель даних](data-model.md)
 
-- [00 — Readiness](tasks/00-readiness.md)
-- [01 — Domain planning](tasks/01-domain.md)
-- [02 — Infrastructure planning](tasks/02-infrastructure.md)
-- [03 — Application planning](tasks/03-application.md)
-- [04 — API planning](tasks/04-api.md)
-- [05 — Background delivery job](tasks/05-jobs.md)
-- [06 — Verification](tasks/06-verification.md)
+## Постачання
 
-## Related durable documentation
+- [Контракт HTTP і SOAP](contracts/api-contract.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність до постачання](checklist/delivery-readiness.md)
+- [Звіт про постачання](delivery-report.md)
 
-- [1C integration boundary](../../../architecture/integrations/one-c/README.md)
-- [Backend standards](../../../standards/README.md)
-- [Sales → 1C delivery instruction](../../../../../SALES_1C_SYNC_INSTRUCTION.txt)
+## Завдання для реалізації за допомогою ШІ
 
-## Change log
+Специфікація визначає конкретні завдання для фаз 00–05. Виконуй їх послідовно й заповни контрольний список готовності специфікації до внесення змін у код.
 
-- 2026-09-09 — Completed T170, T180, and T185 delivery verification. Added the sync-status and audited manual-retry API extensions, configurable order-sync execution, stale-claim recovery, and final delivery evidence.
+- [00 — Підготовка](tasks/00-readiness.md)
+- [01 — Планування домену](tasks/01-domain.md)
+- [02 — Планування інфраструктури](tasks/02-infrastructure.md)
+- [03 — Планування Application](tasks/03-application.md)
+- [04 — Планування API](tasks/04-api.md)
+- [05 — Фонове завдання передавання](tasks/05-jobs.md)
+- [06 — Перевірка](tasks/06-verification.md)
 
-- 2026-08-19 — Added durable storage of the 1C-created document number after an accepted SOAP write. A future admin order read API must expose it to the frontend.
+## Пов'язана довготривала документація
 
-- 2026-08-17 — Initial draft. Public Catalog quick orders are explicitly excluded; the existing `CreateSiteRequest` SOAP operation is the intended 1C write operation.
+- [Межа інтеграції з 1C](../../../architecture/integrations/one-c/README.md)
+- [Стандарти backend](../../../standards/README.md)
+- [Інструкція з передавання Sales → 1C](../../../../../SALES_1C_SYNC_INSTRUCTION.txt)
+
+## Історія змін
+
+- 2026-09-09 — Завершено перевірку постачання за T170, T180 і T185. Додано розширення API для статусу синхронізації та ручного повтору з аудитом, налаштовуване виконання синхронізації замовлень, відновлення завислих захоплень і підсумкові свідчення постачання.
+
+- 2026-08-19 — Додано надійне зберігання номера документа, створеного в 1C, після прийнятого SOAP-запису. Майбутній API читання замовлень адміністратора має повертати його frontend.
+
+- 2026-08-17 — Початкова чернетка. Публічні швидкі замовлення Catalog явно виключено; наявну SOAP-операцію `CreateSiteRequest` визначено для запису в 1C.

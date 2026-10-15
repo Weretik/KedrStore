@@ -1,61 +1,61 @@
-# Stock projection refresh
+# Оновлення проєкції залишків
 
-**Module:** catalog  
-**Status:** implemented  
-**Owner:** backend team  
-**Created:** 2026-07-27  
-**Related:** Catalog 1C import jobs
+**Модуль:** catalog\
+**Статус:** реалізовано\
+**Відповідальні:** backend-команда\
+**Створено:** 2026-07-27\
+**Пов'язано:** задачі імпорту Catalog з 1C
 
-## Goal
+## Мета
 
-As a catalog user, I want a targeted stock import to refresh the product-list read model so that the `InStock` filter and value remain current.
+Як користувач каталогу, я хочу, щоб цільовий імпорт залишків оновлював модель читання списку товарів, аби фільтр і значення `InStock` залишалися актуальними.
 
-## Scope
+## Межі
 
-- In scope: rebuild `ProductListProjections` after a successful targeted `stocks` import.
-- Out of scope: incremental/partial projection updates.
-- Assumption: a non-empty 1C stock response is authoritative for the selected root.
-- Dependencies: `IProductListProjectionRebuilder` and the existing catalog jobs host.
+- У межах: перебудувати `ProductListProjections` після успішного цільового імпорту `stocks`.
+- Поза межами: інкрементальне або часткове оновлення проєкції.
+- Припущення: непорожня відповідь 1C щодо залишків є авторитетною для вибраного кореня.
+- Залежності: `IProductListProjectionRebuilder` і наявний хост задач каталогу.
 
-## Scenarios
+## Сценарії
 
-1. Given a targeted stock import updates product stock, when it finishes, then the product-list projection is rebuilt.
-2. Given a full import, when its stock phases run, then they do not rebuild independently and the full job rebuilds once at the end.
+1. Якщо цільовий імпорт залишків оновив залишки товарів, після його завершення проєкція списку товарів перебудовується.
+2. Під час повного імпорту етапи залишків не виконують незалежної перебудови; повна задача перебудовує проєкцію один раз наприкінці.
 
-## Contract and compatibility
+## Контракт і сумісність
 
-- API contract document: not needed because no API contract changes.
-- Existing consumers and compatibility: `stocks` now refreshes `InStock` automatically; CLI arguments stay unchanged.
-- Authorization and idempotency: not applicable to the CLI job.
+- Документ API-контракту не потрібен, оскільки API-контракт не змінюється.
+- Наявні споживачі й сумісність: `stocks` тепер автоматично оновлює `InStock`; аргументи CLI не змінюються.
+- Авторизація та ідемпотентність: не застосовуються до задачі CLI.
 
-## Implementation phases
+## Етапи реалізації
 
-| Phase | Status | Required? | Outcome |
+| Етап | Статус | Обов'язковий? | Результат |
 | --- | --- | --- | --- |
-| Application | implemented | yes | Targeted stock job triggers the read-model refresh; full job suppresses intermediate refreshes. |
-| Documentation | implemented | yes | Import-flow and runbook reflect the new behavior. |
+| Application | реалізовано | так | Цільова задача імпорту залишків запускає оновлення моделі читання; повна задача пригнічує проміжні оновлення. |
+| Документація | реалізовано | так | Опис потоку імпорту й runbook відображають нову поведінку. |
 
-## Files
+## Файли
 
-- Modify: `SyncOneCStocksJob`, `SyncOneCFullJob`, catalog import documentation and runbook.
-- Do not change: database schema, public HTTP contracts, projection schema.
+- Змінити: `SyncOneCStocksJob`, `SyncOneCFullJob`, документацію імпорту каталогу та runbook.
+- Не змінювати: схему бази даних, публічні HTTP-контракти, схему проєкції.
 
-## Acceptance criteria
+## Критерії прийняття
 
-- [x] Targeted `stocks` rebuilds `ProductListProjections` after stock persistence.
-- [x] `full` still performs a single final projection rebuild.
-- [x] CLI runbook documents the behavior.
+- [x] Цільовий `stocks` перебудовує `ProductListProjections` після збереження залишків.
+- [x] `full` і надалі виконує одну фінальну перебудову проєкції.
+- [x] Runbook CLI описує цю поведінку.
 
-## Verification
+## Перевірка
 
-- `dotnet restore KedrStore.sln`: passed, with pre-existing package vulnerability warnings.
-- `dotnet build KedrStore.sln --no-restore`: passed, 0 errors and 28 existing warnings.
-- `dotnet test KedrStore.sln --no-build --no-restore`: could not pass: `SlugTests.MapProduct_Should_Clean_Slugs` fails independently of this change; integration tests cannot connect to PostgreSQL at `127.0.0.1:5432`.
+- `dotnet restore KedrStore.sln`: успішно, з попередніми попередженнями про вразливості пакетів.
+- `dotnet build KedrStore.sln --no-restore`: успішно, 0 помилок і 28 наявних попереджень.
+- `dotnet test KedrStore.sln --no-build --no-restore`: не вдалося завершити успішно: `SlugTests.MapProduct_Should_Clean_Slugs` падає незалежно від цієї зміни; інтеграційні тести не можуть підключитися до PostgreSQL за адресою `127.0.0.1:5432`.
 
-## Risks and open questions
+## Ризики та відкриті питання
 
-- [ ] Projection rebuilding remains full-table replacement; large catalogs may benefit from a separately designed incremental projection mechanism.
+- [ ] Перебудова проєкції й надалі замінює всю таблицю; для великих каталогів може бути корисним окремо спроєктований механізм інкрементального оновлення.
 
-## Change log
+## Історія змін
 
-- 2026-07-27 — Implemented automatic product-list projection refresh after targeted stock sync.
+- 2026-07-27 — Реалізовано автоматичне оновлення проєкції списку товарів після цільової синхронізації залишків.

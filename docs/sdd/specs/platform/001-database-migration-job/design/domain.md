@@ -1,7 +1,7 @@
-# Database migration job — domain and ownership
+# Job міграції БД — домен і відповідальність
 
-No business-domain model changes are required.
+Змін бізнес-доменної моделі не потрібно.
 
-`IDatabaseMigrator` remains the infrastructure abstraction that owns applying migrations for a specific EF `DbContext`. `Host.Jobs` owns process orchestration only: it resolves the registered migrators, invokes them in a deterministic order, logs progress, and returns an exit code.
+`IDatabaseMigrator` залишається інфраструктурною абстракцією застосування міграцій для конкретного EF `DbContext`. `Host.Jobs` відповідає лише за координацію процесу: знаходить зареєстровані засоби міграції, викликає їх у визначеному порядку, логує прогрес і повертає код виходу.
 
-`Host.Api` owns HTTP serving and must not own schema initialization. This keeps Cloud Run readiness independent from database migration duration or failures.
+`Host.Api` відповідає за HTTP-обслуговування, а не ініціалізацію схеми. Тому готовність Cloud Run не залежить від тривалості міграції чи її збою.

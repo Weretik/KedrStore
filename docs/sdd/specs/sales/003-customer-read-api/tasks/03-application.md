@@ -1,13 +1,13 @@
-# Phase 03 — Application
+# Фаза 03 — Application
 
-## Ordered tasks
+## Завдання за порядком
 
-1. After EN-001, execute [EN-002 — Define customer query contracts](application/EN-002-query-contracts.md).
-2. Wait for Infrastructure TS-001.
-3. Execute these independent tasks in parallel when TS-001 is complete:
-   - [TS-002 — Get active-customer list](application/TS-002-get-customer-list.md);
-   - [TS-003 — Get customer by counterparty ID](application/TS-003-get-customer-by-id.md).
+1. Після EN-001 виконати [EN-002 — Визначити контракти запитів клієнтів](application/EN-002-query-contracts.md).
+2. Дочекатися завершення TS-001 в інфраструктурі.
+3. Після завершення TS-001 виконати паралельно ці незалежні завдання:
+   - [TS-002 — Отримати список активних клієнтів](application/TS-002-get-customer-list.md);
+   - [TS-003 — Отримати клієнта за ID контрагента](application/TS-003-get-customer-by-id.md).
 
-## Checkpoint
+## Контрольна точка
 
-Both list and detail use cases return explicit Ardalis.Result outcomes, pass cancellation, expose only approved fields, and have focused Application evidence.
+Сценарії використання списку й деталей повертають явні результати Ardalis.Result, передають скасування, відкривають лише погоджені поля й мають свідчення цільової перевірки Application.

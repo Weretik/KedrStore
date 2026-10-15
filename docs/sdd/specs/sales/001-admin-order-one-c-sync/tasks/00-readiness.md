@@ -1,8 +1,8 @@
-# Phase 00 — Refinement and readiness
+# Фаза 00 — уточнення та готовність
 
-- [x] T001 Created [00.1 — Confirm the implementation baseline](readiness/00.1-scope-contracts.md) for scope, SOAP, authorization, idempotency, and use-case confirmation.
-- [x] T002 Created [00.2 — Discover CLI and generators](readiness/00.2-tooling.md) for EF Core, OpenAPI, build, and test tooling.
+- [x] T001 Створено [00.1 — підтвердження вихідного стану реалізації](readiness/00.1-scope-contracts.md) для уточнення меж, SOAP, авторизації, ідемпотентності та сценарію.
+- [x] T002 Створено [00.2 — дослідження CLI і генераторів](readiness/00.2-tooling.md) для EF Core, OpenAPI, збірки й тестування.
 
-## Checkpoint
+## Контрольна точка
 
-The two required readiness subphases exist. Execute each only after the user explicitly provides its exact path.
+Дві обов'язкові підфази готовності існують. Виконуйте кожну лише після того, як користувач явно надасть її точний шлях.

@@ -1,7 +1,7 @@
-# Phase 01 — Domain
+# Фаза 01 — домен
 
-No Domain implementation task is required. SC-001–SC-004 read the existing `Counterparty` and `CounterpartyCategoryPriceType` model without changing invariants, state transitions, identifiers, soft-delete behavior, or events.
+Завдання з реалізації в домені не потрібне. SC-001–SC-004 читають наявну модель `Counterparty` і `CounterpartyCategoryPriceType`, не змінюючи інваріантів, переходів стану, ідентифікаторів, поведінки логічного видалення чи подій.
 
-## Checkpoint
+## Контрольна точка
 
-`traceability.md` uses `—` in the Domain column for every scenario, and `design/domain.md` documents why no Domain work is needed.
+У `traceability.md` для кожного сценарію в стовпці «Домен» стоїть `—`, а `design/domain.md` пояснює, чому робота в домені не потрібна.

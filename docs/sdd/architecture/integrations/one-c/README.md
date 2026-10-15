@@ -1,27 +1,27 @@
-# OneC integration
+# Інтеграція з 1C
 
-This section records the durable boundary between KedrStore and 1C. It documents current code behaviour, never credentials, endpoints or real production identifiers.
+Розділ фіксує сталу межу між KedrStore і 1C. Він описує поточну поведінку коду без credentials, endpoints або реальних production-ідентифікаторів.
 
 ```text
 1C SOAP → BuildingBlocks.Integrations.OneC → module adapter → Application job/service → database
                                    │                         │
-                              WCF/auth only            Catalog or Sales ownership
+                              лише WCF/auth            відповідальність Catalog або Sales
 ```
 
-## Read by task
+## Навігація за завданням
 
-- SOAP operations and value normalization: [client contract](client-contract.md)
-- Catalog import order, projection and visibility: [catalog import flow](catalog-import-flow.md)
-- Catalog terms, including Doors, Hardware, and Cosmos: [product glossary](../../../../product/glossary.md)
-- Counterparty import and Identity user provisioning: [Sales/Identity flow](sales-counterparty-identity-sync.md)
-- Deletion semantics and safe operation: [data safety](data-safety.md)
-- Running and diagnosing jobs: [Host.Jobs runbooks](../../../operations/jobs/README.md)
+- SOAP-операції й нормалізація: [контракт клієнта](client-contract.md)
+- Порядок імпорту Catalog, проєкція й видимість: [потік імпорту](catalog-import-flow.md)
+- Терміни Catalog, зокрема Doors, Hardware і Cosmos: [продуктовий словник](../../../../product/glossary.md)
+- Імпорт контрагентів і створення користувачів Identity: [потік Sales/Identity](sales-counterparty-identity-sync.md)
+- Семантика видалення й безпечне виконання: [безпека даних](data-safety.md)
+- Запуск і діагностика jobs: [runbooks Host.Jobs](../../../operations/jobs/README.md)
 
-## Boundaries
+## Межі відповідальності
 
-- `BuildingBlocks.Integrations.OneC` owns generated WCF transport and Basic authentication. `Generated/Reference.cs` is generated code: do not edit it manually.
-- Catalog and Sales Infrastructure own their module-specific adapters and mappings.
-- Catalog Application owns job orchestration through `IOneCClient`; it does not depend on WCF types.
-- `Host.Jobs` is a one-run console host, not a scheduler. Cron/CI/deployment automation invokes it.
+- `BuildingBlocks.Integrations.OneC` володіє згенерованим транспортом WCF і базовою автентифікацією. `Generated/Reference.cs` — згенерований код, не редагуй його вручну.
+- Інфраструктурні шари Catalog і Sales відповідають за адаптери й перетворення даних власних модулів.
+- Прикладний шар Catalog координує завдання через `IOneCClient` і не залежить від WCF-типів.
+- `Host.Jobs` — консольний хост одного запуску без власного планувальника; його викликає cron, CI або автоматизація розгортання.
 
-This mirrors production runbook practice: contract, data ownership, safety and operations are separate so a field mapping change cannot silently become a destructive data change.
+Контракт, власність даних, безпека й операції описані окремо, щоб зміна mapping поля не стала непомітно руйнівною зміною даних.

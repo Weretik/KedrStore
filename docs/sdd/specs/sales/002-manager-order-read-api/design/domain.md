@@ -1,14 +1,14 @@
-# Manager order read API — design: Domain
+# API читання замовлень менеджера — проєктування Domain
 
-## Responsibility
+## Відповідальність
 
-This is a query-only feature. `Order` remains the owner of order number, counterparty reference, comment, and lines. `OneCOrderSync` remains the owner of delivery state and accepted 1C document number. `Counterparty` remains the owner of customer identity and profile data. No aggregate method, value object, invariant, or domain event is required for the agreed read behavior.
+Ця функціональність складається лише із запитів читання. `Order` і надалі володіє номером замовлення, посиланням на контрагента, коментарем і позиціями. `OneCOrderSync` володіє станом передавання та прийнятим номером документа 1С. `Counterparty` володіє ідентичністю клієнта й даними профілю. Для погодженої поведінки читання не потрібні нові методи агрегату, об'єкти значення, інваріанти чи доменні події.
 
-## Intermodule interaction
+## Взаємодія модулів
 
-The query reads only Sales-owned data. It does not call Catalog, Identity, or 1C. Authorization consumes the existing Identity-owned policy abstraction after the concrete access decision is agreed.
+Запит читає лише дані, якими володіє Sales. Він не звертається до Catalog, Identity або 1С. Авторизація використовує наявну абстракцію політики, якою володіє Identity, після погодження конкретного рішення про доступ.
 
-## Risks
+## Ризики
 
-- Historical order detail intentionally shows the counterparty's currently stored name and phone because the order model contains no customer snapshot. Consumers must not interpret those values as the profile at order-creation time.
-- Delivery state can change after a list or detail response is produced; the API returns the state observed during that query and does not promise a live 1C status.
+- Деталі історичного замовлення навмисно показують поточні збережені ім'я й телефон контрагента, оскільки модель замовлення не містить знімка клієнта. Споживачі не повинні тлумачити ці значення як профіль на момент створення замовлення.
+- Стан передавання може змінитися після формування відповіді списку або деталей; API повертає стан на момент запиту й не обіцяє актуальний стан у 1С.

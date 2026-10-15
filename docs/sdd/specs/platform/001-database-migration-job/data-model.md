@@ -1,11 +1,11 @@
-# Database migration job — data model
+# Job міграції БД — модель даних
 
-No application entity or public DTO is added.
+Нових сутностей застосунку чи публічних DTO немає.
 
-The operational state is EF Core's existing `__EFMigrationsHistory` table per database. Its invariants are:
+Операційний стан — наявна таблиця EF Core `__EFMigrationsHistory` для кожної БД. Її інваріанти:
 
-- Catalog and Sales `MigrationId` values are immutable once applied to production.
-- The approved Identity reset removes exactly the two obsolete int-key Identity rows before it establishes the Guid initial baseline.
-- After the reset, the ordered history must correspond to the source migration lineage for every context.
+- Значення `MigrationId` Catalog і Sales незмінні після застосування в production.
+- Погоджений reset Identity видаляє рівно два застарілі рядки Identity з int-ключами до створення початкового Guid-baseline.
+- Після reset упорядкована історія кожного context має відповідати послідовності міграцій у коді.
 
-The job stores no connection strings, credentials, or migration payloads.
+Job не зберігає рядків підключення, credentials або payloads міграцій.

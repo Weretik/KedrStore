@@ -1,72 +1,49 @@
-# Testing rules
+# Правила тестування
 
-## Behavior-first test selection
+## Вибір тестів за поведінкою
 
-Every new or changed observable behavior must reference an acceptance scenario
-such as `SC-001`. Select the narrowest test level that proves the risk:
+Кожна нова або змінена спостережувана поведінка має посилатися на приймальний сценарій на зразок `SC-001`. Вибирай найвужчий рівень тесту, який доводить потрібну властивість:
 
-- Domain rules and state transitions: Domain unit tests;
-- use-case orchestration, validation, and results: Application tests;
-- persistence constraints, transactions, and adapters: integration tests;
-- HTTP status, serialization, authorization, and OpenAPI behavior: API
-  integration or contract tests;
-- layer or dependency changes: architecture tests.
+- Доменні правила й переходи стану: unit-тести Domain;
+- координація сценаріїв використання, валідація й результати: тести Application;
+- обмеження збереження даних, транзакції й адаптери: інтеграційні тести;
+- HTTP-статуси, серіалізація, авторизація та OpenAPI-поведінка: API-інтеграційні або контрактні тести;
+- зміни шарів чи залежностей: архітектурні тести.
 
-Do not repeat the complete scenario at every level without a distinct risk.
-One scenario may be supported by several focused tests.
+Не повторюй повний сценарій на кожному рівні без окремого ризику. Один сценарій можуть підтверджувати кілька цільових тестів.
 
-## Test project ownership
+## Відповідальність тестових проєктів
 
-- `UnitTests` contains deterministic Domain and Application tests and does not
-  reference Infrastructure, Bootstrapper, HTTP hosts, or EF Core InMemory.
-- `IntegrationTests` contains persistence, migration, provider, external
-  adapter, background-job, HTTP, and OpenAPI tests.
-- `ArchitectureTests` verifies project-reference direction, compiled type
-  dependencies, business-module isolation, and test source organization.
+- `UnitTests` містить детерміновані тести Domain і Application та не посилається на Infrastructure, Bootstrapper, HTTP hosts або EF Core InMemory.
+- `IntegrationTests` містить тести збереження даних, міграцій, провайдера, зовнішніх адаптерів, фонових завдань, HTTP і OpenAPI.
+- `ArchitectureTests` перевіряє напрям посилань між проєктами, залежності скомпільованих типів, ізоляцію бізнес-модулів та організацію тестів.
 
-Within each project, organize tests as `<Module>/<Responsibility>` and use the
-matching namespace. Put reusable fixtures, scenario builders, and fakes under
-`TestSupport`; do not create empty module directories.
+У кожному проєкті розміщуй тести за `<Module>/<Responsibility>` із відповідним namespace. Спільні fixtures, scenario builders і fakes клади в `TestSupport`; не створюй порожніх папок модулів.
 
-## Relational and provider-specific behavior
+## Реляційна й provider-специфічна поведінка
 
-Use PostgreSQL integration tests for migrations, SQL, transactions,
-constraints, indexes, and PostgreSQL-specific concurrency such as `xmin`.
-EF Core InMemory may support fast orchestration tests only when relational and
-provider behavior is outside the risk being proved.
+Для міграцій, SQL, транзакцій, обмежень, індексів і специфічної для PostgreSQL конкурентності на зразок `xmin` використовуй інтеграційні тести з PostgreSQL. EF Core InMemory може допомагати швидким тестам orchestration лише коли реляційна й provider-поведінка не входить до ризику, який перевіряєш.
 
-PostgreSQL integration tests use Testcontainers and separate `DbContext`
-instances for concurrent workers. A missing local Docker endpoint may produce
-an explicit skipped test. On CI, where Docker is a prerequisite, container
-startup and migration failures fail the verification gate.
+Інтеграційні тести PostgreSQL використовують Testcontainers і окремі екземпляри `DbContext` для конкурентних виконавців. Якщо локальна кінцева точка Docker недоступна, тест може явно пропускатися. У CI Docker є передумовою, тому збій запуску контейнера або міграції зупиняє перевірку.
 
 ## Red -> Green -> Refactor
 
-For new behavior:
+Для нової поведінки:
 
-1. **Red**: add the smallest test that expresses the selected rule or scenario,
-   run it, and confirm that it fails for the expected missing behavior.
-2. **Green**: implement the smallest complete behavior that makes the test pass
-   without implementing unrelated scenarios.
-3. **Refactor**: improve names and structure while preserving architectural
-   boundaries, then rerun the focused tests.
-4. **Regression**: run the affected test set and record the command and result.
+1. **Red**: додай найменший тест для вибраного правила чи сценарію, запусти його й переконайся, що він падає саме через відсутню поведінку.
+2. **Green**: реалізуй найменшу завершену поведінку для проходження тесту без сторонніх сценаріїв.
+3. **Refactor**: покращ назви й структуру зі збереженням архітектурних меж, потім повтори цільові тести.
+4. **Regression**: запусти зачеплений набір тестів і запиши команду та результат.
 
-A task is not complete until its evidence names the test and records the Red,
-Green, and regression results. Do not treat compilation errors, broken test
-setup, or unrelated failures as a valid Red result.
+Завдання не завершено, доки свідчення не називає тест і не фіксує результати Red, Green та регресії. Помилка компіляції, зламане тестове оточення або сторонній збій не є коректним Red.
 
-## Exceptions
+## Винятки
 
-A Red-first test may be omitted for documentation-only work, generated
-migrations, exploratory spikes, or infrastructure changes that cannot be
-observed meaningfully before a prerequisite exists. Record the reason, the
-replacement verification, and the scenarios enabled or covered. An exception
-is not permission to omit final verification.
+Red-first тест можна пропустити для суто документаційної роботи, згенерованих міграцій, дослідницьких spikes або інфраструктурних змін, які неможливо змістовно спостерігати до появи передумови. Запиши причину, замінну перевірку й сценарії, що стали можливими або були покриті. Виняток не скасовує фінальної перевірки.
 
-## Repository verification
+## Перевірка репозиторію
 
-Before completing a feature, run where applicable:
+Перед завершенням фічі виконай застосовні команди:
 
 ```powershell
 dotnet restore KedrStore.sln
@@ -74,6 +51,4 @@ dotnet build KedrStore.sln --no-restore
 dotnet test KedrStore.sln --no-build
 ```
 
-If verification is blocked or fails, state the exact command, failure point,
-and whether the failure is pre-existing or caused by the change. Do not hide
-unrelated failures.
+Якщо перевірка заблокована або падає, назви точну команду, місце збою й те, чи збій існував до зміни або спричинений нею. Не приховуй сторонніх помилок.

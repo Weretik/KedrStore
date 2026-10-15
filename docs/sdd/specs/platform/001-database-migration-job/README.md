@@ -1,54 +1,54 @@
-# 001 — Database migration job
+# 001 — Job міграції БД
 
-**Module:** platform
-**Type:** migration
-**Status:** in-progress
-**Owner:** backend team
-**Created:** 2026-07-29
+**Модуль:** platform
+**Тип:** міграція
+**Статус:** у роботі
+**Відповідальні:** backend-команда
+**Створено:** 2026-07-29
 
-Move EF Core schema migration execution out of the Cloud Run API startup path and into the root `Host.Jobs` executable. The approved production path resets the non-critical Identity schema and migration history, then recreates it through the current Guid-based initial migration. The API must start without attempting to alter a database schema.
+Перенести виконання EF Core-міграцій зі старту Cloud Run API до кореневого виконуваного `Host.Jobs`. Погоджений production-порядок скидає некритичні схему й історію Identity, тоді відтворює їх поточною початковою міграцією з Guid-ключами. API має стартувати без спроб змінити схему БД.
 
-## Scope
+## Обсяг
 
-- Reset only the approved non-critical Identity tables and their historical migration rows after a fresh backup.
-- Add an explicit, one-shot `--job=migrate` mode to `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` and its executable.
-- Run migrations serially for all registered contexts with structured logs and a non-zero exit code on failure.
-- Remove automatic migration execution from `Host.Api` startup.
-- Update the Cloud Run deployment workflow so the migration job completes successfully before a new API revision is deployed.
+- Після свіжого backup скинути лише погоджені некритичні таблиці Identity та їхні історичні рядки міграцій.
+- Додати явний одноразовий режим `--job=migrate` до `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` і його виконуваного коду.
+- Послідовно застосовувати міграції для всіх зареєстрованих contexts зі структурованими логами та ненульовим кодом виходу за помилки.
+- Прибрати автоматичне виконання міграцій зі старту `Host.Api`.
+- Оновити процес розгортання Cloud Run, щоб завдання міграції успішно завершувалося до розгортання нової ревізії API.
 
-## Out of scope
+## Поза обсягом
 
-- Changing application HTTP contracts or domain behavior.
-- Recreating, deleting, or manually editing Catalog or Sales production tables.
-- Changing unrelated 1C import jobs.
+- Зміна HTTP-контрактів застосунку або доменної поведінки.
+- Повторне створення, видалення чи ручне редагування production-таблиць Catalog або Sales.
+- Зміна не пов'язаних jobs імпорту 1C.
 
-## Requirements
+## Вимоги
 
-- [Overview and scope](requirements/overview.md)
-- [Migration safety](requirements/migration-safety.md)
+- [Огляд і обсяг](requirements/overview.md)
+- [Безпека міграції](requirements/migration-safety.md)
 
-## Technical design
+## Технічний дизайн
 
-- [Domain and ownership](design/domain.md)
-- [Infrastructure and rollout](design/infrastructure.md)
-- [Approved Identity reset SQL](design/identity-reset.sql.md)
-- [Data model](data-model.md)
+- [Домен і відповідальність](design/domain.md)
+- [Інфраструктура й розгортання](design/infrastructure.md)
+- [Погоджений SQL reset Identity](design/identity-reset.sql.md)
+- [Модель даних](data-model.md)
 
-## Delivery
+## Передача й перевірка
 
-- [API/integration contract](contracts/api-contract.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [API/інтеграційний контракт](contracts/api-contract.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність до передачі](checklist/delivery-readiness.md)
 
-## AI implementation tasks
+## Завдання реалізації для AI
 
-AI performs only unfinished tasks in the current phase, marks completed tasks as `[x]`, and proceeds only after the checkpoint. `[P]` indicates safe parallel execution after dependencies are complete.
+AI виконує лише незавершені завдання поточної фази, позначає готові як `[x]` і переходить далі тільки після контрольної точки. `[P]` означає безпечне паралельне виконання після завершення залежностей.
 
-| Phase | Result |
+| Фаза | Результат |
 | --- | --- |
-| [00 — Readiness](tasks/00-readiness.md) | confirmed production baseline and rollback plan |
-| [01 — Migration lineage](tasks/01-migration-lineage.md) | compatible Identity migration history and forward-only delta |
-| [02 — Root migration job](tasks/02-root-migration-job.md) | explicit root migration job with safe exit behavior |
-| [03 — Deployment orchestration](tasks/03-deployment-orchestration.md) | API startup is schema-neutral; CI runs the job first |
-| [04 — API](tasks/04-api.md) | not applicable; no HTTP contract is introduced |
-| [05 — Verification](tasks/05-verification.md) | disposable and production rollout evidence |
+| [00 — Готовність](tasks/00-readiness.md) | підтверджений початковий стан продукційного середовища й план відкату |
+| [01 — Послідовність міграцій](tasks/01-migration-lineage.md) | сумісна історія міграцій Identity і зміна лише в прямому напрямі |
+| [02 — Кореневе завдання міграції](tasks/02-root-migration-job.md) | явне кореневе завдання міграції з безпечним завершенням |
+| [03 — Координація розгортання](tasks/03-deployment-orchestration.md) | старт API не змінює схему; CI спершу запускає завдання |
+| [04 — API](tasks/04-api.md) | не застосовується; HTTP-контракт не додається |
+| [05 — Перевірка](tasks/05-verification.md) | свідчення одноразової перевірки й розгортання у продукційному середовищі |

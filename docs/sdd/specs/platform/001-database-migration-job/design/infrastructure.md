@@ -1,26 +1,26 @@
-# Database migration job — infrastructure and rollout
+# Завдання міграції БД — інфраструктура й розгортання
 
-## Approved Identity reset
+## Погоджений reset Identity
 
-Production Identity history contains the int-key migrations `20260118230934_InitialAppIdentityDbContext` and `20260507141045_AddRefreshSessionStore`, while the current application model uses Guid keys. The approved rollout deliberately discards non-critical Identity data rather than attempting an unsafe key conversion.
+Історія Identity у продукційному середовищі містить міграції з int-ключами `20260118230934_InitialAppIdentityDbContext` і `20260507141045_AddRefreshSessionStore`, тоді як поточна модель застосунку використовує Guid-ключі. Погоджений порядок розгортання свідомо відкидає некритичні дані Identity замість ризикового перетворення ключів.
 
-After a fresh backup and foreign-key review, the reset drops only `AppRefreshSessions` and `AspNet*` Identity tables, then removes only the two historical Identity rows from `__EFMigrationsHistory`. The root migration job applies `20260529142739_InitialAppIdentityDbContext`, which recreates the current Guid Identity schema. Catalog and Sales tables and migration history remain untouched.
+Після свіжого backup та перевірки зовнішніх ключів reset видаляє лише таблиці Identity `AppRefreshSessions` і `AspNet*`, потім лише два історичні рядки Identity з `__EFMigrationsHistory`. Кореневий migration job застосовує `20260529142739_InitialAppIdentityDbContext`, що відтворює поточну Guid-схему Identity. Таблиці й історія міграцій Catalog та Sales залишаються недоторканими.
 
-## Job contract
+## Контракт job
 
-Add `--job=migrate` to `Host.Jobs/Program.cs`. It invokes a dedicated migration orchestration service in the `Host.Jobs` root project; the service resolves all `IDatabaseMigrator` registrations in an explicit context order, then runs the existing seeders so the baseline Identity roles/admin account are recreated. It emits context names and outcome only, without connection strings or secrets.
+Додати `--job=migrate` у `Host.Jobs/Program.cs`. Він викликає окремий сервіс координації міграцій у кореневому проєкті `Host.Jobs`: сервіс знаходить усі реєстрації `IDatabaseMigrator` у визначеному порядку контекстів, тоді запускає наявні сидери для відтворення ролей і облікового запису адміністратора Identity. У логах є лише назви контекстів і результат без рядків підключення чи секретів.
 
-The job returns `0` on success and non-zero on the first error. It accepts no `--rootId` and has no 1C dependency.
+Job повертає `0` за успіху й ненульовий код за першої помилки. Він не приймає `--rootId` і не залежить від 1C.
 
-## Cloud Run sequence
+## Порядок у Cloud Run
 
-1. Build and push the Jobs image.
-2. Update/create and execute a dedicated `database-migrate` Cloud Run Job using the Jobs image, database connection secret, and the admin-password secret required by the Identity seeder.
-3. Wait for execution success.
-4. Deploy the API revision.
+1. Зібрати й опублікувати образ Jobs.
+2. Оновити/створити та запустити окремий Cloud Run Job `database-migrate` з образом Jobs, секретом підключення до БД і секретом admin-пароля, потрібним сидеру Identity.
+3. Дочекатися успішного завершення.
+4. Розгорнути ревізію API.
 
-The API `Program.cs` removes `RunStartupTasksAsync` migration execution. Seeding is a separate decision and must not be silently retained in API startup.
+У `Program.cs` API прибрано виконання міграцій через `RunStartupTasksAsync`. Seeding — окреме рішення; його не можна непомітно залишати під час старту API.
 
-## Rollback
+## Відкат
 
-Before the first production execution, create a Cloud SQL backup. If the forward migration fails, stop deployment and restore from the verified backup or apply an explicitly reviewed reverse migration; do not retry by changing `__EFMigrationsHistory` manually.
+До першого виконання у продукційному середовищі створи резервну копію Cloud SQL. Якщо міграція в прямому напрямі падає, зупини розгортання й віднови перевірену резервну копію або застосуй явно переглянуту зворотну міграцію; не повторюй запуск після ручної зміни `__EFMigrationsHistory`.

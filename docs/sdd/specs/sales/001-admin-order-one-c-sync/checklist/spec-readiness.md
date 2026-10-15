@@ -1,9 +1,9 @@
-# Admin order and 1C synchronization — checklist: specification readiness
+# Замовлення адміністратора та синхронізація з 1C — контрольний список готовності специфікації
 
-- [x] The requirements distinguish the new Sales manager order from the excluded Catalog public quick-order flow.
-- [x] Every business, API, and SOAP mapping decision needed for the initial implementation is recorded.
-- [x] Each known requirement has a design direction or a documented deferred decision.
-- [x] The proposed model contains only data required by the manager order and durable 1C delivery lifecycle.
-- [x] Each requirement is covered by concrete task IDs in phases 01–05.
-- [x] HTTP route, authorization, idempotency, `Amount` semantics, maximum retry count, and SOAP accepted/error semantics are agreed as the feature baseline.
-- [x] The 1C integration boundary, retry rules, time window, logging, and sensitive-data constraints link to durable documentation and the supplied delivery instruction.
+- [x] Вимоги відрізняють нове замовлення менеджера в Sales від виключеного публічного сценарію швидкого замовлення Catalog.
+- [x] Зафіксовано всі рішення щодо бізнес-логіки та відображення API й SOAP, потрібні для початкової реалізації.
+- [x] Для кожної відомої вимоги визначено напрям дизайну або задокументоване відкладене рішення.
+- [x] Запропонована модель містить лише дані, потрібні для замовлення менеджера й надійного життєвого циклу передавання до 1C.
+- [x] Кожну вимогу охоплено конкретними ID завдань у фазах 01–05.
+- [x] HTTP-маршрут, авторизацію, ідемпотентність, семантику `Amount`, максимальну кількість повторів і семантику прийняття/помилки SOAP узгоджено як базові рішення фічі.
+- [x] Для межі інтеграції з 1C, правил повторних спроб, часового вікна, журналювання та обмежень на чутливі дані наведено посилання на довготривалу документацію й надану інструкцію з передавання.

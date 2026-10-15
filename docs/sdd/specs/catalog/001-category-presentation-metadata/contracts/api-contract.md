@@ -1,15 +1,15 @@
-# Category presentation metadata — API and integration contract
+# Метадані представлення категорій — API та інтеграційний контракт
 
-**Status:** verified application consumer contract; no HTTP contract in scope
+**Статус:** перевірений контракт споживача Application; HTTP-контракт поза межами
 
-## Existing integration contract
+## Наявний інтеграційний контракт
 
-The existing 1C SOAP client contract is unchanged. Cosmos remains a backend-owned virtual category: category import must not call `GetCategories` for the configured Cosmos root, and product-details import assigns `OneC:CosmosCategoryId` to every Cosmos product.
+Наявний контракт SOAP-клієнта 1C не змінюється. Cosmos залишається віртуальною категорією, якою володіє backend: імпорт категорій не має викликати `GetCategories` для налаштованого кореня Cosmos, а імпорт деталей товарів призначає `OneC:CosmosCategoryId` кожному товару Cosmos.
 
-## HTTP consumer decision
+## Рішення щодо HTTP-споживача
 
-The repository contains an application `GetCategoriesQuery` and `CategoryTreeDto`, but no API controller or route dispatches that query. HTTP exposure is not in scope for this feature: the Catalog Application read model is the consuming boundary.
+Репозиторій містить application-запит `GetCategoriesQuery` і `CategoryTreeDto`, але жоден API-контролер чи маршрут не відправляє цей запит. Надання HTTP-доступу не входить до меж цієї функціональності: модель читання Catalog Application є межею споживання.
 
-`CategoryTreeDto` preserves its existing `Id`, `Name`, and `Children` fields and additively exposes `ShortNameUk`, `ShortNameRu`, `SortOrder`, and `Level`. Children are ordered by `SortOrder`, then numeric `Id`.
+`CategoryTreeDto` зберігає наявні поля `Id`, `Name` і `Children` та адитивно додає `ShortNameUk`, `ShortNameRu`, `SortOrder` і `Level`. Дочірні категорії впорядковуються за `SortOrder`, потім за числовим `Id`.
 
-No route, operation ID, authorization policy, OpenAPI document, or API task is created. A later feature that introduces HTTP exposure must first agree an additive contract that preserves `id`, `name`, and `children` semantics.
+Новий маршрут, operation ID, політика авторизації, документ OpenAPI чи API-задача не створюються. Наступна функціональність, яка відкриє HTTP-доступ, спочатку має погодити адитивний контракт зі збереженням семантики `id`, `name` і `children`.

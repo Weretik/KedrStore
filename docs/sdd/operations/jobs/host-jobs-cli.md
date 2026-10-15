@@ -1,49 +1,46 @@
-# Host.Jobs CLI
+# CLI Host.Jobs
 
-`Host.Jobs` loads `appsettings.json` and environment variables. In Development it loads **its own** User Secrets (separate from `Host.Api`).
+`Host.Jobs` завантажує `appsettings.json` і змінні середовища. У Development він використовує **власні** User Secrets, окремі від `Host.Api`. Із кореня репозиторію:
 
 ```powershell
-Set-Location C:\Users\Віталій\RiderProjects\KedrStore\src\Bootstrapper\Host.Jobs\Host.Jobs
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project .\Host.Jobs.csproj -- --job=<name>
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=<name>
 ```
 
-| Job | Argument | Purpose |
+| Job | Аргумент | Призначення |
 | --- | --- | --- |
-| `full` | — | catalog full refresh for both configured roots |
-| `pricetypes` | — | catalog price types |
-| `category`, `productdetails`, `stocks`, `prices` | one or more `--rootId=<id>` | targeted catalog root refresh |
-| `rebuild-projections` | — | rebuild catalog list read model |
-| `check-product-photos` | — | check every active product photo URL and persist its latest availability |
-| `counterparties` | — | Sales counterparties |
-| `counterparty-category-price-types` | — | Sales customer price rules |
-| `sales-customers-full` | — | counterparties, then price rules |
-| `sync-one-c-orders` | — | one due batch of persisted Sales manager orders |
+| `migrate` | — | послідовні EF-міграції зареєстрованих контекстів, потім сидери; змінює схему й дані |
+| `full` | — | Повне оновлення Catalog для налаштованих root IDs Doors, Hardware і Cosmos |
+| `pricetypes` | — | Типи цін Catalog |
+| `category`, `productdetails`, `stocks`, `prices` | Один або кілька `--rootId=<id>` | Цільове оновлення root Catalog |
+| `rebuild-projections` | — | Перебудова моделі читання списку Catalog |
+| `check-product-photos` | — | Перевірка URL фото кожного активного товару й збереження останнього статусу |
+| `counterparties` | — | Контрагенти Sales |
+| `counterparty-category-price-types` | — | Цінові правила клієнтів Sales |
+| `sales-customers-full` | — | Спершу контрагенти, потім цінові правила |
+| `sync-one-c-orders` | — | Один готовий до виконання batch збережених замовлень менеджерів Sales |
 
-Example:
+Приклад:
 
 ```powershell
-dotnet run --project .\Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=stocks --rootId=<one-c-root-id>
 ```
 
-Repeat `--rootId` for multiple roots. Exit code `0` and `[SUCCESS] Job finished OK` mean no exception; still validate import counts. Code `1` means job/argument/runtime failure; code `2` means a root-dependent job lacked `--rootId`.
+Повтори `--rootId` для кількох коренів. Код виходу `0` і `[SUCCESS] Job finished OK` означають відсутність винятку; окремо перевір кількість імпортованих записів. Код `1` означає помилку job, аргументу або виконання; код `2` — відсутній `--rootId` для job, що його потребує. Для `migrate` звір результат за [інструкцією з міграцій](../data/migrations-and-seeding.md).
 
-For order-delivery prerequisites, result interpretation, stopping, and dead-letter handling, follow the [Sales OneC runbook](sales-one-c-runbook.md#manager-order-delivery).
+Передумови доставки замовлень, тлумачення результату, зупинку й обробку dead-letter див. в [операційній інструкції Sales/1C](sales-one-c-runbook.md#доставка-замовлень-менеджера).
 
-For CDN classification, result interpretation, configuration, and Cloud Run
-operation, follow the [Catalog product-photo check runbook](catalog-photo-check-runbook.md).
+Класифікацію CDN, результат, конфігурацію й запуск Cloud Run описує [операційна інструкція з перевірки фото Catalog](catalog-photo-check-runbook.md).
 
-## Manual 1C write smoke test
+## Ручний smoke test запису в 1C
 
-This command performs a real `CreateSiteRequest` write. Use it only with a test 1C endpoint and test counterparty/product data. `OneCSoap:Endpoint`, `Username`, and `Password` must be supplied through the Host.Jobs User Secrets or environment variables; never put them in `appsettings.json` or command arguments.
+Ця команда виконує реальний запис `CreateSiteRequest`. Використовуй її лише з тестовою кінцевою точкою 1C і тестовими даними контрагента/товару. `OneCSoap:Endpoint`, `Username` і `Password` надавай через User Secrets `Host.Jobs` або змінні середовища; не записуй їх в `appsettings.json` чи аргументи команди.
 
 ```powershell
-$jobProject = 'C:\Users\Віталій\RiderProjects\KedrStore\src\Bootstrapper\Host.Jobs\Host.Jobs'
-Set-Location $jobProject
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project .\Host.Jobs.csproj -- --job=one-c-smoke-write --counterpartyId=000000298 --productId=8190 --quantity=10 --amount=1000 --orderNumber=TEST-SO-20260818-001 --comment='TEST: manual SOAP verification.'
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=one-c-smoke-write --counterpartyId=000000298 --productId=8190 --quantity=10 --amount=1000 --orderNumber=TEST-SO-20260818-001 --comment='TEST: manual SOAP verification.'
 ```
 
-Numeric product IDs are left-padded to nine characters before transmission, so `8190` is sent as `000008190`. A confirmed 1C document ID produces exit code `0`; a business rejection produces exit code `3`.
+Числові ID товарів доповнюються початковими нулями до дев'яти символів: `8190` передається як `000008190`. Підтверджений ID документа 1C дає код виходу `0`; бізнес-відхилення — код `3`.
 
-Recorded live-test evidence, response interpretation, and the code map are maintained in the feature's [1C write smoke verification](../../specs/sales/001-admin-order-one-c-sync/tasks/test/06.3-one-c-write-smoke-test.md).
+Записані свідчення live-тесту, тлумачення відповіді й карту коду зберігає [smoke-перевірка запису 1C](../../specs/sales/001-admin-order-one-c-sync/tasks/test/06.3-one-c-write-smoke-test.md) у специфікації фічі.

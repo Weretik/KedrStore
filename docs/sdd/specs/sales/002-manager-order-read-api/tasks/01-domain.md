@@ -1,7 +1,7 @@
-# Phase 01 — Domain
+# Фаза 01 — Domain
 
-No Domain implementation task is required. SC-001–SC-005 read the existing `Order`, `OrderLine`, `OneCOrderSync`, and `Counterparty` model without changing invariants, state transitions, identifiers, or events.
+Задача реалізації Domain не потрібна. SC-001–SC-005 читають наявну модель `Order`, `OrderLine`, `OneCOrderSync` і `Counterparty` без зміни інваріантів, переходів стану, ідентифікаторів або подій.
 
-## Checkpoint
+## Контрольна точка
 
-`traceability.md` uses `—` in the Domain column for every scenario, and `design/domain.md` documents why no Domain work is needed.
+`traceability.md` містить `—` у стовпці Domain для кожного сценарію, а `design/domain.md` пояснює, чому робота в Domain не потрібна.

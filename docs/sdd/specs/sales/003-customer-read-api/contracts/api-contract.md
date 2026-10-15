@@ -1,27 +1,27 @@
-# Customer read API — API contract
+# API читання клієнтів — контракт API
 
-**Status:** agreed
+**Статус:** agreed
 
-## Consumers and compatibility
+## Споживачі та сумісність
 
-The consumer is the Sales administration frontend. This additive read API does not change Sales catalog, order creation/delivery, customer synchronization, or Identity. Both operations allow anonymous access during the current rollout stage. Any caller can read the approved projections of active Sales counterparties; no row-level assignment restriction applies.
+Споживачем є адміністративний інтерфейс Sales. Цей додатковий API читання не змінює каталог Sales, створення чи доставку замовлень, синхронізацію клієнтів або Identity. На поточному етапі розгортання обидві операції дозволяють анонімний доступ. Будь-який викликач може читати погоджені проєкції активних контрагентів Sales; обмеження за призначенням на рівні рядків не застосовується.
 
-## List customers
+## Список клієнтів
 
 `GET /api/admin/customers`
 
-Operation ID: `getAdminCustomers`.
+Ідентифікатор операції: `getAdminCustomers`.
 
-Query parameters:
+Параметри запиту:
 
-| Parameter | Required | Rules |
+| Параметр | Обов'язковий | Правила |
 | --- | --- | --- |
-| `page` | no | Integer `>= 1`; default `1` |
-| `pageSize` | no | Integer from `1` through `100`; default `20` |
+| `page` | ні | Ціле число `>= 1`; типове значення `1` |
+| `pageSize` | ні | Ціле число від `1` до `100`; типове значення `20` |
 
-No search, deletion-state, price-type, or custom-sort filter is included. Results contain active counterparties only and are ordered by `name` ascending and then `counterpartyId` ascending.
+Фільтрів за пошуком, станом видалення, типом ціни чи довільним сортуванням немає. Результати містять лише активних контрагентів і впорядковані за `name` за зростанням, потім за `counterpartyId` за зростанням.
 
-Successful response:
+Успішна відповідь:
 
 ```json
 {
@@ -41,15 +41,15 @@ Successful response:
 }
 ```
 
-The list intentionally excludes email, `IdentityUserId`, price rules, audit/deletion fields, order IDs, and order details.
+Зі списку навмисно виключено електронну пошту, `IdentityUserId`, правила цін, поля аудиту й видалення, ID та деталі замовлень.
 
-## Get customer detail
+## Отримання деталей клієнта
 
 `GET /api/admin/customers/{counterpartyId}`
 
-Operation ID: `getAdminCustomerById`. `counterpartyId` is a non-blank, URL-encoded Sales/1C identifier of at most 64 characters and is matched exactly. Unknown and soft-deleted counterparties return `404`.
+Ідентифікатор операції: `getAdminCustomerById`. `counterpartyId` — непорожній ідентифікатор Sales/1C завдовжки не більш ніж 64 символи, закодований для URL; порівняння точне. Для невідомих і логічно видалених контрагентів повертається `404`.
 
-Successful response:
+Успішна відповідь:
 
 ```json
 {
@@ -67,29 +67,29 @@ Successful response:
 }
 ```
 
-Category price rules are ordered by `categoryId` ascending. Detail excludes `IdentityUserId`, soft-delete/audit fields, order IDs, order counts, and order details.
+Правила цін для категорій упорядковано за `categoryId` за зростанням. Деталі не містять `IdentityUserId`, полів логічного видалення й аудиту, ID замовлень, їх кількості чи деталей.
 
-## Customer page composition
+## Склад сторінки клієнта
 
-The customer detail response does not embed orders. When the administration frontend opens a customer page, it requests these resources independently and may run them in parallel:
+Відповідь із деталями клієнта не містить вкладених замовлень. Коли адміністративний інтерфейс відкриває сторінку клієнта, він незалежно запитує ці ресурси й може виконувати запити паралельно:
 
 ```text
 GET /api/admin/customers/{counterpartyId}
 GET /api/admin/orders?counterpartyId={counterpartyId}&page=1&pageSize=20
 ```
 
-The order collection remains independently paged and uses the manager-order list schema from feature 002. No duplicate nested customer-orders route is introduced.
+Список замовлень залишається окремо посторінковим і використовує схему списку замовлень менеджера з фічі 002. Дубльований вкладений маршрут замовлень клієнта не додається.
 
-## Errors and access
+## Помилки й доступ
 
-- `200 OK`: filled or empty list, or existing active-customer detail.
-- `400 Bad Request`: invalid paging or counterparty identifier input.
-- `404 Not Found`: no active counterparty exists for a valid `counterpartyId`.
+- `200 OK`: заповнений або порожній список чи деталі наявного активного клієнта.
+- `400 Bad Request`: некоректні параметри посторінкового виводу або ідентифікатор контрагента.
+- `404 Not Found`: для коректного `counterpartyId` немає активного контрагента.
 
-Neither operation requires authentication or authorization during the current rollout stage.
+На поточному етапі розгортання жодна операція не потребує автентифікації чи авторизації.
 
-Read operations have no idempotency requirement and never call 1C/Identity or mutate persistence.
+Для операцій читання немає вимоги до ідемпотентності; вони ніколи не викликають 1C/Identity і не змінюють збережені дані.
 
-## OpenAPI and rollout
+## OpenAPI та розгортання
 
-Before transport implementation, create `docs/sdd/contracts/sales/customer-read.openapi.yaml` and add `$ref` entries for both operations to `docs/sdd/contracts/openapi.yaml`. Deploy implementation and aggregate contract together and verify runtime OpenAPI against this source contract.
+Перед реалізацією транспортного шару створити `docs/sdd/contracts/sales/customer-read.openapi.yaml` і додати посилання `$ref` на обидві операції до `docs/sdd/contracts/openapi.yaml`. Розгортати реалізацію разом зі зведеним контрактом і перевірити OpenAPI під час виконання за цим вихідним контрактом.

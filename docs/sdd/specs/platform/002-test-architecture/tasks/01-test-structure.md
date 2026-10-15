@@ -1,25 +1,24 @@
-# TS-001 — Reorganize tests and correct project ownership
+# TS-001 — Реорганізувати тести й виправити відповідальність проєктів
 
-- **Covers:** SC-001, SC-002
-- **Depends on:** none
-- **Exact paths:** `tests/UnitTests`, `tests/IntegrationTests`
-- **Test level:** unit and integration regression
+- **Покриває:** SC-001, SC-002
+- **Залежить від:** немає
+- **Точні шляхи:** `tests/UnitTests`, `tests/IntegrationTests`
+- **Рівень тесту:** unit та integration регресія
 
-## Work
+## Робота
 
-- [x] Move tests into module and responsibility directories and matching namespaces.
-- [x] Split the Sales order-sync job suite into focused classes with shared support.
-- [x] Move infrastructure and host tests out of `UnitTests`.
-- [x] Remove EF Core InMemory, Infrastructure, and Host project references from `UnitTests`.
-- [x] Delete `UnitTest1.cs`.
+- [x] Перенести тести до папок модулів/відповідальності й відповідних namespaces.
+- [x] Поділити набір тестів job синхронізації Sales на цільові класи зі спільною підтримкою.
+- [x] Перенести тести Infrastructure і host з `UnitTests`.
+- [x] Прибрати references на EF Core InMemory, Infrastructure та Host з `UnitTests`.
+- [x] Видалити `UnitTest1.cs`.
 
-## Test-first exception and evidence
+## Виняток із test-first і свідчення
 
-- Reason: this task preserves existing behavior while changing ownership and structure.
-- Before baseline: `dotnet test KedrStore.sln --no-restore --verbosity minimal` passed 65 unit and 22 integration tests on 2026-09-09; ArchitectureTests did not execute.
-- After regression: `dotnet test tests/UnitTests/UnitTests.csproj --no-build --configuration Release` passed 41 tests; `dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-build --configuration Release` passed 44 and skipped the Docker-dependent PostgreSQL test.
+- Причина: завдання зберігає наявну поведінку, змінюючи відповідальність і структуру.
+- Початковий стан до зміни: `dotnet test KedrStore.sln --no-restore --verbosity minimal` пройшов 65 модульних і 22 інтеграційні тести 2026-09-09; ArchitectureTests не виконалися.
+- Регресія після зміни: `dotnet test tests/UnitTests/UnitTests.csproj --no-build --configuration Release` пройшов 41 тест; `dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-build --configuration Release` пройшов 44 тести й пропустив PostgreSQL-тест через Docker.
 
-## Checkpoint
+## Контрольна точка
 
-All existing tests compile and pass from their target project, and UnitTests has
-no outward production-layer dependency.
+Усі наявні тести компілюються й проходять у своїх цільових проєктах, а UnitTests не залежить від зовнішніх production-шарів.

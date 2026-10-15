@@ -1,41 +1,41 @@
-# 003 — Missing product photos
+# 003 — Відсутні фотографії товарів
 
-- **Module:** Catalog
-- **Type:** feature
-- **Status:** verified
-- **Owner:** Catalog team
-- **Created:** 2026-09-23
+- **Модуль:** Catalog
+- **Тип:** функціональність
+- **Статус:** перевірено
+- **Відповідальні:** команда Catalog
+- **Створено:** 2026-09-23
 
-Provide a fast anonymous administration API for active products whose stored
-photo URL is currently unusable. A one-shot Host.Jobs command probes the CDN
-and persists the latest result; the HTTP request reads that state from
-PostgreSQL and never waits for the CDN. Deployment creates or updates the
-corresponding Cloud Run Job, while its schedule remains operator-owned.
+Надати швидкий адміністративний API з анонімним доступом для активних товарів,
+збережений URL фотографії яких наразі непридатний. Одноразова команда Host.Jobs
+перевіряє CDN і зберігає останній результат; HTTP-запит читає цей стан із
+PostgreSQL і ніколи не очікує на CDN. Розгортання створює або оновлює
+відповідну Cloud Run Job, тоді як її розклад залишається у віданні оператора.
 
-## Requirements
+## Вимоги
 
-- [Overview and scope](requirements/overview.md)
-- [Photo availability tracking](requirements/photo-availability.md)
+- [Огляд і межі](requirements/overview.md)
+- [Відстеження доступності фотографій](requirements/photo-availability.md)
 
-## Technical design
+## Технічний дизайн
 
 - [Domain](design/domain.md)
 - [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
-- [API and integration contract](contracts/api-contract.md)
+- [Модель даних](data-model.md)
+- [API та інтеграційний контракт](contracts/api-contract.md)
 
-## Planning and delivery
+## Планування та постачання
 
-- [Scenario traceability](traceability.md)
-- [Task graph](tasks/README.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [Простежуваність сценаріїв](traceability.md)
+- [Граф задач](tasks/README.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність постачання](checklist/delivery-readiness.md)
 
-Behavior tasks used `Red -> Green -> Refactor -> Regression -> evidence`.
-Implementation and delivery evidence are recorded in the task files and
-traceability matrix.
+Задачі поведінки виконували за циклом `Red -> Green -> Refactor -> Regression -> evidence`.
+Свідчення реалізації та постачання записано у файлах задач і матриці
+простежуваності.
 
-## Change notes
+## Історія змін
 
-- 2026-09-23 — Initial specification: persisted CDN checks, anonymous missing-photo API, Host.Jobs command, and Cloud Run Job deployment wiring.
-- 2026-09-23 — Implemented and verified the domain state, PostgreSQL migration, bounded CDN probe, import reconciliation, one-shot job, database-only anonymous API, contracts, operations guide, and Cloud Run Job definition.
+- 2026-09-23 — Початкова специфікація: збережені перевірки CDN, API відсутніх фотографій з анонімним доступом, команда Host.Jobs і підключення розгортання Cloud Run Job.
+- 2026-09-23 — Реалізовано й перевірено domain-стан, міграцію PostgreSQL, обмежену перевірку CDN, узгодження імпорту, одноразову задачу, анонімний API лише на базі даних, контракти, операційний посібник і визначення Cloud Run Job.

@@ -1,192 +1,193 @@
-# Missing product photos — photo availability tracking
+# Відсутні фотографії товарів — відстеження доступності фотографій
 
-## Behavior
+## Поведінка
 
-- Each active product has a latest check state tied to its current photo URL.
-- Running the photo-check job examines every active product once per run and
-  records a terminal result without stopping the batch for an individual URL
-  failure.
-- The API lists only products whose latest terminal result is `Missing`,
-  `InvalidContentType`, or `CheckFailed`.
-- `Available` and `Unknown` products do not appear. `Unknown` means no completed
-  check exists for the current URL, so absence has not yet been established.
-- A CDN file disappearing changes the next completed result to `Missing`; its
-  diagnostic row remains because that row is the evidence used by the API.
+- Кожен активний товар має стан останньої перевірки, прив'язаний до поточного
+  URL його фотографії.
+- Запуск задачі перевірки фотографій досліджує кожен активний товар один раз за
+  запуск і записує термінальний результат, не зупиняючи пакет через збій
+  окремого URL.
+- API повертає лише товари, останній термінальний результат яких — `Missing`,
+  `InvalidContentType` або `CheckFailed`.
+- Товари зі станами `Available` і `Unknown` не показуються. `Unknown` означає,
+  що для поточного URL ще немає завершеної перевірки, отже відсутність не встановлено.
+- Якщо файл CDN зникає, наступний завершений результат стає `Missing`; його
+  діагностичний рядок зберігається, оскільки API використовує його як свідчення.
 
-## Business rules
+## Бізнес-правила
 
-### R-001 — Current URL owns current state
+### R-001 — Поточний стан належить поточному URL
 
-A check result applies only to the exact photo URL recorded with it. A new
-product or changed URL has `Unknown` state until that URL is checked.
+Результат перевірки стосується лише точного URL фотографії, записаного разом
+із ним. Новий товар або змінений URL має стан `Unknown`, доки цей URL не перевірять.
 
-### R-002 — Successful image
+### R-002 — Успішна відповідь із зображенням
 
-A final HTTP response in the `2xx` range with a media type whose normalized
-type is `image/*` is `Available`.
+Кінцева HTTP-відповідь у діапазоні `2xx` із медіатипом, нормалізований тип
+якого — `image/*`, має стан `Available`.
 
-### R-003 — Unavailable image classifications
+### R-003 — Класифікація недоступного зображення
 
-`404` and `410` are `Missing`. A final `2xx` response whose media type is
-missing or is not `image/*` is `InvalidContentType`. A timeout, DNS/network
-failure, invalid or disallowed URL, `429`, any `5xx`, and every other
-non-success result is `CheckFailed`.
+`404` і `410` означають `Missing`. Кінцева відповідь `2xx` без медіатипу або
+з медіатипом, відмінним від `image/*`, означає `InvalidContentType`. Таймаут,
+збій DNS/мережі, некоректний або недозволений URL, `429`, будь-який `5xx` та
+кожен інший неуспішний результат означають `CheckFailed`.
 
-All three non-available terminal statuses appear in the API. Their distinct
-status and bounded diagnostic data remain available for troubleshooting.
+Усі три термінальні статуси недоступності показуються в API. Їхні відмінні
+статуси й обмежені діагностичні дані залишаються доступними для дослідження збоїв.
 
-### R-004 — HEAD with bounded GET fallback
+### R-004 — HEAD з обмеженим резервним GET
 
-The checker first sends `HEAD`. On `405` or `501` only, it retries the same URL
-with `GET`, completes after response headers are available, and does not read
-the complete image body. This follows the HTTP definition of `HEAD` while
-handling an origin that does not implement it.
+Перевірка спочатку надсилає `HEAD`. Лише за `405` або `501` вона повторює той
+самий URL через `GET`, завершується після отримання заголовків відповіді й не
+читає повне тіло зображення. Це відповідає HTTP-визначенню `HEAD` і водночас
+підтримує сервер джерела, який його не реалізує.
 
-### R-005 — Complete active catalog scope
+### R-005 — Повне охоплення активного каталогу
 
-Every non-soft-deleted product is eligible, regardless of stock,
-`ExportToSite`, category, sale flag, or new-product flag. Soft-deleted products
-are neither probed nor returned.
+Кожен товар без м'якого видалення підлягає перевірці незалежно від залишків,
+`ExportToSite`, категорії, ознаки розпродажу чи ознаки новинки. Товари з
+м'яким видаленням не перевіряються й не повертаються.
 
-### R-006 — Bounded execution
+### R-006 — Обмежене виконання
 
-The job processes deterministic product-ID batches with configurable batch
-size, request timeout, and maximum in-process concurrency. Cancellation stops
-new work and leaves already committed batches valid. One product failure is
-persisted as `CheckFailed` and does not fail the run; a database, configuration,
-or unhandled orchestration failure produces a non-zero job exit.
+Задача обробляє детерміновані пакети за ID товарів із налаштовуваними розміром
+пакета, таймаутом запиту й максимальним внутрішнім паралелізмом. Скасування
+зупиняє нову роботу й залишає вже збережені пакети чинними. Збій одного товару
+зберігається як `CheckFailed` і не завершує запуск помилкою; збій бази даних,
+конфігурації чи необроблена помилка оркестрації дають ненульовий код завершення задачі.
 
-### R-007 — Fast persisted read
+### R-007 — Швидке читання збереженого стану
 
-The unavailable-photo API reads PostgreSQL only, is paged, orders by product
-ID ascending, and performs no CDN calls. Page defaults are `page=1` and
-`pageSize=20`; `pageSize` cannot exceed `100`.
+API недоступних фотографій читає лише PostgreSQL, використовує сторінкову
+навігацію, упорядковує за ID товару за зростанням і не викликає CDN. Значення
+за замовчуванням — `page=1` і `pageSize=20`; `pageSize` не може перевищувати `100`.
 
-### R-008 — Lifecycle integrity
+### R-008 — Цілісність життєвого циклу
 
-Physical product deletion removes its dependent photo-check row. Soft deletion
-preserves the row but removes the product from job and API scope. Restoring a
-product makes its saved current-URL state eligible again; a changed URL is
-first reset to `Unknown` under R-001.
+Фізичне видалення товару видаляє залежний рядок перевірки фотографії. М'яке
+видалення зберігає рядок, але виключає товар з області задачі та API. Відновлення
+товару знову робить придатним його збережений стан поточного URL; змінений URL
+спочатку скидається до `Unknown` за R-001.
 
-### R-009 — Anonymous read access
+### R-009 — Анонімний доступ для читання
 
-The endpoint is explicitly anonymous during this feature and exposes no raw
-exception, response body, credential, connection data, or unbounded diagnostic
-message.
+У межах цієї функціональності endpoint явно анонімний і не розкриває сирих
+винятків, тіл відповідей, облікових даних, даних підключення чи необмежених
+діагностичних повідомлень.
 
-### R-010 — Deployment without scheduling
+### R-010 — Розгортання без планування запуску
 
-The production workflow creates or updates one Cloud Run Job from the existing
-Host.Jobs image with the photo-check command and database secret. Deployment
-does not execute the job and does not create its schedule.
+Production workflow створює або оновлює одну Cloud Run Job із наявного образу
+Host.Jobs з командою перевірки фотографій і секретом бази даних. Розгортання
+не запускає задачу й не створює її розкладу.
 
-## Acceptance scenarios
+## Сценарії прийняття
 
-### SC-001 — Available image is excluded
+### SC-001 — Доступне зображення виключається
 
-**Covers:** R-001, R-002, R-004, R-005
+**Покриває:** R-001, R-002, R-004, R-005
 
-Given an active product with its current photo URL
-When a check receives a successful image response
-Then the latest state is `Available`
-And the product is absent from the unavailable-photo list.
+Дано активний товар із поточним URL фотографії.
+Коли перевірка отримує успішну відповідь із зображенням,
+тоді останній стан — `Available`,
+і товар відсутній у списку недоступних фотографій.
 
-### SC-002 — Missing CDN file is listed
+### SC-002 — Відсутній файл CDN потрапляє до списку
 
-**Covers:** R-003, R-005, R-007
+**Покриває:** R-003, R-005, R-007
 
-Given an active product whose current photo URL returns `404` or `410`
-When the job completes and the list is requested
-Then the latest state is `Missing`
-And the paged API contains the product and check metadata.
+Дано активний товар, поточний URL фотографії якого повертає `404` або `410`.
+Коли задача завершується і запитується список,
+тоді останній стан — `Missing`,
+і сторінковий API містить товар та метадані перевірки.
 
-### SC-003 — Non-image success is listed
+### SC-003 — Успішна відповідь не із зображенням потрапляє до списку
 
-**Covers:** R-002, R-003
+**Покриває:** R-002, R-003
 
-Given an active product whose photo URL returns `2xx`
-When the response media type is absent or is not `image/*`
-Then the latest state is `InvalidContentType`
-And the product appears as unavailable.
+Дано активний товар, URL фотографії якого повертає `2xx`.
+Коли медіатип відповіді відсутній або відмінний від `image/*`,
+тоді останній стан — `InvalidContentType`,
+і товар показується як недоступний.
 
-### SC-004 — Technical check failure is isolated and listed
+### SC-004 — Технічний збій перевірки ізолюється й потрапляє до списку
 
-**Covers:** R-003, R-006
+**Покриває:** R-003, R-006
 
-Given multiple active products
-When one probe times out or receives another technical failure
-Then that product is saved as `CheckFailed`
-And checking continues for the remaining products
-And the failed product appears as unavailable.
+Дано кілька активних товарів.
+Коли одна перевірка перевищує таймаут або отримує інший технічний збій,
+тоді цей товар зберігається як `CheckFailed`,
+перевірка решти товарів продовжується,
+і товар зі збоєм показується як недоступний.
 
-### SC-005 — HEAD fallback avoids full image download
+### SC-005 — Резервний шлях HEAD не завантажує повне зображення
 
-**Covers:** R-004
+**Покриває:** R-004
 
-Given a CDN endpoint that answers `HEAD` with `405` or `501`
-When the product is checked
-Then the checker issues one fallback `GET`
-And classifies the response from its status and headers without consuming the
-complete image body.
+Дано CDN endpoint, який відповідає на `HEAD` кодом `405` або `501`.
+Коли товар перевіряється,
+тоді перевірка надсилає один резервний `GET`
+і класифікує відповідь за її статусом та заголовками без читання
+повного тіла зображення.
 
-### SC-006 — Changed URL invalidates old evidence
+### SC-006 — Змінений URL інвалідовує старе свідчення
 
-**Covers:** R-001
+**Покриває:** R-001
 
-Given a completed result for a product photo URL
-When import changes that product's photo URL
-Then the result becomes `Unknown` for the new URL
-And the old result cannot cause the product to appear in the unavailable list.
+Дано завершений результат для URL фотографії товару.
+Коли імпорт змінює URL фотографії цього товару,
+тоді результат стає `Unknown` для нового URL,
+і старий результат не може спричинити появу товару в списку недоступних.
 
-### SC-007 — Product lifecycle controls dependent state
+### SC-007 — Життєвий цикл товару керує залежним станом
 
-**Covers:** R-005, R-008
+**Покриває:** R-005, R-008
 
-Given a product and its photo-check row
-When the product is soft-deleted
-Then neither the job nor API includes it
-When the product is later physically deleted
-Then its photo-check row is removed automatically.
+Дано товар і його рядок перевірки фотографії.
+Коли товар м'яко видаляють,
+тоді ані задача, ані API не включають його.
+Коли товар згодом фізично видаляють,
+тоді його рядок перевірки фотографії видаляється автоматично.
 
-### SC-008 — Paged endpoint is anonymous and database-only
+### SC-008 — Сторінковий endpoint анонімний і читає лише базу даних
 
-**Covers:** R-007, R-009
+**Покриває:** R-007, R-009
 
-Given persisted available, unavailable, and unknown product states
-When an anonymous client requests a valid page
-Then it receives `200` with only unavailable rows ordered by product ID
-And no CDN request occurs.
+Дано збережені стани доступних, недоступних і невідомих товарів.
+Коли анонімний клієнт запитує коректну сторінку,
+тоді він отримує `200` лише з недоступними рядками за порядком ID товару,
+і запит до CDN не виконується.
 
-### SC-009 — Invalid paging is rejected
+### SC-009 — Некоректна сторінкова навігація відхиляється
 
-**Covers:** R-007
+**Покриває:** R-007
 
-Given a page below `1`, a page size below `1`, or a page size above `100`
-When the list is requested
-Then the client receives the established `400` validation response.
+Дано номер сторінки менший за `1`, розмір сторінки менший за `1` або більший за `100`.
+Коли запитується список,
+тоді клієнт отримує усталену відповідь валідації `400`.
 
-### SC-010 — Cloud Run Job is deployed but not run
+### SC-010 — Cloud Run Job розгортається, але не запускається
 
-**Covers:** R-010
+**Покриває:** R-010
 
-Given a successful production deployment
-When the workflow updates Cloud Run resources
-Then `catalog-product-photo-check` exists with
-`--job=check-product-photos`, one task, parallelism one, platform retries zero,
-and the database secret
-And the workflow neither executes nor schedules it.
+Дано успішне production-розгортання.
+Коли workflow оновлює ресурси Cloud Run,
+тоді `catalog-product-photo-check` існує з
+`--job=check-product-photos`, однією задачею, паралелізмом один, нульовою
+кількістю повторів платформи та секретом бази даних,
+а workflow не запускає й не планує її.
 
-### SC-011 — Job scope ignores export flag
+### SC-011 — Область задачі не залежить від ознаки експорту
 
-**Covers:** R-005
+**Покриває:** R-005
 
-Given two active products whose `ExportToSite` values differ
-When the job runs
-Then both products are checked and receive a result.
+Дано два активні товари з різними значеннями `ExportToSite`.
+Коли задача запускається,
+тоді обидва товари перевіряються й отримують результат.
 
-## Deferred scenarios
+## Відкладені сценарії
 
-- Authorization and role-based access for the admin endpoint.
-- Operator-owned Cloud Scheduler configuration.
-- Manual single-product recheck and frontend repair workflow.
+- Авторизація й доступ за ролями до адміністративного endpoint.
+- Конфігурація Cloud Scheduler під відповідальністю оператора.
+- Ручна повторна перевірка одного товару й workflow виправлення у frontend.

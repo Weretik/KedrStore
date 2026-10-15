@@ -1,13 +1,13 @@
-# Missing product photos — data model
+# Відсутні фотографії товарів — модель даних
 
-## Context
+## Контекст
 
-The stored `Product.Photo` URL is deterministic but does not prove that the CDN
-serves an image. The feature needs one latest-result row per active product,
-with enough data to reject a stale result after the URL changes and to diagnose
-why the image was considered unavailable.
+Збережений URL `Product.Photo` є детермінованим, але не доводить, що CDN
+віддає зображення. Функціональності потрібен один рядок останнього результату
+для кожного активного товару з достатніми даними, щоб відхилити застарілий
+результат після зміни URL та діагностувати причину недоступності зображення.
 
-## Model
+## Модель
 
 ```text
 Product
@@ -29,26 +29,27 @@ Product
     └── DiagnosticMessage: string?, max 500
 ```
 
-`ProductId` is reused as a typed shared primary key because the dependent has no
-identity or lifecycle outside its product. No generated scalar or GUID is added.
+`ProductId` повторно використовується як типізований спільний первинний ключ,
+оскільки залежний запис не має окремої від товару ідентичності чи життєвого циклу.
+Згенерований скалярний ідентифікатор або GUID не додається.
 
-## Invariants and integrity
+## Інваріанти та цілісність
 
-- There is at most one photo-check row per product.
-- `PhotoUrl` is required, trimmed, absolute HTTPS, at most 1000 characters, and
-  represents the URL to which the stored result applies.
-- `Unknown` has `CheckedAtUtc = null`, `HttpStatusCode = null`, and no diagnostic.
-- Every terminal status has a non-null `CheckedAtUtc`.
-- `Available` has no diagnostic message; its HTTP status is in `200..299`.
-- `Missing` records `404` or `410`.
-- `InvalidContentType` records a `2xx` status and a bounded diagnostic code.
-- `CheckFailed` may have no HTTP status for transport failures and records a
-  bounded diagnostic code; raw response bodies are never stored.
-- Applying a result requires its URL to equal `PhotoUrl`; otherwise the write is
-  discarded as stale.
-- Physical Product deletion cascades to `ProductPhotoChecks`.
-- Soft deletion does not remove the dependent row, but all feature reads and
-  checks require an active Product.
-- Index `(Status, ProductId)` supports deterministic unavailable-result paging.
-- The initial migration backfills only active products as `Unknown` using their
-  current `Photo` URL.
+- Для кожного товару існує не більше одного рядка перевірки фотографії.
+- `PhotoUrl` є обов'язковим, обрізаним від пробілів абсолютним HTTPS URL довжиною
+  не більш як 1000 символів і позначає URL, до якого належить збережений результат.
+- Для `Unknown` значення `CheckedAtUtc = null`, `HttpStatusCode = null`, а діагностики немає.
+- Кожен термінальний статус має ненульове `CheckedAtUtc`.
+- Для `Available` немає діагностичного повідомлення; його HTTP-статус у межах `200..299`.
+- `Missing` фіксує `404` або `410`.
+- `InvalidContentType` фіксує статус `2xx` й обмежений діагностичний код.
+- `CheckFailed` за транспортних збоїв може не мати HTTP-статусу й фіксує
+  обмежений діагностичний код; сирі тіла відповідей ніколи не зберігаються.
+- Застосування результату потребує збігу його URL із `PhotoUrl`; інакше запис
+  відкидається як застарілий.
+- Фізичне видалення Product каскадно видаляє `ProductPhotoChecks`.
+- М'яке видалення не видаляє залежний рядок, але всі читання й перевірки цієї
+  функціональності потребують активного Product.
+- Індекс `(Status, ProductId)` підтримує детерміновану сторінкову навігацію недоступних результатів.
+- Початкова міграція заповнює лише активні товари статусом `Unknown`, використовуючи
+  їхній поточний URL `Photo`.

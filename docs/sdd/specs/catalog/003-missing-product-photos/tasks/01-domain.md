@@ -1,8 +1,8 @@
-# Phase 01 — Domain task planning
+# Етап 01 — Планування задач Domain
 
-- [x] Execute [TS-001 — photo-check state](domain/01.1-photo-check-state.md).
+- [x] Виконати [TS-001 — стан перевірки фотографії](domain/01.1-photo-check-state.md).
 
-## Checkpoint
+## Контрольна точка
 
-The state object enforces URL ownership, terminal results, timestamps, and
-bounded diagnostics without HTTP, EF, logging, or configuration dependencies.
+Об'єкт стану забезпечує володіння URL, термінальні результати, часові позначки
+й обмежену діагностику без залежностей від HTTP, EF, логування чи конфігурації.

@@ -1,13 +1,13 @@
-# Test architecture — checklist: specification readiness
+# Архітектура тестів — чеклист готовності специфікації
 
-- [x] Scope and observable behavior are complete and consistent.
-- [x] Every rule has a stable `R-*` ID.
-- [x] Every in-scope behavior has a stable `SC-*` scenario ID.
-- [x] Boundary and failure behavior is defined, including Docker unavailability.
-- [x] Given/When/Then statements contain no production implementation detail.
-- [x] There are no unresolved clarifications.
-- [x] Each scenario has a design solution.
-- [x] No production data-model or HTTP contract change is required.
-- [x] Integration dependencies and CI behavior are defined.
-- [x] `traceability.md` maps every scenario to test level and tasks.
-- [x] Every task has exact paths, dependencies, checkpoint, and evidence plan.
+- [x] Обсяг і спостережувана поведінка повні й узгоджені.
+- [x] Кожне правило має сталий ID `R-*`.
+- [x] Кожна поведінка в обсязі має сталий ID сценарію `SC-*`.
+- [x] Поведінку меж і збоїв визначено, зокрема недоступність Docker.
+- [x] Формулювання Given/When/Then не містять деталей production-реалізації.
+- [x] Невирішених уточнень немає.
+- [x] Кожен сценарій має дизайн-рішення.
+- [x] Зміни production-моделі даних або HTTP-контракту не потрібні.
+- [x] Інтеграційні залежності й поведінку CI визначено.
+- [x] `traceability.md` пов'язує кожен сценарій із рівнем тесту та завданнями.
+- [x] Кожне завдання має точні шляхи, залежності, контрольну точку й план свідчень.

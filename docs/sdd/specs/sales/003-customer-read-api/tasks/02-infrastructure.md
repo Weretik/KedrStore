@@ -1,12 +1,12 @@
-# Phase 02 — Infrastructure
+# Фаза 02 — інфраструктура
 
-## Ordered tasks
+## Завдання за порядком
 
-1. Wait for [EN-002 — Define customer query contracts](application/EN-002-query-contracts.md).
-2. Execute [TS-001 — Implement customer read model](infrastructure/TS-001-customer-read-model.md), beginning with its PostgreSQL Red test before creating the read service.
+1. Дочекатися [EN-002 — Визначити контракти запитів клієнтів](application/EN-002-query-contracts.md).
+2. Виконати [TS-001 — Реалізувати модель читання клієнтів](infrastructure/TS-001-customer-read-model.md), почавши з Red-тесту PostgreSQL до створення служби читання.
 
-## Checkpoint
+## Контрольна точка
 
-The no-tracking read service implements the agreed Application contract, enforces soft-delete and privacy boundaries, and has PostgreSQL integration evidence.
+Служба читання без відстеження змін реалізує погоджений контракт Application, дотримується меж логічного видалення й приватності та має свідчення інтеграційної перевірки з PostgreSQL.
 
-No migration task is planned. Add one only if the agreed performance target and query-plan evidence require a new index.
+Завдання для міграції не заплановано. Додавати його слід лише тоді, коли погоджена ціль швидкодії й дані плану запиту вимагатимуть нового індексу.

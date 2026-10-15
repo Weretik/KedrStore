@@ -1,10 +1,10 @@
-# Phase 01 — Domain
+# Фаза 01 — Domain
 
-- [x] T005 Not applicable: the feature only reads existing `ProductCategory` data; no Domain file changed.
-- [x] T006 Not applicable: existing category/import rules retain ownership of identity, hierarchy, order, and localized labels.
-- [x] T007 Not applicable: no new domain behavior exists; projection behavior is covered in Phase 03 tests.
-- [x] T008 Not applicable: no targeted domain-test command is required.
+- [x] T005 Не застосовується: фіча лише читає наявні дані `ProductCategory`; жоден файл Domain не змінювався.
+- [x] T006 Не застосовується: наявні правила категорій/імпорту і далі відповідають за ідентичність, ієрархію, порядок і локалізовані назви.
+- [x] T007 Не застосовується: нової доменної поведінки немає; поведінку проєкції покривають тести Фази 03.
+- [x] T008 Не застосовується: окрема команда тестування домену не потрібна.
 
-## Checkpoint
+## Контрольна точка
 
-No domain change is permitted. Proceed to Phase 02 only to record that persistence is reused.
+Зміна домену не дозволена. Перейдіть до Фази 02 лише для фіксації повторного використання зберігання.

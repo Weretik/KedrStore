@@ -1,84 +1,87 @@
-# Missing product photos — design: Infrastructure
+# Відсутні фотографії товарів — дизайн Infrastructure
 
-## Persistence and query
+## Збереження та запит
 
-Add `ProductPhotoChecks` to `CatalogDbContext` with a shared `ProductId` key,
-required URL snapshot and status, nullable completion/HTTP/diagnostic fields,
-and a required foreign key to `Products` using physical cascade delete. Add an
-index on `(Status, ProductId)` for the unavailable-status page. The product's
-existing query filter remains authoritative for active scope; queries must join
-through active `Products`/`ProductListProjections` and use no tracking.
+Додати `ProductPhotoChecks` до `CatalogDbContext` зі спільним ключем `ProductId`,
+обов'язковими знімком URL і статусом, необов'язковими полями завершення/HTTP/діагностики
+та обов'язковим зовнішнім ключем до `Products` із фізичним каскадним видаленням.
+Додати індекс `(Status, ProductId)` для сторінки недоступних статусів. Наявний
+фільтр запитів товарів залишається авторитетним для активної області; запити
+мають з'єднуватися через активні `Products`/`ProductListProjections` без відстеження.
 
-The migration creates the table, constraint, and index, then inserts `Unknown`
-rows for existing non-soft-deleted products from their current `Photo` value.
-Deleted historical products are not backfilled. Rolling back drops only this
-table and its feature state.
+Міграція створює таблицю, обмеження й індекс, а потім додає рядки `Unknown`
+для наявних товарів без м'якого видалення з їхнім поточним значенням `Photo`.
+Історичні видалені товари не заповнюються. Відкат видаляє лише цю таблицю
+та стан функціональності в ній.
 
-The list query joins the status table to the existing admin product sources,
-filters `Missing`, `InvalidContentType`, and `CheckFailed`, orders by product ID,
-counts, and pages in SQL. It does not materialize the full catalog and does not
-call the CDN.
+Запит списку з'єднує таблицю статусів із наявними джерелами адміністративних
+даних товарів, фільтрує `Missing`, `InvalidContentType` і `CheckFailed`,
+упорядковує за ID товару, рахує та виконує сторінкову навігацію в SQL. Він
+не матеріалізує весь каталог і не викликає CDN.
 
-## CDN adapter
+## Адаптер CDN
 
-Application defines an `IProductPhotoProbe` abstraction and a transport-neutral
-result. Infrastructure implements it with a typed `HttpClient`:
+Application визначає абстракцію `IProductPhotoProbe` і результат, незалежний
+від транспорту. Infrastructure реалізує її через типізований `HttpClient`:
 
-- only absolute HTTPS URLs on the configured allow-listed CDN host are sent;
-- redirects are bounded and accepted only when each target remains HTTPS and on
-  the allow-listed host;
-- the initial request is `HEAD`;
-- only `405` and `501` trigger `GET` with
+- надсилаються лише абсолютні HTTPS URL на налаштованому дозволеному хості CDN;
+- кількість перенаправлень обмежена; вони приймаються лише тоді, коли кожна ціль
+  залишається HTTPS на дозволеному хості;
+- початковий запит — `HEAD`;
+- лише `405` і `501` запускають `GET` із
   `HttpCompletionOption.ResponseHeadersRead`;
-- the fallback response is disposed after status and headers are classified;
-- normalized `Content-Type` beginning with `image/` is required for success;
-- response bodies and unbounded external messages are never persisted or logged;
-- the per-request timeout, batch size, and concurrency have validated,
-  configurable defaults.
+- резервну відповідь звільняють після класифікації статусу й заголовків;
+- для успіху потрібен нормалізований `Content-Type`, що починається з `image/`;
+- тіла відповідей і необмежені зовнішні повідомлення ніколи не зберігають і не журналюють;
+- таймаут окремого запиту, розмір пакета й паралелізм мають перевірені
+  налаштовувані значення за замовчуванням.
 
-The design follows [RFC 9110 HTTP semantics](https://datatracker.ietf.org/doc/html/rfc9110#name-head),
-which defines `HEAD` as the `GET` metadata response without response content.
+Дизайн відповідає [семантиці HTTP в RFC 9110](https://datatracker.ietf.org/doc/html/rfc9110#name-head),
+яка визначає `HEAD` як відповідь із метаданими `GET` без вмісту відповіді.
 
-## Job execution and observability
+## Виконання задачі та спостережуваність
 
-`CheckProductPhotosJob` lives in Catalog Application and pages active products
-by ascending ID. It probes with bounded in-process concurrency, classifies every
-individual result, and commits one bounded batch at a time. A URL comparison is
-part of the write condition. Cancellation stops scheduling new probes and is
-propagated normally. Individual remote failures become `CheckFailed`; database,
-invalid configuration, or unexpected orchestration failures fail the command.
+`CheckProductPhotosJob` розміщено в Catalog Application; він обробляє активні
+товари сторінками за зростанням ID. Задача перевіряє їх з обмеженим внутрішнім
+паралелізмом, класифікує кожен результат і зберігає по одному обмеженому пакету.
+Порівняння URL є частиною умови запису. Скасування припиняє планування нових
+перевірок і передається звичайним чином. Окремі віддалені збої стають `CheckFailed`;
+збої бази даних, некоректна конфігурація чи неочікувані помилки оркестрації
+призводять до помилки команди.
 
-Structured summary logs contain counts for examined, available, missing,
-invalid-content, check-failed, stale-result-discarded, and elapsed duration.
-Per-item warning logs use product ID, bounded status/diagnostic code, and host;
-they do not contain bodies, secrets, or exception dumps for expected failures.
+Структуровані підсумкові журнали містять кількості перевірених, доступних,
+відсутніх, із недопустимим вмістом, невдало перевірених і відкинутих застарілих
+результатів, а також тривалість. Попередження для окремих елементів містять
+ID товару, обмежений статус/діагностичний код і хост; вони не містять тіл
+відповідей, секретів чи дампів винятків для очікуваних збоїв.
 
-Host.Jobs registers the use case and maps
-`--job=check-product-photos` to one run. The CLI documentation records that no
-`--rootId` is needed.
+Host.Jobs реєструє сценарій і зіставляє
+`--job=check-product-photos` з одним запуском. Документація CLI фіксує,
+що `--rootId` не потрібний.
 
-## Cloud Run deployment
+## Розгортання Cloud Run
 
-Extend `.github/workflows/deploy-cloudrun.yml` with create-or-update logic for
-`catalog-product-photo-check`, using the existing `JOBS_IMAGE`, region, and
-project. Configure:
+Розширити `.github/workflows/deploy-cloudrun.yml` логікою створення або оновлення
+`catalog-product-photo-check` із використанням наявних `JOBS_IMAGE`, регіону
+й проєкту. Налаштувати:
 
-- argument `--job=check-product-photos`;
+- аргумент `--job=check-product-photos`;
 - `--tasks 1`, `--parallelism 1`, `--max-retries 0`;
-- a `30m` task timeout;
-- only `ConnectionStrings__Default=db-connection:latest` as a secret.
+- таймаут задачі `30m`;
+- лише `ConnectionStrings__Default=db-connection:latest` як секрет.
 
-The workflow updates the definition but contains no `gcloud run jobs execute`
-for this job and no scheduler resource. This matches the one-shot Cloud Run Job
-model in the [Google Cloud documentation](https://cloud.google.com/run/docs/create-jobs).
+Workflow оновлює визначення, але не містить `gcloud run jobs execute` для цієї
+задачі та не створює ресурсу scheduler. Це відповідає моделі одноразової Cloud Run Job
+із [документації Google Cloud](https://cloud.google.com/run/docs/create-jobs).
 
-## Migration and rollout
+## Міграція та розгортання
 
-Database migration must run before the new API, job command, and workflow job
-definition become active. The endpoint initially returns an empty page because
-backfilled rows are `Unknown`; the first operator-scheduled run populates
-terminal states. Deploying the Cloud Run definition does not start that run.
+Міграцію бази даних треба виконати до активації нового API, команди задачі
+й визначення задачі workflow. Спочатку endpoint повертає порожню сторінку,
+оскільки заповнені міграцією рядки мають статус `Unknown`; перший запуск,
+запланований оператором, заповнює термінальні стани. Розгортання визначення
+Cloud Run не запускає цю перевірку.
 
-Rollback first disables the external schedule, then rolls back API/job code and
-drops the feature table through the migration down path. No Product or CDN data
-is removed.
+Відкат спочатку вимикає зовнішній розклад, потім відкочує код API/задачі й
+видаляє таблицю функціональності через зворотний шлях міграції. Дані Product
+або CDN не видаляються.

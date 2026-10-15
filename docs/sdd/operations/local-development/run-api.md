@@ -1,30 +1,30 @@
-# Run Host.Api locally
+# Локальний запуск Host.Api
 
-## Prerequisites
+## Передумови
 
-- .NET SDK matching the solution target (`net10.0`).
-- PostgreSQL reachable through `ConnectionStrings:Default`.
-- Required local secrets configured; see [configuration and secrets](../configuration/configuration-and-secrets.md).
+- .NET SDK для цільового `net10.0`; точну базову версію й roll-forward визначає `global.json`.
+- PostgreSQL, доступний через `ConnectionStrings:Default`, зі схемою, яку підготовлено окремим завданням міграції.
+- Потрібні локальні секрети; див. [конфігурацію й секрети](../configuration/configuration-and-secrets.md).
 
-## Start
+## Запуск
 
-From the repository root:
+Із кореня репозиторію:
 
 ~~~powershell
 dotnet restore KedrStore.sln
 dotnet run --project src/Bootstrapper/Host.Api/Host.Api.csproj --launch-profile https
 ~~~
 
-The `https` launch profile listens on `https://localhost:7230` and also on `http://localhost:5081`. Use the HTTPS address for authentication/refresh testing: the current refresh cookie is configured as `Secure`.
+Профіль `https` слухає `https://localhost:7230` і `http://localhost:5081`. Для перевірки автентифікації та refresh використовуй HTTPS: поточний refresh-cookie має атрибут `Secure`.
 
-For an HTTP-only endpoint check, use the `http` profile:
+Для перевірки кінцевої точки лише через HTTP використовуй профіль `http`:
 
 ~~~powershell
 dotnet run --project src/Bootstrapper/Host.Api/Host.Api.csproj --launch-profile http
 ~~~
 
-The API host starts migrations and seeders before it begins serving requests. Read [migrations and seeders](../data/migrations-and-seeding.md) before running it against a non-local database.
+API не запускає міграції або сидери під час старту. Підготовку БД виконує окрема команда `Host.Jobs --job=migrate`; перевір її порядок і наслідки в [інструкції з міграцій і seed-даних](../data/migrations-and-seeding.md). API однаково потребує налаштованого доступу до БД для робочих запитів.
 
-## Stop and rebuild
+## Зупинка й повторна збірка
 
-Stop the running Host.Api process before building when Windows has locked its output DLLs. Then run the relevant build/test commands from [testing standards](../../standards/quality/testing.md).
+Якщо Windows блокує вихідні DLL, зупини запущений `Host.Api` перед збіркою. Далі виконай потрібні команди зі [стандарту тестування](../../standards/testing-rules.md).

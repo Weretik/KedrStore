@@ -1,6 +1,6 @@
 # BuildingBlocks.Infrastructure
 
-## Structure
+## Структура
 
 ~~~text
 BuildingBlocks.Infrastructure/
@@ -24,24 +24,24 @@ BuildingBlocks.Infrastructure/
     └── TelegramOptions
 ~~~
 
-## Registered shared services
+## Зареєстровані спільні сервіси
 
-AddInfrastructureServices registers:
+`AddInfrastructureServices` реєструє:
 
-- IDomainEventContext as EfDomainEventContext;
-- IDomainEventDispatcher as MediatorDomainEventDispatcher;
+- IDomainEventContext як EfDomainEventContext;
+- IDomainEventDispatcher як MediatorDomainEventDispatcher;
 - IHttpContextAccessor;
-- ICurrentUserService as HttpContextCurrentUserService;
-- IPermissionService as ClaimPermissionService;
-- Catalog XML-to-JSON converter;
-- Telegram typed HTTP client, configured from Telegram options.
+- ICurrentUserService як HttpContextCurrentUserService;
+- IPermissionService як ClaimPermissionService;
+- конвертер Catalog XML-to-JSON;
+- типізований HTTP-клієнт Telegram із параметрами Telegram.
 
-## Startup and data approach
+## Запуск і дані
 
-DbMigrator<TContext> applies EF migrations through the provider execution strategy. UseAppMigrations runs all registered IDatabaseMigrator instances. UseAppSeeders runs all unique registered ISeeder instances in a scoped startup operation.
+`DbMigrator<TContext>` застосовує EF-міграції через стратегію виконання провайдера. Методи розширення `UseAppMigrations` і `UseAppSeeders` залишаються в BuildingBlocks.Infrastructure, але `Host.Api` їх не викликає. Поточний шлях виконання — окремий `Host.Jobs --job=migrate`: він запускає зареєстровані `IDatabaseMigrator`, а потім унікальні за типом `ISeeder`. Див. [операційний порядок](../../../operations/data/migrations-and-seeding.md).
 
-These startup extensions are host-level operations. A feature handler must not apply migrations or seed data itself.
+Це операції рівня host. Handler фічі не застосовує міграції та не виконує сидери самостійно.
 
-## Security behavior
+## Поведінка безпеки
 
-HttpContextCurrentUserService reads identity, claims, roles and permission claims from the current HTTP principal. ClaimPermissionService grants Admin role access, otherwise requires the matching current numeric user ID and permission claim. Do not bypass it by reading HttpContext in Application.
+`HttpContextCurrentUserService` читає identity, claims, ролі та claims дозволів із поточного HTTP principal. `ClaimPermissionService` надає доступ ролі Admin, а для інших вимагає збіг поточного числового user ID та permission claim. Не обходь його прямим читанням `HttpContext` в Application.

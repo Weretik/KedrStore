@@ -1,15 +1,15 @@
-# Database rules
+# Правила БД
 
-## Reads and performance
+## Читання та продуктивність
 
-For read use cases, use projections and `AsNoTracking` where appropriate. Avoid N+1 queries, unbounded list endpoints, and unnecessary materialization. Pagination and filtering for large lists must be part of the contract.
+Для use cases читання застосовуй проєкції та `AsNoTracking`, де це доречно. Уникай N+1-запитів, необмежених endpoints списків і зайвої матеріалізації. Pagination і фільтрація великих списків мають бути частиною контракту.
 
-## Consistency and transactions
+## Узгодженість і транзакції
 
-Respect existing transaction and concurrency boundaries. Do not add automatic retries to writes with side effects without documented idempotency. Do not silently weaken consistency guarantees.
+Дотримуйся чинних меж транзакцій і конкурентного доступу. Не додавай автоматичних повторів для записів із побічними ефектами без документованої ідемпотентності. Не послаблюй гарантії узгодженості без явного рішення.
 
-## EF Core, migrations, and data
+## EF Core, міграції й дані
 
-EF Core mapping belongs in Infrastructure. Domain entities contain no persistence concerns. Create a migration only when it is required within the feature scope; do not edit applied migrations. Verify a new migration against an empty test database and document rollback and rollout risks.
+Перетворення моделей EF Core належить Infrastructure. Доменні сутності не містять логіки збереження даних. Створюй міграцію лише коли цього потребує обсяг фічі; не редагуй уже застосовані міграції. Перевір нову міграцію на порожній тестовій БД і опиши ризики відкату та розгортання. Поточний запуск через окремий `Host.Jobs --job=migrate` описано в [операціях](../operations/data/migrations-and-seeding.md).
 
-Preserve query semantics and database contracts. Change reference/seed data through the existing seeding mechanism, not hidden runtime writes.
+Зберігай семантику запитів і контракти БД. Довідкові/seed-дані змінюй через чинний механізм seeding, а не прихованими записами під час runtime.

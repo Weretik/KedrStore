@@ -1,9 +1,9 @@
-# Manager order read API — design: Infrastructure
+# API читання замовлень менеджера — проєктування Infrastructure
 
-## Persistence and integrations
+## Збереження даних та інтеграції
 
-Infrastructure will provide no-tracking read projections from the Sales database. The collection joins only the counterparty name and sync summary needed for compact rows and calculates `lineCount` and `totalAmount` in the query. Detail projects lines, current counterparty name/phone, and the safe sync summary. The optional counterparty scope filters exactly by `Orders.CounterpartyId`; neither operation queries 1C. Collection ordering is `CreatedAtUtc` descending, then `OrderId` descending, with page `1`, page size `20`, and maximum `100` defaults/bounds applied by the Application contract.
+Infrastructure надає проєкції читання без відстеження змін із бази даних Sales. Список приєднує лише ім'я контрагента й зведення синхронізації, потрібні для компактних рядків, та обчислює `lineCount` і `totalAmount` у запиті. Деталі проєктують позиції, поточні ім'я й телефон контрагента та безпечне зведення синхронізації. Необов'язковий фільтр за контрагентом точно порівнює `Orders.CounterpartyId`; жодна з операцій не звертається до 1С. Список упорядкований за `CreatedAtUtc` у спадному порядку, потім за `OrderId` у спадному порядку; контракт Application застосовує значення за замовчуванням — сторінка `1`, розмір `20` — і максимум `100`.
 
-## Migration and rollout
+## Міграція та впровадження
 
-No migration is planned because the feature reads existing tables and the existing `Orders.CounterpartyId` index. Before implementation, validate the selected list query against representative order-line volumes and add an index only if evidence shows the existing model cannot meet an agreed performance target. The API is additive and must be deployed with its OpenAPI aggregate reference and focused contract tests.
+Міграцію не заплановано, оскільки функціональність читає наявні таблиці й використовує чинний індекс `Orders.CounterpartyId`. Перед реалізацією перевірте вибраний запит списку на репрезентативних обсягах позицій замовлень і додавайте індекс лише тоді, коли докази покажуть, що наявна модель не досягає погодженого показника продуктивності. API є адитивним; його потрібно розгортати разом із посиланням в агрегованому OpenAPI та цільовими контрактними тестами.

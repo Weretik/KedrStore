@@ -1,8 +1,8 @@
-# Database migration job — safety requirements
+# Job міграції БД — вимоги безпеки
 
-- Take and verify a Cloud SQL backup before the first production migration rollout.
-- Inspect the production `__EFMigrationsHistory` and table schema before changing source migration files.
-- The approved destructive reset may delete only Identity tables and the two corresponding historical rows after the fresh backup is verified. It must not change Catalog or Sales data or history.
-- Do not rename, squash, delete, or regenerate applied Catalog or Sales migrations.
-- The migration job must use the same secret-provided connection string as the API, never log it, and stop at the first failed context.
-- Run at most one migration job at a time for a database. Cloud Run Job retry/re-execution must be safe because EF migrations are idempotent after the approved reset is complete.
+- Зроби й перевір резервну копію Cloud SQL до першого розгортання міграції у продукційному середовищі.
+- Переглянь production `__EFMigrationsHistory` і схему таблиць до зміни файлів міграцій у коді.
+- Погоджений руйнівний reset може видалити лише таблиці Identity та два відповідні історичні рядки після перевірки свіжого backup. Дані й історія Catalog або Sales залишаються незмінними.
+- Не перейменовуй, не об'єднуй, не видаляй і не генеруй заново застосовані міграції Catalog або Sales.
+- Завдання міграції має використовувати той самий рядок підключення із секретів, що й API, ніколи його не логувати й зупинятися на першому контексті з помилкою.
+- Для однієї БД запускай не більше одного завдання міграції одночасно. Повторний запуск Cloud Run Job має бути безпечним, адже після завершення погодженого скидання EF-міграції ідемпотентні.

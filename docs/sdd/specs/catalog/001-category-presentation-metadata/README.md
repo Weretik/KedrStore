@@ -1,50 +1,50 @@
-# Category presentation metadata
+# Метадані представлення категорій
 
-**Module:** catalog
-**Type:** feature
-**Status:** completed and verified
-**Owner:** backend team
-**Created:** 2026-07-27
+**Модуль:** catalog
+**Тип:** функціональність
+**Статус:** завершено й перевірено
+**Відповідальні:** backend-команда
+**Створено:** 2026-07-27
 
-The Catalog backend will own localized category presentation metadata—short Ukrainian and Russian labels, display order and hierarchy level—while retaining the original 1C name and all existing identifiers. The feature also preserves the backend-owned virtual Cosmos category so that Cosmos product import never calls the unavailable 1C categories operation. It does not change storefront code, public routes, generated SOAP code, or existing category IDs and slugs.
+Backend Catalog володітиме локалізованими метаданими представлення категорій — короткими українськими й російськими назвами, порядком відображення та рівнем ієрархії — зі збереженням оригінальної назви 1C й усіх наявних ідентифікаторів. Функціональність також зберігає віртуальну категорію Cosmos, якою володіє backend, щоб імпорт товарів Cosmos ніколи не викликав недоступну операцію категорій 1C. Вона не змінює код storefront, публічні маршрути, згенерований SOAP-код або наявні ID й slug категорій.
 
-## Completion status
+## Стан завершення
 
-All applicable phases and task IDs are complete and verified. Delivery evidence, known test limitations, and the resolved historical import blocker are recorded in [Phase 05](tasks/05-verification.md).
+Усі застосовні етапи й ID задач завершені та перевірені. Свідчення постачання, відомі обмеження тестів і усунуту історичну перешкоду імпорту зафіксовано в [етапі 05](tasks/05-verification.md).
 
-## Source baseline
+## Вихідний стан джерел
 
-- [Frozen storefront category constants](catalog-category-slugs.constants.ts.md) define the current slugs, Ukrainian labels, nesting and display order.
-- [Frozen UA/RU translations](translate.md) define the current Russian short labels.
-- Current 1C import configuration and the existing virtual Cosmos category are the implementation baseline; the snapshots are inputs, not runtime source code.
+- [Зафіксовані константи категорій storefront](catalog-category-slugs.constants.ts.md) визначають поточні slug, українські назви, вкладеність і порядок відображення.
+- [Зафіксовані переклади UA/RU](translate.md) визначають поточні короткі російські назви.
+- Поточна конфігурація імпорту 1C й наявна віртуальна категорія Cosmos є основою реалізації; ці знімки — вхідні дані, а не вихідний код runtime.
 
-## Requirements
+## Вимоги
 
-- [Overview and scope](requirements/overview.md)
-- [Category presentation metadata](requirements/category-presentation.md)
-- [Cosmos import safety](requirements/cosmos-import.md)
+- [Огляд і межі](requirements/overview.md)
+- [Метадані представлення категорій](requirements/category-presentation.md)
+- [Безпека імпорту Cosmos](requirements/cosmos-import.md)
 
-## Technical design
+## Технічний дизайн
 
 - [Domain](design/domain.md)
 - [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
+- [Модель даних](data-model.md)
 
-## Delivery
+## Постачання
 
-- [API/integration contract](contracts/api-contract.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [API/інтеграційний контракт](contracts/api-contract.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність постачання](checklist/delivery-readiness.md)
 
-## AI implementation tasks
+## Задачі реалізації для AI
 
-AI performs only unfinished tasks in the current phase, marks completed tasks as `[x]`, and proceeds only after the checkpoint. `[P]` indicates safe parallel execution after dependencies are complete.
+AI виконує лише незавершені задачі поточного етапу, позначає виконані як `[x]` і переходить далі тільки після контрольної точки. `[P]` означає безпечне паралельне виконання після завершення залежностей.
 
-| Phase | Result |
+| Етап | Результат |
 | --- | --- |
-| [00 — Clarification](tasks/00-readiness.md) | agreed metadata mapping and delivery contract |
-| [01 — Domain](tasks/01-domain.md) | aggregate metadata and unit tests |
-| [02 — Infrastructure](tasks/02-infrastructure.md) | configuration, persistence and migration |
-| [03 — Application](tasks/03-application.md) | import behavior and read projection |
-| [04 — API](tasks/04-api.md) | agreed category-tree consumer contract, if applicable |
-| [05 — Verification](tasks/05-verification.md) | delivery evidence and rollout record |
+| [00 — Уточнення](tasks/00-readiness.md) | погоджене відображення метаданих і контракт постачання |
+| [01 — Domain](tasks/01-domain.md) | метадані агрегата й unit-тести |
+| [02 — Infrastructure](tasks/02-infrastructure.md) | конфігурація, збереження та міграція |
+| [03 — Application](tasks/03-application.md) | поведінка імпорту й проєкція читання |
+| [04 — API](tasks/04-api.md) | погоджений контракт споживача дерева категорій, якщо застосовно |
+| [05 — Перевірка](tasks/05-verification.md) | свідчення постачання й запис про розгортання |

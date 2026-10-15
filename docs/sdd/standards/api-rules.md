@@ -1,31 +1,27 @@
-# API rules
+# Правила API
 
-## Contract stability
+## Стабільність контракту
 
-Public routes, action names, and response fields are stable by default. Prefer additive changes. Document an incompatible change, affected clients, migration path, and rollout plan in the feature specification and contract.
+Публічні маршрути, назви дій і поля відповіді за замовчуванням стабільні. Віддавай перевагу сумісним доповненням. Несумісну зміну, зачеплених клієнтів, шлях міграції й порядок розгортання описуй у специфікації фічі та контракті.
 
-For new or changed HTTP behavior, link each operation to its `SC-*` acceptance
-scenarios. Agree the human-readable contract and versioned OpenAPI document
-before transport implementation when practical. Derive focused contract/API
-Red tests from the agreement, implement the transport, then verify the runtime
-behavior against OpenAPI before consumer handoff.
+Для нової або зміненої HTTP-поведінки пов'язуй кожну операцію з приймальними сценаріями `SC-*`. Коли практично можливо, узгодь читабельний контракт і версійний OpenAPI-документ до реалізації транспортного рівня. За цими рішеннями створи цільові Red-тести контракту/API, реалізуй транспортний рівень і перед передачею споживачам звір фактичну поведінку з OpenAPI.
 
-Use task-specific DTOs. Do not expose entities, persistence types, secrets, or internal exceptions. For write operations that risk repeated execution, define `Idempotency-Key` semantics before implementation.
+Використовуй DTO для конкретного завдання. Не відкривай сутності, типи збереження даних, секрети або внутрішні винятки. Для записів із ризиком повторного виконання визнач семантику `Idempotency-Key` до реалізації.
 
-## Controllers
+## Контролери
 
-Controllers must:
+Controllers мають:
 
-- accept explicit request models;
-- pass `CancellationToken` to Mediator;
-- return the established Ardalis.Result HTTP mapping;
-- declare relevant `ProducesResponseType` attributes;
-- contain no validation, business, or EF logic.
+- приймати явні request models;
+- передавати `CancellationToken` до Mediator;
+- застосовувати чинне HTTP-відображення Ardalis.Result;
+- оголошувати відповідні атрибути `ProducesResponseType`;
+- не містити логіки валідації, бізнес-правил або EF.
 
-## Validation, results, and errors
+## Валідація, результати й помилки
 
-FluentValidation validators are registered by scanning the Application assembly and run through the Mediator validation behavior. Place the validator in the folder of its corresponding use case.
+Валідатори FluentValidation реєструються скануванням збірок Application і виконуються через поведінку валідації Mediator. Розміщуй валідатор у папці відповідного сценарію використання.
 
-Validate input form: required fields, ranges, formats, enum values, length, and input combinations. Check state and business invariants in Domain or Application use-case logic.
+На вході перевіряй обов'язкові поля, діапазони, формати, значення переліків, довжину й комбінації параметрів. Стан і бізнес-інваріанти перевіряй у Domain або логіці сценарію використання Application.
 
-Return Ardalis.Result for expected failures. Preserve the current API error mapping. Do not use exceptions for ordinary validation or not-found control flow, and do not expose internal details in responses.
+Для очікуваних помилок повертай Ardalis.Result. Зберігай чинне API-відображення помилок. Не використовуй винятки для звичайної валідації чи not-found сценарію й не відкривай внутрішні деталі у відповідях.

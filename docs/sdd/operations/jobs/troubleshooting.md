@@ -1,13 +1,13 @@
-# Job troubleshooting
+# Діагностика фонових завдань
 
-| Symptom | First checks | Do not do |
+| Симптом | Перші перевірки | Не роби |
 | --- | --- | --- |
-| missing configuration | environment and `Host.Jobs` secrets | paste connection strings or SOAP credentials into logs |
-| SOAP/auth failure | approved secret store and endpoint reachability | log headers, passwords or Authorization values |
-| received zero records | root ID, environment, source availability | manual cleanup/repeated destructive imports |
-| received non-zero, mapped zero | mapper, category lookup, response field format | rerun until data changes |
-| public list stale | projection rebuild and `ExportToSite` | assume public invisibility equals deletion |
-| stock list stale | `stocks` does not rebuild projection | assume list reads live product stock |
-| locked DLL during build | stop local `Host.Api`, retry | delete output under a running host |
+| Немає конфігурації | Середовище й секрети `Host.Jobs` | Вставляти рядки підключення або SOAP credentials у логи |
+| Збій SOAP/автентифікації | Погоджене сховище секретів і доступність кінцевої точки | Логувати заголовки, паролі чи значення Authorization |
+| Отримано нуль записів | Root ID, середовище й доступність джерела | Очищати дані вручну або повторювати руйнівний імпорт |
+| Отримано записи, але mapped = 0 | Mapper, пошук категорії, формат полів відповіді | Повторювати job, сподіваючись на зміну даних |
+| Публічний список застарів | Відновлення проєкції та `ExportToSite` | Вважати непомітність у списку видаленням |
+| Список залишків застарів | Чи завершився `stocks` і перебудова проєкції; перевір логи й `ProductListProjections` | Припускати, що список читає live stock товару |
+| DLL заблоковано під час збірки | Зупинити локальний `Host.Api` і повторити | Видаляти output під запущеним host |
 
-Retain job name, environment, root IDs when safe, timings, counts, exception type and database migration version. That supports diagnosis without retaining full SOAP payloads or secrets.
+Збережи назву job, середовище, безпечні root IDs, тривалість, лічильники, тип винятку й версію міграції БД. Це допомагає діагностиці без повних SOAP payloads або секретів.

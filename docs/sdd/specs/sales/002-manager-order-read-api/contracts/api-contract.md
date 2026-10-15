@@ -1,28 +1,28 @@
-# Manager order read API — API contract
+# API читання замовлень менеджера — контракт API
 
-**Status:** agreed
+**Статус:** погоджено
 
-## Consumers and compatibility
+## Споживачі та сумісність
 
-The consumer is the Sales administration frontend. This additive read API does not change `POST /api/admin/orders`, the sync-status/retry routes, or Catalog `POST /api/orders`. The list and detail operations temporarily allow anonymous access and do not apply a row-level assignment restriction.
+Споживачем є frontend адміністрування Sales. Цей адитивний API читання не змінює `POST /api/admin/orders`, маршрути стану синхронізації та повторної спроби або `POST /api/orders` модуля Catalog. Операції списку й деталей тимчасово дозволяють анонімний доступ і не застосовують обмеження за призначенням окремих рядків.
 
-## List manager orders
+## Список замовлень менеджерів
 
 `GET /api/admin/orders`
 
-Operation ID: `getAdminOrders`.
+Ідентифікатор операції: `getAdminOrders`.
 
-Query parameters:
+Параметри запиту:
 
-| Parameter | Required | Rules |
+| Параметр | Обов'язковий | Правила |
 | --- | --- | --- |
-| `counterpartyId` | no | Non-blank Sales/1C counterparty identifier, maximum 64 characters; exact match |
-| `page` | no | Integer `>= 1`; default `1` |
-| `pageSize` | no | Integer from `1` through `100`; default `20` |
+| `counterpartyId` | ні | Непорожній ідентифікатор контрагента Sales/1С, максимум 64 символи; точний збіг |
+| `page` | ні | Ціле число `>= 1`; за замовчуванням `1` |
+| `pageSize` | ні | Ціле число від `1` до `100`; за замовчуванням `20` |
 
-No search, date, sync-status, amount, or custom-sort filter is included. Results are ordered by `createdAtUtc` descending and then `orderId` descending. An unknown, deleted, or active counterparty ID with no matching orders returns `200` with an empty page. Historical orders of a soft-deleted counterparty remain visible.
+Фільтрів за пошуком, датою, станом синхронізації, сумою чи довільним сортуванням немає. Результати впорядковано за `createdAtUtc` у спадному порядку, потім за `orderId` у спадному порядку. Невідомий, видалений або активний контрагент без відповідних замовлень дає `200` із порожньою сторінкою. Історичні замовлення м'яко видаленого контрагента залишаються видимими.
 
-Successful response:
+Успішна відповідь:
 
 ```json
 {
@@ -48,15 +48,15 @@ Successful response:
 }
 ```
 
-`lineCount` is the number of persisted `OrderLine` rows. `totalAmount` is the sum of their `amount` values. The list does not contain comments, line arrays, contact details, sync diagnostics, or retry/notification history.
+`lineCount` — кількість збережених рядків `OrderLine`. `totalAmount` — сума їхніх значень `amount`. Список не містить коментарів, масивів позицій, контактних даних, діагностики синхронізації чи історії повторів і сповіщень.
 
-## Get manager-order detail
+## Деталі замовлення менеджера
 
 `GET /api/admin/orders/{orderId}`
 
-Operation ID: `getAdminOrderById`. `orderId` is the positive local `OrderId` (`int64`).
+Ідентифікатор операції: `getAdminOrderById`. `orderId` — додатний локальний `OrderId` (`int64`).
 
-Successful response:
+Успішна відповідь:
 
 ```json
 {
@@ -86,18 +86,18 @@ Successful response:
 }
 ```
 
-Lines are ordered by their persisted `OrderLineId` ascending. `OrderLine.amount` is the total for the complete line quantity, not a unit price; the API does not manufacture a unit-price field. `totalAmount` is the sum of line amounts. The counterparty summary uses the currently stored name and phone and remains available for historical orders when the counterparty is soft-deleted.
+Позиції впорядковано за їхнім збереженим `OrderLineId` у зростаючому порядку. `OrderLine.amount` — сума за повну кількість позиції, а не ціна одиниці; API не вигадує поля ціни за одиницю. `totalAmount` — сума вартостей позицій. Зведення контрагента використовує поточні збережені ім'я й телефон і залишається доступним для історичних замовлень після м'якого видалення контрагента.
 
-The response excludes email, `IdentityUserId`, soft-delete/audit fields, SOAP bodies, hashes, HTTP/error diagnostics, attempt details, notification state, and retry-audit records.
+Відповідь виключає email, `IdentityUserId`, поля м'якого видалення й аудиту, тіла SOAP, хеші, діагностику HTTP і помилок, деталі спроб, стан сповіщень і записи аудиту повторів.
 
-## Errors and security
+## Помилки та безпека
 
-- `200 OK`: filled or empty list, or existing detail.
-- `400 Bad Request`: invalid paging, counterparty identifier, or order identifier input.
-- `404 Not Found`: no manager order exists for a valid `orderId`.
+- `200 OK`: заповнений чи порожній список або деталі наявного замовлення.
+- `400 Bad Request`: некоректна пагінація, ідентифікатор контрагента чи ідентифікатор замовлення.
+- `404 Not Found`: замовлення менеджера з коректним `orderId` не існує.
 
-Read operations have no idempotency requirement and never call 1C or mutate persistence. Anonymous access is temporary and must be replaced with the agreed authorization policy before production rollout.
+Операції читання не потребують вимоги ідемпотентності, ніколи не звертаються до 1С і не змінюють збережені дані. Анонімний доступ тимчасовий; до production rollout його потрібно замінити погодженою політикою авторизації.
 
-## OpenAPI and rollout
+## OpenAPI та впровадження
 
-Before transport implementation, create `docs/sdd/contracts/sales/manager-order-read.openapi.yaml` and add `$ref` entries for both operations to `docs/sdd/contracts/openapi.yaml`. Deploy implementation and aggregate contract together and verify runtime OpenAPI against this source contract.
+Перед реалізацією transport створіть `docs/sdd/contracts/sales/manager-order-read.openapi.yaml` і додайте записи `$ref` для обох операцій до `docs/sdd/contracts/openapi.yaml`. Розгортайте реалізацію й агрегований контракт разом і звіряйте runtime OpenAPI з цим вихідним контрактом.

@@ -1,47 +1,46 @@
-# Missing product photos — design: Domain
+# Відсутні фотографії товарів — дизайн Domain
 
-## Responsibility
+## Відповідальність
 
-Introduce `ProductPhotoCheck` as a Catalog-owned operational aggregate keyed by
-the existing strongly typed `ProductId`. It has no independent identity: the
-shared key is both its primary key and foreign key to `Product`. This follows
-the identifier strategy and expresses the one-to-zero-or-one lifecycle.
+Запровадити `ProductPhotoCheck` як операційний агрегат Catalog із ключем на основі
+наявного строго типізованого `ProductId`. Він не має незалежної ідентичності:
+спільний ключ є водночас його первинним і зовнішнім ключем до `Product`. Це
+відповідає стратегії ідентифікаторів і виражає життєвий цикл «один до нуля або одного».
 
-The aggregate owns the current URL snapshot, status, last-completed timestamp,
-nullable HTTP status, and bounded diagnostic code/message. Its behavior is:
+Агрегат володіє знімком поточного URL, статусом, часовою позначкою останнього
+завершення, необов'язковим HTTP-статусом і обмеженими діагностичним кодом/повідомленням.
+Його поведінка:
 
-- create or reset to `Unknown` for a current URL;
-- record `Available`, `Missing`, `InvalidContentType`, or `CheckFailed` with a
-  completion timestamp;
-- clear stale completion and diagnostics when the URL changes;
-- reject a result for a URL other than the stored current URL;
-- keep `Unknown` without a completed timestamp and require one for terminal
-  states.
+- створювати стан `Unknown` або скидати до нього для поточного URL;
+- записувати `Available`, `Missing`, `InvalidContentType` або `CheckFailed`
+  із часовою позначкою завершення;
+- очищати застарілі позначку завершення й діагностику після зміни URL;
+- відхиляти результат для URL, відмінного від збереженого поточного URL;
+- залишати `Unknown` без позначки завершення й вимагати її для термінальних станів.
 
-The status enum is closed to the five agreed values. HTTP classification itself
-does not belong in Domain because it depends on transport semantics; the
-Application job passes a classified result into the aggregate.
+Enum статусів обмежений п'ятьма погодженими значеннями. Сама HTTP-класифікація
+не належить до Domain, оскільки залежить від семантики транспорту; задача
+Application передає агрегату вже класифікований результат.
 
-## Intermodule interaction
+## Взаємодія між модулями
 
-All behavior stays inside Catalog. The 1C product-details import reconciles
-`ProductPhotoCheck` after creating or updating a `Product`. Host.Jobs invokes a
-Catalog Application job. No domain event, cross-module contract, queue, or
-distributed transaction is required.
+Уся поведінка залишається в Catalog. Імпорт деталей товарів 1C узгоджує
+`ProductPhotoCheck` після створення або оновлення `Product`. Host.Jobs викликає
+задачу Catalog Application. Domain-подія, міжмодульний контракт, черга чи
+розподілена транзакція не потрібні.
 
-`ProductPhotoCheck` is independently loaded and updated by the background job,
-so it is an aggregate root despite sharing the product lifecycle. PostgreSQL
-enforces the required parent relationship and cascade only for physical
-deletion.
+Фонова задача незалежно завантажує й оновлює `ProductPhotoCheck`, тому він є
+коренем агрегата, хоча й поділяє життєвий цикл товару. PostgreSQL забезпечує
+обов'язковий зв'язок із батьківським записом і каскад лише за фізичного видалення.
 
-## Risks
+## Ризики
 
-- An import can change a URL while a probe is in flight. Persistence must use
-  an atomic compare against the URL snapshot so an old result cannot overwrite
-  the reset state for a new URL.
-- A Cloud Run execution must remain single-task, but an operator could start
-  overlapping executions. Result writes must be idempotent for the same URL;
-  the later completed check may replace the earlier one.
-- A CDN outage can classify many products as `CheckFailed`. That is intentional
-  consumer-visible unavailability, while the distinct status prevents it from
-  being confused with a confirmed missing object.
+- Імпорт може змінити URL під час виконання перевірки. Збереження має атомарно
+  порівнювати зі знімком URL, щоб старий результат не перезаписав скинутий стан
+  для нового URL.
+- Виконання Cloud Run має залишатися одною задачею, але оператор може запустити
+  виконання з перекриттям. Записи результатів мають бути ідемпотентними для
+  однакового URL; пізніше завершена перевірка може замінити попередню.
+- Збій CDN може класифікувати багато товарів як `CheckFailed`. Це навмисна
+  недоступність, видима споживачу, а окремий статус не дає сплутати її
+  з підтвердженою відсутністю об'єкта.

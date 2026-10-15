@@ -1,26 +1,26 @@
-# Category presentation metadata — overview and scope
+# Метадані представлення категорій — огляд і межі
 
-## Goal
+## Мета
 
-As a catalog administrator, I want category presentation metadata to be owned and imported by the backend, so that category navigation can use one source of truth instead of a manually maintained storefront constants file.
+Як адміністратор каталогу, я хочу, щоб backend володів метаданими представлення категорій та імпортував їх, аби навігація категоріями використовувала одне джерело істини замість файлу констант storefront, який підтримують вручну.
 
-## In scope
+## У межах роботи
 
-- Retain the original full 1C category name independently from localized short display labels.
-- Configure and persist Ukrainian and Russian short labels, deterministic display order, and hierarchy level.
-- Apply the approved metadata during category import for hardware, doors, and the backend-owned Cosmos category.
-- Make the existing category-tree read model capable of returning the required metadata when an agreed consumer contract requires it.
-- Preserve safe Cosmos product import without a 1C `GetCategories` call.
+- Зберігати оригінальну повну назву категорії 1C незалежно від локалізованих коротких назв для відображення.
+- Налаштовувати й зберігати українські та російські короткі назви, детермінований порядок відображення й рівень ієрархії.
+- Застосовувати затверджені метадані під час імпорту категорій фурнітури, дверей і категорії Cosmos, якою володіє backend.
+- Забезпечити здатність наявної моделі читання дерева категорій повертати потрібні метадані, коли цього вимагатиме погоджений контракт споживача.
+- Зберегти безпечний імпорт товарів Cosmos без виклику `GetCategories` у 1C.
 
-## Out of scope
+## Поза межами роботи
 
-- Modifying the storefront repository or removing its constants file.
-- Changing public routes, category/product identifiers, existing slugs, or generated 1C SOAP client code.
-- Translating, normalizing, or replacing the original 1C `Name` field.
-- Creating an admin UI for metadata management.
+- Зміна репозиторію storefront або видалення його файлу констант.
+- Зміна публічних маршрутів, ідентифікаторів категорій/товарів, наявних slug або згенерованого коду SOAP-клієнта 1C.
+- Переклад, нормалізація або заміна оригінального поля 1C `Name`.
+- Створення адміністративного UI для керування метаданими.
 
-## Agreed delivery decisions
+## Погоджені рішення щодо постачання
 
-- Metadata matches by the existing `(ProductTypeIdOneC, CategoryId)` pair; it never matches localized text or a generated slug.
-- An unconfigured category preserves its 1C `Name`, receives that name as both short labels, and is ordered after configured siblings; the full deterministic policy is in `tasks/00-readiness.md`.
-- No public HTTP category-tree response is in scope. The Catalog Application category-tree read model is the consuming boundary.
+- Метадані зіставляються за наявною парою `(ProductTypeIdOneC, CategoryId)`; зіставлення за локалізованим текстом чи згенерованим slug не застосовується.
+- Неналаштована категорія зберігає своє `Name` із 1C, отримує цю назву як обидві короткі назви й сортується після налаштованих категорій того самого рівня; повну детерміновану політику викладено в `tasks/00-readiness.md`.
+- Публічна HTTP-відповідь дерева категорій не входить до меж роботи. Межею споживання є модель читання дерева категорій Catalog Application.

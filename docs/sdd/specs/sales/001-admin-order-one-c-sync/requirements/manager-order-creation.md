@@ -1,26 +1,26 @@
-# Admin order and 1C synchronization — manager order creation
+# Замовлення адміністратора та синхронізація з 1C — створення замовлення менеджером
 
-## Behavior
+## Поведінка
 
-- The frontend sends the selected customer's 1C identifier and the order data to the temporarily anonymous Sales endpoint. Manager/Admin authorization is required before production use.
-- The application verifies that the counterparty exists in Sales and is not soft-deleted before an order can be created.
-- The system assigns its own immutable order identifier. The manager does not supply the identifier used as the 1C external key.
-- The command stores the order, order lines, and one `OneCOrderSync` record in `Pending` state atomically. The HTTP request does not wait for a 1C call.
+- Frontend передає ідентифікатор вибраного клієнта в 1C і дані замовлення до тимчасово анонімного endpoint модуля Sales. Перед використанням у продукційному середовищі потрібна авторизація Manager/Admin.
+- Перед створенням замовлення Application перевіряє, що контрагент існує в Sales і не позначений як видалений.
+- Система призначає власний незмінний ідентифікатор замовлення. Менеджер не задає ідентифікатор, який використовується як зовнішній ключ у 1C.
+- Команда атомарно зберігає замовлення, його рядки й один запис `OneCOrderSync` у стані `Pending`. HTTP-запит не чекає виклику 1C.
 
-## Rules and invariants
+## Правила та інваріанти
 
-- Every order belongs to exactly one existing Sales counterparty.
-- The order keeps only the counterparty identifier. Customer name, phone, and email remain owned by the current Sales `Counterparty` record and are read when needed.
-- An order contains at least one line; each line has a valid catalog/1C product identifier and a strictly positive integer quantity.
-- Each line contains `Amount`: the total amount for the whole requested quantity, not the unit price.
-- `OrderId` is stable for the full order lifetime and is used unchanged in every SOAP retry.
-- A failed local transaction creates neither a persisted order nor a synchronization record.
+- Кожне замовлення належить рівно одному наявному контрагенту Sales.
+- Замовлення зберігає лише ідентифікатор контрагента. Ім'я клієнта, телефон та електронна адреса залишаються в актуальному записі Sales `Counterparty` і зчитуються за потреби.
+- Замовлення містить щонайменше один рядок; кожен рядок має коректний ідентифікатор товару Catalog/1C і строго додатну цілу кількість.
+- Кожен рядок містить `Amount`: загальну суму для всієї замовленої кількості, а не ціну одиниці.
+- `OrderId` залишається незмінним протягом усього життєвого циклу замовлення й передається без змін під час кожної повторної SOAP-спроби.
+- Якщо локальна транзакція завершується помилкою, ані замовлення, ані запис синхронізації не зберігаються.
 
-`OrderLine.ProductName` is a local Catalog snapshot resolved by `productId` during creation. The admin client does not supply a product name; an unknown local product makes the request invalid before order persistence.
+`OrderLine.ProductName` — локальний знімок назви з Catalog, отриманий за `productId` під час створення. Адміністративний клієнт не передає назву товару; невідомий локальний товар робить запит некоректним ще до збереження замовлення.
 
-## Acceptance scenarios
+## Сценарії приймання
 
-1. Given an active counterparty and a valid non-empty order, when an authorized manager creates it, then Sales persists the order and a `Pending` synchronization record in one transaction and returns the local order identifier.
-2. Given an unknown or soft-deleted counterparty, when a manager creates an order, then the request fails and no order or synchronization record is stored.
-3. Given invalid lines, when a manager submits the request, then validation fails before persistence or a SOAP call.
-4. Given a successfully created order, when the create request finishes, then no synchronous SOAP call has been required for the successful HTTP response.
+1. Якщо контрагент активний, а непорожнє замовлення коректне, то під час створення уповноваженим менеджером Sales зберігає замовлення й запис синхронізації `Pending` в одній транзакції та повертає локальний ідентифікатор замовлення.
+2. Якщо контрагент невідомий або позначений як видалений, то спроба менеджера створити замовлення завершується помилкою, а замовлення й запис синхронізації не зберігаються.
+3. Якщо рядки некоректні, то після надсилання запиту менеджером валідація завершується помилкою до збереження даних або виклику SOAP.
+4. Якщо замовлення успішно створено, то для успішної HTTP-відповіді після завершення запиту не потрібен синхронний виклик SOAP.

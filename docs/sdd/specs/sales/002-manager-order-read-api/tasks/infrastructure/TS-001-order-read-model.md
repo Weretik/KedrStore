@@ -1,30 +1,30 @@
-# TS-001 — Implement manager-order read model
+# TS-001 — реалізувати модель читання замовлень менеджера
 
-- **Task ID:** TS-001
-- **Covers:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** EN-002
-- **Exact paths:** `src/Sales/Sales.Infrastructure/Orders/OrderReadService.cs`, `src/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructureExtensions.cs`, `tests/IntegrationTests/Sales/Persistence/SalesOrderReadModelTests.cs`
-- **Test level:** Infrastructure integration
+- **ID задачі:** TS-001
+- **Покриває:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** EN-002
+- **Точні шляхи:** `src/Sales/Sales.Infrastructure/Orders/OrderReadService.cs`, `src/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructureExtensions.cs`, `tests/IntegrationTests/Sales/Persistence/SalesOrderReadModelTests.cs`
+- **Рівень тесту:** інтеграція Infrastructure
 
-## Evidence
+## Докази
 
-- **Focused test:** `SalesOrderReadModelTests`
-- **Red:** authored the list projection test before the service; the first command compiled but was skipped because Docker was unavailable, so an executable Red was not observed. This provider-prerequisite deviation is recorded rather than treated as Red evidence.
-- **Green:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~SalesOrderReadModelTests` with `KEDR_SALES_TEST_POSTGRES_CONNECTION` targeting an isolated PostgreSQL 18 schema; 4 passed, 0 failed, 0 skipped, including a 150-line aggregate projection.
-- **Refactor:** feature-specific seed IDs removed cross-class fixture collisions; the focused PostgreSQL run remained 4/4 passing.
-- **Regression:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~Sales.Persistence` against an isolated PostgreSQL 18 schema; 7 passed, 0 failed, 0 skipped.
+- **Цільовий тест:** `SalesOrderReadModelTests`
+- **Red:** тест проєкції списку написано до сервісу; перша команда скомпілювалася, але тест пропущено через недоступність Docker, тому виконуваний Red не спостерігався. Це відхилення через передумову провайдера зафіксовано, а не видано за доказ Red.
+- **Green:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~SalesOrderReadModelTests` із `KEDR_SALES_TEST_POSTGRES_CONNECTION`, спрямованим на ізольовану схему PostgreSQL 18; 4 пройшли, 0 помилок, 0 пропусків, включно з проєкцією агрегату на 150 позицій.
+- **Рефакторинг:** специфічні для функціональності ID seed-даних усунули колізії фікстур між класами; цільовий запуск PostgreSQL залишився успішним 4/4.
+- **Регресія:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~Sales.Persistence` на ізольованій схемі PostgreSQL 18; 7 пройшли, 0 помилок, 0 пропусків.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest PostgreSQL integration test for one SC-001 list projection and run it; the provider prerequisite caused the documented Red deviation above.
-- [x] **Red:** add focused cases for detail/not-found, exact counterparty filtering, empty results, soft-deleted-counterparty behavior, and excluded diagnostics as required by SC-002–SC-004.
-- [x] **Green:** implement only enough no-tracking list/detail projection behavior to pass the current failing case; join only required `Counterparty`, `OrderLine`, and `OneCOrderSync` data.
-- [x] **Green:** apply agreed ordering, filters, and pagination before materialization; return an empty collection or missing detail as agreed.
-- [x] **Green:** register the abstraction in Sales Infrastructure and rerun the focused test after each increment.
-- [x] **Refactor:** remove redundant loading, keep internal diagnostics out of projections, and inspect query plan/index usage if EN-001 defines a performance target.
-- [x] **Regression:** run all `Sales.Persistence` integration tests and verify no tracked modifications or 1C calls.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший інтеграційний тест PostgreSQL для однієї проєкції списку SC-001 і запустити його; передумова провайдера спричинила описане вище відхилення Red.
+- [x] **Red:** додати цільові випадки для деталей/відсутності, точного фільтра за контрагентом, порожніх результатів, поведінки для м'яко видаленого контрагента й виключення діагностики за SC-002–SC-004.
+- [x] **Green:** реалізувати лише достатню для поточного тесту поведінку проєкцій списку й деталей без відстеження; приєднати лише потрібні дані `Counterparty`, `OrderLine` і `OneCOrderSync`.
+- [x] **Green:** застосувати погоджені порядок, фільтри й пагінацію до матеріалізації; повертати порожню колекцію або відсутність деталей згідно з домовленістю.
+- [x] **Green:** зареєструвати абстракцію в Sales Infrastructure та повторювати цільовий тест після кожного приросту.
+- [x] **Рефакторинг:** прибрати зайве завантаження, не включати внутрішню діагностику до проєкцій і дослідити план запиту/використання індексу, якщо EN-001 визначить показник продуктивності.
+- [x] **Регресія:** запустити всі інтеграційні тести `Sales.Persistence` і перевірити відсутність відстежуваних змін та викликів 1С.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Докази».
 
-## Checkpoint
+## Контрольна точка
 
-The projection scopes results correctly and loads only agreed response data.
+Проєкція правильно обмежує результати й завантажує лише погоджені дані відповіді.

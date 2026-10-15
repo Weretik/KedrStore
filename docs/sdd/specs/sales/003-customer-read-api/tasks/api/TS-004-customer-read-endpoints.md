@@ -1,29 +1,29 @@
-# TS-004 — Add customer-read endpoints
+# TS-004 — Додати маршрути читання клієнтів
 
-- **Task ID:** TS-004
-- **Covers:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** TS-002, TS-003, EN-003
-- **Exact paths:** `src/Sales/Sales.Api/Controllers/AdminCustomersController.cs`, `src/Sales/Sales.Api/Contracts/Customers/`, `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`
-- **Test level:** API integration
+- **ID завдання:** TS-004
+- **Охоплює:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** TS-002, TS-003, EN-003
+- **Точні шляхи:** `src/Sales/Sales.Api/Controllers/AdminCustomersController.cs`, `src/Sales/Sales.Api/Contracts/Customers/`, `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`
+- **Рівень тестування:** інтеграційні тести API
 
-## Evidence
+## Свідчення
 
-- **Focused test:** `AdminCustomerApiTests`
-- **Red:** focused run compiled 12 tests and failed 9 with route-level `404` because customer endpoints were absent; the 3 independent cases passed.
-- **Green:** after the access amendment, the anonymous-route Red failed 2/2 with `401`; applying `[AllowAnonymous]` made the full focused suite pass 11/11.
-- **Refactor:** public request/response types remain in separate files and the controller only maps transport contracts to queries; focused tests remained Green.
-- **Regression:** combined `Sales.Api`, `Sales.Persistence`, and `Platform.Api` run passed 55/55.
+- **Цільовий тест:** `AdminCustomerApiTests`
+- **Red:** цільовий запуск скомпілював 12 тестів; 9 завершилися помилкою маршруту `404` через відсутність маршрутів клієнтів, а 3 незалежні випадки пройшли.
+- **Green:** після зміни вимоги до доступу Red-тест анонімного маршруту не пройшов 2/2 зі статусом `401`; після застосування `[AllowAnonymous]` увесь цільовий набір пройшов 11/11.
+- **Рефакторинг:** публічні типи запитів і відповідей залишилися в окремих файлах, а контролер лише відображає транспортні контракти на запити; цільові тести залишилися Green.
+- **Регресія:** спільний запуск `Sales.Api`, `Sales.Persistence` і `Platform.Api` пройшов 55/55.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest HTTP integration test for the first agreed customer route and run it to confirm the expected missing-route/behavior failure.
-- [x] **Red:** add focused failing tests for response mapping, validation/not-found, soft-delete privacy, and anonymous access required by SC-001–SC-004.
-- [x] **Green:** add thin endpoint methods one failing case at a time; map inputs to queries, pass cancellation, and use established Ardalis.Result mapping.
-- [x] **Green:** add only required HTTP DTOs/mappers, apply the agreed anonymous access, and declare response types/statuses matching EN-003.
-- [x] **Refactor:** remove controller/mapping duplication without broadening the approved personal-data boundary.
-- [x] **Regression:** run `AdminCustomerApiTests` and the Sales API subset.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший інтеграційний HTTP-тест для першого погодженого маршруту клієнтів і запустити його, щоб підтвердити очікуваний збій через відсутній маршрут чи поведінку.
+- [x] **Red:** додати цільові тести, що мають падати, для відображення відповіді, валідації й результату «не знайдено», приватності логічно видалених записів та анонімного доступу, потрібних для SC-001–SC-004.
+- [x] **Green:** додавати тонкі методи маршрутів по одному випадку, що падає; відображати вхідні дані на запити, передавати скасування й використовувати усталене відображення Ardalis.Result.
+- [x] **Green:** додати лише необхідні HTTP DTO й мапери, застосувати погоджений анонімний доступ та оголосити типи й статуси відповідей згідно з EN-003.
+- [x] **Рефакторинг:** прибрати дублювання в контролері й відображенні, не розширюючи погоджену межу персональних даних.
+- [x] **Регресія:** запустити `AdminCustomerApiTests` і піднабір тестів Sales API.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Свідчення».
 
-## Checkpoint
+## Контрольна точка
 
-Every route is thin, explicitly anonymous, cancellation-aware, and privacy/contract-compliant.
+Кожен маршрут простий, явно анонімний, враховує скасування й відповідає вимогам приватності та контракту.

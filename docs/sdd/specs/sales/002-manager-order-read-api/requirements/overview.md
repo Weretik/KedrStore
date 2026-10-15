@@ -1,35 +1,35 @@
-# Manager order read API — overview and boundaries
+# API читання замовлень менеджера — огляд і межі
 
-## Goal
+## Мета
 
-As a Sales manager, I want to view manager orders and inspect an individual order so that I can follow customer purchases and their 1C delivery state.
+Як менеджер Sales, я хочу переглядати замовлення менеджерів і досліджувати окреме замовлення, щоб відстежувати покупки клієнтів та стан їх передавання до 1С.
 
-## In scope
+## У межах функціональності
 
-- Retrieve a list of persisted manager orders.
-- Retrieve one persisted manager order with its existing order lines and 1C synchronization state.
-- Retrieve persisted manager orders for one existing counterparty.
-- Read the existing `Order`, `OrderLine`, `OneCOrderSync`, and `Counterparty` data without modifying it.
+- Отримання списку збережених замовлень менеджерів.
+- Отримання одного збереженого замовлення менеджера з наявними позиціями та станом синхронізації з 1С.
+- Отримання збережених замовлень менеджерів для одного наявного контрагента.
+- Читання наявних даних `Order`, `OrderLine`, `OneCOrderSync` і `Counterparty` без їх зміни.
 
-## Out of scope
+## Поза межами функціональності
 
-- Creating, editing, cancelling, deleting, or retrying orders.
-- Changing the existing manager-order creation, 1C synchronization, or dead-letter workflows.
-- Changing counterparty synchronization or customer data.
-- New domain entities, identifiers, migrations, or database schema changes unless an agreed performance requirement proves they are necessary.
+- Створення, редагування, скасування, видалення замовлень або повторна спроба їх обробки.
+- Зміна чинних процесів створення замовлень менеджера, синхронізації з 1С або обробки dead-letter.
+- Зміна синхронізації контрагентів або даних клієнтів.
+- Нові доменні сутності, ідентифікатори, міграції чи зміни схеми БД, якщо погоджена вимога до продуктивності не доведе їх необхідність.
 
-## Actors and external systems
+## Учасники та зовнішні системи
 
-- Sales manager: consumes the administration read API.
-- Sales administrator: may consume the same API if the agreed authorization policy permits it.
-- Sales database: authoritative persisted source for orders, lines, counterparties, and delivery state.
-- 1C: is not called by these read operations.
+- Менеджер Sales: використовує адміністративний API читання.
+- Адміністратор Sales: може використовувати той самий API, якщо це дозволяє погоджена політика авторизації.
+- База даних Sales: авторитетне джерело збережених замовлень, позицій, контрагентів і стану передавання.
+- 1С: ці операції читання не звертаються до неї.
 
-## Agreed decisions
+## Погоджені рішення
 
-- The list and detail routes temporarily allow anonymous access; no row-level assignment filter applies. Authorization must be restored before production rollout.
-- `GET /api/admin/orders` provides one paged collection with an optional exact `counterpartyId` filter; there is no duplicate nested customer-orders endpoint.
-- The list returns compact order summaries. `GET /api/admin/orders/{orderId}` returns the complete approved order detail.
-- Paging defaults to page `1` and page size `20`, with maximum page size `100`; ordering is newest first by `createdAtUtc`, then `orderId`.
-- Historical orders remain visible when their counterparty is soft-deleted. The current stored counterparty name and phone may be shown in the order detail.
-- Search and additional filters are outside this feature.
+- Маршрути списку й деталей тимчасово дозволяють анонімний доступ; фільтр за призначенням окремих рядків не застосовується. Авторизацію потрібно відновити до production rollout.
+- `GET /api/admin/orders` надає одну колекцію з пагінацією та необов'язковим точним фільтром `counterpartyId`; дублюючого вкладеного маршруту замовлень клієнта немає.
+- Список повертає компактні зведення замовлень. `GET /api/admin/orders/{orderId}` повертає повні погоджені деталі замовлення.
+- За замовчуванням сторінка `1`, розмір сторінки `20`, максимальний розмір `100`; порядок від найновіших за `createdAtUtc`, потім за `orderId`.
+- Історичні замовлення залишаються видимими, коли їхнього контрагента м'яко видалено. У деталях замовлення можна показувати поточні збережені ім'я й телефон контрагента.
+- Пошук та додаткові фільтри не входять до цієї функціональності.

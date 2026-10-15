@@ -1,10 +1,10 @@
-# Phase 02 — Infrastructure
+# Фаза 02 — Infrastructure
 
-- [x] [T040 — EF Core persistence mapping](infrastructure/02.1-order-persistence.md)
-- [x] [T050 — Sales database migration](infrastructure/02.2-sales-migration.md)
-- [x] [T060 — 1C SOAP write adapter](infrastructure/02.3-one-c-write-adapter.md)
-- [x] [T080 — Infrastructure integration tests](infrastructure/02.5-infrastructure-tests.md)
+- [x] [T040 — мапінг збереження EF Core](infrastructure/02.1-order-persistence.md)
+- [x] [T050 — міграція бази даних Sales](infrastructure/02.2-sales-migration.md)
+- [x] [T060 — адаптер запису SOAP до 1С](infrastructure/02.3-one-c-write-adapter.md)
+- [x] [T080 — інтеграційні тести Infrastructure](infrastructure/02.5-infrastructure-tests.md)
 
-## Checkpoint
+## Контрольна точка
 
-The Sales schema persists one durable delivery record for each order, and SOAP concerns remain at the Infrastructure boundary. The scheduled delivery worker is intentionally implemented in Phase 05 after the HTTP creation path is complete.
+Схема Sales зберігає один стійкий запис передавання для кожного замовлення, а робота із SOAP залишається на межі Infrastructure. Плановий worker передавання навмисно реалізовано у фазі 05 після завершення HTTP-шляху створення.

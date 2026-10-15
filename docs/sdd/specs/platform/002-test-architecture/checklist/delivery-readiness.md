@@ -1,12 +1,12 @@
-# Test architecture — checklist: delivery readiness
+# Архітектура тестів — чеклист готовності delivery
 
-- [x] Every in-scope scenario is verified, with the documented local Docker exception.
-- [x] Unit tests reference only intended inner-layer assemblies.
-- [x] PostgreSQL concurrency verification is implemented and mandatory in Docker-enabled CI; local unavailability is an accepted exception.
-- [x] Architecture rules execute and report actionable violations.
-- [x] Existing API and adapter integration tests remain green.
-- [x] Task evidence and justified exceptions are recorded.
-- [x] Restore, build, and all locally executable tests pass.
-- [x] Coverage is collected locally and configured for mandatory CI artifact upload.
-- [x] Documentation, implementation, test names, and workflow agree.
-- [x] All task IDs are closed or carry a concrete blocker.
+- [x] Кожен сценарій в обсязі перевірено, із задокументованим локальним винятком для Docker.
+- [x] Unit-тести посилаються лише на потрібні assemblies внутрішніх шарів.
+- [x] Перевірку конкурентності PostgreSQL реалізовано й зроблено обов'язковою в CI з Docker; локальна недоступність є погодженим винятком.
+- [x] Архітектурні правила виконуються й повідомляють про порушення, які можна виправити.
+- [x] Наявні інтеграційні тести API й адаптерів залишаються успішними.
+- [x] Свідчення завдань і обґрунтовані винятки записано.
+- [x] Restore, build і всі доступні локально тести проходять.
+- [x] Coverage збирається локально й налаштований обов'язковий upload artifact у CI.
+- [x] Документація, реалізація, назви тестів і процес CI узгоджені.
+- [x] Усі ID завдань закриті або мають конкретну перешкоду.

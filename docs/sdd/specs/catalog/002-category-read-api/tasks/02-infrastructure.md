@@ -1,6 +1,6 @@
-# Phase 02 — Infrastructure
+# Фаза 02 — Infrastructure
 
-- [x] T009 Reused `ICatalogReadRepository<ProductCategory>` and `AllCategoriesSpec` with its `AsNoTracking` query.
-- [x] T010 Not applicable: the feature adds no key, constraint, index, or persistence mapping.
-- [x] T011 Not applicable: no migration or backfill is allowed.
-- [x] T012 Added category route coverage to `tests/IntegrationTests/ApiContractTests.cs`; targeted contract tests passed 3/3.
+- [x] T009 Повторно використано `ICatalogReadRepository<ProductCategory>` і `AllCategoriesSpec` з його запитом `AsNoTracking`.
+- [x] T010 Не застосовується: фіча не додає ключів, обмежень, індексів чи відображень зберігання.
+- [x] T011 Не застосовується: міграція чи backfill не дозволені.
+- [x] T012 Додано покриття маршрутів категорій у `tests/IntegrationTests/ApiContractTests.cs`; цільові контрактні тести пройшли 3/3.

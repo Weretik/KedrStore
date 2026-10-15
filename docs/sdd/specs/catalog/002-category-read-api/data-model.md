@@ -1,10 +1,10 @@
-# Category read API — data model
+# API читання категорій — модель даних
 
-## Context
+## Контекст
 
-The feature is read-only. It projects the existing `ProductCategory` aggregate; it introduces no table, column, migration, or persisted relation.
+Фіча доступна лише для читання. Вона проєктує наявний агрегат `ProductCategory`; таблиці, стовпці, міграції чи збережені зв’язки не додаються.
 
-## Model
+## Модель
 
 ```text
 ProductCategory (existing aggregate)
@@ -19,10 +19,10 @@ ProductCategory (existing aggregate)
 └── Path: internal hierarchy source; not exposed
 ```
 
-## Invariants and integrity
+## Інваріанти та цілісність
 
-- The API projection does not expose the EF entity or the technical `Path`; it uses task-specific DTOs.
-- `ParentId`, `Level`, and `Children` must describe one consistent, acyclic category tree. Existing category import/domain rules remain the owner of that integrity.
-- The public response preserves the existing `SortOrder`-then-`Id` sibling ordering. No client-supplied sorting is accepted.
-- `name` is selected only from the persisted localized short names; it never changes the stable `id`, `slug`, `parentId`, `sortOrder`, or `level` fields.
-- The admin contract may expose the original `Name`, both localized short names, and `ProductTypeIdOneC`; it still does not expose technical `Path` or the persistence entity.
+- Проєкція API не розкриває сутність EF або технічний `Path`; вона використовує DTO, специфічні для завдань.
+- `ParentId`, `Level` і `Children` мають описувати одне узгоджене дерево категорій без циклів. Цілісність і далі забезпечують наявні правила імпорту категорій і домену.
+- Публічна відповідь зберігає наявне впорядкування сусідів спершу за `SortOrder`, потім за `Id`. Сортування, задане клієнтом, не приймається.
+- `name` вибирається лише зі збережених локалізованих коротких назв; воно ніколи не змінює стабільні поля `id`, `slug`, `parentId`, `sortOrder` або `level`.
+- Контракт адміністратора може надавати початкове `Name`, обидві локалізовані короткі назви та `ProductTypeIdOneC`; технічний `Path` і далі не розкривається, як і сутність зберігання.

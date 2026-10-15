@@ -1,17 +1,17 @@
-# OneC import data safety
+# Безпека даних під час імпорту з 1C
 
-1C is authoritative for catalog fields in the roots it manages. A feature that changes categories, product details, stock or prices locally must define whether the next import will overwrite that field.
+1C є джерелом істини для полів каталогу в коренях, якими вона керує. Фіча, що локально змінює категорії, деталі товару, залишки або ціни, має визначити, чи перезапише це поле наступний імпорт.
 
-`ExportToSite` is import-owned visibility, not a delete signal.
+`ExportToSite` — керований імпортом прапорець видимості, а не сигнал видалення.
 
-## Current guards
+## Поточні запобіжники
 
-| Flow | Guard |
+| Потік | Запобіжник |
 | --- | --- |
-| categories | skips deletion when 1C returns no categories |
-| products | returns before writes when response is empty; throws before deletion when non-empty response maps to zero |
-| price types/stocks/prices | empty result returns before writes |
+| Категорії | Пропускає видалення, якщо 1C не повернула категорій |
+| Товари | За порожньої відповіді завершує до записів; якщо непорожня відповідь дає нуль після mapping, кидає виняток до видалення |
+| Типи цін/залишки/ціни | За порожнього результату завершує до записів |
 
-For a valid non-empty category/product result, the job can remove rows absent from the source root. Jobs have no dry run, distributed lock, automatic retry or scheduler today.
+За коректного непорожнього результату категорій/товарів завдання може видалити записи, відсутні у джерельному корені. Станом на перевірку завдання не мають пробного запуску без запису, розподіленого блокування, автоматичних повторних спроб або внутрішнього планувальника.
 
-Before running: select the correct environment/root, avoid overlapping runs for the same root, and inspect received/mapped/synced counts. If counts are unexpected, stop subsequent runs, preserve non-secret diagnostics, correct source/configuration/mapping, then rerun a complete synchronization. Do not infer deletion from the public list: its visibility additionally depends on `ExportToSite` and list filters.
+Перед запуском вибери правильні середовище й root, не накладай виконання для одного root та перевір лічильники received/mapped/synced. Якщо вони неочікувані, зупини наступні запуски, збережи діагностику без секретів, виправ джерело/конфігурацію/mapping і тільки тоді повтори повну синхронізацію. Не роби висновок про видалення з публічного списку: видимість залежить також від `ExportToSite` і фільтрів списку.

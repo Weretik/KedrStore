@@ -1,10 +1,10 @@
-# Customer read API — checklist: specification readiness
+# API читання клієнтів — контрольний список: готовність специфікації
 
-- [x] Scope is limited to read projections of existing Sales counterparties and optionally their existing price-type rules.
-- [x] Rules R-001 through R-006 and scenarios SC-001 through SC-004 are stable identifiers.
-- [x] The existing counterparty ownership and soft-delete boundary are documented.
-- [x] No speculative entity, identifier, or migration is introduced.
-- [x] Traceability covers every in-scope scenario.
-- [x] Routes, access, personal-data fields, price rules, pagination/search, and deleted-customer behavior are resolved or excluded.
-- [x] Human-readable API contract, error mapping, and planned OpenAPI operation details are agreed.
-- [x] Each planned task is expanded with exact paths, dependencies, checkpoints, and planned Red/Green/regression evidence.
+- [x] Обсяг обмежено проєкціями читання наявних контрагентів Sales і, за потреби, їхніх наявних правил типів цін.
+- [x] Правила R-001–R-006 і сценарії SC-001–SC-004 мають сталі ідентифікатори.
+- [x] Задокументовано відповідальність за наявних контрагентів і межу логічного видалення.
+- [x] Не додано припущених сутностей, ідентифікаторів чи міграцій.
+- [x] Матриця зв'язків охоплює кожен сценарій у межах фічі.
+- [x] Маршрути, доступ, поля персональних даних, правила цін, посторінковий вивід і пошук, а також поведінку для видалених клієнтів визначено або виключено.
+- [x] Погоджено читабельний контракт API, відображення помилок і заплановані деталі операцій OpenAPI.
+- [x] Кожне заплановане завдання деталізовано точними шляхами, залежностями, контрольними точками й очікуваними свідченнями Red/Green/регресії.

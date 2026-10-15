@@ -1,29 +1,29 @@
-# TS-004 — Add manager-order read endpoints
+# TS-004 — додати маршрути читання замовлень менеджера
 
-- **Task ID:** TS-004
-- **Covers:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** TS-002, TS-003, EN-003
-- **Exact paths:** `src/Sales/Sales.Api/Controllers/AdminOrdersController.cs`, `src/Sales/Sales.Api/Contracts/Orders/`, `tests/IntegrationTests/Sales/Api/AdminOrderApiTests.cs`
-- **Test level:** API integration
+- **ID задачі:** TS-004
+- **Покриває:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** TS-002, TS-003, EN-003
+- **Точні шляхи:** `src/Sales/Sales.Api/Controllers/AdminOrdersController.cs`, `src/Sales/Sales.Api/Contracts/Orders/`, `tests/IntegrationTests/Sales/Api/AdminOrderApiTests.cs`
+- **Рівень тесту:** інтеграція API
 
-## Evidence
+## Докази
 
-- **Focused test:** manager-order read cases in `AdminOrderApiTests`
-- **Red:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~ManagerOrderReadApiTests`; 8 failed on missing GET routes/access and 3 pre-endpoint cases passed.
-- **Green:** same command; 11 passed, 0 failed.
-- **Refactor:** explicit query parameter names and transport metadata aligned runtime OpenAPI and preserved blank-input validation; focused suite remained 11/11 passing.
-- **Regression:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~Sales.Api`; 26 passed, 0 failed.
+- **Цільовий тест:** випадки читання замовлень менеджера в `AdminOrderApiTests`
+- **Red:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~ManagerOrderReadApiTests`; 8 випадків провалилися через відсутність GET-маршрутів/доступу, 3 випадки до додавання маршрутів пройшли.
+- **Green:** та сама команда; 11 пройшли, 0 помилок.
+- **Рефакторинг:** явні імена параметрів запиту й transport-метадані узгодили runtime OpenAPI та зберегли валідацію порожнього вводу; цільовий набір залишився успішним 11/11.
+- **Регресія:** `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~Sales.Api`; 26 пройшли, 0 помилок.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest HTTP integration test for the first agreed route and run it to confirm the expected missing-route/behavior failure.
-- [x] **Red:** add focused failing tests for response mapping, validation/not-found, authentication, authorization, and scope required by SC-001–SC-005.
-- [x] **Green:** add thin endpoint methods; map inputs to queries, pass cancellation, and use the established Ardalis.Result mapping.
-- [x] **Green:** add only required HTTP DTOs/mappers, apply the agreed policy, and declare response types/statuses matching EN-003.
-- [x] **Refactor:** preserve existing create, sync-status, and retry behavior while applying `CanManageOrders` only to the new read routes.
-- [x] **Regression:** run `AdminOrderApiTests` and the Sales API subset.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший інтеграційний HTTP-тест першого погодженого маршруту й запустити його, щоб підтвердити очікувану помилку відсутнього маршруту/поведінки.
+- [x] **Red:** додати цільові тести, що падають, для мапінгу відповіді, валідації/відсутності, автентифікації, авторизації та меж за SC-001–SC-005.
+- [x] **Green:** додати тонкі методи маршрутів; перетворювати вхідні дані на запити, передавати скасування й використовувати наявний мапінг Ardalis.Result.
+- [x] **Green:** додати лише потрібні HTTP DTO/мапери, застосувати погоджену політику та оголосити типи/статуси відповідей згідно з EN-003.
+- [x] **Рефакторинг:** зберегти чинну поведінку створення, стану синхронізації та повтору, застосовуючи `CanManageOrders` лише до нових маршрутів читання.
+- [x] **Регресія:** запустити `AdminOrderApiTests` і піднабір Sales API.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Докази».
 
-## Checkpoint
+## Контрольна точка
 
-Every route is thin, authorized, cancellation-aware, and contract-compliant.
+Кожний маршрут тонкий, авторизований, підтримує скасування й відповідає контракту.

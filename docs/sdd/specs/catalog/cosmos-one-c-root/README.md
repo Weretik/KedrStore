@@ -1,71 +1,71 @@
-# Cosmos 1C root import
+# Імпорт кореня Cosmos з 1C
 
-**Module:** catalog  
-**Status:** implemented  
-**Owner:** backend team  
-**Created:** 2026-07-27  
-**Related:** Catalog 1C import jobs
+**Модуль:** catalog\
+**Статус:** реалізовано\
+**Власник:** backend-команда\
+**Створено:** 2026-07-27\
+**Пов'язане:** завдання імпорту Catalog з 1C
 
-## Goal
+## Мета
 
-As a catalog administrator, I want the `Космос` 1C root to be included in catalog imports so that its categories, products, stock, prices and list projection are current on the site.
+Як адміністратор каталогу, я хочу, щоб корінь 1C `Космос` входив до імпорту каталогу, аби його категорії, товари, залишки, ціни та проєкція списку були актуальними на сайті.
 
-## Scope
+## Обсяг
 
-- In scope: configure the string root `Космос`; include it in full synchronization; support its non-numeric root value in category import.
-- Out of scope: new API endpoints, database schema changes and manual category hierarchy for Cosmos.
-- Assumptions: 1C returns numeric category and product identifiers inside the `Космос` root responses.
-- Dependencies: all four existing 1C catalog SOAP operations accept `RootCategoryId` as a string.
+- У межах обсягу: налаштувати рядковий корінь `Космос`; включити його до повної синхронізації; підтримати його нечислове значення кореня під час імпорту категорій.
+- Поза обсягом: нові API endpoint-и, зміни схеми бази даних і ручна ієрархія категорій для Cosmos.
+- Припущення: 1C повертає числові ідентифікатори категорій і товарів у відповідях для кореня `Космос`.
+- Залежності: усі чотири наявні SOAP-операції каталогу 1C приймають `RootCategoryId` як рядок.
 
-## Scenarios
+## Сценарії
 
-1. Given `OneC:CosmosRootCategoryId` is `Космос`, when `--job=full` runs, then categories, details, stock and prices are imported for that root and the final projection includes its products.
-2. Given a category name exists in multiple roots, when Cosmos product details are imported, then category resolution uses only Cosmos categories.
+1. Якщо `OneC:CosmosRootCategoryId` має значення `Космос`, то під час запуску `--job=full` для цього кореня імпортуються категорії, деталі, залишки й ціни, а підсумкова проєкція містить його товари.
+2. Якщо назва категорії є в кількох коренях, то під час імпорту деталей товарів Cosmos пошук категорії використовує лише категорії Cosmos.
 
-## Contract and compatibility
+## Контракт і сумісність
 
-- API contract document: not needed because no HTTP contract changes.
-- Existing consumers and compatibility: existing root IDs and CLI arguments remain unchanged; full synchronization gains a third root.
-- Authorization and idempotency: not applicable to CLI jobs.
+- Документ контракту API: не потрібен, оскільки HTTP-контракт не змінюється.
+- Наявні споживачі та сумісність: наявні ID коренів і аргументи CLI залишаються незмінними; повна синхронізація охоплює третій корінь.
+- Авторизація та ідемпотентність: не застосовуються до завдань CLI.
 
-## Implementation phases
+## Етапи реалізації
 
-| Phase | Status | Required? | Outcome |
+| Етап | Статус | Обов'язково? | Результат |
 | --- | --- | --- | --- |
-| Application | implemented | yes | String-root category import and root-scoped product category mapping. |
-| Host configuration | implemented | yes | Cosmos root is configured in API and jobs hosts. |
-| Documentation | not needed | no | Existing root list is illustrative; full-job source defines the executable order. |
+| Application | реалізовано | так | Імпорт категорій із рядковим коренем і зіставлення категорій товарів у межах кореня. |
+| Конфігурація хостів | реалізовано | так | Корінь Cosmos налаштовано в хостах API і завдань. |
+| Документація | не потрібна | ні | Наявний список коренів є ілюстративним; джерело завдання повного імпорту визначає порядок виконання. |
 
-## Files
+## Файли
 
-- Modify: catalog 1C options, category/product-detail jobs, mapping/specification, full job and host configuration.
-- Do not change: public API contracts, database schema and SOAP generated client.
+- Змінити: налаштування catalog 1C, завдання імпорту категорій/деталей товарів, зіставлення/специфікацію, завдання повного імпорту та конфігурацію хостів.
+- Не змінювати: публічні API-контракти, схему бази даних і згенерований SOAP-клієнт.
 
-## Acceptance criteria
+## Критерії приймання
 
-- [x] `Космос` is sent as the root value to all four catalog import jobs within `full`.
-- [x] A non-numeric root no longer causes category import parsing failure.
-- [x] Full import rebuilds the projection after all three roots finish.
-- [x] Category matching for product details is scoped to the imported root.
+- [x] `Космос` передається як значення кореня до всіх чотирьох завдань імпорту каталогу в межах `full`.
+- [x] Нечисловий корінь більше не спричиняє помилку парсингу під час імпорту категорій.
+- [x] Повний імпорт перебудовує проєкцію після завершення роботи з усіма трьома коренями.
+- [x] Пошук категорії для деталей товарів обмежено імпортованим коренем.
 
-## Verification
+## Перевірка
 
-- `dotnet restore KedrStore.sln`: passed, with pre-existing package vulnerability warnings.
-- `dotnet build KedrStore.sln --no-restore`: passed, 0 errors and 9 warnings.
-- `dotnet test KedrStore.sln --no-build --no-restore`: could not pass: `SlugTests.MapProduct_Should_Clean_Slugs` fails independently of this change; integration tests cannot connect to PostgreSQL at `127.0.0.1:5432`.
+- `dotnet restore KedrStore.sln`: успішно, з наявними раніше попередженнями про вразливості пакетів.
+- `dotnet build KedrStore.sln --no-restore`: успішно, 0 помилок і 9 попереджень.
+- `dotnet test KedrStore.sln --no-build --no-restore`: не пройшов: `SlugTests.MapProduct_Should_Clean_Slugs` завершується помилкою незалежно від цієї зміни; інтеграційні тести не можуть підключитися до PostgreSQL за адресою `127.0.0.1:5432`.
 
-## Cosmos virtual category
+## Віртуальна категорія Cosmos
 
-- `OneC:CosmosCategoryId` is configured as `920000` in both hosts.
-- The category job detects the Cosmos root, creates or updates this local category and returns without calling the unavailable categories SOAP operation.
-- Product-details import assigns this category ID to every product returned for the Cosmos root, without resolving its 1C category path.
-- The job stops with an explicit error if ID `920000` is already owned by a different root.
+- `OneC:CosmosCategoryId` налаштовано зі значенням `920000` в обох хостах.
+- Завдання імпорту категорій виявляє корінь Cosmos, створює або оновлює цю локальну категорію та завершує роботу без виклику недоступної SOAP-операції категорій.
+- Імпорт деталей товарів призначає ID цієї категорії кожному товару, повернутому для кореня Cosmos, без визначення його шляху категорій у 1C.
+- Завдання зупиняється з явною помилкою, якщо ID `920000` уже належить іншому кореню.
 
-## Risks and open questions
+## Ризики та відкриті питання
 
-- [ ] Validate against 1C that `GetCategories(Космос)` returns every category referenced by `GetProductDetails(Космос)`.
-- [ ] A targeted run must provide `--rootId=Космос`; full import is preferred for a coherent refresh.
+- [ ] Перевірити на 1C, що `GetCategories(Космос)` повертає кожну категорію, на яку посилається `GetProductDetails(Космос)`.
+- [ ] Для цільового запуску потрібно вказати `--rootId=Космос`; для узгодженого оновлення рекомендовано повний імпорт.
 
-## Change log
+## Історія змін
 
-- 2026-07-27 — Added Cosmos root to catalog 1C full synchronization.
+- 2026-07-27 — Корінь Cosmos додано до повної синхронізації каталогу з 1C.

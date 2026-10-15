@@ -1,9 +1,9 @@
-# Customer read API — design: Infrastructure
+# API читання клієнтів — дизайн: інфраструктура
 
-## Persistence and integrations
+## Збереження даних та інтеграції
 
-Infrastructure will provide no-tracking Sales database projections for active counterparties, applying the established soft-delete predicate. The paged list projects only ID, name, and phone and orders by name then ID. Detail additionally projects email, default price type, and category price-type rules ordered by category ID. It must not load order data or invoke the existing 1C synchronization services or Identity persistence.
+Інфраструктура надаватиме проєкції з бази даних Sales без відстеження змін для активних контрагентів, застосовуючи усталений предикат логічного видалення. Посторінковий список проєктує лише ID, ім'я й телефон та впорядковується за іменем, потім за ID. Проєкція деталей додатково містить електронну пошту, типовий тип ціни й правила типів цін для категорій, упорядковані за ID категорії. Вона не повинна завантажувати дані замовлень або викликати наявні служби синхронізації з 1C чи сховище Identity.
 
-## Migration and rollout
+## Міграція та розгортання
 
-No migration is planned because the feature reads existing `Counterparties` and `CounterpartyCategoryPriceTypes` tables. Before implementation, validate the agreed list search, ordering, and pagination against representative data; add an index only with an agreed performance requirement and measured need. The additive API must be deployed with its aggregate OpenAPI reference and focused contract tests.
+Міграцію не заплановано, оскільки фіча читає наявні таблиці `Counterparties` і `CounterpartyCategoryPriceTypes`. Перед реалізацією перевірити погоджені пошук у списку, порядок і посторінковий вивід на показових даних; додавати індекс лише за наявності погодженої вимоги до швидкодії та виміряної потреби. Новий API потрібно розгортати разом із посиланням на нього у зведеному OpenAPI та цільовими контрактними тестами.

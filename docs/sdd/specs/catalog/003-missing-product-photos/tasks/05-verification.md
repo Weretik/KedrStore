@@ -1,8 +1,8 @@
-# Phase 05 — Verification task planning
+# Етап 05 — Планування задач перевірки
 
-- [x] Execute [TS-007 — feature verification and delivery](verification/05.1-feature-verification.md).
+- [x] Виконати [TS-007 — перевірка й постачання функціональності](verification/05.1-feature-verification.md).
 
-## Checkpoint
+## Контрольна точка
 
-All scenarios have recorded evidence, contracts match runtime behavior, and the
-delivery checklist and report describe residual operational risks.
+Для всіх сценаріїв зафіксовано свідчення, контракти відповідають runtime-поведінці,
+а чеклист і звіт про постачання описують залишкові операційні ризики.

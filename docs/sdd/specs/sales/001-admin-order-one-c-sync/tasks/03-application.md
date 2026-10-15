@@ -1,8 +1,8 @@
-# Phase 03 — Application
+# Фаза 03 — Application
 
-- [x] [T090 — Application contracts](application/03.1-order-contracts.md)
-- [x] [T100 — Create manager order command](application/03.2-create-order.md)
+- [x] [T090 — контракти Application](application/03.1-order-contracts.md)
+- [x] [T100 — команда створення замовлення менеджера](application/03.2-create-order.md)
 
-## Checkpoint
+## Контрольна точка
 
-The command validates the manager input, confirms the Sales counterparty, and commits `Order` with `OneCOrderSync(Pending)` atomically. It does not invoke SOAP.
+Команда перевіряє ввід менеджера, підтверджує контрагента Sales і атомарно фіксує `Order` разом із `OneCOrderSync(Pending)`. Вона не викликає SOAP.

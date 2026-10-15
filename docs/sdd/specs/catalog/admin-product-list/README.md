@@ -1,45 +1,45 @@
-# Admin product list
+# Список товарів для адміністратора
 
-**Module:** catalog  
-**Status:** verified  
-**Created:** 2026-07-24  
-**Related:** admin frontend product-list specification
+**Модуль:** catalog\
+**Статус:** перевірено\
+**Створено:** 2026-07-24\
+**Пов'язане:** специфікація списку товарів адміністративного frontend
 
-## Goal
+## Мета
 
-Provide an anonymous admin-facing product-list API without a language route segment. It returns both Ukrainian and Russian product names and supports a pageable filtered list plus a full-list endpoint.
+Надати API списку товарів для адміністратора з анонімним доступом і без мовного сегмента в маршруті. Він повертає українські та російські назви товарів і підтримує сторінковий відфільтрований список, а також endpoint повного списку.
 
-## Scope
+## Обсяг
 
-- In scope: GET /api/admin/products and GET /api/admin/products/all, bilingual names, list filters, sorting, paging and query validation.
-- Out of scope: product editing, schema migration, authorization and a new product weight/attribute model.
+- У межах обсягу: GET /api/admin/products і GET /api/admin/products/all, назви двома мовами, фільтри списку, сортування, розбиття на сторінки та валідація запиту.
+- Поза обсягом: редагування товарів, міграція схеми, авторизація та нова модель ваги/атрибутів товару.
 
-## Contract and compatibility
+## Контракт і сумісність
 
-- GET /api/admin/products uses GetAdminProductsRequest and returns PagedResult<List<AdminProductListRowDto>>.
-- GET /api/admin/products/all returns List<AdminProductListRowDto> without filtering or paging.
-- The row contains identifiers, both names, slug, photo, category, stock flags, price, stock and quantity-in-pack.
-- Both routes are explicitly AllowAnonymous because the host fallback policy requires authentication.
+- GET /api/admin/products використовує GetAdminProductsRequest і повертає PagedResult<List<AdminProductListRowDto>>.
+- GET /api/admin/products/all повертає List<AdminProductListRowDto> без фільтрації та розбиття на сторінки.
+- Рядок містить ідентифікатори, обидві назви, slug, фото, категорію, ознаки наявності, ціну, залишок і кількість в упаковці.
+- Обидва маршрути явно мають AllowAnonymous, оскільки резервна політика хоста вимагає автентифікації.
 
-## Design by layer
+## Проєктування за шарами
 
-- Domain: no new invariant or entity change.
-- Application: dedicated query/handler pair, validator and DTO.
-- Infrastructure: queries Catalog ProductListProjection and Product as no-tracking read sources; no migration.
-- API: AdminProductsController only binds, dispatches and maps Result.
+- Domain: без нових інваріантів або змін сутностей.
+- Application: окрема пара запиту й обробника, валідатор і DTO.
+- Infrastructure: запитує Catalog ProductListProjection і Product як джерела читання без відстеження; без міграції.
+- API: AdminProductsController лише прив'язує параметри, передає запит і зіставляє Result.
 
-## Acceptance criteria
+## Критерії приймання
 
-- [x] Neither endpoint contains a language path parameter.
-- [x] Filtered endpoint accepts search, category, stock/sale/new, price, sorting and paging parameters.
-- [x] Both product names and standard list fields are returned.
-- [x] Invalid page, sort, category and price ranges are rejected by FluentValidation.
+- [x] Жоден endpoint не містить мовного параметра в шляху.
+- [x] Endpoint з фільтрацією приймає параметри пошуку, категорії, наявності/розпродажу/новинок, ціни, сортування та розбиття на сторінки.
+- [x] Повертаються обидві назви товару й стандартні поля списку.
+- [x] Некоректні значення сторінки, сортування, категорії та діапазону цін відхиляє FluentValidation.
 
-## Verification
+## Перевірка
 
-- Catalog.Application builds with zero errors and warnings.
-- Full Host.Api build may require stopping the locally running host first because it locks output DLL files.
+- Catalog.Application збирається без помилок і попереджень.
+- Для повної збірки Host.Api може спочатку знадобитися зупинити локально запущений хост, оскільки він блокує вихідні файли DLL.
 
-## Change log
+## Історія змін
 
-- 2026-07-24 — Initial implementation and verification record.
+- 2026-07-24 — Початкова реалізація та запис про перевірку.

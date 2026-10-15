@@ -1,29 +1,29 @@
-# TS-002 — Get active-customer list
+# TS-002 — Отримати список активних клієнтів
 
-- **Task ID:** TS-002
-- **Covers:** SC-001
-- **Depends on:** TS-001
-- **Exact paths:** `src/Sales/Sales.Application/Features/Customers/GetList/`, `tests/UnitTests/Sales/Application/GetCustomerListQueryHandlerTests.cs`
-- **Test level:** Application
+- **ID завдання:** TS-002
+- **Охоплює:** SC-001
+- **Залежить від:** TS-001
+- **Точні шляхи:** `src/Sales/Sales.Application/Features/Customers/GetList/`, `tests/UnitTests/Sales/Application/GetCustomerListQueryHandlerTests.cs`
+- **Рівень тестування:** Application
 
-## Evidence
+## Свідчення
 
-- **Focused test:** `GetCustomerListQueryHandlerTests`
-- **Red:** combined customer-handler run compiled 11 tests and failed the 2 list handler cases because the temporary handler returned the expected not-implemented error; validators passed.
-- **Green:** combined focused customer-handler run passed 11/11.
-- **Refactor:** handler delegates directly to `ICustomerReadService`, preserves its `Result`, and forwards the cancellation token; focused tests remained Green.
-- **Regression:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application` passed 32/32.
+- **Цільовий тест:** `GetCustomerListQueryHandlerTests`
+- **Red:** спільний запуск обробників клієнтів скомпілював 11 тестів; 2 випадки для обробника списку не пройшли, оскільки тимчасовий обробник повернув очікувану помилку відсутньої реалізації; валідатори пройшли.
+- **Green:** спільний цільовий запуск обробників клієнтів пройшов 11/11.
+- **Рефакторинг:** обробник безпосередньо делегує виклик `ICustomerReadService`, зберігає його `Result` і передає токен скасування; цільові тести залишилися Green.
+- **Регресія:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application` пройшов 32/32.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest handler test for SC-001 and run it to confirm failure because list orchestration is absent.
-- [x] **Red:** add focused failing cases for empty list, invalid page/search/sort/filter input, read failure, and cancellation.
-- [x] **Green:** add the query, agreed filters/paging, validator when needed, and result DTO one failing case at a time.
-- [x] **Green:** delegate selection to `ICustomerReadService`, return explicit Ardalis.Result outcomes, and rerun the focused test after each increment.
-- [x] **Refactor:** simplify mapping and validation without accessing EF or Domain entities.
-- [x] **Regression:** run the Sales Application test subset.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший тест обробника для SC-001 і запустити його, щоб підтвердити збій через відсутню координацію списку.
+- [x] **Red:** додати цільові випадки, що мають падати, для порожнього списку, некоректних сторінки, пошуку, сортування чи фільтра, помилки читання й скасування.
+- [x] **Green:** додавати запит, погоджені фільтри й посторінковий вивід, за потреби валідатор і DTO результату по одному випадку, що падає.
+- [x] **Green:** делегувати вибірку `ICustomerReadService`, повертати явні результати Ardalis.Result і повторювати цільовий тест після кожного кроку.
+- [x] **Рефакторинг:** спростити відображення й валідацію без доступу до EF або доменних сутностей.
+- [x] **Регресія:** запустити піднабір тестів Sales Application.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Свідчення».
 
-## Checkpoint
+## Контрольна точка
 
-The query exposes only the agreed active-customer list boundary.
+Запит відкриває лише погоджений набір даних списку активних клієнтів.

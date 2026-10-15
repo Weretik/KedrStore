@@ -1,10 +1,10 @@
-# Category presentation metadata — data model
+# Метадані представлення категорій — модель даних
 
-## Context
+## Контекст
 
-The existing `ProductCategories` table stores 1C ownership, original category name, slug, parent ID, and ltree path. It needs display-oriented data that is separate from the 1C source name and can be consumed without a storefront-maintained mapping.
+Наявна таблиця `ProductCategories` зберігає належність до кореня 1C, оригінальну назву категорії, slug, ID батьківської категорії та шлях ltree. Їй потрібні дані для відображення, відокремлені від вихідної назви 1C, які можна споживати без відображення, підтримуваного storefront.
 
-## Model
+## Модель
 
 ```text
 ProductCategory / ProductCategories
@@ -20,10 +20,10 @@ ProductCategory / ProductCategories
 └── Level: int (new depth derived from final hierarchy)
 ```
 
-## Invariants and integrity
+## Інваріанти та цілісність
 
-- `Name` is required, has the existing maximum length of 100, and remains the original 1C name.
-- `ShortNameUk` and `ShortNameRu` are required after migration backfill, trimmed and non-blank, with a maximum length of 100.
-- `SortOrder` is deterministic, non-negative, and unique per `ParentId` sibling set (including the root sibling set). An unconfigured category uses `Int32.MaxValue`; a numeric category ID breaks any resulting tie.
-- `Level >= 0`; a root has level `0`, and the value matches the hierarchy derived from `Path`/`ParentId`.
-- Add an index only if the agreed category-tree query requires database ordering beyond the current in-memory tree construction; index shape follows the agreed read access pattern.
+- `Name` є обов'язковим, зберігає наявну максимальну довжину 100 і залишається оригінальною назвою 1C.
+- `ShortNameUk` і `ShortNameRu` є обов'язковими після заповнення міграцією, обрізаними від пробілів і непорожніми, з максимальною довжиною 100.
+- `SortOrder` є детермінованим, невід'ємним і унікальним серед дочірніх категорій одного `ParentId` (зокрема серед кореневих). Для неналаштованої категорії використовується `Int32.MaxValue`; числовий ID категорії розв'язує можливу рівність.
+- `Level >= 0`; коренева категорія має рівень `0`, а значення відповідає ієрархії, виведеній із `Path`/`ParentId`.
+- Додавайте індекс лише тоді, коли погоджений запит дерева категорій потребує впорядкування в базі даних на додачу до поточного формування дерева в пам'яті; форма індексу має відповідати погодженому шаблону читання.

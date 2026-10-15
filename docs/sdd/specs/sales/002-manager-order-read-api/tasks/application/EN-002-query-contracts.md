@@ -1,29 +1,29 @@
-# EN-002 — Define manager-order query contracts
+# EN-002 — визначити контракти запитів замовлень менеджера
 
-- **Task ID:** EN-002
-- **Enables:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** EN-001
-- **Exact paths:** `src/Sales/Sales.Application/Contracts/Orders/IOrderReadService.cs`, `src/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
-- **Test level:** Application compile/contract verification
+- **ID задачі:** EN-002
+- **Підтримує:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** EN-001
+- **Точні шляхи:** `src/Sales/Sales.Application/Contracts/Orders/IOrderReadService.cs`, `src/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
+- **Рівень тесту:** перевірка компіляції Application і контракту
 
-## Why this is an enabler
+## Чому це підготовча задача
 
-List and detail handlers share a read abstraction and projections. Defining that boundary first keeps EF types out of Application and supports focused test fakes.
+Обробники списку й деталей використовують спільну абстракцію читання та проєкції. Попереднє визначення цієї межі не допускає типів EF до Application і дає змогу використовувати цільові тестові замінники.
 
-## Work
+## Робота
 
-- [x] Inspect `IOrderSyncStatusReader`; reuse concepts without expanding its sync-only responsibility.
-- [x] Define one Application read abstraction for the agreed list/detail projections.
-- [x] Define list-row, detail, line, counterparty, sync, paging, and filter records only when required by EN-001.
-- [x] Exclude Domain entities, EF types, SOAP diagnostics, retry audits, and notification fields.
-- [x] Pass `CancellationToken` through every read operation.
+- [x] Дослідити `IOrderSyncStatusReader`; повторно використати підходи без розширення його відповідальності лише за синхронізацію.
+- [x] Визначити одну абстракцію читання Application для погоджених проєкцій списку й деталей.
+- [x] Визначити записи рядка списку, деталей, позиції, контрагента, синхронізації, пагінації та фільтра лише тоді, коли цього вимагає EN-001.
+- [x] Виключити доменні сутності, типи EF, діагностику SOAP, аудит повторів і поля сповіщень.
+- [x] Передавати `CancellationToken` через кожну операцію читання.
 
-## Test-first exception and replacement verification
+## Виняток із test-first та замінна перевірка
 
-- **Reason:** compile-time contracts precede handler and infrastructure behavioral tests.
-- **Replacement check:** build `src/Sales/Sales.Application/Sales.Application.csproj` and compile focused test fixtures.
-- **Result:** completed 2026-09-10; `dotnet build src/Sales/Sales.Application/Sales.Application.csproj` passed with 0 warnings and 0 errors.
+- **Причина:** контракти часу компіляції передують поведінковим тестам обробника й інфраструктури.
+- **Замінна перевірка:** зібрати `src/Sales/Sales.Application/Sales.Application.csproj` і скомпілювати цільові тестові фікстури.
+- **Результат:** завершено 2026-09-10; `dotnet build src/Sales/Sales.Application/Sales.Application.csproj` пройшла з 0 попереджень і 0 помилок.
 
-## Checkpoint
+## Контрольна точка
 
-List and detail use cases have stable, minimal Application contracts matching the agreed response boundary.
+Сценарії списку й деталей мають сталі мінімальні контракти Application, що відповідають погодженій межі відповіді.

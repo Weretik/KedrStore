@@ -1,30 +1,30 @@
-# EN-001 — Agree manager-order read behavior
+# EN-001 — погодити поведінку читання замовлень менеджера
 
-- **Task ID:** EN-001
-- **Enables:** SC-001, SC-002, SC-003, SC-004, SC-005
-- **Depends on:** none
-- **Exact paths:** `docs/sdd/specs/sales/002-manager-order-read-api/requirements/overview.md`, `docs/sdd/specs/sales/002-manager-order-read-api/requirements/order-reading.md`, `docs/sdd/specs/sales/002-manager-order-read-api/contracts/api-contract.md`, `docs/sdd/specs/sales/002-manager-order-read-api/data-model.md`, `docs/sdd/specs/sales/002-manager-order-read-api/traceability.md`, `docs/sdd/specs/sales/002-manager-order-read-api/checklist/spec-readiness.md`
-- **Test level:** documentation review
+- **ID задачі:** EN-001
+- **Підтримує:** SC-001, SC-002, SC-003, SC-004, SC-005
+- **Залежить від:** немає
+- **Точні шляхи:** `docs/sdd/specs/sales/002-manager-order-read-api/requirements/overview.md`, `docs/sdd/specs/sales/002-manager-order-read-api/requirements/order-reading.md`, `docs/sdd/specs/sales/002-manager-order-read-api/contracts/api-contract.md`, `docs/sdd/specs/sales/002-manager-order-read-api/data-model.md`, `docs/sdd/specs/sales/002-manager-order-read-api/traceability.md`, `docs/sdd/specs/sales/002-manager-order-read-api/checklist/spec-readiness.md`
+- **Рівень тесту:** рев'ю документації
 
-## Why this is an enabler
+## Чому це підготовча задача
 
-Routes, authorization, visible fields, list semantics, and deleted-counterparty history change public behavior. A meaningful implementation test cannot be written until these decisions are explicit.
+Маршрути, авторизація, видимі поля, семантика списку й історія видаленого контрагента змінюють публічну поведінку. Змістовний тест реалізації неможливо написати, доки ці рішення не визначені явно.
 
-## Work
+## Робота
 
-- [x] Resolve every manager-order clarification or move it explicitly out of scope.
-- [x] Agree list/detail routes, operation IDs, parameters, result fields, examples, status codes, and security.
-- [x] Agree pagination, deterministic ordering, filters, empty-list behavior, and unknown/deleted-counterparty behavior.
-- [x] Confirm that authorized Manager/Admin callers can see all orders without row-level assignment filtering.
-- [x] Update rules/scenarios while preserving their stable IDs.
-- [x] Mark the human contract agreed and complete the specification-readiness checklist.
+- [x] Вирішити кожне уточнення щодо замовлень менеджера або явно винести його за межі функціональності.
+- [x] Погодити маршрути списку/деталей, ID операцій, параметри, поля результату, приклади, коди стану та безпеку.
+- [x] Погодити пагінацію, детермінований порядок, фільтри, поведінку порожнього списку й поведінку для невідомого/видаленого контрагента.
+- [x] Підтвердити, що авторизовані викликачі Manager/Admin можуть бачити всі замовлення без фільтра за призначенням рядків.
+- [x] Оновити правила й сценарії зі збереженням їхніх сталих ID.
+- [x] Позначити людський контракт погодженим і завершити контрольний список готовності специфікації.
 
-## Test-first exception and replacement verification
+## Виняток із test-first та замінна перевірка
 
-- **Reason:** this task records product decisions and changes no executable behavior.
-- **Replacement check:** verify that every previously open product decision has an agreed contract outcome and traceability mapping.
-- **Result:** completed 2026-09-10; decisions are recorded in requirements and the agreed API contract.
+- **Причина:** ця задача фіксує продуктові рішення й не змінює виконуваної поведінки.
+- **Замінна перевірка:** переконатися, що кожне раніше відкрите продуктове рішення має погоджений результат у контракті та відображення у простежуваності.
+- **Результат:** завершено 2026-09-10; рішення зафіксовано у вимогах і погодженому контракті API.
 
-## Checkpoint
+## Контрольна точка
 
-The specification can produce request/response contracts and failing behavioral tests without invented behavior.
+Специфікація дозволяє створити контракти запиту/відповіді та поведінкові тести, що падають, без вигадування поведінки.

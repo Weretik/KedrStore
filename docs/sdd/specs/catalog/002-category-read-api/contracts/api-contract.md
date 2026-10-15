@@ -1,20 +1,20 @@
-# Category read API — API contract
+# API читання категорій — контракт API
 
-**Status:** agreed
+**Статус:** agreed
 
-The machine-readable source is [category-read.openapi.yaml](../../../../contracts/catalog/category-read.openapi.yaml), referenced by the aggregate [OpenAPI contract](../../../../contracts/openapi.yaml). It is a new additive public Catalog API.
+Машиночитане джерело — [category-read.openapi.yaml](../../../../contracts/catalog/category-read.openapi.yaml), на яке посилається зведений [контракт OpenAPI](../../../../contracts/openapi.yaml). Це новий адитивний публічний API Catalog.
 
-| Operation | Route | Success | Errors | Access |
+| Операція | Маршрут | Успіх | Помилки | Доступ |
 | --- | --- | --- | --- | --- |
-| `getCategoryTree` | `GET /api/catalog/{lang}/categories` | `200` array of recursive `CategoryTreeNode`; `[]` when empty | `400` invalid language | Anonymous |
-| `getCategoryBySlug` | `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | `200` `CategoryDetails` | `400` invalid input; `404` unknown slug | Anonymous |
-| `getAdminCategories` | `GET /api/categories` | `200` flat `AdminCategory` array; `[]` when empty | — | Anonymous, temporary internal UI surface |
-| `getAdminCategoryById` | `GET /api/categories/{id}` | `200` `AdminCategory` | `400` invalid id; `404` absent id | Anonymous, temporary internal UI surface |
+| `getCategoryTree` | `GET /api/catalog/{lang}/categories` | `200` — масив рекурсивних `CategoryTreeNode`; `[]`, якщо порожньо | `400` — некоректна мова | Анонімний |
+| `getCategoryBySlug` | `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | `200` — `CategoryDetails` | `400` — некоректний ввід; `404` — невідомий slug | Анонімний |
+| `getAdminCategories` | `GET /api/categories` | `200` — плаский масив `AdminCategory`; `[]`, якщо порожньо | — | Анонімний, тимчасова внутрішня поверхня UI |
+| `getAdminCategoryById` | `GET /api/categories/{id}` | `200` — `AdminCategory` | `400` — некоректний id; `404` — відсутній id | Анонімний, тимчасова внутрішня поверхня UI |
 
-`lang` is exactly `uk` or `ru`. `categorySlug` is a non-empty public slug of at most 100 characters. Responses use camel case. `CategoryTreeNode` contains `id`, `slug`, locale-selected `name`, `parentId`, `sortOrder`, `level`, and recursive `children`. `CategoryDetails` adds `breadcrumbs`, ordered root-to-current category; each breadcrumb contains `id`, `slug`, and localized `name`.
+`lang` — рівно `uk` або `ru`. `categorySlug` — непорожній публічний slug довжиною не більше 100 символів. Відповіді використовують camel case. `CategoryTreeNode` містить `id`, `slug`, локалізоване `name`, `parentId`, `sortOrder`, `level` і рекурсивне `children`. `CategoryDetails` додатково містить `breadcrumbs` у порядку від кореневої категорії до поточної; кожен елемент breadcrumbs містить `id`, `slug` і локалізоване `name`.
 
-All operations are safe, read-only GET operations, so no idempotency key or request body applies. The two public operations are explicitly anonymous, consistent with public product routes despite the host fallback authorization policy. The ordinary `400` validation-error array and bodyless `404` follow the existing API convention.
+Усі операції — безпечні GET-запити лише для читання, тому для них не потрібні ключ ідемпотентності чи тіло запиту. Дві публічні операції явно доступні анонімно, як і публічні маршрути продуктів, попри резервну політику авторизації host. Звичайний масив помилок валідації `400` і `404` без тіла відповідають наявній домовленості API.
 
-The admin operations are temporarily anonymous, consistent with the existing admin-products read surface. They return both localized short names, the original source `name`, and `productTypeIdOneC`, unlike the locale-specific public response. The admin list is an unpaged depth-first flattening of the tree with `sortOrder`, then `id` within each sibling set; it keeps `parentId` and `level` so the UI can reconstruct the hierarchy. A future external-exposure change must add authorization before changing this contract.
+Операції адміністратора тимчасово доступні анонімно, як і наявний інтерфейс читання продуктів адміністратора. Вони повертають обидві локалізовані короткі назви, початкове джерельне `name` і `productTypeIdOneC`, на відміну від публічної відповіді для окремої локалі. Список адміністратора — непосторінкове обходження дерева в глибину з порядком `sortOrder`, а потім `id` у межах кожної групи сусідів; у ньому зберігаються `parentId` і `level`, щоб UI міг відновити ієрархію. Майбутня зміна зовнішньої доступності має додати авторизацію до зміни цього контракту.
 
-The explicit `by-slug` segment avoids a route collision with the existing `/{categorySlug}/products` endpoint. Compatibility is additive: no current route or schema changes. Clients must treat unknown additive response fields as ignorable. During rollout, deploy the API and its aggregate OpenAPI reference atomically; frontend clients must generate types from the aggregate contract rather than backend DTOs.
+Явний сегмент `by-slug` уникає конфлікту маршруту з наявним ендпоїнтом `/{categorySlug}/products`. Сумісність є адитивною: жоден поточний маршрут чи схема не змінюється. Клієнти мають ігнорувати невідомі додаткові поля відповіді. Під час розгортання API та посилання на нього у зведеному OpenAPI слід розгортати атомарно; frontend-клієнти мають генерувати типи зі зведеного контракту, а не з DTO backend.

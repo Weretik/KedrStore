@@ -1,6 +1,6 @@
-# Approved production Identity reset SQL
+# Погоджений SQL для production reset Identity
 
-Run this script only after creating and verifying a fresh backup. It deliberately stops if any non-Identity table has a foreign key to an Identity table. Do not add `CASCADE`.
+Запускай цей скрипт лише після створення й перевірки свіжого backup. Він навмисно зупиняється, якщо будь-яка таблиця поза Identity має зовнішній ключ до таблиці Identity. Не додавай `CASCADE`.
 
 ```sql
 BEGIN;
@@ -47,4 +47,4 @@ WHERE "MigrationId" IN (
 COMMIT;
 ```
 
-After the script commits, execute the dedicated migration job. It must record `20260529142739_InitialAppIdentityDbContext`, recreate the Guid Identity schema, and seed roles/admin credentials. If preflight fails or any statement errors, PostgreSQL rolls the transaction back; stop and investigate before retrying.
+Після commit скрипта запусти окремий migration job. Він має записати `20260529142739_InitialAppIdentityDbContext`, відтворити Guid-схему Identity й створити ролі/admin credentials. Якщо preflight або будь-яка команда SQL падає, PostgreSQL відкочує транзакцію; зупинись і досліди причину до повтору.

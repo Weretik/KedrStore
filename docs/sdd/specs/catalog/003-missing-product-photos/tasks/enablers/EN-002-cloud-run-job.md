@@ -1,32 +1,32 @@
-# EN-002 — Host.Jobs and Cloud Run photo-check wiring
+# EN-002 — Підключення перевірки фотографій у Host.Jobs і Cloud Run
 
-- **Task ID:** EN-002
-- **Enables:** SC-010
-- **Depends on:** TS-004
-- **Exact paths:** `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, `.github/workflows/deploy-cloudrun.yml`, `docs/sdd/operations/jobs/host-jobs-cli.md`, `docs/sdd/operations/jobs/catalog-photo-check-runbook.md`
-- **Test level:** CLI integration + workflow static verification
+- **ID задачі:** EN-002
+- **Уможливлює:** SC-010
+- **Залежить від:** TS-004
+- **Точні шляхи:** `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, `.github/workflows/deploy-cloudrun.yml`, `docs/sdd/operations/jobs/host-jobs-cli.md`, `docs/sdd/operations/jobs/catalog-photo-check-runbook.md`
+- **Рівень тесту:** інтеграційний CLI + статична перевірка workflow
 
-## Why this is an enabler
+## Чому це передумова
 
-Host dispatch and deployment YAML expose the already tested Application job to
-operators. Their correctness is verified through command dispatch and static
-deployment configuration rather than reproducing photo behavior.
+Диспетчеризація хоста й YAML розгортання відкривають операторам уже перевірену
+задачу Application. Їхню правильність перевіряють через диспетчеризацію команди
+й статичну конфігурацію розгортання, не повторюючи поведінкові перевірки фотографій.
 
-## Work
+## Робота
 
-- [x] Register the job, options, and adapters in the jobs composition root.
-- [x] Map only `--job=check-product-photos`; require no `rootId`.
-- [x] Document local execution, summary interpretation, cancellation, and the operator-owned schedule.
-- [x] Add create-or-update logic for `catalog-product-photo-check` using the agreed image, argument, secret, task count, parallelism, retry, and timeout.
-- [x] Prove the workflow contains no execution command for this job and no scheduler creation.
+- [x] Зареєструвати задачу, options і адаптери в точці компонування задач.
+- [x] Зіставити лише `--job=check-product-photos`; не вимагати `rootId`.
+- [x] Задокументувати локальне виконання, тлумачення підсумку, скасування й розклад під відповідальністю оператора.
+- [x] Додати логіку створення або оновлення `catalog-product-photo-check` із погодженими образом, аргументом, секретом, кількістю задач, паралелізмом, повторами й таймаутом.
+- [x] Довести, що workflow не містить команди виконання цієї задачі та створення scheduler.
 
-## Test-first exception and replacement verification
+## Виняток із test-first і замінна перевірка
 
-- Reason Red-first is not meaningful: Cloud Run provisioning cannot be safely executed from the automated test suite, and the wiring adds no new business classification behavior.
-- Replacement command/check: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-restore --filter FullyQualifiedName~ProductPhotoCheckDeploymentTests`; Release build of Host.Jobs; manual workflow diff inspection. `actionlint` and `yamllint` were queried but are not installed in the local environment.
-- Result: static deployment test passed 1/1 and asserts the exact command, job name, secret, execution limits, and absence of job execution or scheduler creation; Release solution build passed with zero warnings and errors.
+- Причина, чому Red-first не має змісту: підготовку Cloud Run не можна безпечно виконувати з автоматизованого набору тестів, а підключення не додає нової бізнес-поведінки класифікації.
+- Замінна команда/перевірка: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-restore --filter FullyQualifiedName~ProductPhotoCheckDeploymentTests`; Release-збірка Host.Jobs; ручний перегляд diff workflow. Наявність `actionlint` і `yamllint` перевіряли, але вони не встановлені в локальному середовищі.
+- Результат: статичний тест розгортання пройшов 1/1 і перевіряє точну команду, назву задачі, секрет, обмеження виконання й відсутність запуску задачі чи створення scheduler; Release-збірка solution пройшла без попереджень і помилок.
 
-## Checkpoint
+## Контрольна точка
 
-The shared image can run the one-shot command locally and in Cloud Run, while
-deployment only creates or updates its definition.
+Спільний образ може виконати одноразову команду локально й у Cloud Run, тоді як
+розгортання лише створює або оновлює її визначення.

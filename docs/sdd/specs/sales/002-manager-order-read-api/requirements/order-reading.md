@@ -1,88 +1,88 @@
-# Manager order read API — order reading
+# API читання замовлень менеджера — читання замовлень
 
-## Behavior
+## Поведінка
 
-- The system returns persisted manager orders according to the agreed list scope.
-- The system returns the complete persisted order representation when an existing order is requested, including its original lines and the current 1C synchronization state.
-- The system can limit the order list to the exact counterparty identifier supplied by the caller.
-- Read requests do not invoke 1C and do not change the order, counterparty, synchronization record, or audit data.
+- Система повертає збережені замовлення менеджерів відповідно до погоджених меж списку.
+- На запит наявного замовлення система повертає його повне збережене представлення, зокрема початкові позиції та поточний стан синхронізації з 1С.
+- Система може обмежити список замовлень точним ідентифікатором контрагента, переданим викликачем.
+- Запити читання не викликають 1С і не змінюють замовлення, контрагента, запис синхронізації чи дані аудиту.
 
-## Business rules
+## Бізнес-правила
 
-### R-001 — Only persisted manager orders are returned
+### R-001 — Повертаються лише збережені замовлення менеджерів
 
-The list and detail operations read the existing Sales `Order` records. Public Catalog quick orders are outside this feature and must not be returned.
+Операції списку й деталей читають наявні записи `Order` модуля Sales. Швидкі публічні замовлення Catalog не належать до цієї функціональності й не повинні повертатися.
 
-### R-002 — Order detail preserves the persisted order composition
+### R-002 — Деталі замовлення зберігають його збережений склад
 
-For an existing manager order, detail contains its identifier and number, creation time, current counterparty summary, optional comment, persisted lines, computed total amount, and safe current `OneCOrderSync` summary. Internal delivery diagnostics and audit data are excluded.
+Для наявного замовлення менеджера деталі містять ідентифікатор і номер, час створення, поточне зведення контрагента, необов'язковий коментар, збережені позиції, обчислену загальну суму й безпечне поточне зведення `OneCOrderSync`. Внутрішню діагностику передавання та дані аудиту виключено.
 
-### R-003 — Counterparty-scoped reading uses the Sales counterparty identifier
+### R-003 — Читання за контрагентом використовує його ідентифікатор у Sales
 
-When `counterpartyId` is supplied to the common order-list operation, the system returns only orders whose `Order.CounterpartyId` exactly matches it. Unknown identifiers produce an empty page. Historical orders remain readable for a soft-deleted counterparty.
+Коли до спільної операції списку замовлень передано `counterpartyId`, система повертає лише замовлення, у яких `Order.CounterpartyId` точно збігається з ним. Невідомий ідентифікатор дає порожню сторінку. Історичні замовлення м'яко видаленого контрагента залишаються доступними для читання.
 
-### R-004 — Reads have no side effects
+### R-004 — Читання не має побічних ефектів
 
-Order read operations neither call 1C nor alter local persistence, including `OneCOrderSync` attempt, retry, notification, and audit fields.
+Операції читання замовлень не звертаються до 1С і не змінюють локальні дані, зокрема поля спроб, повторів, сповіщень та аудиту `OneCOrderSync`.
 
-### R-005 — Read access is temporarily anonymous
+### R-005 — Доступ до читання тимчасово анонімний
 
-The list and detail operations temporarily allow anonymous access. Callers can read all manager orders; no row-level assignment restriction applies. Authorization must be restored before production rollout.
+Операції списку й деталей тимчасово дозволяють анонімний доступ. Викликачі можуть читати всі замовлення менеджерів; обмеження за призначенням окремих рядків не діє. Авторизацію потрібно відновити до production rollout.
 
-### R-006 — Collection and detail have separate payload sizes
+### R-006 — Список і деталі мають різний обсяг даних
 
-The collection is paged and contains compact summaries without line arrays or comments. Detail contains the approved complete order projection. Collection paging defaults to page 1 and page size 20, accepts at most 100 rows, and orders newest first by creation time then order ID.
+Список має пагінацію й містить компактні зведення без масивів позицій і коментарів. Деталі містять погоджену повну проєкцію замовлення. За замовчуванням список повертає сторінку 1 розміром 20, приймає не більше 100 рядків і впорядковується від найновіших за часом створення, потім за ID замовлення.
 
-## Acceptance scenarios
+## Сценарії приймання
 
-### SC-001 — Browse manager orders
+### SC-001 — Переглянути замовлення менеджерів
 
-**Covers:** R-001, R-005, R-006
+**Покриває:** R-001, R-005, R-006
 
-Given persisted manager orders exist
-When the caller requests the manager-order list
-Then the result contains only persisted manager orders within the agreed list scope
-And it does not contain Catalog quick orders
-And every row contains the compact summary without comment or order-line array
-And rows are paged and ordered newest first according to R-006.
+За умови, що збережені замовлення менеджерів існують,
+коли викликач запитує їхній список,
+тоді результат містить лише збережені замовлення менеджерів у погоджених межах списку,
+не містить швидких замовлень Catalog,
+кожний рядок містить компактне зведення без коментаря чи масиву позицій,
+а рядки мають пагінацію й упорядковані від найновіших відповідно до R-006.
 
-### SC-002 — Open an existing manager order
+### SC-002 — Відкрити наявне замовлення менеджера
 
-**Covers:** R-002, R-004, R-005
+**Покриває:** R-002, R-004, R-005
 
-Given a persisted manager order has lines and a current 1C synchronization record
-When the caller requests that order
-Then the result contains the agreed order information, its persisted lines, and current delivery state
-And every line's `amount` represents the complete line quantity
-And the result contains the sum of line amounts but no manufactured unit-price field
-And no 1C call or local state change occurs.
+За умови, що збережене замовлення менеджера має позиції та поточний запис синхронізації з 1С,
+коли викликач запитує це замовлення,
+тоді результат містить погоджені дані замовлення, збережені позиції та поточний стан передавання,
+`amount` кожної позиції представляє її повну кількість,
+результат містить суму вартостей позицій без вигаданого поля ціни за одиницю,
+і не відбувається звернення до 1С чи зміни локального стану.
 
-### SC-003 — Browse orders for one counterparty
+### SC-003 — Переглянути замовлення одного контрагента
 
-**Covers:** R-003, R-005
+**Покриває:** R-003, R-005
 
-Given orders exist for more than one counterparty
-When the caller requests orders for one counterparty identifier
-Then every returned order belongs to that counterparty
-And no order for another counterparty is returned.
+За умови, що існують замовлення кількох контрагентів,
+коли викликач запитує замовлення за ідентифікатором одного контрагента,
+тоді кожне повернене замовлення належить цьому контрагенту,
+а замовлення іншого контрагента не повертаються.
 
-### SC-004 — Request an unknown order
+### SC-004 — Запитати невідоме замовлення
 
-**Covers:** R-002, R-005
+**Покриває:** R-002, R-005
 
-Given no manager order exists for the requested identifier
-When a caller requests the order detail
-Then the system returns the agreed not-found result
-And no 1C call or local state change occurs.
+За умови, що замовлення менеджера із запитаним ідентифікатором не існує,
+коли викликач запитує його деталі,
+тоді система повертає погоджений результат «не знайдено»
+і не звертається до 1С та не змінює локальний стан.
 
-### SC-005 — Allow an anonymous read
+### SC-005 — Дозволити анонімне читання
 
-**Covers:** R-005
+**Покриває:** R-005
 
-Given a caller is not authenticated
-When the caller requests an order list or detail
-Then the system returns the requested read result without an authentication challenge.
+За умови, що викликач не автентифікований,
+коли він запитує список або деталі замовлення,
+тоді система повертає запитаний результат читання без вимоги автентифікації.
 
-## Deferred scenarios
+## Відкладені сценарії
 
-- Search, date-range filtering, status filtering, sorting, export, aggregates, and cursor navigation are deferred until their product requirements are agreed.
+- Пошук, фільтрацію за діапазоном дат і станом, сортування, експорт, агрегати та курсорну навігацію відкладено до погодження відповідних продуктових вимог.

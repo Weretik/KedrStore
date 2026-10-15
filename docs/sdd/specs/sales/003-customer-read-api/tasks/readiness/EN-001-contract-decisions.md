@@ -1,30 +1,30 @@
-# EN-001 — Agree customer-read behavior
+# EN-001 — Погодити поведінку читання клієнтів
 
-- **Task ID:** EN-001
-- **Enables:** SC-001, SC-002, SC-003, SC-004
-- **Depends on:** none
-- **Exact paths:** `docs/sdd/specs/sales/003-customer-read-api/requirements/overview.md`, `docs/sdd/specs/sales/003-customer-read-api/requirements/customer-reading.md`, `docs/sdd/specs/sales/003-customer-read-api/contracts/api-contract.md`, `docs/sdd/specs/sales/003-customer-read-api/data-model.md`, `docs/sdd/specs/sales/003-customer-read-api/traceability.md`, `docs/sdd/specs/sales/003-customer-read-api/checklist/spec-readiness.md`
-- **Test level:** documentation review
+- **ID завдання:** EN-001
+- **Забезпечує:** SC-001, SC-002, SC-003, SC-004
+- **Залежить від:** немає
+- **Точні шляхи:** `docs/sdd/specs/sales/003-customer-read-api/requirements/overview.md`, `docs/sdd/specs/sales/003-customer-read-api/requirements/customer-reading.md`, `docs/sdd/specs/sales/003-customer-read-api/contracts/api-contract.md`, `docs/sdd/specs/sales/003-customer-read-api/data-model.md`, `docs/sdd/specs/sales/003-customer-read-api/traceability.md`, `docs/sdd/specs/sales/003-customer-read-api/checklist/spec-readiness.md`
+- **Рівень тестування:** перевірка документації
 
-## Why this is an enabler
+## Чому це спільна передумова
 
-Routes, access mode, personal-data fields, price rules, list semantics, and soft-delete behavior change public behavior and privacy boundaries.
+Маршрути, режим доступу, поля персональних даних, правила цін, семантика списку й поведінка логічного видалення впливають на публічну поведінку та межі приватності.
 
-## Work
+## Робота
 
-- [x] Resolve every customer clarification or move it explicitly out of scope.
-- [x] Agree routes, operation IDs, parameters, result fields, examples, status codes, and anonymous access.
-- [x] Agree pagination, ordering, lack of search/extra filters, empty list, and unknown/deleted-customer behavior.
-- [x] Include phone in list; include email/default/category price types in detail; exclude `IdentityUserId` and order data.
-- [x] Update rules/scenarios while preserving their stable IDs.
-- [x] Mark the human contract agreed and complete specification readiness.
+- [x] Ухвалити рішення щодо кожного питання про клієнтів або явно винести його за межі фічі.
+- [x] Погодити маршрути, ID операцій, параметри, поля результатів, приклади, коди статусів і анонімний доступ.
+- [x] Погодити посторінковий вивід, порядок, відсутність пошуку й додаткових фільтрів, порожній список і поведінку для невідомого чи видаленого клієнта.
+- [x] У список включити телефон; у деталі — електронну пошту, типовий тип ціни й типи цін для категорій; виключити `IdentityUserId` і дані замовлень.
+- [x] Оновити правила й сценарії зі збереженням сталих ID.
+- [x] Позначити текстовий контракт погодженим і завершити підготовку специфікації.
 
-## Test-first exception and replacement verification
+## Виняток із підходу «спочатку тест» і замінна перевірка
 
-- **Reason:** this task records product/privacy decisions and changes no executable behavior.
-- **Replacement check:** verify that every previously open product/privacy decision has an agreed contract outcome and traceability mapping.
-- **Result:** completed 2026-09-10; decisions are recorded in requirements and the agreed API contract.
+- **Причина:** завдання фіксує продуктові рішення й рішення щодо приватності без зміни виконуваної поведінки.
+- **Замінна перевірка:** переконатися, що кожне раніше відкрите продуктове питання й питання приватності має погоджене рішення в контракті та зв'язок у матриці сценаріїв.
+- **Результат:** завершено 2026-09-10; рішення зафіксовано у вимогах і погодженому контракті API.
 
-## Checkpoint
+## Контрольна точка
 
-The specification defines an explicit least-privilege response and access boundary.
+Специфікація явно визначає межі відповіді й доступу за принципом найменших привілеїв.

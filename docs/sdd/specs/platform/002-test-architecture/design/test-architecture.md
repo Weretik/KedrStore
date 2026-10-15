@@ -1,23 +1,14 @@
-# Test architecture design
+# Дизайн архітектури тестів
 
-## Project responsibilities
+## Відповідальність проєктів
 
-`UnitTests` proves deterministic Domain and Application behavior without a
-database provider, HTTP host, network, or bootstrapper. It may reference
-module Domain and Application assemblies.
+`UnitTests` доводить детерміновану поведінку Domain і Application без provider БД, HTTP host, мережі або bootstrapper. Він може посилатися на assemblies Domain і Application модулів.
 
-`IntegrationTests` proves EF Core mappings and persistence, migrations,
-PostgreSQL behavior, external adapter mappings, job orchestration, and HTTP or
-OpenAPI behavior. Fast component tests may use EF Core InMemory only when their
-risk is service orchestration rather than relational or provider behavior.
-Every PostgreSQL-specific claim is covered separately by a PostgreSQL fixture.
+`IntegrationTests` доводить перетворення моделей EF Core і збереження даних, міграції, поведінку PostgreSQL, перетворення даних зовнішніх адаптерів, координацію фонових завдань та HTTP/OpenAPI-поведінку. Швидкі компонентні тести можуть застосовувати EF Core InMemory лише коли перевіряють координацію сервісу, а не реляційну чи залежну від провайдера поведінку. Кожне PostgreSQL-специфічне твердження окремо перевіряє фікстура PostgreSQL.
 
-`ArchitectureTests` reads the repository project graph and compiled assemblies.
-Project-graph tests catch forbidden references even when no type currently uses
-them. Assembly tests catch forbidden type dependencies and keep failures close
-to the violating type.
+`ArchitectureTests` читає граф проєктів репозиторію та скомпільовані assemblies. Тести графа виявляють заборонені references, навіть якщо жоден тип їх зараз не використовує. Тести assemblies знаходять заборонені залежності типів і показують збій близько до типу-порушника.
 
-## Target layout
+## Цільове розміщення
 
 ```text
 tests/
@@ -38,52 +29,30 @@ tests/
     └── TestSupport/
 ```
 
-Only directories with actual tests are created. A module does not receive an
-empty folder merely to make the tree symmetrical.
+Створюються лише папки з реальними тестами. Модуль не отримує порожню папку лише для симетрії дерева.
 
-## Sales order-sync test split
+## Поділ тестів синхронізації замовлень Sales
 
-The former `SyncOneCOrdersJobTests` responsibilities are split into delivery,
-scheduling, recovery, notification, and concurrency classes. Scenario setup,
-database construction, fakes, and clocks are shared through Sales test support.
-The simulated concurrency interceptor is removed after the real PostgreSQL race
-test exists.
+Колишні обов'язки `SyncOneCOrdersJobTests` поділено між класами доставки, планування, відновлення, сповіщень і конкурентності. Налаштування сценаріїв, створення БД, fakes і clocks спільні через test support Sales. Імітований concurrency interceptor прибрано після появи реального PostgreSQL-тесту гонки.
 
-## PostgreSQL lifecycle
+## Життєвий цикл PostgreSQL
 
-One xUnit collection fixture owns a `PostgreSqlContainer`. It starts once per
-collection, builds isolated databases or resets schema as required, and applies
-Sales migrations before tests. Each racing worker creates its own
-`SalesDbContext`, so EF change tracking cannot serialize the test accidentally.
-The fixture converts a missing Docker endpoint into a descriptive xUnit skip;
-other startup or migration failures remain test failures.
+Одна фікстура колекції xUnit володіє `PostgreSqlContainer`. Вона стартує один раз на колекцію, створює ізольовані БД або скидає схему за потреби й застосовує міграції Sales до тестів. Кожен конкурентний виконавець створює власний `SalesDbContext`, щоб відстеження змін EF випадково не серіалізувало тест. За відсутності кінцевої точки Docker фікстура явно пропускає xUnit-тест із поясненням; інші збої старту або міграції залишаються помилками тесту.
 
-## Architecture policy
+## Архітектурне правило
 
-The allowed production reference direction is:
+Дозволений напрям залежностей у продукційному коді:
 
 ```text
 Host -> Api and Infrastructure -> Application -> Domain
-Contracts may be consumed explicitly across a module boundary.
-BuildingBlocks layers may be consumed by their corresponding or outer layers.
+Contracts можуть явно споживатися через межу модуля.
+Шари BuildingBlocks можуть споживатися відповідними або зовнішніми шарами.
 ```
 
-The initial architecture suite encodes rules that match the current documented
-architecture. Existing documented cross-module adapters in Infrastructure are
-allowed explicitly. New direct Domain/Application/API coupling between Catalog,
-Sales, and Identity is rejected unless the architecture documentation and rule
-set are deliberately changed together.
+Початковий набір архітектурних тестів кодує правила, що відповідають поточній задокументованій архітектурі. Наявні описані міжмодульні адаптери Infrastructure явно дозволені. Новий прямий зв'язок Domain/Application/API між Catalog, Sales та Identity заборонений, якщо документацію архітектури й набір правил не змінено разом свідомо.
 
-BuildingBlocks projects cannot reference a business module. During
-implementation, the existing XML-to-JSON adapter and its registration moved
-from `BuildingBlocks.Infrastructure` to `Catalog.Infrastructure` so this rule
-could be enforced without an exception.
+Проєкти BuildingBlocks не можуть посилатися на бізнес-модуль. Під час реалізації наявний адаптер XML-to-JSON і його реєстрацію перенесено з `BuildingBlocks.Infrastructure` до `Catalog.Infrastructure`, щоб правило діяло без винятку.
 
-## CI and coverage
+## CI та покриття тестами
 
-The workflow uses a verification job on `ubuntu-latest`. It restores once,
-builds once, runs unit and architecture tests, then integration tests with
-`XPlat Code Coverage`. GitHub-hosted Linux runners provide Docker for
-Testcontainers. The deploy job declares `needs: verify`, so authentication,
-image publishing, migrations, and deployment cannot start after a failed gate.
-Cobertura output is uploaded even when a later test step fails, where possible.
+Процес CI використовує завдання перевірки на `ubuntu-latest`. Він один раз відновлює залежності й збирає рішення, запускає модульні та архітектурні тести, потім інтеграційні тести з `XPlat Code Coverage`. Хостовані GitHub виконавці Linux надають Docker для Testcontainers. Завдання розгортання оголошує `needs: verify`, тому автентифікація, публікація образу, міграції й розгортання не стартують після помилки перевірки. Результат Cobertura за можливості завантажується навіть якщо пізніший крок тестування падає.

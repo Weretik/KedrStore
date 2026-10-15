@@ -1,14 +1,14 @@
-# Phase 05 — Verification and rollout
+# Фаза 05 — Перевірка й розгортання
 
-- [x] T017 Run `dotnet restore KedrStore.sln`, `dotnet build KedrStore.sln --no-restore`, and relevant tests; record outcomes and pre-existing failures. **Dependencies:** T011, T015.
-- [ ] T018 Apply the approved Identity reset and current Guid initial migration to a disposable database matching the production baseline; verify only Identity tables are re-created. **Dependencies:** T006, T011.
-- [ ] T019 Run `Host.Jobs --job=migrate` twice against the disposable database; verify the second run is a successful no-op. **Dependencies:** T009, T018.
-- [ ] T020 Deploy and execute the Cloud Run `database-migrate` Job after a verified Cloud SQL backup; record sanitized logs and confirm API revision starts and listens on its assigned port. **Dependencies:** T003, T013, T019.
-- [ ] T021 Complete `checklist/delivery-readiness.md`, align the specification with code, and record rollback evidence and residual risks. **Dependencies:** T017-T020.
+- [x] T017 Виконати `dotnet restore KedrStore.sln`, `dotnet build KedrStore.sln --no-restore` і відповідні тести; записати результати та попередні збої. **Залежності:** T011, T015.
+- [ ] T018 Застосувати погоджений reset Identity і поточну початкову Guid-міграцію до одноразової БД, що відповідає production-baseline; перевірити, що відтворено лише таблиці Identity. **Залежності:** T006, T011.
+- [ ] T019 Двічі запустити `Host.Jobs --job=migrate` на одноразовій БД; підтвердити, що другий запуск успішний і нічого не змінює. **Залежності:** T009, T018.
+- [ ] T020 Після перевіреного backup Cloud SQL розгорнути й виконати Cloud Run Job `database-migrate`; записати логи без секретів і підтвердити, що API revision стартує та слухає призначений порт. **Залежності:** T003, T013, T019.
+- [ ] T021 Завершити `checklist/delivery-readiness.md`, звірити специфікацію з кодом і записати свідчення rollback та залишкові ризики. **Залежності:** T017–T020.
 
-## Verification record (2026-07-29)
+## Запис перевірки (2026-07-29)
 
-- `dotnet restore KedrStore.sln` succeeded with existing NuGet vulnerability warnings.
-- `dotnet build KedrStore.sln --no-restore` succeeded with 48 existing warnings and no errors.
-- Focused migration tests passed: 3/3. Full solution tests passed 21/22 unit tests and 4/4 integration tests; the existing failure is `UnitTests.SlugTests.MapProduct_Should_Clean_Slugs`.
-- T018-T021 remain open until the reset is run against a disposable database and the hosting backup/IAM/Cloud Run steps are verified.
+- `dotnet restore KedrStore.sln` пройшов із наявними попередженнями NuGet про вразливості.
+- `dotnet build KedrStore.sln --no-restore` пройшов із 48 наявними попередженнями й без помилок.
+- Цільові тести міграцій пройшли: 3/3. Тести всього solution: 21/22 unit і 4/4 integration; наявний збій — `UnitTests.SlugTests.MapProduct_Should_Clean_Slugs`.
+- T018–T021 відкриті до виконання reset на одноразовій БД і перевірки backup/IAM/Cloud Run середовища.

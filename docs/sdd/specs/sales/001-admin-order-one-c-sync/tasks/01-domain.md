@@ -1,9 +1,9 @@
-# Phase 01 — Domain
+# Фаза 01 — Domain
 
-- [x] [T010 — Order aggregate and lines](domain/01.1-order-aggregate.md)
-- [x] [T020 — 1C delivery lifecycle](domain/01.2-one-c-order-sync.md)
-- [x] [T030 — Domain tests](domain/01.3-order-domain-tests.md)
+- [x] [T010 — агрегат замовлення та позиції](domain/01.1-order-aggregate.md)
+- [x] [T020 — життєвий цикл передавання до 1С](domain/01.2-one-c-order-sync.md)
+- [x] [T030 — тести Domain](domain/01.3-order-domain-tests.md)
 
-## Checkpoint
+## Контрольна точка
 
-`Order` and `OneCOrderSync` protect all state transitions without SOAP, EF Core, or HTTP dependencies.
+`Order` і `OneCOrderSync` захищають усі переходи стану без залежностей від SOAP, EF Core або HTTP.

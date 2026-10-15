@@ -1,127 +1,127 @@
-# Sales OneC runbook
+# Операційна інструкція з інтеграції Sales із 1C
 
-Sales owns two independent OneC workflows:
+Sales має два незалежні потоки 1C:
 
-- customer reference-data synchronization imports counterparties and category price rules;
-- manager-order delivery sends already persisted Sales orders to OneC.
+- синхронізація довідкових даних клієнтів імпортує контрагентів і цінові правила категорій;
+- доставка замовлень менеджера передає до 1C уже збережені замовлення Sales.
 
-Both workflows use the shared low-level SOAP transport. Their orchestration, persistence, retries, and operational state remain inside Sales Infrastructure. `Host.Jobs` runs one requested operation and exits; recurring execution is owned by the deployment scheduler.
+Обидва потоки використовують спільний низькорівневий транспорт SOAP. Їх координація, збереження даних, повторні спроби та операційний стан залишаються в інфраструктурному шарі Sales. `Host.Jobs` виконує одну задану операцію й завершується; повторні запуски забезпечує планувальник середовища.
 
-## Customer reference-data synchronization
+## Синхронізація довідкових даних клієнтів
 
-Before running customer synchronization, read [the counterparty and Identity flow](../../architecture/integrations/one-c/sales-counterparty-identity-sync.md). This workflow creates, updates, and can delete local Identity users as part of reconciliation.
+Перед синхронізацією клієнтів прочитай [потік контрагентів та Identity](../../architecture/integrations/one-c/sales-counterparty-identity-sync.md). Під час звіряння він створює, оновлює й може видаляти локальних користувачів Identity.
 
-| Command | Operation |
+| Команда | Операція |
 | --- | --- |
-| `--job=counterparties` | imports, updates, and restores counterparties according to Sales service policy |
-| `--job=counterparty-category-price-types` | imports customer/category price-type rules |
-| `--job=sales-customers-full` | runs counterparties first, then price rules |
+| `--job=counterparties` | Імпортує, оновлює й відновлює контрагентів за правилами сервісу Sales |
+| `--job=counterparty-category-price-types` | Імпортує правила типів цін для клієнтів/категорій |
+| `--job=sales-customers-full` | Спершу запускає контрагентів, потім цінові правила |
 
 ```powershell
 $env:DOTNET_ENVIRONMENT = 'Development'
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=sales-customers-full
 ```
 
-Review imported, updated, restored, deleted, and skipped counts in the final logs before accepting the refresh.
+Перш ніж прийняти оновлення, перевір у фінальних логах лічильники imported, updated, restored, deleted і skipped.
 
-## Manager-order delivery
+## Доставка замовлень менеджера
 
-`sync-one-c-orders` processes manager orders created through the Sales admin API. The HTTP request persists an `Order` and its `OneCOrderSync` record; it never waits for OneC. The job later selects due synchronization records, sends them through the Sales OneC adapter, persists the result, processes every due dead-letter notification, and exits.
+`sync-one-c-orders` обробляє замовлення менеджера, створені через Sales admin API. HTTP-запит зберігає `Order` і запис `OneCOrderSync` та не очікує відповіді 1C. Пізніше job вибирає записи, час яких настав, передає їх через Sales 1C-адаптер, зберігає результат, обробляє готові dead-letter сповіщення й завершується.
 
-The detailed business and state-transition rules are maintained in the [feature specification](../../specs/sales/001-admin-order-one-c-sync/requirements/one-c-delivery.md). This runbook covers operation of the implemented job.
+Докладні бізнес-правила й переходи стану зберігає [специфікація фічі](../../specs/sales/001-admin-order-one-c-sync/requirements/one-c-delivery.md). Ця операційна інструкція описує експлуатацію реалізованого завдання.
 
-### Required configuration
+### Потрібна конфігурація
 
-Supply secrets through Host.Jobs User Secrets for local Development or through the deployment secret store. Operational settings have safe defaults in `Host.Jobs/appsettings.json` and can be overridden by environment variables.
+Для локального Development надавай секрети через User Secrets `Host.Jobs`, для розгортання — через сховище секретів середовища. Операційні параметри мають типові значення в `Host.Jobs/appsettings.json` і можуть перевизначатися змінними середовища.
 
-| Setting | Purpose |
+| Параметр | Призначення |
 | --- | --- |
-| `ConnectionStrings:Default` / `ConnectionStrings__Default` | Sales PostgreSQL persistence and synchronization state |
-| `OneCSoap:Endpoint` / `OneCSoap__Endpoint` | environment-specific OneC SOAP endpoint |
-| `OneCSoap:Username` / `OneCSoap__Username` | OneC SOAP authentication |
-| `OneCSoap:Password` / `OneCSoap__Password` | OneC SOAP authentication |
-| `Telegram:BotToken` / `Telegram__BotToken` | dead-letter notification transport |
-| `Telegram:ChatId` / `Telegram__ChatId` | dead-letter notification destination |
-| `Sales:OneCOrderSync:BatchSize` / `Sales__OneCOrderSync__BatchSize` | maximum due orders per run; default `20` |
-| `Sales:OneCOrderSync:InterCallDelay` / `Sales__OneCOrderSync__InterCallDelay` | pause between SOAP calls as `hh:mm:ss`; default `00:00:05` |
-| `Sales:OneCOrderSync:MaximumAttempts` / `Sales__OneCOrderSync__MaximumAttempts` | transport attempts before `DeadLetter`; default `10` |
-| `Sales:OneCOrderSync:SendingWindowStart` / `Sales__OneCOrderSync__SendingWindowStart` | Kyiv-local window start as `hh:mm:ss`; default `07:00:00` |
-| `Sales:OneCOrderSync:SendingWindowEnd` / `Sales__OneCOrderSync__SendingWindowEnd` | exclusive Kyiv-local window end as `hh:mm:ss`; default `20:00:00` |
-| `Sales:OneCOrderSync:StaleSentRecoveryDelay` / `Sales__OneCOrderSync__StaleSentRecoveryDelay` | age after which an unfinished `Sent` attempt can be recovered; default `00:15:00` |
+| `ConnectionStrings:Default` / `ConnectionStrings__Default` | Збереження даних Sales у PostgreSQL і стан синхронізації |
+| `OneCSoap:Endpoint` / `OneCSoap__Endpoint` | Кінцева точка SOAP 1C для поточного середовища |
+| `OneCSoap:Username` / `OneCSoap__Username` | SOAP-автентифікація 1C |
+| `OneCSoap:Password` / `OneCSoap__Password` | SOAP-автентифікація 1C |
+| `Telegram:BotToken` / `Telegram__BotToken` | Transport dead-letter сповіщення |
+| `Telegram:ChatId` / `Telegram__ChatId` | Адресат dead-letter сповіщення |
+| `Sales:OneCOrderSync:BatchSize` / `Sales__OneCOrderSync__BatchSize` | Максимум готових замовлень за запуск; типове `20` |
+| `Sales:OneCOrderSync:InterCallDelay` / `Sales__OneCOrderSync__InterCallDelay` | Пауза між SOAP-викликами як `hh:mm:ss`; типове `00:00:05` |
+| `Sales:OneCOrderSync:MaximumAttempts` / `Sales__OneCOrderSync__MaximumAttempts` | Межа спроб транспорту до `DeadLetter`; типове `10` |
+| `Sales:OneCOrderSync:SendingWindowStart` / `Sales__OneCOrderSync__SendingWindowStart` | Початок вікна за київським часом як `hh:mm:ss`; типове `07:00:00` |
+| `Sales:OneCOrderSync:SendingWindowEnd` / `Sales__OneCOrderSync__SendingWindowEnd` | Кінець вікна за київським часом (виключно) як `hh:mm:ss`; типове `20:00:00` |
+| `Sales:OneCOrderSync:StaleSentRecoveryDelay` / `Sales__OneCOrderSync__StaleSentRecoveryDelay` | Вік незавершеного `Sent` для відновлення; типове `00:15:00` |
 
-Apply Sales migrations before enabling scheduled delivery. The job must resolve all configuration above even when the current batch contains no new dead-letter record.
+Застосуй міграції Sales до ввімкнення повторної доставки. Job має отримати всю перелічену конфігурацію, навіть коли поточний batch не містить нового dead-letter запису.
 
-### Run locally
+### Локальний запуск
 
-Use a non-production database and an approved test OneC endpoint. A run can create real documents in the configured OneC database.
+Використовуй непродукційну БД і погоджену тестову кінцеву точку 1C. Запуск може створити реальні документи в налаштованій БД 1C.
 
 ```powershell
 $env:DOTNET_ENVIRONMENT = 'Development'
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=sync-one-c-orders
 ```
 
-Exit code `0` and `[SUCCESS] Job finished OK` mean the pass completed without an unhandled exception. They do not mean every order was accepted. Review the structured completion counts for `Processed`, `Accepted`, `BusinessError`, `TransportError`, `Deferred`, and `DeadLetter`.
+Код виходу `0` і `[SUCCESS] Job finished OK` означають, що прохід завершився без необробленого винятку. Це не означає прийняття кожного замовлення. Перевір структуровані фінальні лічильники `Processed`, `Accepted`, `BusinessError`, `TransportError`, `Deferred` і `DeadLetter`.
 
-### Runtime behavior
+### Поведінка під час виконання
 
-- One run processes at most the configured `BatchSize` due records and then exits.
-- SOAP calls are separated by the configured `InterCallDelay`.
-- Sending is allowed during the configured `Europe/Kyiv` window. Its end is exclusive. Outside that window, due records are deferred to the next window without a SOAP call.
-- Transport failures are scheduled after 5 minutes, 15 minutes, 30 minutes, 1 hour, and then 3 hours. Delivery becomes `DeadLetter` at the configured `MaximumAttempts`.
-- A business rejection becomes `BusinessError` and is not retried automatically.
-- An accepted response becomes `Accepted`; the returned OneC document number is persisted.
-- The stable Sales `OrderNumber` is reused as the OneC request key on every transport retry.
-- Multiple workers use optimistic concurrency when claiming a record. The Cloud Run Job is additionally configured with one task and parallelism `1`.
-- Cloud Run platform retries must remain `0`; durable retry timing belongs to `OneCOrderSync`.
+- Один запуск обробляє не більше `BatchSize` готових записів і завершується.
+- Між SOAP-викликами витримується `InterCallDelay`.
+- Надсилання дозволено в налаштованому вікні `Europe/Kyiv`; кінець вікна не входить до нього. Поза вікном записи переносяться на наступне без SOAP-виклику.
+- Збої транспорту планують повтор через 5, 15, 30 хвилин, 1 годину, далі 3 години. Після `MaximumAttempts` доставка стає `DeadLetter`.
+- Бізнес-відхилення стає `BusinessError` і автоматично не повторюється.
+- Прийнята відповідь стає `Accepted`; отриманий номер документа 1C зберігається.
+- Сталий `OrderNumber` Sales повторно використовується як ключ запиту 1C під час кожної повторної спроби транспорту.
+- Кілька workers використовують optimistic concurrency під час захоплення запису. Cloud Run Job додатково налаштовано на один task і parallelism `1`.
+- Кількість повторних запусків на рівні Cloud Run має залишатися `0`; стале планування повторів належить `OneCOrderSync`.
 
-Invalid values stop the host during startup: batch size and maximum attempts must be positive, delays cannot be negative, and the sending-window end must be after its start within one day. After changing an operational setting, run one controlled execution and inspect its summary before restoring the scheduler.
+Некоректні значення зупиняють хост під час старту: розмір пакета й межа спроб мають бути додатними, затримки — невід'ємними, а кінець вікна надсилання — пізнішим за початок у межах однієї доби. Після зміни операційного параметра виконай один контрольований запуск і перевір його підсумок до відновлення планувальника.
 
-### Cloud Run operation
+### Виконання в Cloud Run
 
-The deployment workflow creates or updates `onec-orders-sync` with the Host.Jobs image, argument `--job=sync-one-c-orders`, one task, parallelism `1`, platform retries `0`, and a 10-minute timeout. The workflow does not execute the order job and does not create its Cloud Scheduler schedule.
+Процес розгортання створює або оновлює `onec-orders-sync` з образом Host.Jobs, аргументом `--job=sync-one-c-orders`, одним завданням, паралелізмом `1`, нульовою кількістю повторних запусків платформи й обмеженням часу 10 хвилин. Процес не запускає завдання доставки й не створює розклад Cloud Scheduler.
 
-Before enabling a schedule, verify the deployed job revision, arguments, secret bindings, task count, parallelism, retry setting, timeout, and service account. Configure the scheduler and its invocation service account manually in the deployment environment. Keep scheduler names and cadence in the environment's operational inventory because they are not defined by this repository.
+Перед увімкненням розкладу перевір ревізію завдання, аргументи, прив'язки секретів, кількість завдань, паралелізм, повторні запуски, обмеження часу й обліковий запис сервісу. Cloud Scheduler та обліковий запис сервісу для його викликів налаштовуй окремо в середовищі розгортання. Назви й частоту розкладів зберігай в операційному реєстрі середовища: цей репозиторій їх не визначає.
 
-To stop outbound order delivery, pause or disable the scheduler that invokes `onec-orders-sync`. Let an already running execution finish or cancel that execution through the Cloud Run operator interface if an immediate stop is required. Do not delete the Cloud Run Job or synchronization rows: pending state is required for recovery.
+Щоб зупинити вихідну доставку, призупини або вимкни планувальник, який запускає `onec-orders-sync`. Уже запущене виконання дочекайся або скасуй через інтерфейс оператора Cloud Run, якщо потрібна негайна зупинка. Не видаляй Cloud Run Job чи записи синхронізації: незавершений стан потрібен для відновлення.
 
-After deployment or configuration changes, execute one controlled run against approved data and confirm the completion counts and persisted synchronization state before enabling recurring execution.
+Після розгортання або зміни конфігурації виконай один контрольований запуск на погоджених даних і підтвердь фінальні лічильники та збережений стан синхронізації до ввімкнення повторного виконання.
 
-### Status interpretation
+### Тлумачення статусів
 
-| Status | Meaning | Operator action |
+| Статус | Значення | Дія оператора |
 | --- | --- | --- |
-| `Pending` | persisted and eligible when `NextAttemptAtUtc` is due | wait for or execute the next scheduled pass |
-| `Sent` | an attempt was claimed and its outcome has not been persisted yet | a record younger than `StaleSentRecoveryDelay` remains protected; an older record is automatically retried with the same duplicate-safe `OrderNumber` |
-| `Accepted` | OneC accepted the order and returned a document number | no replay; use the local order number and stored OneC document number for tracing |
-| `BusinessError` | OneC responded but did not create a document | investigate the safe diagnostic code and source data; no automatic retry |
-| `TransportError` or `RetryScheduled` | delivery is eligible after `NextAttemptAtUtc` | fix connectivity or configuration and allow a later pass to retry |
-| `DeadLetter` | the transport-attempt limit was reached | follow the dead-letter procedure below; no automatic OneC resend |
+| `Pending` | Запис збережено й готовий, коли настане `NextAttemptAtUtc` | Чекай наступного запланованого проходу або виконай його |
+| `Sent` | Спробу захоплено, результат ще не збережено | Молодший за `StaleSentRecoveryDelay` запис захищено; старіший автоматично повторюється з тим самим безпечним від дублювання `OrderNumber` |
+| `Accepted` | 1C прийняла замовлення й повернула номер документа | Не надсилай повторно; для трасування використовуй локальний номер замовлення та збережений номер документа 1C |
+| `BusinessError` | 1C відповіла, але не створила документ | Перевір безпечний діагностичний код і вихідні дані; автоматичного retry немає |
+| `TransportError` або `RetryScheduled` | Доставка буде готова після `NextAttemptAtUtc` | Виправ з'єднання/конфігурацію й дозволь наступному проходу повторити |
+| `DeadLetter` | Досягнуто межі спроб транспорту | Дотримуйся наведеної нижче процедури для `DeadLetter`; автоматичного повторного запису в 1C немає |
 
-### Diagnosis
+### Діагностика
 
-Search logs by `OrderId`, `OrderNumber`, and `CorrelationId`. Retain the attempt number, status, safe diagnostic code, next-attempt time, job revision, and migration version. The final summary provides batch-level counts.
+Шукай логи за `OrderId`, `OrderNumber` і `CorrelationId`. Зберігай номер спроби, статус, безпечний діагностичний код, час наступної спроби, revision job і версію міграції. Фінальний підсумок містить лічильники batch.
 
-Do not add SOAP request bodies, response comments, authorization headers, credentials, customer data, or Telegram tokens to logs or incident records. A transport diagnostic identifies the exception type; a business diagnostic identifies the bounded application code. Raw OneC diagnostics are intentionally excluded.
+Не додавай SOAP request bodies, response comments, authorization headers, credentials, дані клієнта або токени Telegram до логів чи записів інциденту. Transport-діагностика називає тип винятку; бізнес-діагностика — обмежений application code. Сирі діагностичні дані 1C навмисно виключені.
 
-If a record remains `Sent` for less than the configured `StaleSentRecoveryDelay`, do not intervene: the original execution may still be active. Older records are recovered automatically. Repeated concurrency warnings still require investigation before changing state.
+Якщо запис залишається `Sent` менше за `StaleSentRecoveryDelay`, не втручайся: вихідне виконання може ще працювати. Старіші записи відновлюються автоматично. Повторні concurrency-попередження потребують розслідування до ручної зміни стану.
 
-### Dead-letter procedure
+### Процедура dead-letter
 
-When delivery transitions to `DeadLetter`, the job persists that state before attempting a Telegram notification. The notification contains safe order context and an Excel export of the persisted order lines. Notification delivery has its own maximum of five attempts with delays of 5 minutes, 15 minutes, 30 minutes, 1 hour, and 3 hours; a notification failure does not resend the OneC order or change its `DeadLetter` status.
+Коли доставка переходить у `DeadLetter`, job спершу зберігає цей стан і лише потім намагається надіслати Telegram-сповіщення. Воно містить безпечний контекст замовлення й Excel-експорт збережених рядків. Сповіщення має власну межу п'яти спроб із затримками 5, 15, 30 хвилин, 1 та 3 години; його збій не надсилає замовлення в 1C повторно й не змінює `DeadLetter`.
 
-1. Find the record by local order ID or order number and confirm its attempt count and final safe diagnostic code.
-2. Check whether Telegram notification succeeded, is waiting for its next attempt, or exhausted its notification attempts.
-3. Use the attached line export and the stored order data to investigate the endpoint, credentials, network, counterparty, and products without copying secrets or raw SOAP payloads.
-4. Confirm with the OneC operator whether a document already exists for the stable local `OrderNumber` before considering another write.
-5. Record the incident outcome and the OneC document number if a document already exists.
+1. Знайди запис за локальним ID або номером замовлення й підтвердь кількість спроб та фінальний безпечний діагностичний код.
+2. Перевір, чи Telegram-сповіщення виконано, очікує наступної спроби або вичерпало їх.
+3. За прикріпленим експортом рядків і збереженими даними замовлення перевір кінцеву точку, облікові дані, мережу, контрагента й товари, не копіюючи секрети чи сирі дані запитів SOAP.
+4. До нового запису запитай оператора 1C, чи вже існує документ для сталого локального `OrderNumber`.
+5. Зафіксуй результат інциденту й номер документа 1C, якщо він уже існує.
 
-After correcting the cause, a manager can schedule `BusinessError` or `DeadLetter` through `POST /api/admin/orders/{orderId}/sync/retry` with a non-empty JSON `reason`. A `202` response means the audited transition to `RetryScheduled` was persisted; it does not mean that 1C accepted the order. The next regular `sync-one-c-orders` execution sends it with the same `OrderNumber`. A `409` means the current state is not eligible, and `404` means the order was not found.
+Після усунення причини менеджер може запланувати повтор для `BusinessError` або `DeadLetter` через `POST /api/admin/orders/{orderId}/sync/retry` з непорожнім JSON `reason`. Відповідь `202` означає збережений і аудований перехід до `RetryScheduled`, а не прийняття замовлення в 1C. Наступний звичайний запуск `sync-one-c-orders` надішле його з тим самим `OrderNumber`. `409` означає, що поточний стан непридатний для повтору, `404` — замовлення не знайдено.
 
-Do not retry `Accepted`, `Sent`, or an already active delivery, and do not reset synchronization rows with SQL. If the persisted order data itself is wrong and cannot be corrected through a supported business operation, create a new order instead of repeatedly sending the same invalid snapshot. The retry endpoint remains temporarily anonymous with the other admin-order endpoints and must receive `PolicyNames.CanManageOrders` before production exposure.
+Не повторюй `Accepted`, `Sent` або вже активну доставку й не скидай записи синхронізації через SQL. Якщо збережені дані замовлення помилкові й їх неможливо виправити підтримуваною бізнес-операцією, створи нове замовлення замість повторного надсилання того самого некоректного знімка. Кінцева точка повтору тимчасово залишається анонімною разом з іншими кінцевими точками замовлень адміністратора; до доступу в продукційному середовищі вона має отримати `PolicyNames.CanManageOrders`.
 
-## Related procedures
+## Пов'язані інструкції
 
-- [Host.Jobs CLI](host-jobs-cli.md)
-- [Job troubleshooting](troubleshooting.md)
-- [Configuration and secrets](../configuration/configuration-and-secrets.md)
-- [Manual OneC write smoke verification](../../specs/sales/001-admin-order-one-c-sync/tasks/test/06.3-one-c-write-smoke-test.md)
+- [CLI Host.Jobs](host-jobs-cli.md)
+- [Діагностика jobs](troubleshooting.md)
+- [Конфігурація й секрети](../configuration/configuration-and-secrets.md)
+- [Ручна smoke-перевірка запису 1C](../../specs/sales/001-admin-order-one-c-sync/tasks/test/06.3-one-c-write-smoke-test.md)

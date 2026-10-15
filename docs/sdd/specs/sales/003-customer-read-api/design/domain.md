@@ -1,14 +1,14 @@
-# Customer read API — design: Domain
+# API читання клієнтів — дизайн: домен
 
-## Responsibility
+## Відповідальність
 
-This is a query-only feature. `Counterparty` remains the owner of customer identity, profile data, deletion state, and default price type. `CounterpartyCategoryPriceType` remains the owner of category-specific price type values. No aggregate method, value object, invariant, or domain event is required to read the existing data.
+Ця фіча виконує лише запити на читання. `Counterparty` і надалі відповідає за ідентичність клієнта, дані профілю, стан видалення й типовий тип ціни. `CounterpartyCategoryPriceType` і надалі відповідає за значення типу ціни для окремої категорії. Для читання наявних даних не потрібні метод агрегату, об'єкт-значення, інваріант чи доменна подія.
 
-## Intermodule interaction
+## Взаємодія модулів
 
-The query reads Sales-owned data only. It does not call 1C. It must not load Identity user data merely because `IdentityUserId` is stored on the counterparty; any identity enrichment requires a separate agreed boundary.
+Запит читає лише дані, якими володіє Sales. Він не викликає 1C. Не можна завантажувати дані користувача Identity лише через те, що на контрагенті збережено `IdentityUserId`; будь-яке доповнення даними Identity потребує окремо погодженої межі.
 
-## Risks
+## Ризики
 
-- Email and phone are personal data exposed by the currently anonymous read API only within the agreed DTO boundary; list omits email and detail includes it according to the agreed contract.
-- The local counterparty is a synchronized projection and may lag 1C; the API returns the locally persisted state and does not promise a live 1C lookup.
+- Електронна пошта й телефон — персональні дані, які нині анонімний API читання відкриває лише в межах погоджених DTO; список не містить електронної пошти, а деталі містять її відповідно до погодженого контракту.
+- Локальний контрагент є синхронізованою проєкцією і може відставати від 1C; API повертає локально збережений стан і не обіцяє запиту до 1C у реальному часі.

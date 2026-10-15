@@ -1,33 +1,33 @@
-# Admin order and 1C synchronization — 1C delivery
+# Замовлення адміністратора та синхронізація з 1C — передавання до 1C
 
-## Behavior
+## Поведінка
 
-- `Host.Jobs` runs `SyncOneCOrdersJob` through `--job=sync-one-c-orders`; each run selects a small batch of synchronization records due for delivery (`NextAttemptAtUtc <= now`).
-- For each record, Infrastructure maps the persisted order to the existing `CreateSiteRequest` SOAP operation and calls 1C outside the creating HTTP request.
-- The request contains the selected counterparty's 1C ID, stable local `OrderId`, order date, agreed comment and item rows. Each row maps to 1C `ProductId`, `Quantity`, and `Amount`.
-- The same job checks the synchronous `CreateSiteRequest` response after each send: a confirmed created-document `DocId` finishes delivery and is stored as `OneCDocumentNumber`; a response such as `Не создан...` is a business failure even if `DocId` is non-empty. A transient transport failure schedules a retry, and a business failure is retained for diagnosis without aggressive retries.
-- OneC ignores a repeated request with an existing stable `OrderNumber`. A `Sent` record whose attempt has had no persisted outcome for 15 minutes is therefore safe to claim again with the same `OrderNumber`; a newer `Sent` record remains protected from concurrent delivery.
+- `Host.Jobs` запускає `SyncOneCOrdersJob` через `--job=sync-one-c-orders`; кожен запуск вибирає невеликий пакет записів синхронізації, термін передавання яких настав (`NextAttemptAtUtc <= now`).
+- Для кожного запису Infrastructure відображає збережене замовлення на наявну SOAP-операцію `CreateSiteRequest` і викликає 1C поза HTTP-запитом створення.
+- Запит містить ідентифікатор вибраного контрагента в 1C, незмінний локальний `OrderId`, дату замовлення, узгоджений коментар і рядки товарів. Кожен рядок відображається на `ProductId`, `Quantity` та `Amount` у 1C.
+- Те саме завдання перевіряє синхронну відповідь `CreateSiteRequest` після кожного надсилання: `DocId`, який підтверджує створення документа, завершує передавання й зберігається як `OneCDocumentNumber`; відповідь на кшталт `Не создан...` є бізнес-помилкою, навіть якщо `DocId` непорожній. Тимчасова транспортна помилка планує повторну спробу, а бізнес-помилка зберігається для діагностики без частих повторів.
+- OneC ігнорує повторний запит із уже наявним незмінним `OrderNumber`. Тому запис `Sent`, для спроби якого протягом 15 хвилин не збережено результату, можна знову захопити з тим самим `OrderNumber`; новіший запис `Sent` залишається захищеним від одночасного передавання.
 
-## Rules and invariants
+## Правила та інваріанти
 
-- The delivery state values are `Pending`, `Sent`, `Accepted`, `BusinessError`, `TransportError`, `RetryScheduled`, and `DeadLetter`.
-- Retry delays are 5 minutes, 15 minutes, 30 minutes, 60 minutes, then every 3 hours. The configured initial maximum is 10 attempts.
-- The initial configuration processes a batch of 20 and delays 5 seconds between SOAP calls; all operational values are configuration-backed.
-- Delivery runs only in the explicit Europe/Kyiv sending window. Outside it, the job moves `NextAttemptAtUtc` to the next allowed time. The initial default window is 07:00–20:00, subject to deployment configuration.
-- The job runs once, processes its batch, and exits. Cloud Scheduler cadence is an operator-managed deployment setting and is outside this feature's code and workflow scope.
-- The same stable `OrderId` is sent on every retry, preventing duplicate 1C documents.
-- Secrets, authorization headers, raw sensitive request payloads, and unbounded raw responses must not be persisted or logged.
-- A manager may manually schedule a new delivery cycle only from `BusinessError` or `DeadLetter`. The API persists the reason and audit context, reuses the immutable `OrderNumber`, and returns before any SOAP call.
-- `Accepted`, `Sent`, `Pending`, `TransportError`, and `RetryScheduled` cannot be manually retried. Concurrent retry requests are resolved through the synchronization concurrency token.
+- Можливі стани передавання: `Pending`, `Sent`, `Accepted`, `BusinessError`, `TransportError`, `RetryScheduled` і `DeadLetter`.
+- Затримки повторних спроб становлять 5, 15, 30 і 60 хвилин, а далі — кожні 3 години. Початково налаштований максимум — 10 спроб.
+- Початкова конфігурація обробляє пакет із 20 записів і робить паузу 5 секунд між SOAP-викликами; усі операційні значення задаються конфігурацією.
+- Передавання виконується лише в явно визначеному вікні надсилання Europe/Kyiv. Поза ним завдання переносить `NextAttemptAtUtc` на наступний дозволений час. Початкове типове вікно — 07:00–20:00, його можна змінити під час розгортання.
+- Завдання запускається один раз, обробляє свій пакет і завершується. Періодичність Cloud Scheduler налаштовує оператор під час розгортання; вона не входить до обсягу коду й процесу цієї фічі.
+- Той самий незмінний `OrderId` надсилається під час кожної повторної спроби, запобігаючи дублюванню документів у 1C.
+- Секрети, заголовки авторизації, необроблені чутливі дані запитів і необмежені за розміром необроблені відповіді не можна зберігати або записувати в журнали.
+- Менеджер може вручну запланувати новий цикл передавання лише зі стану `BusinessError` або `DeadLetter`. API зберігає причину й контекст аудиту, повторно використовує незмінний `OrderNumber` і повертає відповідь до будь-якого SOAP-виклику.
+- Для станів `Accepted`, `Sent`, `Pending`, `TransportError` і `RetryScheduled` ручний повтор недоступний. Одночасні запити повтору узгоджуються за допомогою токена конкурентності синхронізації.
 
-## Acceptance scenarios
+## Сценарії приймання
 
-1. Given a due pending synchronization record inside the allowed window, when 1C accepts it, then the record is `Accepted`, includes acceptance time and the returned 1C document number, and will not be retried.
-2. Given a timeout, network failure, or gateway failure, when the job sends an order, then it records a transport failure and schedules the next retry using the configured backoff.
-3. Given an empty 1C `DocId`, when the job sends an order, then it records `BusinessError` with a sanitized `Comment` and does not schedule aggressive automatic retries.
-4. Given a record outside the allowed window, when the job runs, then it makes no SOAP call and schedules the record for the next allowed Kyiv time.
-5. Given repeated transient failures beyond the configured maximum, when the next attempt is evaluated, then the record transitions to `DeadLetter` for manual processing.
-6. Given a record moves to `DeadLetter`, when the transition is saved, then the system sends one Telegram alert with the client, order ID, final error, and an Excel file containing the order lines.
-7. Given an accepted order is later returned by an admin order read/status API, then its response includes `oneCDocumentNumber`; the value is `null` while delivery has not been accepted.
-8. Given a `BusinessError` or `DeadLetter` order and a non-empty reason, when a manager requests a retry, then the previous failure is audited, the record becomes due `RetryScheduled`, and the HTTP request makes no 1C call.
-9. Given an order in any other status, when a manager requests a retry, then the API returns a conflict and does not change delivery state.
+1. Якщо термін передавання запису синхронізації в стані очікування настав у дозволеному вікні, то після прийняття в 1C запис переходить у `Accepted`, містить час прийняття й повернений номер документа 1C та більше не повторюється.
+2. Якщо під час надсилання замовлення виникає таймаут, збій мережі або шлюзу, завдання фіксує транспортну помилку й планує наступну спробу за налаштованим графіком затримок.
+3. Якщо під час надсилання замовлення 1C повертає порожній `DocId`, завдання фіксує `BusinessError` з очищеним `Comment` і не планує частих автоматичних повторів.
+4. Якщо запис перебуває поза дозволеним вікном, завдання не викликає SOAP і планує передавання на наступний дозволений час за Києвом.
+5. Якщо кількість повторних тимчасових збоїв перевищила налаштований максимум, під час оцінювання наступної спроби запис переходить у `DeadLetter` для ручного опрацювання.
+6. Якщо запис переходить у `DeadLetter`, після збереження переходу система надсилає одне сповіщення Telegram із клієнтом, ID замовлення, остаточною помилкою та файлом Excel із рядками замовлення.
+7. Якщо прийняте замовлення згодом повертає API читання замовлення/статусу для адміністратора, відповідь містить `oneCDocumentNumber`; доки передавання не прийнято, значення дорівнює `null`.
+8. Якщо замовлення має стан `BusinessError` або `DeadLetter` і вказано непорожню причину, після запиту менеджера на повтор попередня помилка потрапляє до аудиту, запис переходить у `RetryScheduled` із терміном виконання, а HTTP-запит не викликає 1C.
+9. Якщо замовлення має будь-який інший стан, після запиту менеджера на повтор API повертає конфлікт і не змінює стан передавання.

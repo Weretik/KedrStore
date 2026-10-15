@@ -1,20 +1,20 @@
-# Database migration job — overview and scope
+# Job міграції БД — огляд і обсяг
 
-## Problem
+## Проблема
 
-Cloud Run revision `api-00054-4kq` terminated before listening on port 8080 because API startup executed EF migrations. The Identity migration source no longer matched the database history: PostgreSQL already contained `AspNetRoles`, while EF attempted to run a replacement initial migration.
+Ревізія Cloud Run `api-00054-4kq` завершилася до початку прослуховування порту 8080, оскільки старт API запускав EF-міграції. Код міграцій Identity більше не відповідав історії БД: PostgreSQL уже містила `AspNetRoles`, а EF намагався застосувати замінну початкову міграцію.
 
-## Required outcome
+## Потрібний результат
 
-- The API process only serves HTTP; it does not call `Database.MigrateAsync()` during startup.
-- A dedicated root job explicitly applies pending EF migrations and exits successfully only after all contexts complete.
-- The approved destructive reset removes only non-critical Identity data, then establishes `20260529142739_InitialAppIdentityDbContext` as the new Identity baseline.
-- A deployment stops before API rollout when the migration job fails.
+- Процес API лише обслуговує HTTP; під час старту не викликає `Database.MigrateAsync()`.
+- Окремий кореневий job явно застосовує очікувані EF-міграції та завершується успішно лише після всіх contexts.
+- Погоджений руйнівний reset видаляє лише некритичні дані Identity, потім встановлює `20260529142739_InitialAppIdentityDbContext` як новий baseline Identity.
+- За помилки завдання міграції розгортання зупиняється до оновлення API.
 
-## Acceptance criteria
+## Критерії приймання
 
-1. Starting `Host.Api` with a reachable database does not invoke any `IDatabaseMigrator`.
-2. `Host.Jobs --job=migrate` runs each registered `IDatabaseMigrator` once, serially, and reports the failing context if one fails.
-3. Re-running a successful migration job is idempotent: it makes no schema changes and exits with code 0.
-4. The approved Identity reset removes no Catalog or Sales data; after the reset only the new Guid Identity baseline is recorded.
-5. Cloud Run deploy runs the migration job successfully before it deploys the API revision.
+1. Старт `Host.Api` за доступної БД не викликає жодного `IDatabaseMigrator`.
+2. `Host.Jobs --job=migrate` послідовно запускає кожен зареєстрований `IDatabaseMigrator` рівно раз і повідомляє context збою.
+3. Повторне успішне завдання міграції ідемпотентне: не змінює схему й завершується з кодом 0.
+4. Погоджений reset Identity не видаляє дані Catalog або Sales; після нього записано лише новий Guid-baseline Identity.
+5. Розгортання Cloud Run успішно запускає завдання міграції до публікації нової ревізії API.

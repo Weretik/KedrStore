@@ -1,49 +1,49 @@
-# 003 — Customer read API
+# 003 — API читання клієнтів
 
-- **Module:** Sales
-- **Type:** feature
-- **Status:** delivered
-- **Owner:** Sales team
-- **Created:** 2026-09-10
+- **Модуль:** Sales
+- **Тип:** фіча
+- **Статус:** delivered
+- **Власник:** команда Sales
+- **Створено:** 2026-09-10
 
-API consumers need to browse existing customers and inspect one customer’s current Sales profile. This feature exposes anonymous read-only projections of the existing `Counterparty` model and its category price-type rules; it does not alter customer synchronization, Identity users, or price calculation.
+Споживачам API потрібно переглядати наявних клієнтів і поточний профіль окремого клієнта в Sales. Ця фіча надає анонімний доступ до проєкцій лише для читання наявної моделі `Counterparty` та її правил типів цін для категорій. Вона не змінює синхронізацію клієнтів, користувачів Identity чи обчислення цін.
 
-## Requirements
+## Вимоги
 
-- [Overview and boundaries](requirements/overview.md)
-- [Customer reading](requirements/customer-reading.md)
+- [Огляд і межі](requirements/overview.md)
+- [Читання даних клієнтів](requirements/customer-reading.md)
 
-## Technical design
+## Технічний дизайн
 
-- [Domain](design/domain.md)
-- [Infrastructure](design/infrastructure.md)
-- [Data model](data-model.md)
-- [API contract](contracts/api-contract.md)
-- [Versioned OpenAPI](../../../contracts/sales/customer-read.openapi.yaml)
+- [Домен](design/domain.md)
+- [Інфраструктура](design/infrastructure.md)
+- [Модель даних](data-model.md)
+- [Контракт API](contracts/api-contract.md)
+- [Версійний OpenAPI](../../../contracts/sales/customer-read.openapi.yaml)
 
-## Planning and delivery
+## Планування та виконання
 
-- [Scenario traceability](traceability.md)
-- [Task graph](tasks/README.md)
-- [Specification readiness](checklist/spec-readiness.md)
-- [Delivery readiness](checklist/delivery-readiness.md)
+- [Зв'язок сценаріїв із завданнями](traceability.md)
+- [Граф завдань](tasks/README.md)
+- [Готовність специфікації](checklist/spec-readiness.md)
+- [Готовність виконання](checklist/delivery-readiness.md)
 
-## Related documentation
+## Пов'язана документація
 
-- [Manager order read API](../002-manager-order-read-api/README.md)
-- [Sales customer synchronization runbook](../../../operations/jobs/sales-one-c-runbook.md)
-- [Current aggregate API contract](../../../contracts/openapi.yaml)
-- [Sales module ownership](../../../architecture/overview/modules.md)
+- [API читання замовлень для менеджера](../002-manager-order-read-api/README.md)
+- [Інструкція із синхронізації клієнтів Sales](../../../operations/jobs/sales-one-c-runbook.md)
+- [Поточний зведений контракт API](../../../contracts/openapi.yaml)
+- [Відповідальність модуля Sales](../../../architecture/overview/modules.md)
 
-## Delivery report
+## Звіт про виконання
 
-SC-001 through SC-004 and EN-001 through EN-003 / TS-001 through TS-006 are complete. `GET /api/admin/customers` returns a compact active-customer page ordered by name and counterparty ID; `GET /api/admin/customers/{counterpartyId}` returns the approved current profile and category price rules. Both routes currently allow anonymous access.
+SC-001–SC-004 і EN-001–EN-003 / TS-001–TS-006 завершено. `GET /api/admin/customers` повертає сторінку зі стислими даними активних клієнтів, упорядковану за іменем та ID контрагента; `GET /api/admin/customers/{counterpartyId}` повертає погоджений поточний профіль і правила типів цін для категорій. Обидва маршрути наразі дозволяють анонімний доступ.
 
-The delivery gate passed restore, a warning-free build, 70 Unit tests, 10 Architecture tests, and 83 Integration tests with no skips after the anonymous-access amendment. PostgreSQL checks used isolated schemas that were removed after verification. The feature OpenAPI validates; Redocly reports only its advisory `info-license` warning. No migration was required.
+Під час фінальної перевірки успішно виконано відновлення залежностей, збірку без попереджень, 70 модульних тестів, 10 архітектурних тестів і 83 інтеграційні тести без пропусків після зміни щодо анонімного доступу. Перевірки PostgreSQL використовували ізольовані схеми, видалені після перевірки. OpenAPI фічі проходить валідацію; Redocly повідомляє лише рекомендаційне попередження `info-license`. Міграція не знадобилася.
 
-## Change notes
+## Історія змін
 
-- 2026-09-10 — Initial draft for customer list and detail reads. No code or machine-readable contract is added.
-- 2026-09-10 — Agreed compact list/full detail DTOs, paging/order, soft-delete behavior, and separate paged order loading.
-- 2026-09-10 — Delivered list/detail queries, PostgreSQL projections, HTTP endpoints, versioned OpenAPI, and focused/full regression evidence.
-- 2026-09-10 — Changed both customer-read routes to anonymous access for the current rollout stage and updated contract/scenario evidence.
+- 2026-09-10 — Початкова чернетка читання списку клієнтів і деталей клієнта. Код і машинозчитуваний контракт не додано.
+- 2026-09-10 — Погоджено стислі DTO списку й повні DTO деталей, посторінковий вивід і порядок, поведінку для логічно видалених записів та окреме посторінкове завантаження замовлень.
+- 2026-09-10 — Реалізовано запити списку й деталей, проєкції PostgreSQL, HTTP-маршрути, версійний OpenAPI та зафіксовано результати цільових і повних регресійних перевірок.
+- 2026-09-10 — Обидва маршрути читання клієнтів змінено для анонімного доступу на поточному етапі розгортання; оновлено контракт і свідчення для сценаріїв.

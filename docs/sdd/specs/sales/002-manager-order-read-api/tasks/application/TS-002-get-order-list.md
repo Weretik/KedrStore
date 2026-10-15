@@ -1,29 +1,29 @@
-# TS-002 — Get manager-order lists
+# TS-002 — отримувати списки замовлень менеджерів
 
-- **Task ID:** TS-002
-- **Covers:** SC-001, SC-003
-- **Depends on:** TS-001
-- **Exact paths:** `src/Sales/Sales.Application/Features/Orders/GetList/`, `tests/UnitTests/Sales/Application/GetOrderListQueryHandlerTests.cs`
-- **Test level:** Application
+- **ID задачі:** TS-002
+- **Покриває:** SC-001, SC-003
+- **Залежить від:** TS-001
+- **Точні шляхи:** `src/Sales/Sales.Application/Features/Orders/GetList/`, `tests/UnitTests/Sales/Application/GetOrderListQueryHandlerTests.cs`
+- **Рівень тесту:** Application
 
-## Evidence
+## Докази
 
-- **Focused test:** `GetOrderListQueryHandlerTests`
-- **Red:** combined focused handler run compiled and failed 2 list orchestration assertions against the absent delegation while its 3 validator cases passed.
-- **Green:** combined `GetOrderListQueryHandlerTests|GetOrderByIdQueryHandlerTests` run passed 9/9.
-- **Refactor:** reran the same focused suite after simplifying delegation; 9/9 passed.
-- **Regression:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application`; 21 passed, 0 failed.
+- **Цільовий тест:** `GetOrderListQueryHandlerTests`
+- **Red:** спільний цільовий запуск обробників скомпілювався й провалив 2 перевірки оркестрації списку через відсутнє делегування; 3 перевірки валідатора пройшли.
+- **Green:** спільний запуск `GetOrderListQueryHandlerTests|GetOrderByIdQueryHandlerTests` пройшов 9/9.
+- **Рефакторинг:** той самий цільовий набір повторно запущено після спрощення делегування; 9/9 пройшли.
+- **Регресія:** `dotnet test tests/UnitTests/UnitTests.csproj --filter FullyQualifiedName~Sales.Application`; 21 пройшов, 0 помилок.
 
-## Work
+## Робота
 
-- [x] **Red:** add the smallest handler test for SC-001 and run it to confirm failure because list orchestration is absent.
-- [x] **Red:** add focused cases for exact counterparty scope, invalid input, read failure, and cancellation; persistence tests cover empty/exclusion behavior at the layer that applies the filter.
-- [x] **Green:** add the query, optional counterparty scope, agreed filters/paging, validator, and result DTO.
-- [x] **Green:** delegate selection to `IOrderReadService`, return explicit Ardalis.Result outcomes, and rerun the focused test.
-- [x] **Refactor:** simplify mapping and validation without introducing EF or Domain entity access.
-- [x] **Regression:** run the Sales Application test subset.
-- [x] Record actual Red, Green, refactor, and regression results in `Evidence`.
+- [x] **Red:** додати найменший тест обробника для SC-001 і запустити його, щоб підтвердити помилку через відсутність оркестрації списку.
+- [x] **Red:** додати цільові випадки точного обмеження за контрагентом, некоректного вводу, помилки читання та скасування; тести сховища покривають порожній результат і виключення на шарі, що застосовує фільтр.
+- [x] **Green:** додати запит, необов'язкове обмеження за контрагентом, погоджені фільтри й пагінацію, валідатор і DTO результату.
+- [x] **Green:** передати вибірку до `IOrderReadService`, повертати явні результати Ardalis.Result і повторити цільовий тест.
+- [x] **Рефакторинг:** спростити мапінг і валідацію без доступу до EF або сутностей Domain.
+- [x] **Регресія:** запустити піднабір тестів Sales Application.
+- [x] Зафіксувати фактичні результати Red, Green, рефакторингу й регресії в розділі «Докази».
 
-## Checkpoint
+## Контрольна точка
 
-The query supports the agreed collections and cannot leak orders outside the requested counterparty scope.
+Запит підтримує погоджені колекції й не може розкривати замовлення поза запитаним контрагентом.
