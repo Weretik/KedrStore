@@ -91,7 +91,7 @@ dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Da
 dotnet user-secrets set "ADMIN_DEFAULT_PASSWORD" "<local-only-password>" --project src/Bootstrapper/Host.Api/Host.Api.csproj
 ```
 
-On startup, the API automatically applies migrations and seeds data. Do not point it at a database that must not be modified.
+`Host.Api` під час запуску не виконує міграції та seed. Перед запуском API з новою схемою окремо виконайте `Host.Jobs --job=migrate` для потрібної бази даних. Команда змінює схему й дані; спочатку перевірте цільову базу. Поточну команду та порядок наведено в [інструкції з міграцій і seed](docs/sdd/operations/data/migrations-and-seeding.md).
 
 ## Background jobs and 1C import
 

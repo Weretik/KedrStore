@@ -17,7 +17,9 @@ docs/sdd/contracts/
 
 - [Посібник інтеграції frontend](frontend-integration.md) описує автентифікацію, CSRF, pagination, помилки та власників endpoints.
 - [Сукупний контракт OpenAPI 3.1](openapi.yaml) охоплює поточні зареєстровані controllers.
-- Модульні контракти: [товари каталогу](catalog/products.openapi.yaml), [категорії каталогу](catalog/category-read.openapi.yaml), [identity](identity/session.openapi.yaml) і [sales](sales/catalog.openapi.yaml).
+- Catalog: [товари](catalog/products.openapi.yaml), [категорії](catalog/category-read.openapi.yaml), [швидке замовлення](catalog/orders.openapi.yaml).
+- Sales: [каталог для менеджера](sales/catalog.openapi.yaml), [замовлення й синхронізація з 1C](sales/admin-order-one-c-sync.openapi.yaml), [читання замовлень](sales/manager-order-read.openapi.yaml), [читання клієнтів](sales/customer-read.openapi.yaml).
+- Identity: [сеанс](identity/session.openapi.yaml).
 
 OpenAPI-файли описують контракт поточного коду. Вони самі не відкривають доступ до кінцевих точок: авторизаційні атрибути й резервне правило доступу хоста залишаються визначальними.
 
