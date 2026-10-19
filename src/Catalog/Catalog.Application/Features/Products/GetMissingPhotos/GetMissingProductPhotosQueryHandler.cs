@@ -3,6 +3,7 @@ using Catalog.Contracts.Products.GetMissingPhotos;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Enums;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.GetMissingPhotos;
 
@@ -17,8 +18,13 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
 
         var page = query.Request.Page;
         var pageSize = query.Request.PageSize;
+        var categoriesQuery = catalogDbContext.Categories.AsNoTracking();
+        var categoryIds = query.Request.CategoryId is { } categoryId
+            ? await AdminProductCategoryIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
+            : null;
         var projections = ApplyFilters(
             catalogDbContext.ProductListProjections.AsNoTracking(),
+            categoryIds,
             query.Request);
         var unavailable =
             from projection in projections
@@ -29,35 +35,59 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
             where check.Status == ProductPhotoStatus.Missing ||
                   check.Status == ProductPhotoStatus.InvalidContentType ||
                   check.Status == ProductPhotoStatus.CheckFailed
-            select new MissingProductPhotoListRowDto
-            {
-                Id = projection.ProductId.Value,
-                NameUk = projection.NameUk,
-                NameRu = projection.NameRu,
-                ProductSlug = projection.ProductSlug,
-                Photo = check.PhotoUrl,
-                CategoryId = projection.CategoryId.Value,
-                InStock = projection.InStock,
-                IsSale = projection.IsSale,
-                IsNew = projection.IsNew,
-                ExportToSite = projection.ExportToSite,
-                Price = projection.RetailPrice,
-                Stock = product.Stock,
-                QuantityInPack = product.QuantityInPack,
-                PhotoAvailable = false,
-                PhotoStatus = check.Status == ProductPhotoStatus.Missing
-                    ? ProductPhotoAvailabilityStatus.Missing
-                    : check.Status == ProductPhotoStatus.InvalidContentType
-                        ? ProductPhotoAvailabilityStatus.InvalidContentType
-                        : ProductPhotoAvailabilityStatus.CheckFailed,
-                PhotoCheckedAtUtc = check.CheckedAtUtc!.Value,
-                PhotoHttpStatusCode = check.HttpStatusCode
-            };
+            select new { projection, product, check };
 
         var totalRecords = await unavailable.LongCountAsync(cancellationToken);
-        var items = await ApplySorting(unavailable, query.Request.Sort)
+        var sorted = query.Request.Sort switch
+        {
+            ProductSort.IdDesc => unavailable.OrderByDescending(row => row.projection.ProductId),
+            ProductSort.NameAsc => unavailable.OrderBy(row => row.projection.NameUk)
+                .ThenBy(row => row.projection.NameRu).ThenBy(row => row.projection.ProductId),
+            ProductSort.NameDesc => unavailable.OrderByDescending(row => row.projection.NameUk)
+                .ThenByDescending(row => row.projection.NameRu).ThenBy(row => row.projection.ProductId),
+            ProductSort.PriceAsc => unavailable.OrderBy(row => row.projection.RetailPrice.HasValue ? 0 : 1)
+                .ThenBy(row => row.projection.RetailPrice).ThenBy(row => row.projection.ProductId),
+            ProductSort.PriceDesc => unavailable.OrderBy(row => row.projection.RetailPrice.HasValue ? 0 : 1)
+                .ThenByDescending(row => row.projection.RetailPrice).ThenBy(row => row.projection.ProductId),
+            ProductSort.CategoryAsc => unavailable.OrderBy(row => categoriesQuery
+                    .Where(category => category.Id == row.projection.CategoryId)
+                    .Select(category => category.ShortNameUk).FirstOrDefault())
+                .ThenBy(row => row.projection.ProductId),
+            ProductSort.CategoryDesc => unavailable.OrderByDescending(row => categoriesQuery
+                    .Where(category => category.Id == row.projection.CategoryId)
+                    .Select(category => category.ShortNameUk).FirstOrDefault())
+                .ThenBy(row => row.projection.ProductId),
+            _ => unavailable.OrderBy(row => row.projection.ProductId)
+        };
+        var items = await sorted
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(row => new MissingProductPhotoListRowDto
+            {
+                Id = row.projection.ProductId.Value,
+                NameUk = row.projection.NameUk,
+                NameRu = row.projection.NameRu,
+                ProductSlug = row.projection.ProductSlug,
+                Photo = row.check.PhotoUrl,
+                CategoryId = row.projection.CategoryId.Value,
+                CategoryName = categoriesQuery.Where(category => category.Id == row.projection.CategoryId)
+                    .Select(category => category.ShortNameUk).FirstOrDefault() ?? string.Empty,
+                InStock = row.projection.InStock,
+                IsSale = row.projection.IsSale,
+                IsNew = row.projection.IsNew,
+                ExportToSite = row.projection.ExportToSite,
+                Price = row.projection.RetailPrice,
+                Stock = row.product.Stock,
+                QuantityInPack = row.product.QuantityInPack,
+                PhotoAvailable = false,
+                PhotoStatus = row.check.Status == ProductPhotoStatus.Missing
+                    ? ProductPhotoAvailabilityStatus.Missing
+                    : row.check.Status == ProductPhotoStatus.InvalidContentType
+                        ? ProductPhotoAvailabilityStatus.InvalidContentType
+                        : ProductPhotoAvailabilityStatus.CheckFailed,
+                PhotoCheckedAtUtc = row.check.CheckedAtUtc!.Value,
+                PhotoHttpStatusCode = row.check.HttpStatusCode
+            })
             .ToListAsync(cancellationToken);
 
         var pagedInfo = new PagedInfo(
@@ -71,6 +101,7 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
 
     private static IQueryable<ProductListProjection> ApplyFilters(
         IQueryable<ProductListProjection> projections,
+        ProductCategoryId[]? categoryIds,
         GetMissingProductPhotosRequest request)
     {
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -88,6 +119,9 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
             }
         }
 
+        if (categoryIds is not null)
+            projections = projections.Where(projection => categoryIds.Contains(projection.CategoryId));
+
         if (request.InStock.HasValue)
             projections = projections.Where(projection => projection.InStock == request.InStock.Value);
 
@@ -102,18 +136,6 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
 
         return projections;
     }
-
-    private static IOrderedQueryable<MissingProductPhotoListRowDto> ApplySorting(
-        IQueryable<MissingProductPhotoListRowDto> products,
-        ProductSort sort) => sort switch
-        {
-            ProductSort.IdDesc => products.OrderByDescending(product => product.Id),
-            ProductSort.NameAsc => products.OrderBy(product => product.NameUk).ThenBy(product => product.NameRu).ThenBy(product => product.Id),
-            ProductSort.NameDesc => products.OrderByDescending(product => product.NameUk).ThenByDescending(product => product.NameRu).ThenBy(product => product.Id),
-            ProductSort.PriceAsc => products.OrderBy(product => product.Price.HasValue ? 0 : 1).ThenBy(product => product.Price).ThenBy(product => product.Id),
-            ProductSort.PriceDesc => products.OrderBy(product => product.Price.HasValue ? 0 : 1).ThenByDescending(product => product.Price).ThenBy(product => product.Id),
-            _ => products.OrderBy(product => product.Id)
-        };
 
     private static string EscapeLike(string text) => text
         .Replace(@"\", @"\\", StringComparison.Ordinal)

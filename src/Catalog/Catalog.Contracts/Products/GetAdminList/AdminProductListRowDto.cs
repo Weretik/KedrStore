@@ -8,6 +8,7 @@ public sealed record AdminProductListRowDto
     public string ProductSlug { get; init; } = null!;
     public string Photo { get; init; } = null!;
     public int? CategoryId { get; init; }
+    public string CategoryName { get; init; } = string.Empty;
     public bool InStock { get; init; }
     public bool IsSale { get; init; }
     public bool IsNew { get; init; }

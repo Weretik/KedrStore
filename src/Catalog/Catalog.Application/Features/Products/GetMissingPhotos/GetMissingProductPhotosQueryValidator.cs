@@ -15,6 +15,10 @@ public sealed class GetMissingProductPhotosQueryValidator : AbstractValidator<Ge
             RuleFor(query => query.Request.SearchTerm)
                 .MaximumLength(100);
 
+            RuleFor(query => query.Request.CategoryId)
+                .GreaterThan(0)
+                .When(query => query.Request.CategoryId.HasValue);
+
             RuleFor(query => query.Request.Sort)
                 .IsInEnum();
 

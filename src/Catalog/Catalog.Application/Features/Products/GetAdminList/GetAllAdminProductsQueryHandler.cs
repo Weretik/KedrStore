@@ -22,6 +22,9 @@ public sealed class GetAllAdminProductsQueryHandler(IReadCatalogDbContext catalo
                     ProductSlug = projection.ProductSlug,
                     Photo = projection.Photo,
                     CategoryId = projection.CategoryId.Value,
+                    CategoryName = catalogDbContext.Categories.AsNoTracking()
+                        .Where(category => category.Id == projection.CategoryId)
+                        .Select(category => category.ShortNameUk).FirstOrDefault() ?? string.Empty,
                     InStock = projection.InStock,
                     IsSale = projection.IsSale,
                     IsNew = projection.IsNew,

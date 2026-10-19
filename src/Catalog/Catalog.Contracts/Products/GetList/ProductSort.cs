@@ -8,4 +8,6 @@ public enum ProductSort
     NameDesc,
     PriceAsc,
     PriceDesc,
+    CategoryAsc,
+    CategoryDesc,
 }

@@ -111,6 +111,7 @@ paths:
         not contact the CDN while handling the request.
       parameters:
         - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/CategoryId'
         - $ref: '#/components/parameters/AdminInStock'
         - $ref: '#/components/parameters/IsSale'
         - $ref: '#/components/parameters/IsNew'
@@ -151,7 +152,7 @@ components:
     PriceTypeId: { name: priceTypeId, in: query, schema: { type: integer, minimum: 1, default: 11 } }
     PriceFrom: { name: priceFrom, in: query, schema: { type: number, minimum: 0 } }
     PriceTo: { name: priceTo, in: query, schema: { type: number, minimum: 0 } }
-    ProductSort: { name: sort, in: query, schema: { type: string, enum: [IdAsc, IdDesc, NameAsc, NameDesc, PriceAsc, PriceDesc], default: IdAsc } }
+    ProductSort: { name: sort, in: query, schema: { type: string, enum: [IdAsc, IdDesc, NameAsc, NameDesc, PriceAsc, PriceDesc, CategoryAsc, CategoryDesc], default: IdAsc } }
     Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
     PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
   responses:
@@ -217,7 +218,7 @@ components:
       properties: { id: { type: integer }, name: { type: string }, slug: { type: string } }
     AdminProduct:
       type: object
-      required: [id, nameUk, nameRu, productSlug, photo, inStock, isSale, isNew, exportToSite, stock, quantityInPack]
+      required: [id, nameUk, nameRu, productSlug, photo, categoryName, inStock, isSale, isNew, exportToSite, stock, quantityInPack]
       properties:
         id: { type: integer }
         nameUk: { type: string }
@@ -225,6 +226,7 @@ components:
         productSlug: { type: string }
         photo: { type: string }
         categoryId: { type: [integer, 'null'] }
+        categoryName: { type: string, description: Ukrainian short category name; empty when the reference is unavailable. }
         inStock: { type: boolean }
         isSale: { type: boolean }
         isNew: { type: boolean }

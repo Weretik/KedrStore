@@ -83,6 +83,39 @@ public sealed class MissingProductPhotosApiTests
         Assert.Contains("s20.jpg", detailBody.RootElement.GetProperty("scheme").GetString());
     }
 
+    [Fact]
+    public async Task CategoryFilter_IncludesAllDescendants_AndSortsByUkrainianName()
+    {
+        await using var db = CreateContext();
+        SeedMissing(db, 100);
+        SeedMissing(db, 101);
+        SeedMissing(db, 102);
+        SeedMissing(db, 103);
+        SeedMissing(db, 200);
+        var categories = db.Categories.Local.ToDictionary(category => category.Id.Value);
+        categories[101].Update("Child", "child", CategoryPath.From("n100.n101"), ProductCategoryId.From(100));
+        categories[102].Update("Grandchild", "grandchild", CategoryPath.From("n100.n101.n102"), ProductCategoryId.From(101));
+        categories[103].Update("Deep", "deep", CategoryPath.From("n100.n101.n102.n103"), ProductCategoryId.From(102));
+        categories[100].UpdatePresentationMetadata("Якір", "Якорь", 0, 0);
+        categories[101].UpdatePresentationMetadata("Блок", "Блок", 0, 1);
+        categories[102].UpdatePresentationMetadata("Абетка", "Азбука", 0, 2);
+        categories[103].UpdatePresentationMetadata("Вікно", "Окно", 0, 3);
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        foreach (var path in new[] { "/api/admin/products", "/api/admin/products/missing-photos" })
+        {
+            using var response = await client.GetAsync($"{path}?categoryId=100&sort=CategoryAsc&page=1&pageSize=2");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            Assert.Equal(4, body.RootElement.GetProperty("pagedInfo").GetProperty("totalRecords").GetInt64());
+            var rows = body.RootElement.GetProperty("value");
+            Assert.Equal([102, 101], rows.EnumerateArray().Select(row => row.GetProperty("id").GetInt32()));
+            Assert.Equal("Абетка", rows[0].GetProperty("categoryName").GetString());
+        }
+    }
+
     [Theory]
     [InlineData("page=0")]
     [InlineData("pageSize=0")]

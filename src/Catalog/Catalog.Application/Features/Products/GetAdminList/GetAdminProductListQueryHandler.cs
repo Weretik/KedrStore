@@ -19,15 +19,17 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
         var pageNumber = query.Request.Page < 1 ? 1 : query.Request.Page;
         var pageSize = query.Request.PageSize < 1 ? 20 : Math.Min(query.Request.PageSize, MaxPageSize);
+        var categoriesQuery = catalogDbContext.Categories.AsNoTracking();
+        var categoryIds = query.Request.CategoryId is { } categoryId
+            ? await AdminProductCategoryIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
+            : null;
         var productsQuery = ApplySorting(
-            ApplyFilters(
-                catalogDbContext.ProductListProjections.AsNoTracking(),
-                catalogDbContext.Categories.AsNoTracking(),
-                query.Request),
+            ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), categoryIds, query.Request),
+            categoriesQuery,
             query.Request.Sort);
 
         var totalRecords = await productsQuery.LongCountAsync(cancellationToken);
-        var items = await JoinProductDetails(productsQuery, catalogDbContext.Products.AsNoTracking())
+        var items = await JoinProductDetails(productsQuery, catalogDbContext.Products.AsNoTracking(), categoriesQuery)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -43,7 +45,8 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
     private static IQueryable<AdminProductListRowDto> JoinProductDetails(
         IQueryable<ProductListProjection> projectionsQuery,
-        IQueryable<Product> productsQuery)
+        IQueryable<Product> productsQuery,
+        IQueryable<ProductCategory> categoriesQuery)
     {
         return from projection in projectionsQuery
                join product in productsQuery on projection.ProductId equals product.Id
@@ -55,6 +58,8 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
                    ProductSlug = projection.ProductSlug,
                    Photo = projection.Photo,
                    CategoryId = projection.CategoryId.Value,
+                   CategoryName = categoriesQuery.Where(category => category.Id == projection.CategoryId)
+                       .Select(category => category.ShortNameUk).FirstOrDefault() ?? string.Empty,
                    InStock = projection.InStock,
                    IsSale = projection.IsSale,
                    IsNew = projection.IsNew,
@@ -67,7 +72,7 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
     private static IQueryable<ProductListProjection> ApplyFilters(
         IQueryable<ProductListProjection> productsQuery,
-        IQueryable<ProductCategory> categoriesQuery,
+        ProductCategoryId[]? categoryIds,
         GetAdminProductsRequest request)
     {
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -85,13 +90,8 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
             }
         }
 
-        if (request.CategoryId is not null)
-        {
-            productsQuery = ApplyCategoryFilter(
-                productsQuery,
-                categoriesQuery,
-                ProductCategoryId.From(request.CategoryId.Value));
-        }
+        if (categoryIds is not null)
+            productsQuery = productsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
         else if (!string.IsNullOrWhiteSpace(request.CategorySlug))
         {
             productsQuery = productsQuery.Where(projection => projection.CategorySlug == request.CategorySlug.Trim());
@@ -118,27 +118,9 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
         return productsQuery;
     }
 
-    private static IQueryable<ProductListProjection> ApplyCategoryFilter(
-        IQueryable<ProductListProjection> productsQuery,
-        IQueryable<ProductCategory> categoriesQuery,
-        ProductCategoryId selectedCategoryId)
-    {
-        var childCategoryIds = categoriesQuery
-            .Where(category => category.ParentId == selectedCategoryId)
-            .Select(category => category.Id);
-
-        var categoryIds = categoriesQuery
-            .Where(category =>
-                category.Id == selectedCategoryId ||
-                category.ParentId == selectedCategoryId ||
-                (category.ParentId.HasValue && childCategoryIds.Contains(category.ParentId.Value)))
-            .Select(category => category.Id);
-
-        return productsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
-    }
-
     private static IQueryable<ProductListProjection> ApplySorting(
         IQueryable<ProductListProjection> productsQuery,
+        IQueryable<ProductCategory> categoriesQuery,
         ProductSort sort)
     {
         return sort switch
@@ -148,6 +130,14 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
             ProductSort.NameDesc => productsQuery.OrderByDescending(projection => projection.NameUk).ThenByDescending(projection => projection.NameRu).ThenBy(projection => projection.ProductId),
             ProductSort.PriceAsc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenBy(projection => projection.RetailPrice).ThenBy(projection => projection.ProductId),
             ProductSort.PriceDesc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenByDescending(projection => projection.RetailPrice).ThenBy(projection => projection.ProductId),
+            ProductSort.CategoryAsc => productsQuery.OrderBy(projection => categoriesQuery
+                    .Where(category => category.Id == projection.CategoryId)
+                    .Select(category => category.ShortNameUk).FirstOrDefault())
+                .ThenBy(projection => projection.ProductId),
+            ProductSort.CategoryDesc => productsQuery.OrderByDescending(projection => categoriesQuery
+                    .Where(category => category.Id == projection.CategoryId)
+                    .Select(category => category.ShortNameUk).FirstOrDefault())
+                .ThenBy(projection => projection.ProductId),
             _ => productsQuery.OrderBy(projection => projection.ProductId)
         };
     }

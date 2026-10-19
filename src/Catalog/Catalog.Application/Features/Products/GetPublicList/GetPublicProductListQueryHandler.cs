@@ -28,7 +28,7 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             projectionsQuery = projectionsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
         }
         projectionsQuery = ApplyFilters(projectionsQuery, request, language);
-        projectionsQuery = ApplySorting(projectionsQuery, request.Sort, language);
+        projectionsQuery = ApplySorting(projectionsQuery, catalogDbContext.Categories.AsNoTracking(), request.Sort, language);
 
         var pageNumber = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 20 : request.PageSize;
@@ -158,6 +158,7 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
 
     private static IQueryable<ProductListProjection> ApplySorting(
         IQueryable<ProductListProjection> projectionsQuery,
+        IQueryable<ProductCategory> categoriesQuery,
         ProductSort sort,
         string language)
     {
@@ -176,6 +177,16 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             ProductSort.PriceDesc => projectionsQuery
                 .OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1)
                 .ThenByDescending(projection => projection.RetailPrice),
+            ProductSort.CategoryAsc => projectionsQuery.OrderBy(projection => categoriesQuery
+                    .Where(category => category.Id == projection.CategoryId)
+                    .Select(category => language == "ru" ? category.ShortNameRu : category.ShortNameUk)
+                    .FirstOrDefault())
+                .ThenBy(projection => projection.ProductId),
+            ProductSort.CategoryDesc => projectionsQuery.OrderByDescending(projection => categoriesQuery
+                    .Where(category => category.Id == projection.CategoryId)
+                    .Select(category => language == "ru" ? category.ShortNameRu : category.ShortNameUk)
+                    .FirstOrDefault())
+                .ThenBy(projection => projection.ProductId),
             _ => projectionsQuery.OrderBy(projection => projection.ProductId)
         };
     }

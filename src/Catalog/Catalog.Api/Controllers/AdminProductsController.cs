@@ -56,6 +56,7 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         var applicationRequest = new GetMissingProductPhotosRequest
         {
             SearchTerm = request.SearchTerm,
+            CategoryId = request.CategoryId,
             InStock = request.InStock,
             IsSale = request.IsSale,
             IsNew = request.IsNew,
@@ -74,6 +75,9 @@ public sealed record GetMissingProductPhotosHttpRequest
 {
     [FromQuery(Name = "searchTerm")]
     public string? SearchTerm { get; init; }
+
+    [FromQuery(Name = "categoryId")]
+    public int? CategoryId { get; init; }
 
     [FromQuery(Name = "inStock")]
     public bool? InStock { get; init; }

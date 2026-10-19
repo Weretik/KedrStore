@@ -5,6 +5,7 @@ namespace Catalog.Contracts.Products.GetMissingPhotos;
 public sealed record GetMissingProductPhotosRequest
 {
     public string? SearchTerm { get; init; }
+    public int? CategoryId { get; init; }
     public bool? InStock { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
