@@ -11,6 +11,7 @@ public sealed record GetAdminProductsRequest
     public bool? InStock { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
+    public bool? ExportToSite { get; init; }
 
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }

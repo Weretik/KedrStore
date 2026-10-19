@@ -79,9 +79,10 @@ paths:
         - $ref: '#/components/parameters/SearchTerm'
         - $ref: '#/components/parameters/CategorySlug'
         - $ref: '#/components/parameters/CategoryId'
-        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/AdminInStock'
         - $ref: '#/components/parameters/IsSale'
         - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/ExportToSite'
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
         - $ref: '#/components/parameters/ProductSort'
@@ -109,11 +110,33 @@ paths:
         Temporarily anonymous. Reads persisted photo-check state only and does
         not contact the CDN while handling the request.
       parameters:
+        - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/AdminInStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/ExportToSite'
+        - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
       responses:
         '200': { description: Unavailable product-photo page, content: { application/json: { schema: { $ref: '#/components/schemas/MissingProductPhotoPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+  /api/admin/products/by-slug/{productSlug}:
+    get:
+      operationId: getAdminProductBySlug
+      summary: Get one admin product by slug
+      tags: [Admin products]
+      security: []
+      description: Current Admin controller explicitly allows anonymous access.
+      parameters:
+        - name: productSlug
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 255 }
+      responses:
+        '200': { description: Admin product details, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductDetails' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Product not found }
 components:
   parameters:
     Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }
@@ -121,8 +144,10 @@ components:
     CategorySlug: { name: categorySlug, in: query, schema: { type: string, maxLength: 100 } }
     CategoryId: { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
     InStock: { name: inStock, in: query, schema: { type: boolean, default: true } }
+    AdminInStock: { name: inStock, in: query, schema: { type: boolean } }
     IsSale: { name: isSale, in: query, schema: { type: boolean } }
     IsNew: { name: isNew, in: query, schema: { type: boolean } }
+    ExportToSite: { name: exportToSite, in: query, schema: { type: boolean } }
     PriceTypeId: { name: priceTypeId, in: query, schema: { type: integer, minimum: 1, default: 11 } }
     PriceFrom: { name: priceFrom, in: query, schema: { type: number, minimum: 0 } }
     PriceTo: { name: priceTo, in: query, schema: { type: number, minimum: 0 } }
@@ -219,3 +244,22 @@ components:
             photoStatus: { type: string, enum: [Missing, InvalidContentType, CheckFailed] }
             photoCheckedAtUtc: { type: string, format: date-time }
             photoHttpStatusCode: { type: [integer, 'null'], minimum: 100, maximum: 599 }
+    AdminProductDetails:
+      type: object
+      required: [id, nameUk, nameRu, productSlug, photo, scheme, categoryId, categoryName, inStock, isSale, isNew, exportToSite, price, stock, quantityInPack]
+      properties:
+        id: { type: integer }
+        nameUk: { type: string }
+        nameRu: { type: string }
+        productSlug: { type: string }
+        photo: { type: string }
+        scheme: { type: string, description: Stored scheme URL; the API does not probe media availability. }
+        categoryId: { type: integer }
+        categoryName: { type: string }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        exportToSite: { type: boolean }
+        price: { type: [number, 'null'] }
+        stock: { type: number }
+        quantityInPack: { type: integer }

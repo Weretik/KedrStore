@@ -35,6 +35,54 @@ public sealed class MissingProductPhotosApiTests
         Assert.Equal(404, row.GetProperty("photoHttpStatusCode").GetInt32());
     }
 
+    [Fact]
+    public async Task Get_UsesServerFiltersBeforePagingAndCountsMatchingRows()
+    {
+        await using var db = CreateContext();
+        SeedMissing(db, 10, inStock: false, isSale: false, isNew: true, exportToSite: false);
+        SeedMissing(db, 11, inStock: false, isSale: false, isNew: true, exportToSite: false);
+        SeedMissing(db, 12, inStock: true, isSale: false, isNew: true, exportToSite: false);
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(
+            "/api/admin/products/missing-photos?inStock=false&isSale=false&isNew=true&exportToSite=false&sort=IdDesc&page=2&pageSize=1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(2, body.RootElement.GetProperty("pagedInfo").GetProperty("totalRecords").GetInt64());
+        Assert.Equal(10, body.RootElement.GetProperty("value")[0].GetProperty("id").GetInt32());
+    }
+
+    [Fact]
+    public async Task AdminList_FiltersFalseBeforePaging_AndDetailsIncludeBothNamesAndFlags()
+    {
+        await using var db = CreateContext();
+        SeedMissing(db, 20, inStock: false, isSale: true, isNew: false, exportToSite: false);
+        SeedMissing(db, 21, inStock: true, isSale: true, isNew: false, exportToSite: false);
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        using var list = await client.GetAsync(
+            "/api/admin/products?inStock=false&isSale=true&isNew=false&exportToSite=false&page=1&pageSize=1");
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        using var listBody = JsonDocument.Parse(await list.Content.ReadAsStringAsync());
+        Assert.Equal(1, listBody.RootElement.GetProperty("pagedInfo").GetProperty("totalRecords").GetInt64());
+        Assert.Equal(20, listBody.RootElement.GetProperty("value")[0].GetProperty("id").GetInt32());
+
+        using var details = await client.GetAsync("/api/admin/products/by-slug/product-20");
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        using var detailBody = JsonDocument.Parse(await details.Content.ReadAsStringAsync());
+        Assert.Equal("Product 20 uk", detailBody.RootElement.GetProperty("nameUk").GetString());
+        Assert.Equal("Product 20 ru", detailBody.RootElement.GetProperty("nameRu").GetString());
+        Assert.True(detailBody.RootElement.GetProperty("isSale").GetBoolean());
+        Assert.False(detailBody.RootElement.GetProperty("inStock").GetBoolean());
+        Assert.False(detailBody.RootElement.GetProperty("exportToSite").GetBoolean());
+        Assert.Contains("s20.jpg", detailBody.RootElement.GetProperty("scheme").GetString());
+    }
+
     [Theory]
     [InlineData("page=0")]
     [InlineData("pageSize=0")]
@@ -69,7 +117,13 @@ public sealed class MissingProductPhotosApiTests
         return new CatalogDbContext(options);
     }
 
-    private static void SeedMissing(CatalogDbContext db, int id)
+    private static void SeedMissing(
+        CatalogDbContext db,
+        int id,
+        bool inStock = true,
+        bool isSale = false,
+        bool isNew = false,
+        bool exportToSite = false)
     {
         var now = new DateTimeOffset(2026, 9, 23, 12, 0, 0, TimeSpan.Zero);
         var productId = ProductId.From(id);
@@ -92,9 +146,9 @@ public sealed class MissingProductPhotosApiTests
             now,
             2,
             1,
-            false,
-            false,
-            false));
+            isNew,
+            isSale,
+            exportToSite));
         db.ProductListProjections.Add(ProductListProjection.Create(
             productId,
             $"Product {id} uk",
@@ -103,10 +157,10 @@ public sealed class MissingProductPhotosApiTests
             photo,
             categoryId,
             $"category-{id}",
-            true,
-            false,
-            false,
-            false,
+            inStock,
+            isSale,
+            isNew,
+            exportToSite,
             100m));
         var check = ProductPhotoCheck.CreateUnknown(productId, photo);
         check.RecordMissing(photo, now, 404);

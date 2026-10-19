@@ -6,7 +6,7 @@
 
 | Модуль | Специфікації |
 | --- | --- |
-| Catalog | [метадані категорій](catalog/001-category-presentation-metadata/README.md), [читання категорій](catalog/002-category-read-api/README.md), [відсутні фото](catalog/003-missing-product-photos/README.md), [admin список товарів](catalog/admin-product-list/README.md), [корінь 1C/Cosmos](catalog/cosmos-one-c-root/README.md), [оновлення проєкції залишків](catalog/stock-projection-refresh/README.md) |
+| Catalog | [метадані категорій](catalog/001-category-presentation-metadata/README.md), [читання категорій](catalog/002-category-read-api/README.md), [відсутні фото](catalog/003-missing-product-photos/README.md), [admin деталі товару](catalog/004-admin-product-detail/README.md), [admin список товарів](catalog/admin-product-list/README.md), [корінь 1C/Cosmos](catalog/cosmos-one-c-root/README.md), [оновлення проєкції залишків](catalog/stock-projection-refresh/README.md) |
 | Sales | [створення замовлення й 1C](sales/001-admin-order-one-c-sync/README.md), [читання замовлень менеджером](sales/002-manager-order-read-api/README.md), [читання клієнтів](sales/003-customer-read-api/README.md) |
 | Platform | [окрема job міграції](platform/001-database-migration-job/README.md), [архітектура тестів](platform/002-test-architecture/README.md) |
 

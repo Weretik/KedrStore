@@ -6,4 +6,5 @@ public sealed record GetAdminCustomerDetailResponse(
     string? Phone,
     string Email,
     int DefaultPriceTypeId,
-    IReadOnlyList<GetAdminCustomerCategoryPriceTypeResponse> CategoryPriceTypes);
+    IReadOnlyList<GetAdminCustomerCategoryPriceTypeResponse> CategoryPriceTypes,
+    string? DefaultPriceTypeName);

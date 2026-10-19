@@ -37,10 +37,31 @@ public sealed class AdminCustomerApiTests
         Assert.Equal(20, state.LastListRequest?.PageSize);
     }
 
+    [Fact]
+    public async Task GetList_ForwardsServerFiltersAndSort()
+    {
+        var state = CreateState();
+        using var factory = CreateFactory(state);
+        using var client = factory.CreateClient();
+
+        using var response = await client.GetAsync(
+            "/api/admin/customers?searchTerm=alpha&counterpartyId=customer&name=Alpha&phone=380&sort=-phone&page=2&pageSize=10");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("alpha", state.LastListRequest?.SearchTerm);
+        Assert.Equal("customer", state.LastListRequest?.CounterpartyId);
+        Assert.Equal("Alpha", state.LastListRequest?.Name);
+        Assert.Equal("380", state.LastListRequest?.Phone);
+        Assert.Equal("-phone", state.LastListRequest?.Sort);
+        Assert.Equal(2, state.LastListRequest?.Page);
+        Assert.Equal(10, state.LastListRequest?.PageSize);
+    }
+
     [Theory]
     [InlineData("page=0")]
     [InlineData("pageSize=0")]
     [InlineData("pageSize=101")]
+    [InlineData("sort=unknown")]
     public async Task GetList_ReturnsBadRequestForInvalidPaging(string query)
     {
         using var factory = CreateFactory(CreateState());
@@ -79,6 +100,9 @@ public sealed class AdminCustomerApiTests
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.Equal("customer-1", body.RootElement.GetProperty("counterpartyId").GetString());
         Assert.Equal(10, body.RootElement.GetProperty("categoryPriceTypes")[0].GetProperty("categoryId").GetInt32());
+        Assert.Equal("Роздрібна", body.RootElement.GetProperty("defaultPriceTypeName").GetString());
+        Assert.Equal("Замки", body.RootElement.GetProperty("categoryPriceTypes")[0].GetProperty("categoryName").GetString());
+        Assert.Equal("Оптова", body.RootElement.GetProperty("categoryPriceTypes")[0].GetProperty("priceTypeName").GetString());
         Assert.False(body.RootElement.TryGetProperty("identityUserId", out _));
         Assert.False(body.RootElement.TryGetProperty("orders", out _));
         Assert.False(body.RootElement.TryGetProperty("isDeleted", out _));
@@ -133,7 +157,8 @@ public sealed class AdminCustomerApiTests
             null,
             "customer@example.com",
             1,
-            [new CustomerCategoryPriceTypeDto(10, 20)]);
+            [new CustomerCategoryPriceTypeDto(10, 20, "Замки", "Оптова")],
+            "Роздрібна");
         return new TestCustomerReadState
         {
             Page = new PagedResult<List<CustomerListItemDto>>(

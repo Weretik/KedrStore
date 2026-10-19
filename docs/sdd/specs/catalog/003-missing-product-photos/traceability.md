@@ -17,3 +17,14 @@
 Усі сценарії мають свідчення реалізації. Фізичні тести життєвого циклу PostgreSQL
 для SC-007 додано до репозиторію й вони обов'язкові в CI; локально їх пропущено
 через недоступність Docker.
+
+## Інкремент 2026-10-19
+
+Попередні свідчення стосуються лише SC-001–SC-011. Нові рядки нижче містять результати вузьких автоматичних перевірок; повний прогін і окремий PostgreSQL-тест пошуку не виконувалися.
+
+| Сценарій | Правила | Дизайн | Задачі | Рівень тесту | Свідчення |
+| --- | --- | --- | --- | --- | --- |
+| SC-012 | R-011, R-013 | [Серверна таблиця](requirements/table-browsing.md) | TS-008, TS-009, TS-010 | Цільовий application/API | Код `ILIKE` і OpenAPI звірено; runtime пошук у PostgreSQL не перевірявся |
+| SC-013 | R-012, R-013 | [Серверна таблиця](requirements/table-browsing.md) | TS-008, TS-009, TS-010 | Цільовий application/API | `MissingProductPhotosApiTests.Get_UsesServerFiltersBeforePagingAndCountsMatchingRows`, `6/6` у вузькому класі |
+| SC-014 | R-013, R-014 | [Серверна таблиця](requirements/table-browsing.md) | TS-008, TS-009, TS-010 | Цільовий application/API | Той самий тест перевірив `IdDesc`, `page=2`, `pageSize=1`, `totalRecords=2`; валідатор — `7/7` unit |
+| SC-015 | R-011–R-013 | [Серверна таблиця](requirements/table-browsing.md) | TS-009, TS-010 | Цільовий application/API | Комбінацію boolean-фільтрів перевірено; сумісний пошук разом із ними окремо не запускався |

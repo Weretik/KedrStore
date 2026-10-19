@@ -74,6 +74,16 @@ API додайте його в `docs/sdd/contracts/catalog/products.openapi.yaml
 Операція не використовує `404`, а збої CDN ніколи не стають HTTP-помилкою
 цього endpoint читання.
 
+## Зміна 2026-10-19 — параметри серверної таблиці
+
+**Статус:** реалізовано 2026-10-19; цей розділ доповнює початковий контракт за [SC-012–SC-015](../requirements/table-browsing.md).
+
+```http
+GET /api/admin/products/missing-photos?searchTerm=8190&inStock=false&isSale=false&isNew=true&exportToSite=true&sort=NameAsc&page=1&pageSize=20
+```
+
+Усі нові параметри необов'язкові. `searchTerm` має не більш як `100` символів; boolean-параметри `inStock`, `isSale`, `isNew`, `exportToSite` розрізняють відсутнє значення, `true` і `false`. `sort` приймає `IdAsc`, `IdDesc`, `NameAsc`, `NameDesc`, `PriceAsc`, `PriceDesc`, за замовчуванням `IdAsc`. Сортування має завершальний ключ ID. Фільтрація й підрахунок передують пагінації; форма `PagedResult`, поля рядка, доступ та помилка `400` залишаються тими самими. Адитивну зміну внесено до машинозчитуваного [OpenAPI](../../../../contracts/catalog/products.openapi.yaml). Міграція, CDN-запити й зміна job не потрібні.
+
 ## CLI-контракт Host.Jobs
 
 ```text

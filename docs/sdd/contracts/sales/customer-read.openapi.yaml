@@ -20,9 +20,33 @@ paths:
           in: query
           required: false
           schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - name: searchTerm
+          in: query
+          required: false
+          description: Case-insensitive substring in counterpartyId, name or phone.
+          schema: { type: string, maxLength: 100 }
+        - name: counterpartyId
+          in: query
+          required: false
+          description: Case-insensitive ID substring filter.
+          schema: { type: string, maxLength: 100 }
+        - name: name
+          in: query
+          required: false
+          description: Case-insensitive name substring filter.
+          schema: { type: string, maxLength: 100 }
+        - name: phone
+          in: query
+          required: false
+          description: Case-insensitive phone substring filter.
+          schema: { type: string, maxLength: 100 }
+        - name: sort
+          in: query
+          required: false
+          schema: { type: string, enum: [name, '-name', counterpartyId, '-counterpartyId', phone, '-phone'], default: name }
       responses:
         '200':
-          description: A name-ordered page of active Sales customers.
+          description: A filtered, sorted page of active Sales customers; totals are computed before paging.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CustomerPage' }
@@ -72,22 +96,31 @@ components:
         phone: { type: [string, 'null'], maxLength: 50, example: '+380000000000' }
     CustomerDetail:
       type: object
-      required: [counterpartyId, name, phone, email, defaultPriceTypeId, categoryPriceTypes]
+      required: [counterpartyId, name, phone, email, defaultPriceTypeId, defaultPriceTypeName, categoryPriceTypes]
       properties:
         counterpartyId: { type: string, maxLength: 64, example: '000000000' }
         name: { type: string, maxLength: 300, example: Customer }
         phone: { type: [string, 'null'], maxLength: 50, example: '+380000000000' }
         email: { type: string, maxLength: 320, example: client@example.com }
         defaultPriceTypeId: { type: integer, minimum: 1 }
+        defaultPriceTypeName:
+          type: [string, 'null']
+          description: Name from Catalog PriceType; null if the referenced type is unavailable.
         categoryPriceTypes:
           type: array
           items: { $ref: '#/components/schemas/CustomerCategoryPriceType' }
     CustomerCategoryPriceType:
       type: object
-      required: [categoryId, priceTypeId]
+      required: [categoryId, categoryName, priceTypeId, priceTypeName]
       properties:
         categoryId: { type: integer, minimum: 1 }
+        categoryName:
+          type: [string, 'null']
+          description: Name from Catalog ProductCategory; null if unavailable.
         priceTypeId: { type: integer, minimum: 1 }
+        priceTypeName:
+          type: [string, 'null']
+          description: Name from Catalog PriceType; null if unavailable.
     ValidationErrors:
       type: object
       additionalProperties: true

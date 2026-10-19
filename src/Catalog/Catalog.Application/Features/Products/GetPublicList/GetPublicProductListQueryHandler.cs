@@ -22,6 +22,11 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         var projectionsQuery = catalogDbContext.ProductListProjections
             .AsNoTracking()
             .Where(projection => projection.ExportToSite);
+        var categoryIds = await GetSelectedCategoryTreeIdsAsync(request, cancellationToken);
+        if (categoryIds is not null)
+        {
+            projectionsQuery = projectionsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
+        }
         projectionsQuery = ApplyFilters(projectionsQuery, request, language);
         projectionsQuery = ApplySorting(projectionsQuery, request.Sort, language);
 
@@ -59,6 +64,44 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         return Result.Success(new PagedResult<List<ProductListRowDto>>(pagedInfo, items));
     }
 
+    private async Task<ProductCategoryId[]?> GetSelectedCategoryTreeIdsAsync(
+        GetProductsRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (request.CategoryId is null && string.IsNullOrWhiteSpace(request.CategorySlug))
+        {
+            return null;
+        }
+
+        var categories = await catalogDbContext.Categories
+            .AsNoTracking()
+            .Select(category => new { category.Id, category.ParentId, category.Slug })
+            .ToListAsync(cancellationToken);
+
+        var selected = request.CategoryId is { } categoryId
+            ? categories.FirstOrDefault(category => category.Id.Value == categoryId)
+            : categories.FirstOrDefault(category => category.Slug == request.CategorySlug!.Trim());
+        if (selected is null)
+        {
+            return [];
+        }
+
+        var childrenByParent = categories
+            .Where(category => category.ParentId.HasValue)
+            .ToLookup(category => category.ParentId!.Value, category => category.Id);
+        var selectedIds = new HashSet<ProductCategoryId>();
+        var pending = new Stack<ProductCategoryId>();
+        pending.Push(selected.Id);
+
+        while (pending.TryPop(out var currentId))
+        {
+            if (!selectedIds.Add(currentId)) continue;
+            foreach (var childId in childrenByParent[currentId]) pending.Push(childId);
+        }
+
+        return [.. selectedIds];
+    }
+
     private static IQueryable<ProductListProjection> ApplyFilters(
         IQueryable<ProductListProjection> projectionsQuery,
         GetProductsRequest request,
@@ -79,16 +122,6 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
                     ? projectionsQuery.Where(projection => EF.Functions.ILike(projection.SearchTextRu, pattern, @"\"))
                     : projectionsQuery.Where(projection => EF.Functions.ILike(projection.SearchTextUk, pattern, @"\"));
             }
-        }
-
-        if (request.CategoryId is not null)
-        {
-            var categoryId = ProductCategoryId.From(request.CategoryId.Value);
-            projectionsQuery = projectionsQuery.Where(projection => projection.CategoryId == categoryId);
-        }
-        else if (!string.IsNullOrWhiteSpace(request.CategorySlug))
-        {
-            projectionsQuery = projectionsQuery.Where(projection => projection.CategorySlug == request.CategorySlug.Trim());
         }
 
         if (request.InStock == true)

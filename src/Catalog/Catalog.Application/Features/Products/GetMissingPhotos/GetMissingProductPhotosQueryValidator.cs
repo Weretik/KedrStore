@@ -12,6 +12,12 @@ public sealed class GetMissingProductPhotosQueryValidator : AbstractValidator<Ge
 
         When(query => query.Request is not null, () =>
         {
+            RuleFor(query => query.Request.SearchTerm)
+                .MaximumLength(100);
+
+            RuleFor(query => query.Request.Sort)
+                .IsInEnum();
+
             RuleFor(query => query.Request.Page)
                 .GreaterThanOrEqualTo(1)
                 .WithMessage("Page number must be >= 1.");

@@ -42,4 +42,34 @@ internal sealed class CatalogReferenceDataReader(IReadCatalogDbContext catalogDb
             .Select(item => item.Id.Value)
             .ToHashSetAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyDictionary<int, string>> GetCategoryNamesAsync(
+        IReadOnlyCollection<int> categoryIds,
+        CancellationToken cancellationToken)
+    {
+        if (categoryIds.Count == 0)
+            return new Dictionary<int, string>();
+
+        var requestedIds = categoryIds.Distinct().Select(ProductCategoryId.From).ToArray();
+        return await catalogDbContext.Categories
+            .AsNoTracking()
+            .Where(item => requestedIds.Contains(item.Id))
+            .Select(item => new { Id = item.Id.Value, item.Name })
+            .ToDictionaryAsync(item => item.Id, item => item.Name, cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<int, string>> GetPriceTypeNamesAsync(
+        IReadOnlyCollection<int> priceTypeIds,
+        CancellationToken cancellationToken)
+    {
+        if (priceTypeIds.Count == 0)
+            return new Dictionary<int, string>();
+
+        var requestedIds = priceTypeIds.Distinct().Select(PriceTypeId.From).ToArray();
+        return await catalogDbContext.PriceTypes
+            .AsNoTracking()
+            .Where(item => requestedIds.Contains(item.Id))
+            .Select(item => new { Id = item.Id.Value, Name = item.PriceTypeName })
+            .ToDictionaryAsync(item => item.Id, item => item.Name, cancellationToken);
+    }
 }

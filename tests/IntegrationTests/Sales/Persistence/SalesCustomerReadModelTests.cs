@@ -1,3 +1,4 @@
+using Catalog.Application.Contracts.Persistence;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -72,6 +73,31 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
     }
 
     [SkippableFact]
+    public async Task GetListAsync_FiltersEntireSetBeforeCountingAndPaging()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetDatabaseAsync();
+        var now = new DateTimeOffset(2026, 9, 10, 10, 0, 0, TimeSpan.Zero);
+        await SeedCustomerAsync("match-2", "Alpha Two", now, phone: "+38022");
+        await SeedCustomerAsync("match-1", "Alpha One", now, phone: "+38011");
+        await SeedCustomerAsync("other", "Bravo", now, phone: "+38033");
+        await SeedCustomerAsync("deleted-match", "Alpha Deleted", now, deleted: true, phone: "+38044");
+
+        await using var provider = BuildProvider();
+        await using var scope = provider.CreateAsyncScope();
+        var reader = scope.ServiceProvider.GetRequiredService<ICustomerReadService>();
+
+        var page = await reader.GetListAsync(
+            new CustomerListRequest { SearchTerm = "ALPHA", Phone = "+380", Sort = "-name", Page = 2, PageSize = 1 },
+            CancellationToken.None);
+
+        Assert.True(page.IsSuccess);
+        Assert.Equal(2, page.Value.PagedInfo.TotalRecords);
+        Assert.Equal(2, page.Value.PagedInfo.TotalPages);
+        Assert.Equal(["match-1"], page.Value.Value.Select(customer => customer.CounterpartyId));
+    }
+
+    [SkippableFact]
     public async Task GetByIdAsync_ReturnsActiveCustomerAndOrderedCategoryPriceTypes()
     {
         postgres.SkipIfUnavailable();
@@ -99,6 +125,9 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         Assert.Equal(1, result.Value.DefaultPriceTypeId);
         Assert.Equal([10, 20], result.Value.CategoryPriceTypes.Select(rule => rule.CategoryId));
         Assert.Equal([101, 202], result.Value.CategoryPriceTypes.Select(rule => rule.PriceTypeId));
+        Assert.Equal("Роздрібна", result.Value.DefaultPriceTypeName);
+        Assert.Equal(["Категорія 10", "Категорія 20"], result.Value.CategoryPriceTypes.Select(rule => rule.CategoryName));
+        Assert.Equal(["Тип 101", "Тип 202"], result.Value.CategoryPriceTypes.Select(rule => rule.PriceTypeName));
         Assert.DoesNotContain(typeof(CustomerDetailDto).GetProperties(), property =>
             property.Name is "IdentityUserId" or "IsDeleted" or "CreatedAt" or "UpdatedAt" or "Orders");
         Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.DataBase.SalesDbContext>()
@@ -135,7 +164,27 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSingleton<ICatalogReferenceDataReader, TestCatalogReferenceDataReader>();
         return services.BuildServiceProvider();
+    }
+
+    private sealed class TestCatalogReferenceDataReader : ICatalogReferenceDataReader
+    {
+        public Task<HashSet<int>> GetExistingCategoryIdsAsync(IReadOnlyCollection<int> categoryIds, CancellationToken cancellationToken)
+            => Task.FromResult(categoryIds.ToHashSet());
+
+        public Task<HashSet<int>> GetExistingPriceTypeIdsAsync(IReadOnlyCollection<int> priceTypeIds, CancellationToken cancellationToken)
+            => Task.FromResult(priceTypeIds.ToHashSet());
+
+        public Task<IReadOnlyDictionary<int, string>> GetCategoryNamesAsync(
+            IReadOnlyCollection<int> categoryIds, CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyDictionary<int, string>>(
+                categoryIds.ToDictionary(id => id, id => $"Категорія {id}"));
+
+        public Task<IReadOnlyDictionary<int, string>> GetPriceTypeNamesAsync(
+            IReadOnlyCollection<int> priceTypeIds, CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyDictionary<int, string>>(
+                priceTypeIds.ToDictionary(id => id, id => id == 1 ? "Роздрібна" : $"Тип {id}"));
     }
 
     private async Task ResetDatabaseAsync()

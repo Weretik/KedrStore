@@ -1,5 +1,7 @@
 using Catalog.Application.Features.Products.GetMissingPhotos;
 using Catalog.Contracts.Products.GetMissingPhotos;
+using Catalog.Contracts.Products.GetList;
+using Catalog.Application.Features.Products.GetAdminDetail;
 
 namespace UnitTests.Catalog.Application;
 
@@ -31,5 +33,31 @@ public sealed class GetMissingProductPhotosTests
 
         Assert.True(first.IsValid);
         Assert.True(maximum.IsValid);
+    }
+
+    [Fact]
+    public void Validator_RejectsOversizedSearchAndUnknownSort()
+    {
+        var validator = new GetMissingProductPhotosQueryValidator();
+        var result = validator.Validate(new GetMissingProductPhotosQuery(
+            new GetMissingProductPhotosRequest
+            {
+                SearchTerm = new string('a', 101),
+                Sort = (ProductSort)999
+            }));
+
+        Assert.False(result.IsValid);
+        Assert.Equal(2, result.Errors.Count);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void DetailValidator_RejectsEmptySlug(string slug)
+    {
+        var result = new GetAdminProductBySlugQueryValidator()
+            .Validate(new GetAdminProductBySlugQuery(slug));
+
+        Assert.False(result.IsValid);
     }
 }

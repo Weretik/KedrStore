@@ -97,14 +97,17 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
             productsQuery = productsQuery.Where(projection => projection.CategorySlug == request.CategorySlug.Trim());
         }
 
-        if (request.InStock == true)
-            productsQuery = productsQuery.Where(projection => projection.InStock);
+        if (request.InStock.HasValue)
+            productsQuery = productsQuery.Where(projection => projection.InStock == request.InStock.Value);
 
         if (request.IsSale.HasValue)
             productsQuery = productsQuery.Where(projection => projection.IsSale == request.IsSale.Value);
 
         if (request.IsNew.HasValue)
             productsQuery = productsQuery.Where(projection => projection.IsNew == request.IsNew.Value);
+
+        if (request.ExportToSite.HasValue)
+            productsQuery = productsQuery.Where(projection => projection.ExportToSite == request.ExportToSite.Value);
 
         if (request.PriceFrom is not null)
             productsQuery = productsQuery.Where(projection => projection.RetailPrice != null && projection.RetailPrice >= request.PriceFrom.Value);
@@ -141,10 +144,10 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
         return sort switch
         {
             ProductSort.IdDesc => productsQuery.OrderByDescending(projection => projection.ProductId),
-            ProductSort.NameAsc => productsQuery.OrderBy(projection => projection.NameUk).ThenBy(projection => projection.NameRu),
-            ProductSort.NameDesc => productsQuery.OrderByDescending(projection => projection.NameUk).ThenByDescending(projection => projection.NameRu),
-            ProductSort.PriceAsc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenBy(projection => projection.RetailPrice),
-            ProductSort.PriceDesc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenByDescending(projection => projection.RetailPrice),
+            ProductSort.NameAsc => productsQuery.OrderBy(projection => projection.NameUk).ThenBy(projection => projection.NameRu).ThenBy(projection => projection.ProductId),
+            ProductSort.NameDesc => productsQuery.OrderByDescending(projection => projection.NameUk).ThenByDescending(projection => projection.NameRu).ThenBy(projection => projection.ProductId),
+            ProductSort.PriceAsc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenBy(projection => projection.RetailPrice).ThenBy(projection => projection.ProductId),
+            ProductSort.PriceDesc => productsQuery.OrderBy(projection => projection.RetailPrice.HasValue ? 0 : 1).ThenByDescending(projection => projection.RetailPrice).ThenBy(projection => projection.ProductId),
             _ => productsQuery.OrderBy(projection => projection.ProductId)
         };
     }

@@ -6,4 +6,5 @@ public sealed record CustomerDetailDto(
     string? Phone,
     string Email,
     int DefaultPriceTypeId,
-    IReadOnlyList<CustomerCategoryPriceTypeDto> CategoryPriceTypes);
+    IReadOnlyList<CustomerCategoryPriceTypeDto> CategoryPriceTypes,
+    string? DefaultPriceTypeName = null);

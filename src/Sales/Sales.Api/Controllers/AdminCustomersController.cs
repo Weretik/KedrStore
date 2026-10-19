@@ -22,7 +22,12 @@ public sealed class AdminCustomersController(ISender sender) : ControllerBase
             new GetCustomerListQuery(new CustomerListRequest
             {
                 Page = request.Page,
-                PageSize = request.PageSize
+                PageSize = request.PageSize,
+                SearchTerm = request.SearchTerm,
+                CounterpartyId = request.CounterpartyId,
+                Name = request.Name,
+                Phone = request.Phone,
+                Sort = request.Sort
             }),
             cancellationToken);
 
@@ -56,6 +61,8 @@ public sealed class AdminCustomersController(ISender sender) : ControllerBase
             result.Email,
             result.DefaultPriceTypeId,
             result.CategoryPriceTypes
-                .Select(rule => new GetAdminCustomerCategoryPriceTypeResponse(rule.CategoryId, rule.PriceTypeId))
-                .ToList());
+                .Select(rule => new GetAdminCustomerCategoryPriceTypeResponse(
+                    rule.CategoryId, rule.PriceTypeId, rule.CategoryName, rule.PriceTypeName))
+                .ToList(),
+            result.DefaultPriceTypeName);
 }
