@@ -229,6 +229,79 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
+            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderDraft", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CounterpartyId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UpdatedAtUtc", "Id");
+
+                    b.HasIndex("CounterpartyId", "UpdatedAtUtc", "Id");
+
+                    b.ToTable("OrderDrafts", (string)null);
+                });
+
+            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderDraftLine", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("DraftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DraftId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("OrderDraftLines", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_OrderDraftLines_Quantity", "\"Quantity\" > 0");
+                        });
+                });
+
             modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderLine", b =>
                 {
                     b.Property<long>("Id")
@@ -262,6 +335,40 @@ namespace Sales.Infrastructure.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderLines", (string)null);
+                });
+
+            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderDraftIdempotencyRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("DraftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("RequestHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DraftId");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
+                    b.ToTable("OrderDraftIdempotencyRecords", (string)null);
                 });
 
             modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderIdempotencyRecord", b =>
@@ -384,11 +491,38 @@ namespace Sales.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderDraft", b =>
+                {
+                    b.HasOne("Sales.Domain.Customers.Entities.Counterparty", null)
+                        .WithMany()
+                        .HasForeignKey("CounterpartyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderDraftLine", b =>
+                {
+                    b.HasOne("Sales.Domain.Orders.Entities.OrderDraft", null)
+                        .WithMany("Lines")
+                        .HasForeignKey("DraftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderLine", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.Entities.Order", null)
                         .WithMany("Lines")
                         .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderDraftIdempotencyRecord", b =>
+                {
+                    b.HasOne("Sales.Domain.Orders.Entities.OrderDraft", null)
+                        .WithMany()
+                        .HasForeignKey("DraftId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -412,6 +546,11 @@ namespace Sales.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.Entities.Order", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderDraft", b =>
                 {
                     b.Navigation("Lines");
                 });

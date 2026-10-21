@@ -1,0 +1,186 @@
+openapi: 3.1.0
+info:
+  title: Sales Admin order drafts API
+  version: 0.1.0
+  description: Implemented isolated React Admin draft API, included in aggregate openapi.yaml.
+servers:
+  - url: /
+paths:
+  /api/admin/order-workspace/drafts:
+    get:
+      operationId: getAdminOrderDrafts
+      summary: Search saved drafts
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [updatedAt, '-updatedAt', title, '-title', customerName, '-customerName'], default: '-updatedAt' }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: Filtered page; totalRecords is computed before paging.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DraftPage' }
+        '400': { description: Invalid query. }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+    post:
+      operationId: createAdminOrderDraft
+      summary: Save a reusable draft
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DraftInput' }
+      responses:
+        '201':
+          description: Draft created without order number or 1C sync.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DraftDetail' }
+        '200':
+          description: Idempotent replay of the same create.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DraftDetail' }
+        '400': { description: "Invalid draft, customer, product or price." }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Selected customer or product does not exist. }
+        '409': { description: Idempotency key reused with different body. }
+  /api/admin/order-workspace/drafts/{draftId}:
+    parameters:
+      - name: draftId
+        in: path
+        required: true
+        schema: { type: integer, format: int64, minimum: 1 }
+    get:
+      operationId: getAdminOrderDraftById
+      summary: Read one draft with current pricing availability
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Saved lines and version remain available even if current pricing is unavailable.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DraftDetail' }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Draft not found. }
+    put:
+      operationId: updateAdminOrderDraft
+      summary: Replace editable draft fields
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: If-Match
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DraftInput' }
+      responses:
+        '200':
+          description: Updated draft with a new version.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DraftDetail' }
+        '400': { description: "Invalid draft, customer, product or price." }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Draft not found. }
+        '409': { description: Draft changed since supplied version. }
+    delete:
+      operationId: deleteAdminOrderDraft
+      summary: Delete one draft and its lines
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: If-Match
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '204': { description: Draft deleted. }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Draft not found. }
+        '409': { description: Draft changed since supplied version. }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+  schemas:
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer, minimum: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100 }
+        totalPages: { type: integer, minimum: 0 }
+        totalRecords: { type: integer, minimum: 0 }
+    DraftPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/DraftListItem' } }
+    DraftListItem:
+      type: object
+      required: [draftId, title, counterpartyId, counterpartyName, updatedAtUtc, lineCount]
+      properties:
+        draftId: { type: integer, format: int64, minimum: 1 }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        counterpartyId: { type: string, maxLength: 64 }
+        counterpartyName: { type: string, maxLength: 300 }
+        updatedAtUtc: { type: string, format: date-time }
+        lineCount: { type: integer, minimum: 1 }
+    DraftInput:
+      type: object
+      required: [title, counterpartyId, lines]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        note: { type: [string, 'null'], maxLength: 2000 }
+        counterpartyId: { type: string, minLength: 1, maxLength: 64 }
+        lines: { type: array, minItems: 1, maxItems: 100, items: { $ref: '#/components/schemas/DraftInputLine' } }
+    DraftInputLine:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: string, minLength: 1, maxLength: 64 }
+        quantity: { type: integer, minimum: 1 }
+    DraftDetail:
+      type: object
+      required: [draftId, version, title, counterpartyId, counterpartyName, createdAtUtc, updatedAtUtc, lines, totalAmount, pricingStatus]
+      properties:
+        draftId: { type: integer, format: int64, minimum: 1 }
+        version: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        note: { type: [string, 'null'], maxLength: 2000 }
+        counterpartyId: { type: string, maxLength: 64 }
+        counterpartyName: { type: string, maxLength: 300 }
+        createdAtUtc: { type: string, format: date-time }
+        updatedAtUtc: { type: string, format: date-time }
+        lines: { type: array, minItems: 1, items: { $ref: '#/components/schemas/DraftQuotedLine' } }
+        totalAmount: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }
+        pricingStatus: { type: string, enum: [Available, Unavailable] }
+        pricingErrorCode: { type: [string, 'null'], description: Safe reason when current pricing is unavailable. }
+    DraftQuotedLine:
+      type: object
+      required: [productId, productName, quantity, unitPrice, lineAmount]
+      properties:
+        productId: { type: string, maxLength: 64 }
+        productName: { type: [string, 'null'], maxLength: 512 }
+        quantity: { type: integer, minimum: 1 }
+        unitPrice: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }
+        lineAmount: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }

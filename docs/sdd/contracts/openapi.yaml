@@ -44,6 +44,16 @@ paths:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync-status
   /api/admin/orders/{orderId}/sync/retry:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync~1retry
+  /api/admin/order-workspace/orders:
+    $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1orders
+  /api/admin/order-workspace/orders/{orderId}:
+    $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1orders~1{orderId}
+  /api/admin/order-workspace/quote:
+    $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1quote
+  /api/admin/order-workspace/drafts:
+    $ref: ./sales/admin-order-drafts.openapi.yaml#/paths/~1api~1admin~1order-workspace~1drafts
+  /api/admin/order-workspace/drafts/{draftId}:
+    $ref: ./sales/admin-order-drafts.openapi.yaml#/paths/~1api~1admin~1order-workspace~1drafts~1{draftId}
   /api/admin/customers:
     $ref: ./sales/customer-read.openapi.yaml#/paths/~1api~1admin~1customers
   /api/admin/customers/{counterpartyId}:

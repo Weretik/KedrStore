@@ -30,6 +30,8 @@ public static class SalesInfrastructureExtensions
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();
+        services.AddScoped<AdminWorkspacePricing>();
+        services.AddScoped<IAdminOrderWorkspaceService, AdminOrderWorkspaceService>();
         services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
         services.AddScoped<IOrderReadService, OrderReadService>();
         services.AddScoped<ICustomerReadService, CustomerReadService>();

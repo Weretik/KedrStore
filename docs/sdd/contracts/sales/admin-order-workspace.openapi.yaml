@@ -1,0 +1,210 @@
+openapi: 3.1.0
+info:
+  title: Sales Admin order workspace API
+  version: 0.1.0
+  description: Implemented isolated React Admin order workspace API, included in aggregate openapi.yaml.
+servers:
+  - url: /
+paths:
+  /api/admin/order-workspace/orders:
+    get:
+      operationId: getAdminWorkspaceOrders
+      summary: Search persisted Admin orders
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [createdAt, '-createdAt', orderNumber, '-orderNumber', customerName, '-customerName', totalAmount, '-totalAmount'], default: '-createdAt' }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: Filtered page; totalRecords is computed before paging.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderPage' }
+        '400': { description: Invalid query. }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+    post:
+      operationId: createAdminWorkspaceOrder
+      summary: Create one priced order and pending 1C sync
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateOrderRequest' }
+      responses:
+        '201':
+          description: Order created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateOrderResponse' }
+        '200':
+          description: Idempotent replay of the same request.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateOrderResponse' }
+        '400': { description: "Invalid lines, customer, price or request." }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Selected customer or product does not exist. }
+        '409':
+          description: Quote changed or idempotency key reused with different request.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderConflict' }
+  /api/admin/order-workspace/orders/{orderId}:
+    get:
+      operationId: getAdminWorkspaceOrderById
+      summary: Read a persisted Admin order
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: Stored order snapshot.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderDetail' }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Order not found. }
+  /api/admin/order-workspace/quote:
+    post:
+      operationId: quoteAdminWorkspaceOrder
+      summary: Price a selected customer's lines without persisting an order
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuoteRequest' }
+      responses:
+        '200':
+          description: Current server-calculated quote.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quote' }
+        '400': { description: Invalid lines or unavailable price. }
+        '401': { description: Authentication required. }
+        '403': { description: CanManageOrders policy denied. }
+        '404': { description: Selected customer or product does not exist. }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+  schemas:
+    Money: { type: number, multipleOf: 0.01, minimum: 0 }
+    PagedInfo:
+      type: object
+      required: [pageNumber, pageSize, totalPages, totalRecords]
+      properties:
+        pageNumber: { type: integer, minimum: 1 }
+        pageSize: { type: integer, minimum: 1, maximum: 100 }
+        totalPages: { type: integer, minimum: 0 }
+        totalRecords: { type: integer, minimum: 0 }
+    OrderPage:
+      type: object
+      required: [pagedInfo, value]
+      properties:
+        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
+        value: { type: array, items: { $ref: '#/components/schemas/OrderListItem' } }
+    OrderListItem:
+      type: object
+      required: [orderId, orderNumber, counterpartyId, counterpartyName, createdAtUtc, lineCount, totalAmount, syncStatus]
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1 }
+        orderNumber: { type: string, maxLength: 64 }
+        counterpartyId: { type: string, maxLength: 64 }
+        counterpartyName: { type: string, maxLength: 300 }
+        createdAtUtc: { type: string, format: date-time }
+        lineCount: { type: integer, minimum: 1 }
+        totalAmount: { $ref: '#/components/schemas/Money' }
+        syncStatus: { type: string }
+    OrderDetail:
+      type: object
+      required: [orderId, orderNumber, counterpartyId, counterpartyName, createdAtUtc, lines, totalAmount, syncStatus]
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1 }
+        orderNumber: { type: string, maxLength: 64 }
+        counterpartyId: { type: string, maxLength: 64 }
+        counterpartyName: { type: string, maxLength: 300 }
+        createdAtUtc: { type: string, format: date-time }
+        comment: { type: [string, 'null'], maxLength: 1000 }
+        lines: { type: array, minItems: 1, items: { $ref: '#/components/schemas/StoredLine' } }
+        totalAmount: { $ref: '#/components/schemas/Money' }
+        syncStatus: { type: string }
+        oneCDocumentNumber: { type: [string, 'null'] }
+    StoredLine:
+      type: object
+      required: [productId, productName, quantity, amount]
+      properties:
+        productId: { type: string, maxLength: 64 }
+        productName: { type: string, maxLength: 512 }
+        quantity: { type: integer, minimum: 1 }
+        amount: { $ref: '#/components/schemas/Money' }
+    InputLine:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: string, minLength: 1, maxLength: 64 }
+        quantity: { type: integer, minimum: 1 }
+    QuoteRequest:
+      type: object
+      required: [counterpartyId, lines]
+      properties:
+        counterpartyId: { type: string, minLength: 1, maxLength: 64 }
+        lines: { type: array, minItems: 1, maxItems: 100, items: { $ref: '#/components/schemas/InputLine' } }
+    QuoteLine:
+      type: object
+      required: [productId, productName, quantity, unitPrice, lineAmount]
+      properties:
+        productId: { type: string, maxLength: 64 }
+        productName: { type: string, maxLength: 512 }
+        quantity: { type: integer, minimum: 1 }
+        unitPrice: { $ref: '#/components/schemas/Money' }
+        lineAmount: { $ref: '#/components/schemas/Money' }
+    Quote:
+      type: object
+      required: [counterpartyId, lines, totalAmount, quoteFingerprint]
+      properties:
+        counterpartyId: { type: string, maxLength: 64 }
+        lines: { type: array, minItems: 1, items: { $ref: '#/components/schemas/QuoteLine' } }
+        totalAmount: { $ref: '#/components/schemas/Money' }
+        quoteFingerprint: { type: string, minLength: 1 }
+    CreateOrderRequest:
+      allOf:
+        - { $ref: '#/components/schemas/QuoteRequest' }
+        - type: object
+          required: [quoteFingerprint]
+          properties:
+            quoteFingerprint: { type: string, minLength: 1 }
+            comment: { type: [string, 'null'], maxLength: 1000 }
+    CreateOrderResponse:
+      type: object
+      required: [orderId, orderNumber, totalAmount, syncStatus]
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1 }
+        orderNumber: { type: string, maxLength: 64 }
+        totalAmount: { $ref: '#/components/schemas/Money' }
+        syncStatus: { type: string, enum: [Pending] }
+    OrderConflict:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, enum: [quote_changed, idempotency_conflict] }
+        quote:
+          oneOf:
+            - { $ref: '#/components/schemas/Quote' }
+            - { type: 'null' }
