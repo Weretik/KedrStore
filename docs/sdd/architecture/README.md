@@ -10,6 +10,7 @@ KedrStore — модульний backend на ASP.NET Core і .NET 10. Пото�
 - [Структура проєкту](overview/project-structure.md) — дерево solution і шари.
 - [Межі шарів](overview/layers.md) — відповідальність і заборонені залежності.
 - [Карта модулів](overview/modules.md) — відповідальність Catalog, Sales, Identity та BuildingBlocks.
+- [Карта бази даних](data-model/README.md) — дерево таблиць за фічами та окремі описи PK/FK.
 - [Продуктовий словник](../../product/glossary.md) — терміни каталогу, дверей, фурнітури й Cosmos.
 
 ### Розміщення коду за шарами
