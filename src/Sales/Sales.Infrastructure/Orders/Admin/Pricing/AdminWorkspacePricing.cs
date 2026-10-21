@@ -7,7 +7,7 @@ using Sales.Application.Contracts.Orders;
 
 namespace Sales.Infrastructure.Orders;
 
-internal sealed class AdminWorkspacePricing(SalesDbContext salesDb, IReadCatalogDbContext catalogDb)
+internal sealed class AdminWorkspacePricing(SalesDbContext salesDb, IReadCatalogDbContext catalogDb) : IWorkspacePricing
 {
     internal static void ValidateRequest(WorkspaceQuoteRequest? request)
     {

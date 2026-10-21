@@ -1,12 +1,21 @@
 using Identity.Application.Security.Policies;
 using Sales.Application.Contracts.Orders;
+using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
+using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;
+using Sales.Application.Features.Orders.AdminWorkspace.Orders.Quote;
+using Sales.Application.Features.Orders.AdminWorkspace.Orders.Create;
+using Sales.Application.Features.Orders.AdminWorkspace.Drafts.GetList;
+using Sales.Application.Features.Orders.AdminWorkspace.Drafts.GetById;
+using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Create;
+using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Update;
+using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Delete;
 
 namespace Sales.Api.Controllers;
 
 [ApiController]
 [Authorize(Policy = PolicyNames.CanManageOrders)]
 [Route("api/admin/order-workspace")]
-public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService service) : ControllerBase
+public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBase
 {
     [HttpGet("orders", Name = "getAdminWorkspaceOrders")]
     public async Task<ActionResult> GetOrders(
@@ -14,21 +23,21 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
         [FromQuery] string sort = "-createdAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try { return Ok(await service.GetOrdersAsync(searchTerm, counterpartyId, sort, page, pageSize, cancellationToken)); }
+        try { return Ok((await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId, sort, page, pageSize), cancellationToken)).Value); }
         catch (WorkspaceException error) { return Error(error); }
     }
 
     [HttpGet("orders/{orderId:long}", Name = "getAdminWorkspaceOrderById")]
     public async Task<ActionResult> GetOrder(long orderId, CancellationToken cancellationToken)
     {
-        var order = await service.GetOrderAsync(orderId, cancellationToken);
-        return order is null ? NotFound() : Ok(order);
+        var result = await sender.Send(new GetWorkspaceOrderQuery(orderId), cancellationToken);
+        return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
     }
 
     [HttpPost("quote", Name = "quoteAdminWorkspaceOrder")]
     public async Task<ActionResult> Quote([FromBody] WorkspaceQuoteRequest request, CancellationToken cancellationToken)
     {
-        try { return Ok(await service.QuoteAsync(request, cancellationToken)); }
+        try { return Ok((await sender.Send(new QuoteWorkspaceOrderQuery(request), cancellationToken)).Value); }
         catch (WorkspaceException error) { return Error(error); }
     }
 
@@ -40,7 +49,7 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
     {
         try
         {
-            var result = await service.CreateOrderAsync(request, idempotencyKey, cancellationToken);
+            var result = (await sender.Send(new CreateWorkspaceOrderCommand(request, idempotencyKey), cancellationToken)).Value;
             if (result.Conflict is not null) return Conflict(result.Conflict);
             return result.Replay ? Ok(result.Order) : StatusCode(201, result.Order);
         }
@@ -53,7 +62,7 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
         [FromQuery] string sort = "-updatedAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try { return Ok(await service.GetDraftsAsync(searchTerm, counterpartyId, sort, page, pageSize, cancellationToken)); }
+        try { return Ok((await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId, sort, page, pageSize), cancellationToken)).Value); }
         catch (WorkspaceException error) { return Error(error); }
     }
 
@@ -62,8 +71,8 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
     {
         try
         {
-            var draft = await service.GetDraftAsync(draftId, cancellationToken);
-            return draft is null ? NotFound() : Ok(draft);
+            var result = await sender.Send(new GetWorkspaceDraftQuery(draftId), cancellationToken);
+            return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
         }
         catch (WorkspaceException error) { return Error(error); }
     }
@@ -76,7 +85,7 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
     {
         try
         {
-            var result = await service.CreateDraftAsync(request, idempotencyKey, cancellationToken);
+            var result = (await sender.Send(new CreateWorkspaceDraftCommand(request, idempotencyKey), cancellationToken)).Value;
             return result.Replay ? Ok(result.Draft) : StatusCode(201, result.Draft);
         }
         catch (WorkspaceException error) { return Error(error); }
@@ -89,8 +98,8 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
     {
         try
         {
-            var draft = await service.UpdateDraftAsync(draftId, version, request, cancellationToken);
-            return draft is null ? NotFound() : Ok(draft);
+            var result = await sender.Send(new UpdateWorkspaceDraftCommand(draftId, version, request), cancellationToken);
+            return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
         }
         catch (WorkspaceException error) { return Error(error); }
     }
@@ -99,7 +108,7 @@ public sealed class AdminOrderWorkspaceController(IAdminOrderWorkspaceService se
     public async Task<ActionResult> DeleteDraft(
         long draftId, [FromHeader(Name = "If-Match")] string version, CancellationToken cancellationToken)
     {
-        try { return await service.DeleteDraftAsync(draftId, version, cancellationToken) ? NoContent() : NotFound(); }
+        try { return (await sender.Send(new DeleteWorkspaceDraftCommand(draftId, version), cancellationToken)).Value ? NoContent() : NotFound(); }
         catch (WorkspaceException error) { return Error(error); }
     }
 

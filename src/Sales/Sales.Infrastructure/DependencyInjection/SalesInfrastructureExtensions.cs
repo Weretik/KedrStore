@@ -31,7 +31,12 @@ public static class SalesInfrastructureExtensions
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();
         services.AddScoped<AdminWorkspacePricing>();
-        services.AddScoped<IAdminOrderWorkspaceService, AdminOrderWorkspaceService>();
+        services.AddScoped<IWorkspacePricing>(sp => sp.GetRequiredService<AdminWorkspacePricing>());
+        services.AddScoped<IWorkspaceOrderReader, WorkspaceOrderReader>();
+        services.AddScoped<IWorkspaceOrderCreator, WorkspaceOrderCreator>();
+        services.AddScoped<WorkspaceDraftDetails>();
+        services.AddScoped<IWorkspaceDraftReader, WorkspaceDraftReader>();
+        services.AddScoped<IWorkspaceDraftWriter, WorkspaceDraftWriter>();
         services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
         services.AddScoped<IOrderReadService, OrderReadService>();
         services.AddScoped<ICustomerReadService, CustomerReadService>();

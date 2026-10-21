@@ -1,6 +1,6 @@
-# Планований API-контракт чернеток
+# API-контракт чернеток
 
-**Статус:** операції реалізовано в робочому дереві. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-drafts.openapi.yaml) включено до агрегованого `docs/sdd/contracts/openapi.yaml`. Усі маршрути — нові, окремі від `/api/admin/orders`.
+**Статус:** операції реалізовано в коміті `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-drafts.openapi.yaml) включено до агрегованого `docs/sdd/contracts/openapi.yaml`. Усі маршрути — нові, окремі від `/api/admin/orders`.
 
 | operationId | Method/path | Поведінка |
 | --- | --- | --- |
