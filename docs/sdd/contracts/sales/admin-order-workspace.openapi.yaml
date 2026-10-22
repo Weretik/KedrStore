@@ -10,10 +10,12 @@ paths:
     get:
       operationId: getAdminWorkspaceOrders
       summary: Search persisted Admin orders
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
         - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
+        - { name: createdFrom, in: query, description: Inclusive calendar date in Europe/Kyiv., schema: { type: string, format: date } }
+        - { name: createdTo, in: query, description: Inclusive calendar date in Europe/Kyiv., schema: { type: string, format: date } }
         - name: sort
           in: query
           schema: { type: string, enum: [createdAt, '-createdAt', orderNumber, '-orderNumber', customerName, '-customerName', totalAmount, '-totalAmount'], default: '-createdAt' }
@@ -26,12 +28,10 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrderPage' }
         '400': { description: Invalid query. }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
     post:
       operationId: createAdminWorkspaceOrder
       summary: Create one priced order and pending 1C sync
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - name: Idempotency-Key
           in: header
@@ -54,8 +54,6 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/CreateOrderResponse' }
         '400': { description: "Invalid lines, customer, price or request." }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Selected customer or product does not exist. }
         '409':
           description: Quote changed or idempotency key reused with different request.
@@ -66,7 +64,7 @@ paths:
     get:
       operationId: getAdminWorkspaceOrderById
       summary: Read a persisted Admin order
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - name: orderId
           in: path
@@ -78,14 +76,12 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrderDetail' }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Order not found. }
   /api/admin/order-workspace/quote:
     post:
       operationId: quoteAdminWorkspaceOrder
       summary: Price a selected customer's lines without persisting an order
-      security: [{ bearerAuth: [] }]
+      security: []
       requestBody:
         required: true
         content:
@@ -97,13 +93,18 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Quote' }
-        '400': { description: Invalid lines or unavailable price. }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
+        '400':
+          description: Invalid lines, insufficient product stock or unavailable UAH price.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message]
+                properties:
+                  code: { type: string, example: unavailable_product }
+                  message: { type: string, example: Недостатньо товару на складі. }
         '404': { description: Selected customer or product does not exist. }
 components:
-  securitySchemes:
-    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
   schemas:
     Money: { type: number, multipleOf: 0.01, minimum: 0 }
     PagedInfo:

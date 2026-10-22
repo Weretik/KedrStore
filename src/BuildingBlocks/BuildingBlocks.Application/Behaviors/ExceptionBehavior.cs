@@ -25,6 +25,10 @@ public sealed class ExceptionBehavior<TMessage, TResponse>(
 
             throw;
         }
+        catch (Exception ex) when (ex is IExpectedApplicationException)
+        {
+            throw;
+        }
         catch (Exception ex) when (IsCritical(ex))
         {
             var messageType = typeof(TMessage).Name;

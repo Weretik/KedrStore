@@ -14,6 +14,7 @@
 - [Трасування й готовність](traceability.md)
 - [Спільний аудит відповідальностей 004/005](../004-admin-order-workspace/code-audit/audit.md)
 - [Структурне виправлення](../006-admin-workspace-structure-remediation/README.md)
+- [Зміна 2026-10-22: діапазон дати створення](date-filter-2026-10-22.md) — заплановано, код і OpenAPI ще не змінено
 
 Пов’язаний окремий інкремент оформлення: [004](../004-admin-order-workspace/README.md).
 

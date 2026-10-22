@@ -52,6 +52,7 @@ public static class SalesInfrastructureExtensions
         services.AddScoped<ISalesOneCWriteClient, SalesOneCWriteClient>();
         services.AddScoped<CounterpartyContactNormalizer>();
         services.AddScoped<OneCCounterpartiesSyncService>();
+        services.AddScoped<StaleCounterpartyRemoval>();
         services.AddScoped<OneCCounterpartyCategoryPriceTypesSyncService>();
         services.AddScoped<SyncOneCCounterpartiesJob>();
         services.AddScoped<SyncOneCCounterpartyCategoryPriceTypesJob>();

@@ -473,6 +473,40 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderSyncRetryAudits", (string)null);
                 });
 
+            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.PendingCounterpartyIdentityDeletion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CounterpartyId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("IdentityUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityUserId");
+
+                    b.HasIndex("CounterpartyId", "IdentityUserId")
+                        .IsUnique();
+
+                    b.ToTable("PendingCounterpartyIdentityDeletions", (string)null);
+                });
+
             modelBuilder.Entity("Sales.Domain.Orders.Entities.OneCOrderSync", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.Entities.Order", null)

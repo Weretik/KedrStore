@@ -6,7 +6,9 @@ namespace Sales.Infrastructure.Orders;
 internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderReader
 {
     public async Task<WorkspacePage<WorkspaceOrderListItem>> GetOrdersAsync(
-        string? searchTerm, string? counterpartyId, string sort, int page, int pageSize, CancellationToken ct)
+        string? searchTerm, string? counterpartyId,
+        DateTimeOffset? createdFromUtc, DateTimeOffset? createdToUtcExclusive,
+        string sort, int page, int pageSize, CancellationToken ct)
     {
         ValidatePage(searchTerm, counterpartyId, page, pageSize);
         var query =
@@ -15,6 +17,10 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             join sync in db.OneCOrderSyncs.AsNoTracking() on order.Id equals sync.OrderId
             where counterpartyId == null || order.CounterpartyId == counterpartyId
             select new { order, customer, sync };
+        if (createdFromUtc is { } fromUtc)
+            query = query.Where(x => x.order.CreatedAt >= fromUtc);
+        if (createdToUtcExclusive is { } toUtc)
+            query = query.Where(x => x.order.CreatedAt < toUtc);
         foreach (var term in Terms(searchTerm))
         {
             var pattern = "%" + EscapeLike(term) + "%";

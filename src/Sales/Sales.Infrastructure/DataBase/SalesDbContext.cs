@@ -14,6 +14,8 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     internal DbSet<OrderIdempotencyRecord> OrderIdempotencyRecords => Set<OrderIdempotencyRecord>();
     internal DbSet<OrderSyncRetryAudit> OrderSyncRetryAudits => Set<OrderSyncRetryAudit>();
     internal DbSet<OrderDraftIdempotencyRecord> OrderDraftIdempotencyRecords => Set<OrderDraftIdempotencyRecord>();
+    internal DbSet<PendingCounterpartyIdentityDeletion> PendingCounterpartyIdentityDeletions =>
+        Set<PendingCounterpartyIdentityDeletion>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

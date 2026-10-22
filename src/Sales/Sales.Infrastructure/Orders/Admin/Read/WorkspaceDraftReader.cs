@@ -6,7 +6,9 @@ namespace Sales.Infrastructure.Orders;
 internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDetails details) : IWorkspaceDraftReader
 {
     public async Task<WorkspacePage<WorkspaceDraftListItem>> GetDraftsAsync(
-        string? searchTerm, string? counterpartyId, string sort, int page, int pageSize, CancellationToken ct)
+        string? searchTerm, string? counterpartyId,
+        DateTimeOffset? createdFromUtc, DateTimeOffset? createdToUtcExclusive,
+        string sort, int page, int pageSize, CancellationToken ct)
     {
         ValidatePage(searchTerm, counterpartyId, page, pageSize);
         var query =
@@ -15,6 +17,10 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
                 on draft.CounterpartyId equals customer.Id
             where counterpartyId == null || draft.CounterpartyId == counterpartyId
             select new { draft, customer };
+        if (createdFromUtc is { } fromUtc)
+            query = query.Where(x => x.draft.CreatedAtUtc >= fromUtc);
+        if (createdToUtcExclusive is { } toUtc)
+            query = query.Where(x => x.draft.CreatedAtUtc < toUtc);
         foreach (var term in Terms(searchTerm))
         {
             var pattern = "%" + EscapeLike(term) + "%";

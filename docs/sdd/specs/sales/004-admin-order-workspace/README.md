@@ -14,6 +14,7 @@
 - [Трасування й готовність](traceability.md)
 - [Аудит відповідальностей коду](code-audit/audit.md)
 - [Структурне виправлення](../006-admin-workspace-structure-remediation/README.md)
+- [Зміна 2026-10-22: діапазон дат замовлень](date-filter-2026-10-22.md) — заплановано, код і OpenAPI ще не змінено
 
 Модель чернеток визначає [005](../005-admin-order-drafts/README.md). Фактичний стан нинішніх замовлень описано в [Sales feature](../../../features/sales/admin-orders.md).
 

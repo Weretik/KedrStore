@@ -2,7 +2,7 @@
 
 **Модуль:** Sales. **Споживач:** React Admin. **Стан:** код і контракт у репозиторії; міграцію не застосовано до робочої БД.
 
-[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) відкриває окремі маршрути `/api/admin/order-workspace` під політикою `CanManageOrders` і передає кожну операцію окремому Application handler. Наявний `/api/admin/orders` залишається окремим контрактом. [Читач замовлень](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) виконує пошук, сортування й сторінковий перегляд; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) бере політику вибраного клієнта та ціни Catalog. Під час оформлення [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) повторно розраховує суму, порівнює fingerprint і через чинний OrderCreationStore атомарно записує Order та Pending 1C sync.
+[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) відкриває окремі анонімні маршрути `/api/admin/order-workspace` і передає кожну операцію окремому Application handler. Наявний `/api/admin/orders` залишається окремим контрактом. [Читач замовлень](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) виконує пошук, сортування й сторінковий перегляд; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) бере політику вибраного клієнта, актуальний залишок та ціни Catalog. Недостатній залишок повертає очікуваний 400 `unavailable_product` із назвою й кількостями товару. Під час оформлення [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) повторно розраховує суму, порівнює fingerprint і через чинний OrderCreationStore атомарно записує Order та Pending 1C sync.
 
 Чернетки реалізовано окремою [моделлю](../../../../src/Sales/Sales.Domain/Orders/Entities/OrderDraft.cs), [читачем](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs) і [адаптером запису](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Drafts/WorkspaceDraftWriter.cs). Вони не отримують номера Order і не передаються в 1C. Відповідь деталі містить актуальний серверний розрахунок або `pricingStatus=Unavailable` зі збереженими позиціями та `null` замість недоступних цін; PUT/DELETE використовують `If-Match`. Оформлення на основі чернетки не змінює її.
 
@@ -29,7 +29,7 @@ flowchart LR
 
 ```text
 src/Sales/
-├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs           # захищений HTTP-вхід
+├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs           # анонімний HTTP-вхід, відомі помилки → статус/code/message
 ├── Sales.Application/
 │   ├── Contracts/Orders/
 │   │   ├── WorkspaceOrderContracts.cs                         # DTO замовлень

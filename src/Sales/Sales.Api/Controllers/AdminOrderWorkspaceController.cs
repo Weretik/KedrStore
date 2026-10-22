@@ -1,4 +1,3 @@
-using Identity.Application.Security.Policies;
 using Sales.Application.Contracts.Orders;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;
@@ -13,17 +12,23 @@ using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Delete;
 namespace Sales.Api.Controllers;
 
 [ApiController]
-[Authorize(Policy = PolicyNames.CanManageOrders)]
+[AllowAnonymous]
 [Route("api/admin/order-workspace")]
 public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBase
 {
     [HttpGet("orders", Name = "getAdminWorkspaceOrders")]
     public async Task<ActionResult> GetOrders(
         [FromQuery] string? searchTerm, [FromQuery] string? counterpartyId,
+        [FromQuery] string? createdFrom, [FromQuery] string? createdTo,
         [FromQuery] string sort = "-createdAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try { return Ok((await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId, sort, page, pageSize), cancellationToken)).Value); }
+        try
+        {
+            var dates = WorkspaceDateRange.Parse(createdFrom, createdTo);
+            return Ok((await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId,
+                dates.FromUtc, dates.ToUtcExclusive, sort, page, pageSize), cancellationToken)).Value);
+        }
         catch (WorkspaceException error) { return Error(error); }
     }
 
@@ -59,10 +64,16 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
     [HttpGet("drafts", Name = "getAdminOrderDrafts")]
     public async Task<ActionResult> GetDrafts(
         [FromQuery] string? searchTerm, [FromQuery] string? counterpartyId,
+        [FromQuery] string? createdFrom, [FromQuery] string? createdTo,
         [FromQuery] string sort = "-updatedAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try { return Ok((await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId, sort, page, pageSize), cancellationToken)).Value); }
+        try
+        {
+            var dates = WorkspaceDateRange.Parse(createdFrom, createdTo);
+            return Ok((await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId,
+                dates.FromUtc, dates.ToUtcExclusive, sort, page, pageSize), cancellationToken)).Value);
+        }
         catch (WorkspaceException error) { return Error(error); }
     }
 

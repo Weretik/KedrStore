@@ -10,10 +10,12 @@ paths:
     get:
       operationId: getAdminOrderDrafts
       summary: Search saved drafts
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
         - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
+        - { name: createdFrom, in: query, description: Inclusive creation calendar date in Europe/Kyiv., schema: { type: string, format: date } }
+        - { name: createdTo, in: query, description: Inclusive creation calendar date in Europe/Kyiv., schema: { type: string, format: date } }
         - name: sort
           in: query
           schema: { type: string, enum: [updatedAt, '-updatedAt', title, '-title', customerName, '-customerName'], default: '-updatedAt' }
@@ -26,12 +28,10 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DraftPage' }
         '400': { description: Invalid query. }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
     post:
       operationId: createAdminOrderDraft
       summary: Save a reusable draft
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - name: Idempotency-Key
           in: header
@@ -54,8 +54,6 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DraftDetail' }
         '400': { description: "Invalid draft, customer, product or price." }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Selected customer or product does not exist. }
         '409': { description: Idempotency key reused with different body. }
   /api/admin/order-workspace/drafts/{draftId}:
@@ -67,20 +65,18 @@ paths:
     get:
       operationId: getAdminOrderDraftById
       summary: Read one draft with current pricing availability
-      security: [{ bearerAuth: [] }]
+      security: []
       responses:
         '200':
           description: Saved lines and version remain available even if current pricing is unavailable.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/DraftDetail' }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Draft not found. }
     put:
       operationId: updateAdminOrderDraft
       summary: Replace editable draft fields
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - name: If-Match
           in: header
@@ -98,14 +94,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DraftDetail' }
         '400': { description: "Invalid draft, customer, product or price." }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
     delete:
       operationId: deleteAdminOrderDraft
       summary: Delete one draft and its lines
-      security: [{ bearerAuth: [] }]
+      security: []
       parameters:
         - name: If-Match
           in: header
@@ -113,13 +107,9 @@ paths:
           schema: { type: string, minLength: 1 }
       responses:
         '204': { description: Draft deleted. }
-        '401': { description: Authentication required. }
-        '403': { description: CanManageOrders policy denied. }
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
 components:
-  securitySchemes:
-    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
   schemas:
     PagedInfo:
       type: object

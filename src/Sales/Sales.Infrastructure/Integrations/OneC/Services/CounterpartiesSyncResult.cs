@@ -5,4 +5,5 @@ public sealed record CounterpartiesSyncResult(
     int Updated,
     int Restored,
     int Deleted,
-    int Skipped);
+    int Skipped,
+    int Unchanged = 0);

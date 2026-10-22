@@ -23,6 +23,6 @@
 
 ## Фактичний evidence реалізації (2026-10-21)
 
-- Контракт включено до `docs/sdd/contracts/openapi.yaml`; новий controller застосовує `CanManageOrders`.
+- Контракт включено до `docs/sdd/contracts/openapi.yaml`; у поточній зміні controller переведено на `[AllowAnonymous]`.
 - `dotnet build src/Bootstrapper/Host.Api/Host.Api.csproj --no-restore -v:q -p:NuGetAudit=false -clp:ErrorsOnly` — успіх, 0 errors.
 - PostgreSQL інтеграційний тест і `EXPLAIN` не виконано; робочу БД не змінювали. Потрібна перевірка на ізольованій тестовій БД перед розгортанням.

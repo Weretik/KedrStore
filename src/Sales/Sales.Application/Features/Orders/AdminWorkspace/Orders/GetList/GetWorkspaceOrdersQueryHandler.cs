@@ -7,6 +7,8 @@ public sealed class GetWorkspaceOrdersQueryHandler(IWorkspaceOrderReader port)
 {
     public async ValueTask<Result<WorkspacePage<WorkspaceOrderListItem>>> Handle(GetWorkspaceOrdersQuery request, CancellationToken cancellationToken)
     {
-        return Result.Success(await port.GetOrdersAsync(request.SearchTerm, request.CounterpartyId, request.Sort, request.Page, request.PageSize, cancellationToken));
+        return Result.Success(await port.GetOrdersAsync(request.SearchTerm, request.CounterpartyId,
+            request.CreatedFromUtc, request.CreatedToUtcExclusive,
+            request.Sort, request.Page, request.PageSize, cancellationToken));
     }
 }

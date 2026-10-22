@@ -11,6 +11,7 @@ public sealed class OneCCounterpartiesSyncService(
     ISalesOneCReadClient oneCClient,
     SalesDbContext salesDbContext,
     IImportedCounterpartyIdentityProvisioningService identityProvisioningService,
+    StaleCounterpartyRemoval staleRemoval,
     CounterpartyContactNormalizer contactNormalizer,
     ILogger<OneCCounterpartiesSyncService> logger)
 {
@@ -18,12 +19,22 @@ public sealed class OneCCounterpartiesSyncService(
     {
         logger.LogInformation("SyncOneCCounterpartiesJob started");
 
+        await staleRemoval.DrainIdentityDeletionsAsync(cancellationToken);
+
         var counterparties = await oneCClient.GetCounterpartiesAsync(cancellationToken);
         if (counterparties.Count == 0)
         {
             logger.LogWarning("No counterparties received from 1C. Sync stopping.");
             return new CounterpartiesSyncResult(0, 0, 0, 0, 0);
         }
+
+        // The SOAP operation returns a complete snapshot. A malformed source ID makes
+        // absence impossible to prove for this run, so deletion must fail closed.
+        var sourceIdsComplete = counterparties.All(item => !string.IsNullOrWhiteSpace(item.CounterpartyId));
+        var sourceCounterpartyIds = counterparties
+            .Where(item => !string.IsNullOrWhiteSpace(item.CounterpartyId))
+            .Select(item => item.CounterpartyId.Trim())
+            .ToHashSet(StringComparer.Ordinal);
 
         var deduped = counterparties
             .Where(item => !string.IsNullOrWhiteSpace(item.CounterpartyId))
@@ -43,7 +54,7 @@ public sealed class OneCCounterpartiesSyncService(
         var restored = 0;
         var deleted = 0;
         var skipped = 0;
-        var activeCounterpartyIds = new HashSet<string>(StringComparer.Ordinal);
+        var unchanged = 0;
 
         foreach (var item in deduped)
         {
@@ -89,7 +100,6 @@ public sealed class OneCCounterpartiesSyncService(
                 continue;
             }
 
-            activeCounterpartyIds.Add(normalized.CounterpartyId);
             var now = DateTimeOffset.UtcNow;
 
             if (existingCounterparty is null)
@@ -110,10 +120,22 @@ public sealed class OneCCounterpartiesSyncService(
                 continue;
             }
 
-            if (existingCounterparty.IsDeleted)
+            var wasDeleted = existingCounterparty.IsDeleted;
+            if (wasDeleted)
             {
                 existingCounterparty.Restore(now);
                 restored++;
+            }
+
+            var fieldsChanged = existingCounterparty.IdentityUserId != identityResult.Value
+                                || existingCounterparty.Name != normalized.CounterpartyName
+                                || existingCounterparty.Email != normalized.Email
+                                || existingCounterparty.Phone != normalized.Phone
+                                || existingCounterparty.DefaultPriceTypeId != normalized.DefaultPriceTypeId;
+            if (!fieldsChanged && !wasDeleted)
+            {
+                unchanged++;
+                continue;
             }
 
             existingCounterparty.Update(
@@ -128,62 +150,33 @@ public sealed class OneCCounterpartiesSyncService(
             updated++;
         }
 
-        var staleCounterparties = existingCounterparties.Values
-            .Where(item => !activeCounterpartyIds.Contains(item.Id))
-            .ToArray();
+        var staleCounterparties = sourceIdsComplete
+            ? existingCounterparties.Values.Where(item => !sourceCounterpartyIds.Contains(item.Id)).ToArray()
+            : [];
 
-        if (staleCounterparties.Length > 0)
-        {
-            var staleCounterpartyIds = staleCounterparties
-                .Select(item => item.Id)
-                .ToHashSet(StringComparer.Ordinal);
-
-            var staleRules = await salesDbContext.CounterpartyCategoryPriceTypes
-                .Where(rule => staleCounterpartyIds.Contains(rule.CounterpartyId))
-                .ToListAsync(cancellationToken);
-
-            if (staleRules.Count > 0)
-            {
-                salesDbContext.CounterpartyCategoryPriceTypes.RemoveRange(staleRules);
-            }
-
-            salesDbContext.Counterparties.RemoveRange(staleCounterparties);
-            deleted = staleCounterparties.Length;
-        }
+        if (!sourceIdsComplete)
+            logger.LogWarning("1C returned a counterparty with no ID. Deletion was skipped for this run.");
 
         await salesDbContext.SaveChangesAsync(cancellationToken);
-
-        foreach (var staleCounterparty in staleCounterparties)
-        {
-            var deleteIdentityResult = await identityProvisioningService.DeleteUserAsync(
-                staleCounterparty.IdentityUserId,
-                staleCounterparty.Id,
-                cancellationToken);
-
-            if (!deleteIdentityResult.IsSuccess)
-            {
-                logger.LogWarning(
-                    "Counterparty {CounterpartyId} was deleted from Sales, but deleting linked AppUser {IdentityUserId} failed: {Errors}",
-                    staleCounterparty.Id,
-                    staleCounterparty.IdentityUserId,
-                    string.Join(", ", deleteIdentityResult.Errors));
-            }
-        }
+        deleted = await staleRemoval.RemoveAsync(staleCounterparties, cancellationToken);
+        await staleRemoval.DrainIdentityDeletionsAsync(cancellationToken);
 
         logger.LogInformation(
-            "SyncOneCCounterpartiesJob finished. Imported: {Imported}, Updated: {Updated}, Restored: {Restored}, Deleted: {Deleted}, Skipped: {Skipped}",
+            "SyncOneCCounterpartiesJob finished. Imported: {Imported}, Updated: {Updated}, Restored: {Restored}, Deleted: {Deleted}, Skipped: {Skipped}, Unchanged: {Unchanged}",
             imported,
             updated,
             restored,
             deleted,
-            skipped);
+            skipped,
+            unchanged);
 
         return new CounterpartiesSyncResult(
             Imported: imported,
             Updated: updated,
             Restored: restored,
             Deleted: deleted,
-            Skipped: skipped);
+            Skipped: skipped,
+            Unchanged: unchanged);
     }
 
     private bool TryNormalize(

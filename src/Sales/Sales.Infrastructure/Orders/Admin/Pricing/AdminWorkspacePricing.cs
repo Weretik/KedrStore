@@ -76,7 +76,8 @@ internal sealed class AdminWorkspacePricing(SalesDbContext salesDb, IReadCatalog
             var productId = int.Parse(line.ProductId, CultureInfo.InvariantCulture);
             var product = products.Single(x => x.Id.Value == productId);
             if (product.Stock < line.Quantity)
-                throw new WorkspaceException(400, "unavailable_product", "Product stock is insufficient.");
+                throw new WorkspaceException(400, "unavailable_product",
+                    $"Недостатньо товару «{product.Name}» на складі: доступно {product.Stock}, потрібно {line.Quantity}.");
             var typeId = rules.FirstOrDefault(x => x.CategoryId == product.CategoryId.Value)?.PriceTypeId
                 ?? customer.DefaultPriceTypeId;
             var price = prices.FirstOrDefault(x => x.ProductId.Value == productId && x.PriceTypeId.Value == typeId);
