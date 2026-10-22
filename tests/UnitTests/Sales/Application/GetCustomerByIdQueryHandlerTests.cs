@@ -65,7 +65,7 @@ public sealed class GetCustomerByIdQueryHandlerTests
     public void DetailDto_ContainsOnlyApprovedFields()
     {
         Assert.Equal(
-            ["CounterpartyId", "Name", "Phone", "Email", "DefaultPriceTypeId", "CategoryPriceTypes"],
+            ["CounterpartyId", "Name", "Phone", "Email", "DefaultPriceTypeId", "CategoryPriceTypes", "DefaultPriceTypeName"],
             typeof(CustomerDetailDto).GetProperties().Select(property => property.Name));
     }
 
