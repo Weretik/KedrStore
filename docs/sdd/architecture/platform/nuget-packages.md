@@ -1,68 +1,68 @@
-# Прямі NuGet-залежності
+# Direct NuGet Dependencies
 
-**Перевірено 2026-10-15:** усі `src/**/*.csproj` і `tests/**/*.csproj` у репозиторії. Виявлено 68 записів `PackageReference`, що утворюють 53 унікальні пари «назва + оголошена версія». `Directory.Packages.props` немає; версії задано в самих `.csproj`. Таблиця описує **оголошені прямі залежності**, а не гарантує, що кожен пакет фактично викликається кодом або встановлений у конкретному середовищі. Для транзитивних залежностей і розв'язаних версій використовуй NuGet restore/assets, не додавай їх вручну до цього каталогу.
+**Verified 2026-10-15:** all `src/**/*.csproj` and `tests/**/*.csproj` in the repository. The scan found 68 `PackageReference` entries forming 53 unique name + declared-version pairs. There is no `Directory.Packages.props`; versions are specified in the `.csproj` files themselves. The table describes **declared direct dependencies** and does not guarantee that every package is actually called by code or installed in a particular environment. For transitive dependencies and resolved versions, use NuGet restore/assets; do not add them manually to this catalog.
 
-Позначення у стовпці «Проєкт»: `B.*` = `src/BuildingBlocks/BuildingBlocks.*`, `C.*` = `src/Catalog/Catalog.*`, `S.*` = `src/Sales/Sales.*`, `H.Api` = `src/Bootstrapper/Host.Api/Host.Api.csproj`, `T.Unit` = `tests/UnitTests/UnitTests.csproj`, `T.Integration` = `tests/IntegrationTests/IntegrationTests.csproj`, `T.Architecture` = `tests/ArchitectureTests/ArchitectureTests.csproj`. Для `B.*`, `C.*` і `S.*` до назви проєкту додай `.csproj`; для `B.Integrations.OneC` шлях `src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integrations.OneC.csproj`. Кожен запис таблиці можна звірити з указаним manifest. Однаковий пакет у кількох проєктах наведено одним рядком із усіма власниками.
+Project-column abbreviations: `B.*` = `src/BuildingBlocks/BuildingBlocks.*`, `C.*` = `src/Catalog/Catalog.*`, `S.*` = `src/Sales/Sales.*`, `H.Api` = `src/Bootstrapper/Host.Api/Host.Api.csproj`, `T.Unit` = `tests/UnitTests/UnitTests.csproj`, `T.Integration` = `tests/IntegrationTests/IntegrationTests.csproj`, and `T.Architecture` = `tests/ArchitectureTests/ArchitectureTests.csproj`. Append `.csproj` to `B.*`, `C.*`, and `S.*` project names; the path for `B.Integrations.OneC` is `src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integrations.OneC.csproj`. Each table entry can be checked against the indicated manifest. A package used by several projects appears in one row with all owners.
 
-| Пряма залежність | Версія | Проєкт | Призначення або перевірний контекст |
+| Direct dependency | Version | Project | Purpose or verification context |
 | --- | --- | --- | --- |
-| `Ardalis.Result` | 10.1.0 | B.Api, C.Contracts | Типізований результат і контракт відповіді; HTTP-відображення описано в [BuildingBlocks.Api](building-blocks/api.md). |
-| `Ardalis.Result.AspNetCore` | 10.1.0 | B.Application | Інтеграція `Result` з ASP.NET Core; перевіряй точне використання у коді перед зміною. |
-| `Ardalis.Result.FluentValidation` | 10.1.0 | B.Application | Інтеграція помилок `FluentValidation` з `Result`; перевіряй точне використання у коді. |
-| `Ardalis.SmartEnum` | 8.2.0 | C.Domain | Типізовані перелічення в домені Catalog. |
-| `Ardalis.Specification` | 9.3.1 | B.Application | Специфікації для репозиторних запитів; [підхід до збереження даних](../runtime/persistence-and-integrations.md). |
-| `Ardalis.Specification.EntityFrameworkCore` | 9.3.1 | B.Application | EF Core-адаптер специфікацій; фактичні виклики перевіряй у коді. |
-| `ClosedXML` | 0.105.0 | B.Application | Створення Excel-файлів; перевіряй відповідальність шару та використання в експорті. |
-| `FluentValidation` | 12.1.1 | B.Application | Валідатори вхідних даних у use cases. |
-| `FluentValidation.DependencyInjectionExtensions` | 12.1.1 | B.Application | Реєстрація валідаторів у DI; фактична реєстрація у `Host.Api/DependencyInjection/ServiceRegistration/Pipeline/FluentValidationRegistrationExtensions.cs`. |
-| `Hangfire` | 1.8.22 | B.Application | Оголошена бібліотека фонового виконання; поточний `Host.Jobs` працює як одноразовий CLI без власного планувальника ([опис](../../operations/jobs/README.md)). Не приписуй їй виконання завдань без перевірки коду. |
-| `libphonenumber-csharp` | 9.0.22 | B.Application, S.Infrastructure | Обробка й перевірка телефонних номерів; шукай конкретні виклики у відповідних проєктах. |
-| `Mediator.Abstractions` | 3.0.1 | B.Application | Контракти request/handler і pipeline Mediator. |
-| `Mediator.SourceGenerator` | 3.0.1 | H.Api | Генерація реалізації Mediator під час збірки host; реєстрація у `MediatorRegistrationExtensions.cs`. |
-| `Microsoft.AspNetCore.Http.Abstractions` | 2.3.9 | B.Application, B.Infrastructure | HTTP-абстракції, оголошені у двох BuildingBlocks-проєктах; перевіряй актуальну потребу перед зміною. |
-| `Microsoft.AspNetCore.Identity.EntityFrameworkCore` | 10.0.2 | B.Application | ASP.NET Core Identity з EF Core; конкретне використання та межі шару звіряй у коді. |
-| `Microsoft.AspNetCore.OpenApi` | 10.0.2 | H.Api | Вбудована кінцева точка OpenAPI; `Host.Api/Program.cs` викликає `MapOpenApi()` у Development. |
-| `Microsoft.EntityFrameworkCore` | 10.0.2 | B.Application | EF Core API, оголошений у BuildingBlocks.Application; контексти й міграції належать Infrastructure. |
-| `Microsoft.EntityFrameworkCore.Tools` | 10.0.2 | H.Api | Інструменти design-time для EF Core; не runtime-сервіс. |
-| `Microsoft.Extensions.Configuration.Abstractions` | 10.0.2 | B.Application, B.Integrations.OneC | Інтерфейси конфігурації для спільних компонентів та 1C. |
-| `Microsoft.Extensions.DependencyInjection.Abstractions` | 10.0.2 | B.Application | Інтерфейси DI для реєстрації й резолюції сервісів. |
-| `Microsoft.Extensions.Http` | 10.0.2 | B.Application | `HttpClientFactory` та DI для HTTP-клієнтів; конкретні адаптери перевіряй у коді. |
-| `Microsoft.Extensions.Logging.Abstractions` | 10.0.2 | B.Application | Інтерфейси logging для application-компонентів. |
-| `Microsoft.OpenApi` | 2.8.0 | H.Api | Об'єктна модель OpenAPI для конфігурації схем і Swagger. |
-| `Newtonsoft.Json` | 13.0.4 | B.Application | Оголошений JSON serializer; точну потребу й місця виклику звіряй до зміни. |
-| `NodaMoney` | 2.6.0 | B.Application, C.Domain | Грошові значення та валюти для контрактів/домену Catalog. |
-| `Npgsql.EntityFrameworkCore.PostgreSQL` | 10.0.0 | B.Application | EF Core provider PostgreSQL; фактичні `DbContext` та міграції в Infrastructure. |
-| `Scriban` | 7.2.7 | H.Api | Шаблонізатор, оголошений у API host; поточні виклики й потребу перевіряй у коді. |
-| `Serilog` | 4.3.0 | H.Api | Структуроване журналювання API host. |
-| `Serilog.AspNetCore` | 10.0.0 | H.Api | ASP.NET Core інтеграція Serilog; `Program.cs` викликає request logging. |
-| `Serilog.Enrichers.Environment` | 3.0.1 | H.Api | Додаткові властивості середовища у логах за конфігурацією. |
-| `Serilog.Enrichers.Process` | 3.0.0 | H.Api | Додаткові властивості процесу у логах за конфігурацією. |
-| `Serilog.Settings.Configuration` | 10.0.0 | H.Api | Читання налаштувань Serilog з конфігурації. |
-| `Slugify.Core` | 5.1.1 | B.Application, T.Unit | Формування URL-slug і його unit-перевірки. |
-| `Swashbuckle.AspNetCore` | 10.0.0 | H.Api | Генерація Swagger UI та OpenAPI у Development. |
-| `System.Security.Cryptography.Xml` | 10.0.10 | B.Integrations.OneC | XML-криптографія, оголошена для 1C-інтеграції; конкретний протокол перевіряй за адаптером. |
-| `System.ServiceModel.Duplex` | 6.0.0 | B.Integrations.OneC | WCF duplex API, оголошений 1C-проєктом; фактичну потребу перевіряй. |
-| `System.ServiceModel.Federation` | 10.0.652802 | B.Integrations.OneC | WCF federation API, оголошений 1C-проєктом; фактичну потребу перевіряй. |
-| `System.ServiceModel.Http` | 10.0.652802 | B.Integrations.OneC | Транспорт HTTP для SOAP/WCF-клієнта 1C. |
-| `System.ServiceModel.NetTcp` | 10.0.652802 | B.Integrations.OneC | WCF NetTcp API, оголошений 1C-проєктом; фактичну потребу перевіряй. |
-| `System.ServiceModel.Primitives` | 10.0.652802 | B.Integrations.OneC | Базові WCF контракти для SOAP-клієнта. |
-| `System.ServiceModel.Security` | 6.0.0 | B.Integrations.OneC | WCF security API для SOAP-клієнта; конкретне застосування перевіряй. |
-| `Telegram.Bot` | 22.8.1 | B.Application | Транспорт Telegram для сповіщень; [операційний контекст](../../operations/jobs/sales-one-c-runbook.md). |
-| `Unidecode.NET` | 2.2.1 | B.Application | Транслітерація тексту; конкретне використання перевіряй у коді. |
-| `Vogen` | 8.0.4 | B.Application, C.Domain | Оголошений генератор value objects для legacy-коду; [чинне правило](../../standards/identifier-strategy.md) не дозволяє нові typed IDs через Vogen. |
+| `Ardalis.Result` | 10.1.0 | B.Api, C.Contracts | Typed result and response contract; HTTP mapping is described in [BuildingBlocks.Api](building-blocks/api.md). |
+| `Ardalis.Result.AspNetCore` | 10.1.0 | B.Application | `Result` integration with ASP.NET Core; check exact code usage before changing it. |
+| `Ardalis.Result.FluentValidation` | 10.1.0 | B.Application | Integration of `FluentValidation` errors with `Result`; check exact code usage. |
+| `Ardalis.SmartEnum` | 8.2.0 | C.Domain | Typed enumerations in the Catalog domain. |
+| `Ardalis.Specification` | 9.3.1 | B.Application | Specifications for repository queries; [persistence approach](../runtime/persistence-and-integrations.md). |
+| `Ardalis.Specification.EntityFrameworkCore` | 9.3.1 | B.Application | EF Core adapter for specifications; check actual calls in code. |
+| `ClosedXML` | 0.105.0 | B.Application | Excel file creation; check layer responsibility and export usage. |
+| `FluentValidation` | 12.1.1 | B.Application | Input validators in use cases. |
+| `FluentValidation.DependencyInjectionExtensions` | 12.1.1 | B.Application | Validator registration in DI; actual registration is in `Host.Api/DependencyInjection/ServiceRegistration/Pipeline/FluentValidationRegistrationExtensions.cs`. |
+| `Hangfire` | 1.8.22 | B.Application | Declared background execution library; current `Host.Jobs` runs as a one-shot CLI without its own scheduler ([description](../../operations/jobs/README.md)). Do not attribute job execution to it without checking the code. |
+| `libphonenumber-csharp` | 9.0.22 | B.Application, S.Infrastructure | Phone number processing and validation; look for specific calls in the relevant projects. |
+| `Mediator.Abstractions` | 3.0.1 | B.Application | Mediator request/handler contracts and pipeline. |
+| `Mediator.SourceGenerator` | 3.0.1 | H.Api | Generates the Mediator implementation during host build; registration is in `MediatorRegistrationExtensions.cs`. |
+| `Microsoft.AspNetCore.Http.Abstractions` | 2.3.9 | B.Application, B.Infrastructure | HTTP abstractions declared in two BuildingBlocks projects; check current need before changing them. |
+| `Microsoft.AspNetCore.Identity.EntityFrameworkCore` | 10.0.2 | B.Application | ASP.NET Core Identity with EF Core; check concrete usage and layer boundaries in the code. |
+| `Microsoft.AspNetCore.OpenApi` | 10.0.2 | H.Api | Built-in OpenAPI endpoint; `Host.Api/Program.cs` calls `MapOpenApi()` in Development. |
+| `Microsoft.EntityFrameworkCore` | 10.0.2 | B.Application | EF Core API declared in BuildingBlocks.Application; contexts and migrations belong in Infrastructure. |
+| `Microsoft.EntityFrameworkCore.Tools` | 10.0.2 | H.Api | EF Core design-time tools; not a runtime service. |
+| `Microsoft.Extensions.Configuration.Abstractions` | 10.0.2 | B.Application, B.Integrations.OneC | Configuration interfaces for shared components and 1C. |
+| `Microsoft.Extensions.DependencyInjection.Abstractions` | 10.0.2 | B.Application | DI interfaces for service registration and resolution. |
+| `Microsoft.Extensions.Http` | 10.0.2 | B.Application | `HttpClientFactory` and DI for HTTP clients; check concrete adapters in code. |
+| `Microsoft.Extensions.Logging.Abstractions` | 10.0.2 | B.Application | Logging interfaces for application components. |
+| `Microsoft.OpenApi` | 2.8.0 | H.Api | OpenAPI object model for schema and Swagger configuration. |
+| `Newtonsoft.Json` | 13.0.4 | B.Application | Declared JSON serializer; check exact need and call sites before changing. |
+| `NodaMoney` | 2.6.0 | B.Application, C.Domain | Monetary values and currencies for Catalog contracts/domain. |
+| `Npgsql.EntityFrameworkCore.PostgreSQL` | 10.0.0 | B.Application | EF Core PostgreSQL provider; actual `DbContext` types and migrations are in Infrastructure. |
+| `Scriban` | 7.2.7 | H.Api | Templating engine declared in the API host; check current calls and need in the code. |
+| `Serilog` | 4.3.0 | H.Api | Structured logging for the API host. |
+| `Serilog.AspNetCore` | 10.0.0 | H.Api | Serilog integration for ASP.NET Core; `Program.cs` calls request logging. |
+| `Serilog.Enrichers.Environment` | 3.0.1 | H.Api | Additional environment properties in logs, according to configuration. |
+| `Serilog.Enrichers.Process` | 3.0.0 | H.Api | Additional process properties in logs, according to configuration. |
+| `Serilog.Settings.Configuration` | 10.0.0 | H.Api | Reads Serilog settings from configuration. |
+| `Slugify.Core` | 5.1.1 | B.Application, T.Unit | URL slug generation and its unit tests. |
+| `Swashbuckle.AspNetCore` | 10.0.0 | H.Api | Generates Swagger UI and OpenAPI in Development. |
+| `System.Security.Cryptography.Xml` | 10.0.10 | B.Integrations.OneC | XML cryptography declared for the 1C integration; check the specific protocol in the adapter. |
+| `System.ServiceModel.Duplex` | 6.0.0 | B.Integrations.OneC | WCF duplex API declared by the 1C project; check whether it is actually needed. |
+| `System.ServiceModel.Federation` | 10.0.652802 | B.Integrations.OneC | WCF federation API declared by the 1C project; check whether it is actually needed. |
+| `System.ServiceModel.Http` | 10.0.652802 | B.Integrations.OneC | HTTP transport for the 1C SOAP/WCF client. |
+| `System.ServiceModel.NetTcp` | 10.0.652802 | B.Integrations.OneC | WCF NetTcp API declared by the 1C project; check whether it is actually needed. |
+| `System.ServiceModel.Primitives` | 10.0.652802 | B.Integrations.OneC | Base WCF contracts for the SOAP client. |
+| `System.ServiceModel.Security` | 6.0.0 | B.Integrations.OneC | WCF security API for the SOAP client; check concrete use. |
+| `Telegram.Bot` | 22.8.1 | B.Application | Telegram transport for notifications; [operational context](../../operations/jobs/sales-one-c-runbook.md). |
+| `Unidecode.NET` | 2.2.1 | B.Application | Text transliteration; check concrete use in the code. |
+| `Vogen` | 8.0.4 | B.Application, C.Domain | Declared value-object generator for legacy code; [current rule](../../standards/identifier-strategy.md) does not allow new typed IDs through Vogen. |
 
-## Прямі пакети тестових проєктів
+## Direct test-project packages
 
-| Пряма залежність | Версія | Проєкт | Призначення |
+| Direct dependency | Version | Project | Purpose |
 | --- | --- | --- | --- |
-| `coverlet.collector` | 6.0.4 | T.Unit, T.Integration, T.Architecture | Збір покриття тестів. |
-| `Microsoft.AspNetCore.Mvc.Testing` | 10.0.2 | T.Integration | Тестовий запуск ASP.NET Core host. |
-| `Microsoft.EntityFrameworkCore.InMemory` | 10.0.2 | T.Integration | Нереляційний EF provider лише для обмежених тестових сценаріїв; [правила](../../standards/testing-rules.md). |
-| `Microsoft.NET.Test.Sdk` | 18.0.1 | T.Unit, T.Integration, T.Architecture | Інтеграція тестів з `dotnet test`. |
-| `NetArchTest.Rules` | 1.3.2 | T.Architecture | Перевірки залежностей і архітектурних меж. |
-| `Testcontainers.PostgreSql` | 4.15.0 | T.Integration | Тимчасовий PostgreSQL для інтеграційних тестів. |
-| `xunit` | 2.9.3 | T.Unit, T.Integration, T.Architecture | Тестовий framework. |
-| `xunit.runner.visualstudio` | 3.1.5 | T.Unit, T.Integration, T.Architecture | Запуск xUnit у test runner. |
-| `Xunit.SkippableFact` | 1.4.13 | T.Integration | Явне пропускання тесту, коли локальна передумова недоступна. |
+| `coverlet.collector` | 6.0.4 | T.Unit, T.Integration, T.Architecture | Test coverage collection. |
+| `Microsoft.AspNetCore.Mvc.Testing` | 10.0.2 | T.Integration | Test hosting for ASP.NET Core. |
+| `Microsoft.EntityFrameworkCore.InMemory` | 10.0.2 | T.Integration | Non-relational EF provider for limited test scenarios only; [rules](../../standards/testing-rules.md). |
+| `Microsoft.NET.Test.Sdk` | 18.0.1 | T.Unit, T.Integration, T.Architecture | Test integration with `dotnet test`. |
+| `NetArchTest.Rules` | 1.3.2 | T.Architecture | Dependency and architectural-boundary checks. |
+| `Testcontainers.PostgreSql` | 4.15.0 | T.Integration | Temporary PostgreSQL for integration tests. |
+| `xunit` | 2.9.3 | T.Unit, T.Integration, T.Architecture | Test framework. |
+| `xunit.runner.visualstudio` | 3.1.5 | T.Unit, T.Integration, T.Architecture | Runs xUnit in the test runner. |
+| `Xunit.SkippableFact` | 1.4.13 | T.Integration | Explicitly skips a test when a local prerequisite is unavailable. |
 
-Версію SDK задає [`global.json`](../../../../global.json): `10.0.101` із `rollForward: latestFeature`; цільові frameworks у `.csproj` — `net10.0`. При оновленні залежностей звіряй цю таблицю з усіма manifests, а фактичне використання — з imports, DI та runtime-конфігурацією. Пакет, що лише оголошений, не називай обов'язковим архітектурним підходом без такого підтвердження.
+The SDK version is set by [`global.json`](../../../../global.json): `10.0.101` with `rollForward: latestFeature`; target frameworks in `.csproj` files are `net10.0`. When updating dependencies, compare this table with all manifests and actual usage with imports, DI, and runtime configuration. Do not describe a merely declared package as a required architectural pattern without that confirmation.

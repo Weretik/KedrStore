@@ -1,37 +1,37 @@
-# Міграції та seed
+# Database migrations and seed data
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** platform.
+**Static code check:** 2026-10-16. **Module:** Platform.
 
-Окрема job, що змінює схему і початкові дані.
+A separate job changes the schema and initial data.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) обирає `--job=migrate`; [DatabaseMigrationJob](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs) виконує зареєстровані мігратори, потім seeders. [Host.Api](../../../../src/Bootstrapper/Host.Api/Program.cs) автоматично цей цикл не запускає. Перед job перевір конфігурацію і цільову БД.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) selects `--job=migrate`; [DatabaseMigrationJob](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs) runs registered migrators, followed by seeders. [Host.Api](../../../../src/Bootstrapper/Host.Api/Program.cs) does not run this process automatically. Check configuration and the target database before running the job.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 └── Bootstrapper/
-    ├── Host.Api/Program.cs  # API-хост; міграції не запускає
+    ├── Host.Api/Program.cs  # API host; does not run migrations
     └── Host.Jobs/Host.Jobs/
-        ├── DatabaseMigrationJob.cs  # запуск job
-        └── Program.cs  # запуск job
+        ├── DatabaseMigrationJob.cs  # runs the job
+        └── Program.cs  # runs the job
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["Host.Jobs --job=migrate"] --> B["DatabaseMigrationJob"]
-    B --> C["Зареєстровані мігратори"]
-    C --> D["База даних"]
+    B --> C["Registered migrators"]
+    C --> D["Database"]
     B --> E["Seeders"]
     E --> D
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Процедура](../../operations/data/migrations-and-seeding.md) · [SDD](../../specs/platform/001-database-migration-job/README.md).
+[Procedure](../../operations/data/migrations-and-seeding.md) · [SDD](../../specs/platform/001-database-migration-job/README.md).

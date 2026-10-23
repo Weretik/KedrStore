@@ -1,10 +1,10 @@
-# Структура Application
+# Application structure
 
-## Відповідальність
+## Responsibility
 
-Application виконує один сценарій використання за раз. Вона координує Domain і абстракції, але не володіє реалізацією збереження даних або транспортного рівня.
+Application executes one use case at a time. It coordinates Domain and abstractions but does not own persistence or transport implementations.
 
-## Цільова структура фічі
+## Target feature structure
 
 ~~~text
 <Module>.Application/
@@ -13,37 +13,37 @@ Application виконує один сценарій використання з
 │       └── <UseCase>/
 │           ├── <UseCase>Command.cs | <UseCase>Query.cs
 │           ├── <UseCase>CommandHandler.cs | <UseCase>QueryHandler.cs
-│           ├── DTOs/               приватні DTO сценарію, лише за потреби
+│           ├── DTOs/               private use-case DTOs, only when needed
 │           ├── Validators/
 │           │   └── <UseCase>Validator.cs
-│           └── Extensions/         лише пов'язані LINQ/mapping helpers
+│           └── Extensions/         only related LINQ/mapping helpers
 ├── Contracts/
-│   ├── Persistence/                абстракції DbContext/read/repository
-│   ├── Integrations/               абстракції зовнішніх сервісів
+│   ├── Persistence/                DbContext/read/repository abstractions
+│   ├── Integrations/               external service abstractions
 │   └── Services/
-├── Integrations/                   координація зовнішніх потоків
-├── Jobs/                           логіка завдання для сценарію, не підключення планувальника
+├── Integrations/                   external flow coordination
+├── Jobs/                           use-case job logic, not scheduler wiring
 └── <Module>ApplicationAssemblyMarker.cs
 ~~~
 
-## Схема сценарію використання
+## Use-case diagram
 
 ~~~text
 Command or Query
        │
        ▼
 FluentValidation validator ── invalid ──► Result.Invalid
-       │ коректний вхід
+       │ valid input
        ▼
 Handler ──► Domain aggregate / Application abstraction
        │
        └──► Result.Success | Result.NotFound | Result.Conflict | Result.Invalid
 ~~~
 
-## Правила
+## Rules
 
-- Команди змінюють стан, запити лише читають.
-- Обробник виконує один сценарій використання й отримує лише абстракції.
-- Запит застосовує проєкцію без відстеження змін, коли це доречно.
-- Валідатори відповідають за вхід; Domain — за бізнес-інваріанти.
-- Публічний міжмодульний DTO розміщуй у Module.Contracts, а не поряд із handler.
+- Commands change state; queries only read.
+- A handler executes one use case and depends only on abstractions.
+- A query uses a no-tracking projection when appropriate.
+- Validators own input checks; Domain owns business invariants.
+- Put a public cross-module DTO in Module.Contracts, not beside the handler.

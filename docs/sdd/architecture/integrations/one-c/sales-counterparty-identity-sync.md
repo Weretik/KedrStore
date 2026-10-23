@@ -1,74 +1,74 @@
-# Контрагенти 1C і створення облікових записів Identity
+# 1C counterparties and Identity account provisioning
 
-## Призначення та відповідальність
+## Purpose and ownership
 
-Імпорт Sales перетворює контрагента 1C на два пов'язані локальні записи:
+Sales import maps a 1C counterparty to two related local records:
 
 ```text
 1C GetCounterparties
        ↓ SalesOneCReadClient
 OneCCounterpartiesSyncService
-       ├── Sales.Counterparties (бізнес-клієнт)
+       ├── Sales.Counterparties (business customer)
        └── IImportedCounterpartyIdentityProvisioningService
                 ↓
-          Identity.AspNetUsers (обліковий запис для входу, роль User)
+          Identity.AspNetUsers (login account, User role)
 ```
 
-`Counterparty.Id` у Sales — рядок `CounterpartyId` з 1C після обрізання пробілів. `Counterparty.IdentityUserId` пов'язує його з `AppUser.Id` (GUID). Sales відповідає за запис клієнта; Identity — за користувача для входу, hashing пароля, ролі та параметри облікового запису.
+`Counterparty.Id` in Sales is the trimmed 1C `CounterpartyId` string. `Counterparty.IdentityUserId` links it to `AppUser.Id` (GUID). Sales owns the customer record; Identity owns the login user, password hashing, roles, and account settings.
 
-## Методи й поля джерела
+## Source methods and fields
 
-`SalesOneCReadClient.GetCounterpartiesAsync()` викликає згенеровану SOAP-операцію `GetCounterpartiesAsync()` і відображає:
+`SalesOneCReadClient.GetCounterpartiesAsync()` calls generated SOAP operation `GetCounterpartiesAsync()` and maps:
 
-| Поле 1C | Локальне використання |
+| 1C field | Local use |
 | --- | --- |
-| `CounterpartyId` | ID контрагента Sales; вхідне значення початкового пароля імпортованого запису |
-| `CounterpartyName` | Назва контрагента та `AppUser.FullName` |
-| `Email` | Email Sales, username і email Identity |
-| `Phone` | Нормалізований телефон Sales; некоректний необов'язковий телефон ігнорується |
-| `DefaultPriceTypeId` | Типова ціна клієнта |
+| `CounterpartyId` | Sales counterparty ID; input value for the imported account's initial password |
+| `CounterpartyName` | Counterparty name and `AppUser.FullName` |
+| `Email` | Sales email, username, and Identity email |
+| `Phone` | Normalized Sales phone; invalid optional phone is ignored |
+| `DefaultPriceTypeId` | Customer default price |
 
-`SalesOneCReadClient.GetCounterpartyCategoryPriceTypesAsync()` викликає `GetCounterpartyCategoryPriceTypesAsync()` і повертає правила `(CounterpartyId, CategoryId, PriceTypeId)`. У `sales-customers-full` синхронізація правил іде після контрагентів, щоб перевірити посилання на них.
+`SalesOneCReadClient.GetCounterpartyCategoryPriceTypesAsync()` calls `GetCounterpartyCategoryPriceTypesAsync()` and returns `(CounterpartyId, CategoryId, PriceTypeId)` rules. In `sales-customers-full`, rule sync runs after counterparties so their references can be validated.
 
-## Звіряння контрагентів
+## Counterparty reconciliation
 
 `OneCCounterpartiesSyncService`:
 
-1. Якщо 1C не повернула контрагентів, завершується без змін.
-2. Прибирає дублікати непорожніх ID, залишаючи останній рядок для кожного.
-3. Відхиляє рядок із порожнім ID/назвою, недодатним типовим типом ціни або некоректним/відсутнім email. Логує причину пропуску.
-4. Нормалізує email і необов'язковий телефон через `CounterpartyContactNormalizer`.
-5. Створює чи знаходить користувача Identity, потім створює, оновлює або відновлює контрагента Sales.
-6. Локальних контрагентів, відсутніх у непорожній коректній відповіді джерела, вважає застарілими: видаляє їхні правила цін категорій і записи Sales, потім запитує видалення користувача Identity.
+1. Stops without changes if 1C returns no counterparties.
+2. Deduplicates non-empty IDs, keeping the last row for each.
+3. Rejects rows with empty ID/name, non-positive default price type, or invalid/missing email; logs the skip reason.
+4. Normalizes email and optional phone through `CounterpartyContactNormalizer`.
+5. Creates or finds an Identity user, then creates, updates, or restores the Sales counterparty.
+6. Treats local counterparties missing from a valid non-empty source response as stale: removes their category price rules and Sales records, then requests deletion of the Identity user.
 
-Він також не дозволяє пов'язати один `IdentityUserId` із двома різними контрагентами в одному локальному стані.
+It also prevents linking one `IdentityUserId` to two different counterparties in one local state.
 
-## Створення та оновлення користувача Identity
+## Identity user creation and update
 
-Реалізація — `ImportedCounterpartyIdentityProvisioningService`, зареєстрована в Identity Infrastructure для інтерфейсу Application `IImportedCounterpartyIdentityProvisioningService`.
+Implementation: `ImportedCounterpartyIdentityProvisioningService`, registered in Identity Infrastructure for Application interface `IImportedCounterpartyIdentityProvisioningService`.
 
 ```text
-наявний Counterparty.IdentityUserId → пошук AppUser за ID
-                                      ↓ не знайдено
-                                  пошук AppUser за email
-                                      ↓ не знайдено
-                              створити AppUser + роль User
+existing Counterparty.IdentityUserId → find AppUser by ID
+                                      ↓ not found
+                                  find AppUser by email
+                                      ↓ not found
+                              create AppUser + User role
 ```
 
-Для нового користувача сервіс задає username/email/повне ім'я, `EmailConfirmed` і `LockoutEnabled` з `Identity:ImportedCounterparties`, тоді створює обліковий запис із 1C `CounterpartyId` як вхідним значенням початкового пароля. Для знайденого користувача він оновлює ті самі поля, скидає пароль до поточного `CounterpartyId` і забезпечує роль `User`. Паролі обробляються hashing ASP.NET Identity; застосунок не має логувати або відкривати вхідне значення.
+For a new user, the service sets username/email/full name, `EmailConfirmed`, and `LockoutEnabled` from `Identity:ImportedCounterparties`, then creates an account using the 1C `CounterpartyId` as the initial password input. For an existing user, it updates those fields, resets the password to the current `CounterpartyId`, and ensures the `User` role. ASP.NET Identity hashes passwords; the application must not log or expose the input value.
 
-## Безпека й операційні наслідки
+## Security and operational effects
 
-- Це не просто імпорт читання: `counterparties` або `sales-customers-full` може створити, оновити, відновити або видалити як дані клієнта, так і облікові записи для входу.
-- Збіг email може пов'язати наявного користувача Identity з імпортованим контрагентом. Вважай імпортований email авторитетним лише після перевірки якості даних 1C.
-- Зміни Sales зберігаються до видалення застарілих користувачів Identity. Якщо видалення Identity не вдалося, видалення Sales залишається, а в лог пишеться попередження; осиротілий обліковий запис перевір вручну.
-- Потік охоплює contexts Sales та Identity й не є однією міжконтекстною транзакцією. Не додавай побічних ефектів, що припускають атомарний rollback без окремого дизайну.
-- Правила типів цін категорій пропускаються, якщо контрагента немає в Sales або категорії чи типу ціни немає в Catalog. Якщо довідкові дані змінилися, до `sales-customers-full` синхронізуй Catalog.
+- This is more than a read import: `counterparties` or `sales-customers-full` can create, update, restore, or delete both customer data and login accounts.
+- An email match can link an existing Identity user to an imported counterparty. Treat imported 1C email as authoritative only after data quality is confirmed.
+- Sales changes are saved before stale Identity users are deleted. If Identity deletion fails, the Sales deletion remains and a warning is logged; investigate the orphaned account manually.
+- The flow spans Sales and Identity contexts and is not one cross-context transaction. Do not add side effects that assume atomic rollback without separate design.
+- Category price-type rules are skipped when the counterparty is absent from Sales or the category/price type is missing from Catalog. If lookup data changed, sync Catalog before `sales-customers-full`.
 
-## Перевірка після безпечного тестового запуску
+## Verification after a safe test run
 
-1. Використай непродукційного тестового контрагента з коректним email і типовим типом ціни.
-2. Запусти `--job=counterparties`; перевір поля контрагента Sales і рівно один пов'язаний `IdentityUserId`.
-3. Перевір, що користувач Identity має роль `User` і застосовані параметри імпортованого облікового запису. Не переглядай і не друкуй парольні дані.
-4. Запусти `--job=counterparty-category-price-types`; перевір, що залишилися лише правила з коректними локальними посиланнями Catalog.
-5. Перевір лічильники imported, updated, restored, deleted і skipped. Досліди пропущені чи видалені записи до повторного запуску.
+1. Use a non-production test counterparty with valid email and default price type.
+2. Run `--job=counterparties`; check Sales fields and exactly one linked `IdentityUserId`.
+3. Check that the Identity user has the `User` role and imported account settings. Do not inspect or print password data.
+4. Run `--job=counterparty-category-price-types`; check that only rules with valid local Catalog references remain.
+5. Check imported, updated, restored, deleted, and skipped counts. Investigate skipped or deleted rows before rerunning.

@@ -1,17 +1,17 @@
-# Безпека даних під час імпорту з 1C
+# Data safety for 1C imports
 
-1C є джерелом істини для полів каталогу в коренях, якими вона керує. Фіча, що локально змінює категорії, деталі товару, залишки або ціни, має визначити, чи перезапише це поле наступний імпорт.
+1C is the source of truth for catalog fields in roots it manages. A feature that changes categories, product details, stock, or prices locally must state whether the next import will overwrite that field.
 
-`ExportToSite` — керований імпортом прапорець видимості, а не сигнал видалення.
+`ExportToSite` is an import-managed visibility flag, not a deletion signal.
 
-## Поточні запобіжники
+## Current safeguards
 
-| Потік | Запобіжник |
+| Flow | Safeguard |
 | --- | --- |
-| Категорії | Пропускає видалення, якщо 1C не повернула категорій |
-| Товари | За порожньої відповіді завершує до записів; якщо непорожня відповідь дає нуль після mapping, кидає виняток до видалення |
-| Типи цін/залишки/ціни | За порожнього результату завершує до записів |
+| Categories | Skips deletion when 1C returns no categories |
+| Products | Stops before writes on an empty response; if a non-empty response maps to zero rows, throws before deletion |
+| Price types/stock/prices | Stops before writes on an empty result |
 
-За коректного непорожнього результату категорій/товарів завдання може видалити записи, відсутні у джерельному корені. Станом на перевірку завдання не мають пробного запуску без запису, розподіленого блокування, автоматичних повторних спроб або внутрішнього планувальника.
+For valid non-empty category/product results, a job may delete records missing from the source root. At the time of review, jobs had no dry-run mode, distributed lock, automatic retries, or internal scheduler.
 
-Перед запуском вибери правильні середовище й root, не накладай виконання для одного root та перевір лічильники received/mapped/synced. Якщо вони неочікувані, зупини наступні запуски, збережи діагностику без секретів, виправ джерело/конфігурацію/mapping і тільки тоді повтори повну синхронізацію. Не роби висновок про видалення з публічного списку: видимість залежить також від `ExportToSite` і фільтрів списку.
+Before running, choose the correct environment and root, avoid overlapping runs for the same root, and check received/mapped/synced counts. If they are unexpected, stop subsequent runs, preserve diagnostics without secrets, fix the source/configuration/mapping, and only then retry the full sync. Do not infer deletion from the public list: visibility also depends on `ExportToSite` and list filters.

@@ -1,17 +1,17 @@
-# Identity — доступ і сеанси: дані
+# Identity — access and sessions: data
 
-**Джерело:** [Identity snapshot](../../../../src/Identity/Identity.Infrastructure/Migrations/AppIdentityDbContextModelSnapshot.cs) і [конфігурації](../../../../src/Identity/Identity.Infrastructure/Configuration/), перевірено 2026-10-21. [Назад до карти БД](README.md) · [фіча сеансу](../../features/identity/session.md).
+**Source:** [Identity snapshot](../../../../src/Identity/Identity.Infrastructure/Migrations/AppIdentityDbContextModelSnapshot.cs) and [configurations](../../../../src/Identity/Identity.Infrastructure/Configuration/), checked 2026-10-21. [Back to database map](README.md) · [session feature](../../features/identity/session.md).
 
-| Таблиця | PK | Призначення |
+| Table | PK | Purpose |
 | --- | --- | --- |
-| `AspNetUsers` | `Id` | Користувачі та облікові дані. |
-| `AspNetRoles` | `Id` | Ролі й рівні доступу. |
-| `AspNetUserRoles` | `UserId`, `RoleId` | Призначення ролей користувачам. |
-| `AspNetUserClaims` | `Id` | Claims користувача (`UserId` FK). |
-| `AspNetRoleClaims` | `Id` | Claims ролі (`RoleId` FK). |
-| `AspNetUserLogins` | `LoginProvider`, `ProviderKey` | Зовнішні входи (`UserId` FK). |
-| `AspNetUserTokens` | `UserId`, `LoginProvider`, `Name` | Токени (`UserId` FK). |
-| `AppRefreshSessions` | `Id` | Refresh-сесії (`UserId` FK). |
+| `AspNetUsers` | `Id` | Users and credentials. |
+| `AspNetRoles` | `Id` | Roles and access levels. |
+| `AspNetUserRoles` | `UserId`, `RoleId` | User role assignments. |
+| `AspNetUserClaims` | `Id` | User claims (`UserId` FK). |
+| `AspNetRoleClaims` | `Id` | Role claims (`RoleId` FK). |
+| `AspNetUserLogins` | `LoginProvider`, `ProviderKey` | External logins (`UserId` FK). |
+| `AspNetUserTokens` | `UserId`, `LoginProvider`, `Name` | Tokens (`UserId` FK). |
+| `AppRefreshSessions` | `Id` | Refresh sessions (`UserId` FK). |
 
 ```mermaid
 erDiagram

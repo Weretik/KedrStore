@@ -1,41 +1,41 @@
 # BuildingBlocks.Application
 
-## Структура
+## Structure
 
 ~~~text
 BuildingBlocks.Application/
 ├── Behaviors/
 │   ├── RequestLoggingBehavior
 │   ├── ExceptionBehavior
-│   ├── PerformanceBehavior + параметри
+│   ├── PerformanceBehavior + options
 │   ├── ValidationBehavior
 │   └── DomainEventDispatcherBehavior
 ├── Contracts/
 │   ├── ICurrentUserService, IPermissionService
 │   ├── ICacheService, IEmailService, IEnvironmentService
-│   └── технічні абстракції для модулів
+│   └── technical abstractions for modules
 ├── Notifications/
 │   ├── IDomainEventContext, IDomainEventDispatcher
 │   └── DomainEventNotification + handler
-├── Logging/                  згенеровані структуровані log helpers
+├── Logging/                  generated structured log helpers
 ├── Helpers/PhoneNumberHelper.cs
 └── ApplicationAssemblyMarker.cs
 ~~~
 
-## Поведінки pipeline
+## Pipeline behaviors
 
-Host реєструє RequestLogging, Exception, Performance, Validation і DomainEventDispatcher саме в такому порядку. Точна семантика — у [Mediator behaviors](../../runtime/mediator-behaviors.md).
+The host registers RequestLogging, Exception, Performance, Validation, and DomainEventDispatcher in exactly this order. See [Mediator behaviors](../../runtime/mediator-behaviors.md) for their precise semantics.
 
-## Сповіщення
+## Notifications
 
-`IDomainEventContext` надає сутності з накопиченими подіями. `IDomainEventDispatcher` публікує події. `DomainEventNotification` є обгорткою повідомлення Mediator. Типовий handler повідомлення навмисно порожній; handlers конкретних модулів підписуються на цей шаблон повідомлень/подій за потреби.
+`IDomainEventContext` provides entities with accumulated events. `IDomainEventDispatcher` publishes events. `DomainEventNotification` is a Mediator notification wrapper. The default notification handler is intentionally empty; handlers in specific modules can subscribe to this notification/event pattern when needed.
 
-## Логи й helpers
+## Logging and helpers
 
-Папка Logging містить сталі source-generated шаблони Serilog/Microsoft для запитів, валідації, продуктивності, доменних подій, cancellation і необроблених збоїв. Використовуй їх через чинні behaviors; не логуй сирі чутливі дані запиту.
+The Logging folder contains stable source-generated Serilog/Microsoft templates for requests, validation, performance, domain events, cancellation, and unhandled failures. Use them through the existing behaviors; do not log raw sensitive request data.
 
-`PhoneNumberHelper` — спільний інструмент нормалізації та перевірки телефонів. Використовуй його замість дублювання parsing.
+`PhoneNumberHelper` is a shared utility for normalizing and validating phone numbers. Use it instead of duplicating parsing logic.
 
-## Доступність контрактів
+## Contract availability
 
-`ICurrentUserService` та `IPermissionService` мають спільні реалізації в Infrastructure. `ICacheService`, `IEmailService` і `IEnvironmentService` наразі є лише контрактами в BuildingBlocks; спільну реалізацію там не зареєстровано. Не інжекти їх у нову фічу, доки відповідальний модуль не надасть і не зареєструє реалізацію.
+`ICurrentUserService` and `IPermissionService` have shared implementations in Infrastructure. `ICacheService`, `IEmailService`, and `IEnvironmentService` are currently only contracts in BuildingBlocks; no shared implementation is registered there. Do not inject them into a new feature until the responsible module provides and registers an implementation.

@@ -1,5 +1,5 @@
-# Користувачі
+# Users
 
-Цей розділ стосується початкових облікових записів, імпортованих контрагентів, реєстрації, запрошень і фіч керування користувачами.
+This section covers initial accounts, imported counterparties, registration, invitations, and user-management features.
 
-- [Створення облікових записів і реєстрація](provisioning-and-registration.md)
+- [Account provisioning and registration](provisioning-and-registration.md)

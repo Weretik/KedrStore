@@ -1,21 +1,21 @@
-# Технологічний стек
+# Technology stack
 
-| Область | Поточний вибір | Правило для нової роботи |
+| Area | Current choice | Rule for new work |
 | --- | --- | --- |
-| Runtime | .NET 10 / C#; `global.json` задає SDK `10.0.101` із `latestFeature` roll-forward | Дотримуйся nullable-анотацій і налаштованих аналізаторів. |
-| HTTP | ASP.NET Core controllers | Залишай controllers тонкими й використовуй Mediator. |
-| Mediator | Mediator 3.x | Використовуй пари request/handler і чинний pipeline. |
-| Mediator pipeline | RequestLogging, Exception, Performance, Validation, DomainEventDispatcher behaviors | Зберігай порядок реєстрації; не розміщуй бізнес-правила в behaviors. |
-| Валідація | FluentValidation | Розміщуй валідатор входу поряд із відповідним сценарієм використання. |
-| Результат | Ardalis.Result | Повертай `Result` або `Result<T>` і застосовуй чинне API-відображення. |
-| Дані | EF Core 10 + Npgsql/PostgreSQL | Конфігурація EF і міграції належать Infrastructure; виконання міграцій — окремому `Host.Jobs --job=migrate`. |
-| Репозиторії | Ardalis.Specification | Повторно використовуй наявний стиль репозиторію/специфікацій там, де він застосовується. |
-| Identity | ASP.NET Core Identity | Зберігай домовленості ролей, policies і fallback-auth. |
-| Логи | Serilog | Лише структуровані логи без чутливих даних. |
-| Фонова робота | Наявні абстракції фонових завдань та `Host.Jobs` | Не прив'язуй Application безпосередньо до планувальника; `Host.Jobs` є одноразовим CLI. |
-| Зовнішній каталог | Інтеграція з 1C через SOAP | Тримай згенерований код і клієнта за адаптерами Infrastructure. |
-| Тести | xUnit: unit, integration, architecture | Додавай тести відповідно до зміненої межі й ризику. |
+| Runtime | .NET 10 / C#; `global.json` sets SDK `10.0.101` with `latestFeature` roll-forward | Follow nullable annotations and configured analyzers. |
+| HTTP | ASP.NET Core controllers | Keep controllers thin and use Mediator. |
+| Mediator | Mediator 3.x | Use request/handler pairs and the existing pipeline. |
+| Mediator pipeline | RequestLogging, Exception, Performance, Validation, DomainEventDispatcher behaviors | Preserve registration order; do not put business rules in behaviors. |
+| Validation | FluentValidation | Keep input validators beside the corresponding use case. |
+| Results | Ardalis.Result | Return `Result` or `Result<T>` and use existing API mapping. |
+| Data | EF Core 10 + Npgsql/PostgreSQL | EF configuration and migrations belong in Infrastructure; migrations run through separate `Host.Jobs --job=migrate`. |
+| Repositories | Ardalis.Specification | Reuse the existing repository/specification style where it applies. |
+| Identity | ASP.NET Core Identity | Preserve role, policy, and fallback-auth conventions. |
+| Logging | Serilog | Use structured logs without sensitive data. |
+| Background work | Existing background-job abstractions and `Host.Jobs` | Do not couple Application directly to a scheduler; `Host.Jobs` is a one-shot CLI. |
+| External catalog | 1C integration over SOAP | Keep generated code and client behind Infrastructure adapters. |
+| Tests | xUnit: unit, integration, and architecture | Add tests appropriate to the changed boundary and risk. |
 
-Повний перелік **оголошених прямих** залежностей, версій і проєктів містить [каталог NuGet-пакетів](nuget-packages.md). Роль пакета у таблиці не доводить його фактичне використання без перевірки коду.
+The [NuGet package catalog](nuget-packages.md) lists all declared **direct** dependencies, versions, and projects. A package's role in this table does not prove its actual use without checking code.
 
-Не додавай пакет для заміни чинного підходу проєкту без явного рішення в специфікації фічі та погодження.
+Do not add a package to replace an existing project approach without an explicit feature-spec decision and approval.

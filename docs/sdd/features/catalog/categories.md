@@ -1,33 +1,33 @@
-# Категорії каталогу
+# Catalog categories
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** catalog.
+**Static code check:** 2026-10-16. **Module:** Catalog.
 
-Публічний список і деталі за slug, а також окреме admin-читання.
+Public list and details by slug, plus separate admin reads.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[Публічний controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) і [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) передають запити до [Application handler](../../../../src/Catalog/Catalog.Application/Features/Category/GetList/GetCategoriesQuryHandler.cs). [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs) зберігається через [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/DataBase/CatalogDbContext.cs). Це read API; зміни категорій тут не реалізовані.
+The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) dispatch requests to the [Application handler](../../../../src/Catalog/Catalog.Application/Features/Category/GetList/GetCategoriesQuryHandler.cs). [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs) is stored through [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/DataBase/CatalogDbContext.cs). This is a read API; category changes are not implemented here.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key feature components; it does not include every supporting file.
 
 ```text
 src/
 └── Catalog/
     ├── Catalog.Api/Controllers/
-    │   ├── AdminCategoriesController.cs  # HTTP-вхід
-    │   └── CategoriesController.cs  # HTTP-вхід
+    │   ├── AdminCategoriesController.cs  # HTTP entry point
+    │   └── CategoriesController.cs  # HTTP entry point
     ├── Catalog.Application/Features/Category/
-    │   ├── AdminGetById/GetAdminCategoryByIdQueryHandler.cs  # обробник сценарію
-    │   ├── AdminGetList/GetAdminCategoriesQueryHandler.cs  # обробник сценарію
-    │   ├── GetBySlug/GetCategoryBySlugQueryHandler.cs  # обробник сценарію
-    │   └── GetList/GetCategoriesQuryHandler.cs  # обробник сценарію
-    ├── Catalog.Domain/Entities/ProductCategory.cs  # доменна модель
-    └── Catalog.Infrastructure/DataBase/CatalogDbContext.cs  # контекст даних
+    │   ├── AdminGetById/GetAdminCategoryByIdQueryHandler.cs  # use-case handler
+    │   ├── AdminGetList/GetAdminCategoriesQueryHandler.cs  # use-case handler
+    │   ├── GetBySlug/GetCategoryBySlugQueryHandler.cs  # use-case handler
+    │   └── GetList/GetCategoriesQuryHandler.cs  # use-case handler
+    ├── Catalog.Domain/Entities/ProductCategory.cs  # domain model
+    └── Catalog.Infrastructure/DataBase/CatalogDbContext.cs  # data context
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
@@ -39,6 +39,6 @@ flowchart LR
     E --> G["ProductCategory"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/catalog/category-read.openapi.yaml) · [SDD читання](../../specs/catalog/002-category-read-api/README.md) · [SDD метаданих](../../specs/catalog/001-category-presentation-metadata/README.md).
+[Contract](../../contracts/catalog/category-read.openapi.yaml) · [Category read SDD](../../specs/catalog/002-category-read-api/README.md) · [Category metadata SDD](../../specs/catalog/001-category-presentation-metadata/README.md).

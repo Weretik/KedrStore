@@ -1,14 +1,14 @@
-# Структура проєкту й шарів
+# Project and layer structure
 
-## Карта solution
+## Solution map
 
 ~~~text
 KedrStore.sln
 │
 ├── src/
 │   ├── Bootstrapper/
-│   │   ├── Host.Api/                 composition root і HTTP host
-│   │   └── Host.Jobs/                CLI host для jobs
+│   │   ├── Host.Api/                 composition root and HTTP host
+│   │   └── Host.Jobs/                CLI host for jobs
 │   ├── BuildingBlocks/
 │   │   ├── BuildingBlocks.Domain/
 │   │   ├── BuildingBlocks.Application/
@@ -36,11 +36,11 @@ KedrStore.sln
 │   ├── IntegrationTests/
 │   └── ArchitectureTests/
 └── docs/
-    ├── sdd/                         чинна документація
-    └── legacy/                      лише архів
+    ├── sdd/                         current documentation
+    └── legacy/                      archive only
 ~~~
 
-## Схема залежностей
+## Dependency diagram
 
 ~~~text
                          Host.Api / Host.Jobs
@@ -56,7 +56,7 @@ KedrStore.sln
                             ▼
                        <Module>.Domain
 
-<Module>.Contracts — стала межа DTO для потрібних споживачів.
+<Module>.Contracts — stable DTO boundary for relevant consumers.
 ~~~
 
-Не кожному модулю потрібен кожен із цих проєктів, але напрям залежностей потрібно зберігати. `BuildingBlocks.Integrations.OneC` — окремий спільний транспортний проєкт, описаний у [довіднику BuildingBlocks](../platform/building-blocks/README.md).
+Not every module needs every project, but preserve the dependency direction. `BuildingBlocks.Integrations.OneC` is a separate shared transport project described in the [BuildingBlocks guide](../platform/building-blocks/README.md).

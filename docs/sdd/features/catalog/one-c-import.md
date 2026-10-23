@@ -1,41 +1,41 @@
-# Імпорт каталогу з 1C
+# 1C catalog import
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** catalog.
+**Static code check:** 2026-10-16. **Module:** Catalog.
 
-Фоновий імпорт категорій, деталей товарів, цін, типів цін і залишків.
+Background import of categories, product details, prices, price types, and stock.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) запускає [full job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCFullJob.cs) та окремі jobs. [Контракт клієнта](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Contracts/IOneCClient.cs) ізолює 1C; [OneCClient](../../../../src/Catalog/Catalog.Infrastructure/Integrations/OneC/Client/OneCClient.cs) реалізує доступ; [CatalogEfRepository](../../../../src/Catalog/Catalog.Infrastructure/Repositories/CatalogEfRepository.cs) записує дані.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Contracts/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Catalog/Catalog.Infrastructure/Integrations/OneC/Client/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Catalog/Catalog.Infrastructure/Repositories/CatalogEfRepository.cs) persists data.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
-├── Bootstrapper/Host.Jobs/Host.Jobs/Program.cs  # запуск job
+├── Bootstrapper/Host.Jobs/Host.Jobs/Program.cs  # runs the job
 └── Catalog/
     ├── Catalog.Application/Integrations/OneC/
-    │   ├── Contracts/IOneCClient.cs  # порт і контракт
-    │   └── Jobs/SyncOneCFullJob.cs  # фонова задача
+    │   ├── Contracts/IOneCClient.cs  # port and contract
+    │   └── Jobs/SyncOneCFullJob.cs  # background job
     └── Catalog.Infrastructure/
-        ├── Integrations/OneC/Client/OneCClient.cs  # інфраструктурна реалізація
-        └── Repositories/CatalogEfRepository.cs  # доступ до даних
+        ├── Integrations/OneC/Client/OneCClient.cs  # infrastructure implementation
+        └── Repositories/CatalogEfRepository.cs  # data access
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-    A["Host.Jobs"] --> B["SyncOneCFullJob та окремі jobs"]
+    A["Host.Jobs"] --> B["SyncOneCFullJob and individual jobs"]
     B --> C["IOneCClient"]
     C --> D["OneCClient"]
     D --> E["1C"]
     B --> F["CatalogEfRepository"]
-    F --> G["Дані Catalog"]
+    F --> G["Catalog data"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[CLI](../../operations/jobs/host-jobs-cli.md) · [Потік імпорту](../../architecture/integrations/one-c/catalog-import-flow.md) · [SDD кореня](../../specs/catalog/cosmos-one-c-root/README.md).
+[CLI](../../operations/jobs/host-jobs-cli.md) · [Import flow](../../architecture/integrations/one-c/catalog-import-flow.md) · [Root SDD](../../specs/catalog/cosmos-one-c-root/README.md).

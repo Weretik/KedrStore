@@ -1,37 +1,37 @@
-# Швидке замовлення
+# Quick order
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** catalog.
+**Static code check:** 2026-10-16. **Module:** Catalog.
 
-Публічний `POST /api/orders` із формуванням Excel і сповіщенням Telegram.
+Public `POST /api/orders` with Excel generation and Telegram notification.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[OrderController](../../../../src/Catalog/Catalog.Api/Controllers/OrderController.cs) запускає [CreateOrderCommandHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs). Handler створює GUID, формує Excel через exporter і надсилає файл через notifier. Цей потік не зберігає [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs); його не слід плутати з admin-замовленнями Sales.
+[OrderController](../../../../src/Catalog/Catalog.Api/Controllers/OrderController.cs) invokes [CreateOrderCommandHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs). The handler creates a GUID, generates an Excel file through an exporter, and sends it with a notifier. This flow does not persist a [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs); do not confuse it with Sales admin orders.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 ├── Catalog/
-│   ├── Catalog.Api/Controllers/OrderController.cs  # HTTP-вхід
-│   └── Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs  # обробник сценарію
-└── Sales/Sales.Domain/Orders/Entities/Order.cs  # доменна модель
+│   ├── Catalog.Api/Controllers/OrderController.cs  # HTTP entry point
+│   └── Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs  # use-case handler
+└── Sales/Sales.Domain/Orders/Entities/Order.cs  # domain model
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["OrderController"] --> B["CreateOrderCommandHandler"]
-    B --> C["GUID замовлення"]
+    B --> C["Order GUID"]
     B --> D["Excel exporter"]
-    D --> E["Файл замовлення"]
+    D --> E["Order file"]
     B --> F["Notifier"]
     F --> E
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/catalog/orders.openapi.yaml) · [Замовлення Sales](../sales/admin-orders.md).
+[Contract](../../contracts/catalog/orders.openapi.yaml) · [Sales orders](../sales/admin-orders.md).

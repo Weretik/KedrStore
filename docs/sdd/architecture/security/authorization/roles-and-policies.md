@@ -1,40 +1,40 @@
-# Авторизація
+# Authorization
 
-## Типове правило
+## Default rule
 
-`Host.Api` налаштовує резервне правило авторизації, яке вимагає автентифікованого користувача. Тому кінцева точка захищена, якщо явно не оголошує `[AllowAnonymous]`. Анонімний доступ потрібно явно описати в API-контракті й перевірити в межах фічі.
+`Host.Api` configures a fallback authorization policy that requires an authenticated user. Therefore, an endpoint is protected unless it explicitly declares `[AllowAnonymous]`. Anonymous access must be explicitly described in the API contract and verified as part of the feature.
 
-Автентифікація відповідає на питання **хто викликає**, авторизація — **чи має цей викликач право виконати операцію**.
+Authentication answers **who is calling**; authorization answers **whether that caller may perform the operation**.
 
-## Ролі
+## Roles
 
-Константи ролей містяться в `Identity.Domain/Authorization/RoleNames.cs`.
+Role constants are defined in `Identity.Domain/Authorization/RoleNames.cs`.
 
-| Роль | Поточний зміст | Створює `Host.Jobs --job=migrate` |
+| Role | Current meaning | Created by `Host.Jobs --job=migrate` |
 | --- | --- | --- |
-| `Admin` | Адміністрування системи | так |
-| `Manager` | Керування вмістом | так |
-| `User` | Звичайний автентифікований користувач | так |
-| `Guest` | Оголошена константа ролі | ні |
+| `Admin` | System administration | yes |
+| `Manager` | Content management | yes |
+| `User` | Regular authenticated user | yes |
+| `Guest` | Declared role constant | no |
 
-`RoleSeeder`, який запускає окремий migration job, створює лише Admin, Manager і User. Не призначай `Guest`, доки не визначено його створення та бізнес-зміст.
+`RoleSeeder`, run by the separate migration job, creates only Admin, Manager, and User. Do not assign `Guest` until its provisioning and business meaning are defined.
 
-## Політики доступу
+## Access policies
 
-Назви policies містяться в `Identity.Application/Security/Policies/PolicyNames.cs`; вимоги до ролей налаштовує `Host.Api` в `AuthorizationPoliciesRegistrationExtensions`.
+Policy names are defined in `Identity.Application/Security/Policies/PolicyNames.cs`; role requirements are configured by `Host.Api` in `AuthorizationPoliciesRegistrationExtensions`.
 
-| Policy | Дозволені ролі |
+| Policy | Allowed roles |
 | --- | --- |
 | `RequireAdminRole` / `CanManageUsers` | Admin |
 | `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` | Manager, Admin |
 | `CatalogRead` / `OrderCreate` | User, Manager, Admin |
-| `RequireTenantAccess` | Константа є, але policy наразі не зареєстрована |
+| `RequireTenantAccess` | The constant exists, but the policy is not currently registered |
 
-Не використовуй `RequireTenantAccess` на кінцевій точці, доки немає реєстрації в хості та визначеної семантики.
+Do not use `RequireTenantAccess` on an endpoint until it is registered in the host and its semantics are defined.
 
-## Захист кінцевих точок
+## Protecting endpoints
 
-Віддавай перевагу наявній названій policy, що описує операцію:
+Prefer an existing named policy that describes the operation:
 
 ```csharp
 [HttpPut("{id:guid}")]
@@ -42,19 +42,19 @@
 public async Task<IActionResult> Update(Guid id, ...)
 ```
 
-Controller лише оголошує доступ. Command/query однаково проходить через `ISender`; бізнес-інваріанти залишаються в Domain/Application. Не замінюй policy перевіркою ролі всередині controller.
+The controller only declares access. Commands and queries still go through `ISender`; business invariants remain in Domain/Application. Do not replace a policy with a role check inside the controller.
 
-Для публічної кінцевої точки використовуй `[AllowAnonymous]` і зафіксуй причину в контракті фічі. Це перевизначає резервне правило авторизації.
+For a public endpoint, use `[AllowAnonymous]` and record the reason in the feature contract. This overrides the fallback authorization policy.
 
-## Інфраструктура поточного користувача й дозволів
+## Current-user and permission infrastructure
 
-BuildingBlocks Infrastructure надає абстракції користувача запиту й дозволів, зокрема `HttpContextCurrentUserService` і `ClaimPermissionService`. Якщо сценарій використання потребує даних поточного користувача, використовуй чинну абстракцію Application. Не інжекти `HttpContext`, `UserManager<AppUser>` або `RoleManager<AppRole>` у Domain чи Application іншого модуля.
+BuildingBlocks Infrastructure provides request-user and permission abstractions, including `HttpContextCurrentUserService` and `ClaimPermissionService`. If a use case needs current-user data, use the existing Application abstraction. Do not inject `HttpContext`, `UserManager<AppUser>`, or `RoleManager<AppRole>` into Domain or another module's Application.
 
-## Додавання policy або ролі
+## Adding a policy or role
 
-1. Перевір, чи наявна policy вже описує бізнес-операцію.
-2. Якщо ні, визнач назву policy в Identity Application, а вимогу до ролей — у реєстрації авторизації Host.Api.
-3. Якщо потрібна нова роль, додай константу в Identity Domain і заплануй її створення окремим migration job. Визнач, хто з наявних і майбутніх користувачів її отримує.
-4. Захисти кінцеву точку новим правилом, онови API-контракт і вручну перевір як заборонені, так і дозволені запити.
+1. Check whether an existing policy already describes the business operation.
+2. If not, define the policy name in Identity Application and the role requirement in Host.Api authorization registration.
+3. If a new role is needed, add a constant in Identity Domain and plan its creation through the separate migration job. Define which existing and future users receive it.
+4. Protect the endpoint with the new rule, update the API contract, and manually verify both denied and allowed requests.
 
-Додавання ролі змінює авторизацію, а не лише рядок: воно зачіпає початкове створення, призначення користувачам, документацію й порядок розгортання.
+Adding a role changes authorization, not just a string: it affects initial provisioning, user assignment, documentation, and deployment order.

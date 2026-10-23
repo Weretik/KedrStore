@@ -1,35 +1,35 @@
-# Публічні товари
+# Public products
 
-**Статична звірка з кодом:** 2026-10-19. **Модуль:** catalog.
+**Static code check:** 2026-10-19. **Module:** Catalog.
 
-Анонімні списки за мовою/категорією та деталі за slug.
+Anonymous product lists by language/category and details by slug.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[ProductsController](../../../../src/Catalog/Catalog.Api/Controllers/ProductsController.cs) викликає [handler списку](../../../../src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs) і [handler деталей](../../../../src/Catalog/Catalog.Application/Features/Products/GetBySlug/GetProductBySlugQueryHandler.cs). Список спирається на [read-проєкцію](../../../../src/Catalog/Catalog.Domain/Entities/ProductListProjection.cs); джерельний товар — [Product](../../../../src/Catalog/Catalog.Domain/Entities/Product.cs), ієрархія — [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs), доступ до БД — [IReadCatalogDbContext](../../../../src/Catalog/Catalog.Application/Contracts/Persistence/ICatalogDbContext.cs).
+[ProductsController](../../../../src/Catalog/Catalog.Api/Controllers/ProductsController.cs) calls the [list handler](../../../../src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs) and [details handler](../../../../src/Catalog/Catalog.Application/Features/Products/GetBySlug/GetProductBySlugQueryHandler.cs). The list uses the [read projection](../../../../src/Catalog/Catalog.Domain/Entities/ProductListProjection.cs); the source product is [Product](../../../../src/Catalog/Catalog.Domain/Entities/Product.cs), the hierarchy is [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs), and database access uses [IReadCatalogDbContext](../../../../src/Catalog/Catalog.Application/Contracts/Persistence/ICatalogDbContext.cs).
 
-Коли передано `categoryId` або `categorySlug`, handler читає наявні категорії, вибирає корінь за ID (пріоритетний) чи slug і обходить усіх нащадків за `ParentId` без фіксованої глибини. Публічні проєкції фільтруються за набором ID піддерева до `totalRecords`, сортування та пагінації. Невідома категорія дає порожню сторінку; без параметра категорії зберігається загальний список.
+When `categoryId` or `categorySlug` is supplied, the handler reads existing categories, chooses a root by ID (which takes precedence) or slug, then traverses all descendants by `ParentId` with no fixed depth. Public projections are filtered by the subtree ID set before counting, sorting, and paging. An unknown category returns an empty page; without a category parameter, the general list is retained.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key feature components; it does not include every supporting file.
 
 ```text
 src/
 └── Catalog/
-    ├── Catalog.Api/Controllers/ProductsController.cs  # HTTP-вхід
+    ├── Catalog.Api/Controllers/ProductsController.cs  # HTTP entry point
     ├── Catalog.Application/
-    │   ├── Contracts/Persistence/ICatalogDbContext.cs  # порт і контракт
+    │   ├── Contracts/Persistence/ICatalogDbContext.cs  # port and contract
     │   └── Features/Products/
-    │       ├── GetBySlug/GetProductBySlugQueryHandler.cs  # обробник сценарію
-    │       └── GetPublicList/GetPublicProductListQueryHandler.cs  # обробник сценарію
+    │       ├── GetBySlug/GetProductBySlugQueryHandler.cs  # use-case handler
+    │       └── GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
     └── Catalog.Domain/Entities/
-        ├── Product.cs  # доменна модель
-        ├── ProductCategory.cs  # ієрархія категорій
-        └── ProductListProjection.cs  # модель списку
+        ├── Product.cs  # domain model
+        ├── ProductCategory.cs  # category hierarchy
+        └── ProductListProjection.cs  # list model
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
@@ -42,6 +42,6 @@ flowchart LR
     D --> G["ProductCategory"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/catalog/products.openapi.yaml) · [Проєкція](stock-projection.md) · [SDD піддерева категорії](../../specs/catalog/002-category-read-api/requirements/public-product-category-filter.md).
+[Contract](../../contracts/catalog/products.openapi.yaml) · [Projection](stock-projection.md) · [Category subtree SDD](../../specs/catalog/002-category-read-api/requirements/public-product-category-filter.md).

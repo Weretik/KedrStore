@@ -1,43 +1,43 @@
-# Архітектура backend
+# Backend architecture
 
-KedrStore — модульний backend на ASP.NET Core і .NET 10. Поточні підходи: Clean Architecture, DDD, CQRS, Mediator, FluentValidation, Ardalis.Result, EF Core/PostgreSQL і Serilog. Перелік прямих пакетів та їхніх оголошених версій є в [каталозі NuGet](platform/nuget-packages.md).
+KedrStore is a modular backend built on ASP.NET Core and .NET 10. Current approaches include Clean Architecture, DDD, CQRS, Mediator, FluentValidation, Ardalis.Result, EF Core/PostgreSQL, and Serilog. The [NuGet package catalog](platform/nuget-packages.md) lists declared direct dependencies and versions.
 
-## Навігація за питанням
+## Browse by question
 
-### Загальна картина
+### Overview
 
-- [Карта системи](overview/system-map.md) — hosts, модулі та напрям залежностей.
-- [Структура проєкту](overview/project-structure.md) — дерево solution і шари.
-- [Межі шарів](overview/layers.md) — відповідальність і заборонені залежності.
-- [Карта модулів](overview/modules.md) — відповідальність Catalog, Sales, Identity та BuildingBlocks.
-- [Карта бази даних](data-model/README.md) — дерево таблиць за фічами та окремі описи PK/FK.
-- [Продуктовий словник](../../product/glossary.md) — терміни каталогу, дверей, фурнітури й Cosmos.
+- [System map](overview/system-map.md) — hosts, modules, and dependency direction.
+- [Project structure](overview/project-structure.md) — solution tree and layers.
+- [Layer boundaries](overview/layers.md) — responsibilities and forbidden dependencies.
+- [Module map](overview/modules.md) — Catalog, Sales, Identity, and BuildingBlocks responsibilities.
+- [Database map](data-model/README.md) — feature table trees and key relationships.
+- [Product glossary](../../product/glossary.md) — catalog, doors, hardware, and Cosmos terms.
 
-### Розміщення коду за шарами
+### Code placement by layer
 
 - [Domain](layers/domain-structure.md)
 - [Application](layers/application-structure.md)
 - [Infrastructure](layers/infrastructure-structure.md)
-- [API та Host](layers/api-host-structure.md)
+- [API and Host](layers/api-host-structure.md)
 
-### Виконання запиту й інтеграцій
+### Request execution and integrations
 
-- [Шлях сценарію використання](runtime/use-case-flow.md)
+- [Use-case flow](runtime/use-case-flow.md)
 - [Mediator behaviors](runtime/mediator-behaviors.md)
-- [Наскрізний pipeline](runtime/cross-cutting.md)
-- [Дані й інтеграції](runtime/persistence-and-integrations.md)
-- [Інтеграція з 1C](integrations/one-c/README.md)
+- [Cross-cutting pipeline](runtime/cross-cutting.md)
+- [Data and integrations](runtime/persistence-and-integrations.md)
+- [1C integration](integrations/one-c/README.md)
 
-### Платформа
+### Platform
 
-- [Технологічний стек](platform/technology-stack.md)
-- [Прямі NuGet-залежності](platform/nuget-packages.md)
-- [Інструменти збірки й доставки](platform/tooling-and-delivery.md)
-- [Довідник BuildingBlocks](platform/building-blocks/README.md)
-- [Архітектурні рішення](decisions/README.md)
+- [Technology stack](platform/technology-stack.md)
+- [Direct NuGet dependencies](platform/nuget-packages.md)
+- [Build and delivery tools](platform/tooling-and-delivery.md)
+- [BuildingBlocks guide](platform/building-blocks/README.md)
+- [Architectural decisions](decisions/README.md)
 
-### Identity та контроль доступу
+### Identity and access control
 
-- [Identity, автентифікація й авторизація](security/README.md)
+- [Identity, authentication, and authorization](security/README.md)
 
-Цей розділ описує поточну архітектуру й сталі межі. Запланована зміна спершу належить до [специфікації](../specs/README.md); після прийняття й реалізації сталого рішення онови відповідний архітектурний документ і, за потреби, [ADR](decisions/README.md).
+This section describes the current architecture and stable boundaries. A planned change belongs first in a [specification](../specs/README.md); after a stable decision is accepted and implemented, update the relevant architecture document and, if needed, an [ADR](decisions/README.md).

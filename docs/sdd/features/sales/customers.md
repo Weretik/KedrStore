@@ -1,46 +1,46 @@
-# Клієнти й контрагенти
+# Customers and counterparties
 
-**Статична звірка з кодом:** 2026-10-22. **Модуль:** sales.
+**Static code check:** 2026-10-22. **Module:** Sales.
 
-Admin-список і деталі контрагентів, локальна синхронізація з повним списком 1C та відкладене видалення пов'язаних Identity users.
+Admin counterparty list and details, local synchronization with the full 1C list, and deferred deletion of linked Identity users.
 
-Список `GET /api/admin/customers` застосовує `searchTerm` до ID, імені й телефону та окремі фільтри `counterpartyId`, `name`, `phone` до всієї активної вибірки. Умови поєднуються через AND, `totalRecords` обчислюється до пагінації, а `sort` задає порядок `name`/`counterpartyId`/`phone` у двох напрямках зі стабільним ID. Деталі й синхронізація залишаються окремими сценаріями.
+`GET /api/admin/customers` applies `searchTerm` to ID, name, and phone, and applies separate `counterpartyId`, `name`, and `phone` filters to the complete active set. Conditions are combined with AND; `totalRecords` is calculated before paging; `sort` orders by `name`/`counterpartyId`/`phone` in either direction with stable ID as a tie-breaker. Details and synchronization remain separate use cases.
 
-Деталі зберігають ID типів цін і категорій та додають їхні назви з довідників Catalog через пакетний `ICatalogReferenceDataReader`. Відсутній довідниковий запис дає `null` у відповідному полі назви без втрати правила.
+Details retain price type and category IDs and add their Catalog lookup names through batched `ICatalogReferenceDataReader`. If a lookup record is missing, its name field is `null`; the rule is retained.
 
-За підтвердженим контрактом 1C `GetCounterpartiesAsync` повертає повний список одним масивом. `OneCCounterpartiesSyncService` формує множину джерельних ID до валідації та Identity provisioning; присутній, але пропущений рядок не стає застарілим клієнтом. Порожній масив або будь-який рядок без ID зупиняє видалення для цього проходу.
+Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete list in one array. `OneCCounterpartiesSyncService` builds the set of source IDs before validation and Identity provisioning; a present but skipped row is not treated as stale. An empty array or any row without an ID stops deletion for that pass.
 
-`StaleCounterpartyRemoval` транзакційно видаляє локальні Order/Draft залежності та записує pending Identity deletion. `DrainIdentityDeletionsAsync` повторює Identity delete на наступному проході; якщо user пов'язаний із чинним Counterparty, його не видаляє. PostgreSQL rollback і concurrency сценарії цього потоку ще не підтверджені спеціалізованими integration tests.
+`StaleCounterpartyRemoval` transactionally deletes local Order/Draft dependencies and records pending Identity deletion. `DrainIdentityDeletionsAsync` retries Identity deletion on the next pass; it does not delete a user linked to a current Counterparty. PostgreSQL rollback and concurrency scenarios for this flow are not yet confirmed by specialized integration tests.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[AdminCustomersController](../../../../src/Sales/Sales.Api/Controllers/AdminCustomersController.cs) читає через [list handler](../../../../src/Sales/Sales.Application/Features/Customers/GetList/GetCustomerListQueryHandler.cs) і [detail handler](../../../../src/Sales/Sales.Application/Features/Customers/GetById/GetCustomerByIdQueryHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Entities/Counterparty.cs) є доменною моделлю; [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/OneCCounterpartiesSyncService.cs) оновлює її з 1C, а [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/StaleCounterpartyRemoval.cs) атомарно очищає Sales залежності й планує Identity deletion.
+[AdminCustomersController](../../../../src/Sales/Sales.Api/Controllers/AdminCustomersController.cs) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/GetList/GetCustomerListQueryHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/GetById/GetCustomerByIdQueryHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Entities/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components; it does not include every supporting file.
 
 ```text
 src/
 ├── Sales/
-│   ├── Sales.Api/Controllers/AdminCustomersController.cs  # HTTP-вхід і query-параметри
+│   ├── Sales.Api/Controllers/AdminCustomersController.cs  # HTTP entry point and query parameters
 │   ├── Sales.Application/Features/Customers/
-│   │   ├── GetById/GetCustomerByIdQueryHandler.cs  # обробник сценарію
-│   │   └── GetList/GetCustomerListQueryHandler.cs  # обробник сценарію
-│   ├── Sales.Domain/Customers/Entities/Counterparty.cs  # доменна модель
+│   │   ├── GetById/GetCustomerByIdQueryHandler.cs  # use-case handler
+│   │   └── GetList/GetCustomerListQueryHandler.cs  # use-case handler
+│   ├── Sales.Domain/Customers/Entities/Counterparty.cs  # domain model
 │   └── Sales.Infrastructure/
-│       ├── Customers/CustomerReadService.cs  # пошук, фільтри, порядок, підрахунок і сторінка
-│       ├── Integrations/OneC/SalesOneCReadClient.cs  # повний масив 1C → Sales DTO
-│       ├── Integrations/OneC/Services/OneCCounterpartiesSyncService.cs  # source ID set і upsert
-│       ├── Integrations/OneC/Services/StaleCounterpartyRemoval.cs  # транзакційне видалення та outbox drain
-│       ├── DataBase/Entities/PendingCounterpartyIdentityDeletion.cs  # збережений Identity retry state
-│       ├── Configurations/PendingCounterpartyIdentityDeletionConfiguration.cs  # мапінг outbox
-│       └── Migrations/20261022103423_AddPendingCounterpartyIdentityDeletions.cs  # таблиця outbox
+│       ├── Customers/CustomerReadService.cs  # search, filters, ordering, count, and paging
+│       ├── Integrations/OneC/SalesOneCReadClient.cs  # full 1C array → Sales DTO
+│       ├── Integrations/OneC/Services/OneCCounterpartiesSyncService.cs  # source ID set and upsert
+│       ├── Integrations/OneC/Services/StaleCounterpartyRemoval.cs  # transactional deletion and outbox drain
+│       ├── DataBase/Entities/PendingCounterpartyIdentityDeletion.cs  # persisted Identity retry state
+│       ├── Configurations/PendingCounterpartyIdentityDeletionConfiguration.cs  # outbox mapping
+│       └── Migrations/20261022103423_AddPendingCounterpartyIdentityDeletions.cs  # outbox table
 └── Identity/
     └── Identity.Infrastructure/Services/ImportedCounterpartyIdentityProvisioningService.cs  # Identity lifecycle
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
@@ -59,6 +59,6 @@ flowchart LR
     G --> H["CatalogReferenceDataReader"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/sales/customer-read.openapi.yaml) · [SDD читання клієнтів](../../specs/sales/003-customer-read-api/README.md) · [SDD звіряння 1C](../../specs/sales/007-customer-sync-reconciliation/README.md) · [Runbook](../../operations/jobs/sales-one-c-runbook.md).
+[Contract](../../contracts/sales/customer-read.openapi.yaml) · [Customer read SDD](../../specs/sales/003-customer-read-api/README.md) · [1C reconciliation SDD](../../specs/sales/007-customer-sync-reconciliation/README.md) · [Runbook](../../operations/jobs/sales-one-c-runbook.md).

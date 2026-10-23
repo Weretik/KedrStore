@@ -1,15 +1,15 @@
-# Правила БД
+# Database rules
 
-## Читання та продуктивність
+## Reads and performance
 
-Для use cases читання застосовуй проєкції та `AsNoTracking`, де це доречно. Уникай N+1-запитів, необмежених endpoints списків і зайвої матеріалізації. Pagination і фільтрація великих списків мають бути частиною контракту.
+Use projections and `AsNoTracking` for read use cases where appropriate. Avoid N+1 queries, unbounded list endpoints, and unnecessary materialization. Pagination and filtering for large lists must be part of the contract.
 
-## Узгодженість і транзакції
+## Consistency and transactions
 
-Дотримуйся чинних меж транзакцій і конкурентного доступу. Не додавай автоматичних повторів для записів із побічними ефектами без документованої ідемпотентності. Не послаблюй гарантії узгодженості без явного рішення.
+Follow existing transaction and concurrency boundaries. Do not add automatic retries for writes with side effects without documented idempotency. Do not weaken consistency guarantees without an explicit decision.
 
-## EF Core, міграції й дані
+## EF Core, migrations, and data
 
-Перетворення моделей EF Core належить Infrastructure. Доменні сутності не містять логіки збереження даних. Створюй міграцію лише коли цього потребує обсяг фічі; не редагуй уже застосовані міграції. Перевір нову міграцію на порожній тестовій БД і опиши ризики відкату та розгортання. Поточний запуск через окремий `Host.Jobs --job=migrate` описано в [операціях](../operations/data/migrations-and-seeding.md).
+EF Core model mapping belongs in Infrastructure. Domain entities contain no persistence logic. Add a migration only when required by the feature scope; do not edit migrations that have already been applied. Check a new migration against an empty test database and describe rollback and rollout risks. The current separate `Host.Jobs --job=migrate` execution is described in [operations](../operations/data/migrations-and-seeding.md).
 
-Зберігай семантику запитів і контракти БД. Довідкові/seed-дані змінюй через чинний механізм seeding, а не прихованими записами під час runtime.
+Preserve query semantics and database contracts. Change lookup/seed data through the existing seeding mechanism, not through hidden runtime writes.

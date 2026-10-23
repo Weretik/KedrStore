@@ -1,39 +1,39 @@
-# Сеанс користувача
+# User session
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** identity.
+**Static code check:** 2026-10-16. **Module:** Identity.
 
-Login, refresh, logout і me.
+Login, refresh, logout, and current-user operations.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[AuthSessionController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/AuthSessionController.cs) викликає [login handler](../../../../src/Identity/Identity.Application/Features/Auth/SessionLogin/SessionLoginCommandHandler.cs) та handlers інших операцій; [IdentitySessionService](../../../../src/Identity/Identity.Infrastructure/Services/IdentitySessionService.cs) працює зі станом Identity. Правила токенів, cookie та CSRF описано в окремому [потоці сеансу](../../architecture/security/authentication/session-flow.md).
+[AuthSessionController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/AuthSessionController.cs) calls the [login handler](../../../../src/Identity/Identity.Application/Features/Auth/SessionLogin/SessionLoginCommandHandler.cs) and handlers for other operations. [IdentitySessionService](../../../../src/Identity/Identity.Infrastructure/Services/IdentitySessionService.cs) works with Identity state. Token, cookie, and CSRF rules are described in the separate [session flow](../../architecture/security/authentication/session-flow.md).
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 └── Identity/
-    ├── Identity.Api/Identity.Api/Controllers/AuthSessionController.cs  # HTTP-вхід
+    ├── Identity.Api/Identity.Api/Controllers/AuthSessionController.cs  # HTTP entry point
     ├── Identity.Application/Features/Auth/
-    │   ├── SessionLogin/SessionLoginCommandHandler.cs  # обробник сценарію
-    │   ├── SessionLogout/SessionLogoutCommandHandler.cs  # обробник сценарію
-    │   ├── SessionMe/SessionMeQueryHandler.cs  # обробник сценарію
-    │   └── SessionRefresh/SessionRefreshCommandHandler.cs  # обробник сценарію
-    └── Identity.Infrastructure/Services/IdentitySessionService.cs  # інфраструктурна реалізація
+    │   ├── SessionLogin/SessionLoginCommandHandler.cs  # use-case handler
+    │   ├── SessionLogout/SessionLogoutCommandHandler.cs  # use-case handler
+    │   ├── SessionMe/SessionMeQueryHandler.cs  # use-case handler
+    │   └── SessionRefresh/SessionRefreshCommandHandler.cs  # use-case handler
+    └── Identity.Infrastructure/Services/IdentitySessionService.cs  # infrastructure implementation
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-    A["AuthSessionController"] --> B["SessionLoginCommandHandler та інші handlers"]
+    A["AuthSessionController"] --> B["SessionLoginCommandHandler and other handlers"]
     B --> C["IdentitySessionService"]
-    C --> D["Стан Identity"]
-    A --> E["Cookie, токени та CSRF"]
+    C --> D["Identity state"]
+    A --> E["Cookies, tokens, and CSRF"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/identity/session.openapi.yaml) · [Provisioning](../../architecture/security/users/provisioning-and-registration.md).
+[Contract](../../contracts/identity/session.openapi.yaml) · [Provisioning](../../architecture/security/users/provisioning-and-registration.md).

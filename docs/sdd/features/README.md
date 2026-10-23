@@ -1,32 +1,32 @@
-# Карта backend-фіч KedrStore
+# KedrStore backend feature map
 
-**Статичну звірку з кодом проведено:** 2026-10-16 для попередніх фіч; робочу область замовлень Admin звірено 2026-10-21. Ця карта показує фактично наявні HTTP- та job-сценарії за модулями. Кожен опис пояснює потік, компоненти, дані та зв'язки. [SDD](../specs/README.md) зберігає рішення й історію delivery; [архітектура](../architecture/README.md) — загальні межі. При новій фічі або зміні її будови оновлюй опис і цей індекс у тій самій зміні.
+**Static code check completed:** 2026-10-16 for earlier features; the Admin order workspace was checked on 2026-10-21. This map shows HTTP and job scenarios that actually exist, grouped by module. Each description explains the flow, components, data, and relationships. [SDD](../specs/README.md) holds decisions and delivery history; [architecture](../architecture/README.md) holds common boundaries. When adding a feature or changing its structure, update its description and this index in the same change.
 
-Фактичні шляхи й ролі файлів дивись у картці фічі під заголовком «Структура в коді»; потік між складовими — під заголовком «Схема будови».
+See the feature card's “Code structure” section for actual file paths and roles, and “Structure diagram” for the flow between parts.
 
 ## Catalog
 
-- [Категорії каталогу](catalog/categories.md) — Публічний список і деталі за slug, а також окреме admin-читання.
-- [Публічні товари](catalog/public-products.md) — Анонімні списки за мовою/категорією та деталі за slug.
-- [Admin-товари й фото](catalog/admin-products.md) — Сторінкові списки з серверними фільтрами, повний список, недоступні фото та деталі товару за slug.
-- [Перевірка фото товарів](catalog/photo-check.md) — job перевірки URL і збереження статусу.
-- [Швидке замовлення](catalog/quick-order.md) — Публічний `POST /api/orders` із формуванням Excel і сповіщенням Telegram.
-- [Імпорт каталогу з 1C](catalog/one-c-import.md) — Фоновий імпорт категорій, деталей товарів, цін, типів цін і залишків.
-- [Проєкція товарів і залишків](catalog/stock-projection.md) — Окрема read-модель для списків товарів та її оновлення.
+- [Catalog categories](catalog/categories.md) — public list and details by slug, plus separate admin reads.
+- [Public products](catalog/public-products.md) — anonymous lists by language/category and details by slug.
+- [Admin products and photos](catalog/admin-products.md) — paged lists with server filters, full list, unavailable photos, and product details by slug.
+- [Product photo check](catalog/photo-check.md) — job that checks URLs and saves status.
+- [Quick order](catalog/quick-order.md) — public `POST /api/orders` with Excel generation and Telegram notification.
+- [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
+- [Product and stock projection](catalog/stock-projection.md) — separate read model for product lists and its updates.
 
 ## Sales
 
-- [Замовлення менеджера та 1C](sales/admin-orders.md) — Створення, читання, статус синхронізації та retry замовлення.
-- [Робоча область замовлень Admin](sales/admin-order-workspace.md) — Окремі захищені операції пошуку, серверного розрахунку, оформлення та збережених чернеток для React Admin.
-- [Клієнти й контрагенти](sales/customers.md) — Admin-список і деталі контрагентів, локальна синхронізація з 1C.
-- [Каталог менеджера](sales/manager-catalog.md) — Авторизований список товарів для продажів.
+- [Manager orders and 1C](sales/admin-orders.md) — order creation, reading, synchronization status, and retry.
+- [Admin order workspace](sales/admin-order-workspace.md) — separate protected operations for search, server-side quoting, checkout, and saved drafts in React Admin.
+- [Customers and counterparties](sales/customers.md) — Admin counterparty list and details, local synchronization with 1C.
+- [Manager catalog](sales/manager-catalog.md) — authorized sales product list.
 
 ## Identity
 
-- [Сеанс користувача](identity/session.md) — Login, refresh, logout і me.
+- [User session](identity/session.md) — login, refresh, logout, and me.
 
 ## Platform
 
-- [Міграції та seed](platform/database-migration.md) — Окрема job, що змінює схему і початкові дані.
+- [Migrations and seed](platform/database-migration.md) — separate job that changes the schema and initial data.
 
-Заплановані можливості із SDD та технічні класи без окремого сценарію не подаються тут як готові фічі.
+Planned capabilities from SDDs and technical classes without separate scenarios are not shown here as completed features.

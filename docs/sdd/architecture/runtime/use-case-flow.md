@@ -1,36 +1,36 @@
-# Потік сценарію використання
+# Use-case flow
 
-## Звичайний HTTP-потік
+## Typical HTTP flow
 
 ~~~text
 HTTP request
-  → прив'язка в Controller
+  → Controller binding
   → ISender.Send(request, cancellationToken)
   → Mediator pipeline
   → Command/query handler
-  → Domain + абстракції Application
-  → адаптер Infrastructure / БД
+  → Domain + Application abstractions
+  → Infrastructure adapter / database
   → Ardalis.Result
-  → HTTP-відповідь через ToActionResult
+  → HTTP response through ToActionResult
 ~~~
 
-## Правила CQRS
+## CQRS rules
 
-- Команда змінює стан і повертає лише потрібний ідентифікатор, статус або `Result`.
-- Запит не змінює стан і проєктує тільки потрібні поля.
-- Не приховуй операції запису в обробниках запитів або фонових операціях читання.
-- Передавай `CancellationToken` крізь кожну асинхронну операцію.
-- Роби чутливі до повторів команди ідемпотентними, якщо можливі подвійні побічні ефекти. Для кінцевої точки з `Idempotency-Key` опиши ключ, обсяг і строк зберігання.
+- A command changes state and returns only the needed identifier, status, or `Result`.
+- A query does not change state and projects only the required fields.
+- Do not hide writes in query handlers or background read operations.
+- Pass `CancellationToken` through every asynchronous operation.
+- Make retry-sensitive commands idempotent when duplicate side effects are possible. For endpoints using `Idempotency-Key`, document its key, scope, and retention period.
 
-## Розміщення фічі
+## Feature placement
 
 ~~~text
 <Module>.Application/Features/<Area>/<UseCase>/
   <UseCase>Command|Query.cs
   <UseCase>Command|QueryHandler.cs
-  DTOs/                 (лише приватні для цього сценарію)
+  DTOs/                 (private to this use case only)
   Validators/
-  Extensions/           (лише пов'язані query/mapping helpers)
+  Extensions/           (related query/mapping helpers only)
 ~~~
 
-Поділяй файл, коли його частини мають окремі причини для змін. Не створюй папок-звалищ `Common`, `Helpers` або `Utils`.
+Split a file when its parts have separate reasons to change. Do not create catch-all `Common`, `Helpers`, or `Utils` folders.

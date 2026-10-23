@@ -1,17 +1,17 @@
-# Sales — замовлення й 1C: дані
+# Sales — orders and 1C: data
 
-**Джерело:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) і [конфігурації](../../../../src/Sales/Sales.Infrastructure/Configurations/), перевірено 2026-10-21. [Назад до карти БД](README.md) · [фіча замовлень](../../features/sales/admin-orders.md).
+**Source:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Sales/Sales.Infrastructure/Configurations/), checked 2026-10-21. [Back to database map](README.md) · [orders feature](../../features/sales/admin-orders.md).
 
-| Таблиця | PK | Призначення й важливі поля |
+| Table | PK | Purpose and important fields |
 | --- | --- | --- |
-| `Orders` | `Id` | Замовлення: `CounterpartyId` (FK), `OrderNumber`, `CreatedAt`, `Comment`. |
-| `OrderLines` | `Id` | Позиції: `OrderId` (FK), `ProductId`, `ProductName`, `Quantity`, `Amount`. |
-| `OneCOrderSyncs` | `Id` | Стан передачі в 1C; `OrderId` (FK). |
-| `OrderIdempotencyRecords` | `Id` | Ключ і хеш повторного запиту; `OrderId` (FK). |
-| `OrderSyncRetryAudits` | `Id` | Аудит retry: `OneCOrderSyncId` (FK), `OrderId`, попередній стан і причину. |
-| `OrderDrafts` | `Id` | Окремі збережені чернетки: `CounterpartyId` (FK), `Title`, `Note`, `Version`, час створення й зміни; номера Order немає. |
-| `OrderDraftLines` | `Id` | Позиції: `DraftId` (FK), `ProductId`, додатна `Quantity`; пара `DraftId/ProductId` унікальна. |
-| `OrderDraftIdempotencyRecords` | `Id` | Ключ та хеш запиту на створення чернетки, `DraftId` (FK). |
+| `Orders` | `Id` | Order: `CounterpartyId` (FK), `OrderNumber`, `CreatedAt`, `Comment`. |
+| `OrderLines` | `Id` | Lines: `OrderId` (FK), `ProductId`, `ProductName`, `Quantity`, `Amount`. |
+| `OneCOrderSyncs` | `Id` | 1C delivery state; `OrderId` (FK). |
+| `OrderIdempotencyRecords` | `Id` | Request key and hash; `OrderId` (FK). |
+| `OrderSyncRetryAudits` | `Id` | Retry audit: `OneCOrderSyncId` (FK), `OrderId`, previous state and reason. |
+| `OrderDrafts` | `Id` | Separate saved drafts: `CounterpartyId` (FK), `Title`, `Note`, `Version`, creation/update times; no Order number. |
+| `OrderDraftLines` | `Id` | Lines: `DraftId` (FK), `ProductId`, positive `Quantity`; `DraftId/ProductId` pair is unique. |
+| `OrderDraftIdempotencyRecords` | `Id` | Draft creation request key and hash, `DraftId` (FK). |
 
 ```mermaid
 erDiagram
@@ -25,4 +25,4 @@ erDiagram
     OrderDrafts ||--o| OrderDraftIdempotencyRecords : "DraftId FK"
 ```
 
-`OrderLines.ProductId` є посиланням на товар Catalog за ID без фізичного FK у Sales snapshot. `Counterparties` описано в [даних клієнтів](sales-customers.md).
+`OrderLines.ProductId` references a Catalog product by ID without a physical FK in the Sales snapshot. See [customer data](sales-customers.md) for `Counterparties`.

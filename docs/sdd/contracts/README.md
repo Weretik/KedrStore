@@ -1,34 +1,35 @@
-# API-контракти
+# API contracts
 
-`docs/sdd/contracts/` — канонічне версійне джерело машинозчитуваних публічних API-контрактів.
+`docs/sdd/contracts/` is the canonical versioned source for machine-readable public API contracts.
 
-## Структура
+## Structure
 
 ```text
 docs/sdd/contracts/
-├── openapi.yaml                         # сукупна точка входу для публічних API
+├── openapi.yaml                         # aggregate entry point for public APIs
 └── <module>/
-    └── <feature>.openapi.yaml           # контракт однієї фічі
+    └── <feature>.openapi.yaml           # one feature contract
 ```
 
-`openapi.yaml` — точка входу для Swagger UI, генерації frontend-клієнта й контрактних тестів. Він підключає модульні контракти через `$ref`; не дублюй операції чи схеми в сукупному файлі.
+`openapi.yaml` is the entry point for Swagger UI, frontend client generation, and contract tests. It includes module contracts through `$ref`; do not duplicate operations or schemas in the aggregate file.
 
-## Поточна передача контракту до frontend
+## Current frontend contract handoff
 
-- [Посібник інтеграції frontend](frontend-integration.md) описує автентифікацію, CSRF, pagination, помилки та власників endpoints.
-- [Сукупний контракт OpenAPI 3.1](openapi.yaml) охоплює поточні зареєстровані controllers.
-- Catalog: [товари](catalog/products.openapi.yaml), [категорії](catalog/category-read.openapi.yaml), [швидке замовлення](catalog/orders.openapi.yaml).
-- Sales: [каталог для менеджера](sales/catalog.openapi.yaml), [замовлення й синхронізація з 1C](sales/admin-order-one-c-sync.openapi.yaml), [читання замовлень](sales/manager-order-read.openapi.yaml), [читання клієнтів](sales/customer-read.openapi.yaml).
-- Identity: [сеанс](identity/session.openapi.yaml).
+- [Frontend integration guide](frontend-integration.md) describes authentication, CSRF, pagination, errors, and endpoint owners.
+- [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers currently registered controllers.
+- Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [quick orders](catalog/orders.openapi.yaml).
+- Sales: [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml).
+- Identity: [session](identity/session.openapi.yaml).
 
-OpenAPI-файли описують контракт поточного коду. Вони самі не відкривають доступ до кінцевих точок: авторизаційні атрибути й резервне правило доступу хоста залишаються визначальними.
+The OpenAPI files describe the current code contract. They do not grant endpoint access: authorization attributes and the host fallback access policy remain authoritative.
 
-У `contracts/api-contract.md` кожної SDD-фічі фіксуй рішення про обсяг, споживачів, сумісність, безпеку, помилки, ідемпотентність і розгортання. Для нової чи зміненої HTTP-поведінки узгодь ці рішення й, коли практично можливо, створи або онови машинозчитуваний контракт до реалізації транспортного рівня. За узгодженим контрактом додай цільові Red-тести API/контракту, тоді реалізуй транспортний рівень. Документ фічі посилається на `docs/sdd/contracts/<module>/<feature>.openapi.yaml`; сукупний `openapi.yaml` оновлюється в тій самій зміні.
+Record scope, consumers, compatibility, security, errors, idempotency, and deployment decisions in each feature's `contracts/api-contract.md`. For new or changed HTTP behavior, agree on these decisions and, where practical, create or update the machine-readable contract before implementing the transport layer. Add targeted API/contract Red tests against the agreed contract, then implement the transport. The feature document links to `docs/sdd/contracts/<module>/<feature>.openapi.yaml`; update aggregate `openapi.yaml` in the same change.
 
-Не створюй публічний OpenAPI-документ для суто внутрішньої зміни. До додавання HTTP-контракту узгодь route, method, operation ID, DTO, приклади, помилки, безпеку, ідемпотентність записів із побічними ефектами та шлях міграції для breaking changes.
+Do not create a public OpenAPI document for an internal-only change. Before adding an HTTP contract, agree on route, method, operation ID, DTOs, examples, errors, security, write idempotency for side effects, and a migration path for breaking changes.
+
 ## Admin workspace
 
-- [Робоча область замовлень Admin](sales/admin-order-workspace.openapi.yaml).
-- [Чернетки замовлень Admin](sales/admin-order-drafts.openapi.yaml).
+- [Admin order workspace](sales/admin-order-workspace.openapi.yaml).
+- [Admin order drafts](sales/admin-order-drafts.openapi.yaml).
 
-Ці операції реалізовано в окремому Admin API та включено до агрегованого openapi.yaml.
+These operations are implemented in a separate Admin API and included in the aggregate `openapi.yaml`.

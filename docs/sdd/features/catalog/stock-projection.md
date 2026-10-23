@@ -1,36 +1,36 @@
-# Проєкція товарів і залишків
+# Product and stock projection
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** catalog.
+**Static code check:** 2026-10-16. **Module:** Catalog.
 
-Окрема read-модель для списків товарів та її оновлення.
+A separate read model for product lists and its updates.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[ProductListProjection](../../../../src/Catalog/Catalog.Domain/Entities/ProductListProjection.cs) зберігає дані списку у [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/DataBase/CatalogDbContext.cs). [Rebuilder](../../../../src/Catalog/Catalog.Infrastructure/Projections/ProductListProjectionRebuilder.cs) перебудовує проєкцію; [stock job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCStocksJob.cs) оновлює залишки. [Публічний handler](../../../../src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs) читає проєкцію.
+[ProductListProjection](../../../../src/Catalog/Catalog.Domain/Entities/ProductListProjection.cs) stores list data in [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/DataBase/CatalogDbContext.cs). The [rebuilder](../../../../src/Catalog/Catalog.Infrastructure/Projections/ProductListProjectionRebuilder.cs) rebuilds the projection; the [stock job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCStocksJob.cs) updates stock. The [public handler](../../../../src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs) reads the projection.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 └── Catalog/
     ├── Catalog.Application/
-    │   ├── Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs  # обробник сценарію
-    │   └── Integrations/OneC/Jobs/SyncOneCStocksJob.cs  # фонова задача
-    ├── Catalog.Domain/Entities/ProductListProjection.cs  # доменна модель
+    │   ├── Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
+    │   └── Integrations/OneC/Jobs/SyncOneCStocksJob.cs  # background job
+    ├── Catalog.Domain/Entities/ProductListProjection.cs  # domain model
     └── Catalog.Infrastructure/
-        ├── DataBase/CatalogDbContext.cs  # контекст даних
-        └── Projections/ProductListProjectionRebuilder.cs  # інфраструктурна реалізація
+        ├── DataBase/CatalogDbContext.cs  # data context
+        └── Projections/ProductListProjectionRebuilder.cs  # infrastructure implementation
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["1C"] --> B["SyncOneCStocksJob"]
     B --> C["ICatalogRepository<Product>"]
-    C --> D["Product із залишком"]
+    C --> D["Product with stock"]
     B --> E["IProductListProjectionRebuilder"]
     E --> F["ProductListProjectionRebuilder"]
     F --> G["CatalogDbContext"]
@@ -38,6 +38,6 @@ flowchart LR
     I["GetPublicProductListQueryHandler"] --> H
 ```
 
-## Пов'язані джерела
+## Related sources
 
 [SDD](../../specs/catalog/stock-projection-refresh/README.md) · [Jobs](../../operations/jobs/README.md).

@@ -1,35 +1,35 @@
-# Інтеграція frontend із KedrStore API
+# Frontend integration with the KedrStore API
 
-Версійна точка входу OpenAPI — [openapi.yaml](openapi.yaml). Генеруй типи й клієнти з цього файла; не копіюй DTO з вихідного коду backend.
+The versioned OpenAPI entry point is [openapi.yaml](openapi.yaml). Generate types and clients from this file; do not copy DTOs from backend source code.
 
-## Автентифікація
+## Authentication
 
-`POST /api/auth/session/login` повертає непрозорий Bearer access token і встановлює два cookies: HTTP-only refresh cookie `kedr.rt` (надсилається лише на refresh route) і доступний для читання CSRF cookie `kedr.csrf`.
+`POST /api/auth/session/login` returns an opaque Bearer access token and sets two cookies: the HTTP-only refresh cookie `kedr.rt` (sent only to the refresh route) and the readable CSRF cookie `kedr.csrf`.
 
-Для захищених операцій передавай `Authorization: Bearer <accessToken>`. Для поновлення сесії виклич `POST /api/auth/session/refresh` із `credentials: 'include'` і передай у заголовку `X-CSRF-Token` поточне значення cookie `kedr.csrf`. Кінцева точка поновлення змінює обидва cookie й повертає новий токен доступу. `POST /api/auth/session/logout` також потребує автентифікації Bearer й очищає обидва cookie.
+For protected operations, send `Authorization: Bearer <accessToken>`. To refresh the session, call `POST /api/auth/session/refresh` with `credentials: 'include'` and send the current `kedr.csrf` cookie value in the `X-CSRF-Token` header. The refresh endpoint changes both cookies and returns a new access token. `POST /api/auth/session/logout` also requires Bearer authentication and clears both cookies.
 
-Host має fallback policy, що вимагає автентифікації. Сьогодні публічними є endpoints із явною анонімністю в controller; каталог Sales і автентифіковані endpoints сесії не є публічними.
+The host has a fallback policy that requires authentication. Public endpoints today are those explicitly marked anonymous in a controller; the Sales catalog and authenticated session endpoints are not public.
 
-## Правила HTTP
+## HTTP rules
 
-- Назви властивостей JSON використовують camelCase ASP.NET Core.
-- Списки мають форму `{ pagedInfo, value }`. `pagedInfo` містить `pageNumber`, `pageSize`, `totalPages`, `totalRecords`; `value` — масив рядків.
-- Помилки валідації повертають `400` із чинним масивом Ardalis validation errors. Не прив'язуй логіку до локалізованого тексту помилки.
-- `404` не має тіла відповіді. `409` повертає масив конфліктних повідомлень. `401` означає відсутню/некоректну автентифікацію, `403` — автентифікованого користувача без дозволу.
-- Десяткові значення — числа JSON. Ідентифікатори — цілі числа, якщо схема явно не визначає `uuid` чи `string`.
+- JSON property names use ASP.NET Core camelCase.
+- Lists have the shape `{ pagedInfo, value }`. `pagedInfo` contains `pageNumber`, `pageSize`, `totalPages`, and `totalRecords`; `value` is an array of rows.
+- Validation errors return `400` with the existing Ardalis validation error array. Do not couple logic to localized error text.
+- `404` has no response body. `409` returns an array of conflict messages. `401` means authentication is missing/invalid; `403` means an authenticated user lacks permission.
+- Decimal values are JSON numbers. Identifiers are integers unless the schema explicitly defines `uuid` or `string`.
 
-## Карта endpoints
+## Endpoint map
 
-| Область | Операція | Доступ |
+| Area | Operation | Access |
 | --- | --- | --- |
-| Публічний каталог | `GET /api/catalog/{lang}/products`, деталі товару | Анонімний |
-| Публічна навігація категоріями | `GET /api/catalog/{lang}/categories`, `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | Анонімний |
-| Читання категорій Admin | `GET /api/categories`, `GET /api/categories/{id}` | Анонімний (тимчасова внутрішня UI-поверхня) |
-| Модель читання товарів Admin | `GET /api/admin/products`, `/all` | Анонімний у поточному коді; трактуй як внутрішню/admin UI-поверхню |
-| Швидке замовлення | `POST /api/orders` | Анонімний |
-| Сесія | login, refresh, logout, поточний користувач | Змішаний; див. контракт Identity |
-| Каталог Sales | `POST /api/sales/{lang}/catalog/products` | Потрібен Bearer token |
+| Public catalog | `GET /api/catalog/{lang}/products`, product details | Anonymous |
+| Public category navigation | `GET /api/catalog/{lang}/categories`, `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | Anonymous |
+| Admin category reads | `GET /api/categories`, `GET /api/categories/{id}` | Anonymous (temporary internal UI surface) |
+| Admin product read model | `GET /api/admin/products`, `/all` | Anonymous in current code; treat as internal/admin UI surface |
+| Quick order | `POST /api/orders` | Anonymous |
+| Session | login, refresh, logout, current user | Mixed; see Identity contract |
+| Sales catalog | `POST /api/sales/{lang}/catalog/products` | Bearer token required |
 
-`lang` для API читання каталогу приймає `uk` або `ru`. Колекція категорій — дерево навігації без поділу на сторінки: використовуй надані сервером поля `id`, `slug`, `parentId`, `sortOrder`, `level`, `children`; не відновлюй порядок чи ієрархію за назвами. Назви категорій уже локалізовані для `lang`; деталі категорії додають шлях від кореня до поточного вузла. Розмір сторінки товарів обмежено 100. Сервер зараз нормалізує некоректні нижні значення сторінки під час виконання, але клієнт завжди має надсилати `page >= 1` і `pageSize` від 1 до 100.
+For catalog read APIs, `lang` accepts `uk` or `ru`. The category collection is a navigation tree with no paging: use the server-provided `id`, `slug`, `parentId`, `sortOrder`, `level`, and `children` fields; do not reconstruct order or hierarchy from names. Category names are already localized for `lang`; category details add the path from the root to the current node. Product page size is capped at 100. The server currently normalizes invalid lower page values at runtime, but clients must always send `page >= 1` and `pageSize` from 1 to 100.
 
-Список категорій Admin — пласка ієрархія без поділу на сторінки в порядку обходу в глибину. Він повертає вихідне `name`, обидві локалізовані короткі назви, `productTypeIdOneC` і структурні поля; будуй дерево адміністративного інтерфейсу за `parentId` і зберігай наданий порядок. Маршрут окремого елемента використовує числовий `id`, а не `slug`.
+The Admin category list is a flat hierarchy without paging, ordered by depth-first traversal. It returns the source `name`, both localized short names, `productTypeIdOneC`, and structural fields; build the admin UI tree by `parentId` and preserve the provided order. The individual item route uses numeric `id`, not `slug`.

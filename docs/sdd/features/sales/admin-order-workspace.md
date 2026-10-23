@@ -1,63 +1,63 @@
-# Робоча область замовлень Admin
+# Admin order workspace
 
-**Модуль:** Sales. **Споживач:** React Admin. **Стан:** код і контракт у репозиторії; міграцію не застосовано до робочої БД.
+**Module:** Sales. **Consumer:** React Admin. **State:** code and contract are in the repository; the migration has not been applied to the working database.
 
-[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) відкриває окремі анонімні маршрути `/api/admin/order-workspace` і передає кожну операцію окремому Application handler. Наявний `/api/admin/orders` залишається окремим контрактом. [Читач замовлень](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) виконує пошук, сортування й сторінковий перегляд; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) бере політику вибраного клієнта, актуальний залишок та ціни Catalog. Недостатній залишок повертає очікуваний 400 `unavailable_product` із назвою й кількостями товару. Під час оформлення [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) повторно розраховує суму, порівнює fingerprint і через чинний OrderCreationStore атомарно записує Order та Pending 1C sync.
+[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) exposes separate anonymous `/api/admin/order-workspace` routes and dispatches each operation to its own Application handler. Existing `/api/admin/orders` remains a separate contract. The [order reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) performs search, sorting, and paging; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) uses the selected customer's policy, current stock, and Catalog prices. Insufficient stock returns the expected 400 `unavailable_product` with product name and quantities. During checkout, [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) recalculates the total, compares the fingerprint, and atomically writes Order and Pending 1C sync through the existing OrderCreationStore.
 
-Чернетки реалізовано окремою [моделлю](../../../../src/Sales/Sales.Domain/Orders/Entities/OrderDraft.cs), [читачем](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs) і [адаптером запису](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Drafts/WorkspaceDraftWriter.cs). Вони не отримують номера Order і не передаються в 1C. Відповідь деталі містить актуальний серверний розрахунок або `pricingStatus=Unavailable` зі збереженими позиціями та `null` замість недоступних цін; PUT/DELETE використовують `If-Match`. Оформлення на основі чернетки не змінює її.
+Drafts use a separate [model](../../../../src/Sales/Sales.Domain/Orders/Entities/OrderDraft.cs), [reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs), and [write adapter](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Drafts/WorkspaceDraftWriter.cs). They do not receive an Order number or go to 1C. The details response contains a current server-side quote or `pricingStatus=Unavailable` with saved lines and `null` for unavailable prices; PUT/DELETE use `If-Match`. Checkout from a draft does not change the draft.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     Admin[React Admin] --> Controller[AdminOrderWorkspaceController]
-    Controller --> Handlers[Application handlers за сценаріями]
-    Handlers --> Readers[Order і Draft readers]
+    Controller --> Handlers[Application handlers by use case]
+    Handlers --> Readers[Order and Draft readers]
     Handlers --> Creator[Order creator]
     Handlers --> DraftWriter[Draft writer]
     Handlers --> Pricing[AdminWorkspacePricing]
-    Pricing --> Catalog[Catalog: товари й ціни]
-    Pricing --> Customers[Sales: клієнти]
+    Pricing --> Catalog[Catalog: products and prices]
+    Pricing --> Customers[Sales: customers]
     Creator --> Orders[OrderCreationStore]
-    Orders --> Order[Order та Pending 1C sync]
-    DraftWriter --> DraftTables[OrderDrafts і OrderDraftLines]
+    Orders --> Order[Order and Pending 1C sync]
+    DraftWriter --> DraftTables[OrderDrafts and OrderDraftLines]
     Readers --> DraftTables
-    Sync[Чинна 1C job] --> Order
+    Sync[Existing 1C job] --> Order
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 src/Sales/
-├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs           # анонімний HTTP-вхід, відомі помилки → статус/code/message
+├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs           # anonymous HTTP entry, known errors → status/code/message
 ├── Sales.Application/
 │   ├── Contracts/Orders/
-│   │   ├── WorkspaceOrderContracts.cs                         # DTO замовлень
-│   │   ├── WorkspaceDraftContracts.cs                         # DTO чернеток
-│   │   ├── WorkspaceQuoteContracts.cs                         # DTO розрахунку
-│   │   ├── WorkspacePageContracts.cs                          # пагінація
-│   │   ├── WorkspaceInputLine.cs                              # позиція запиту
-│   │   ├── IWorkspaceOrderReader.cs                           # порт читання замовлень
-│   │   └── IWorkspaceDraftWriter.cs                           # порт запису чернеток
+│   │   ├── WorkspaceOrderContracts.cs                         # order DTOs
+│   │   ├── WorkspaceDraftContracts.cs                         # draft DTOs
+│   │   ├── WorkspaceQuoteContracts.cs                         # quote DTOs
+│   │   ├── WorkspacePageContracts.cs                          # paging
+│   │   ├── WorkspaceInputLine.cs                              # request line
+│   │   ├── IWorkspaceOrderReader.cs                           # order read port
+│   │   └── IWorkspaceDraftWriter.cs                           # draft write port
 │   └── Features/Orders/AdminWorkspace/
-│       ├── Orders/GetList/GetWorkspaceOrdersQueryHandler.cs  # список замовлень
-│       ├── Orders/Quote/QuoteWorkspaceOrderQueryHandler.cs   # серверний quote
-│       ├── Orders/Create/CreateWorkspaceOrderCommandHandler.cs # оформлення
-│       ├── Drafts/GetList/GetWorkspaceDraftsQueryHandler.cs  # список чернеток
-│       ├── Drafts/Create/CreateWorkspaceDraftCommandHandler.cs # нова чернетка
-│       ├── Drafts/Update/UpdateWorkspaceDraftCommandHandler.cs # редагування
-│       └── Drafts/Delete/DeleteWorkspaceDraftCommandHandler.cs # видалення
-├── Sales.Domain/Orders/Entities/OrderDraft.cs                       # модель збереженої чернетки
+│       ├── Orders/GetList/GetWorkspaceOrdersQueryHandler.cs  # order list
+│       ├── Orders/Quote/QuoteWorkspaceOrderQueryHandler.cs   # server-side quote
+│       ├── Orders/Create/CreateWorkspaceOrderCommandHandler.cs # checkout
+│       ├── Drafts/GetList/GetWorkspaceDraftsQueryHandler.cs  # draft list
+│       ├── Drafts/Create/CreateWorkspaceDraftCommandHandler.cs # create draft
+│       ├── Drafts/Update/UpdateWorkspaceDraftCommandHandler.cs # edit draft
+│       └── Drafts/Delete/DeleteWorkspaceDraftCommandHandler.cs # delete draft
+├── Sales.Domain/Orders/Entities/OrderDraft.cs                       # persisted draft model
 └── Sales.Infrastructure/
-    ├── Orders/Admin/Read/                                      # читання замовлень і чернеток
-    ├── Orders/Admin/Checkout/WorkspaceOrderCreator.cs          # оформлення замовлення
-    ├── Orders/Admin/Drafts/WorkspaceDraftWriter.cs             # запис чернеток
-    ├── Orders/Admin/Drafts/WorkspaceDraftDetails.cs            # проєкція деталей зі свіжою ціною
-    ├── Orders/Admin/Pricing/AdminWorkspacePricing.cs           # серверний розрахунок
-    ├── Orders/Admin/Idempotency/WorkspaceIdempotency.cs        # hash і DB conflict для повторів
-    └── Migrations/20261021135819_AddAdminOrderDrafts.cs             # адитивна міграція таблиць
+    ├── Orders/Admin/Read/                                      # order and draft reads
+    ├── Orders/Admin/Checkout/WorkspaceOrderCreator.cs          # order checkout
+    ├── Orders/Admin/Drafts/WorkspaceDraftWriter.cs             # draft writes
+    ├── Orders/Admin/Drafts/WorkspaceDraftDetails.cs            # details projection with fresh prices
+    ├── Orders/Admin/Pricing/AdminWorkspacePricing.cs           # server-side pricing
+    ├── Orders/Admin/Idempotency/WorkspaceIdempotency.cs        # hash and DB conflict handling for retries
+    └── Migrations/20261021135819_AddAdminOrderDrafts.cs             # additive table migration
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт замовлень](../../contracts/sales/admin-order-workspace.openapi.yaml) · [Контракт чернеток](../../contracts/sales/admin-order-drafts.openapi.yaml) · [SDD 004](../../specs/sales/004-admin-order-workspace/README.md) · [SDD 005](../../specs/sales/005-admin-order-drafts/README.md).
+[Order contract](../../contracts/sales/admin-order-workspace.openapi.yaml) · [Draft contract](../../contracts/sales/admin-order-drafts.openapi.yaml) · [SDD 004](../../specs/sales/004-admin-order-workspace/README.md) · [SDD 005](../../specs/sales/005-admin-order-drafts/README.md).

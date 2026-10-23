@@ -1,41 +1,41 @@
-# Структура Infrastructure
+# Infrastructure structure
 
-## Відповідальність
+## Responsibility
 
-Infrastructure — шар адаптерів. Він реалізує контракти Application і зберігає дані/взаємодіє з конкретними технологіями.
+Infrastructure is the adapter layer. It implements Application contracts, persists data, and interacts with specific technologies.
 
-## Цільова структура модуля
+## Target module structure
 
 ~~~text
 <Module>.Infrastructure/
 ├── DataBase/
 │   └── <Module>DbContext.cs
-├── Configurations/          класи EF IEntityTypeConfiguration
-├── Migrations/              EF-міграції та model snapshot
-├── Repositories/            EF-реалізації репозиторіїв
-├── Projections/             перебудова та зберігання моделей читання
+├── Configurations/          EF IEntityTypeConfiguration classes
+├── Migrations/              EF migrations and model snapshot
+├── Repositories/            EF repository implementations
+├── Projections/             read-model rebuild and persistence
 ├── Integrations/
-│   └── <System>/            реалізації HTTP/SOAP/queue адаптерів
-├── Services/                адаптери storage, export, notification
-├── DependencyInjection/     extension-методи Add<Module>...
+│   └── <System>/            HTTP/SOAP/queue adapter implementations
+├── Services/                storage, export, notification adapters
+├── DependencyInjection/     Add<Module>... extension methods
 └── <Module>.Infrastructure.csproj
 ~~~
 
-## Схема адаптерів
+## Adapter diagram
 
 ~~~text
-Абстракція Application
+Application abstraction
           ▲
-          │ реалізує
-Адаптер Infrastructure
+          │ implemented by
+Infrastructure adapter
      ├── EF Core DbContext ──► PostgreSQL
-     ├── зовнішній клієнт ────► 1C / Telegram / storage
-     └── побудова проєкції ──► модель читання
+     ├── external client ────► 1C / Telegram / storage
+     └── projection build ──► read model
 ~~~
 
-## Правила
+## Rules
 
-- EF-конфігурації та міграції не переходять до Domain або Application.
-- Реєструй адаптери через чинний DI extension модуля.
-- Інфраструктурний шар може посилатися на прикладний і доменний; зворотний напрям заборонений.
-- Перетворення зовнішніх даних залишай на межі адаптера; не пропускай згенеровані клієнтські типи у внутрішні шари.
+- EF configurations and migrations do not move into Domain or Application.
+- Register adapters through the module's existing DI extension.
+- Infrastructure may reference Application and Domain; references in the opposite direction are forbidden.
+- Keep external data transformation at the adapter boundary; do not pass generated client types into inner layers.

@@ -1,18 +1,18 @@
-# Інструменти збірки, перевірки й доставки
+# Build, Verification, and Delivery Tooling
 
-**Факт, перевірено 2026-10-15:** цей документ звірено з `global.json`, `KedrStore.sln`, `.github/workflows/deploy-cloudrun.yml`, файлами Dockerfile, `Program.cs` обох хостів і налаштуваннями запуску. Наявність кроку в процесі CI не доводить успішного розгортання в конкретне середовище.
+**Verified fact, checked 2026-10-15:** this document was checked against `global.json`, `KedrStore.sln`, `.github/workflows/deploy-cloudrun.yml`, Dockerfiles, `Program.cs` files for both hosts, and launch settings. The presence of a CI step does not prove successful deployment to a particular environment.
 
-| Область | Джерело в репозиторії | Поточне використання |
+| Area | Repository source | Current use |
 | --- | --- | --- |
-| SDK | `global.json` | .NET SDK `10.0.101`, `rollForward: latestFeature`; проєкти орієнтовані на `net10.0`. |
-| Solution | `KedrStore.sln` | Єдина точка для `dotnet restore`, `dotnet build` і загального `dotnet test`. |
-| Локальні профілі API | `src/Bootstrapper/Host.Api/Properties/launchSettings.json` | Профілі `http` і `https`; адреси й спосіб запуску — в [операційній інструкції](../../operations/local-development/run-api.md). |
-| Конфігурація | `src/Bootstrapper/Host.Api/appsettings*.json`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, ASP.NET Core User Secrets, змінні середовища | Секрети та джерела — у [конфігурації](../../operations/configuration/configuration-and-secrets.md). `Host.Jobs` у Development використовує власні User Secrets. |
-| Контейнери | `src/Bootstrapper/Host.Api/Dockerfile`, `src/Bootstrapper/Host.Jobs/Host.Jobs/Dockerfile` | Окремі образи для HTTP host та CLI jobs. |
-| CI | `.github/workflows/deploy-cloudrun.yml`, завдання `verify` | Отримання коду, .NET із `global.json`, відновлення залежностей, збірка Release, UnitTests, ArchitectureTests, IntegrationTests і завантаження покриття у форматі Cobertura. IntegrationTests можуть потребувати Docker для PostgreSQL Testcontainers. |
-| Доставка | `.github/workflows/deploy-cloudrun.yml`, job `deploy` | Після успішної перевірки створює образи, запускає Cloud Run `database-migrate` job із `--job=migrate` й очікує завершення, тоді розгортає `Host.Api` і оновлює образи jobs. Workflow запускається на push до `master`. |
+| SDK | `global.json` | .NET SDK `10.0.101`, `rollForward: latestFeature`; projects target `net10.0`. |
+| Solution | `KedrStore.sln` | Single entry point for `dotnet restore`, `dotnet build`, and `dotnet test`. |
+| Local API profiles | `src/Bootstrapper/Host.Api/Properties/launchSettings.json` | Profiles `http` and `https`; addresses and launch instructions are in the [operations guide](../../operations/local-development/run-api.md). |
+| Configuration | `src/Bootstrapper/Host.Api/appsettings*.json`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, ASP.NET Core User Secrets, environment variables | See [configuration and secrets](../../operations/configuration/configuration-and-secrets.md). `Host.Jobs` uses its own User Secrets in Development. |
+| Containers | `src/Bootstrapper/Host.Api/Dockerfile`, `src/Bootstrapper/Host.Jobs/Host.Jobs/Dockerfile` | Separate images for the HTTP host and CLI jobs. |
+| CI | `.github/workflows/deploy-cloudrun.yml`, `verify` job | Checks out the code, installs .NET from `global.json`, restores dependencies, builds Release, UnitTests, ArchitectureTests, IntegrationTests and uploads coverage in Cobertura format. IntegrationTests may require Docker for PostgreSQL Testcontainers. |
+| Deployment | `.github/workflows/deploy-cloudrun.yml`, job `deploy` | After verification succeeds, builds images, runs Cloud Run `database-migrate` job with `--job=migrate` and waits for completion, then deploys `Host.Api` and updates job images. The workflow runs on pushes to `master`. |
 
-Локальні команди, визначені [правилами тестування](../../standards/testing-rules.md):
+Local commands defined by [testing rules](../../standards/testing-rules.md):
 
 ```powershell
 dotnet restore KedrStore.sln
@@ -20,6 +20,6 @@ dotnet build KedrStore.sln --no-restore
 dotnet test KedrStore.sln --no-build
 ```
 
-`Host.Jobs` є одноразовим CLI: `--job=<name>` вибирає операцію, `--job=migrate` виконує міграції й сидери. Внутрішній планувальник не запускає завдання самостійно. Див. [CLI та операційні інструкції](../../operations/jobs/README.md). Не запускай завдання міграції за самим фактом читання цієї документації: команда змінює дані та схему.
+`Host.Jobs` is a one-shot CLI: `--job=<name>` selects an operation, and `--job=migrate` runs migrations and seeders. No internal scheduler starts jobs automatically. See [CLI and operations guides](../../operations/jobs/README.md). Do not run the migration job simply because you are reading this documentation: the command changes data and schema.
 
-Під час зміни SDK, маніфестів, файлів Dockerfile, процесу CI або команди запуску онови цей опис, [стек](technology-stack.md), [каталог пакетів](nuget-packages.md) і відповідні операційні інструкції.
+When changing the SDK, manifests, Dockerfiles, CI process, or launch command, update this description, [stack](technology-stack.md), [package catalog](nuget-packages.md) and the relevant operations guides.

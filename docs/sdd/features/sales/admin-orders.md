@@ -1,44 +1,44 @@
-# Замовлення менеджера та 1C
+# Manager orders and 1C
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** sales.
+**Static code check:** 2026-10-16. **Module:** Sales.
 
-Створення, читання, статус синхронізації та retry замовлення.
+Order creation and reads, synchronization status, and retry.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[AdminOrdersController](../../../../src/Sales/Sales.Api/Controllers/AdminOrdersController.cs) викликає [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Create/CreateOrderCommandHandler.cs): перевірка контрагента/товарів, ідемпотентності, запис [Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs) і [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/Entities/OneCOrderSync.cs) через [IOrderCreationStore](../../../../src/Sales/Sales.Application/Contracts/Persistence/IOrderCreationStore.cs) та [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/SyncOneCOrdersService.cs) відповідає за передачу в 1C.
+[AdminOrdersController](../../../../src/Sales/Sales.Api/Controllers/AdminOrdersController.cs) invokes the [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Create/CreateOrderCommandHandler.cs), which validates the counterparty/products and idempotency, then persists [Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs) and [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/Entities/OneCOrderSync.cs) through [IOrderCreationStore](../../../../src/Sales/Sales.Application/Contracts/Persistence/IOrderCreationStore.cs) and [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/SyncOneCOrdersService.cs) sends orders to 1C.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 └── Sales/
-    ├── Sales.Api/Controllers/AdminOrdersController.cs  # HTTP-вхід
+    ├── Sales.Api/Controllers/AdminOrdersController.cs  # HTTP entry point
     ├── Sales.Application/
-    │   ├── Contracts/Persistence/IOrderCreationStore.cs  # порт і контракт
+    │   ├── Contracts/Persistence/IOrderCreationStore.cs  # port and contract
     │   └── Features/Orders/
-    │       ├── Create/CreateOrderCommandHandler.cs  # обробник сценарію
-    │       ├── GetById/GetOrderByIdQueryHandler.cs  # обробник сценарію
-    │       ├── GetList/GetOrderListQueryHandler.cs  # обробник сценарію
-    │       ├── GetSyncStatus/GetOrderSyncStatusQueryHandler.cs  # обробник сценарію
-    │       └── RetrySync/RetryOrderSyncCommandHandler.cs  # обробник сценарію
+    │       ├── Create/CreateOrderCommandHandler.cs  # use-case handler
+    │       ├── GetById/GetOrderByIdQueryHandler.cs  # use-case handler
+    │       ├── GetList/GetOrderListQueryHandler.cs  # use-case handler
+    │       ├── GetSyncStatus/GetOrderSyncStatusQueryHandler.cs  # use-case handler
+    │       └── RetrySync/RetryOrderSyncCommandHandler.cs  # use-case handler
     ├── Sales.Domain/Orders/Entities/
-    │   ├── OneCOrderSync.cs  # доменна модель
-    │   └── Order.cs  # доменна модель
+    │   ├── OneCOrderSync.cs  # domain model
+    │   └── Order.cs  # domain model
     └── Sales.Infrastructure/
-        ├── Integrations/OneC/Services/SyncOneCOrdersService.cs  # інфраструктурна реалізація
-        └── Orders/OrderCreationStore.cs  # доступ до даних
+        ├── Integrations/OneC/Services/SyncOneCOrdersService.cs  # infrastructure implementation
+        └── Orders/OrderCreationStore.cs  # data access
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["AdminOrdersController"] --> B["CreateOrderCommandHandler"]
-    B --> C["Перевірка контрагента, товарів та ідемпотентності"]
-    C --> D["Order та OneCOrderSync"]
+    B --> C["Validate counterparty, products, and idempotency"]
+    C --> D["Order and OneCOrderSync"]
     B --> E["IOrderCreationStore"]
     E -.-> F["OrderCreationStore"]
     F --> G["SalesDbContext"]
@@ -47,6 +47,6 @@ flowchart LR
     H --> I["1C"]
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Створення й sync](../../contracts/sales/admin-order-one-c-sync.openapi.yaml) · [Читання](../../contracts/sales/manager-order-read.openapi.yaml) · [SDD створення](../../specs/sales/001-admin-order-one-c-sync/README.md) · [SDD читання](../../specs/sales/002-manager-order-read-api/README.md).
+[Create and sync contract](../../contracts/sales/admin-order-one-c-sync.openapi.yaml) · [Read contract](../../contracts/sales/manager-order-read.openapi.yaml) · [Create SDD](../../specs/sales/001-admin-order-one-c-sync/README.md) · [Read SDD](../../specs/sales/002-manager-order-read-api/README.md).

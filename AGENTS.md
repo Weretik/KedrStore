@@ -1,45 +1,45 @@
-# AI-навігація: KedrStore
+# AI navigation: KedrStore
 
-Це коротка точка входу для роботи в backend-репозиторії. Фактичні правила, архітектуру, інструменти й команди визначають його код і документація. Читай джерела, потрібні для конкретного завдання. Цей файл діє в усьому репозиторії, якщо вкладений `AGENTS.md` не уточнює окрему ділянку.
+This is a short entry point for working in this backend repository. Its code and documentation define the actual rules, architecture, tools, and commands. Read only the sources needed for the specific task. This file applies throughout the repository unless a nested `AGENTS.md` provides more specific instructions.
 
-## Контекст проєкту
+## Project context
 
-- [Архітектура](docs/sdd/architecture/README.md) — модулі, шари та межі залежностей.
-- [Стандарти](docs/sdd/standards/README.md) — сталі правила розробки, delivery та перевірок.
-- [Специфікації](docs/sdd/specs/README.md) — вимоги, рішення, завдання й докази виконання фіч.
-- [Карта реалізованих фіч](docs/sdd/features/README.md) — пошук за модулем, будова й точки входу в коді.
-- [Контракти](docs/sdd/contracts/README.md) — публічна API-поведінка та її синхронізація.
-- [Операційна документація](docs/sdd/operations/README.md) — запуск, конфігурація, міграції, seed/jobs і діагностика.
-- [Глосарій](docs/product/glossary.md) — сталі бізнес-терміни.
+- [Architecture](docs/sdd/architecture/README.md) — modules, layers, and dependency boundaries.
+- [Standards](docs/sdd/standards/README.md) — stable rules for development, delivery, and verification.
+- [Specifications](docs/sdd/specs/README.md) — feature requirements, decisions, tasks, and completion evidence.
+- [Implemented feature map](docs/sdd/features/README.md) — navigation by module, structure, and code entry points.
+- [Contracts](docs/sdd/contracts/README.md) — public API behavior and contract synchronization.
+- [Operations documentation](docs/sdd/operations/README.md) — startup, configuration, migrations, seed/jobs, and diagnostics.
+- [Glossary](docs/product/glossary.md) — stable business terms.
 
-Визнач модуль і зачеплені документи за запитом та кодом; не припускай однакової реалізації в іншому backend-проєкті. Для контексту конкретної задачі переходь від [карти фіч](docs/sdd/features/README.md) до опису потрібної фічі й коду; специфікацію, архітектуру та стандарти читай лише за зачепленим питанням.
+Identify the module and affected documents from the request and code; do not assume another backend project uses the same implementation. For task-specific context, navigate from the [feature map](docs/sdd/features/README.md) to the relevant feature description and code; read specifications, architecture, and standards only for the issues involved.
 
-Для нової фічі створи стислий опис її фактичної архітектури в `docs/sdd/features/<module>/`, додай посилання до [карти фіч](docs/sdd/features/README.md) у тій самій зміні. Кожен опис містить дерево `Структура в коді` з перевіреними шляхами до ключових каталогів і файлів та короткими поясненнями їхніх ролей; дерево показує фактичну будову фічі, а не заплановані папки. Окрема Mermaid-схема показує фактичний потік між точкою входу, обробниками, моделлю, даними та зовнішніми інтеграціями, якщо вони є. При зміні поведінки, меж, даних, API або інтеграцій онови відповідний опис, дерево і схему в тій самій зміні. Якщо змінюється лише внутрішня деталь без впливу на цю карту, зафіксуй після перевірки, що оновлення не потрібне. Специфікація в `docs/sdd/specs/` описує рішення та докази delivery, а карта фіч — перевірену поточну реалізацію.
+For a new or substantially changed feature, update the [feature map](docs/sdd/features/README.md) under the [delivery rules](docs/sdd/standards/delivery-rules.md); do not document an internal detail again if it does not affect the map.
 
-## Маршрутизація завдань
+## Task routing
 
-| Завдання | Навичка | Джерело правил проєкту |
+| Task | Skill | Project rules |
 | --- | --- | --- |
-| Нова або змінена фіча: специфікація | `$backend-feature-spec` | [Правила delivery](docs/sdd/standards/delivery-rules.md) |
-| Реалізація прийнятої специфікації | `$backend-feature-delivery` | [Правила delivery](docs/sdd/standards/delivery-rules.md) |
-| Кілька агентів на прямий запит користувача | `$backend-feature-orchestrator` | [Специфікації та залежності](docs/sdd/specs/README.md) |
-| Аудит коду / план системного виправлення | `$backend-code-audit` / `$backend-remediation-plan` | [Архітектура](docs/sdd/architecture/README.md) і [стандарти](docs/sdd/standards/README.md) |
-| HTTP/API та зовнішні контракти | `$backend-api-contract-sync` | [Контракти](docs/sdd/contracts/README.md) |
-| Пошук таблиць і зв'язків БД | — | [Карта бази даних](docs/sdd/architecture/data-model/README.md): дерево, далі лише файл потрібного власника |
-| Схема БД, міграції та seed-дані | `$backend-database-change` | [Правила БД](docs/sdd/standards/database-rules.md) і [операції з даними](docs/sdd/operations/data/migrations-and-seeding.md) |
-| Перевірка змін / передача на review | `$backend-change-verification` / `$backend-pr-handoff` | [Правила тестування](docs/sdd/standards/testing-rules.md) |
-| Розбіжності між кодом і документацією | `$backend-docs-sync` | [Індекс стандартів](docs/sdd/standards/README.md) і [карта фіч](docs/sdd/features/README.md) |
+| Specify a new or changed feature | `$backend-feature-spec` | [Delivery rules](docs/sdd/standards/delivery-rules.md) |
+| Implement an accepted specification | `$backend-feature-delivery` | [Delivery rules](docs/sdd/standards/delivery-rules.md) |
+| Multiple agents at the user's explicit request | `$backend-feature-orchestrator` | [Specifications and dependencies](docs/sdd/specs/README.md) |
+| Code audit / systemic remediation plan | `$backend-code-audit` / `$backend-remediation-plan` | [Architecture](docs/sdd/architecture/README.md) and [standards](docs/sdd/standards/README.md) |
+| HTTP/API and external contracts | `$backend-api-contract-sync` | [Contracts](docs/sdd/contracts/README.md) |
+| Find database tables and relationships | — | [Database map](docs/sdd/architecture/data-model/README.md): start with the tree, then read only the relevant owner's file |
+| Database schema, migrations, and seed data | `$backend-database-change` | [Database rules](docs/sdd/standards/database-rules.md) and [data operations](docs/sdd/operations/data/migrations-and-seeding.md) |
+| Verify changes / hand off for review | `$backend-change-verification` / `$backend-pr-handoff` | [Testing rules](docs/sdd/standards/testing-rules.md) |
+| Differences between code and documentation | `$backend-docs-sync` | [Standards index](docs/sdd/standards/README.md) and [feature map](docs/sdd/features/README.md) |
 
-Для нової фічі застосовуй [правила delivery](docs/sdd/standards/delivery-rules.md) і [організації backend-коду](docs/sdd/standards/backend-rules.md): спочатку запланована карта ролей файлів у SDD, перед здачею — звіряння з фактичним кодом.
+For a new feature, apply the [delivery rules](docs/sdd/standards/delivery-rules.md) and [backend code organization rules](docs/sdd/standards/backend-rules.md): plan the file-role map in the SDD first and compare it with actual code before handoff.
 
-## Пріоритет процесу
+## Process priority
 
-Пряме доручення користувача та правила цього репозиторію визначають межі роботи. Для специфікації, реалізації й перевірки фічі використовуй відповідні `backend-*` навички та проєктні документи як основний процес. Додаткові навички застосовуй лише для потрібного методу; вони не додають повторного погодження, обов'язкових агентів, worktree чи окремого TDD-циклу поверх проєктного процесу. Виконуй перевірки та тестування за правилами цього репозиторію й вимогами задачі.
+The user's direct request and this repository's rules define the scope of work. For feature specification, implementation, and verification, use the relevant `backend-*` skills and project documents as the primary process. Apply additional skills only for a needed method; they do not add repeated approval, mandatory agents, a worktree, or a separate TDD cycle on top of the project process. Run checks and tests according to this repository's rules and the task requirements.
 
-## Межі роботи й перевірка
+## Scope and verification
 
-Виконуй усі готові завдання в погодженому обсязі фічі, фази, сценарію або завдання без окремої команди для кожного файла; зупиняйся на межі обсягу, невирішеному продуктовому рішенні чи конкретній перешкоді. Детальний порядок — у [правилах delivery](docs/sdd/standards/delivery-rules.md). Обирай перевірки за [правилами тестування](docs/sdd/standards/testing-rules.md) і конфігурацією зачеплених проєктів. Для нових ідентифікаторів читай [стратегію ID](docs/sdd/standards/identifier-strategy.md).
+Complete all ready tasks within the agreed feature, phase, scenario, or task scope without a separate instruction for each file; stop at the scope boundary, an unresolved product decision, or a concrete blocker. The detailed procedure is in the [delivery rules](docs/sdd/standards/delivery-rules.md). Choose checks according to the [testing rules](docs/sdd/standards/testing-rules.md) and the configuration of affected projects. For new identifiers, read the [ID strategy](docs/sdd/standards/identifier-strategy.md).
 
-Запуск `Host.Api` і робота з БД можуть змінювати стан; перед ними звіряй [проєктний порядок міграцій і seed](docs/sdd/operations/data/migrations-and-seeding.md) та дозволене середовище.
+Starting `Host.Api` and working with the database can change state; before doing either, check the [project procedure for migrations and seed](docs/sdd/operations/data/migrations-and-seeding.md) and the permitted environment.
 
-Коміти, push, створення гілки чи PR та інші дії зі станом remote виконуй лише за прямим дорученням користувача. Зберігай сторонні зміни робочого дерева. Усі посилання тут ведуть лише до файлів цього репозиторію; назви навичок доступні глобально за іменем; локальних копій навичок у репозиторії немає.
+Make commits, push, create a branch or PR, or take other actions that change remote state only at the user's direct request. Preserve unrelated working-tree changes. All links here point only to files in this repository; skills are available globally by name, and this repository has no local copies.

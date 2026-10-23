@@ -1,5 +1,5 @@
-# Модуль автентифікації
+# Authentication module
 
-Цей розділ описує login, bearer access tokens, refresh cookies, CSRF-захист, logout і поточну сесію.
+This section describes login, bearer access tokens, refresh cookies, CSRF protection, logout, and the current session.
 
-- [Потік сесії та життєвий цикл токенів](session-flow.md)
+- [Session flow and token lifecycle](session-flow.md)

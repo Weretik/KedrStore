@@ -1,21 +1,21 @@
-# Дані й інтеграції
+# Data and integrations
 
-## Зберігання даних
+## Persistence
 
-Catalog, Sales та Identity використовують окремі EF Core contexts на PostgreSQL. Конфігурація контексту, міграції й конфігурації сутностей залишаються в Infrastructure відповідального модуля.
+Catalog, Sales, and Identity use separate EF Core contexts on PostgreSQL. Context configuration, migrations, and entity configurations stay in the responsible module's Infrastructure layer.
 
-- Для запитів лише на читання використовуй `AsNoTracking`.
-- Застосовуй проєкції й server-side pagination; уникай N+1 і повної матеріалізації для списків зі сторінками.
-- Репозиторії та Ardalis.Specification використовуй там, де модуль уже застосовує цей підхід.
-- `IUnitOfWork` залишається абстракцією транзакційної межі для координованих записів.
-- Не додавай міграцію й не змінюй схему або семантику конкурентності без явної вимоги фічі.
+- Use `AsNoTracking` for read-only queries.
+- Use projections and server-side pagination; avoid N+1 queries and full materialization for paged lists.
+- Use repositories and Ardalis.Specification where the module already follows that approach.
+- `IUnitOfWork` remains the transaction-boundary abstraction for coordinated writes.
+- Do not add a migration or change schema or concurrency semantics without an explicit feature requirement.
 
-## Зовнішні адаптери
+## External adapters
 
-Клієнти 1C, Telegram-сповіщення, Excel-експорт, адаптери кешу й сховища та реалізації фонових завдань належать Infrastructure. Application володіє лише абстракціями й координацією сценарію використання.
+1C clients, Telegram notifications, Excel export, cache and storage adapters, and background job implementations belong in Infrastructure. Application owns only abstractions and use-case coordination.
 
-Фонова робота має використовувати наявну абстракцію `IBackgroundJobService` або зареєстрований підхід до завдань. Не прив'язуй код Application безпосередньо до планувальника. Окремий `Host.Jobs` запускає одну операцію й завершується.
+Background work should use the existing `IBackgroundJobService` abstraction or the registered job approach. Do not bind Application code directly to the scheduler. A separate `Host.Jobs` runs one operation and exits.
 
-## Моделі читання
+## Read models
 
-Endpoints списку товарів Catalog використовують `ProductListProjection` для оптимізованих запитів читання. Перебудова проєкції належить Infrastructure і запускається чинним циклом синхронізації. Проєкція — модель читання, а не aggregate, який володіє правилами товару.
+Catalog product-list endpoints use `ProductListProjection` for optimized read queries. Rebuilding the projection belongs to Infrastructure and runs within the current synchronization cycle. The projection is a read model, not the aggregate that owns product rules.

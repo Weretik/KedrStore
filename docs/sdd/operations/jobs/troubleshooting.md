@@ -1,13 +1,13 @@
-# Діагностика фонових завдань
+# Background Job Troubleshooting
 
-| Симптом | Перші перевірки | Не роби |
+| Symptom | First checks | Avoid |
 | --- | --- | --- |
-| Немає конфігурації | Середовище й секрети `Host.Jobs` | Вставляти рядки підключення або SOAP credentials у логи |
-| Збій SOAP/автентифікації | Погоджене сховище секретів і доступність кінцевої точки | Логувати заголовки, паролі чи значення Authorization |
-| Отримано нуль записів | Root ID, середовище й доступність джерела | Очищати дані вручну або повторювати руйнівний імпорт |
-| Отримано записи, але mapped = 0 | Mapper, пошук категорії, формат полів відповіді | Повторювати job, сподіваючись на зміну даних |
-| Публічний список застарів | Відновлення проєкції та `ExportToSite` | Вважати непомітність у списку видаленням |
-| Список залишків застарів | Чи завершився `stocks` і перебудова проєкції; перевір логи й `ProductListProjections` | Припускати, що список читає live stock товару |
-| DLL заблоковано під час збірки | Зупинити локальний `Host.Api` і повторити | Видаляти output під запущеним host |
+| Missing configuration | `Host.Jobs` environment and secrets | Putting connection strings or SOAP credentials in logs |
+| SOAP/authentication failure | Approved secret store and endpoint availability | Logging headers, passwords, or Authorization values |
+| Zero records received | Root ID, environment, and source availability | Manually clearing data or repeating a destructive import |
+| Records received, but mapped = 0 | Mapper, category lookup, response field format | Repeating the job and hoping the data changes |
+| Public list is stale | Projection rebuild and `ExportToSite` | Treating absence from the list as deletion |
+| Stock list is stale | Whether `stocks` and projection rebuild completed; check logs and `ProductListProjections` | Assuming the list reads live product stock |
+| DLL locked during build | Stop local `Host.Api` and retry | Deleting output while the host is running |
 
-Збережи назву job, середовище, безпечні root IDs, тривалість, лічильники, тип винятку й версію міграції БД. Це допомагає діагностиці без повних SOAP payloads або секретів.
+Record the job name, environment, safe root IDs, duration, counters, exception type, and database migration version. This supports diagnosis without full SOAP payloads or secrets.

@@ -1,22 +1,22 @@
-# Документація KedrStore
+# KedrStore documentation
 
-Тут зберігається версійна інженерна документація KedrStore. Документи backend підтримують разом зі змінами коду. [Вхід до backend SDD](sdd/README.md) пояснює роль кожного розділу.
+Versioned KedrStore engineering documentation is stored here. Backend documents are maintained alongside code changes. The [backend SDD entry point](sdd/README.md) explains the role of each section.
 
 ## Backend SDD
 
-- [Архітектура](sdd/architecture/README.md) — фактична топологія, модулі та межі шарів.
-- [Інженерні правила](sdd/standards/README.md) — backend, API, дані, безпека, тести й delivery.
-- [Операції](sdd/operations/README.md) — локальний запуск, конфігурація, дані, діагностика та jobs.
-- [Специфікації](sdd/specs/README.md) — вимоги й свідчення для окремих фіч.
-- [Карта фіч](sdd/features/README.md) — реалізовані сценарії за модулями, потоки й точки входу в коді.
-- [Продуктовий словник](product/glossary.md) — сталі терміни каталогу, дверей і фурнітури.
+- [Architecture](sdd/architecture/README.md) — actual topology, modules, and layer boundaries.
+- [Engineering rules](sdd/standards/README.md) — backend, API, data, security, testing, and delivery.
+- [Operations](sdd/operations/README.md) — local startup, configuration, data, diagnostics, and jobs.
+- [Specifications](sdd/specs/README.md) — requirements and evidence for individual features.
+- [Feature map](sdd/features/README.md) — implemented scenarios by module, flows, and code entry points.
+- [Product glossary](product/glossary.md) — stable terms for catalog, doors, and hardware.
 
-- [API-контракти](sdd/contracts/README.md) — версійні OpenAPI-контракти та взаємодія з frontend.
+- [API contracts](sdd/contracts/README.md) — versioned OpenAPI contracts and frontend integration.
 
-## Історична документація
+## Historical documentation
 
-[Архів](legacy/README.md) зберігає старі ADR, архітектурні нотатки, клієнтські PDF і матеріали фіч до чинного набору SDD. Це контекст і джерело для звіряння, а не автоматичне джерело правил для нової роботи.
+The [archive](legacy/README.md) keeps older ADRs, architecture notes, client PDFs, and feature materials from before the current SDD set. It provides context and sources for comparison; it does not automatically define rules for new work.
 
-## Розміщення відомостей
+## Information placement
 
-Сталий опис системи належить до `sdd/architecture`, нормативне правило — до `sdd/standards`. Поточна будова фіч і навігація кодом належать до `sdd/features/`; рішення, вимоги, контракти, завдання й свідчення перевірки — до папки в `sdd/specs/`.
+Stable system descriptions belong in `sdd/architecture`, and normative rules in `sdd/standards`. Current feature structure and code navigation belong in `sdd/features/`; decisions, requirements, contracts, tasks, and verification evidence belong in the corresponding `sdd/specs/` directory.

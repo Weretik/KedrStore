@@ -1,45 +1,45 @@
-# Стратегія ідентифікаторів
+# Identifier strategy
 
-Прочитай цей документ до створення сутності, зміни первинного ключа або відкриття ідентифікатора через API чи інтеграцію. Вибір ID залежить від життєвого циклу сутності: де її створюють, зберігають, передають та ідентифікують, а не від зручного значення C# за замовчуванням.
+Read this document before creating an entity, changing a primary key, or exposing an identifier through an API or integration. Choose an ID based on the entity lifecycle—where it is created, stored, transmitted, and identified—not on the default convenience of a C# type.
 
-## Таблиця рішень
+## Decision table
 
-| Ситуація | Типовий вибір |
+| Situation | Typical choice |
 | --- | --- |
-| Невеликий довідник | `int` |
-| Звичайна бізнес-сутність | `long` |
-| Дуже велика реляційна таблиця | `long` |
-| Одна центральна БД | зазвичай `long` |
-| Кілька незалежних writers/services | `Guid` |
-| Створення offline | `Guid` |
-| Злиття незалежних БД | `Guid` |
-| ID події або повідомлення | `Guid` |
-| Публічний API-ідентифікатор | `Guid` або окремий `PublicId` |
-| Реляційна модель із багатьма FK | зазвичай `long` |
-| З'єднувальна таблиця | часто складений ключ |
-| Зрозумілий людині номер документа | окремий незмінний `string`, ніколи не первинний ключ |
+| Small lookup table | `int` |
+| Ordinary business entity | `long` |
+| Very large relational table | `long` |
+| One central database | usually `long` |
+| Multiple independent writers/services | `Guid` |
+| Offline creation | `Guid` |
+| Merging independent databases | `Guid` |
+| Event or message ID | `Guid` |
+| Public API identifier | `Guid` or separate `PublicId` |
+| Relational model with many FKs | usually `long` |
+| Join table | often a composite key |
+| Human-readable document number | separate immutable `string`, never a primary key |
 
-## Порядок вибору
+## Selection flow
 
 ```text
-Потрібно вибрати ID
+Choose an ID
 │
-├─ Його генерують у кількох незалежних місцях, offline або під час злиття БД?
-│  └─ Так: Guid
+├─ Generated in multiple independent places, offline, or while merging databases?
+│  └─ Yes: Guid
 │
-└─ Ні: є одна центральна реляційна БД?
-   └─ Так: long
-      └─ Це невеликий сталий довідник? int
+└─ No: one central relational database?
+   └─ Yes: long
+      └─ Small stable lookup table? int
 
-Потрібно приховати внутрішній ID БД у публічному API, URL або інтеграції?
-└─ Додай окремий Guid PublicId; реляційний PK залиш long.
+Need to hide the internal database ID in a public API, URL, or integration?
+└─ Add a separate Guid PublicId; keep the relational PK long.
 ```
 
-## Правило проєкту
+## Project rule
 
 ```csharp
-// Aggregate/сутність Domain: звичайний типобезпечний C# ID обгортає
-// вибраний скаляр БД. Колонка EF Core залишається bigint.
+// A regular typed C# ID wraps the chosen database scalar in the Domain aggregate/entity.
+// The EF Core column remains bigint.
 public readonly record struct OrderId
 {
     public long Value { get; }
@@ -57,40 +57,40 @@ public readonly record struct OrderId
 
 public sealed class Order : BaseAuditableEntity<OrderId>;
 
-// Зовнішні ключі Domain використовують той самий типізований ID.
+// Domain foreign keys use the same typed ID.
 public OrderId OrderId { get; private set; }
 
-// Невеликий довідник: типізований ID над int.
+// Small lookup: typed ID wrapping int.
 public readonly record struct CurrencyId(int Value);
 
-// Події, повідомлення, незалежно створювані/розподілені об'єкти: типізований Guid ID.
+// Events, messages, and independently/distributed-created objects: typed Guid ID.
 public readonly record struct IntegrationEventId(Guid Value);
 
-// Публічний ID, коли внутрішній ID не слід відкривати.
-// PublicId теж є типізованим value object.
+// Public ID when the internal ID should not be exposed.
+// PublicId is also a typed value object.
 Guid PublicId;
 
-// Зрозумілий людині номер документа
-string OrderNumber; // унікальний, незмінний, не PK
+// Human-readable document number
+string OrderNumber; // unique, immutable, not the PK
 ```
 
-Для кожної нової чи зміненої сутності Domain її ID та зовнішні ключі Domain мають використовувати типізовану обгортку value-object/readonly-struct над вибраним скаляром. Не додавай `BaseAuditableEntity<long>`, `BaseEntity<Guid>` або сирий скалярний FK у Domain. Це запобігає випадковій передачі стороннього ID до API, зберігаючи ефективні колонки й індекси БД.
+For every new or changed Domain entity, its ID and Domain foreign keys must use a typed value-object/readonly-struct wrapper around the chosen scalar. Do not add `BaseAuditableEntity<long>`, `BaseEntity<Guid>`, or raw scalar FKs to Domain. This prevents accidental use of another ID in APIs while retaining efficient database columns and indexes.
 
-Не використовуй Vogen для нових ID у цьому проєкті. Оголошуй типізовані ID як явні звичайні C# `readonly record struct`, щоб створення, валідація та EF conversion були видимі в коді. Наявне legacy-використання Vogen не входить до обсягу фічі, якщо окрема міграція явно його не прибирає.
+Do not use Vogen for new IDs in this project. Declare typed IDs as explicit regular C# `readonly record struct` types so creation, validation, and EF conversion remain visible in code. Existing legacy Vogen usage is out of feature scope unless a separate migration explicitly removes it.
 
-Сирі скалярні ID допустимі лише у внутрішньому записі збереження даних Infrastructure, який не перетинає межу Domain, наприклад у EF-таблиці ідемпотентності. Типізовані ID Domain відображай у скалярні EF-колонки через перетворювач значень.
+Raw scalar IDs are allowed only in internal Infrastructure persistence records that do not cross the Domain boundary, such as an EF idempotency table. Map typed Domain IDs to scalar EF columns through value converters.
 
-`OrderNumber` призначений для людей та інтеграцій. Він може мати формат `SO-YYYYMMDD-NNNN`, тоді як БД зберігає ефективний числовий первинний ключ.
+`OrderNumber` is intended for people and integrations. It may use a format such as `SO-YYYYMMDD-NNNN`, while the database stores an efficient numeric primary key.
 
-## Чеклист перевірки
+## Review checklist
 
-До погодження нової сутності дай відповіді:
+Before approving a new entity, answer:
 
-1. Де її створюють — в одній БД або кількох незалежних системах?
-2. Чи потрібні offline-створення або подальше злиття БД?
-3. Це бізнес-запис із багатьма FK чи невеликий довідник?
-4. Чи потрібно приховати внутрішній ID від публічних клієнтів?
-5. Чи потрібен окремий зрозумілий людині номер документа?
-6. Чи обгорнуто вибраний скаляр типізованим Domain ID і чи так само типізовані його зовнішні ключі?
+1. Where is it created—in one database or multiple independent systems?
+2. Is offline creation or later database merging required?
+3. Is it a business record with many FKs or a small lookup table?
+4. Must the internal ID be hidden from public clients?
+5. Is a separate human-readable document number needed?
+6. Is the chosen scalar wrapped in a typed Domain ID, with its foreign keys typed the same way?
 
-Не використовуй `Guid` для кожної сутності лише тому, що його можна створити в коді застосунку.
+Do not use `Guid` for every entity just because application code can generate one.

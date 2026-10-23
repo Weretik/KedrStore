@@ -1,10 +1,10 @@
-# Sales — клієнти: дані
+# Sales — customers: data
 
-**Джерело:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) і [конфігурації](../../../../src/Sales/Sales.Infrastructure/Configurations/), перевірено 2026-10-21. [Назад до карти БД](README.md) · [фіча клієнтів](../../features/sales/customers.md).
+**Source:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Sales/Sales.Infrastructure/Configurations/), checked 2026-10-21. [Back to database map](README.md) · [customers feature](../../features/sales/customers.md).
 
-| Таблиця | PK | Призначення й важливі поля |
+| Table | PK | Purpose and important fields |
 | --- | --- | --- |
-| `Counterparties` | `Id` | Контрагент: `Name`, `Email`, `Phone`, `IdentityUserId`, `DefaultPriceTypeId`, дати. |
-| `CounterpartyCategoryPriceTypes` | `CounterpartyId`, `CategoryId` | Тип ціни `PriceTypeId` для категорії контрагента. |
+| `Counterparties` | `Id` | Counterparty: `Name`, `Email`, `Phone`, `IdentityUserId`, `DefaultPriceTypeId`, dates. |
+| `CounterpartyCategoryPriceTypes` | `CounterpartyId`, `CategoryId` | Price type `PriceTypeId` for a counterparty's category. |
 
-У snapshot немає фізичних FK від `CounterpartyCategoryPriceTypes` до `Counterparties` чи таблиць Catalog, а також від `Counterparties.IdentityUserId` до Identity. Це смислові посилання між даними, тому ER-діаграма FK для цих двох таблиць порожня. `Orders.CounterpartyId` має фізичний FK до `Counterparties.Id`; замовлення описано [окремо](sales-orders.md).
+The snapshot has no physical FKs from `CounterpartyCategoryPriceTypes` to `Counterparties` or Catalog tables, nor from `Counterparties.IdentityUserId` to Identity. These are semantic references, so the FK ER diagram for these tables is empty. `Orders.CounterpartyId` has a physical FK to `Counterparties.Id`; see [orders](sales-orders.md).

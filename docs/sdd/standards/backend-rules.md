@@ -1,28 +1,28 @@
-# Правила backend
+# Backend rules
 
-## Шари й залежності
+## Layers and dependencies
 
-Дотримуйся напряму залежностей `API → Application → Domain`. Infrastructure залежить від внутрішніх шарів, а не навпаки.
+Follow dependency direction `API → Application → Domain`. Infrastructure depends on inner layers, not the reverse.
 
-- Доменний шар містить бізнес-інваріанти, сутності, об'єкти-значення й доменні сервіси; у ньому немає DTO транспортного рівня або залежностей від інфраструктурного шару.
-- Прикладний шар координує сценарії використання через абстракції, а не реалізації інфраструктурного шару.
-- Інфраструктурний шар містить засоби збереження даних та інтеграційні адаптери; бізнес-правила йому не належать.
-- Шар API виконує лише прив'язку HTTP-запитів, авторизацію й відображення результатів; у ньому немає EF або бізнес-логіки.
+- Domain contains business invariants, entities, value objects, and domain services; it contains no transport DTOs or Infrastructure dependencies.
+- Application coordinates use cases through abstractions, not Infrastructure implementations.
+- Infrastructure contains persistence and integration adapters; business rules do not belong there.
+- API handles HTTP binding, authorization, and result mapping only; it contains no EF or business logic.
 
-## Ідентифікатори сутностей
+## Entity identifiers
 
-Перед створенням або зміною ідентифікатора сутності застосуй [стратегію ідентифікаторів](identifier-strategy.md). Не обирай `Guid` автоматично: тип ID залежить від життєвого циклу створення й інтеграції. У Domain обгортай вибраний скаляр типізованим value object/readonly struct; не використовуй сирі примітивні ID у `BaseEntity`, `BaseAuditableEntity` або зовнішніх ключах Domain.
+Apply the [identifier strategy](identifier-strategy.md) before creating or changing an entity identifier. Do not default to `Guid`: the ID type depends on the creation lifecycle and integrations. In Domain, wrap the chosen scalar in a typed value object/readonly struct; do not use raw primitive IDs in `BaseEntity`, `BaseAuditableEntity`, or Domain foreign keys.
 
-## CQRS, Mediator і структура коду
+## CQRS, Mediator, and code structure
 
-У прикладному шарі групуй код за фічами. Команду або запит, обробник, валідатор і приватні DTO одного сценарію тримай разом. Один обробник Mediator відповідає за один сценарій використання; команди змінюють стан, запити — ні.
+Group application code by feature. Keep a use case's command or query, handler, validator, and private DTOs together. Each Mediator handler owns one use case; commands change state, queries do not.
 
-Один файл і каталог має цілісну відповідальність. Перед створенням файлів нової фічі звір заплановану карту в SDD із чинними межами модулів; перед завершенням переглянь її фактичні файли. Розділяй незалежні сценарії, контракти читання/запису та адаптери за їхніми власниками, не створюючи зайвих абстракцій чи папок заради одного дрібного файла. Кількість рядків є приводом переглянути файл, а не правилом автоматичного поділу.
+Each file and directory should have a coherent responsibility. Before creating files for a feature, compare the planned SDD map with current module boundaries; review the actual files before completion. Separate independent use cases, read/write contracts, and adapters by ownership without creating unnecessary abstractions or folders for a single small file. Line count is a reason to review a file, not an automatic split rule.
 
-Передавай `CancellationToken` через увесь потік. Наскрізні аспекти залишай у поведінках конвеєра Mediator, але не перенось туди бізнес-правила.
+Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in Mediator pipeline behaviors, but do not move business rules there.
 
-Використовуй конкретні назви: `CreateOrderCommand`, `GetPublicProductListQuery`, `GetAdminProductListQueryHandler`. Не створюй розмитих папок або назв на зразок `Common`, `Misc`, `Helper`, `Utils`, `Manager`. Не додавай абстракцій без конкретної потреби.
+Use specific names such as `CreateOrderCommand`, `GetPublicProductListQuery`, and `GetAdminProductListQueryHandler`. Avoid vague folders or names such as `Common`, `Misc`, `Helper`, `Utils`, and `Manager`. Do not add abstractions without a concrete need.
 
-## Доменні події й транзакції
+## Domain events and transactions
 
-Дотримуйся чинного циклу доменної події: `collect → dispatch → clear`. Сценарії використання, які змінюють кілька агрегатів, координують транзакцію через наявний `IUnitOfWork`.
+Follow the current domain event lifecycle: `collect → dispatch → clear`. Use cases that change multiple aggregates coordinate a transaction through the existing `IUnitOfWork`.

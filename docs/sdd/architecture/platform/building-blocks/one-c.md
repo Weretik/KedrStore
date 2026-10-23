@@ -1,10 +1,10 @@
 # BuildingBlocks.Integrations.OneC
 
-## Призначення
+## Purpose
 
-Цей проєкт зосереджує низькорівневий SOAP-механізм, спільний для інтеграцій з 1C.
+This project centralizes the low-level SOAP mechanism shared by 1C integrations.
 
-## Структура
+## Structure
 
 ~~~text
 BuildingBlocks.Integrations.OneC/
@@ -15,9 +15,9 @@ BuildingBlocks.Integrations.OneC/
 └── Test/OneCSoapSmokeTest.cs
 ~~~
 
-## Правила
+## Rules
 
-- `OneCSoapClientFactory` реєструється як singleton через `AddOneCIntegrationServices`.
-- `BasicAuthEndpointBehavior` додає базову автентифікацію до згенерованої кінцевої точки SOAP.
-- `Generated/Reference.cs` — згенерований код; не рефактори його вручну.
-- Клієнти 1C і перетворення даних конкретного модуля залишаються в Infrastructure цього модуля; цей проєкт дає лише спільну транспортну основу.
+- `OneCSoapClientFactory` is registered as a singleton through `AddOneCIntegrationServices`.
+- `BasicAuthEndpointBehavior` adds basic authentication to the generated SOAP endpoint.
+- `Generated/Reference.cs` is generated code; do not refactor it manually.
+- 1C clients and module-specific data transformations remain in that module's Infrastructure; this project provides only the shared transport foundation.

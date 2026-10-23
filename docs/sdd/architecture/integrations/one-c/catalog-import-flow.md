@@ -1,35 +1,35 @@
-# Потік імпорту Catalog
+# Catalog import flow
 
-## Повна синхронізація
+## Full synchronization
 
-`SyncOneCFullJob` задає канонічний порядок оновлення. Він читає налаштовані root IDs Doors, Hardware і Cosmos та виконує:
+`SyncOneCFullJob` defines the canonical update order. It reads configured root IDs for Doors, Hardware, and Cosmos, then runs:
 
 ```text
-типи цін
-  → категорії (doors, hardware, cosmos)
-  → деталі товарів (doors, hardware, cosmos)
-  → залишки (doors, hardware, cosmos)
-  → ціни (doors, hardware, cosmos)
-  → одна перебудова ProductListProjections
+price types
+  → categories (doors, hardware, cosmos)
+  → product details (doors, hardware, cosmos)
+  → stock (doors, hardware, cosmos)
+  → prices (doors, hardware, cosmos)
+  → one ProductListProjections rebuild
 ```
 
-| Job | Читає | Записує | За порожньої відповіді |
+| Job | Reads | Writes | On empty response |
 | --- | --- | --- | --- |
-| Типи цін | Типи цін 1C | `PriceTypes` | Без змін |
-| Категорії | Категорії одного root | `Categories` | Зберігає наявні записи; upsert root/manual groups |
-| Деталі товарів | Товари одного root + RU CSV | `Products`, `ProductTranslations` | Без змін; якщо непорожня відповідь дає нуль після mapping, перед видаленням кидає виняток |
-| Залишки | Залишки одного root | `Products.Stock` | Без змін |
-| Ціни | Ціни одного root | `ProductPrices` | Без змін |
-| Перебудова проєкції | Локальні дані каталогу | `ProductListProjections` | Замінює модель читання |
+| Price types | 1C price types | `PriceTypes` | No changes |
+| Categories | Categories for one root | `Categories` | Preserves existing records; upserts root/manual groups |
+| Product details | Products for one root + RU CSV | `Products`, `ProductTranslations` | No changes; if a non-empty response maps to zero rows, throws before deletion |
+| Stock | Stock for one root | `Products.Stock` | No changes |
+| Prices | Prices for one root | `ProductPrices` | No changes |
+| Projection rebuild | Local catalog data | `ProductListProjections` | Replaces the read model |
 
-Звіряння категорій/товарів може видалити записи, відсутні в непорожній зіставленій відповіді джерела для цього root. Запускай jobs для окремого root лише коли 1C повертає його повністю.
+Category/product reconciliation may delete records missing from a non-empty mapped source response for that root. Run per-root jobs only when 1C returns that root in full.
 
-## Правило видимості
+## Visibility rule
 
-`ExportToSite` travels `1C → Products → ProductListProjections`.
+`ExportToSite` flows through `1C → Products → ProductListProjections`.
 
-- `false` не зупиняє імпорт, оновлення залишків або збереження цін.
-- Публічний список товарів фільтрує за `ExportToSite == true`.
-- Адміністративні списки не фільтрують за цим прапорцем і повертають `exportToSite`.
+- `false` does not stop import, stock updates, or price persistence.
+- The public product list filters for `ExportToSite == true`.
+- Admin lists do not filter on this flag and return `exportToSite`.
 
-`full` вимикає проміжні перебудови й перебудовує проєкцію один раз наприкінці. Цільовий `stocks` job за замовчуванням перебудовує проєкцію після оновлення залишків, тому `InStock` у списку актуалізується. Джерело: `SyncOneCFullJob.cs`, `SyncOneCStocksJob.cs` і `Host.Jobs/Program.cs`, звірено 2026-10-15.
+`full` disables intermediate rebuilds and rebuilds the projection once at the end. The targeted `stocks` job rebuilds the projection after stock updates by default, keeping list `InStock` current. Sources: `SyncOneCFullJob.cs`, `SyncOneCStocksJob.cs`, and `Host.Jobs/Program.cs`, checked 2026-10-15.

@@ -1,19 +1,19 @@
-# Операційна інструкція з інтеграції Catalog із 1C
+# Catalog/1C Integration Runbook
 
-Для звичайного оновлення виконай один job `full`: він використовує безпечний порядок імпорту й наприкінці перебудовує проєкції.
+For a routine refresh, run the single `full` job: it uses a safe import order and rebuilds projections at the end.
 
 ```powershell
-# Виконувати з кореня репозиторію
+# Run from the repository root
 $env:DOTNET_ENVIRONMENT = 'Development'
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=full
 ```
 
-| Ситуація | Job | Наступна дія |
+| Situation | Job | Next action |
 | --- | --- | --- |
-| Змінилася ієрархія | `category --rootId=<id>` | За потреби онови деталі товарів, потім перебудуй проєкцію |
-| Змінилися деталі/видимість | `productdetails --rootId=<id>` | Проєкція перебудовується автоматично |
-| Змінилися залишки | `stocks --rootId=<id>` | Проєкція перебудовується автоматично |
-| Змінилися ціни | `prices --rootId=<id>` | Проєкція перебудовується автоматично |
-| Проєкція застаріла після ремонту БД | `rebuild-projections` | Перевір списки |
+| Hierarchy changed | `category --rootId=<id>` | Refresh product details if needed, then rebuild the projection |
+| Details/visibility changed | `productdetails --rootId=<id>` | Projection is rebuilt automatically |
+| Stock changed | `stocks --rootId=<id>` | Projection is rebuilt automatically |
+| Prices changed | `prices --rootId=<id>` | Projection is rebuilt automatically |
+| Projection is stale after database repair | `rebuild-projections` | Check the lists |
 
-Після виконання перевір фінальний рядок успіху й лічильники received/mapped/synced. Після перебудови проєкції переконайся, що відомий товар з `exportToSite:false` є в `/api/admin/products/all` і відсутній у публічному списку. Не запускай цільові jobs паралельно з `full` для того самого root.
+After execution, check the final success line and the received/mapped/synced counters. After rebuilding the projection, confirm that a known product with `exportToSite:false` appears in `/api/admin/products/all` and is absent from the public list. Do not run targeted jobs in parallel with `full` for the same root.

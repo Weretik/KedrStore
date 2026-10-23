@@ -1,36 +1,36 @@
-# Каталог менеджера
+# Manager catalog
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** sales.
+**Static code check:** 2026-10-16. **Module:** Sales.
 
-Авторизований список товарів для продажів.
+Authorized product list for sales.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[Sales CatalogController](../../../../src/Sales/Sales.Api/Controllers/CatalogController.cs) обслуговує `GET /api/sales/{lang}/catalog/products`; [handler](../../../../src/Sales/Sales.Application/Features/Catalog/GetList/GetCatalogListQueryHandler.cs) формує read-результат через контракти Catalog. [Price policy](../../../../src/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) належить Sales. Це інший сценарій, ніж анонімний публічний каталог.
+[Sales CatalogController](../../../../src/Sales/Sales.Api/Controllers/CatalogController.cs) serves `GET /api/sales/{lang}/catalog/products`; the [handler](../../../../src/Sales/Sales.Application/Features/Catalog/GetList/GetCatalogListQueryHandler.cs) builds a read result through Catalog contracts. [Price policy](../../../../src/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) belongs to Sales. This is a separate use case from the anonymous public catalog.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
 └── Sales/
-    ├── Sales.Api/Controllers/CatalogController.cs  # HTTP-вхід
-    ├── Sales.Application/Features/Catalog/GetList/GetCatalogListQueryHandler.cs  # обробник сценарію
-    └── Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs  # інфраструктурна реалізація
+    ├── Sales.Api/Controllers/CatalogController.cs  # HTTP entry point
+    ├── Sales.Application/Features/Catalog/GetList/GetCatalogListQueryHandler.cs  # use-case handler
+    └── Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs  # infrastructure implementation
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["Sales CatalogController"] --> B["GetCatalogListQueryHandler"]
-    B --> C["Контракти Catalog"]
+    B --> C["Catalog contracts"]
     B --> D["DefaultPricePolicyProvider"]
-    C --> E["Каталог менеджера"]
+    C --> E["Manager catalog"]
     D --> E
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[Контракт](../../contracts/sales/catalog.openapi.yaml) · [Публічний каталог](../catalog/public-products.md).
+[Contract](../../contracts/sales/catalog.openapi.yaml) · [Public catalog](../catalog/public-products.md).

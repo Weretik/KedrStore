@@ -1,6 +1,6 @@
 # BuildingBlocks.Infrastructure
 
-## Структура
+## Structure
 
 ~~~text
 BuildingBlocks.Infrastructure/
@@ -24,24 +24,24 @@ BuildingBlocks.Infrastructure/
     └── TelegramOptions
 ~~~
 
-## Зареєстровані спільні сервіси
+## Registered shared services
 
-`AddInfrastructureServices` реєструє:
+`AddInfrastructureServices` registers:
 
-- IDomainEventContext як EfDomainEventContext;
-- IDomainEventDispatcher як MediatorDomainEventDispatcher;
+- IDomainEventContext as EfDomainEventContext;
+- IDomainEventDispatcher as MediatorDomainEventDispatcher;
 - IHttpContextAccessor;
-- ICurrentUserService як HttpContextCurrentUserService;
-- IPermissionService як ClaimPermissionService;
-- конвертер Catalog XML-to-JSON;
-- типізований HTTP-клієнт Telegram із параметрами Telegram.
+- ICurrentUserService as HttpContextCurrentUserService;
+- IPermissionService as ClaimPermissionService;
+- Catalog XML-to-JSON converter;
+- typed Telegram HTTP client with Telegram options.
 
-## Запуск і дані
+## Startup and data
 
-`DbMigrator<TContext>` застосовує EF-міграції через стратегію виконання провайдера. Методи розширення `UseAppMigrations` і `UseAppSeeders` залишаються в BuildingBlocks.Infrastructure, але `Host.Api` їх не викликає. Поточний шлях виконання — окремий `Host.Jobs --job=migrate`: він запускає зареєстровані `IDatabaseMigrator`, а потім унікальні за типом `ISeeder`. Див. [операційний порядок](../../../operations/data/migrations-and-seeding.md).
+`DbMigrator<TContext>` applies EF migrations through the provider execution strategy. The `UseAppMigrations` and `UseAppSeeders` extension methods remain in BuildingBlocks.Infrastructure, but `Host.Api` does not call them. The current execution path is the separate `Host.Jobs --job=migrate`: it runs the registered `IDatabaseMigrator` services, then `ISeeder` services unique by type. See the [operational sequence](../../../operations/data/migrations-and-seeding.md).
 
-Це операції рівня host. Handler фічі не застосовує міграції та не виконує сидери самостійно.
+These are host-level operations. A feature handler does not apply migrations or run seeders itself.
 
-## Поведінка безпеки
+## Security behavior
 
-`HttpContextCurrentUserService` читає identity, claims, ролі та claims дозволів із поточного HTTP principal. `ClaimPermissionService` надає доступ ролі Admin, а для інших вимагає збіг поточного числового user ID та permission claim. Не обходь його прямим читанням `HttpContext` в Application.
+`HttpContextCurrentUserService` reads identity, claims, roles, and permission claims from the current HTTP principal. `ClaimPermissionService` grants access to the Admin role and, for others, requires the current numeric user ID to match along with a permission claim. Do not bypass it by reading `HttpContext` directly in Application.

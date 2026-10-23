@@ -1,48 +1,56 @@
-# Правила тестування
+# Testing rules
 
-## Вибір тестів за поведінкою
+## Selecting tests by behavior
 
-Кожна нова або змінена спостережувана поведінка має посилатися на приймальний сценарій на зразок `SC-001`. Вибирай найвужчий рівень тесту, який доводить потрібну властивість:
+Every new or changed observable behavior must link to an acceptance scenario such as `SC-001`. Choose the narrowest test level that proves the required property:
 
-- Доменні правила й переходи стану: unit-тести Domain;
-- координація сценаріїв використання, валідація й результати: тести Application;
-- обмеження збереження даних, транзакції й адаптери: інтеграційні тести;
-- HTTP-статуси, серіалізація, авторизація та OpenAPI-поведінка: API-інтеграційні або контрактні тести;
-- зміни шарів чи залежностей: архітектурні тести.
+- Domain rules and state transitions: Domain unit tests;
+- use-case coordination, validation, and results: Application tests;
+- persistence constraints, transactions, and adapters: integration tests;
+- HTTP status codes, serialization, authorization, and OpenAPI behavior: API integration or contract tests;
+- layer or dependency changes: architecture tests.
 
-Не повторюй повний сценарій на кожному рівні без окремого ризику. Один сценарій можуть підтверджувати кілька цільових тестів.
+Do not repeat an entire scenario at every level without a separate risk. Several focused tests can support one scenario.
 
-## Відповідальність тестових проєктів
+## Test project responsibilities
 
-- `UnitTests` містить детерміновані тести Domain і Application та не посилається на Infrastructure, Bootstrapper, HTTP hosts або EF Core InMemory.
-- `IntegrationTests` містить тести збереження даних, міграцій, провайдера, зовнішніх адаптерів, фонових завдань, HTTP і OpenAPI.
-- `ArchitectureTests` перевіряє напрям посилань між проєктами, залежності скомпільованих типів, ізоляцію бізнес-модулів та організацію тестів.
+- `UnitTests` contains deterministic Domain and Application tests and does not reference Infrastructure, Bootstrapper, HTTP hosts, or EF Core InMemory.
+- `IntegrationTests` contains persistence, migration, provider, external adapter, background job, HTTP, and OpenAPI tests.
+- `ArchitectureTests` checks project reference direction, compiled type dependencies, business-module isolation, and test organization.
 
-У кожному проєкті розміщуй тести за `<Module>/<Responsibility>` із відповідним namespace. Спільні fixtures, scenario builders і fakes клади в `TestSupport`; не створюй порожніх папок модулів.
+In each project, organize tests by `<Module>/<Responsibility>` with a matching namespace. Put shared fixtures, scenario builders, and fakes in `TestSupport`; do not create empty module directories.
 
-## Реляційна й provider-специфічна поведінка
+## Relational and provider-specific behavior
 
-Для міграцій, SQL, транзакцій, обмежень, індексів і специфічної для PostgreSQL конкурентності на зразок `xmin` використовуй інтеграційні тести з PostgreSQL. EF Core InMemory може допомагати швидким тестам orchestration лише коли реляційна й provider-поведінка не входить до ризику, який перевіряєш.
+Use PostgreSQL integration tests for migrations, SQL, transactions, constraints, indexes, and PostgreSQL-specific concurrency such as `xmin`. EF Core InMemory may help with fast orchestration tests only when relational and provider behavior are outside the risk being tested.
 
-Інтеграційні тести PostgreSQL використовують Testcontainers і окремі екземпляри `DbContext` для конкурентних виконавців. Якщо локальна кінцева точка Docker недоступна, тест може явно пропускатися. У CI Docker є передумовою, тому збій запуску контейнера або міграції зупиняє перевірку.
+PostgreSQL integration tests use Testcontainers and separate `DbContext` instances for concurrent actors. If a local Docker endpoint is unavailable, a test may explicitly skip. In CI, Docker is a prerequisite, so a failure to start the container or apply migrations fails verification.
 
-## Red -> Green -> Refactor
+## Red → Green → Refactor
 
-Для нової поведінки:
+For new behavior:
 
-1. **Red**: додай найменший тест для вибраного правила чи сценарію, запусти його й переконайся, що він падає саме через відсутню поведінку.
-2. **Green**: реалізуй найменшу завершену поведінку для проходження тесту без сторонніх сценаріїв.
-3. **Refactor**: покращ назви й структуру зі збереженням архітектурних меж, потім повтори цільові тести.
-4. **Regression**: запусти зачеплений набір тестів і запиши команду та результат.
+1. **Red**: add the smallest test for the selected rule or scenario, run it, and confirm that it fails specifically because the behavior is missing.
+2. **Green**: implement the smallest complete behavior that passes the test without unrelated scenarios.
+3. **Refactor**: improve names and structure while preserving architecture boundaries, then rerun the focused tests.
+4. **Regression**: run the affected test set and record the command and result.
 
-Завдання не завершено, доки свідчення не називає тест і не фіксує результати Red, Green та регресії. Помилка компіляції, зламане тестове оточення або сторонній збій не є коректним Red.
+A task is not complete until its evidence names the test and records Red, Green, and regression results. A compilation error, broken test environment, or unrelated failure is not a valid Red result.
 
-## Винятки
+## Exceptions
 
-Red-first тест можна пропустити для суто документаційної роботи, згенерованих міграцій, дослідницьких spikes або інфраструктурних змін, які неможливо змістовно спостерігати до появи передумови. Запиши причину, замінну перевірку й сценарії, що стали можливими або були покриті. Виняток не скасовує фінальної перевірки.
+A Red-first test can be omitted for documentation-only work, generated migrations, exploratory spikes, or infrastructure changes that cannot be meaningfully observed before a prerequisite exists. Record the reason, replacement check, and scenarios enabled or covered. The exception does not remove final verification.
 
-## Обсяг перевірок під час реалізації
+## Verification scope during implementation
 
-Під час написання фічі запускай лише автоматичні тести зміненої фічі та безпосередньо пов'язаних із нею компонентів і контрактів. Обирай найвужчі доступні проєкти, фільтри та команди, які перевіряють конкретний ризик. Зафіксуй виконані команди, результати й неперевірені ризики.
+| When | Minimum action |
+| --- | --- |
+| Local change | Run `dotnet test tests/<Project>/<Project>.csproj --filter <name>` for the affected behavior; for documentation, check links and run `git diff --check`. |
+| Boundary, API, or database change | Add the relevant `ArchitectureTests` or `IntegrationTests` project/filter and the needed contract or operational evidence. |
+| Full CI | The `verify` job in the [workflow](../../../.github/workflows/deploy-cloudrun.yml) checks PRs and pushes; rerun the full suite locally only on explicit request. |
 
-Загальний прогін тестів модуля, застосунку чи репозиторію, повні `restore` і `build`, комплексну регресію, coverage та повний аудит виконуй лише за прямим запитом користувача. Незамовлений повний прогін не є умовою завершення фічі. Якщо потрібна цільова перевірка заблокована або падає, назви точну команду, місце збою й відомий вплив на результат; не приховуй сторонніх помилок.
+Check project names and available filters under `tests/` before running them.
+
+While implementing a feature, run only automated tests for the changed feature and directly related components and contracts. Choose the narrowest available projects, filters, and commands that test the specific risk. Record commands run, results, and unverified risks.
+
+Run a general module, application, or repository test suite, full `restore` and `build`, broad regression, coverage, or a full audit only at the user's explicit request. An unrequested full run is not a completion condition. If a required focused check is blocked or fails, name the exact command, failure point, and known impact on the result; do not hide unrelated errors.

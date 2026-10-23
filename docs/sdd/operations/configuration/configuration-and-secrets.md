@@ -1,34 +1,34 @@
-# Конфігурація й секрети
+# Configuration and secrets
 
-## Джерела
+## Sources
 
-`Host.Api` використовує стандартні джерела конфігурації ASP.NET Core. Для Development у його проєкті задано User Secrets ID; локальні чутливі значення зберігай у User Secrets. `Host.Jobs` також завантажує власні User Secrets у Development, окремі від API. Під час розгортання передавай чутливі значення через погоджений механізм секретів/змінних середовища.
+`Host.Api` uses the standard ASP.NET Core configuration sources. Its project has a User Secrets ID for Development; store local sensitive values in User Secrets. `Host.Jobs` also loads its own User Secrets in Development, separate from the API's. During deployment, provide sensitive values through the approved secrets/environment-variable mechanism.
 
-У ключах змінних середовища використовуй подвійне підкреслення: наприклад, `ConnectionStrings__Default` відповідає `ConnectionStrings:Default`.
+Use double underscores in environment variable keys: for example, `ConnectionStrings__Default` maps to `ConnectionStrings:Default`.
 
-## Важливі параметри
+## Important settings
 
-| Параметр | Призначення | Секрет |
+| Setting | Purpose | Secret |
 | --- | --- | --- |
-| `ConnectionStrings:Default` | З'єднання PostgreSQL для контекстів застосунку | так |
-| `ADMIN_DEFAULT_PASSWORD` | Пароль лише для початкового створення адміністратора через migration job | так |
-| `OneCSoap:Endpoint`, `Username`, `Password` | SOAP-інтеграція з 1C | кінцева точка залежить від середовища; облікові дані — секрет |
-| `Telegram:BotToken`, `ChatId` | Інтеграція з Telegram | так |
-| `Sales:OneCOrderSync` | Розмір batch, інтервали, межа спроб, київське вікно відправлення та recovery застарілого `Sent` | ні |
-| `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Дозволені browser origins для API | ні, але залежить від середовища |
-| `Identity:SessionCookies` | Назви, шляхи, строк життя, `Secure` та SameSite для cookies | ні |
-| `Identity:SessionSecurity` | Межі строку дії access/refresh токенів | ні |
+| `ConnectionStrings:Default` | PostgreSQL connection for application contexts | Yes |
+| `ADMIN_DEFAULT_PASSWORD` | Password used only to create the initial administrator through the migration job | Yes |
+| `OneCSoap:Endpoint`, `Username`, `Password` | 1C SOAP integration | Endpoint is environment-specific; credentials are secret |
+| `Telegram:BotToken`, `ChatId` | Telegram integration | Yes |
+| `Sales:OneCOrderSync` | Batch size, intervals, attempt limit, Kyiv sending window, and recovery for stale `Sent` state | No |
+| `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
+| `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, and SameSite | No |
+| `Identity:SessionSecurity` | Access/refresh token lifetime limits | No |
 
-Приклад локального секрету для `Host.Api`:
+Example local secret for `Host.Api`:
 
 ~~~powershell
 dotnet user-secrets set "ADMIN_DEFAULT_PASSWORD" "<local-only-value>" --project src/Bootstrapper/Host.Api/Host.Api.csproj
 ~~~
 
-Для `Host.Jobs --job=migrate` надай `ADMIN_DEFAULT_PASSWORD` і `ConnectionStrings:Default` через **його** User Secrets або змінні середовища. API User Secrets автоматично не передаються Jobs host.
+For `Host.Jobs --job=migrate`, provide `ADMIN_DEFAULT_PASSWORD` and `ConnectionStrings:Default` through its own User Secrets or environment variables. API User Secrets are not automatically passed to the Jobs host.
 
-Не записуй реальні паролі, токени чи production-рядки підключення в `appsettings*.json`, Markdown, код або логи. Під час діагностики запуску не друкуй значення конфігурації.
+Do not put real passwords, tokens, or production connection strings in `appsettings*.json`, Markdown, code, or logs. Do not print configuration values while diagnosing startup.
 
-## Файли cookie й CORS
+## Cookies and CORS
 
-Refresh-автентифікація використовує cookies з credentials, тому CORS задає явний allow-list; wildcard origins не використовуються. Поточний refresh-cookie має `Secure: true` і `SameSite: None`. Перевіряй refresh через HTTPS або зроби свідоме локальне перевизначення, яке не переноситься в спільне середовище.
+Refresh authentication uses cookies with credentials, so CORS has an explicit allow-list; wildcard origins are not used. The current refresh cookie has `Secure: true` and `SameSite: None`. Test refresh over HTTPS or make an intentional local override that is not carried into a shared environment.

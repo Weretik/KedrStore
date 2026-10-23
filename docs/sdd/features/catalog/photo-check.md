@@ -1,42 +1,42 @@
-# Перевірка фото товарів
+# Product photo check
 
-**Статична звірка з кодом:** 2026-10-16. **Модуль:** Catalog.
+**Static code check:** 2026-10-16. **Module:** Catalog.
 
-Окрема job `check-product-photos` перевіряє доступність основних фото товарів; admin API читає її результати для списку проблемних фото.
+The separate `check-product-photos` job checks whether primary product photos are reachable; the Admin API reads its results for the list of problematic photos.
 
-## Будова й зв'язки
+## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) запускає [CheckProductPhotosJob](../../../../src/Catalog/Catalog.Application/Jobs/ProductPhotos/CheckProductPhotosJob.cs). Вона бере товари партіями через [ProductPhotoCheckStore](../../../../src/Catalog/Catalog.Infrastructure/Products/ProductPhotoCheckStore.cs), перевіряє URL через [ProductPhotoProbe](../../../../src/Catalog/Catalog.Infrastructure/Integrations/ProductPhotos/ProductPhotoProbe.cs) та зберігає [ProductPhotoCheck](../../../../src/Catalog/Catalog.Domain/Entities/ProductPhotoCheck.cs). [GetMissingProductPhotosQueryHandler](../../../../src/Catalog/Catalog.Application/Features/Products/GetMissingPhotos/GetMissingProductPhotosQueryHandler.cs) використовує результати, але не виконує перевірку URL під час HTTP-запиту.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs [CheckProductPhotosJob](../../../../src/Catalog/Catalog.Application/Jobs/ProductPhotos/CheckProductPhotosJob.cs). It loads products in batches through [ProductPhotoCheckStore](../../../../src/Catalog/Catalog.Infrastructure/Products/ProductPhotoCheckStore.cs), probes URLs with [ProductPhotoProbe](../../../../src/Catalog/Catalog.Infrastructure/Integrations/ProductPhotos/ProductPhotoProbe.cs), and saves [ProductPhotoCheck](../../../../src/Catalog/Catalog.Domain/Entities/ProductPhotoCheck.cs). [GetMissingProductPhotosQueryHandler](../../../../src/Catalog/Catalog.Application/Features/Products/GetMissingPhotos/GetMissingProductPhotosQueryHandler.cs) uses the saved results; it does not probe URLs during HTTP requests.
 
-## Структура в коді
+## Code structure
 
-Наведено перевірені точки входу та ключові складові фічі; дерево не перелічує всі допоміжні файли.
+The tree lists verified entry points and key components, not every supporting file.
 
 ```text
 src/
-├── Bootstrapper/Host.Jobs/Host.Jobs/Program.cs  # запуск job
+├── Bootstrapper/Host.Jobs/Host.Jobs/Program.cs  # runs the job
 └── Catalog/
     ├── Catalog.Application/
-    │   ├── Features/Products/GetMissingPhotos/GetMissingProductPhotosQueryHandler.cs  # обробник сценарію
-    │   └── Jobs/ProductPhotos/CheckProductPhotosJob.cs  # фонова задача
-    ├── Catalog.Domain/Entities/ProductPhotoCheck.cs  # доменна модель
+    │   ├── Features/Products/GetMissingPhotos/GetMissingProductPhotosQueryHandler.cs  # use-case handler
+    │   └── Jobs/ProductPhotos/CheckProductPhotosJob.cs  # background job
+    ├── Catalog.Domain/Entities/ProductPhotoCheck.cs  # domain model
     └── Catalog.Infrastructure/
-        ├── Integrations/ProductPhotos/ProductPhotoProbe.cs  # інфраструктурна реалізація
-        └── Products/ProductPhotoCheckStore.cs  # доступ до даних
+        ├── Integrations/ProductPhotos/ProductPhotoProbe.cs  # infrastructure implementation
+        └── Products/ProductPhotoCheckStore.cs  # data access
 ```
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
     A["Host.Jobs"] --> B["CheckProductPhotosJob"]
     B --> C["IProductPhotoCheckStore"]
     B --> D["IProductPhotoProbe"]
-    D --> E["URL фото"]
+    D --> E["Photo URL"]
     C --> F["ProductPhotoCheck"]
     G["GetMissingProductPhotosQueryHandler"] --> F
 ```
 
-## Пов'язані джерела
+## Related sources
 
-[SDD](../../specs/catalog/003-missing-product-photos/README.md) · [Runbook](../../operations/jobs/catalog-photo-check-runbook.md) · [OpenAPI читання](../../contracts/catalog/products.openapi.yaml).
+[SDD](../../specs/catalog/003-missing-product-photos/README.md) · [Runbook](../../operations/jobs/catalog-photo-check-runbook.md) · [Read OpenAPI](../../contracts/catalog/products.openapi.yaml).

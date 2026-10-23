@@ -1,10 +1,10 @@
 # BuildingBlocks.Api
 
-## Призначення
+## Purpose
 
-BuildingBlocks.Api містить MVC-відображення Ardalis.Result у HTTP `ActionResult`.
+BuildingBlocks.Api contains the MVC mapping from Ardalis.Result to HTTP `ActionResult`.
 
-## Відображення
+## Mapping
 
 ~~~text
 ResultStatus.Ok           → 200 OK with value
@@ -16,6 +16,6 @@ ResultStatus.Unauthorized → 401
 other/unmapped            → 500
 ~~~
 
-## Правило
+## Rule
 
-Після `ISender.Send` контролери викликають чинний метод розширення `ToActionResult`. Не перевизначай статуси `Result` вручну в кожній кінцевій точці, крім випадку, коли документований API-контракт потребує вже прийнятого в проєкті розширення.
+After `ISender.Send`, controllers call the existing `ToActionResult` extension method. Do not map `Result` statuses manually in each endpoint unless the documented API contract requires an extension already adopted by the project.

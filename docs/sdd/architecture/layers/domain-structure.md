@@ -1,39 +1,39 @@
-# Структура Domain
+# Domain structure
 
-## Відповідальність
+## Responsibility
 
-Domain володіє бізнес-моделлю та її інваріантами. Її можна зрозуміти без знання ASP.NET Core, EF Core, SQL, HTTP чи зовнішніх клієнтів.
+Domain owns the business model and its invariants. It can be understood without knowing ASP.NET Core, EF Core, SQL, HTTP, or external clients.
 
-## Цільова структура модуля
+## Target module structure
 
 ~~~text
 <Module>.Domain/
-├── Entities/                 aggregates і сутності
+├── Entities/                 aggregates and entities
 │   └── <Area>/
-├── ValueObjects/             перевірені значення та типізовані ID
-├── Errors/                   фабрики/коди доменних помилок
-├── Events/                   доменні події
-├── Services/                 лише чисті доменні сервіси
-├── Specifications/           доменні специфікації за потреби
+├── ValueObjects/             validated values and typed IDs
+├── Errors/                   domain error factories/codes
+├── Events/                   domain events
+├── Services/                 pure domain services only
+├── Specifications/           domain specifications when needed
 ├── Constants/
 └── <Module>.Domain.csproj
 ~~~
 
-## Схема розміщення
+## Placement diagram
 
 ~~~text
-Command Application
-        │ викликає поведінку
+Application command
+        │ invokes behavior
         ▼
 Aggregate / Entity ───► Value object
-        │ забезпечує інваріант     │ перевіряє поняття
-        ├──► Доменна помилка
-        └──► Доменна подія (накопичена, не dispatch тут)
+        │ enforces invariant      │ validates concept
+        ├──► Domain error
+        └──► Domain event (accumulated, not dispatched here)
 ~~~
 
-## Правила
+## Rules
 
-- Фабрики й методи поведінки забезпечують інваріанти.
-- Використовуй value object, якщо примітив допускає некоректний стан.
-- Доменна подія описує завершений бізнес-факт; її накопичує сутність.
-- Тут не місце request DTO, `DbSet`, EF-конфігурації, реалізації репозиторію, HTTP-виклику чи залежності від логування.
+- Factories and behavior methods enforce invariants.
+- Use a value object when a primitive allows an invalid state.
+- A domain event describes a completed business fact; an entity accumulates it.
+- Request DTOs, `DbSet`, EF configuration, repository implementations, HTTP calls, and logging dependencies do not belong here.

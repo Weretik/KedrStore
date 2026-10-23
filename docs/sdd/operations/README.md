@@ -1,22 +1,22 @@
-# Операційна документація
+# Operations documentation
 
-Розділ пояснює, як налаштувати, запустити й діагностувати backend. Тут описано операційні факти; ручні перевірки конкретної фічі зберігаються в її специфікації.
+This section explains how to configure, run, and diagnose the backend. It records operational facts; manual checks for a specific feature belong in that feature's specification.
 
 ```text
 operations/
-├── local-development/  запуск API та локальні адреси
-├── configuration/      джерела конфігурації й секрети
-├── data/               окремий migration job і seed-дані
-├── diagnostics/        health, Swagger і логи
-└── jobs/               команди Host.Jobs та імпорту 1C
+├── local-development/  API startup and local addresses
+├── configuration/      configuration sources and secrets
+├── data/               separate migration job and seed data
+├── diagnostics/        health, Swagger, and logs
+└── jobs/               Host.Jobs commands and 1C imports
 ```
 
-## Навігація за завданням
+## Browse by task
 
-- Локально запустити backend: [локальна розробка](local-development/run-api.md)
-- Налаштувати середовище: [конфігурація й секрети](configuration/configuration-and-secrets.md)
-- Підготувати БД окремим job: [міграції та seed-дані](data/migrations-and-seeding.md)
-- Перевірити API або відтворити HTTP-запит: [діагностика](diagnostics/health-logs-swagger.md)
-- Виконати 1C/import операцію: [jobs і runbooks](jobs/README.md)
+- Run the backend locally: [local development](local-development/run-api.md)
+- Configure the environment: [configuration and secrets](configuration/configuration-and-secrets.md)
+- Prepare the database with a separate job: [migrations and seed data](data/migrations-and-seeding.md)
+- Check the API or reproduce an HTTP request: [diagnostics](diagnostics/health-logs-swagger.md)
+- Run a 1C/import operation: [jobs and runbooks](jobs/README.md)
 
-Не записуй тут паролі, токени, повні рядки підключення або production endpoints.
+Do not record passwords, tokens, full connection strings, or production endpoints here.

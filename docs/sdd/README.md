@@ -1,18 +1,18 @@
-# Backend SDD проєкту KedrStore
+# KedrStore backend SDD
 
-Це вхід до чинної документації backend. Відомості про реалізацію перевіряй за кодом і конфігурацією репозиторію; специфікації можуть описувати заплановані зміни, тому їхній статус не замінює перевірку поточної поведінки.
+This is the entry point to current backend documentation. Verify implementation details against repository code and configuration; specifications may describe planned changes, so their status does not replace checking current behavior.
 
-| Питання | Де шукати |
+| Question | Where to look |
 | --- | --- |
-| Які є модулі, шари, hosts, runtime-потоки та інтеграції? | [Архітектура](architecture/README.md) |
-| Які технології, прямі NuGet-залежності й інструменти оголошені? | [Стек](architecture/platform/technology-stack.md), [каталог пакетів](architecture/platform/nuget-packages.md) та [інструменти](architecture/platform/tooling-and-delivery.md) |
-| Які сталі правила для коду, API, БД, безпеки, тестів і delivery? | [Стандарти](standards/README.md) |
-| Як запустити API, підготувати БД і виконати jobs? | [Операції](operations/README.md) |
-| Де версійні API-контракти та правила взаємодії з frontend? | [Контракти](contracts/README.md) |
-| Де вимоги, проєктні рішення та свідчення окремої фічі? | [Специфікації](specs/README.md) |
-| Які фічі реалізовані та де їхній код і дані? | [Карта фіч](features/README.md) |
-| Як відрізнити чинне архітектурне рішення від історичного ADR? | [Рішення](architecture/decisions/README.md) |
+| Which modules, layers, hosts, runtime flows, and integrations exist? | [Architecture](architecture/README.md) |
+| Which technologies, direct NuGet dependencies, and tools are declared? | [Stack](architecture/platform/technology-stack.md), [package catalog](architecture/platform/nuget-packages.md), and [tooling](architecture/platform/tooling-and-delivery.md) |
+| Which stable rules govern code, API, database, security, testing, and delivery? | [Standards](standards/README.md) |
+| How do I start the API, prepare the database, and run jobs? | [Operations](operations/README.md) |
+| Where are versioned API contracts and frontend integration rules? | [Contracts](contracts/README.md) |
+| Where are requirements, design decisions, and evidence for a feature? | [Specifications](specs/README.md) |
+| Which features are implemented, and where are their code and data? | [Feature map](features/README.md) |
+| How do I distinguish a current architecture decision from a historical ADR? | [Decisions](architecture/decisions/README.md) |
 
-Архітектура описує перевірений поточний стан і сталі межі. Стандарти містять чинні нормативні правила. `features/` показує будову поточних фіч, а `specs/` зберігає задум, хід і свідчення конкретної зміни. Історичні матеріали в [`docs/legacy/`](../legacy/README.md) не є автоматично чинними правилами.
+Architecture describes the verified current state and stable boundaries. Standards contain current normative rules. `features/` shows the structure of current features, while `specs/` records the intent, progress, and evidence of a specific change. Historical material in [`docs/legacy/`](../legacy/README.md) is not automatically a current rule.
 
-**Межа перевірки:** інвентар пакетів і поведінку запуску звірено з репозиторієм 2026-10-15. Після зміни коду, manifests або deployment workflow відповідні документи потрібно звірити знову.
+**Verification boundary:** The package inventory and startup behavior were checked against the repository on 2026-10-15. After changes to code, manifests, or deployment workflows, the relevant documents must be checked again.

@@ -1,30 +1,30 @@
-# Міграції та seed-дані
+# Migrations and seed data
 
-## Поточний порядок запуску
+## Current execution order
 
-Станом на 2026-10-15 `Host.Api` **не запускає** міграції й сидери під час старту: у `src/Bootstrapper/Host.Api/Program.cs` немає виклику `RunStartupTasksAsync()`, `UseAppMigrations()` або `UseAppSeeders()`. Сервісні extension-методи для міграцій і сидерів залишаються в `BuildingBlocks.Infrastructure`, але сама їхня наявність не означає виклик з API.
+As of 2026-10-15, `Host.Api` does **not** run migrations or seeders at startup: `src/Bootstrapper/Host.Api/Program.cs` has no call to `RunStartupTasksAsync()`, `UseAppMigrations()`, or `UseAppSeeders()`. Migration/seeder extension methods remain in `BuildingBlocks.Infrastructure`, but their presence does not mean the API invokes them.
 
-Міграцію та seed-дані виконує окрема команда `Host.Jobs`:
+A separate `Host.Jobs` command runs migrations and seed data:
 
 ```powershell
 dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=migrate
 ```
 
-`src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs` послідовно викликає зареєстровані `IDatabaseMigrator`, а після них — унікальні за типом `ISeeder`. За помилки `Host.Jobs/Program.cs` повертає ненульовий код. Звичайний запуск API більше не підготовлює базу автоматично. Команда `--job=migrate` змінює схему й дані; перевір конфігурацію та цільову БД до запуску.
+`src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs` calls registered `IDatabaseMigrator` implementations in order, then each unique `ISeeder` type. On failure, `Host.Jobs/Program.cs` returns a non-zero exit code. Normal API startup no longer prepares the database automatically. `--job=migrate` changes schema and data; verify configuration and target database before running it.
 
-Поточний `.github/workflows/deploy-cloudrun.yml` створює або оновлює Cloud Run Job `database-migrate`, запускає його й очікує успіху перед новою API-ревізією. Це опис коду процесу розгортання, а не підтвердження фактичного стану будь-якого середовища. Порядок і ризики першого розгортання Identity описані в [специфікації завдання міграції](../../specs/platform/001-database-migration-job/README.md).
+The current `.github/workflows/deploy-cloudrun.yml` creates or updates the Cloud Run Job `database-migrate`, runs it, and waits for success before deploying a new API revision. This describes the deployment workflow code; it does not confirm the state of any deployed environment. First-deployment order and Identity risks are described in the [migration job specification](../../specs/platform/001-database-migration-job/README.md).
 
-## Поточні Identity-сидери
+## Current Identity seeders
 
-- `RoleSeeder` забезпечує ролі Admin, Manager і User.
-- `IdentitySeeder` створює налаштованого адміністратора лише коли його немає і задано `ADMIN_DEFAULT_PASSWORD`.
+- `RoleSeeder` ensures the Admin, Manager, and User roles exist.
+- `IdentitySeeder` creates a configured administrator only when none exists and `ADMIN_DEFAULT_PASSWORD` is set.
 
-Пароль не читається з поля `Identity:AdminUser:DefaultPassword`: сидер використовує `ADMIN_DEFAULT_PASSWORD`. Без нього створення адміністратора пропускається з записом у лог. Не записуй значення пароля в документацію чи журнал виконання.
+The password is not read from `Identity:AdminUser:DefaultPassword`; the seeder uses `ADMIN_DEFAULT_PASSWORD`. Without it, administrator creation is skipped and logged. Do not record the password in documentation or execution logs.
 
-## Правила змін
+## Change rules
 
-- Додавай міграцію лише коли фіча змінює постійну схему або контракт даних.
-- Занось дизайн міграції, порядок розгортання, відкату або відновлення й перевірки до відповідної [специфікації фічі](../../specs/README.md) за [правилами БД](../../standards/database-rules.md). Додавай `data-model.md` і `design/infrastructure.md`, якщо вони потрібні для цієї зміни.
-- Не переписуй уже застосовану міграцію, змінюючи історію production.
-- Зміну seed-даних розглядай як зміну даних: документуй ідемпотентність, поведінку для наявних записів і відновлення.
-- Після зміни міграції чи сидера перевір результат окремого `--job=migrate` і логи; сам старт API не доводить, що міграція пройшла.
+- Add a migration only when a feature changes persistent schema or data contracts.
+- Record migration design, rollout order, rollback/recovery, and verification in the relevant [feature specification](../../specs/README.md) under the [database rules](../../standards/database-rules.md). Add `data-model.md` and `design/infrastructure.md` when the change requires them.
+- Do not rewrite an already applied migration and alter production history.
+- Treat seed-data changes as data changes: document idempotency, behavior for existing rows, and recovery.
+- After changing a migration or seeder, verify a separate `--job=migrate` run and its logs; API startup does not prove that the migration succeeded.

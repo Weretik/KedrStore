@@ -1,45 +1,45 @@
-# Чеклист фічі з контролем доступу
+# Feature Access-Control Checklist
 
-Застосовуй чеклист у відповідній [специфікації фічі](../../../specs/README.md).
+Apply this checklist in the relevant [feature specification](../../../specs/README.md).
 
-## Порядок ухвалення рішення
+## Decision sequence
 
 ```text
-Чи наявна policy охоплює операцію?
-  | так -> захисти кінцеву точку нею; не додавай роль чи новий потік користувача
+Does an existing policy cover the operation?
+  | yes -> protect the endpoint with it; do not add a role or a new user flow
   |
   no
   v
-Це новий бізнес-дозвіл чи новий тип користувача?
-  | дозвіл -> додай названу policy і пов'яжи з наявними ролями
-  | тип користувача -> додай роль, свідомо створи/признач її, потім за потреби додай policy
+Is this a new business permission or a new user type?
+  | permission -> add a named policy and map it to existing roles
+  | user type -> add a role, deliberately provision/assign it, then add a policy if needed
   |
   v
-Анонімний викликач може створити такого користувача?
-  | ні  -> фіча Admin/запрошення/імпорту
-  | так -> фіча реєстрації з підтвердженням і захистом від зловживань
+Can an anonymous caller create this user?
+  | no  -> Admin/invitation/import feature
+  | yes -> registration feature with confirmation and abuse protection
 ```
 
-## Чеклист специфікації
+## Specification checklist
 
-- [ ] Назви захищену операцію бізнес-термінами.
-- [ ] Використай наявну policy або поясни потребу в новій.
-- [ ] Для нової policy: назви її в `PolicyNames` і визнач вимоги до ролей у Host.Api.
-- [ ] Для нової ролі: додай константу, план створення початкових даних і розгортання та правила призначення; не залишай оголошену, але недоступну роль.
-- [ ] Укажи, хто викликає кінцеву точку, і свідомо познач анонімні кінцеві точки через `AllowAnonymous`.
-- [ ] Якщо створюють користувачів або призначають ролі, оформи фічу як сценарій використання модуля Identity.
-- [ ] Визнач, чи відкликати наявні refresh-сесії після зміни ролі, пароля або стану облікового запису.
-- [ ] Додай rate limits і безпечні помилки для анонімних endpoints або endpoints із credentials.
-- [ ] Включи `401 Unauthorized`, `403 Forbidden` та успішні сценарії в API-контракт і план перевірки Swagger.
+- [ ] Name the protected operation in business terms.
+- [ ] Use an existing policy or explain why a new one is needed.
+- [ ] For a new policy: name it in `PolicyNames` and define role requirements in Host.Api.
+- [ ] For a new role: add a constant, plan initial provisioning and deployment, and define assignment rules; do not leave a declared but unavailable role.
+- [ ] State who calls the endpoint and deliberately mark anonymous endpoints with `AllowAnonymous`.
+- [ ] If users are created or roles assigned, define the feature as an Identity module use case.
+- [ ] Decide whether existing refresh sessions are revoked after a role, password, or account-status change.
+- [ ] Add rate limits and safe errors for anonymous endpoints or endpoints with credentials.
+- [ ] Include `401 Unauthorized`, `403 Forbidden`, and success cases in the API contract and Swagger verification plan.
 
-## Матриця ручної перевірки
+## Manual verification matrix
 
-| Випадок | Очікуваний результат |
+| Case | Expected result |
 | --- | --- |
-| Немає bearer token на захищеному route | `401` |
-| Автентифікований користувач без потрібної ролі | `403` |
-| Потрібна роль і коректний запит | Успішна відповідь за контрактом |
-| Явна анонімна кінцева точка | Працює без токена Bearer лише коли це допускає її валідація |
-| Refresh без CSRF або з невідповідним значенням | `400` |
+| No bearer token on a protected route | `401` |
+| Authenticated user without the required role | `403` |
+| Required role and valid request | Successful response as defined by the contract |
+| Explicitly anonymous endpoint | Works without a bearer token only when its validation permits it |
+| Refresh without CSRF or with a mismatched value | `400` |
 
-Після зміни ролей або правил авторизації перевір новий вхід. Токени містять твердження про ролі, отримані під час їх видачі, тому сесії, створені до зміни, перевір окремо, якщо розгортання потребує негайного ефекту.
+After changing roles or authorization rules, verify a new login. Tokens contain role claims obtained when issued, so check sessions created before the change separately if deployment requires immediate effect.

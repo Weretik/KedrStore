@@ -1,25 +1,25 @@
-# Карта модулів
+# Module map
 
 ## Catalog
 
-Шари: Catalog.Api, Catalog.Application, Catalog.Contracts, Catalog.Domain, Catalog.Infrastructure.
+Layers: Catalog.Api, Catalog.Application, Catalog.Contracts, Catalog.Domain, Catalog.Infrastructure.
 
-Відповідає за товари каталогу, категорії, типи цін, переклади, проєкцію списку товарів, інтеграцію створення замовлення, синхронізацію з 1C і публічне/адміністративне читання каталогу.
+Owns catalog products, categories, price types, translations, the product-list projection, order-creation integration, 1C synchronization, and public/admin catalog reads.
 
 ## Sales
 
-Шари: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
+Layers: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
 
-Відповідає за клієнтів і контрагентів продажів, цінову політику та інтеграцію продажів із каталогом. Споживає Catalog через контракти й read-абстракції, а не через типи Catalog.Infrastructure.
+Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog through contracts and read abstractions, not Catalog.Infrastructure types.
 
 ## Identity
 
-Шари: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.
+Layers: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.
 
-Відповідає за збереження ідентичностей, ролі, правила авторизації, сервіси сесії й поточного користувача та початкові дані. Бізнес-модулі використовують абстракції дозволів/поточного користувача, а не EF-типи Identity.
+Owns identity persistence, roles, authorization policies, session/current-user services, and seed data. Business modules use permission/current-user abstractions rather than Identity EF types.
 
 ## BuildingBlocks
 
-BuildingBlocks.Domain містить доменні примітиви. BuildingBlocks.Application містить Mediator behaviors, підтримку результатів/валідації та абстракції доменних подій. BuildingBlocks.Infrastructure містить спільні реалізації адаптерів. Це технічна основа, а не четвертий бізнес-модуль.
+BuildingBlocks.Domain contains domain primitives. BuildingBlocks.Application contains Mediator behaviors, result/validation support, and domain-event abstractions. BuildingBlocks.Infrastructure contains shared adapter implementations. This is technical foundation, not a fourth business module.
 
-Перед додаванням або дублюванням спільних примітивів прочитай [довідник BuildingBlocks](../platform/building-blocks/README.md).
+Before adding or duplicating shared primitives, read the [BuildingBlocks guide](../platform/building-blocks/README.md).
