@@ -1,42 +1,42 @@
-# Зміна 2026-10-22 — діапазон дат замовлень
+# Change 2026-10-22 — order date range
 
-**Статус:** SDD, код і версійний OpenAPI ще не змінено. Додаток до [004 Admin workspace](README.md); історичні R-001–R-007, SC-001–SC-006 і докази залишаються незмінними. Спільний ID інкременту з Admin frontend: `order-workspace-2026-10-22`.
+**Status:** SDD, code, and versioned OpenAPI have not yet changed. Addendum to [004 Admin workspace](README.md); historical R-001–R-007, SC-001–SC-006, and evidence remain unchanged. Shared increment ID with Admin frontend: `order-workspace-2026-10-22`.
 
-## Вимоги й приймання
+## Requirements and acceptance
 
-- **R-008.** `getAdminWorkspaceOrders` приймає необов’язкові `createdFrom` і `createdTo` у форматі календарної дати `YYYY-MM-DD`. Межі включно за часовим поясом `Europe/Kyiv`; в SQL перетворювати на напіввідкритий UTC-інтервал `[початок createdFrom, початок дня після createdTo)`. Це коректно охоплює дні переходу літнього часу. Одна межа допустима, `createdFrom > createdTo` повертає 400.
-- **R-009.** Фільтр поєднується через AND із наявними `searchTerm` та `counterpartyId`; `totalRecords` обчислюється після всіх умов і до `Skip/Take`, стабільний sort зберігається. Той самий endpoint обслуговує головну сторінку та таблицю в деталях клієнта; в останній `counterpartyId` є обов’язковим frontend-контекстом.
-- **R-010.** Параметри не змінюють DTO запису, авторизаційне рішення, idempotency створення чи дані БД. Нова міграція не потрібна. Індекс пропонувати лише за результатом `EXPLAIN` на релевантному обсязі.
+- **R-008.** `getAdminWorkspaceOrders` accepts optional `createdFrom` and `createdTo` in calendar-date format `YYYY-MM-DD`. Boundaries are inclusive in the `Europe/Kyiv` timezone; convert them in SQL to a half-open UTC interval `[start of createdFrom, start of the day after createdTo)`. This correctly covers daylight-saving transition days. Either boundary may be supplied alone; `createdFrom > createdTo` returns 400.
+- **R-009.** The filter is combined with existing `searchTerm` and `counterpartyId` using AND; `totalRecords` is calculated after all conditions and before `Skip/Take`, preserving stable sorting. The same endpoint serves the main page and the table in customer details; in the latter, `counterpartyId` is required frontend context.
+- **R-010.** Parameters do not change the record DTO, authorization decision, create idempotency, or database data. No migration is needed. Propose an index only after `EXPLAIN` on relevant volume.
 
 | ID | Given / When / Then |
 | --- | --- |
-| **SC-007** | Given замовлення на межах і поза діапазоном у київському часі; When Admin запитує `createdFrom`/`createdTo`; Then повертаються лише записи включених календарних днів і правильний `totalRecords`. |
-| **SC-008** | Given клієнт має замовлення різних дат, а інші клієнти теж мають записи; When запит містить `counterpartyId` і діапазон; Then сторінка містить тільки записи цього клієнта в діапазоні. |
-| **SC-009** | Given межі переплутані або мають невалідний формат; When Admin запитує список; Then отримує 400 без SQL-запиту з невалідними умовами. |
+| **SC-007** | Given orders on and outside the range in Kyiv time; when Admin requests `createdFrom`/`createdTo`; then only records in the included calendar days are returned, with the correct `totalRecords`. |
+| **SC-008** | Given a customer has orders on different dates and other customers also have records; when the request includes `counterpartyId` and a range; then the page contains only that customer's records in the range. |
+| **SC-009** | Given the boundaries are reversed or have an invalid format; when Admin requests the list; then 400 is returned without a SQL query using invalid conditions. |
 
-## Контракт, дизайн і порядок
+## Contract, design, and sequence
 
-Канонічна операція — `GET /api/admin/order-workspace/orders`, `operationId: getAdminWorkspaceOrders` у `docs/sdd/contracts/sales/admin-order-workspace.openapi.yaml` та агрегованому `docs/sdd/contracts/openapi.yaml`. Запланувати query-параметри `createdFrom?: string(date)`, `createdTo?: string(date)`; response лишається наявним `OrderPage`, помилка 400 — чинний безпечний формат. До реалізації оновити лише provider OpenAPI й contract tests, після фіксації revision передати frontend для штатного snapshot sync. Чинний контролер тимчасово `[AllowAnonymous]` за рішенням попереднього етапу; ця зміна доступу не торкається.
+Canonical operation: `GET /api/admin/order-workspace/orders`, `operationId: getAdminWorkspaceOrders` in `docs/sdd/contracts/sales/admin-order-workspace.openapi.yaml` and aggregated `docs/sdd/contracts/openapi.yaml`. Plan query parameters `createdFrom?: string(date)`, `createdTo?: string(date)`; the response remains the existing `OrderPage`, and 400 uses the existing safe format. Before implementation, update only provider OpenAPI and contract tests; after recording the revision, hand it to frontend for the standard snapshot sync. The controller's current `[AllowAnonymous]` follows the prior-stage decision and is unaffected.
 
-Запит проходить `AdminOrderWorkspaceController` → `GetWorkspaceOrdersQuery` → `WorkspaceOrderReader`. Валідацію формату/порядку меж виконати до reader; UTC-межі обчислювати в одному місці. `CreatedAtUtc` не перетворювати функцією в SQL `WHERE`, щоб зберегти можливість використання індексу. Відсутність обох меж має зберегти поточну поведінку.
+The request flows through `AdminOrderWorkspaceController` → `GetWorkspaceOrdersQuery` → `WorkspaceOrderReader`. Validate boundary format/order before the reader; calculate UTC boundaries in one place. Do not apply a function to `CreatedAtUtc` in SQL `WHERE`, preserving index usability. With neither boundary supplied, retain current behavior.
 
-| Шлях | Стан | Відповідальність |
+| Path | State | Responsibility |
 | --- | --- | --- |
-| `docs/sdd/contracts/sales/admin-order-workspace.openapi.yaml` | наявний | версійний HTTP-контракт дати |
-| `src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs` | наявний | query binding і 400 |
-| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Orders/GetList/` | наявний | валідація/передача умов |
-| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs` | наявний | UTC-умови, count і сторінка |
-| `tests/IntegrationTests/Sales/Api/` | наявний каталог | вузькі API/SQL тести меж і pagination |
-| `docs/sdd/features/sales/admin-order-workspace.md` | наявний | звірка карти після реалізації |
+| `docs/sdd/contracts/sales/admin-order-workspace.openapi.yaml` | existing | versioned HTTP date contract |
+| `src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs` | existing | query binding and 400 |
+| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Orders/GetList/` | existing | validation/condition passing |
+| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs` | existing | UTC conditions, count, and page |
+| `tests/IntegrationTests/Sales/Api/` | existing directory | focused API/SQL boundary and pagination tests |
+| `docs/sdd/features/sales/admin-order-workspace.md` | existing | reconcile feature map after implementation |
 
-| Задача | Залежить від | Робота | Доказ/checkpoint |
+| Task | Depends on | Work | Evidence/checkpoint |
 | --- | --- | --- | --- |
-| **EN-002** | — | Узгодити OpenAPI параметри та timezone `Europe/Kyiv`; зафіксувати provider revision | contract lint, точні приклади DST/400 |
-| **TS-005** | EN-002 | Додати binding, validation, reader-фільтр у зазначених шляхах | Red → Green: API/SQL тести меж, AND умов, count |
-| **TS-006** | TS-005 | Звірити feature-карту, контракт і цільовий regression | traceability/evidence, без повного прогону без запиту |
+| **EN-002** | — | Align OpenAPI parameters and `Europe/Kyiv` timezone; record provider revision | contract lint, exact DST/400 examples |
+| **TS-005** | EN-002 | Add binding, validation, and reader filter in the listed paths | Red → Green: API/SQL tests for boundaries, AND conditions, count |
+| **TS-006** | TS-005 | Reconcile feature map, contract, and targeted regression | traceability/evidence, no full suite without request |
 
-| Правила | Сценарії | Задачі | Рівень |
+| Rules | Scenarios | Tasks | Level |
 | --- | --- | --- | --- |
 | R-008–R-010 | SC-007–SC-009 | EN-002, TS-005–TS-006 | contract/API/SQL integration |
 
-**Готовність:** продуктове рішення про діапазон і часовий пояс прийнято. Немає блокера для provider контракту; реалізація не доручена цим документом.
+**Readiness:** Product decision on date range and timezone is accepted. There is no blocker to the provider contract; this document does not authorize implementation.

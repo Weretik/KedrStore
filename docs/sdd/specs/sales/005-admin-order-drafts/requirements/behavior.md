@@ -1,76 +1,76 @@
-# Правила й приймальні сценарії
+# Rules and acceptance scenarios
 
-## Правила
+## Rules
 
-- **R-001.** Збережена чернетка має внутрішній `draftId`, обов’язкові назву й `counterpartyId`, необов’язкову нотатку та щонайменше одну позицію. Номера замовлення, `Order` і `OneCOrderSync` для неї немає.
-- **R-002.** Позиції містять унікальні `productId` та додатні кількості. Сервер перевіряє активного клієнта й актуальні товари при створенні та зміні. Ціна не надходить від клієнта; перегляд/редагування показує актуальний серверний розрахунок. Коли після збереження клієнт, товар, залишок або ціна стають недоступними, GET detail усе одно повертає збережені ID/кількості, назву, version і `pricingStatus=Unavailable`; ціни та сума дорівнюють `null`, а `pricingErrorCode` містить безпечну причину. Це дає змогу виправити або видалити чернетку без підміни відсутньої ціни нулем. PUT із новим складом вимагає доступної ціни.
-- **R-003.** Чернетку можна переглянути, змінити назву/нотатку/клієнта/позиції, видалити після підтвердження у UI. API не відповідає за модальне підтвердження. Зміна використовує optimistic concurrency token; за паралельного редагування — 409 і повторне завантаження.
-- **R-004.** Список має server pagination (1/20, max 100), пошук за частиною назви чернетки/назви клієнта або точним числовим ID, `counterpartyId` exact; багатослівні токени AND. Сортування за `updatedAt` (типово спадання), `title`, `customerName` у двох напрямках зі стабільним `draftId`.
-- **R-005.** Перехід «Оформити на основі чернетки» лише читає її й передає склад у тимчасову робочу область Admin; оформлення відбувається окремим [004](../../004-admin-order-workspace/README.md). Успішне замовлення **не змінює й не видаляє** джерельну чернетку, щоб її можна було використати знову.
-- **R-006.** Нові операції захищені `CanManageOrders`; видалення фізично прибирає чернетку та її позиції в одній транзакції. Помилки не розкривають внутрішні дані.
+- **R-001.** A saved draft has an internal `draftId`, required title and `counterpartyId`, optional note, and at least one line. It has no order number, `Order`, or `OneCOrderSync`.
+- **R-002.** Lines have unique `productId` values and positive quantities. The server validates the active customer and current products on create and update. The client does not provide prices; viewing/editing shows the current server quote. If the customer, product, stock, or price becomes unavailable after saving, GET detail still returns saved IDs/quantities, title, version, and `pricingStatus=Unavailable`; prices and amount are `null`, and `pricingErrorCode` contains a safe reason. This lets the user fix or delete the draft without substituting zero for a missing price. PUT with new lines requires an available price.
+- **R-003.** A draft can be viewed, edited (title/note/customer/lines), and deleted after confirmation in the UI. The API does not handle modal confirmation. Updates use an optimistic concurrency token; concurrent edits return 409 and require reloading.
+- **R-004.** The list uses server pagination (1/20, max 100), search by part of the draft title/customer name or exact numeric ID, exact `counterpartyId`, and AND-combined multiword tokens. Sort by `updatedAt` (descending by default), `title`, and `customerName` in both directions, with stable `draftId` tie-breaker.
+- **R-005.** “Create order from draft” only reads the draft and passes its lines to a temporary Admin workspace; checkout is handled separately by [004](../../004-admin-order-workspace/README.md). A successful order **does not modify or delete** the source draft, so it can be reused.
+- **R-006.** New operations require `CanManageOrders`; deletion physically removes the draft and its lines in one transaction. Errors do not expose internal data.
 
-## Сценарії приймання
+## Acceptance scenarios
 
-### SC-001 — Зберегти чернетку
+### SC-001 — Save a draft
 
-**Покриває:** R-001, R-002
+**Covers:** R-001, R-002
 
-- Given активний клієнт і валідний набір товарів існують
-- When Admin надсилає назву, нотатку та позиції для збереження
-- Then Sales створює чернетку цього клієнта з власним ID
-- And не створює номер замовлення, Order або OneCOrderSync.
+- Given an active customer and a valid set of products exist
+- When Admin submits a title, note, and lines to save
+- Then Sales creates a draft for that customer with its own ID
+- And creates no order number, Order, or OneCOrderSync.
 
-### SC-002 — Змінити чернетку
+### SC-002 — Update a draft
 
-**Покриває:** R-002, R-003
+**Covers:** R-002, R-003
 
-- Given чернетка існує і її version актуальна
-- When Admin змінює клієнта, назву, нотатку чи позиції
-- Then зберігаються нові дані та повертається актуальна серверна вартість
-- And за застарілої version повертається 409 без втрати збережених змін іншого користувача.
+- Given a draft exists and its version is current
+- When Admin changes the customer, title, note, or lines
+- Then the new data is saved and the current server-calculated amount is returned
+- And a stale version returns 409 without losing another user's saved changes.
 
-### SC-003 — Знайти чернетки
+### SC-003 — Find drafts
 
-**Покриває:** R-004
+**Covers:** R-004
 
-- Given чернетки кількох клієнтів існують
-- When Admin шукає кількома словами, фільтрує за ID клієнта, сортує й гортає
-- Then кожна сторінка і totalRecords відповідають умовам до пагінації
-- And порядок стабільний при рівних значеннях основного ключа.
+- Given drafts for multiple customers exist
+- When Admin searches with multiple words, filters by customer ID, sorts, and pages
+- Then each page and `totalRecords` reflect conditions before pagination
+- And ordering is stable when primary sort values are equal.
 
-### SC-004 — Видалити чернетку
+### SC-004 — Delete a draft
 
-**Покриває:** R-003, R-006
+**Covers:** R-003, R-006
 
-- Given чернетка існує й викликач має потрібний доступ
-- When Admin підтвердив видалення та викликає DELETE
-- Then чернетка й її позиції більше не доступні
-- And Order та записи синхронізації не змінені.
+- Given a draft exists and the caller has required access
+- When Admin confirms deletion and calls DELETE
+- Then the draft and its lines are no longer available
+- And Order and sync records are unchanged.
 
-### SC-005 — Використати чернетку повторно
+### SC-005 — Reuse a draft
 
-**Покриває:** R-005
+**Covers:** R-005
 
-- Given збережена чернетка стала основою нового оформленого замовлення
-- When Admin знову запитує її деталі
-- Then бачить той самий склад, назву й клієнта
-- And чернетку можна використати для наступного замовлення.
+- Given a saved draft has been used as the basis of a new completed order
+- When Admin requests its details again
+- Then the same lines, title, and customer are shown
+- And the draft remains available for another order.
 
-### SC-006 — Відкрити чернетку після втрати ціни або товару
+### SC-006 — Open a draft after a price or product becomes unavailable
 
-**Покриває:** R-002, R-003
+**Covers:** R-002, R-003
 
-- Given чернетку збережено, а згодом товар, залишок, клієнт або ціна стали недоступними
-- When Admin запитує деталі
-- Then отримує 200 зі збереженими ID/кількостями, назвою та version
-- And бачить `pricingStatus=Unavailable`, безпечний код причини та `null` для недоступних цін і суми
-- And може змінити склад або видалити чернетку за отриманою version.
+- Given a draft was saved and its product, stock, customer, or price later becomes unavailable
+- When Admin requests its details
+- Then 200 is returned with saved IDs/quantities, title, and version
+- And `pricingStatus=Unavailable`, a safe reason code, and `null` for unavailable prices and amount are shown
+- And the draft can be edited or deleted using the returned version.
 
-### SC-007 — Одночасне створення з одним ключем
+### SC-007 — Concurrent creation with one key
 
-**Покриває:** R-001, R-006
+**Covers:** R-001, R-006
 
-- Given два одночасні POST запити мають однаковий `Idempotency-Key`
-- When запити містять однакове тіло
-- Then створюється одна чернетка, а другий запит повертає її як replay
-- And для різних тіл другий запит отримує 409 без другого запису.
+- Given two concurrent POST requests have the same `Idempotency-Key`
+- When the requests have the same body
+- Then one draft is created and the second request returns it as a replay
+- And if bodies differ, the second request gets 409 and no second record is created.

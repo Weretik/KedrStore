@@ -1,49 +1,49 @@
-# 004 — Деталі товару для Admin
+# 004 — Admin product details
 
-**Модуль:** Catalog. **Статус:** реалізовано; цільово перевірено. **Дата:** 2026-10-19.
+**Module:** Catalog. **Status:** Implemented; targeted verification completed. **Date:** 2026-10-19.
 
-## Мета й межі
+## Goal and boundaries
 
-Надати read-only API одного товару для адміністративної сторінки деталей. Чинний [публічний endpoint за slug](../../../contracts/catalog/products.openapi.yaml) повертає назву лише однією мовою і не містить усіх ознак Admin; новий маршрут повертає обидві назви, схему та стани без залежності від доступності товару в публічному каталозі. Редагування, видалення, зміна імпорту 1C, схема БД і перевірка URL зображень залишаються поза обсягом.
+Provide a read-only API for one product for the Admin details page. The existing [public endpoint by slug](../../../contracts/catalog/products.openapi.yaml) returns a name in only one language and omits some Admin flags; the new route returns both names, scheme, and state without depending on whether the product is available in the public catalog. Editing, deletion, changes to 1C import, database schema, and image URL checks are out of scope.
 
-## Правила
+## Rules
 
-- **R-001.** `GET /api/admin/products/by-slug/{productSlug}` приймає непорожній slug товару завдовжки не більш як `255` символів — це обмеження чинного поля `ProductListProjection.ProductSlug`. Для наявного активного товару повертає один об'єкт без пагінації; для відсутнього — `404`, для порожнього або надмірно довгого значення — усталену помилку валідації `400`, якщо запит досягає контролера. Статичний сегмент `by-slug` виключає конфлікт із `/all` і `/missing-photos`.
-- **R-002.** Відповідь містить `id`, `nameUk`, `nameRu`, `productSlug`, `photo`, `scheme`, `categoryId`, `categoryName`, `inStock`, `isSale`, `isNew`, `exportToSite`, `price`, `stock`, `quantityInPack`. Значення ознак і ціни узгоджені з рядком чинного Admin-списку. `scheme` повертає збережений URL; доступність медіафайла визначає клієнт, а API не робить мережевого запиту до CDN.
-- **R-003.** Дані Admin доступні й для товару з `exportToSite=false`. `productSlug` дозволяє frontend утворити посилання на публічний каталог лише коли `exportToSite=true`; API не повертає середовище-залежний абсолютний URL і не стверджує, що публічна сторінка гарантовано доступна.
-- **R-004.** Публічна операція `GET /api/catalog/{lang}/product/{productSlug}` та її DTO залишаються сумісними. Новий маршрут має поточну модель доступу інших Admin-product операцій (`AllowAnonymous`); обмеження доступу потребує окремого рішення для всіх Admin-операцій.
+- **R-001.** `GET /api/admin/products/by-slug/{productSlug}` accepts a non-empty product slug no longer than `255` characters, matching the existing `ProductListProjection.ProductSlug` limit. For an existing active product it returns one object without pagination; a missing product returns `404`, and an empty or oversized value returns the established `400` validation error if the request reaches the controller. The static `by-slug` segment avoids conflicts with `/all` and `/missing-photos`.
+- **R-002.** The response contains `id`, `nameUk`, `nameRu`, `productSlug`, `photo`, `scheme`, `categoryId`, `categoryName`, `inStock`, `isSale`, `isNew`, `exportToSite`, `price`, `stock`, `quantityInPack`. Flags and price agree with the current Admin list row. `scheme` returns the saved URL; media availability is determined by the client, and the API makes no CDN request.
+- **R-003.** Admin data is available even when `exportToSite=false`. `productSlug` lets frontend create a public catalog link only when `exportToSite=true`; the API returns no environment-dependent absolute URL and does not claim the public page is guaranteed to be available.
+- **R-004.** The public operation `GET /api/catalog/{lang}/product/{productSlug}` and its DTO remain compatible. The new route has the current access model of other Admin product operations (`AllowAnonymous`); access restrictions require a separate decision for all Admin operations.
 
-## Приймальні сценарії
+## Acceptance scenarios
 
-- **SC-001 (R-001, R-002).** Дано товар з різними назвами українською та російською, схемою, ціною й активними ознаками; коли клієнт запитує його slug, тоді отримує `200` з усіма переліченими полями й точними значеннями `true`/`false`.
-- **SC-002 (R-002, R-003).** Дано товар без експорту на сайт і зі схемою, файл якої недоступний; коли клієнт запитує його деталі, тоді отримує `200`, `exportToSite=false` і збережений URL `scheme`; наявність фото або схеми не перевіряється під час HTTP-запиту. Клієнт приховує блок схеми після помилки завантаження.
-- **SC-003 (R-001).** Коли товар за slug відсутній, тоді повертається `404`; коли slug порожній або перевищує узгоджену межу, тоді повертається усталена помилка валідації за умови, що запит відповідає маршруту. Відсутній сегмент отримує стандартний `404` маршрутизації.
-- **SC-004 (R-004).** Після додавання Admin endpoint наявний публічний endpoint за slug продовжує повертати свій поточний контракт незалежно від нової моделі деталей Admin.
+- **SC-001 (R-001, R-002).** Given a product with different Ukrainian and Russian names, a scheme, price, and active flags; when the client requests its slug; then it receives `200` with all listed fields and exact `true`/`false` values.
+- **SC-002 (R-002, R-003).** Given a product not exported to the site and with an unavailable scheme file; when the client requests details; then it receives `200`, `exportToSite=false`, and the saved `scheme` URL. Photo or scheme availability is not checked during the HTTP request. The client hides the scheme section after a load error.
+- **SC-003 (R-001).** A missing product slug returns `404`; an empty or over-limit slug returns the established validation error if the request matches the route. A missing segment receives the standard routing `404`.
+- **SC-004 (R-004).** After adding the Admin endpoint, the existing public endpoint by slug continues returning its current contract regardless of the new Admin detail model.
 
-## HTTP-контракт і сумісність
+## HTTP contract and compatibility
 
-| Питання | Рішення |
+| Question | Decision |
 | --- | --- |
-| Route і method | `GET /api/admin/products/by-slug/{productSlug}`, лише читання |
+| Route and method | `GET /api/admin/products/by-slug/{productSlug}`, read-only |
 | operationId | `getAdminProductBySlug` |
-| Параметр | `productSlug`: непорожній рядок, максимум `255` символів, без обрізання значення |
-| Відповідь | `200`: `AdminProductDetails`, поля R-002; `price` nullable, `scheme` — збережений URL |
-| Помилки | `400` для невалідного slug, що пройшов маршрутизацію; `404` для неіснуючого/неактивного товару або відсутнього сегмента; інші збої за спільними правилами API |
-| Доступ | Поточна явна анонімність `AdminProductsController`; без нової схеми авторизації в цьому інкременті |
-| Ідемпотентність | Безпечний GET, ключ не потрібний |
+| Parameter | `productSlug`: non-empty string, max `255` characters, no truncation |
+| Response | `200`: `AdminProductDetails`, fields from R-002; `price` nullable, `scheme` is saved URL |
+| Errors | `400` for invalid slug that matched routing; `404` for missing/inactive product or missing segment; other failures follow shared API rules |
+| Access | Current explicit anonymous access on `AdminProductsController`; no new authorization scheme in this increment |
+| Idempotency | Safe GET; no key required |
 
-Операцію та схему додано до [модульного OpenAPI](../../../contracts/catalog/products.openapi.yaml), а `$ref` маршруту — до [сукупного OpenAPI](../../../contracts/openapi.yaml). Контракт адитивний; чинні DTO списків і публічного товару не змінюються. Приклад публічної URL зі slug належить frontend-конфігурації/маршруту сайту, а не відповіді backend.
+The operation and schema were added to the [module OpenAPI](../../../contracts/catalog/products.openapi.yaml), and its route `$ref` to [aggregated OpenAPI](../../../contracts/openapi.yaml). The contract is additive; current list DTOs and public product DTO do not change. A public URL example using the slug belongs to frontend site configuration/routing, not the backend response.
 
-## Дизайн і дані
+## Design and data
 
-`AdminProductsController` передає slug окремому CQRS-запиту; Application читає `Product`, `ProductListProjection` і категорію без відстеження. Проєкція надає двомовні назви й ознаки, `Product` — схему та кількість в упаковці, категорія — назву. Потрібні стовпці вже існують; зміна схеми, міграція, імпорт і нова зовнішня інтеграція не потрібні. Проєкція не втрачає товари без експорту на сайт. [Карту Admin-товарів](../../../features/catalog/admin-products.md), її дерево файлів і схему потоку оновлено.
+`AdminProductsController` passes the slug to a separate CQRS request; Application reads `Product`, `ProductListProjection`, and category without tracking. The projection provides bilingual names and flags, `Product` provides the scheme and quantity per pack, and category provides the name. Required columns already exist; no schema change, migration, import change, or new external integration is needed. The projection retains products that are not exported to the site. The [Admin products map](../../../features/catalog/admin-products.md), its file tree, and flow diagram were updated.
 
-## Задачі та простежуваність
+## Tasks and traceability
 
-| Задача | Сценарії | Залежність | Мінімальний доказ |
+| Task | Scenarios | Dependency | Minimum evidence |
 | --- | --- | --- | --- |
-| TS-001 — машинний контракт | SC-001–SC-004 | немає | OpenAPI: route, DTO, помилки, доступ, `$ref` |
-| TS-002 — Application-запит | SC-001–SC-003 | TS-001 | Цільові тести обох мов, ознак, URL схеми та `404` за slug |
-| TS-003 — HTTP і карта фічі | SC-001–SC-004 | TS-002 | Цільові API-тести `200`/`400`/`404` і відсутності зміни публічного контракту; оновлена карта |
+| TS-001 — machine-readable contract | SC-001–SC-004 | none | OpenAPI: route, DTO, errors, access, `$ref` |
+| TS-002 — Application query | SC-001–SC-003 | TS-001 | Targeted tests for both languages, flags, scheme URL, and `404` by slug |
+| TS-003 — HTTP and feature map | SC-001–SC-004 | TS-002 | Targeted API tests for `200`/`400`/`404` and unchanged public contract; map updated |
 
-**Свідчення 2026-10-19:** `MissingProductPhotosApiTests.AdminList_FiltersFalseBeforePaging_AndDetailsIncludeBothNamesAndFlags` отримав `200` за slug для товару з `exportToSite=false`, перевірив різні `nameUk`/`nameRu`, `isSale`, `inStock`, `exportToSite` і URL `scheme`; вузький клас API-тестів пройшов `6/6`. Unit-тести валідації slug входять до цільових `7/7`. Окремого HTTP-тесту `404`, oversized slug чи реальної доступності медіафайла не запускали; це межа свідчень, а не твердження про стан CDN. Повний прогін проєкту не виконувався за [правилами перевірки](../../../standards/testing-rules.md). **Залишковий ризик:** чинний анонімний доступ Admin-операцій існує в коді; цей інкремент його не змінює.
+**Evidence as of 2026-10-19:** `MissingProductPhotosApiTests.AdminList_FiltersFalseBeforePaging_AndDetailsIncludeBothNamesAndFlags` returned `200` by slug for a product with `exportToSite=false`, and checked different `nameUk`/`nameRu`, `isSale`, `inStock`, `exportToSite`, and the `scheme` URL; the focused API test class passed `6/6`. Slug validation unit tests are included in the targeted `7/7`. A separate HTTP test for `404`, oversized slug, or actual media availability was not run; this is the limit of the evidence, not a claim about CDN state. The full project suite was not run under the [verification rules](../../../standards/testing-rules.md). **Remaining risk:** Admin operations currently allow anonymous access in code; this increment does not change that.

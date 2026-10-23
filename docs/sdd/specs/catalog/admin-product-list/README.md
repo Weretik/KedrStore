@@ -1,80 +1,80 @@
-# Список товарів для адміністратора
+# Admin product list
 
-**Модуль:** catalog\
-**Статус:** перевірено\
-**Створено:** 2026-07-24\
-**Пов'язане:** специфікація списку товарів адміністративного frontend
+**Module:** catalog\
+**Status:** verified\
+**Created:** 2026-07-24\
+**Related:** Admin frontend product-list specification
 
-## Мета
+## Goal
 
-Надати API списку товарів для адміністратора з анонімним доступом і без мовного сегмента в маршруті. Він повертає українські та російські назви товарів і підтримує сторінковий відфільтрований список, а також endpoint повного списку.
+Provide an anonymously accessible product-list API for administrators, without a language segment in the route. It returns Ukrainian and Russian product names and supports both a paged filtered list and a full-list endpoint.
 
-## Обсяг
+## Scope
 
-- У межах обсягу: GET /api/admin/products і GET /api/admin/products/all, назви двома мовами, фільтри списку, сортування, розбиття на сторінки та валідація запиту.
-- Поза обсягом: редагування товарів, міграція схеми, авторизація та нова модель ваги/атрибутів товару.
+- In scope: GET /api/admin/products and GET /api/admin/products/all, bilingual names, list filters, sorting, pagination, and request validation.
+- Out of scope: product editing, schema migration, authorization, and a new product weight/attributes model.
 
-## Контракт і сумісність
+## Contract and compatibility
 
-- GET /api/admin/products використовує GetAdminProductsRequest і повертає PagedResult<List<AdminProductListRowDto>>.
-- GET /api/admin/products/all повертає List<AdminProductListRowDto> без фільтрації та розбиття на сторінки.
-- Рядок містить ідентифікатори, обидві назви, slug, фото, категорію, ознаки наявності, ціну, залишок і кількість в упаковці.
-- Обидва маршрути явно мають AllowAnonymous, оскільки резервна політика хоста вимагає автентифікації.
+- GET /api/admin/products uses GetAdminProductsRequest and returns PagedResult<List<AdminProductListRowDto>>.
+- GET /api/admin/products/all returns List<AdminProductListRowDto> without filtering or pagination.
+- A row contains identifiers, both names, slug, photo, category, availability flags, price, stock, and quantity per pack.
+- Both routes explicitly use AllowAnonymous because the host's fallback policy requires authentication.
 
-## Проєктування за шарами
+## Layered design
 
-- Domain: без нових інваріантів або змін сутностей.
-- Application: окрема пара запиту й обробника, валідатор і DTO.
-- Infrastructure: запитує Catalog ProductListProjection і Product як джерела читання без відстеження; без міграції.
-- API: AdminProductsController лише прив'язує параметри, передає запит і зіставляє Result.
+- Domain: no new invariants or entity changes.
+- Application: separate request/handler pair, validator, and DTO.
+- Infrastructure: reads Catalog ProductListProjection and Product without tracking; no migration.
+- API: AdminProductsController only binds parameters, dispatches the request, and maps Result.
 
-## Критерії приймання
+## Acceptance criteria
 
-- [x] Жоден endpoint не містить мовного параметра в шляху.
-- [x] Endpoint з фільтрацією приймає параметри пошуку, категорії, наявності/розпродажу/новинок, ціни, сортування та розбиття на сторінки.
-- [x] Повертаються обидві назви товару й стандартні поля списку.
-- [x] Некоректні значення сторінки, сортування, категорії та діапазону цін відхиляє FluentValidation.
+- [x] No endpoint has a language parameter in its route.
+- [x] The filtered endpoint accepts search, category, availability/sale/newness, price, sorting, and pagination parameters.
+- [x] Both product names and standard list fields are returned.
+- [x] FluentValidation rejects invalid page, sort, category, and price-range values.
 
-## Перевірка
+## Verification
 
-- Catalog.Application збирається без помилок і попереджень.
-- Для повної збірки Host.Api може спочатку знадобитися зупинити локально запущений хост, оскільки він блокує вихідні файли DLL.
+- Catalog.Application builds without errors or warnings.
+- A full Host.Api build may require stopping a locally running host first because it locks output DLL files.
 
-## Історія змін
+## Change history
 
-- 2026-07-24 — Початкова реалізація та запис про перевірку.
+- 2026-07-24 — Initial implementation and verification record.
 
-## Зміна 2026-10-19 — серверні фільтри для таблиці Admin
+## Change 2026-10-19 — server-side filters for the Admin table
 
-**Статус зміни:** реалізовано; цільово перевірено 2026-10-19. Попередні критерії та свідчення вище описують реалізацію 2026-07-24; докази нового інкременту наведено нижче. Операції `GET /api/admin/products` і `GET /api/admin/products/all` залишаються в модулі Catalog; повний endpoint `/all` не є джерелом сторінкової таблиці.
+**Change status:** implemented; targeted verification on 2026-10-19. The earlier criteria and evidence above describe the 2026-07-24 implementation; evidence for the new increment is below. `GET /api/admin/products` and `GET /api/admin/products/all` remain in Catalog; `/all` is not the source for the paged table.
 
-### Правила
+### Rules
 
-- **R-001.** `GET /api/admin/products` застосовує пошук і всі передані фільтри до `totalRecords`, а потім виконує стабільне серверне сортування та пагінацію. Відсутній фільтр означає обидва значення ознаки, `true` — лише «так», `false` — лише «ні».
-- **R-002.** `inStock`, `isSale`, `isNew` і новий `exportToSite` мають точну тризначну семантику запиту (`null`/`true`/`false`); зокрема `inStock=false` включає тільки відсутні товари. Ознака `exportToSite` вже є у проєкції та відповіді, тому міграція БД не потрібна.
-- **R-003.** `searchTerm` шукає за наявними українським і російським пошуковими полями, які містять ID і назву. `page` починається з `1`, `pageSize` має діапазон `1..100`; неприпустимі параметри повертають усталену помилку валідації `400`.
-- **R-004.** Для однакових значень поля сортування додається ID товару як завершальний ключ, щоб товар не повторювався й не пропускався між сторінками. Таблиця пропонує серверне сортування лише для полів, підтриманих API; інші колонки не імітують сортування в межах завантаженої сторінки.
+- **R-001.** `GET /api/admin/products` applies search and all supplied filters before calculating `totalRecords`, then performs stable server sorting and pagination. An absent filter means either flag value, `true` means only true, and `false` means only false.
+- **R-002.** `inStock`, `isSale`, `isNew`, and new `exportToSite` have exact three-state query semantics (`null`/`true`/`false`); specifically, `inStock=false` includes only unavailable products. `exportToSite` already exists in the projection and response, so no database migration is required.
+- **R-003.** `searchTerm` searches existing Ukrainian and Russian search fields, which contain ID and name. `page` starts at `1`; `pageSize` ranges `1..100`; invalid parameters return the established `400` validation error.
+- **R-004.** Add product ID as the final sort key for equal field values so products are not duplicated or skipped across pages. The table offers server sorting only for API-supported fields; other columns do not simulate sorting within the loaded page.
 
-### Приймальні сценарії
+### Acceptance scenarios
 
-- **SC-001 (R-001, R-002).** Дано товари з обома значеннями кожної ознаки; коли клієнт окремо запитує `false` для наявності, акції, новинки або експорту на сайт, тоді кожний результат має саме `false`, а `totalRecords` дорівнює кількості всіх відповідних товарів до `Skip/Take`.
-- **SC-002 (R-001, R-003).** Дано збіг української назви, російської назви або ID поза першою сторінкою; коли клієнт шукає його та переходить між сторінками, тоді пошук охоплює весь серверний список, `pagedInfo` відповідає відфільтрованому набору, порожня сторінка має `value=[]`.
-- **SC-003 (R-003, R-004).** Коли клієнт передає недопустиму сторінку, розмір або пошуковий рядок, тоді отримує `400`; за однакового поля сортування порядок за ID залишається відтворюваним.
+- **SC-001 (R-001, R-002).** Given products with both values for every flag; when the client separately requests `false` for stock, sale, newness, or site export; then every result has exactly `false` and `totalRecords` counts all matches before `Skip/Take`.
+- **SC-002 (R-001, R-003).** Given a Ukrainian name, Russian name, or ID match outside the first page; when the client searches and moves between pages; then search spans the full server list, `pagedInfo` reflects the filtered set, and an empty page has `value=[]`.
+- **SC-003 (R-003, R-004).** When the client sends an invalid page, size, or search string, it receives `400`; sorting remains reproducible by ID when the primary sort value ties.
 
-### Контракт, дизайн і межі
+### Contract, design, and boundaries
 
-Адитивно додано необов'язковий query-параметр `exportToSite: boolean` до `getAdminProducts` у [версійному OpenAPI](../../../contracts/catalog/products.openapi.yaml). Назви, DTO відповіді, `PagedResult`, коди помилок і поточну модель доступу збережено. Для MUI `page` перетворюється з індексу `0` на `1`, `pageSize` передається без зміни, `totalRecords` стає `rowCount`; цей опис визначає межу контракту, а не реалізацію frontend. Довільна JSON-модель фільтрів MUI не передається через API: споживач відображає підтримані колонки на названі параметри. `ExportToSite` не слід плутати з доступністю фотографії.
+An optional query parameter `exportToSite: boolean` was added to `getAdminProducts` in the [versioned OpenAPI](../../../contracts/catalog/products.openapi.yaml). Names, response DTO, `PagedResult`, error codes, and current access model are unchanged. For MUI, convert `page` from zero-based to one-based, pass `pageSize` unchanged, and map `totalRecords` to `rowCount`; this defines the contract boundary, not frontend implementation. Do not pass arbitrary MUI JSON filter models through the API: the consumer maps supported columns to named parameters. Do not confuse `ExportToSite` with photo availability.
 
-Фільтрація виконується над `ProductListProjection` до `LongCountAsync` і пагінації; приєднання `Product` зберігає чинні поля рядка. Не змінювати домен, схему БД, імпорт чи `/all`. Порядок перевірки — лише цільові автоматичні тести зміненої фічі за [правилами тестування](../../../standards/testing-rules.md), без повного прогону без окремого запиту користувача.
+Filtering runs on `ProductListProjection` before `LongCountAsync` and pagination; joining `Product` preserves existing row fields. Do not change Domain, database schema, import, or `/all`. Verification is limited to targeted automated tests for the changed feature under [testing rules](../../../standards/testing-rules.md); do not run the full suite without a separate user request.
 
-### Задачі та простежуваність
+### Tasks and traceability
 
-| Задача | Сценарії | Залежність | Мінімальний доказ |
+| Task | Scenarios | Dependency | Minimum evidence |
 | --- | --- | --- | --- |
-| TS-001 — контракт | SC-001–SC-003 | немає | OpenAPI описує `exportToSite`, значення `false`, сторінки й помилки |
-| TS-002 — фільтрація й порядок | SC-001–SC-003 | TS-001 | Цільові тести обробника для `false`, пошуку, підрахунку та стабільного порядку |
-| TS-003 — API та опис фічі | SC-001–SC-003 | TS-002 | Цільовий API-тест параметрів/помилки; оновлено `docs/sdd/features/catalog/admin-products.md` |
+| TS-001 — contract | SC-001–SC-003 | none | OpenAPI describes `exportToSite`, `false`, paging, and errors |
+| TS-002 — filtering and ordering | SC-001–SC-003 | TS-001 | Targeted handler tests for `false`, search, count, and stable ordering |
+| TS-003 — API and feature description | SC-001–SC-003 | TS-002 | Targeted API test for parameters/errors; update `docs/sdd/features/catalog/admin-products.md` |
 
-**Сумісність:** новий параметр необов'язковий, а виправлення `inStock=false` змінює лише помилкову попередню поведінку. **Історія зміни:** 2026-10-19 — реалізовано серверний `exportToSite`, точний `inStock=false` і стабільний порядок; оновлено OpenAPI й [карту фічі](../../../features/catalog/admin-products.md).
+**Compatibility:** the new parameter is optional, and the `inStock=false` fix changes only incorrect previous behavior. **Change history:** 2026-10-19 — implemented server-side `exportToSite`, exact `inStock=false`, and stable ordering; updated OpenAPI and the [feature map](../../../features/catalog/admin-products.md).
 
-**Свідчення:** цільовий `MissingProductPhotosApiTests.AdminList_FiltersFalseBeforePaging_AndDetailsIncludeBothNamesAndFlags` перевірив `inStock=false`, `exportToSite=false`, `totalRecords` до сторінки й точний ID; 2026-10-19 вузький запуск класу API-тестів пройшов `6/6`. Пошук `ILIKE` і всі комбінації сортування окремим PostgreSQL-тестом не перевірялися; повний прогін не запускався за правилом обмеженого обсягу.
+**Evidence:** targeted `MissingProductPhotosApiTests.AdminList_FiltersFalseBeforePaging_AndDetailsIncludeBothNamesAndFlags` verified `inStock=false`, `exportToSite=false`, `totalRecords` before paging, and exact ID; the focused API test class passed `6/6` on 2026-10-19. `ILIKE` search and all sort combinations were not separately tested against PostgreSQL; the full suite was not run under the scope rule.

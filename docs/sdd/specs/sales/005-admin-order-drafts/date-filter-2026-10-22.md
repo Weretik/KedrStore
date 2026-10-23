@@ -1,41 +1,41 @@
-# Зміна 2026-10-22 — діапазон дати створення чернеток
+# Change 2026-10-22 — draft creation date range
 
-**Статус:** SDD, код і OpenAPI не змінено. Додаток до [005 Admin drafts](README.md); попередні R-001–R-006, SC-001–SC-007 і виконані задачі залишаються історією. Спільний інкремент із frontend: `order-workspace-2026-10-22`.
+**Status:** SDD, code, and OpenAPI are unchanged. Addendum to [005 Admin drafts](README.md); previous R-001–R-006, SC-001–SC-007, and completed tasks remain historical. Shared increment with frontend: `order-workspace-2026-10-22`.
 
-## Вимоги й сценарії
+## Requirements and scenarios
 
-- **R-007.** `getAdminOrderDrafts` приймає необов’язкові `createdFrom` і `createdTo` як `YYYY-MM-DD`; чернетки фільтруються за незмінною `CreatedAtUtc`, не за `UpdatedAtUtc`. Обидві межі включно за `Europe/Kyiv`, одна межа допустима; обернений/невалідний діапазон дає 400. SQL використовує напіввідкриті UTC-межі.
-- **R-008.** Діапазон поєднується з пошуком та `counterpartyId`, `totalRecords` рахується до пагінації. Наявний порядок за `UpdatedAtUtc` лишається типовим, якщо користувач не змінив sort. DTO, модель даних і механізм видалення чернетки не змінюються; нова міграція не потрібна.
+- **R-007.** `getAdminOrderDrafts` accepts optional `createdFrom` and `createdTo` as `YYYY-MM-DD`; drafts are filtered by immutable `CreatedAtUtc`, not `UpdatedAtUtc`. Both boundaries are inclusive in `Europe/Kyiv`; either may be supplied alone. A reversed/invalid range returns 400. SQL uses half-open UTC boundaries.
+- **R-008.** The range is combined with search and `counterpartyId`; `totalRecords` is counted before pagination. Existing `UpdatedAtUtc` sorting remains the default unless the user changes sort. DTO, data model, and draft deletion mechanism are unchanged; no migration is needed.
 
 | ID | Given / When / Then |
 | --- | --- |
-| **SC-008** | Given чернетку створено в обраному діапазоні й змінено пізніше поза ним; When Admin задає дати; Then чернетка входить до вибірки за датою створення й count відповідає умовам. |
-| **SC-009** | Given кілька чернеток різних клієнтів на межах діапазону; When Admin поєднує дати, пошук і `counterpartyId`; Then сторінка, count та стабільний порядок відповідають усім умовам. |
-| **SC-010** | Given формат чи порядок меж некоректні; When Admin запитує список; Then отримує 400 без зміни даних. |
+| **SC-008** | Given a draft was created in the selected range and updated later outside it; when Admin sets dates; then the draft is included based on creation date and the count matches the conditions. |
+| **SC-009** | Given drafts for different customers fall on range boundaries; when Admin combines dates, search, and `counterpartyId`; then page, count, and stable ordering reflect every condition. |
+| **SC-010** | Given the format or order of boundaries is invalid; when Admin requests the list; then 400 is returned without changing data. |
 
-## Контракт, дизайн і задачі
+## Contract, design, and tasks
 
-Канонічна операція — `GET /api/admin/order-workspace/drafts`, `operationId: getAdminOrderDrafts` у `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml`. Додати `createdFrom?: string(date)`/`createdTo?: string(date)` до provider OpenAPI; response лишається `DraftPage`. Чинний `[AllowAnonymous]` у workspace controller зберігається. Після provider revision frontend синхронізує snapshot штатним workflow.
+Canonical operation: `GET /api/admin/order-workspace/drafts`, `operationId: getAdminOrderDrafts` in `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml`. Add `createdFrom?: string(date)`/`createdTo?: string(date)` to provider OpenAPI; response remains `DraftPage`. The current `[AllowAnonymous]` on the workspace controller remains. After the provider revision, frontend syncs the snapshot through the standard workflow.
 
-`AdminOrderWorkspaceController` передає діапазон у `GetWorkspaceDraftsQuery`; `WorkspaceDraftReader` накладає UTC-умови на `CreatedAtUtc` до `LongCountAsync`, `Skip/Take`. Межі й validation мають бути спільно узгоджені з [фільтром замовлень](../004-admin-order-workspace/date-filter-2026-10-22.md), без дублювання двох різних правил timezone.
+`AdminOrderWorkspaceController` passes the range to `GetWorkspaceDraftsQuery`; `WorkspaceDraftReader` applies UTC conditions to `CreatedAtUtc` before `LongCountAsync` and `Skip/Take`. Boundary and validation rules must be aligned with the [order filter](../004-admin-order-workspace/date-filter-2026-10-22.md), without duplicating timezone rules.
 
-| Шлях | Стан | Відповідальність |
+| Path | State | Responsibility |
 | --- | --- | --- |
-| `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml` | наявний | provider параметри |
-| `src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs` | наявний | binding |
-| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Drafts/GetList/` | наявний | валідація/передача |
-| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs` | наявний | фільтр, count, пагінація |
-| `tests/IntegrationTests/Sales/Api/` | наявний каталог | вузькі API/SQL тести |
-| `docs/sdd/features/sales/admin-order-workspace.md` | наявний | звірка після реалізації |
+| `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml` | existing | provider parameters |
+| `src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs` | existing | binding |
+| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Drafts/GetList/` | existing | validation/passing conditions |
+| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs` | existing | filter, count, pagination |
+| `tests/IntegrationTests/Sales/Api/` | existing directory | focused API/SQL tests |
+| `docs/sdd/features/sales/admin-order-workspace.md` | existing | reconcile after implementation |
 
-| Задача | Залежить від | Робота | Доказ/checkpoint |
+| Task | Depends on | Work | Evidence/checkpoint |
 | --- | --- | --- | --- |
-| **EN-002** | 004/EN-002 | Узгодити draft OpenAPI з однаковими межами дат | contract lint, приклад редагування поза діапазоном |
-| **TS-005** | EN-002 | Реалізувати query/reader фільтр | Red → Green: API/SQL тести створення vs оновлення, AND, count, 400 |
-| **TS-006** | TS-005 | Звірити feature-карту й цільову регресію | traceability/evidence |
+| **EN-002** | 004/EN-002 | Align draft OpenAPI with the same date boundaries | contract lint, example updated outside range |
+| **TS-005** | EN-002 | Implement query/reader filter | Red → Green: API/SQL tests for creation vs update, AND, count, 400 |
+| **TS-006** | TS-005 | Reconcile feature map and targeted regression | traceability/evidence |
 
-| Правила | Сценарії | Задачі | Рівень |
+| Rules | Scenarios | Tasks | Level |
 | --- | --- | --- | --- |
 | R-007–R-008 | SC-008–SC-010 | EN-002, TS-005–TS-006 | contract/API/SQL integration |
 
-**Готовність:** вибір поля `CreatedAtUtc`, діапазону та `Europe/Kyiv` прийнято; реалізацію ще не розпочато.
+**Readiness:** `CreatedAtUtc`, range behavior, and `Europe/Kyiv` are accepted; implementation has not started.

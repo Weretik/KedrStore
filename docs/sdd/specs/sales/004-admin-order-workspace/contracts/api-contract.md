@@ -1,16 +1,16 @@
-# API-контракт робочої області замовлень
+# Admin order workspace API contract
 
-**Статус:** операції реалізовано в коміті `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-workspace.openapi.yaml) включено до агрегованого [контракту](../../../../contracts/openapi.yaml). Чинний `admin-order-one-c-sync.openapi.yaml` не змінено.
+**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-workspace.openapi.yaml) is included in the aggregated [contract](../../../../contracts/openapi.yaml). The existing `admin-order-one-c-sync.openapi.yaml` is unchanged.
 
-| operationId | Method/path | Запит/відповідь |
+| operationId | Method/path | Request/response |
 | --- | --- | --- |
 | `getAdminWorkspaceOrders` | GET `/api/admin/order-workspace/orders` | `searchTerm?,counterpartyId?,sort?,page?,pageSize?` → `pagedInfo, value[]` |
-| `getAdminWorkspaceOrderById` | GET `/api/admin/order-workspace/orders/{orderId}` | номер, клієнт, позиції, сума, дата, sync |
-| `quoteAdminWorkspaceOrder` | POST `/api/admin/order-workspace/quote` | `counterpartyId, lines[{productId,quantity}]` → позиції з unitPrice/lineAmount, totalAmount, quoteFingerprint |
-| `createAdminWorkspaceOrder` | POST `/api/admin/order-workspace/orders` | той самий набір + `quoteFingerprint`, optional comment, `Idempotency-Key` UUID → `orderId,orderNumber,totalAmount,syncStatus` |
+| `getAdminWorkspaceOrderById` | GET `/api/admin/order-workspace/orders/{orderId}` | number, customer, lines, amount, date, sync |
+| `quoteAdminWorkspaceOrder` | POST `/api/admin/order-workspace/quote` | `counterpartyId, lines[{productId,quantity}]` → lines with unitPrice/lineAmount, totalAmount, quoteFingerprint |
+| `createAdminWorkspaceOrder` | POST `/api/admin/order-workspace/orders` | same set + `quoteFingerprint`, optional comment, `Idempotency-Key` UUID → `orderId,orderNumber,totalAmount,syncStatus` |
 
-Список має page 1.., pageSize 1..100, defaults 1/20; `sort` — whitelist R-003; `searchTerm` trim і maxLength 100. Рядок списку: `orderId,orderNumber,counterpartyId,counterpartyName,createdAtUtc,lineCount,totalAmount,syncStatus`. Деталі містять збережені `productId,productName,quantity,amount`. Сервер не приймає ціну чи суму у create body. `counterpartyId` у GET є точним фільтром для деталей клієнта.
+The list has page 1.., pageSize 1..100, defaults 1/20; `sort` is the R-003 whitelist; `searchTerm` is trimmed and maxLength 100. A list row is `orderId,orderNumber,counterpartyId,counterpartyName,createdAtUtc,lineCount,totalAmount,syncStatus`. Details contain saved `productId,productName,quantity,amount`. The server does not accept price or amount in the create body. `counterpartyId` in GET is an exact filter for customer details.
 
-Усі операції на поточному етапі анонімні; 400 validation, 404 detail/customer, 409 fingerprint або idempotency conflict, 500 без внутрішніх даних. Create повертає 201 для нового запису та 200 для ідемпотентного повтору. `quoteFingerprint` є незворотним відбитком нормалізованого набору, клієнта та значень цін із серверного розрахунку, без довіри до переданої клієнтом суми; відбиток підтверджує бачений набір цін, але не є засобом авторизації; сервер завжди перераховує фактичні ціни.
+All operations are anonymous at this stage; 400 validation, 404 detail/customer, 409 fingerprint or idempotency conflict, 500 without internal data. Create returns 201 for a new record and 200 for an idempotent replay. `quoteFingerprint` is an irreversible fingerprint of the normalized set, customer, and server-calculated price values, without trusting client-submitted amount; it confirms the displayed price set but is not authorization. The server always recalculates actual prices.
 
-Якщо кількість перевищує актуальний `Product.Stock`, quote повертає очікуваний HTTP 400 із `code=unavailable_product` та повідомленням із назвою товару, доступною і запитаною кількістю. `WorkspaceException` проходить Mediator pipeline до контролера без логування як невідома помилка.
+If quantity exceeds current `Product.Stock`, quote returns the expected HTTP 400 with `code=unavailable_product` and a message with product name, available quantity, and requested quantity. `WorkspaceException` passes through the Mediator pipeline to the controller without being logged as an unknown error.

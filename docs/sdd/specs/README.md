@@ -1,31 +1,31 @@
-# Специфікації функціональності
+# Feature specifications
 
-## Наявні специфікації
+## Existing specifications
 
-Це індекс проєктних рішень і delivery; [карта фактично реалізованих фіч](../features/README.md) веде до архітектури поточного коду. Статус кожної роботи перевіряй у її README та коді.
+This is an index of design decisions and delivery records; the [implemented feature map](../features/README.md) points to the architecture of current code. Check each work item's status in its README and in code.
 
-| Модуль | Специфікації |
+| Module | Specifications |
 | --- | --- |
-| Catalog | [метадані категорій](catalog/001-category-presentation-metadata/README.md), [читання категорій](catalog/002-category-read-api/README.md), [відсутні фото](catalog/003-missing-product-photos/README.md), [admin деталі товару](catalog/004-admin-product-detail/README.md), [admin список товарів](catalog/admin-product-list/README.md), [корінь 1C/Cosmos](catalog/cosmos-one-c-root/README.md), [оновлення проєкції залишків](catalog/stock-projection-refresh/README.md) |
-| Sales | [створення замовлення й 1C](sales/001-admin-order-one-c-sync/README.md), [читання замовлень менеджером](sales/002-manager-order-read-api/README.md), [читання клієнтів](sales/003-customer-read-api/README.md), [робоча область замовлень Admin](sales/004-admin-order-workspace/README.md), [чернетки замовлень Admin](sales/005-admin-order-drafts/README.md), [розподіл відповідальностей workspace](sales/006-admin-workspace-structure-remediation/README.md), [звіряння клієнтів із 1C](sales/007-customer-sync-reconciliation/README.md) |
-| Platform | [окрема job міграції](platform/001-database-migration-job/README.md), [архітектура тестів](platform/002-test-architecture/README.md) |
+| Catalog | [category metadata](catalog/001-category-presentation-metadata/README.md), [category reads](catalog/002-category-read-api/README.md), [missing photos](catalog/003-missing-product-photos/README.md), [Admin product details](catalog/004-admin-product-detail/README.md), [Admin product list](catalog/admin-product-list/README.md), [1C/Cosmos root](catalog/cosmos-one-c-root/README.md), [stock projection refresh](catalog/stock-projection-refresh/README.md) |
+| Sales | [order creation and 1C](sales/001-admin-order-one-c-sync/README.md), [manager order reads](sales/002-manager-order-read-api/README.md), [customer reads](sales/003-customer-read-api/README.md), [Admin order workspace](sales/004-admin-order-workspace/README.md), [Admin order drafts](sales/005-admin-order-drafts/README.md), [workspace responsibility remediation](sales/006-admin-workspace-structure-remediation/README.md), [customer reconciliation with 1C](sales/007-customer-sync-reconciliation/README.md) |
+| Platform | [separate migration job](platform/001-database-migration-job/README.md), [test architecture](platform/002-test-architecture/README.md) |
 
-Цей каталог містить вимоги, проєктні рішення, контракти, записи завдань і докази перевірки окремих змін. Для нетривіальної зміни поведінки оновлюйте її специфікацію до реалізації. Статус або план у специфікації сам по собі не доводить, що поведінка вже є в коді.
+This directory contains requirements, design decisions, contracts, task records, and verification evidence for individual changes. Update the specification for a nontrivial behavior change before implementation. A status or plan in a specification alone does not prove that the behavior exists in code.
 
-## Структура
+## Structure
 
 ```text
 docs/sdd/specs/
-└── <module>/<NNN>-<feature>/     специфікація окремої функціональності
+└── <module>/<NNN>-<feature>/     specification of one feature
 ```
 
-- Починайте нову роботу з навички `backend-feature-spec` та відповідних [правил реалізації](../standards/delivery-rules.md). Каталог функціональності фіксує спостережувану мету, обсяг, правила, сценарії, дизайн, контракти, завдання й докази перевірки. Створюйте лише потрібні для цієї зміни артефакти.
-- Якщо змінюється поведінка в чинній специфікації, зберігайте ідентифікатори завершених завдань та історію перевірки. Призначайте `R-*` і `SC-*` зміненій поведінці, додавайте трасування змінених сценаріїв і регресійних залежностей, а новим завданням — `TS-*` або `EN-*`. Залишайте завершені старі файли завдань як історію; не перенумеровуйте їх і не переписуйте їхні докази. Переносьте всю стару специфікацію на новий формат лише на окремий запит користувача.
-- Машинозчитувані публічні API-контракти зберігайте в [`docs/sdd/contracts/`](../contracts/README.md).
-- Для термінів каталогу, пов'язаних із дверима, фурнітурою, Cosmos або даними товарів 1C, використовуйте [глосарій товарів](../../product/glossary.md).
+- Start new work with `backend-feature-spec` and the relevant [delivery rules](../standards/delivery-rules.md). A feature directory records the observable goal, scope, rules, scenarios, design, contracts, tasks, and verification evidence. Create only the artifacts needed for that change.
+- If behavior changes in an existing specification, preserve completed task IDs and verification history. Assign `R-*` and `SC-*` to changed behavior, add traceability for changed scenarios and regression dependencies, and assign `TS-*` or `EN-*` to new tasks. Keep completed old task files as history; do not renumber them or rewrite their evidence. Migrate the entire old specification to a new format only when the user explicitly requests it.
+- Store machine-readable public API contracts in [`docs/sdd/contracts/`](../contracts/README.md).
+- For catalog terms related to doors, hardware, Cosmos, or 1C product data, use the [product glossary](../../product/glossary.md).
 
-## Життєвий цикл
+## Lifecycle
 
-Чернетка → прийнято → в роботі → перевірено → завершено.
+Draft → accepted → in progress → verified → complete.
 
-Реалізація не повинна непомітно розходитися з прийнятою специфікацією. Записуйте датовану примітку про зміну із причиною, впливом на обсяг і новою перевіркою.
+Implementation must not silently diverge from the accepted specification. Record a dated change note with the reason, scope impact, and new verification.

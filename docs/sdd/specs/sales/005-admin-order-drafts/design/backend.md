@@ -1,13 +1,13 @@
-# Модель даних і backend design
+# Data model and backend design
 
-## Базис
+## Baseline
 
-Перед реалізацією у Sales snapshot були `Orders`, `OrderLines`, `OneCOrderSyncs`; таблиць чернеток не було. Чернеткові таблиці додає ця фіча. Чернетки — нова модель Sales, не статус чинного Order.
+Before implementation, the Sales snapshot had `Orders`, `OrderLines`, and `OneCOrderSyncs`; there were no draft tables. This feature adds draft tables. Drafts are a new Sales model, not a status of an existing Order.
 
-## Плановані дані
+## Planned data
 
 ```text
-SalesDbContext (поточна PostgreSQL схема)
+SalesDbContext (current PostgreSQL schema)
 ├── OrderDrafts
 │   ├── Id bigint PK (Domain: typed DraftId)
 │   ├── CounterpartyId string FK -> Counterparties.Id
@@ -26,8 +26,8 @@ SalesDbContext (поточна PostgreSQL схема)
     └── IdempotencyKey, RequestHash, CreatedAtUtc
 ```
 
-Ідентифікатори — за [стратегією](../../../../standards/identifier-strategy.md); ProductId — посилання на Catalog без DB FK, як в OrderLines. Кількість відповідає чинному `OrderLine.Quantity` типу `int` і має бути додатною. Унікальність `(DraftId, ProductId)`; індекси `(CounterpartyId, UpdatedAt DESC, Id DESC)`, `(UpdatedAt DESC, Id DESC)`. Індекс для title/name search додавати лише за `EXPLAIN` з репрезентативними даними; при текстовому пошуку по Counterparty перевірити join-план. Ціна й сума не зберігаються в чернетці як авторитетні дані; їх обчислює pricing service [004](../../004-admin-order-workspace/design/backend.md).
+Identifiers follow the [strategy](../../../../standards/identifier-strategy.md); ProductId references Catalog without a database FK, as in OrderLines. Quantity matches the existing `OrderLine.Quantity` type `int` and must be positive. Enforce uniqueness on `(DraftId, ProductId)`; indexes `(CounterpartyId, UpdatedAt DESC, Id DESC)`, `(UpdatedAt DESC, Id DESC)`. Add an index for title/name search only after `EXPLAIN` with representative data; check the join plan for text search on Counterparty. Price and amount are not stored as authoritative draft data; the pricing service [004](../../004-admin-order-workspace/design/backend.md) calculates them.
 
-## Міграція та сумісність
+## Migration and compatibility
 
-Нова адитивна EF migration створює три таблиці; старі Orders і 1C job не змінюються. Rollout: міграція перед Admin deployment; rollback UI/API без видалення таблиць або даних, відкат БД лише окремим безпечним рішенням. Оновити SalesDbContext, snapshot, карту БД і Sales feature після реалізації. Конкурентне редагування — token у відповідях, `If-Match` або version у PUT/DELETE, передавати поточну `version` у заголовку `If-Match` за плановим OpenAPI. Для видалення застосувати авторизацію та транзакцію.
+A new additive EF migration creates three tables; existing Orders and the 1C job are unchanged. Rollout: migration before Admin deployment; rolling back UI/API does not delete tables or data, while database rollback requires a separate safe decision. Update SalesDbContext, snapshot, database map, and Sales feature after implementation. Concurrent editing uses a token in responses, `If-Match` or version in PUT/DELETE, and the current `version` in the `If-Match` header per planned OpenAPI. Deletion must use authorization and a transaction.

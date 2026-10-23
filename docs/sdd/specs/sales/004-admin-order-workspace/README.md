@@ -1,21 +1,21 @@
-# 004 — Робоча область замовлень Admin
+# 004 — Admin order workspace
 
-- **Модуль:** Sales
-- **Споживач:** React Admin
-- **Статус:** реалізовано в коміті `b3797c1`; потрібна перевірка з PostgreSQL і review
-- **Перевірено базис:** 2026-10-21
+- **Module:** Sales
+- **Consumer:** React Admin
+- **Status:** implemented in commit `b3797c1`; PostgreSQL verification and review are still required
+- **Baseline checked:** 2026-10-21
 
-Окремі операції Admin дають менеджеру пошук і перегляд замовлень, серверний розрахунок вартості та оформлення замовлення з поточного набору товарів. Чинні `/api/admin/orders` і їхні DTO не змінюються в цьому інкременті.
+Separate Admin operations let a manager search and view orders, calculate prices on the server, and place an order from the current product selection. The existing `/api/admin/orders` routes and DTOs do not change in this increment.
 
-- [Правила й сценарії](requirements/behavior.md)
+- [Rules and scenarios](requirements/behavior.md)
 - [Backend design](design/backend.md)
-- [API-рішення](contracts/api-contract.md)
-- [Задачі](tasks/README.md)
-- [Трасування й готовність](traceability.md)
-- [Аудит відповідальностей коду](code-audit/audit.md)
-- [Структурне виправлення](../006-admin-workspace-structure-remediation/README.md)
-- [Зміна 2026-10-22: діапазон дат замовлень](date-filter-2026-10-22.md) — заплановано, код і OpenAPI ще не змінено
+- [API decisions](contracts/api-contract.md)
+- [Tasks](tasks/README.md)
+- [Traceability and readiness](traceability.md)
+- [Code responsibility audit](code-audit/audit.md)
+- [Structural remediation](../006-admin-workspace-structure-remediation/README.md)
+- [2026-10-22 change: order date range](date-filter-2026-10-22.md) — planned; code and OpenAPI have not yet changed
 
-Модель чернеток визначає [005](../005-admin-order-drafts/README.md). Фактичний стан нинішніх замовлень описано в [Sales feature](../../../features/sales/admin-orders.md).
+The draft model is defined in [005](../005-admin-order-drafts/README.md). The actual state of current orders is described in the [Sales feature map](../../../features/sales/admin-orders.md).
 
-- [Готовність SDD](checklist/spec-readiness.md)
+- [SDD readiness](checklist/spec-readiness.md)

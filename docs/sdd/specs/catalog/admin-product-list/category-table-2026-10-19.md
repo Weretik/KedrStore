@@ -1,28 +1,28 @@
-# Категорія в Admin-таблиці товарів — 2026-10-19
+# Category in the Admin product table — 2026-10-19
 
-**Мета.** Менеджер бачить українську назву категорії кожного товару, вибирає категорію зі зрозумілого ієрархічного списку та отримує серверний відбір і порядок для всієї вибірки до пагінації.
+**Goal.** The manager sees each product's Ukrainian category name, selects a category from a readable hierarchy, and gets server-side filtering and ordering across the full result set before pagination.
 
-## Правила і сценарії
+## Rules and scenarios
 
-- **R-CAT-01.** `GET /api/admin/products` та `GET /api/admin/products/missing-photos` приймають необов'язковий `categoryId > 0`. Вибір категорії охоплює її та всіх нащадків незалежно від глибини. Без `categoryId` усі категорії залишаються доступними.
-- **R-CAT-02.** Рядок обох Admin-списків містить `categoryName` з `ProductCategory.ShortNameUk`; для відсутнього довідкового запису повертається порожній рядок, який клієнт показує як недоступну назву. Контракт змінюється адитивно.
-- **R-CAT-03.** `CategoryAsc` і `CategoryDesc` сортують за українською назвою категорії з ID товару як стабільним останнім ключем. `totalRecords` обчислюється після відбору і до `Skip/Take`.
-- **SC-CAT-01.** Коли вибрано кореневу категорію, товари цієї категорії та нащадків третього й дальших рівнів з'являються в `value`, а `totalRecords` враховує всі збіги до сторінки.
-- **SC-CAT-02.** Коли сортовано категорію за зростанням/спаданням, сервер повертає глобальний порядок і стабільний порядок товарів однієї категорії.
-- **SC-CAT-03.** Коли вибрано категорію в режимі «Без фото», сервер застосовує той самий відбір до вибірки з недоступними фото.
+- **R-CAT-01.** `GET /api/admin/products` and `GET /api/admin/products/missing-photos` accept optional `categoryId > 0`. Selecting a category includes it and all descendants, regardless of depth. Without `categoryId`, all categories remain available.
+- **R-CAT-02.** Both Admin list rows include `categoryName` from `ProductCategory.ShortNameUk`; a missing reference returns an empty string, which the client displays as an unavailable name. The contract change is additive.
+- **R-CAT-03.** `CategoryAsc` and `CategoryDesc` sort by Ukrainian category name, with product ID as the final stable key. `totalRecords` is calculated after filtering and before `Skip/Take`.
+- **SC-CAT-01.** When a root category is selected, products from it and descendants at level three and beyond appear in `value`, and `totalRecords` counts all matches before paging.
+- **SC-CAT-02.** When sorting categories ascending/descending, the server returns global order and stable product ordering within a category.
+- **SC-CAT-03.** When a category is selected in «Без фото» mode, the server applies the same filter to the products with unavailable photos.
 
-## Дизайн і задачі
+## Design and tasks
 
-Модуль Catalog лишається власником фільтра й категорій. `ProductListProjection.CategoryId` зв'язується з `ProductCategory`; дерево будується з `ParentId`, не обрізається двома рівнями. Нових таблиць і міграцій немає. OpenAPI у `docs/sdd/contracts/catalog/products.openapi.yaml` є джерелом контракту. Нові значення `ProductSort` є адитивними; для public-операцій, що споживають цей спільний enum, категорійний порядок також має бути визначений, а не мовчки замінений порядком ID.
+Catalog remains the owner of filters and categories. `ProductListProjection.CategoryId` joins to `ProductCategory`; the tree is built from `ParentId` and is not truncated at two levels. No new tables or migrations. OpenAPI at `docs/sdd/contracts/catalog/products.openapi.yaml` is the source of truth. New `ProductSort` values are additive; public operations that consume this shared enum must also define category ordering rather than silently substituting ID order.
 
-| Задача | Сценарій | Доказ |
+| Task | Scenario | Evidence |
 | --- | --- | --- |
-| TS-CAT-01 — контракт і DTO | SC-CAT-01–03 | OpenAPI та DTO містять categoryId/categoryName/CategoryAsc/CategoryDesc |
-| TS-CAT-02 — серверний відбір і порядок | SC-CAT-01–03 | цільові тести глибокого дерева, підрахунку й сортування |
-| TS-CAT-03 — документація фічі | SC-CAT-01–03 | оновлена карта Admin-товарів і контракт |
+| TS-CAT-01 — contract and DTO | SC-CAT-01–03 | OpenAPI and DTO contain categoryId/categoryName/CategoryAsc/CategoryDesc |
+| TS-CAT-02 — server filtering and ordering | SC-CAT-01–03 | Targeted tests for deep trees, counts, and sorting |
+| TS-CAT-03 — feature documentation | SC-CAT-01–03 | Updated Admin products feature map and contract |
 
-**Межі перевірки:** лише автоматичні тести зміненої фічі; браузер, повний прогін і БД не запускаються без окремого дозволу.
+**Verification boundary:** automated tests for the changed feature only; do not run browser checks, the full suite, or the database without separate authorization.
 
-## Статичний аудит меж (2026-10-19)
+## Static boundary audit (2026-10-19)
 
-Перевірено лише `GetAdminProductListQueryHandler`, `GetMissingProductPhotosQueryHandler`, `GetPublicProductListQueryHandler` і `AdminProductCategoryIds`. Підтверджене порушення: попередній Admin-фільтр охоплював лише два рівні нащадків; замінено на повний обхід `ParentId` з множиною відвіданих ID. Спискові handler-и відповідають за фільтр/порядок/пагінацію та проєкцію DTO, helper — лише за ID дерева. Public handler уже мав повний обхід, тому його фільтр не змінено. Наявність SQL-трансляції нових `CategoryAsc/Desc` на PostgreSQL потребує окремого безпечного тесту без зміни БД; InMemory API-тест не доводить її.
+Reviewed only `GetAdminProductListQueryHandler`, `GetMissingProductPhotosQueryHandler`, `GetPublicProductListQueryHandler`, and `AdminProductCategoryIds`. Confirmed violation: the previous Admin filter included only two descendant levels; it was replaced by a full `ParentId` traversal with a visited-ID set. List handlers own filtering/order/pagination and DTO projection; the helper only returns tree IDs. The Public handler already had a full traversal, so its filter was unchanged. PostgreSQL SQL translation of the new `CategoryAsc/Desc` still needs a safe test that does not modify the database; an InMemory API test does not prove it.

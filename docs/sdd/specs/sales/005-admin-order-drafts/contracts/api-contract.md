@@ -1,15 +1,15 @@
-# API-контракт чернеток
+# Order drafts API contract
 
-**Статус:** операції реалізовано в коміті `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-drafts.openapi.yaml) включено до агрегованого `docs/sdd/contracts/openapi.yaml`. Усі маршрути — нові, окремі від `/api/admin/orders`.
+**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-drafts.openapi.yaml) is included in aggregated `docs/sdd/contracts/openapi.yaml`. All routes are new and separate from `/api/admin/orders`.
 
-| operationId | Method/path | Поведінка |
+| operationId | Method/path | Behavior |
 | --- | --- | --- |
 | `getAdminOrderDrafts` | GET `/api/admin/order-workspace/drafts` | `searchTerm?,counterpartyId?,sort?,page?,pageSize?` → `pagedInfo,value[]` |
 | `createAdminOrderDraft` | POST `/api/admin/order-workspace/drafts` | `title,note?,counterpartyId,lines[{productId,quantity}]` → 201, draftId |
-| `getAdminOrderDraftById` | GET `/api/admin/order-workspace/drafts/{draftId}` | повні дані, актуальна quote, version |
-| `updateAdminOrderDraft` | PUT `/api/admin/order-workspace/drafts/{draftId}` | повна заміна редагованих полів + concurrency token → повні дані |
+| `getAdminOrderDraftById` | GET `/api/admin/order-workspace/drafts/{draftId}` | full data, current quote, version |
+| `updateAdminOrderDraft` | PUT `/api/admin/order-workspace/drafts/{draftId}` | replace editable fields + concurrency token → full data |
 | `deleteAdminOrderDraft` | DELETE `/api/admin/order-workspace/drafts/{draftId}` | concurrency token → 204 |
 
-Рядок списку: `draftId,title,counterpartyId,counterpartyName,updatedAtUtc,lineCount`. За доступної ціни деталі містять актуальний розрахунок. Якщо після збереження ціна, товар, залишок або клієнт недоступні, GET detail однаково повертає збережені поля, `pricingStatus=Unavailable`, `pricingErrorCode` і `null` для цін/суми. Список не виконує N+1 розрахунків цін.
+A list row is `draftId,title,counterpartyId,counterpartyName,updatedAtUtc,lineCount`. When prices are available, details include the current quote. If price, product, stock, or customer becomes unavailable after saving, GET detail still returns saved fields, `pricingStatus=Unavailable`, `pricingErrorCode`, and `null` prices/amount. The list does not run N+1 price calculations.
 
-Помилки: 400 validation, 401/403 access, 404 невідома чернетка/клієнт, 409 stale version, 500 safe error. `title` trim, 1..200; `note` maxLength=2000. Редагування/видалення не створює Order та 1C sync. Авторизація — `CanManageOrders`; POST вимагає UUID `Idempotency-Key`: той самий ключ і тіло повертають той самий draft, інше тіло — 409.
+Errors: 400 validation, 401/403 access, 404 unknown draft/customer, 409 stale version, 500 safe error. `title` is trimmed, 1..200; `note` maxLength=2000. Editing/deleting does not create an Order or 1C sync. Authorization is `CanManageOrders`; POST requires a UUID `Idempotency-Key`: same key and body return the same draft, different body returns 409.

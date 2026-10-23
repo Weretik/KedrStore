@@ -1,21 +1,21 @@
-# 005 — Збережені чернетки замовлень Admin
+# 005 — Saved Admin order drafts
 
-- **Модуль:** Sales
-- **Споживач:** React Admin
-- **Статус:** реалізовано в коміті `b3797c1`; міграцію не застосовано, потрібна перевірка з PostgreSQL і review
-- **Перевірено базис:** 2026-10-21
+- **Module:** Sales
+- **Consumer:** React Admin
+- **Status:** Implemented in commit `b3797c1`; migration has not been applied and requires PostgreSQL verification and review
+- **Baseline checked:** 2026-10-21
 
-Чернетка — окремий від Order запис із назвою, необов’язковою нотаткою, клієнтом та позиціями. Вона не має номера замовлення і не надсилається до 1C. Її можна редагувати, видалити або повторно використати як основу оформлення.
+A draft is a record separate from an Order, with a title, optional note, customer, and lines. It has no order number and is not sent to 1C. It can be edited, deleted, or reused as the basis for checkout.
 
-- [Правила й сценарії](requirements/behavior.md)
-- [Модель даних і дизайн](design/backend.md)
-- [API-рішення](contracts/api-contract.md)
-- [Задачі](tasks/README.md)
-- [Трасування й готовність](traceability.md)
-- [Спільний аудит відповідальностей 004/005](../004-admin-order-workspace/code-audit/audit.md)
-- [Структурне виправлення](../006-admin-workspace-structure-remediation/README.md)
-- [Зміна 2026-10-22: діапазон дати створення](date-filter-2026-10-22.md) — заплановано, код і OpenAPI ще не змінено
+- [Rules and scenarios](requirements/behavior.md)
+- [Data model and design](design/backend.md)
+- [API decisions](contracts/api-contract.md)
+- [Tasks](tasks/README.md)
+- [Traceability and readiness](traceability.md)
+- [Shared 004/005 responsibility audit](../004-admin-order-workspace/code-audit/audit.md)
+- [Structural remediation](../006-admin-workspace-structure-remediation/README.md)
+- [2026-10-22 change: creation date range](date-filter-2026-10-22.md) — planned; code and OpenAPI have not changed
 
-Пов’язаний окремий інкремент оформлення: [004](../004-admin-order-workspace/README.md).
+Related separate checkout increment: [004](../004-admin-order-workspace/README.md).
 
-- [Готовність SDD](checklist/spec-readiness.md)
+- [SDD readiness](checklist/spec-readiness.md)
