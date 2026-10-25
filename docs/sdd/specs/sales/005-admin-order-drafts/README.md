@@ -2,7 +2,7 @@
 
 - **Module:** Sales
 - **Consumer:** React Admin
-- **Status:** Implemented in commit `b3797c1`; migration has not been applied and requires PostgreSQL verification and review
+- **Status:** Implemented in commit `b3797c1`; PostgreSQL persistence tests added 2026-10-25 (not yet run against PostgreSQL); review is still required
 - **Baseline checked:** 2026-10-21
 
 A draft is a record separate from an Order, with a title, optional note, customer, and lines. It has no order number and is not sent to 1C. It can be edited, deleted, or reused as the basis for checkout.

@@ -3,7 +3,8 @@
 - [x] T001 Експортувати й записати production `__EFMigrationsHistory` для Catalog, Identity і Sales без чутливих значень. **Залежності:** немає.
 - [x] T002 Звірити production-таблиці Identity з історичними міграціями `20260118230934_InitialAppIdentityDbContext` і `20260507141045_AddRefreshSessionStore`. **Залежності:** T001.
 - [ ] T003 Створити й перевірити backup Cloud SQL; записати ID backup і відповідального за відновлення без credentials. **Залежності:** T001.
-- [ ] T004 Погодити явний порядок migrator contexts і назву/дозволи Cloud Run Job. **Залежності:** T001, T002.
+- [x] T004 Погодити явний порядок migrator contexts і назву/дозволи Cloud Run Job. **Залежності:** T001, T002.
+  Підтвердження 2026-10-25: порядок задано в `DatabaseMigrationJob.GetMigratorOrder`, Cloud Run Job `database-migrate` використовується в `.github/workflows/deploy-cloudrun.yml`.
 
 ## Контрольна точка
 

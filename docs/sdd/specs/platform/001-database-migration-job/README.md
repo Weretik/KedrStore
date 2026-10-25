@@ -2,7 +2,7 @@
 
 **Module:** platform
 **Type:** migration
-**Status:** in progress
+**Status:** implemented in code (2026-10-25 audit); operational tasks T003, T014, T018–T021 remain open
 **Owners:** backend team
 **Created:** 2026-07-29
 

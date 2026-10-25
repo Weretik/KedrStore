@@ -9,7 +9,7 @@
 | R-002–R-003 | SC-006 | TS-002 | GET detail при недоступній поточній ціні |
 | R-001, R-006 | SC-007 | TS-002 | конкурентний POST з одним ключем |
 
-**Стан:** окремі таблиці, API та міграцію реалізовано в локальному коміті `b3797c1`; міграцію до БД не застосовано. Покриття PostgreSQL інтеграційними тестами ще потрібне.
+**Стан:** окремі таблиці, API та міграцію реалізовано в локальному коміті `b3797c1`; міграцію до БД не застосовано. PostgreSQL інтеграційні тести додано 2026-10-25 (див. нижче); результат на реальній PostgreSQL ще не отримано.
 
 ## Рівень перевірки за сценарієм
 
@@ -31,3 +31,18 @@
 - `dotnet test tests/UnitTests/UnitTests.csproj --no-restore --filter FullyQualifiedName~OrderDraftTests -v:q -p:NuGetAudit=false` — 5 passed.
 - `dotnet build src/Bootstrapper/Host.Api/Host.Api.csproj --no-restore -v:q -p:NuGetAudit=false -clp:ErrorsOnly` — успіх, 0 errors.
 - PostgreSQL CRUD/concurrency та `EXPLAIN` не перевірено; потрібна ізольована тестова БД перед розгортанням.
+
+## PostgreSQL інтеграційні тести (2026-10-25)
+
+`tests/IntegrationTests/Sales/Persistence/OrderDraftPostgresTests.cs` (колекція `Sales PostgreSQL`, Testcontainers або `KEDR_SALES_TEST_POSTGRES_CONNECTION`):
+
+| Тест | Сценарій |
+| --- | --- |
+| `Create_PersistsDraftWithLines` | SC-001: draft і рядки зберігаються, `Version` має 32 символи |
+| `Update_ReplacesLines_AndRejectsStaleVersion` | SC-002: заміна рядків; застарілий `Version` → `DbUpdateConcurrencyException` |
+| `Delete_CascadesLinesAndIdempotencyRecords` | SC-004: каскадне видалення рядків і idempotency-записів |
+| `IdempotencyKey_IsUniqueAcrossDrafts` | SC-007: унікальний індекс `IdempotencyKey` (основа конкурентного POST) |
+| `Create_RejectsUnknownCustomerAndDuplicateProduct` | FK `Restrict` на клієнта й унікальність `DraftId + ProductId` |
+
+- `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter FullyQualifiedName~OrderDraftPostgresTests` — збірка успішна, 5 skipped: Docker і локальна PostgreSQL на машині розробника були зупинені.
+- Залишковий ризик: тести ще треба прогнати з Docker або `KEDR_SALES_TEST_POSTGRES_CONNECTION`; SC-003 (SQL пошук/сторінки, `EXPLAIN`) і SC-005/SC-006 на PostgreSQL не покрито.
