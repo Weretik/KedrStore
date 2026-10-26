@@ -28,7 +28,7 @@ access token in JSON response + refresh token in HttpOnly cookie
 | `POST /api/auth/session/logout` | Authenticated user | Revokes active refresh sessions, updates the security stamp, and clears refresh and CSRF cookies. |
 | `GET /api/auth/session/me` | Authenticated user | Returns the current user ID, email, and roles. |
 
-The refresh token is never returned in a JSON response. Its cookie is `HttpOnly`; the CSRF cookie is accessible to the browser so the frontend can pass its value in the configured header during refresh.
+The refresh token is never returned in a JSON response. Its cookie is `HttpOnly`; the CSRF cookie is accessible to the browser so the frontend can pass its value in the configured header during refresh. The CSRF cookie uses `Identity:SessionCookies:CsrfCookieDomain` when it is set (production: `classkedr.com.ua`), because the frontends run on other subdomains than the API; see the [Cloudflare API proxy](../../../operations/deployment/cloudflare-api-proxy.md).
 
 ## Token and session rules
 

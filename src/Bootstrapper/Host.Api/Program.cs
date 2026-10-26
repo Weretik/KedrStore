@@ -1,3 +1,5 @@
+using Host.Api.DependencyInjection.ServiceRegistration.Web;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddSerilog();
@@ -34,6 +36,7 @@ else
 }
 
 app.UseForwardedHeaders();
+app.UseTrustedProxyClientIp();
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();

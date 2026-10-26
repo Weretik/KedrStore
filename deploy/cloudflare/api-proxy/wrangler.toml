@@ -1,0 +1,13 @@
+name = "kedr-api-proxy"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = false
+
+routes = [
+  { pattern = "api.classkedr.com.ua", custom_domain = true }
+]
+
+[vars]
+ORIGIN_URL = "https://api-449981321140.europe-central2.run.app"
+
+# PROXY_SHARED_SECRET is a secret: `npx wrangler secret put PROXY_SHARED_SECRET`
