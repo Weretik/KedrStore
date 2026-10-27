@@ -38,6 +38,14 @@ flowchart LR
     I["GetPublicProductListQueryHandler"] --> H
 ```
 
+## Tests
+
+[ProductStockTests.cs](../../../../tests/UnitTests/Catalog/Domain/ProductStockTests.cs)
+
+The projection refresh has no dedicated automated tests.
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~ProductStock"`.
+
 ## Related sources
 
 [SDD](../../specs/catalog/stock-projection-refresh/README.md) · [Jobs](../../operations/jobs/README.md).

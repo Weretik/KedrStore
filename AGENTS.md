@@ -2,6 +2,10 @@
 
 This is a short entry point for working in this backend repository. Its code and documentation define the actual rules, architecture, tools, and commands. Read only the sources needed for the specific task. This file applies throughout the repository unless a nested `AGENTS.md` provides more specific instructions.
 
+## Product
+
+Kedr (ClassKedr) sells door hardware wholesale, with optional retail orders; it offers no fitting or repair services. 1C is the source of catalog, prices, stock, and counterparties; the backend imports from 1C and sends orders back. Authorization is not enforced yet: see the [current state](docs/sdd/architecture/security/authorization/roles-and-policies.md#current-state-authorization-not-yet-enforced) before touching access rules.
+
 ## Project context
 
 - [Architecture](docs/sdd/architecture/README.md) — modules, layers, and dependency boundaries.
@@ -15,6 +19,13 @@ This is a short entry point for working in this backend repository. Its code and
 Identify the module and affected documents from the request and code; do not assume another backend project uses the same implementation. For task-specific context, navigate from the [feature map](docs/sdd/features/README.md) to the relevant feature description and code; read specifications, architecture, and standards only for the issues involved.
 
 For a new or substantially changed feature, update the [feature map](docs/sdd/features/README.md) under the [delivery rules](docs/sdd/standards/delivery-rules.md); do not document an internal detail again if it does not affect the map.
+
+## Finding context
+
+1. Feature map → feature card → the code in its “Code structure” and the tests in its “Tests”.
+2. Search code in `src/` and `tests/` first; search `docs/sdd/` only for the relevant section.
+3. Open `docs/sdd/specs/**` only for decisions or history of that feature; do not read old task files or revisions by default. Paths in completed task files may be outdated.
+4. Open `docs/legacy/` only when the user asks; it is not a current rule.
 
 ## Task routing
 

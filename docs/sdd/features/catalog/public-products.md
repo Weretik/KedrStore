@@ -42,6 +42,12 @@ flowchart LR
     D --> G["ProductCategory"]
 ```
 
+## Tests
+
+[PublicProductCategoryFilterTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/PublicProductCategoryFilterTests.cs) · [ApiContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ApiContractTests.cs)
+
+Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~PublicProductCategoryFilter"`.
+
 ## Related sources
 
 [Contract](../../contracts/catalog/products.openapi.yaml) · [Projection](stock-projection.md) · [Category subtree SDD](../../specs/catalog/002-category-read-api/requirements/public-product-category-filter.md).

@@ -18,7 +18,7 @@ Keep a feature's current scope and navigation in its `README.md`, requirements i
 
 ## Documentation granularity
 
-A new feature needs a concise description of its actual architecture in `docs/sdd/features/<module>/` and an index link. The description includes a tree of key files and their roles and a compact Mermaid diagram of the verified flow between entry point, handlers, model, data, and integrations. Update the map after a substantial change to these facts; an internal detail that does not affect it needs no repeated description. The SDD records decisions and evidence; the map describes the current implementation.
+A new feature needs a concise description of its actual architecture in `docs/sdd/features/<module>/` and an index link. The description includes a tree of key files and their roles, a compact Mermaid diagram of the verified flow between entry point, handlers, model, data, and integrations, and a “Tests” section with the related test files and a focused run command (or a note that none exist). Keep environment state, such as whether a migration has been applied, out of the card. Update the map after a substantial change to these facts; an internal detail that does not affect it needs no repeated description. The SDD records decisions and evidence; the map describes the current implementation.
 
 - One feature SDD has one coordinating `README.md`; a brief description of the actual implementation lives separately in `features/`.
 - Each document has one role; do not create empty or duplicate files.
@@ -27,6 +27,8 @@ A new feature needs a concise description of its actual architecture in `docs/sd
 - `traceability.md` links scenarios, technical tasks, and evidence without duplicating their content.
 - An ADR is needed only for a lasting architecture change; ordinary use-case decisions belong in the feature design.
 - Feature specifications link to `standards/` rather than copying stable backend, API, security, or testing rules.
+- When tests for a feature are added, moved, or removed, update the card's “Tests” section in the same change.
+- When a YAML file in `docs/sdd/contracts/` changes, say in the PR that kedr-web needs `npm run contracts:sync -- <path-to-KedrStore>`.
 
 ## Completion criteria
 

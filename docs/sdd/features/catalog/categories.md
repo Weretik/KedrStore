@@ -39,6 +39,12 @@ flowchart LR
     E --> G["ProductCategory"]
 ```
 
+## Tests
+
+[ProductCategoryPresentationMetadataTests.cs](../../../../tests/UnitTests/Catalog/Domain/ProductCategoryPresentationMetadataTests.cs) · [CategoryPresentationApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/CategoryPresentationApplicationTests.cs) · [SlugTests.cs](../../../../tests/UnitTests/Catalog/Application/SlugTests.cs) · [CategoryPresentationPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/CategoryPresentationPersistenceTests.cs)
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~CategoryPresentation"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~CategoryPresentation"`.
+
 ## Related sources
 
 [Contract](../../contracts/catalog/category-read.openapi.yaml) · [Category read SDD](../../specs/catalog/002-category-read-api/README.md) · [Category metadata SDD](../../specs/catalog/001-category-presentation-metadata/README.md).

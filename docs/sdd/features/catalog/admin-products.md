@@ -48,6 +48,12 @@ flowchart LR
     G --> H["ProductCategory"]
 ```
 
+## Tests
+
+[MissingProductPhotosApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/MissingProductPhotosApiTests.cs) · [MissingProductPhotoReadTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/MissingProductPhotoReadTests.cs) · [MissingProductPhotoPostgresReadTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/MissingProductPhotoPostgresReadTests.cs) · [MissingProductPhotoContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/MissingProductPhotoContractTests.cs) · [ApiContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ApiContractTests.cs) · [GetMissingProductPhotosTests.cs](../../../../tests/UnitTests/Catalog/Application/GetMissingProductPhotosTests.cs)
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~MissingProductPhoto"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~MissingProductPhoto"`.
+
 ## Related sources
 
 [Contract](../../contracts/catalog/products.openapi.yaml) · [Product list SDD](../../specs/catalog/admin-product-list/README.md) · [Photo SDD](../../specs/catalog/003-missing-product-photos/README.md) · [Product details SDD](../../specs/catalog/004-admin-product-detail/README.md).

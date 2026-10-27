@@ -25,6 +25,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Check documentation links
+        run: python3 tools/docs/check_doc_links.py
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:

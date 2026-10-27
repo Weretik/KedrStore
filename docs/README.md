@@ -1,17 +1,10 @@
 # KedrStore documentation
 
-Versioned KedrStore engineering documentation is stored here. Backend documents are maintained alongside code changes. The [backend SDD entry point](sdd/README.md) explains the role of each section.
+Versioned KedrStore engineering documentation is stored here. Backend documents are maintained alongside code changes.
 
 ## Backend SDD
 
-- [Architecture](sdd/architecture/README.md) — actual topology, modules, and layer boundaries.
-- [Engineering rules](sdd/standards/README.md) — backend, API, data, security, testing, and delivery.
-- [Operations](sdd/operations/README.md) — local startup, configuration, data, diagnostics, and jobs.
-- [Specifications](sdd/specs/README.md) — requirements and evidence for individual features.
-- [Feature map](sdd/features/README.md) — implemented scenarios by module, flows, and code entry points.
-- [Product glossary](product/glossary.md) — stable terms for catalog, doors, and hardware.
-
-- [API contracts](sdd/contracts/README.md) — versioned OpenAPI contracts and frontend integration.
+Start at the [backend SDD entry point](sdd/README.md): it maps each question to architecture, standards, operations, contracts, specifications, and the [feature map](sdd/features/README.md). Stable terms are in the [product glossary](product/glossary.md).
 
 ## Historical documentation
 

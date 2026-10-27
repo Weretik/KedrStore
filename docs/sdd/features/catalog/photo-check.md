@@ -37,6 +37,12 @@ flowchart LR
     G["GetMissingProductPhotosQueryHandler"] --> F
 ```
 
+## Tests
+
+[ProductPhotoCheckTests.cs](../../../../tests/UnitTests/Catalog/Domain/ProductPhotoCheckTests.cs) · [ProductPhotoCheckJobTests.cs](../../../../tests/UnitTests/Catalog/Application/ProductPhotoCheckJobTests.cs) · [ProductPhotoProbeTests.cs](../../../../tests/IntegrationTests/Catalog/ProductPhotos/ProductPhotoProbeTests.cs) · [ProductPhotoCheckStoreTests.cs](../../../../tests/IntegrationTests/Catalog/ProductPhotos/ProductPhotoCheckStoreTests.cs) · [ProductPhotoCheckStorePostgresTests.cs](../../../../tests/IntegrationTests/Catalog/ProductPhotos/ProductPhotoCheckStorePostgresTests.cs) · [ProductPhotoCheckPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/ProductPhotoCheckPersistenceTests.cs) · [ProductPhotoCheckDeploymentTests.cs](../../../../tests/IntegrationTests/Platform/Jobs/ProductPhotoCheckDeploymentTests.cs)
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~ProductPhotoCheck"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~ProductPhotoCheck"`.
+
 ## Related sources
 
 [SDD](../../specs/catalog/003-missing-product-photos/README.md) · [Runbook](../../operations/jobs/catalog-photo-check-runbook.md) · [Read OpenAPI](../../contracts/catalog/products.openapi.yaml).
