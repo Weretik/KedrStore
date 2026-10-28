@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Identity.Infrastructure.Services;
+namespace Identity.Infrastructure.Services.Users;
 
 public sealed class ImportedCounterpartyIdentityProvisioningService(
     UserManager<AppUser> userManager,

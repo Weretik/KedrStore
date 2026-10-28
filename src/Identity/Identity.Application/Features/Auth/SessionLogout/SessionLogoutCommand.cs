@@ -1,3 +1,3 @@
 namespace Identity.Application.Features.Auth.SessionLogout;
 
-public sealed record SessionLogoutCommand : ICommand<Result>;
+public sealed record SessionLogoutCommand(string? RefreshToken) : ICommand<Result>;

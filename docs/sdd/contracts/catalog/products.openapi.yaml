@@ -84,8 +84,8 @@ paths:
       operationId: getAdminProducts
       summary: List admin product rows
       tags: [Admin products]
-      security: []
-      description: Current controller explicitly allows anonymous access; restrict this route before exposing it outside an internal frontend.
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Policy CanManageProducts (Manager and Admin).
       parameters:
         - $ref: '#/components/parameters/SearchTerm'
         - $ref: '#/components/parameters/CategorySlug'
@@ -102,23 +102,27 @@ paths:
       responses:
         '200': { description: Admin product page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/products/all:
     get:
       operationId: getAllAdminProducts
       summary: List all admin product rows
       tags: [Admin products]
-      security: []
-      description: Current controller explicitly allows anonymous access; this returns the unpaged admin row model.
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Policy CanManageProducts (Manager and Admin). Returns the unpaged admin row model.
       responses:
         '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/products/missing-photos:
     get:
       operationId: getAdminProductsWithUnavailablePhotos
       summary: List active products whose latest photo check is unavailable
       tags: [Admin products]
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        Temporarily anonymous. Reads persisted photo-check state only and does
+        Policy CanManageProducts. Reads persisted photo-check state only and does
         not contact the CDN while handling the request.
       parameters:
         - $ref: '#/components/parameters/SearchTerm'
@@ -133,13 +137,15 @@ paths:
       responses:
         '200': { description: Unavailable product-photo page, content: { application/json: { schema: { $ref: '#/components/schemas/MissingProductPhotoPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/products/by-slug/{productSlug}:
     get:
       operationId: getAdminProductBySlug
       summary: Get one admin product by slug
       tags: [Admin products]
-      security: []
-      description: Current Admin controller explicitly allows anonymous access.
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Policy CanManageProducts (Manager and Admin).
       parameters:
         - name: productSlug
           in: path
@@ -149,6 +155,8 @@ paths:
         '200': { description: Admin product details, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductDetails' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Product not found }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   parameters:
     Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }

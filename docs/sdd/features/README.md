@@ -23,7 +23,8 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 ## Identity
 
-- [User session](identity/session.md) — login, refresh, logout, and me.
+- [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.
+- [Staff accounts](identity/staff-accounts.md) — administrators create, block, and re-role administrators and managers.
 
 ## Platform
 

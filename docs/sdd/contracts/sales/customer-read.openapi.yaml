@@ -10,7 +10,7 @@ paths:
     get:
       operationId: getAdminCustomers
       summary: Browse active Sales customers
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: page
           in: query
@@ -51,11 +51,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/CustomerPage' }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/customers/{counterpartyId}:
     get:
       operationId: getAdminCustomerById
       summary: Get one active Sales customer
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: counterpartyId
           in: path
@@ -69,6 +71,8 @@ paths:
               schema: { $ref: '#/components/schemas/CustomerDetail' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: No active customer exists for the supplied identifier. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     PagedInfo:

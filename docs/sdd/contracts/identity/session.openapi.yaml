@@ -1,75 +1,117 @@
 openapi: 3.1.0
-info: { title: KedrStore Session API, version: 0.1.0 }
+info: { title: KedrStore Session API, version: 0.3.0 }
 paths:
-  /api/auth/session/login:
+  /api/auth/cookie/login:
     post:
-      operationId: loginSession
-      summary: Create an authenticated session
+      operationId: loginCookieSession
+      summary: Sign a browser in with the session cookie
       tags: [Session]
       security: []
-      description: Rate-limited by the AuthLogin policy. On success sets `kedr.rt` (HTTP-only) and `kedr.csrf` cookies.
+      description: >-
+        Admin and storefront. Rate-limited by the AuthLogin policy. Sets the HttpOnly session cookie
+        `__Host-kedr.session` (SameSite=Lax, sliding 7 days) and the readable `kedr.csrf` cookie. No token is returned.
+        Five wrong passwords lock the account for 15 minutes.
       requestBody:
         required: true
         content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
-        '200': { description: Authenticated session, headers: { Set-Cookie: { schema: { type: string }, description: Refresh and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
-        '401': { description: Invalid credentials }
+        '200': { description: Signed in, headers: { Set-Cookie: { schema: { type: string }, description: Session and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMeResponse' } } } }
+        '401': { description: 'Invalid credentials, locked or blocked account' }
         '429': { description: Login rate limit exceeded }
-  /api/auth/session/refresh:
+  /api/auth/cookie/logout:
     post:
-      operationId: refreshSession
-      summary: Refresh an authenticated session
+      operationId: logoutCookieSession
+      summary: End the browser session
+      tags: [Session]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '204': { description: Signed out; session and CSRF cookies expired }
+        '400': { description: Missing or invalid CSRF token }
+        '401': { description: No valid session }
+  /api/auth/mobile/login:
+    post:
+      operationId: loginMobile
+      summary: Sign the mobile app in
       tags: [Session]
       security: []
-      description: Rate-limited by the AuthRefresh policy. Send refresh cookies with credentials included and header `X-CSRF-Token` equal to the `kedr.csrf` cookie value. Rotates both cookies.
-      parameters:
-        - name: X-CSRF-Token
-          in: header
-          required: true
-          schema: { type: string }
+      description: Rate-limited by the AuthLogin policy. Returns both tokens in JSON; the app stores them in the device secure store. Sets no cookies.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
-        '200': { description: Refreshed session, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
-        '400': { description: Missing or invalid CSRF token }
-        '401': { description: 'Missing, expired, or invalid refresh cookie' }
-        '429': { description: Refresh rate limit exceeded }
-  /api/auth/session/logout:
+        '200': { description: Token pair, content: { application/json: { schema: { $ref: '#/components/schemas/MobileTokenResponse' } } } }
+        '401': { description: 'Invalid credentials, locked or blocked account' }
+        '429': { description: Login rate limit exceeded }
+  /api/auth/mobile/refresh:
     post:
-      operationId: logoutSession
-      summary: End the current session
+      operationId: refreshMobile
+      summary: Rotate the mobile token pair
+      tags: [Session]
+      security: []
+      description: >-
+        Rate-limited by the AuthRefresh policy. The old refresh token stops working. A token rotated less than
+        60 seconds ago returns 401 without other effect; one rotated earlier is treated as stolen and ends all of the user's sessions.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } }
+      responses:
+        '200': { description: New token pair, content: { application/json: { schema: { $ref: '#/components/schemas/MobileTokenResponse' } } } }
+        '401': { description: 'Unknown, expired, revoked, or already rotated refresh token' }
+        '429': { description: Refresh rate limit exceeded }
+  /api/auth/mobile/logout:
+    post:
+      operationId: logoutMobile
+      summary: End the mobile session
       tags: [Session]
       security: [{ bearerAuth: [] }]
-      description: Revokes the current authenticated session and expires refresh/CSRF cookies.
+      description: Revokes the session of the given refresh token; without it, all of the user's refresh sessions.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { refreshToken: { type: [string, 'null'] } } } } }
       responses:
-        '204': { description: Logged out }
+        '204': { description: Signed out }
         '401': { description: Missing or invalid access token }
   /api/auth/session/me:
     get:
       operationId: getCurrentSession
       summary: Get the current user
       tags: [Session]
-      security: [{ bearerAuth: [] }]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Works with the browser session cookie and with a mobile bearer token. For a cookie session it reissues a missing CSRF cookie.
       responses:
         '200': { description: Current user, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMeResponse' } } } }
-        '401': { description: Missing or invalid access token }
+        '401': { description: Not signed in }
 components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+    cookieAuth: { type: apiKey, in: cookie, name: __Host-kedr.session }
+  parameters:
+    CsrfHeader:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      description: Value of the `kedr.csrf` cookie. Required on every non-GET request made with the session cookie.
+      schema: { type: string }
   schemas:
     SessionLoginRequest:
       type: object
       required: [email, password]
       properties: { email: { type: string, format: email }, password: { type: string, format: password } }
-    SessionTokenResponse:
+    MobileTokenResponse:
       type: object
-      required: [tokenType, accessToken, expiresIn]
+      required: [tokenType, accessToken, expiresIn, refreshToken]
       properties:
         tokenType: { type: string, example: Bearer }
         accessToken: { type: string }
         expiresIn: { type: integer, description: Access-token lifetime in seconds }
+        refreshToken: { type: string, description: Random opaque token; send it back to refresh and logout }
     SessionMeResponse:
       type: object
-      required: [userId, email, roles]
+      required: [userId, email, fullName, roles]
       properties:
         userId: { type: string }
         email: { type: string, format: email }
-        roles: { type: array, items: { type: string } }
+        fullName: { type: string }
+        roles: { type: array, items: { type: string, enum: [Admin, Manager, User] } }

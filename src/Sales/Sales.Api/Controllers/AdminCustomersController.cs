@@ -1,3 +1,4 @@
+using Identity.Application.Security.Policies;
 using Sales.Api.Contracts.Customers;
 using Sales.Application.Features.Customers.GetById;
 using Sales.Application.Features.Customers.GetById.DTOs;
@@ -8,7 +9,7 @@ namespace Sales.Api.Controllers;
 
 [ApiController]
 [Route("api/admin/customers")]
-[AllowAnonymous]
+[Authorize(Policy = PolicyNames.CanManageOrders)]
 public sealed class AdminCustomersController(ISender sender) : ControllerBase
 {
     [HttpGet]

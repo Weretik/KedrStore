@@ -18,7 +18,8 @@ Use double underscores in environment variable keys: for example, `ConnectionStr
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
 | `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, SameSite, and the CSRF cookie domain (`CsrfCookieDomain`, set in `appsettings.Production.json`) | No |
 | `TrustedProxy:SharedSecret` | Secret shared with the Cloudflare API proxy; enables the real client IP behind it ([Cloudflare API proxy](../deployment/cloudflare-api-proxy.md)) | Yes |
-| `Identity:SessionSecurity` | Access/refresh token lifetime limits | No |
+| `Identity:SessionSecurity` | Access/refresh token lifetime limits, refresh reuse grace window | No |
+| `Identity:CookieSession` | Browser session cookie name, sliding lifetime, security-stamp check interval, `RequireSecure` (off only for local HTTP) | No |
 
 Example local secret for `Host.Api`:
 

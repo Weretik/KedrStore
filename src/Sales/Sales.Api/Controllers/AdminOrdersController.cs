@@ -1,3 +1,4 @@
+using Identity.Application.Security.Policies;
 using Sales.Api.Contracts.Orders;
 using Sales.Application.Features.Orders.Create;
 using Sales.Application.Features.Orders.Create.DTOs;
@@ -14,10 +15,10 @@ namespace Sales.Api.Controllers;
 
 [ApiController]
 [Route("api/admin/orders")]
+[Authorize(Policy = PolicyNames.CanManageOrders)]
 public sealed class AdminOrdersController(ISender sender) : ControllerBase
 {
     [HttpPost(Name = "createAdminOrder")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(CreateAdminOrderResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CreateAdminOrderResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -47,7 +48,6 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{orderId:long}/sync-status", Name = "getAdminOrderSyncStatus")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(GetAdminOrderSyncStatusResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -61,7 +61,6 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpPost("{orderId:long}/sync/retry", Name = "retryAdminOrderSync")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(RetryAdminOrderSyncResponse), StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -86,7 +85,6 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpGet(Name = "getAdminOrders")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedResult<List<GetAdminOrderListItemResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> GetList(
@@ -110,7 +108,6 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{orderId:long}", Name = "getAdminOrderById")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(GetAdminOrderDetailResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

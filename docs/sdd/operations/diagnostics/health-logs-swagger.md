@@ -12,7 +12,7 @@ Swagger UI is available only when `ASPNETCORE_ENVIRONMENT=Development`. With the
 https://localhost:7230/swagger
 ```
 
-The Swagger bearer scheme expects an access token from `POST /api/auth/session/login`. Supply the access token to Swagger authorization; do not paste or expose a refresh token.
+The Swagger bearer scheme expects an access token from `POST /api/auth/mobile/login`. Supply the access token to Swagger authorization; do not paste or expose a refresh token.
 
 For reproducible feature verification, create an API-test task in the relevant specification. Record the route, prerequisites, input, expected status, errors, authorization cases, and fresh evidence. Choose the test level according to the [testing rules](../../standards/testing-rules.md).
 

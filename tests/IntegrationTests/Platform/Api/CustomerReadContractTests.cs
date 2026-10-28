@@ -19,10 +19,10 @@ public sealed class CustomerReadContractTests
         Assert.Contains("operationId: getAdminCustomers", featureContract, StringComparison.Ordinal);
         Assert.Contains("operationId: getAdminCustomerById", featureContract, StringComparison.Ordinal);
         Assert.Contains("maximum: 100", featureContract, StringComparison.Ordinal);
-        Assert.DoesNotContain("bearerAuth", featureContract, StringComparison.Ordinal);
-        Assert.Contains("security: []", featureContract, StringComparison.Ordinal);
-        Assert.DoesNotContain("'401'", featureContract, StringComparison.Ordinal);
-        Assert.DoesNotContain("'403'", featureContract, StringComparison.Ordinal);
+        Assert.Contains("security: [{ cookieAuth: [] }, { bearerAuth: [] }]", featureContract, StringComparison.Ordinal);
+        Assert.DoesNotContain("security: []", featureContract, StringComparison.Ordinal);
+        Assert.Contains("'401'", featureContract, StringComparison.Ordinal);
+        Assert.Contains("'403'", featureContract, StringComparison.Ordinal);
         Assert.Contains("CustomerPage:", featureContract, StringComparison.Ordinal);
         Assert.Contains("CustomerDetail:", featureContract, StringComparison.Ordinal);
         Assert.Contains("type: [string, 'null']", featureContract, StringComparison.Ordinal);

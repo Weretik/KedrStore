@@ -7,7 +7,7 @@ public sealed class SessionLogoutCommandHandler(IIdentitySessionService identity
 {
     public async ValueTask<Result> Handle(SessionLogoutCommand command, CancellationToken cancellationToken)
     {
-        var success = await identitySessionService.LogoutAsync(cancellationToken);
+        var success = await identitySessionService.LogoutAsync(command.RefreshToken, cancellationToken);
         return success ? Result.Success() : Result.Unauthorized();
     }
 }

@@ -10,18 +10,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+using IntegrationTests.TestSupport.Api;
+
 namespace IntegrationTests.Catalog.Api;
 
 public sealed class MissingProductPhotosApiTests
 {
     [Fact]
-    public async Task Get_ReturnsAnonymousUnavailablePhotoPage()
+    public async Task Get_ReturnsUnavailablePhotoPageForManager()
     {
         await using var db = CreateContext();
         SeedMissing(db, 42);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/products/missing-photos?page=1&pageSize=20");
 
@@ -44,7 +46,7 @@ public sealed class MissingProductPhotosApiTests
         SeedMissing(db, 12, inStock: true, isSale: false, isNew: true, exportToSite: false);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync(
             "/api/admin/products/missing-photos?inStock=false&isSale=false&isNew=true&exportToSite=false&sort=IdDesc&page=2&pageSize=1");
@@ -63,7 +65,7 @@ public sealed class MissingProductPhotosApiTests
         SeedMissing(db, 21, inStock: true, isSale: true, isNew: false, exportToSite: false);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var list = await client.GetAsync(
             "/api/admin/products?inStock=false&isSale=true&isNew=false&exportToSite=false&page=1&pageSize=1");
@@ -102,7 +104,7 @@ public sealed class MissingProductPhotosApiTests
         categories[103].UpdatePresentationMetadata("Вікно", "Окно", 0, 3);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         foreach (var path in new[] { "/api/admin/products", "/api/admin/products/missing-photos" })
         {
@@ -124,7 +126,7 @@ public sealed class MissingProductPhotosApiTests
     {
         await using var db = CreateContext();
         using var factory = CreateFactory(db);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync($"/api/admin/products/missing-photos?{query}");
 
@@ -137,6 +139,7 @@ public sealed class MissingProductPhotosApiTests
             builder.UseEnvironment("Development");
             builder.ConfigureServices(services =>
             {
+                services.AddTestRoleAuthentication();
                 services.RemoveAll<IReadCatalogDbContext>();
                 services.AddSingleton<IReadCatalogDbContext>(db);
             });

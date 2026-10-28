@@ -1,3 +1,4 @@
+using Identity.Api.Cookies;
 using Identity.Api.Options;
 using Identity.Infrastructure.Options;
 
@@ -9,20 +10,28 @@ public static class IdentityOptionsRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<AdminUserOptions>(configuration.GetSection("Identity:AdminUser"));
-
         services
             .AddOptions<SessionCookieOptions>()
             .Bind(configuration.GetSection(SessionCookieOptions.SectionName))
             .Validate(
-                o => !string.IsNullOrWhiteSpace(o.RefreshTokenCookieName) &&
-                     !string.IsNullOrWhiteSpace(o.RefreshTokenCookiePath) &&
-                     o.RefreshTokenCookieTtlDays > 0 &&
-                     !string.IsNullOrWhiteSpace(o.CsrfCookieName) &&
+                o => !string.IsNullOrWhiteSpace(o.CsrfCookieName) &&
                      !string.IsNullOrWhiteSpace(o.CsrfHeaderName) &&
                      !string.IsNullOrWhiteSpace(o.CsrfCookiePath) &&
                      o.CsrfCookieTtlDays > 0,
                 "Identity:SessionCookies configuration is invalid.");
+
+        services.AddSingleton<SessionCookieWriter>();
+
+        services
+            .AddOptions<IdentityCookieSessionOptions>()
+            .Bind(configuration.GetSection(IdentityCookieSessionOptions.SectionName))
+            .Validate(
+                o => !string.IsNullOrWhiteSpace(o.CookieName) &&
+                     o.LifetimeDays is > 0 and <= 90 &&
+                     o.SecurityStampValidationMinutes is > 0 and <= 60 &&
+                     (o.RequireSecure || !o.CookieName.StartsWith("__Host-", StringComparison.Ordinal)),
+                "Identity:CookieSession configuration is invalid.")
+            .ValidateOnStart();
 
         services
             .AddOptions<IdentitySessionPerformanceOptions>()
@@ -39,7 +48,8 @@ public static class IdentityOptionsRegistrationExtensions
                 o => o.AccessTokenLifetimeMinutes is >= 5 and <= 60 &&
                      o.RefreshAbsoluteLifetimeDays is > 0 and <= 365 &&
                      o.RefreshIdleTimeoutDays is > 0 &&
-                     o.RefreshIdleTimeoutDays <= o.RefreshAbsoluteLifetimeDays,
+                     o.RefreshIdleTimeoutDays <= o.RefreshAbsoluteLifetimeDays &&
+                     o.RefreshReuseGraceSeconds is >= 0 and <= 300,
                 "Identity:SessionSecurity configuration is invalid.")
             .ValidateOnStart();
 

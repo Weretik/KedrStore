@@ -11,7 +11,7 @@ Current user-provisioning paths:
 | Separate `Host.Jobs --job=migrate` | `RoleSeeder` creates the defined roles. `IdentitySeeder` creates the configured administrator only if one does not already exist and `ADMIN_DEFAULT_PASSWORD` is provided. A normal `Host.Api` startup does not run seeders. |
 | Counterparty import | `ImportedCounterpartyIdentityProvisioningService` finds or creates an `AppUser`, synchronizes its fields/password, and assigns the `User` role if it exists. |
 
-The initial administrator is configured through `AdminUserOptions`; the password is read from `ADMIN_DEFAULT_PASSWORD`. Never commit this value to configuration or documentation.
+The initial administrator is configured through `AdminUserOptions`; the password is read from `ADMIN_DEFAULT_PASSWORD`. Never commit this value to configuration or documentation. Other administrators and managers are created by an administrator through the [staff accounts](../../../features/identity/staff-accounts.md) API; there is no self-registration.
 
 ## Designing new registration or user management
 

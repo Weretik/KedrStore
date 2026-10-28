@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info: { title: KedrStore Staff Accounts API, version: 0.1.0 }
+paths:
+  /api/admin/users:
+    get:
+      operationId: getStaffAccounts
+      summary: List administrators and managers
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Policy `CanManageUsers` (role Admin). Customers are not listed.
+      responses:
+        '200': { description: Staff accounts ordered by email, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/StaffAccountResponse' } } } } }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+    post:
+      operationId: createStaffAccount
+      summary: Create an administrator or manager
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateStaffAccountRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/StaffAccountResponse' } } } }
+        '400': { description: 'Invalid email, name, role or password' }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '409': { description: Email already used }
+  /api/admin/users/{userId}/role:
+    put:
+      operationId: changeStaffRole
+      summary: Change a staff account's role
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: The account's sessions pick up the new role within 5 minutes. An administrator cannot change their own role (400).
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [role], properties: { role: { $ref: '#/components/schemas/StaffRole' } } } } }
+      responses:
+        '204': { description: Role changed }
+        '400': { description: Invalid role or own account }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '404': { description: No staff account with this ID }
+  /api/admin/users/{userId}/blocked:
+    put:
+      operationId: setStaffBlocked
+      summary: Block or unblock a staff account
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Blocking ends mobile sessions at once and browser sessions within 5 minutes. An administrator cannot block their own account (400).
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [blocked], properties: { blocked: { type: boolean } } } } }
+      responses:
+        '204': { description: Updated }
+        '400': { description: Own account }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '404': { description: No staff account with this ID }
+  /api/admin/users/{userId}/password:
+    put:
+      operationId: setStaffPassword
+      summary: Set a new password for a staff account
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Ends the account's existing sessions.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [password], properties: { password: { type: string, format: password, minLength: 8, maxLength: 128 } } } } }
+      responses:
+        '204': { description: Password set }
+        '400': { description: Password too short or too weak }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '404': { description: No staff account with this ID }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+    cookieAuth: { type: apiKey, in: cookie, name: __Host-kedr.session }
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    StaffRole: { type: string, enum: [Admin, Manager] }
+    StaffAccountResponse:
+      type: object
+      required: [id, email, fullName, role, isBlocked]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        fullName: { type: string }
+        role: { $ref: '#/components/schemas/StaffRole' }
+        isBlocked: { type: boolean }
+    CreateStaffAccountRequest:
+      type: object
+      required: [email, fullName, role, password]
+      properties:
+        email: { type: string, format: email, maxLength: 256 }
+        fullName: { type: string, maxLength: 256 }
+        role: { $ref: '#/components/schemas/StaffRole' }
+        password: { type: string, format: password, minLength: 8, maxLength: 128 }
