@@ -4,7 +4,7 @@ This is a short entry point for working in this backend repository. Its code and
 
 ## Product
 
-Kedr (ClassKedr) sells door hardware wholesale, with optional retail orders; it offers no fitting or repair services. 1C is the source of catalog, prices, stock, and counterparties; the backend imports from 1C and sends orders back. Authorization is not enforced yet: see the [current state](docs/sdd/architecture/security/authorization/roles-and-policies.md#current-state-authorization-not-yet-enforced) before touching access rules.
+Kedr sells door hardware wholesale (with optional retail orders), not services such as fitting or repair. Authorization is not enforced yet; see the [current state](docs/sdd/architecture/security/authorization/roles-and-policies.md#current-state-authorization-not-yet-enforced) before touching access rules.
 
 ## Project context
 
@@ -26,6 +26,15 @@ For a new or substantially changed feature, update the [feature map](docs/sdd/fe
 2. Search code in `src/` and `tests/` first; search `docs/sdd/` only for the relevant section.
 3. Open `docs/sdd/specs/**` only for decisions or history of that feature; do not read old task files or revisions by default. Paths in completed task files may be outdated.
 4. Open `docs/legacy/` only when the user asks; it is not a current rule.
+
+## Commands
+
+- Focused unit test (fast, no Docker): `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~<Name>"`. Feature cards give the filter.
+- Integration test: the same filter on `tests/IntegrationTests/IntegrationTests.csproj`; slow, needs Docker (Testcontainers), skips without it.
+- Documentation: `python3 tools/docs/check_doc_links.py`.
+- Do not build the whole solution or run every test project unless asked; CI does that.
+
+A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
 
 ## Task routing
 
