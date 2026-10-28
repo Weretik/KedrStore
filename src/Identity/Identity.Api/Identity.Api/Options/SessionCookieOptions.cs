@@ -5,7 +5,8 @@ public sealed class SessionCookieOptions
     public const string SectionName = "Identity:SessionCookies";
 
     public string RefreshTokenCookieName { get; init; } = "kedr.rt";
-    public string RefreshTokenCookiePath { get; init; } = "/api/auth/session/refresh";
+    // Covers refresh and logout, so logout can end only the current session.
+    public string RefreshTokenCookiePath { get; init; } = "/api/auth/session";
     public int RefreshTokenCookieTtlDays { get; init; } = 14;
 
     public string CsrfCookieName { get; init; } = "kedr.csrf";

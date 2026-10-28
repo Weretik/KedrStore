@@ -6,7 +6,7 @@ The versioned OpenAPI entry point is [openapi.yaml](openapi.yaml). Generate type
 
 `POST /api/auth/session/login` returns an opaque Bearer access token and sets two cookies: the HTTP-only refresh cookie `kedr.rt` (sent only to the refresh route) and the readable CSRF cookie `kedr.csrf`.
 
-For protected operations, send `Authorization: Bearer <accessToken>`. To refresh the session, call `POST /api/auth/session/refresh` with `credentials: 'include'` and send the current `kedr.csrf` cookie value in the `X-CSRF-Token` header. The refresh endpoint changes both cookies and returns a new access token. `POST /api/auth/session/logout` also requires Bearer authentication and clears both cookies.
+For protected operations, send `Authorization: Bearer <accessToken>`. To refresh the session, call `POST /api/auth/session/refresh` with `credentials: 'include'` and send the current `kedr.csrf` cookie value in the `X-CSRF-Token` header. The refresh endpoint changes both cookies and returns a new access token. `POST /api/auth/session/logout` also requires Bearer authentication; call it with `credentials: 'include'` so the refresh cookie is sent and only this device is signed out. It clears both cookies.
 
 The host has a fallback policy that requires authentication. Public endpoints today are those explicitly marked anonymous in a controller; the Sales catalog and authenticated session endpoints are not public.
 

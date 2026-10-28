@@ -11,7 +11,8 @@
 | `AspNetRoleClaims` | `Id` | Role claims (`RoleId` FK). |
 | `AspNetUserLogins` | `LoginProvider`, `ProviderKey` | External logins (`UserId` FK). |
 | `AspNetUserTokens` | `UserId`, `LoginProvider`, `Name` | Tokens (`UserId` FK). |
-| `AppRefreshSessions` | `Id` | Refresh sessions (`UserId` FK). |
+| `AppRefreshSessions` | `Id` | Refresh sessions (`UserId` FK); `xmin` guards rotation. |
+| `DataProtectionKeys` | `Id` | ASP.NET Core Data Protection key ring for tokens and cookies. |
 
 ```mermaid
 erDiagram

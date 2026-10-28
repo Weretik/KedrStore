@@ -9,5 +9,5 @@ public interface IIdentitySessionService
     Task<SessionLoginResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
     Task<SessionRefreshResult?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
     Task<SessionMeResult?> GetCurrentUserAsync(CancellationToken cancellationToken = default);
-    Task<bool> LogoutAsync(CancellationToken cancellationToken = default);
+    Task<bool> LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default);
 }

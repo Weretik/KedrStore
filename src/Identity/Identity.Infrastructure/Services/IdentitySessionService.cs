@@ -1,9 +1,7 @@
-using System.Security.Cryptography;
 using Identity.Application.Features.Auth.SessionLogin.DTOs;
 using Identity.Application.Features.Auth.SessionMe.DTOs;
 using Identity.Application.Features.Auth.SessionRefresh.DTOs;
 using Identity.Application.Services;
-using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
@@ -11,20 +9,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Identity.Infrastructure.Services;
 
 public sealed class IdentitySessionService(
-    AppIdentityDbContext dbContext,
+    RefreshSessionStore refreshSessionStore,
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
+    IdentityBearerTokenIssuer bearerTokenIssuer,
     IHttpContextAccessor httpContextAccessor,
     IOptionsMonitor<BearerTokenOptions> bearerTokenOptionsMonitor,
     ILogger<IdentitySessionService> logger,
     IOptions<IdentitySessionPerformanceOptions> performanceOptions,
     IOptions<IdentitySessionSecurityOptions> securityOptions) : IIdentitySessionService
 {
-    private static readonly JsonSerializerOptions TokenJsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     public async Task<SessionLoginResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -58,7 +52,7 @@ public sealed class IdentitySessionService(
         LogStepDuration("Login.CreatePrincipal", stepWatch.ElapsedMilliseconds);
 
         stepWatch.Restart();
-        var tokenPayload = await IssueTokenPayloadAsync(principal, cancellationToken);
+        var tokenPayload = await bearerTokenIssuer.IssueAsync(principal, cancellationToken);
         LogStepDuration("Login.IssueTokenPayload", stepWatch.ElapsedMilliseconds);
         if (tokenPayload is null)
         {
@@ -68,7 +62,7 @@ public sealed class IdentitySessionService(
 
         var now = DateTimeOffset.UtcNow;
         var absoluteExpiresAtUtc = now.AddDays(securityOptions.Value.RefreshAbsoluteLifetimeDays);
-        await CreateRefreshSessionAsync(user.Id, tokenPayload.RefreshToken, now, absoluteExpiresAtUtc, cancellationToken);
+        await refreshSessionStore.CreateAsync(user.Id, tokenPayload.RefreshToken, now, absoluteExpiresAtUtc, cancellationToken);
         logger.LogInformation("AUDIT: Login success for userId {UserId}", user.Id);
 
         return new SessionLoginResult(
@@ -89,9 +83,7 @@ public sealed class IdentitySessionService(
         }
 
         var now = DateTimeOffset.UtcNow;
-        var tokenHash = ComputeTokenHash(refreshToken);
-        var refreshSession = await dbContext.RefreshSessions
-            .SingleOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
+        var refreshSession = await refreshSessionStore.FindByTokenAsync(refreshToken, cancellationToken);
 
         if (refreshSession is null)
         {
@@ -99,15 +91,31 @@ public sealed class IdentitySessionService(
             return null;
         }
 
-        if (refreshSession.RevokedAtUtc.HasValue || refreshSession.ReplacedBySessionId.HasValue)
+        if (IsWithinRotationGrace(refreshSession, now))
+        {
+            // A parallel tab or retry presented the token that was just rotated; not a theft signal.
+            logger.LogInformation("AUDIT: Refresh rejected: session {SessionId} was rotated moments ago", refreshSession.Id);
+            return null;
+        }
+
+        if (refreshSession.ReplacedBySessionId.HasValue)
         {
             await HandleRefreshReuseAsync(refreshSession, now, cancellationToken);
             return null;
         }
 
+        if (refreshSession.RevokedAtUtc.HasValue)
+        {
+            // Logged out or expired; only a rotated token presented again signals theft.
+            logger.LogWarning("AUDIT: Refresh failed: session {SessionId} is revoked ({Reason})",
+                refreshSession.Id,
+                refreshSession.RevocationReason);
+            return null;
+        }
+
         if (refreshSession.AbsoluteExpiresAtUtc <= now)
         {
-            await RevokeSessionAsync(refreshSession, now, "ExpiredAbsolute", cancellationToken);
+            await refreshSessionStore.RevokeAsync(refreshSession, now, "ExpiredAbsolute", cancellationToken);
             logger.LogWarning("AUDIT: Refresh failed: absolute lifetime exceeded for userId {UserId}", refreshSession.UserId);
             return null;
         }
@@ -115,7 +123,7 @@ public sealed class IdentitySessionService(
         var idleExpiresAt = refreshSession.LastUsedAtUtc.AddDays(securityOptions.Value.RefreshIdleTimeoutDays);
         if (idleExpiresAt <= now)
         {
-            await RevokeSessionAsync(refreshSession, now, "ExpiredIdle", cancellationToken);
+            await refreshSessionStore.RevokeAsync(refreshSession, now, "ExpiredIdle", cancellationToken);
             logger.LogWarning("AUDIT: Refresh failed: idle timeout exceeded for userId {UserId}", refreshSession.UserId);
             return null;
         }
@@ -128,7 +136,7 @@ public sealed class IdentitySessionService(
         var userId = refreshTicket?.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userId, out var parsedUserId) || parsedUserId != refreshSession.UserId)
         {
-            await RevokeSessionAsync(refreshSession, now, "PrincipalMismatch", cancellationToken);
+            await refreshSessionStore.RevokeAsync(refreshSession, now, "PrincipalMismatch", cancellationToken);
             logger.LogWarning("AUDIT: Refresh failed: principal mismatch for sessionId {SessionId}", refreshSession.Id);
             return null;
         }
@@ -148,7 +156,7 @@ public sealed class IdentitySessionService(
         var principal = await signInManager.CreateUserPrincipalAsync(user);
         LogStepDuration("Refresh.CreatePrincipal", stepWatch.ElapsedMilliseconds);
         stepWatch.Restart();
-        var tokenPayload = await IssueTokenPayloadAsync(principal, cancellationToken);
+        var tokenPayload = await bearerTokenIssuer.IssueAsync(principal, cancellationToken);
         LogStepDuration("Refresh.IssueTokenPayload", stepWatch.ElapsedMilliseconds);
         if (tokenPayload is null)
         {
@@ -156,18 +164,12 @@ public sealed class IdentitySessionService(
             return null;
         }
 
-        var newSession = await CreateRefreshSessionAsync(
-            refreshSession.UserId,
-            tokenPayload.RefreshToken,
-            now,
-            refreshSession.AbsoluteExpiresAtUtc,
-            cancellationToken);
-
-        refreshSession.LastUsedAtUtc = now;
-        refreshSession.RevokedAtUtc = now;
-        refreshSession.RevocationReason = "Rotated";
-        refreshSession.ReplacedBySessionId = newSession.Id;
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var newSession = await refreshSessionStore.RotateAsync(refreshSession, tokenPayload.RefreshToken, now, cancellationToken);
+        if (newSession is null)
+        {
+            logger.LogInformation("AUDIT: Refresh rejected: session {SessionId} was rotated by a parallel request", refreshSession.Id);
+            return null;
+        }
 
         logger.LogInformation("AUDIT: Refresh success for userId {UserId}; rotated sessionId {OldSessionId} -> {NewSessionId}",
             refreshSession.UserId,
@@ -199,7 +201,7 @@ public sealed class IdentitySessionService(
             Roles: roles.ToArray());
     }
 
-    public async Task<bool> LogoutAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -210,81 +212,25 @@ public sealed class IdentitySessionService(
         }
 
         var now = DateTimeOffset.UtcNow;
-        await RevokeAllActiveSessionsByUserAsync(user.Id, now, "Logout", cancellationToken);
+        var currentSession = string.IsNullOrWhiteSpace(refreshToken)
+            ? null
+            : await refreshSessionStore.FindByTokenAsync(refreshToken, cancellationToken);
 
-        // Revokes existing refresh tokens tied to prior security stamp.
-        await userManager.UpdateSecurityStampAsync(user);
-        logger.LogInformation("AUDIT: Logout success for userId {UserId}", user.Id);
-        return true;
-    }
-
-    private async Task<IdentityBearerTokenPayload?> IssueTokenPayloadAsync(
-        ClaimsPrincipal principal,
-        CancellationToken cancellationToken)
-    {
-        var httpContext = httpContextAccessor.HttpContext;
-        if (httpContext is null)
+        if (currentSession is not null && currentSession.UserId == user.Id)
         {
-            return null;
-        }
-
-        await using var buffer = new MemoryStream();
-        var originalBody = httpContext.Response.Body;
-        var originalStatusCode = httpContext.Response.StatusCode;
-        var originalContentType = httpContext.Response.ContentType;
-        var originalContentLength = httpContext.Response.ContentLength;
-        var originalHeaders = httpContext.Response.Headers
-            .ToDictionary(pair => pair.Key, pair => pair.Value);
-
-        httpContext.Response.Body = buffer;
-
-        try
-        {
-            await httpContext.SignInAsync(IdentityConstants.BearerScheme, principal);
-            buffer.Position = 0;
-
-            return await JsonSerializer.DeserializeAsync<IdentityBearerTokenPayload>(
-                buffer,
-                TokenJsonOptions,
-                cancellationToken);
-        }
-        finally
-        {
-            httpContext.Response.Body = originalBody;
-            httpContext.Response.StatusCode = originalStatusCode;
-            httpContext.Response.ContentType = originalContentType;
-            httpContext.Response.ContentLength = originalContentLength;
-            httpContext.Response.Headers.Clear();
-
-            foreach (var (key, value) in originalHeaders)
+            if (!currentSession.RevokedAtUtc.HasValue)
             {
-                httpContext.Response.Headers[key] = value;
+                await refreshSessionStore.RevokeAsync(currentSession, now, "Logout", cancellationToken);
             }
+
+            logger.LogInformation("AUDIT: Logout success for userId {UserId}, sessionId {SessionId}", user.Id, currentSession.Id);
+            return true;
         }
-    }
 
-    private async Task<AppRefreshSession> CreateRefreshSessionAsync(
-        Guid userId,
-        string refreshToken,
-        DateTimeOffset now,
-        DateTimeOffset absoluteExpiresAtUtc,
-        CancellationToken cancellationToken)
-    {
-        var (ip, userAgent) = GetClientContext();
-        var refreshSession = new AppRefreshSession
-        {
-            UserId = userId,
-            TokenHash = ComputeTokenHash(refreshToken),
-            CreatedAtUtc = now,
-            LastUsedAtUtc = now,
-            AbsoluteExpiresAtUtc = absoluteExpiresAtUtc,
-            CreatedByIp = ip,
-            UserAgent = userAgent
-        };
-
-        dbContext.RefreshSessions.Add(refreshSession);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        return refreshSession;
+        // Without the current refresh session there is nothing narrower to end.
+        await refreshSessionStore.RevokeAllActiveByUserAsync(user.Id, now, "Logout", cancellationToken);
+        logger.LogInformation("AUDIT: Logout of all sessions for userId {UserId}", user.Id);
+        return true;
     }
 
     private async Task HandleRefreshReuseAsync(
@@ -294,69 +240,17 @@ public sealed class IdentitySessionService(
     {
         refreshSession.ReuseDetectedAtUtc = now;
         refreshSession.RevocationReason ??= "ReuseDetected";
-        await RevokeAllActiveSessionsByUserAsync(refreshSession.UserId, now, "ReuseDetected", cancellationToken);
+        await refreshSessionStore.RevokeAllActiveByUserAsync(refreshSession.UserId, now, "ReuseDetected", cancellationToken);
 
         logger.LogWarning("AUDIT: Refresh reuse detected for userId {UserId}, sessionId {SessionId}",
             refreshSession.UserId,
             refreshSession.Id);
     }
 
-    private async Task RevokeAllActiveSessionsByUserAsync(
-        Guid userId,
-        DateTimeOffset now,
-        string reason,
-        CancellationToken cancellationToken)
-    {
-        var activeSessions = await dbContext.RefreshSessions
-            .Where(x => x.UserId == userId && !x.RevokedAtUtc.HasValue && !x.ReplacedBySessionId.HasValue)
-            .ToListAsync(cancellationToken);
-
-        foreach (var session in activeSessions)
-        {
-            session.RevokedAtUtc = now;
-            session.RevocationReason = reason;
-            session.LastUsedAtUtc = now;
-        }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task RevokeSessionAsync(
-        AppRefreshSession refreshSession,
-        DateTimeOffset now,
-        string reason,
-        CancellationToken cancellationToken)
-    {
-        refreshSession.RevokedAtUtc = now;
-        refreshSession.RevocationReason = reason;
-        refreshSession.LastUsedAtUtc = now;
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    private static string ComputeTokenHash(string refreshToken)
-    {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
-        return Convert.ToHexString(hash);
-    }
-
-    private (string? Ip, string? UserAgent) GetClientContext()
-    {
-        var context = httpContextAccessor.HttpContext;
-        if (context is null)
-        {
-            return (null, null);
-        }
-
-        var ip = context.Connection.RemoteIpAddress?.ToString();
-        var userAgent = context.Request.Headers.UserAgent.ToString();
-        return (ip, string.IsNullOrWhiteSpace(userAgent) ? null : userAgent[..Math.Min(userAgent.Length, 256)]);
-    }
-
-    private sealed record IdentityBearerTokenPayload(
-        string TokenType,
-        string AccessToken,
-        int ExpiresIn,
-        string RefreshToken);
+    private bool IsWithinRotationGrace(AppRefreshSession refreshSession, DateTimeOffset now) =>
+        refreshSession.RevocationReason == RefreshSessionStore.RotatedReason &&
+        refreshSession.RevokedAtUtc is { } revokedAt &&
+        now - revokedAt < TimeSpan.FromSeconds(securityOptions.Value.RefreshReuseGraceSeconds);
 
     private async Task<AppUser?> GetCurrentUserEntityAsync(CancellationToken cancellationToken)
     {
@@ -384,5 +278,4 @@ public sealed class IdentitySessionService(
             logger.LogInformation("Identity session step {Step} took {ElapsedMs} ms", step, elapsedMilliseconds);
         }
     }
-
 }

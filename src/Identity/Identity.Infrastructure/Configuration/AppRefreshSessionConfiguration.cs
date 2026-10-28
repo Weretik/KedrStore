@@ -10,6 +10,9 @@ public class AppRefreshSessionConfiguration : IEntityTypeConfiguration<AppRefres
 
         builder.HasKey(x => x.Id);
 
+        // PostgreSQL xmin lets only one refresh request rotate a session.
+        builder.Property<uint>("xmin").IsRowVersion();
+
         builder.Property(x => x.TokenHash)
             .HasMaxLength(128)
             .IsRequired();

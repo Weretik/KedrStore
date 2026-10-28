@@ -13,6 +13,8 @@ public static class IdentityInfrastructureExtensions
         services.AddIdentityDbContextServices(configuration);
         services.Configure<ImportedCounterpartyIdentityOptions>(
             configuration.GetSection(ImportedCounterpartyIdentityOptions.SectionName));
+        services.AddScoped<RefreshSessionStore>();
+        services.AddScoped<IdentityBearerTokenIssuer>();
         services.AddScoped<IIdentitySessionService, IdentitySessionService>();
         services.AddScoped<IImportedCounterpartyIdentityProvisioningService, ImportedCounterpartyIdentityProvisioningService>();
         return services;

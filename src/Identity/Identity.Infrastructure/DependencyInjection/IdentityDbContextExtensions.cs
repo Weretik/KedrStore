@@ -4,7 +4,7 @@ using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Options;
 using Identity.Infrastructure.Security;
 using Identity.Infrastructure.Seeders;
-using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Identity.Infrastructure.DependencyInjection;
 
@@ -22,6 +22,12 @@ public static class IdentityDbContextExtensions
             options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
 
+        // Keys live in PostgreSQL so tokens survive deploys and work on every Cloud Run instance.
+        services
+            .AddDataProtection()
+            .PersistKeysToDbContext<AppIdentityDbContext>()
+            .SetApplicationName("KedrStore");
+
         services
             .AddAuthentication(IdentityConstants.BearerScheme)
             .AddBearerToken(IdentityConstants.BearerScheme, options =>
@@ -38,6 +44,9 @@ public static class IdentityDbContextExtensions
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.AllowedForNewUsers = true;
             })
             .AddRoles<AppRole>()
             .AddSignInManager()

@@ -15,6 +15,8 @@ public sealed class AuthSessionController(
     ISender sender,
     IOptions<SessionCookieOptions> sessionCookieOptions) : ControllerBase
 {
+    private const string LegacyRefreshTokenCookiePath = "/api/auth/session/refresh";
+
     private readonly SessionCookieOptions _cookieOptions = sessionCookieOptions.Value;
 
     [HttpPost("login")]
@@ -75,13 +77,15 @@ public sealed class AuthSessionController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new SessionLogoutCommand(), cancellationToken);
+        Request.Cookies.TryGetValue(_cookieOptions.RefreshTokenCookieName, out var refreshToken);
+        var result = await sender.Send(new SessionLogoutCommand(refreshToken), cancellationToken);
         if (result.Status != Ardalis.Result.ResultStatus.Ok)
         {
             return this.ToActionResult(result);
         }
 
         DeleteRefreshCookie();
+        DeleteLegacyRefreshCookie();
         DeleteCsrfCookie();
         return NoContent();
     }
@@ -114,7 +118,27 @@ public sealed class AuthSessionController(
             IsEssential = true
         };
 
+        DeleteLegacyRefreshCookie();
         Response.Cookies.Append(_cookieOptions.RefreshTokenCookieName, refreshToken, cookieOptions);
+    }
+
+    // Before the cookie path widened, the refresh cookie lived on the refresh path only.
+    // Browsers send that more specific cookie first, so it must go once a new one is set.
+    private void DeleteLegacyRefreshCookie()
+    {
+        if (string.Equals(_cookieOptions.RefreshTokenCookiePath, LegacyRefreshTokenCookiePath, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        Response.Cookies.Delete(_cookieOptions.RefreshTokenCookieName, new CookieOptions
+        {
+            Path = LegacyRefreshTokenCookiePath,
+            Secure = _cookieOptions.Secure,
+            SameSite = _cookieOptions.SameSite,
+            HttpOnly = true,
+            IsEssential = true
+        });
     }
 
     private void AppendCsrfCookie()

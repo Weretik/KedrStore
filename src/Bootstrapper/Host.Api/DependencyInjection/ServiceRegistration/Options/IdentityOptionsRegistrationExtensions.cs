@@ -39,7 +39,8 @@ public static class IdentityOptionsRegistrationExtensions
                 o => o.AccessTokenLifetimeMinutes is >= 5 and <= 60 &&
                      o.RefreshAbsoluteLifetimeDays is > 0 and <= 365 &&
                      o.RefreshIdleTimeoutDays is > 0 &&
-                     o.RefreshIdleTimeoutDays <= o.RefreshAbsoluteLifetimeDays,
+                     o.RefreshIdleTimeoutDays <= o.RefreshAbsoluteLifetimeDays &&
+                     o.RefreshReuseGraceSeconds is >= 0 and <= 300,
                 "Identity:SessionSecurity configuration is invalid.")
             .ValidateOnStart();
 

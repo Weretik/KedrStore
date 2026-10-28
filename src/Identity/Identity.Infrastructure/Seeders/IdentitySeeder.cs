@@ -28,6 +28,7 @@ public class IdentitySeeder(
         var existingAdmin = await userManager.FindByEmailAsync(_adminOptions.Email);
         if (existingAdmin != null)
         {
+            await AlignLockoutAsync(existingAdmin);
             logger.LogInformation("Admin user already exists: {Email}", _adminOptions.Email);
             return;
         }
@@ -65,5 +66,20 @@ public class IdentitySeeder(
         }
 
         logger.LogInformation("Admin user created: {Email}", user.Email);
+    }
+
+    private async Task AlignLockoutAsync(AppUser admin)
+    {
+        if (admin.LockoutEnabled == _adminOptions.LockoutEnabled)
+        {
+            return;
+        }
+
+        var result = await userManager.SetLockoutEnabledAsync(admin, _adminOptions.LockoutEnabled);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            logger.LogError("Failed to align admin lockout: {Errors}", errors);
+        }
     }
 }
