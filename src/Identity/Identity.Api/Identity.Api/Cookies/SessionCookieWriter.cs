@@ -3,40 +3,11 @@ using Identity.Api.Options;
 namespace Identity.Api.Cookies;
 
 /// <summary>
-/// Writes and reads the refresh-token and CSRF cookies shared by the session endpoints.
+/// Writes and checks the readable CSRF cookie that pairs with the browser session cookie.
 /// </summary>
 public sealed class SessionCookieWriter(IOptions<SessionCookieOptions> sessionCookieOptions)
 {
-    // Before the cookie path widened, the refresh cookie lived on the refresh path only.
-    // Browsers send that more specific cookie first, so it must go once a new one is set.
-    private const string LegacyRefreshTokenCookiePath = "/api/auth/session/refresh";
-
     private readonly SessionCookieOptions _options = sessionCookieOptions.Value;
-
-    public string? ReadRefreshToken(HttpRequest request) =>
-        request.Cookies.TryGetValue(_options.RefreshTokenCookieName, out var value) && !string.IsNullOrWhiteSpace(value)
-            ? value
-            : null;
-
-    public void AppendRefreshToken(HttpResponse response, string refreshToken)
-    {
-        DeleteLegacyRefreshToken(response);
-        response.Cookies.Append(_options.RefreshTokenCookieName, refreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = _options.Secure,
-            SameSite = _options.SameSite,
-            Path = _options.RefreshTokenCookiePath,
-            MaxAge = TimeSpan.FromDays(_options.RefreshTokenCookieTtlDays),
-            IsEssential = true
-        });
-    }
-
-    public void DeleteRefreshToken(HttpResponse response)
-    {
-        response.Cookies.Delete(_options.RefreshTokenCookieName, RefreshDeleteOptions(_options.RefreshTokenCookiePath));
-        DeleteLegacyRefreshToken(response);
-    }
 
     public void AppendCsrfToken(HttpResponse response)
     {
@@ -91,23 +62,6 @@ public sealed class SessionCookieWriter(IOptions<SessionCookieOptions> sessionCo
             System.Text.Encoding.UTF8.GetBytes(csrfCookie),
             System.Text.Encoding.UTF8.GetBytes(csrfHeader.ToString()));
     }
-
-    private void DeleteLegacyRefreshToken(HttpResponse response)
-    {
-        if (!string.Equals(_options.RefreshTokenCookiePath, LegacyRefreshTokenCookiePath, StringComparison.Ordinal))
-        {
-            response.Cookies.Delete(_options.RefreshTokenCookieName, RefreshDeleteOptions(LegacyRefreshTokenCookiePath));
-        }
-    }
-
-    private CookieOptions RefreshDeleteOptions(string path) => new()
-    {
-        Path = path,
-        Secure = _options.Secure,
-        SameSite = _options.SameSite,
-        HttpOnly = true,
-        IsEssential = true
-    };
 
     private string? CsrfCookieDomain =>
         string.IsNullOrWhiteSpace(_options.CsrfCookieDomain) ? null : _options.CsrfCookieDomain;

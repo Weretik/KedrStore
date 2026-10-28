@@ -1,5 +1,5 @@
 openapi: 3.1.0
-info: { title: KedrStore Session API, version: 0.2.0 }
+info: { title: KedrStore Session API, version: 0.3.0 }
 paths:
   /api/auth/cookie/login:
     post:
@@ -73,47 +73,6 @@ paths:
       responses:
         '204': { description: Signed out }
         '401': { description: Missing or invalid access token }
-  /api/auth/session/login:
-    post:
-      operationId: loginSession
-      summary: Create an authenticated session (deprecated)
-      deprecated: true
-      tags: [Session]
-      security: []
-      description: Replaced by cookie and mobile login; removed once the frontends stop calling it. On success sets `kedr.rt` (HTTP-only, path `/api/auth/session`) and `kedr.csrf` cookies.
-      requestBody:
-        required: true
-        content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
-      responses:
-        '200': { description: Authenticated session, headers: { Set-Cookie: { schema: { type: string }, description: Refresh and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
-        '401': { description: Invalid credentials }
-        '429': { description: Login rate limit exceeded }
-  /api/auth/session/refresh:
-    post:
-      operationId: refreshSession
-      summary: Refresh an authenticated session (deprecated)
-      deprecated: true
-      tags: [Session]
-      security: []
-      description: Rate-limited by the AuthRefresh policy. Send refresh cookies with credentials included and header `X-CSRF-Token` equal to the `kedr.csrf` cookie value. Rotates both cookies.
-      parameters:
-        - $ref: '#/components/parameters/CsrfHeader'
-      responses:
-        '200': { description: Refreshed session, headers: { Set-Cookie: { schema: { type: string } } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionTokenResponse' } } } }
-        '400': { description: Missing or invalid CSRF token }
-        '401': { description: 'Missing, expired, or invalid refresh cookie' }
-        '429': { description: Refresh rate limit exceeded }
-  /api/auth/session/logout:
-    post:
-      operationId: logoutSession
-      summary: End the current session (deprecated)
-      deprecated: true
-      tags: [Session]
-      security: [{ bearerAuth: [] }]
-      description: Revokes the refresh session from the `kedr.rt` cookie (other devices stay signed in) and expires refresh/CSRF cookies.
-      responses:
-        '204': { description: Logged out }
-        '401': { description: Missing or invalid access token }
   /api/auth/session/me:
     get:
       operationId: getCurrentSession
@@ -140,13 +99,6 @@ components:
       type: object
       required: [email, password]
       properties: { email: { type: string, format: email }, password: { type: string, format: password } }
-    SessionTokenResponse:
-      type: object
-      required: [tokenType, accessToken, expiresIn]
-      properties:
-        tokenType: { type: string, example: Bearer }
-        accessToken: { type: string }
-        expiresIn: { type: integer, description: Access-token lifetime in seconds }
     MobileTokenResponse:
       type: object
       required: [tokenType, accessToken, expiresIn, refreshToken]

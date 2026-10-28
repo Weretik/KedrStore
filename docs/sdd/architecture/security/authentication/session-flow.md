@@ -36,7 +36,6 @@ Set-Cookie: kedr.csrf
 | `POST /api/auth/mobile/refresh` | Anonymous, `AuthRefresh` rate limit | Body `{ refreshToken }`. Rotates the refresh session and returns a new pair. |
 | `POST /api/auth/mobile/logout` | Bearer | Body `{ refreshToken }`. Revokes that refresh session; without it, all of the user's refresh sessions. |
 | `GET /api/auth/session/me` | Cookie or bearer | Current user ID, email, full name, and roles. |
-| `POST /api/auth/session/login`, `/refresh`, `/logout` | Deprecated | The earlier flow (access token in JSON, refresh token in the `kedr.rt` cookie). Kept until the frontends stop calling it, then removed. |
 
 ## Browser session rules
 

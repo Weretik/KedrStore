@@ -17,7 +17,7 @@ public static class SwaggerRegistrationExtensions
                 Type = SecuritySchemeType.Http,
                 Scheme = "bearer",
                 BearerFormat = "Opaque",
-                Description = "Paste the accessToken returned by POST /api/auth/session/login."
+                Description = "Paste the accessToken returned by POST /api/auth/mobile/login."
             });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement

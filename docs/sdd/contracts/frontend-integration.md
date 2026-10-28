@@ -10,7 +10,7 @@ Each client signs in its own way; see the [session contract](identity/session.op
 
 **Mobile.** Call `POST /api/auth/mobile/login`; keep `accessToken` and `refreshToken` in the device secure store. Send `Authorization: Bearer <accessToken>`. On `401`, call `POST /api/auth/mobile/refresh` with `{ refreshToken }` once and retry; each refresh returns a new pair and the old refresh token stops working. Sign out with `POST /api/auth/mobile/logout` and `{ refreshToken }`. Bearer requests need no CSRF header.
 
-The old `/api/auth/session/login|refresh|logout` endpoints are deprecated and are removed once the frontends stop calling them.
+The earlier `/api/auth/session/login|refresh|logout` endpoints were removed on 2026-10-28; only `/api/auth/session/me` remains under that path.
 
 The host has a fallback policy that requires authentication. Public endpoints are those explicitly marked anonymous in a controller. `401` means not signed in: show the login page. `403` means signed in without the needed role: show a "no access" message.
 

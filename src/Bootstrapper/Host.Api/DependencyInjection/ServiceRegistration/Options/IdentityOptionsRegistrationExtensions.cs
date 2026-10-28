@@ -14,10 +14,7 @@ public static class IdentityOptionsRegistrationExtensions
             .AddOptions<SessionCookieOptions>()
             .Bind(configuration.GetSection(SessionCookieOptions.SectionName))
             .Validate(
-                o => !string.IsNullOrWhiteSpace(o.RefreshTokenCookieName) &&
-                     !string.IsNullOrWhiteSpace(o.RefreshTokenCookiePath) &&
-                     o.RefreshTokenCookieTtlDays > 0 &&
-                     !string.IsNullOrWhiteSpace(o.CsrfCookieName) &&
+                o => !string.IsNullOrWhiteSpace(o.CsrfCookieName) &&
                      !string.IsNullOrWhiteSpace(o.CsrfHeaderName) &&
                      !string.IsNullOrWhiteSpace(o.CsrfCookiePath) &&
                      o.CsrfCookieTtlDays > 0,

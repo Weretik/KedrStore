@@ -70,7 +70,7 @@ The existing `/api/auth/session/*` token flow (access token in JSON, refresh tok
 - `CookieCsrfMiddleware` (Host.Api) enforces R-007 only when the request was authenticated by the cookie scheme. The CSRF cookie is the existing `kedr.csrf` with `CsrfCookieDomain`.
 - Endpoints: `POST /api/auth/cookie/login`, `POST /api/auth/cookie/logout` (Identity, rate-limited); `POST /api/auth/mobile/login`, `POST /api/auth/mobile/refresh`, `POST /api/auth/mobile/logout` (body token, reuse the refresh-session service); `GET /api/auth/session/me` works for both schemes. Contracts in `docs/sdd/contracts/identity/`.
 - Refresh tokens become 32 random bytes (Base64Url) stored as SHA-256 hash; access tokens are issued directly with `BearerTokenOptions.BearerTokenProtector` instead of capturing the `SignInAsync` response body.
-- The old `/api/auth/session/login|refresh|logout` endpoints are removed after kedr-web stops calling them.
+- The old `/api/auth/session/login|refresh|logout` endpoints and the `kedr.rt` refresh cookie were removed on 2026-10-28, once kedr-web #15 moved every client to the new flows.
 
 - Staff accounts: `Identity.Application/Features/Users/*` (list, create, change role, block, set password) over a `IStaffAccountService` implemented with `UserManager` in Identity.Infrastructure. `AdminUsersController` at `/api/admin/users` with policy `Identity.Users.Manage` (role `Admin`). Contract in `docs/sdd/contracts/identity/`. Blocking sets `LockoutEnd` to the far future and updates the security stamp; it revokes the user's refresh sessions.
 
