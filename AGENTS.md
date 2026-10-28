@@ -20,7 +20,7 @@ Identify the module and affected documents from the request and code; do not ass
 
 For a new or substantially changed feature, update the [feature map](docs/sdd/features/README.md) under the [delivery rules](docs/sdd/standards/delivery-rules.md); do not document an internal detail again if it does not affect the map.
 
-## Finding context
+## Context search order
 
 1. Feature map → feature card → the code in its “Code structure” and the tests in its “Tests”.
 2. Search code in `src/` and `tests/` first; search `docs/sdd/` only for the relevant section.
