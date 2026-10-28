@@ -24,7 +24,7 @@ paths:
         content: { application/json: { schema: { $ref: '#/components/schemas/CreateStaffAccountRequest' } } }
       responses:
         '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/StaffAccountResponse' } } } }
-        '400': { description: Invalid email, name, role or password }
+        '400': { description: 'Invalid email, name, role or password' }
         '401': { description: Not signed in }
         '403': { description: Not an administrator }
         '409': { description: Email already used }

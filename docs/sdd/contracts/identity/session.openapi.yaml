@@ -16,7 +16,7 @@ paths:
         content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
         '200': { description: Signed in, headers: { Set-Cookie: { schema: { type: string }, description: Session and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMeResponse' } } } }
-        '401': { description: Invalid credentials, locked or blocked account }
+        '401': { description: 'Invalid credentials, locked or blocked account' }
         '429': { description: Login rate limit exceeded }
   /api/auth/cookie/logout:
     post:
@@ -42,7 +42,7 @@ paths:
         content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
         '200': { description: Token pair, content: { application/json: { schema: { $ref: '#/components/schemas/MobileTokenResponse' } } } }
-        '401': { description: Invalid credentials, locked or blocked account }
+        '401': { description: 'Invalid credentials, locked or blocked account' }
         '429': { description: Login rate limit exceeded }
   /api/auth/mobile/refresh:
     post:
