@@ -16,7 +16,8 @@ Use double underscores in environment variable keys: for example, `ConnectionStr
 | `Telegram:BotToken`, `ChatId` | Telegram integration | Yes |
 | `Sales:OneCOrderSync` | Batch size, intervals, attempt limit, Kyiv sending window, and recovery for stale `Sent` state | No |
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
-| `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, and SameSite | No |
+| `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, SameSite, and the CSRF cookie domain (`CsrfCookieDomain`, set in `appsettings.Production.json`) | No |
+| `TrustedProxy:SharedSecret` | Secret shared with the Cloudflare API proxy; enables the real client IP behind it ([Cloudflare API proxy](../deployment/cloudflare-api-proxy.md)) | Yes |
 | `Identity:SessionSecurity` | Access/refresh token lifetime limits | No |
 
 Example local secret for `Host.Api`:
@@ -31,4 +32,4 @@ Do not put real passwords, tokens, or production connection strings in `appsetti
 
 ## Cookies and CORS
 
-Refresh authentication uses cookies with credentials, so CORS has an explicit allow-list; wildcard origins are not used. The current refresh cookie has `Secure: true` and `SameSite: None`. Test refresh over HTTPS or make an intentional local override that is not carried into a shared environment.
+Refresh authentication uses cookies with credentials, so CORS has an explicit allow-list; wildcard origins are not used. The current refresh cookie has `Secure: true` and `SameSite: None`. In production the API is served on `api.classkedr.com.ua`, the same site as the frontends, and the CSRF cookie is set for the parent domain so the frontends can read it. Test refresh over HTTPS or make an intentional local override that is not carried into a shared environment.

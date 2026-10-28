@@ -126,6 +126,7 @@ public sealed class AuthSessionController(
             Secure = _cookieOptions.Secure,
             SameSite = _cookieOptions.SameSite,
             Path = _cookieOptions.CsrfCookiePath,
+            Domain = CsrfCookieDomain,
             MaxAge = TimeSpan.FromDays(_cookieOptions.CsrfCookieTtlDays),
             IsEssential = true
         };
@@ -150,12 +151,16 @@ public sealed class AuthSessionController(
         Response.Cookies.Delete(_cookieOptions.CsrfCookieName, new CookieOptions
         {
             Path = _cookieOptions.CsrfCookiePath,
+            Domain = CsrfCookieDomain,
             Secure = _cookieOptions.Secure,
             SameSite = _cookieOptions.SameSite,
             HttpOnly = false,
             IsEssential = true
         });
     }
+
+    private string? CsrfCookieDomain =>
+        string.IsNullOrWhiteSpace(_cookieOptions.CsrfCookieDomain) ? null : _cookieOptions.CsrfCookieDomain;
 
     private bool IsValidCsrfRequest()
     {
