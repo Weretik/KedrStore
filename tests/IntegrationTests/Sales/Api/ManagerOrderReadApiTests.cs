@@ -1,19 +1,16 @@
 using System.Net;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using Ardalis.Result;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sales.Application.Contracts.Orders;
 using Sales.Application.Features.Orders.GetById.DTOs;
 using Sales.Application.Features.Orders.GetList.DTOs;
 using Sales.Domain.Orders.Enums;
+
+using IntegrationTests.TestSupport.Api;
 
 namespace IntegrationTests.Sales.Api;
 
@@ -24,7 +21,7 @@ public sealed class ManagerOrderReadApiTests
     {
         var state = CreateState();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders?counterpartyId=cp-1&page=2&pageSize=5");
 
@@ -48,7 +45,7 @@ public sealed class ManagerOrderReadApiTests
     public async Task GetList_ReturnsBadRequestForInvalidParameters(string query)
     {
         using var factory = CreateFactory(CreateState());
-        using var client = CreateAuthenticatedClient(factory, "Admin");
+        using var client = factory.CreateClientWithRole("Admin");
 
         using var response = await client.GetAsync($"/api/admin/orders?{query}");
 
@@ -61,7 +58,7 @@ public sealed class ManagerOrderReadApiTests
         var state = CreateState();
         state.ReturnEmptyList = true;
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders?counterpartyId=missing");
 
@@ -75,7 +72,7 @@ public sealed class ManagerOrderReadApiTests
     {
         var state = CreateState();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Admin");
+        using var client = factory.CreateClientWithRole("Admin");
 
         using var response = await client.GetAsync("/api/admin/orders/42");
 
@@ -98,7 +95,7 @@ public sealed class ManagerOrderReadApiTests
         var state = CreateState();
         state.DetailResult = Result.NotFound();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders/404");
 
@@ -108,14 +105,18 @@ public sealed class ManagerOrderReadApiTests
     [Theory]
     [InlineData("/api/admin/orders")]
     [InlineData("/api/admin/orders/42")]
-    public async Task ReadRoutes_AllowAnonymousAccess(string route)
+    public async Task ReadRoutes_RequireManagerOrAdmin(string route)
     {
         using var factory = CreateFactory(CreateState());
         using var client = factory.CreateClient();
 
         using var response = await client.GetAsync(route);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        using var customerClient = factory.CreateClientWithRole("User");
+        using var forbidden = await customerClient.GetAsync(route);
+        Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
     }
 
     private static TestOrderReadState CreateState()
@@ -156,24 +157,9 @@ public sealed class ManagerOrderReadApiTests
                 services.RemoveAll<IOrderReadService>();
                 services.AddSingleton(state);
                 services.AddScoped<IOrderReadService, TestOrderReadService>();
-                services.AddAuthentication(options =>
-                    {
-                        options.DefaultAuthenticateScheme = TestAuthenticationHandler.SchemeName;
-                        options.DefaultChallengeScheme = TestAuthenticationHandler.SchemeName;
-                        options.DefaultForbidScheme = TestAuthenticationHandler.SchemeName;
-                    })
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(
-                        TestAuthenticationHandler.SchemeName,
-                        _ => { });
+                services.AddTestRoleAuthentication();
             });
         });
-
-    private static HttpClient CreateAuthenticatedClient(WebApplicationFactory<Program> factory, string role)
-    {
-        var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Add(TestAuthenticationHandler.RoleHeader, role);
-        return client;
-    }
 
     private sealed class TestOrderReadState
     {
@@ -205,28 +191,6 @@ public sealed class ManagerOrderReadApiTests
         {
             state.LastOrderId = orderId;
             return Task.FromResult(state.DetailResult);
-        }
-    }
-
-    private sealed class TestAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder)
-        : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
-    {
-        public const string SchemeName = "ManagerOrderReadTests";
-        public const string RoleHeader = "X-Test-Role";
-
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-        {
-            if (!Request.Headers.TryGetValue(RoleHeader, out var role) || string.IsNullOrWhiteSpace(role))
-                return Task.FromResult(AuthenticateResult.NoResult());
-
-            var identity = new ClaimsIdentity(
-                [new Claim(ClaimTypes.NameIdentifier, "test-user"), new Claim(ClaimTypes.Role, role.ToString())],
-                SchemeName);
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);
-            return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }
 }

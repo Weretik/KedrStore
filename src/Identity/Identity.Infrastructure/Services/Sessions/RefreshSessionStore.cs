@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
 
-namespace Identity.Infrastructure.Services;
+namespace Identity.Infrastructure.Services.Sessions;
 
 /// <summary>
 /// Stores refresh sessions by token hash: create, find, rotate and revoke.

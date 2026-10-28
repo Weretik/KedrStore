@@ -1,3 +1,4 @@
+using Identity.Application.Security.Policies;
 using Sales.Application.Contracts.Orders;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;
@@ -12,7 +13,7 @@ using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Delete;
 namespace Sales.Api.Controllers;
 
 [ApiController]
-[AllowAnonymous]
+[Authorize(Policy = PolicyNames.CanManageOrders)]
 [Route("api/admin/order-workspace")]
 public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBase
 {

@@ -42,7 +42,7 @@ paths:
       operationId: getAdminCategories
       summary: List categories for catalog administration
       tags: [Admin categories]
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       responses:
         '200':
           description: Unpaged depth-first category rows; may be empty before category import.
@@ -51,12 +51,14 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/AdminCategory' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/categories/{id}:
     get:
       operationId: getAdminCategoryById
       summary: Get one category for catalog administration
       tags: [Admin categories]
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - $ref: '#/components/parameters/CategoryId'
       responses:
@@ -67,6 +69,8 @@ paths:
               schema: { $ref: '#/components/schemas/AdminCategory' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Category not found }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   parameters:
     Lang:

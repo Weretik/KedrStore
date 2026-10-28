@@ -14,10 +14,6 @@ public static class IdentityDbContextExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var sessionSecurityOptions = configuration
-            .GetSection(IdentitySessionSecurityOptions.SectionName)
-            .Get<IdentitySessionSecurityOptions>() ?? new IdentitySessionSecurityOptions();
-
         services.AddDbContext<AppIdentityDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Default")));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AppIdentityDbContext>());
@@ -28,13 +24,7 @@ public static class IdentityDbContextExtensions
             .PersistKeysToDbContext<AppIdentityDbContext>()
             .SetApplicationName("KedrStore");
 
-        services
-            .AddAuthentication(IdentityConstants.BearerScheme)
-            .AddBearerToken(IdentityConstants.BearerScheme, options =>
-            {
-                options.BearerTokenExpiration = TimeSpan.FromMinutes(sessionSecurityOptions.AccessTokenLifetimeMinutes);
-                options.RefreshTokenExpiration = TimeSpan.FromDays(sessionSecurityOptions.RefreshAbsoluteLifetimeDays);
-            });
+        services.AddIdentityAuthentication(configuration);
 
         services.AddIdentityCore<AppUser>(options =>
             {

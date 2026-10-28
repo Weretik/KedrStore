@@ -5,13 +5,14 @@ using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetAdminDetail;
 using Catalog.Contracts.Products.GetMissingPhotos;
 using Catalog.Contracts.Products.GetList;
+using Identity.Application.Security.Policies;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;
 
 [ApiController]
 [Route("api/admin/products")]
-[AllowAnonymous]
+[Authorize(Policy = PolicyNames.CanManageProducts)]
 public sealed class AdminProductsController(ISender sender) : ControllerBase
 {
     [HttpGet]

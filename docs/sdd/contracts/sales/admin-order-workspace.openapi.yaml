@@ -10,7 +10,7 @@ paths:
     get:
       operationId: getAdminWorkspaceOrders
       summary: Search persisted Admin orders
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
         - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
@@ -28,10 +28,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrderPage' }
         '400': { description: Invalid query. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
     post:
       operationId: createAdminWorkspaceOrder
       summary: Create one priced order and pending 1C sync
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: Idempotency-Key
           in: header
@@ -60,11 +62,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/OrderConflict' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/order-workspace/orders/{orderId}:
     get:
       operationId: getAdminWorkspaceOrderById
       summary: Read a persisted Admin order
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: orderId
           in: path
@@ -77,11 +81,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrderDetail' }
         '404': { description: Order not found. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/order-workspace/quote:
     post:
       operationId: quoteAdminWorkspaceOrder
       summary: Price a selected customer's lines without persisting an order
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       requestBody:
         required: true
         content:
@@ -104,6 +110,8 @@ paths:
                   code: { type: string, example: unavailable_product }
                   message: { type: string, example: Недостатньо товару на складі. }
         '404': { description: Selected customer or product does not exist. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     Money: { type: number, multipleOf: 0.01, minimum: 0 }

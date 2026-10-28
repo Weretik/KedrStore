@@ -41,6 +41,7 @@ app.UseCors("Frontend");
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
 app.UseRateLimiter();
+app.UseCookieCsrfProtection();
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,13 +1,14 @@
 using Catalog.Application.Features.Category.AdminGetById;
 using Catalog.Application.Features.Category.AdminGetList;
 using Catalog.Contracts.Category;
+using Identity.Application.Security.Policies;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;
 
 [ApiController]
 [Route("api/categories")]
-[AllowAnonymous]
+[Authorize(Policy = PolicyNames.CanManageProducts)]
 public sealed class AdminCategoriesController(ISender sender) : ControllerBase
 {
     [HttpGet]

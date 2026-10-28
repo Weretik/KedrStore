@@ -6,23 +6,24 @@
 
 Authentication answers **who is calling**; authorization answers **whether that caller may perform the operation**.
 
-## Current state: authorization not yet enforced
+## Endpoint access
 
-**Temporary, checked 2026-10-27.** User authorization is not rolled out yet, so the Admin and storefront controllers below are deliberately marked `[AllowAnonymous]`. The fallback policy above is configured but does not protect them. Until the rollout, a new endpoint in these controllers follows the same temporary rule; do not treat this as the target design.
+Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/001-authentication-rollout/README.md).
 
-| Controller | Routes | Now | Target after rollout |
-| --- | --- | --- | --- |
-| `AdminOrderWorkspaceController` | `/api/admin/order-workspace` | anonymous (class) | `CanManageOrders` |
-| `AdminOrdersController` | `/api/admin/orders` | anonymous (per action) | `CanManageOrders` |
-| `AdminCustomersController` | `/api/admin/customers` | anonymous (class) | `CanManageOrders` or a customer policy |
-| `AdminProductsController` | `/api/admin/products` | anonymous (class) | `CanManageProducts` |
-| `AdminCategoriesController` | `/api/categories` | anonymous (class) | `CanManageProducts` |
-| `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | anonymous (class) | stays public |
-| `OrderController` | `POST /api/orders` (quick order) | anonymous | stays public, rate-limited |
-| `AuthSessionController` | login, refresh | anonymous | stays public, rate-limited |
-| `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | `[Authorize]` | already protected |
+| Controller | Routes | Access |
+| --- | --- | --- |
+| `AdminOrderWorkspaceController` | `/api/admin/order-workspace` | `CanManageOrders` |
+| `AdminOrdersController` | `/api/admin/orders` | `CanManageOrders` |
+| `AdminCustomersController` | `/api/admin/customers` | `CanManageOrders` |
+| `AdminProductsController` | `/api/admin/products` | `CanManageProducts` |
+| `AdminCategoriesController` | `/api/categories` | `CanManageProducts` |
+| `AdminUsersController` | `/api/admin/users` | `CanManageUsers` |
+| `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
+| `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
+| `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
+| `CookieAuthController`, `MobileAuthController`, `AuthSessionController` | login, refresh | public, rate-limited; logout and `me` need a session |
 
-**When authorization is introduced:** remove `[AllowAnonymous]` from every row whose target is a policy, apply the named policy, add `401`/`403` to the affected OpenAPI contracts and synchronize them to kedr-web, add API tests for denied and allowed calls, and delete this section. Use the [access-control checklist](../planning/access-control-checklist.md).
+A new endpoint in an admin controller inherits the controller's policy. A public endpoint needs `[AllowAnonymous]` and a reason in its contract.
 
 ## Roles
 

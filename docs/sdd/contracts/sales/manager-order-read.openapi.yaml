@@ -10,6 +10,7 @@ paths:
     get:
       operationId: getAdminOrders
       summary: Browse persisted manager orders
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: counterpartyId
           in: query
@@ -31,10 +32,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ManagerOrderPage' }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/orders/{orderId}:
     get:
       operationId: getAdminOrderById
       summary: Get one persisted manager order
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: orderId
           in: path
@@ -48,6 +52,8 @@ paths:
               schema: { $ref: '#/components/schemas/ManagerOrderDetail' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: No manager order exists for the supplied identifier. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     PagedInfo:

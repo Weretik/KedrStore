@@ -1,3 +1,4 @@
+using Identity.Api.Cookies;
 using Identity.Api.Options;
 using Identity.Infrastructure.Options;
 
@@ -9,8 +10,6 @@ public static class IdentityOptionsRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<AdminUserOptions>(configuration.GetSection("Identity:AdminUser"));
-
         services
             .AddOptions<SessionCookieOptions>()
             .Bind(configuration.GetSection(SessionCookieOptions.SectionName))
@@ -23,6 +22,19 @@ public static class IdentityOptionsRegistrationExtensions
                      !string.IsNullOrWhiteSpace(o.CsrfCookiePath) &&
                      o.CsrfCookieTtlDays > 0,
                 "Identity:SessionCookies configuration is invalid.");
+
+        services.AddSingleton<SessionCookieWriter>();
+
+        services
+            .AddOptions<IdentityCookieSessionOptions>()
+            .Bind(configuration.GetSection(IdentityCookieSessionOptions.SectionName))
+            .Validate(
+                o => !string.IsNullOrWhiteSpace(o.CookieName) &&
+                     o.LifetimeDays is > 0 and <= 90 &&
+                     o.SecurityStampValidationMinutes is > 0 and <= 60 &&
+                     (o.RequireSecure || !o.CookieName.StartsWith("__Host-", StringComparison.Ordinal)),
+                "Identity:CookieSession configuration is invalid.")
+            .ValidateOnStart();
 
         services
             .AddOptions<IdentitySessionPerformanceOptions>()

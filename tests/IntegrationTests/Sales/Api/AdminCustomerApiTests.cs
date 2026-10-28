@@ -1,18 +1,15 @@
 using System.Net;
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using Ardalis.Result;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Sales.Application.Contracts.Customers;
 using Sales.Application.Features.Customers.GetById.DTOs;
 using Sales.Application.Features.Customers.GetList.DTOs;
+
+using IntegrationTests.TestSupport.Api;
 
 namespace IntegrationTests.Sales.Api;
 
@@ -23,7 +20,7 @@ public sealed class AdminCustomerApiTests
     {
         var state = CreateState();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/customers");
 
@@ -42,7 +39,7 @@ public sealed class AdminCustomerApiTests
     {
         var state = CreateState();
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync(
             "/api/admin/customers?searchTerm=alpha&counterpartyId=customer&name=Alpha&phone=380&sort=-phone&page=2&pageSize=10");
@@ -65,7 +62,7 @@ public sealed class AdminCustomerApiTests
     public async Task GetList_ReturnsBadRequestForInvalidPaging(string query)
     {
         using var factory = CreateFactory(CreateState());
-        using var client = CreateAuthenticatedClient(factory, "Admin");
+        using var client = factory.CreateClientWithRole("Admin");
 
         using var response = await client.GetAsync($"/api/admin/customers?{query}");
 
@@ -78,7 +75,7 @@ public sealed class AdminCustomerApiTests
         var state = CreateState();
         state.ReturnEmptyList = true;
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/customers?page=3&pageSize=10");
 
@@ -92,7 +89,7 @@ public sealed class AdminCustomerApiTests
     {
         var state = CreateState();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Admin");
+        using var client = factory.CreateClientWithRole("Admin");
 
         using var response = await client.GetAsync("/api/admin/customers/customer%2D1");
 
@@ -118,7 +115,7 @@ public sealed class AdminCustomerApiTests
         var state = CreateState();
         state.DetailResult = Result.NotFound();
         using var factory = CreateFactory(state);
-        using var client = CreateAuthenticatedClient(factory, "Manager");
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync($"/api/admin/customers/{counterpartyId}");
 
@@ -129,7 +126,7 @@ public sealed class AdminCustomerApiTests
     public async Task GetById_ReturnsBadRequestForInvalidIdentifier()
     {
         using var factory = CreateFactory(CreateState());
-        using var client = CreateAuthenticatedClient(factory, "Admin");
+        using var client = factory.CreateClientWithRole("Admin");
 
         using var response = await client.GetAsync($"/api/admin/customers/{new string('x', 65)}");
 
@@ -139,14 +136,18 @@ public sealed class AdminCustomerApiTests
     [Theory]
     [InlineData("/api/admin/customers")]
     [InlineData("/api/admin/customers/customer-1")]
-    public async Task ReadRoutes_ReturnSuccessWithoutAuthentication(string route)
+    public async Task ReadRoutes_RequireManagerOrAdmin(string route)
     {
         using var factory = CreateFactory(CreateState());
         using var client = factory.CreateClient();
 
         using var response = await client.GetAsync(route);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        using var customerClient = factory.CreateClientWithRole("User");
+        using var forbidden = await customerClient.GetAsync(route);
+        Assert.Equal(HttpStatusCode.Forbidden, forbidden.StatusCode);
     }
 
     private static TestCustomerReadState CreateState()
@@ -177,24 +178,9 @@ public sealed class AdminCustomerApiTests
                 services.RemoveAll<ICustomerReadService>();
                 services.AddSingleton(state);
                 services.AddScoped<ICustomerReadService, TestCustomerReadService>();
-                services.AddAuthentication(options =>
-                    {
-                        options.DefaultAuthenticateScheme = TestAuthenticationHandler.SchemeName;
-                        options.DefaultChallengeScheme = TestAuthenticationHandler.SchemeName;
-                        options.DefaultForbidScheme = TestAuthenticationHandler.SchemeName;
-                    })
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(
-                        TestAuthenticationHandler.SchemeName,
-                        _ => { });
+                services.AddTestRoleAuthentication();
             });
         });
-
-    private static HttpClient CreateAuthenticatedClient(WebApplicationFactory<Program> factory, string role)
-    {
-        var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Add(TestAuthenticationHandler.RoleHeader, role);
-        return client;
-    }
 
     private sealed class TestCustomerReadState
     {
@@ -227,28 +213,6 @@ public sealed class AdminCustomerApiTests
         {
             state.LastCounterpartyId = counterpartyId;
             return Task.FromResult(state.DetailResult);
-        }
-    }
-
-    private sealed class TestAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder)
-        : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
-    {
-        public const string SchemeName = "CustomerReadTests";
-        public const string RoleHeader = "X-Test-Role";
-
-        protected override Task<AuthenticateResult> HandleAuthenticateAsync()
-        {
-            if (!Request.Headers.TryGetValue(RoleHeader, out var role) || string.IsNullOrWhiteSpace(role))
-                return Task.FromResult(AuthenticateResult.NoResult());
-
-            var identity = new ClaimsIdentity(
-                [new Claim(ClaimTypes.NameIdentifier, "test-user"), new Claim(ClaimTypes.Role, role.ToString())],
-                SchemeName);
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);
-            return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }
 }

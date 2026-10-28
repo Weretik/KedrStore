@@ -10,7 +10,7 @@ paths:
     get:
       operationId: getAdminOrderDrafts
       summary: Search saved drafts
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - { name: searchTerm, in: query, schema: { type: string, maxLength: 100 } }
         - { name: counterpartyId, in: query, schema: { type: string, maxLength: 64 } }
@@ -28,10 +28,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DraftPage' }
         '400': { description: Invalid query. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
     post:
       operationId: createAdminOrderDraft
       summary: Save a reusable draft
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: Idempotency-Key
           in: header
@@ -56,6 +58,8 @@ paths:
         '400': { description: "Invalid draft, customer, product or price." }
         '404': { description: Selected customer or product does not exist. }
         '409': { description: Idempotency key reused with different body. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/order-workspace/drafts/{draftId}:
     parameters:
       - name: draftId
@@ -65,7 +69,7 @@ paths:
     get:
       operationId: getAdminOrderDraftById
       summary: Read one draft with current pricing availability
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       responses:
         '200':
           description: Saved lines and version remain available even if current pricing is unavailable.
@@ -73,10 +77,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DraftDetail' }
         '404': { description: Draft not found. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
     put:
       operationId: updateAdminOrderDraft
       summary: Replace editable draft fields
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: If-Match
           in: header
@@ -96,10 +102,12 @@ paths:
         '400': { description: "Invalid draft, customer, product or price." }
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
     delete:
       operationId: deleteAdminOrderDraft
       summary: Delete one draft and its lines
-      security: []
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
         - name: If-Match
           in: header
@@ -109,6 +117,8 @@ paths:
         '204': { description: Draft deleted. }
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     PagedInfo:

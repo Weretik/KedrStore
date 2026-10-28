@@ -4,7 +4,7 @@ This is a short entry point for working in this backend repository. Its code and
 
 ## Product
 
-Kedr sells door hardware wholesale (with optional retail orders), not services such as fitting or repair. Authorization is not enforced yet; see the [current state](docs/sdd/architecture/security/authorization/roles-and-policies.md#current-state-authorization-not-yet-enforced) before touching access rules.
+Kedr sells door hardware wholesale (with optional retail orders), not services such as fitting or repair. Browsers sign in with a session cookie and mobile with bearer tokens; admin endpoints require a policy. See [endpoint access](docs/sdd/architecture/security/authorization/roles-and-policies.md#endpoint-access) before touching access rules.
 
 ## Project context
 

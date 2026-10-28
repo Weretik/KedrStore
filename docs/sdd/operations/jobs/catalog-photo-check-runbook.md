@@ -33,7 +33,7 @@ Limit the allow-list to the required CDN. A redirect outside HTTPS or an allowed
 - `InvalidContentType`: final response `2xx` without an image media type.
 - `CheckFailed`: timeout, network/DNS failure, invalid URL, `429`, `5xx`, or another unsuccessful result.
 
-The anonymous unavailable-photos API includes the last three statuses. Individual CDN failures do not fail the job. A database failure, invalid configuration, cancellation, or unexpected coordination failure produces a nonzero exit code.
+The unavailable-photos API (Manager or Admin) includes the last three statuses. Individual CDN failures do not fail the job. A database failure, invalid configuration, cancellation, or unexpected coordination failure produces a nonzero exit code.
 
 The final structured log contains the examined, available, missing, invalid-content, check-failed, and stale-result counters, plus duration. Expected remote failures do not log response bodies or credentials.
 

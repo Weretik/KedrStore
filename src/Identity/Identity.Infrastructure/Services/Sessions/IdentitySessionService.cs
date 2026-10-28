@@ -4,9 +4,8 @@ using Identity.Application.Features.Auth.SessionRefresh.DTOs;
 using Identity.Application.Services;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Options;
-using Microsoft.EntityFrameworkCore;
 
-namespace Identity.Infrastructure.Services;
+namespace Identity.Infrastructure.Services.Sessions;
 
 public sealed class IdentitySessionService(
     RefreshSessionStore refreshSessionStore,
@@ -14,7 +13,6 @@ public sealed class IdentitySessionService(
     SignInManager<AppUser> signInManager,
     IdentityBearerTokenIssuer bearerTokenIssuer,
     IHttpContextAccessor httpContextAccessor,
-    IOptionsMonitor<BearerTokenOptions> bearerTokenOptionsMonitor,
     ILogger<IdentitySessionService> logger,
     IOptions<IdentitySessionPerformanceOptions> performanceOptions,
     IOptions<IdentitySessionSecurityOptions> securityOptions) : IIdentitySessionService
@@ -51,14 +49,7 @@ public sealed class IdentitySessionService(
         var principal = await signInManager.CreateUserPrincipalAsync(user);
         LogStepDuration("Login.CreatePrincipal", stepWatch.ElapsedMilliseconds);
 
-        stepWatch.Restart();
-        var tokenPayload = await bearerTokenIssuer.IssueAsync(principal, cancellationToken);
-        LogStepDuration("Login.IssueTokenPayload", stepWatch.ElapsedMilliseconds);
-        if (tokenPayload is null)
-        {
-            logger.LogWarning("AUDIT: Login failed: token payload generation returned null for userId {UserId}", user.Id);
-            return null;
-        }
+        var tokenPayload = bearerTokenIssuer.Issue(principal);
 
         var now = DateTimeOffset.UtcNow;
         var absoluteExpiresAtUtc = now.AddDays(securityOptions.Value.RefreshAbsoluteLifetimeDays);
@@ -129,20 +120,7 @@ public sealed class IdentitySessionService(
         }
 
         var stepWatch = Stopwatch.StartNew();
-        var options = bearerTokenOptionsMonitor.Get(IdentityConstants.BearerScheme);
-        var refreshTicket = options.RefreshTokenProtector.Unprotect(refreshToken);
-        LogStepDuration("Refresh.UnprotectToken", stepWatch.ElapsedMilliseconds);
-
-        var userId = refreshTicket?.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userId, out var parsedUserId) || parsedUserId != refreshSession.UserId)
-        {
-            await refreshSessionStore.RevokeAsync(refreshSession, now, "PrincipalMismatch", cancellationToken);
-            logger.LogWarning("AUDIT: Refresh failed: principal mismatch for sessionId {SessionId}", refreshSession.Id);
-            return null;
-        }
-
-        stepWatch.Restart();
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByIdAsync(refreshSession.UserId.ToString());
         LogStepDuration("Refresh.FindById", stepWatch.ElapsedMilliseconds);
         stepWatch.Restart();
         if (user is null || !await signInManager.CanSignInAsync(user))
@@ -155,14 +133,7 @@ public sealed class IdentitySessionService(
         stepWatch.Restart();
         var principal = await signInManager.CreateUserPrincipalAsync(user);
         LogStepDuration("Refresh.CreatePrincipal", stepWatch.ElapsedMilliseconds);
-        stepWatch.Restart();
-        var tokenPayload = await bearerTokenIssuer.IssueAsync(principal, cancellationToken);
-        LogStepDuration("Refresh.IssueTokenPayload", stepWatch.ElapsedMilliseconds);
-        if (tokenPayload is null)
-        {
-            logger.LogWarning("AUDIT: Refresh failed: token payload generation returned null for userId {UserId}", refreshSession.UserId);
-            return null;
-        }
+        var tokenPayload = bearerTokenIssuer.Issue(principal);
 
         var newSession = await refreshSessionStore.RotateAsync(refreshSession, tokenPayload.RefreshToken, now, cancellationToken);
         if (newSession is null)
@@ -198,6 +169,7 @@ public sealed class IdentitySessionService(
         return new SessionMeResult(
             UserId: user.Id.ToString(),
             Email: user.Email ?? string.Empty,
+            FullName: user.FullName,
             Roles: roles.ToArray());
     }
 

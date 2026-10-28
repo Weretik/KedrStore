@@ -58,6 +58,16 @@ paths:
     $ref: ./sales/customer-read.openapi.yaml#/paths/~1api~1admin~1customers
   /api/admin/customers/{counterpartyId}:
     $ref: ./sales/customer-read.openapi.yaml#/paths/~1api~1admin~1customers~1{counterpartyId}
+  /api/auth/cookie/login:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1cookie~1login
+  /api/auth/cookie/logout:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1cookie~1logout
+  /api/auth/mobile/login:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1mobile~1login
+  /api/auth/mobile/refresh:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1mobile~1refresh
+  /api/auth/mobile/logout:
+    $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1mobile~1logout
   /api/auth/session/login:
     $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1login
   /api/auth/session/refresh:
@@ -66,6 +76,14 @@ paths:
     $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1logout
   /api/auth/session/me:
     $ref: ./identity/session.openapi.yaml#/paths/~1api~1auth~1session~1me
+  /api/admin/users:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users
+  /api/admin/users/{userId}/role:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1role
+  /api/admin/users/{userId}/blocked:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1blocked
+  /api/admin/users/{userId}/password:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1password
   /api/sales/{lang}/catalog/products:
     $ref: ./sales/catalog.openapi.yaml#/paths/~1api~1sales~1{lang}~1catalog~1products
 components:
@@ -74,3 +92,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: Opaque
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: __Host-kedr.session

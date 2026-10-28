@@ -142,6 +142,29 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
             parameter.GetProperty("name").GetString() == name && parameter.GetProperty("in").GetString() == "header");
     }
 
+    [Theory]
+    [InlineData("/api/auth/cookie/login", "post", "loginCookieSession")]
+    [InlineData("/api/auth/cookie/logout", "post", "logoutCookieSession")]
+    [InlineData("/api/auth/mobile/login", "post", "loginMobile")]
+    [InlineData("/api/auth/mobile/refresh", "post", "refreshMobile")]
+    [InlineData("/api/auth/mobile/logout", "post", "logoutMobile")]
+    [InlineData("/api/admin/users", "get", "getStaffAccounts")]
+    [InlineData("/api/admin/users", "post", "createStaffAccount")]
+    [InlineData("/api/admin/users/{userId}/role", "put", "changeStaffRole")]
+    [InlineData("/api/admin/users/{userId}/blocked", "put", "setStaffBlocked")]
+    [InlineData("/api/admin/users/{userId}/password", "put", "setStaffPassword")]
+    public async Task OpenApi_Contains_Identity_Operations(string path, string method, string operationId)
+    {
+        using var client = _factory.CreateClient();
+        using var response = await client.GetAsync("/openapi/v1.json");
+        response.EnsureSuccessStatusCode();
+        using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+
+        Assert.True(doc.RootElement.GetProperty("paths").TryGetProperty(path, out var pathItem), path);
+        Assert.True(pathItem.TryGetProperty(method, out var operation), $"{method} {path}");
+        AssertOperationId(operation, operationId);
+    }
+
     private static void AssertOperationId(JsonElement operation, string expected)
     {
         Assert.True(operation.TryGetProperty("operationId", out var operationId));

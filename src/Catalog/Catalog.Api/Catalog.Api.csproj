@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
     </ItemGroup>
 
 </Project>

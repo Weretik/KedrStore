@@ -7,9 +7,9 @@ paths:
     post:
       operationId: createAdminOrder
       summary: Create an admin order for asynchronous 1C delivery
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        Temporarily anonymous. Before production, protect with
-        PolicyNames.CanManageOrders (Manager and Admin).
+        Policy CanManageOrders (Manager and Admin).
       parameters:
         - name: Idempotency-Key
           in: header
@@ -45,15 +45,15 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { $ref: '#/components/responses/NotFoundError' }
         '409': { $ref: '#/components/responses/ConflictError' }
-        '401': { description: Returned after production authorization is enabled. }
-        '403': { description: Returned after production authorization is enabled. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/orders/{orderId}/sync-status:
     get:
       operationId: getAdminOrderSyncStatus
       summary: Get the current 1C delivery status for an admin order
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        Temporarily anonymous. Before production, protect with
-        PolicyNames.CanManageOrders (Manager and Admin).
+        Policy CanManageOrders (Manager and Admin).
       parameters:
         - name: orderId
           in: path
@@ -66,17 +66,17 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrderSyncStatusResponse' }
         '404': { description: Order not found. }
-        '401': { description: Returned after production authorization is enabled. }
-        '403': { description: Returned after production authorization is enabled. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/orders/{orderId}/sync/retry:
     post:
       operationId: retryAdminOrderSync
       summary: Schedule a failed order for another 1C delivery cycle
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
         Allowed only for BusinessError and DeadLetter. The request records an
         audit entry and changes the state to RetryScheduled; it does not call
-        1C synchronously. Temporarily anonymous. Before production, protect
-        with PolicyNames.CanManageOrders (Manager and Admin).
+        1C synchronously. Policy CanManageOrders (Manager and Admin).
       parameters:
         - name: orderId
           in: path
@@ -96,8 +96,8 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Order not found. }
         '409': { description: Current synchronization status cannot be retried. }
-        '401': { description: Returned after production authorization is enabled. }
-        '403': { description: Returned after production authorization is enabled. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     CreateAdminOrderRequest:

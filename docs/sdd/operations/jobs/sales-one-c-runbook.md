@@ -117,7 +117,7 @@ When delivery enters `DeadLetter`, the job saves that state first and only then 
 
 After the cause is resolved, a manager can schedule a retry for `BusinessError` or `DeadLetter` through `POST /api/admin/orders/{orderId}/sync/retry` with a non-empty JSON `reason`. A `202` response means the transition to `RetryScheduled` was saved and audited; it does not mean 1C accepted the order. The next normal `sync-one-c-orders` run sends it with the same `OrderNumber`. `409` means the current state is not eligible for retry; `404` means the order was not found.
 
-Do not retry `Accepted`, `Sent`, or an already active delivery, and do not reset synchronization records through SQL. If the saved order data is wrong and cannot be corrected through a supported business operation, create a new order instead of resending the same invalid snapshot. The retry endpoint temporarily remains anonymous along with the other admin order endpoints; before production access it must be protected by `PolicyNames.CanManageOrders`.
+Do not retry `Accepted`, `Sent`, or an already active delivery, and do not reset synchronization records through SQL. If the saved order data is wrong and cannot be corrected through a supported business operation, create a new order instead of resending the same invalid snapshot. The retry endpoint, like the other admin order endpoints, requires `PolicyNames.CanManageOrders` (Manager or Admin).
 
 ## Related instructions
 

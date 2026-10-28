@@ -16,6 +16,8 @@ using Sales.Domain.Orders.Entities;
 using Sales.Domain.Orders.Enums;
 using Sales.Domain.Orders.ValueObjects;
 
+using IntegrationTests.TestSupport.Api;
+
 namespace IntegrationTests.Sales.Api;
 
 public sealed class AdminOrderApiTests
@@ -25,7 +27,7 @@ public sealed class AdminOrderApiTests
     {
         var state = new TestOrderState();
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.PostAsync("/api/admin/orders", CreateRequest("active"));
 
@@ -42,7 +44,7 @@ public sealed class AdminOrderApiTests
     public async Task Create_ReturnsBadRequest_ForInvalidOrder()
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         var request = """{"counterpartyId":"active","lines":[{"productId":"101","quantity":0,"amount":125.00}]}""";
 
         using var response = await client.PostAsync("/api/admin/orders", CreateRequestContent(request));
@@ -56,7 +58,7 @@ public sealed class AdminOrderApiTests
     public async Task Create_ReturnsNotFound_ForUnknownOrDeletedCounterparty(string counterpartyId)
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.PostAsync("/api/admin/orders", CreateRequest(counterpartyId));
 
@@ -67,7 +69,7 @@ public sealed class AdminOrderApiTests
     public async Task Create_ReplaysOriginalResult_AndRejectsConflictingIdempotencyKey()
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         var key = Guid.NewGuid();
 
         using var initial = await client.PostAsync("/api/admin/orders", CreateRequest("active", key));
@@ -86,7 +88,7 @@ public sealed class AdminOrderApiTests
         var state = new TestOrderState();
         state.SyncStatuses[42] = new GetOrderSyncStatusResult(42, "SO-TEST-0001", OneCOrderSyncStatus.Pending, null, null);
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders/42/sync-status");
 
@@ -113,7 +115,7 @@ public sealed class AdminOrderApiTests
         var state = new TestOrderState();
         state.SyncStatuses[42] = new GetOrderSyncStatusResult(42, "SO-TEST-0001", status, documentNumber, acceptedAtUtc);
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders/42/sync-status");
 
@@ -130,7 +132,7 @@ public sealed class AdminOrderApiTests
     public async Task GetSyncStatus_ReturnsNotFoundForUnknownOrder()
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
 
         using var response = await client.GetAsync("/api/admin/orders/404/sync-status");
 
@@ -144,7 +146,7 @@ public sealed class AdminOrderApiTests
     {
         var state = new TestOrderState { RetryStatus = status };
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         using var content = CreateRequestContent("""{"reason":"The 1C reference data was corrected"}""");
 
         using var response = await client.PostAsync("/api/admin/orders/42/sync/retry", content);
@@ -162,7 +164,7 @@ public sealed class AdminOrderApiTests
     {
         var state = new TestOrderState { RetryStatus = OneCOrderSyncStatus.Accepted };
         using var factory = CreateFactory(state);
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         using var content = CreateRequestContent("""{"reason":"Retry requested"}""");
 
         using var response = await client.PostAsync("/api/admin/orders/42/sync/retry", content);
@@ -175,7 +177,7 @@ public sealed class AdminOrderApiTests
     public async Task RetrySync_ReturnsNotFoundForUnknownOrder()
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         using var content = CreateRequestContent("""{"reason":"Retry requested"}""");
 
         using var response = await client.PostAsync("/api/admin/orders/404/sync/retry", content);
@@ -187,7 +189,7 @@ public sealed class AdminOrderApiTests
     public async Task RetrySync_ReturnsBadRequestWhenReasonIsEmpty()
     {
         using var factory = CreateFactory(new TestOrderState());
-        using var client = factory.CreateClient();
+        using var client = factory.CreateClientWithRole("Manager");
         using var content = CreateRequestContent("""{"reason":" "}""");
 
         using var response = await client.PostAsync("/api/admin/orders/42/sync/retry", content);
@@ -226,6 +228,7 @@ public sealed class AdminOrderApiTests
             builder.UseEnvironment("Development");
             builder.ConfigureServices(services =>
             {
+                services.AddTestRoleAuthentication();
                 services.RemoveAll<IOrderCreationStore>();
                 services.RemoveAll<IOrderProductReader>();
                 services.RemoveAll<IOrderNumberGenerator>();

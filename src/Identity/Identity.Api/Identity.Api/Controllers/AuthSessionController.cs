@@ -1,24 +1,22 @@
 using Identity.Api.Contracts.Auth;
+using Identity.Api.Cookies;
 using Identity.Application.Features.Auth.SessionLogin;
+using Identity.Application.Features.Auth.SessionLogin.DTOs;
 using Identity.Application.Features.Auth.SessionLogout;
 using Identity.Application.Features.Auth.SessionMe;
 using Identity.Application.Features.Auth.SessionRefresh;
 using Identity.Application.Features.Auth.SessionRefresh.DTOs;
-using Identity.Api.Options;
-using Identity.Application.Features.Auth.SessionLogin.DTOs;
 
 namespace Identity.Api.Controllers;
 
+/// <summary>
+/// Current user for every client, plus the old token-in-JSON flow kept until the frontends move to
+/// <see cref="CookieAuthController"/> and <see cref="MobileAuthController"/>.
+/// </summary>
 [ApiController]
 [Route("api/auth/session")]
-public sealed class AuthSessionController(
-    ISender sender,
-    IOptions<SessionCookieOptions> sessionCookieOptions) : ControllerBase
+public sealed class AuthSessionController(ISender sender, SessionCookieWriter cookies) : ControllerBase
 {
-    private const string LegacyRefreshTokenCookiePath = "/api/auth/session/refresh";
-
-    private readonly SessionCookieOptions _cookieOptions = sessionCookieOptions.Value;
-
     [HttpPost("login")]
     [AllowAnonymous]
     [EnableRateLimiting("AuthLogin")]
@@ -35,8 +33,8 @@ public sealed class AuthSessionController(
             return this.ToActionResult(result);
         }
 
-        AppendRefreshCookie(result.Value.RefreshToken);
-        AppendCsrfCookie();
+        cookies.AppendRefreshToken(Response, result.Value.RefreshToken);
+        cookies.AppendCsrfToken(Response);
         return Ok(new SessionTokenResponse(result.Value.TokenType, result.Value.AccessToken, result.Value.ExpiresIn));
     }
 
@@ -49,25 +47,25 @@ public sealed class AuthSessionController(
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<SessionTokenResponse>> Refresh(CancellationToken cancellationToken)
     {
-        if (!IsValidCsrfRequest())
+        if (!cookies.HasValidCsrfToken(Request))
         {
             return BadRequest("Invalid CSRF token.");
         }
 
-        if (!Request.Cookies.TryGetValue(_cookieOptions.RefreshTokenCookieName, out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+        var refreshToken = cookies.ReadRefreshToken(Request);
+        if (refreshToken is null)
         {
             return Unauthorized();
         }
 
-        var command = new SessionRefreshCommand(new SessionRefreshRequest(refreshToken));
-        var result = await sender.Send(command, cancellationToken);
+        var result = await sender.Send(new SessionRefreshCommand(new SessionRefreshRequest(refreshToken)), cancellationToken);
         if (result.Status != Ardalis.Result.ResultStatus.Ok || result.Value is null)
         {
             return this.ToActionResult(result);
         }
 
-        AppendRefreshCookie(result.Value.RefreshToken);
-        AppendCsrfCookie();
+        cookies.AppendRefreshToken(Response, result.Value.RefreshToken);
+        cookies.AppendCsrfToken(Response);
         return Ok(new SessionTokenResponse(result.Value.TokenType, result.Value.AccessToken, result.Value.ExpiresIn));
     }
 
@@ -77,16 +75,14 @@ public sealed class AuthSessionController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        Request.Cookies.TryGetValue(_cookieOptions.RefreshTokenCookieName, out var refreshToken);
-        var result = await sender.Send(new SessionLogoutCommand(refreshToken), cancellationToken);
+        var result = await sender.Send(new SessionLogoutCommand(cookies.ReadRefreshToken(Request)), cancellationToken);
         if (result.Status != Ardalis.Result.ResultStatus.Ok)
         {
             return this.ToActionResult(result);
         }
 
-        DeleteRefreshCookie();
-        DeleteLegacyRefreshCookie();
-        DeleteCsrfCookie();
+        cookies.DeleteRefreshToken(Response);
+        cookies.DeleteCsrfToken(Response);
         return NoContent();
     }
 
@@ -102,103 +98,6 @@ public sealed class AuthSessionController(
             return this.ToActionResult(result);
         }
 
-        var response = new SessionMeResponse(result.Value.UserId, result.Value.Email, result.Value.Roles);
-        return Ok(response);
+        return Ok(SessionMeResponse.From(result.Value));
     }
-
-    private void AppendRefreshCookie(string refreshToken)
-    {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = _cookieOptions.Secure,
-            SameSite = _cookieOptions.SameSite,
-            Path = _cookieOptions.RefreshTokenCookiePath,
-            MaxAge = TimeSpan.FromDays(_cookieOptions.RefreshTokenCookieTtlDays),
-            IsEssential = true
-        };
-
-        DeleteLegacyRefreshCookie();
-        Response.Cookies.Append(_cookieOptions.RefreshTokenCookieName, refreshToken, cookieOptions);
-    }
-
-    // Before the cookie path widened, the refresh cookie lived on the refresh path only.
-    // Browsers send that more specific cookie first, so it must go once a new one is set.
-    private void DeleteLegacyRefreshCookie()
-    {
-        if (string.Equals(_cookieOptions.RefreshTokenCookiePath, LegacyRefreshTokenCookiePath, StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        Response.Cookies.Delete(_cookieOptions.RefreshTokenCookieName, new CookieOptions
-        {
-            Path = LegacyRefreshTokenCookiePath,
-            Secure = _cookieOptions.Secure,
-            SameSite = _cookieOptions.SameSite,
-            HttpOnly = true,
-            IsEssential = true
-        });
-    }
-
-    private void AppendCsrfCookie()
-    {
-        var csrfToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = false,
-            Secure = _cookieOptions.Secure,
-            SameSite = _cookieOptions.SameSite,
-            Path = _cookieOptions.CsrfCookiePath,
-            Domain = CsrfCookieDomain,
-            MaxAge = TimeSpan.FromDays(_cookieOptions.CsrfCookieTtlDays),
-            IsEssential = true
-        };
-
-        Response.Cookies.Append(_cookieOptions.CsrfCookieName, csrfToken, cookieOptions);
-    }
-
-    private void DeleteRefreshCookie()
-    {
-        Response.Cookies.Delete(_cookieOptions.RefreshTokenCookieName, new CookieOptions
-        {
-            Path = _cookieOptions.RefreshTokenCookiePath,
-            Secure = _cookieOptions.Secure,
-            SameSite = _cookieOptions.SameSite,
-            HttpOnly = true,
-            IsEssential = true
-        });
-    }
-
-    private void DeleteCsrfCookie()
-    {
-        Response.Cookies.Delete(_cookieOptions.CsrfCookieName, new CookieOptions
-        {
-            Path = _cookieOptions.CsrfCookiePath,
-            Domain = CsrfCookieDomain,
-            Secure = _cookieOptions.Secure,
-            SameSite = _cookieOptions.SameSite,
-            HttpOnly = false,
-            IsEssential = true
-        });
-    }
-
-    private string? CsrfCookieDomain =>
-        string.IsNullOrWhiteSpace(_cookieOptions.CsrfCookieDomain) ? null : _cookieOptions.CsrfCookieDomain;
-
-    private bool IsValidCsrfRequest()
-    {
-        if (!Request.Cookies.TryGetValue(_cookieOptions.CsrfCookieName, out var csrfCookie) || string.IsNullOrWhiteSpace(csrfCookie))
-        {
-            return false;
-        }
-
-        if (!Request.Headers.TryGetValue(_cookieOptions.CsrfHeaderName, out var csrfHeader) || string.IsNullOrWhiteSpace(csrfHeader))
-        {
-            return false;
-        }
-
-        return string.Equals(csrfCookie, csrfHeader.ToString(), StringComparison.Ordinal);
-    }
-
 }
