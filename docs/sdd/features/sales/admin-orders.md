@@ -47,6 +47,12 @@ flowchart LR
     H --> I["1C"]
 ```
 
+## Tests
+
+[SalesOrderTests.cs](../../../../tests/UnitTests/Sales/Domain/SalesOrderTests.cs) · [OneCOrderSyncTests.cs](../../../../tests/UnitTests/Sales/Domain/OneCOrderSyncTests.cs) · [OneCOrderSyncNotificationTests.cs](../../../../tests/UnitTests/Sales/Domain/OneCOrderSyncNotificationTests.cs) · [CreateOrderCommandHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/CreateOrderCommandHandlerTests.cs) · [GetOrderListQueryHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/GetOrderListQueryHandlerTests.cs) · [GetOrderByIdQueryHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/GetOrderByIdQueryHandlerTests.cs) · [RetryOrderSyncCommandHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/RetryOrderSyncCommandHandlerTests.cs) · [AdminOrderApiTests.cs](../../../../tests/IntegrationTests/Sales/Api/AdminOrderApiTests.cs) · [ManagerOrderReadApiTests.cs](../../../../tests/IntegrationTests/Sales/Api/ManagerOrderReadApiTests.cs) · [ManagerOrderReadContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ManagerOrderReadContractTests.cs) · [OneC/](../../../../tests/IntegrationTests/Sales/OneC) · [AdminOrderCreationPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/AdminOrderCreationPostgresTests.cs) · [OrderSyncManualRetryPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/OrderSyncManualRetryPostgresTests.cs) · [SalesOrderPersistenceTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/SalesOrderPersistenceTests.cs) · [SalesOrderReadModelTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/SalesOrderReadModelTests.cs)
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~Order"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Order"`.
+
 ## Related sources
 
 [Create and sync contract](../../contracts/sales/admin-order-one-c-sync.openapi.yaml) · [Read contract](../../contracts/sales/manager-order-read.openapi.yaml) · [Create SDD](../../specs/sales/001-admin-order-one-c-sync/README.md) · [Read SDD](../../specs/sales/002-manager-order-read-api/README.md).

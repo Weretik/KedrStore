@@ -34,6 +34,10 @@ flowchart LR
     A --> E["Cookies, tokens, and CSRF"]
 ```
 
+## Tests
+
+No automated tests for login, refresh, logout, or me yet.
+
 ## Related sources
 
 [Contract](../../contracts/identity/session.openapi.yaml) · [Provisioning](../../architecture/security/users/provisioning-and-registration.md).

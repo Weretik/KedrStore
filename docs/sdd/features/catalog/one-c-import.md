@@ -36,6 +36,14 @@ flowchart LR
     F --> G["Catalog data"]
 ```
 
+## Tests
+
+[CosmosProductMappingTests.cs](../../../../tests/UnitTests/Catalog/Application/CosmosProductMappingTests.cs)
+
+The import job and 1C client have no dedicated automated tests.
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~CosmosProductMapping"`.
+
 ## Related sources
 
 [CLI](../../operations/jobs/host-jobs-cli.md) · [Import flow](../../architecture/integrations/one-c/catalog-import-flow.md) · [Root SDD](../../specs/catalog/cosmos-one-c-root/README.md).

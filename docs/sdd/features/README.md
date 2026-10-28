@@ -2,7 +2,7 @@
 
 **Static code check completed:** 2026-10-16 for earlier features; the Admin order workspace was checked on 2026-10-21. This map shows HTTP and job scenarios that actually exist, grouped by module. Each description explains the flow, components, data, and relationships. [SDD](../specs/README.md) holds decisions and delivery history; [architecture](../architecture/README.md) holds common boundaries. When adding a feature or changing its structure, update its description and this index in the same change.
 
-See the feature card's “Code structure” section for actual file paths and roles, and “Structure diagram” for the flow between parts.
+See the feature card's “Code structure” section for actual file paths and roles, “Structure diagram” for the flow between parts, and “Tests” for the related test files and a focused run command.
 
 ## Catalog
 

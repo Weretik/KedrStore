@@ -32,6 +32,12 @@ flowchart LR
     F --> E
 ```
 
+## Tests
+
+[ApiContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ApiContractTests.cs)
+
+No dedicated tests; `ApiContractTests` only checks that the endpoint is in OpenAPI.
+
 ## Related sources
 
 [Contract](../../contracts/catalog/orders.openapi.yaml) · [Sales orders](../sales/admin-orders.md).

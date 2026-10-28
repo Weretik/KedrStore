@@ -45,7 +45,7 @@ A Red-first test can be omitted for documentation-only work, generated migration
 
 | When | Minimum action |
 | --- | --- |
-| Local change | Run `dotnet test tests/<Project>/<Project>.csproj --filter <name>` for the affected behavior; for documentation, check links and run `git diff --check`. |
+| Local change | Run `dotnet test tests/<Project>/<Project>.csproj --filter <name>` for the affected behavior; for documentation, run `python3 tools/docs/check_doc_links.py` and `git diff --check`. |
 | Boundary, API, or database change | Add the relevant `ArchitectureTests` or `IntegrationTests` project/filter and the needed contract or operational evidence. |
 | Full CI | The `verify` job in the [workflow](../../../.github/workflows/deploy-cloudrun.yml) checks PRs and pushes; rerun the full suite locally only on explicit request. |
 

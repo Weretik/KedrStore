@@ -6,6 +6,24 @@
 
 Authentication answers **who is calling**; authorization answers **whether that caller may perform the operation**.
 
+## Current state: authorization not yet enforced
+
+**Temporary, checked 2026-10-27.** User authorization is not rolled out yet, so the Admin and storefront controllers below are deliberately marked `[AllowAnonymous]`. The fallback policy above is configured but does not protect them. Until the rollout, a new endpoint in these controllers follows the same temporary rule; do not treat this as the target design.
+
+| Controller | Routes | Now | Target after rollout |
+| --- | --- | --- | --- |
+| `AdminOrderWorkspaceController` | `/api/admin/order-workspace` | anonymous (class) | `CanManageOrders` |
+| `AdminOrdersController` | `/api/admin/orders` | anonymous (per action) | `CanManageOrders` |
+| `AdminCustomersController` | `/api/admin/customers` | anonymous (class) | `CanManageOrders` or a customer policy |
+| `AdminProductsController` | `/api/admin/products` | anonymous (class) | `CanManageProducts` |
+| `AdminCategoriesController` | `/api/categories` | anonymous (class) | `CanManageProducts` |
+| `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | anonymous (class) | stays public |
+| `OrderController` | `POST /api/orders` (quick order) | anonymous | stays public, rate-limited |
+| `AuthSessionController` | login, refresh | anonymous | stays public, rate-limited |
+| `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | `[Authorize]` | already protected |
+
+**When authorization is introduced:** remove `[AllowAnonymous]` from every row whose target is a policy, apply the named policy, add `401`/`403` to the affected OpenAPI contracts and synchronize them to kedr-web, add API tests for denied and allowed calls, and delete this section. Use the [access-control checklist](../planning/access-control-checklist.md).
+
 ## Roles
 
 Role constants are defined in `Identity.Domain/Authorization/RoleNames.cs`.

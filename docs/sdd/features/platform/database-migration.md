@@ -32,6 +32,12 @@ flowchart LR
     E --> D
 ```
 
+## Tests
+
+[DatabaseMigrationJobTests.cs](../../../../tests/IntegrationTests/Platform/Jobs/DatabaseMigrationJobTests.cs) · [IdentityMigrationLineageTests.cs](../../../../tests/IntegrationTests/Identity/Persistence/IdentityMigrationLineageTests.cs)
+
+Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Migration"`.
+
 ## Related sources
 
 [Procedure](../../operations/data/migrations-and-seeding.md) · [SDD](../../specs/platform/001-database-migration-job/README.md).

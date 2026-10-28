@@ -59,6 +59,12 @@ flowchart LR
     G --> H["CatalogReferenceDataReader"]
 ```
 
+## Tests
+
+[GetCustomerListQueryHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/GetCustomerListQueryHandlerTests.cs) · [GetCustomerByIdQueryHandlerTests.cs](../../../../tests/UnitTests/Sales/Application/GetCustomerByIdQueryHandlerTests.cs) · [AdminCustomerApiTests.cs](../../../../tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs) · [CustomerReadContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/CustomerReadContractTests.cs) · [CounterpartyReconciliationPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/CounterpartyReconciliationPostgresTests.cs) · [SalesCustomerReadModelTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/SalesCustomerReadModelTests.cs) · [SalesCustomerReferenceNamesTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/SalesCustomerReferenceNamesTests.cs)
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~Customer|FullyQualifiedName~Counterparty"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Customer|FullyQualifiedName~Counterparty"`.
+
 ## Related sources
 
 [Contract](../../contracts/sales/customer-read.openapi.yaml) · [Customer read SDD](../../specs/sales/003-customer-read-api/README.md) · [1C reconciliation SDD](../../specs/sales/007-customer-sync-reconciliation/README.md) · [Runbook](../../operations/jobs/sales-one-c-runbook.md).

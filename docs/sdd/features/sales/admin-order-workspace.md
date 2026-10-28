@@ -1,6 +1,6 @@
 # Admin order workspace
 
-**Module:** Sales. **Consumer:** React Admin. **State:** code and contract are in the repository; the migration has not been applied to the working database.
+**Module:** Sales. **Consumer:** React Admin (kedr-web `libs/admin/orders/data-access`).
 
 [AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) exposes separate anonymous `/api/admin/order-workspace` routes and dispatches each operation to its own Application handler. Existing `/api/admin/orders` remains a separate contract. The [order reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) performs search, sorting, and paging; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) uses the selected customer's policy, current stock, and Catalog prices. Insufficient stock returns the expected 400 `unavailable_product` with product name and quantities. During checkout, [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) recalculates the total, compares the fingerprint, and atomically writes Order and Pending 1C sync through the existing OrderCreationStore.
 
@@ -57,6 +57,14 @@ src/Sales/
     ├── Orders/Admin/Idempotency/WorkspaceIdempotency.cs        # hash and DB conflict handling for retries
     └── Migrations/20261021135819_AddAdminOrderDrafts.cs             # additive table migration
 ```
+
+## Tests
+
+[OrderDraftTests.cs](../../../../tests/UnitTests/Sales/Domain/OrderDraftTests.cs) · [WorkspaceDateRangeTests.cs](../../../../tests/UnitTests/Sales/Api/WorkspaceDateRangeTests.cs) · [WorkspaceExceptionBehaviorTests.cs](../../../../tests/UnitTests/Sales/Application/WorkspaceExceptionBehaviorTests.cs) · [OrderDraftPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/OrderDraftPostgresTests.cs)
+
+Quote and checkout handlers have no dedicated tests.
+
+Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~Workspace|FullyQualifiedName~OrderDraft"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Workspace|FullyQualifiedName~OrderDraft"`.
 
 ## Related sources
 
