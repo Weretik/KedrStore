@@ -11,15 +11,16 @@ internal sealed class WorkspaceDraftDetails(SalesDbContext db, AdminWorkspacePri
         try
         {
             var quote = await pricing.QuoteAsync(new WorkspaceQuoteRequest(
-                draft.CounterpartyId, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId, x.Quantity)).ToArray()), ct);
+                draft.CounterpartyId, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId, x.Quantity, x.PriceAdjustment)).ToArray()), ct);
             return new WorkspaceDraftDetail(draft.Id.Value, draft.Version, draft.Title, draft.Note,
                 draft.CounterpartyId, customer, draft.CreatedAtUtc, draft.UpdatedAtUtc,
                 quote.Lines.Select(x => new WorkspaceDraftQuotedLine(
-                    x.ProductId, x.ProductName, x.Quantity, x.UnitPrice, x.LineAmount)).ToArray(),
+                    x.ProductId, x.ProductName, x.Quantity, x.UnitPrice, x.LineAmount, x.PriceAdjustment, x.BaseUnitPrice)).ToArray(),
                 quote.TotalAmount, "Available", null);
         }
         catch (WorkspaceException error) when (error.Code is "customer_not_found" or "product_not_found" or
-                   "unavailable_product" or "unavailable_price" or "amount_overflow" or "invalid_lines")
+                   "unavailable_product" or "unavailable_price" or "negative_price" or "amount_overflow" or "invalid_lines" or
+                   "invalid_price_adjustment")
         {
             var lines = await pricing.DescribeDraftLinesAsync(draft.Lines, ct);
             return new WorkspaceDraftDetail(draft.Id.Value, draft.Version, draft.Title, draft.Note,

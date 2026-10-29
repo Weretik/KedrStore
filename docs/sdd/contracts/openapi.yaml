@@ -50,6 +50,8 @@ paths:
     $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1orders~1{orderId}
   /api/admin/order-workspace/quote:
     $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1quote
+  /api/admin/order-workspace/customer-prices:
+    $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1customer-prices
   /api/admin/order-workspace/drafts:
     $ref: ./sales/admin-order-drafts.openapi.yaml#/paths/~1api~1admin~1order-workspace~1drafts
   /api/admin/order-workspace/drafts/{draftId}:

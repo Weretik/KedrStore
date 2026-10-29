@@ -16,7 +16,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
         var hash = Hash(JsonSerializer.Serialize(new
         {
             title = request.Title.Trim(), note = request.Note?.Trim(), customer = request.CounterpartyId.Trim(),
-            lines = request.Lines.Select(x => new { x.ProductId, x.Quantity })
+            lines = request.Lines.Select(x => new { x.ProductId, x.Quantity, adjustment = x.PriceAdjustment.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) })
         }));
         var existing = await db.OrderDraftIdempotencyRecords.AsNoTracking()
             .SingleOrDefaultAsync(x => x.IdempotencyKey == key, ct);
@@ -33,7 +33,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
         var quote = await pricing.QuoteAsync(new WorkspaceQuoteRequest(request.CounterpartyId, request.Lines), ct);
         var now = DateTimeOffset.UtcNow;
         var draft = OrderDraft.Create(request.Title, request.Note, quote.CounterpartyId,
-            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity)), now);
+            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity, x.PriceAdjustment)), now);
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         db.OrderDrafts.Add(draft);
         await db.SaveChangesAsync(ct);
@@ -73,7 +73,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
         CheckVersion(draft.Version, version);
         var quote = await ValidateDraftAsync(request, ct);
         draft.Update(request.Title, request.Note, quote.CounterpartyId,
-            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity)), DateTimeOffset.UtcNow);
+            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity, x.PriceAdjustment)), DateTimeOffset.UtcNow);
         try { await db.SaveChangesAsync(ct); }
         catch (DbUpdateConcurrencyException)
         {

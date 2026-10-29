@@ -45,7 +45,8 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         var rows = await query.Skip((page - 1) * pageSize).Take(pageSize)
             .Select(x => new WorkspaceOrderListItem(x.order.Id.Value, x.order.OrderNumber,
                 x.order.CounterpartyId, x.customer.Name, x.order.CreatedAt,
-                x.order.Lines.Count, x.order.Lines.Sum(y => y.Amount), x.sync.Status.ToString()))
+                x.order.Lines.Count, x.order.Lines.Sum(y => y.Amount), x.sync.Status.ToString(),
+                x.order.Lines.Sum(y => y.PriceAdjustment * y.Quantity)))
             .ToListAsync(ct);
         return new WorkspacePage<WorkspaceOrderListItem>(PageInfo(page, pageSize, count), rows);
     }
@@ -63,7 +64,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         if (row is null) return null;
         var stored = await db.OrderLines.AsNoTracking()
             .Where(x => EF.Property<OrderId>(x, "OrderId") == id)
-            .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId, x.ProductName, x.Quantity, x.Amount))
+            .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId, x.ProductName, x.Quantity, x.Amount, x.PriceAdjustment))
             .ToArrayAsync(ct);
         return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId,
             row.customer.Name, row.order.CreatedAt, row.order.Comment, stored,

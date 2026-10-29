@@ -159,6 +159,13 @@ components:
       properties:
         productId: { type: string, minLength: 1, maxLength: 64 }
         quantity: { type: integer, minimum: 1 }
+        priceAdjustment:
+          type: number
+          multipleOf: 0.01
+          minimum: -1000000
+          maximum: 1000000
+          default: 0
+          description: Per-unit discount (negative) or markup (positive) in UAH, kept with the draft.
     DraftDetail:
       type: object
       required: [draftId, version, title, counterpartyId, counterpartyName, createdAtUtc, updatedAtUtc, lines, totalAmount, pricingStatus]
@@ -177,10 +184,12 @@ components:
         pricingErrorCode: { type: [string, 'null'], description: Safe reason when current pricing is unavailable. }
     DraftQuotedLine:
       type: object
-      required: [productId, productName, quantity, unitPrice, lineAmount]
+      required: [productId, productName, quantity, unitPrice, lineAmount, priceAdjustment, baseUnitPrice]
       properties:
         productId: { type: string, maxLength: 64 }
         productName: { type: [string, 'null'], maxLength: 512 }
         quantity: { type: integer, minimum: 1 }
-        unitPrice: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }
+        unitPrice: { type: [number, 'null'], multipleOf: 0.01, minimum: 0, description: Final unit price after the adjustment. }
         lineAmount: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }
+        priceAdjustment: { type: number, multipleOf: 0.01, description: Stored per-unit discount (negative) or markup (positive) in UAH. }
+        baseUnitPrice: { type: [number, 'null'], multipleOf: 0.01, minimum: 0, description: Current customer price before the adjustment. }

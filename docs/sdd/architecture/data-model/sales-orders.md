@@ -5,12 +5,12 @@
 | Table | PK | Purpose and important fields |
 | --- | --- | --- |
 | `Orders` | `Id` | Order: `CounterpartyId` (FK), `OrderNumber`, `CreatedAt`, `Comment`. |
-| `OrderLines` | `Id` | Lines: `OrderId` (FK), `ProductId`, `ProductName`, `Quantity`, `Amount`. |
+| `OrderLines` | `Id` | Lines: `OrderId` (FK), `ProductId`, `ProductName`, `Quantity`, `Amount` (final, including any adjustment), `PriceAdjustment` (UAH per unit, discount < 0, markup > 0, default 0). |
 | `OneCOrderSyncs` | `Id` | 1C delivery state; `OrderId` (FK). |
 | `OrderIdempotencyRecords` | `Id` | Request key and hash; `OrderId` (FK). |
 | `OrderSyncRetryAudits` | `Id` | Retry audit: `OneCOrderSyncId` (FK), `OrderId`, previous state and reason. |
 | `OrderDrafts` | `Id` | Separate saved drafts: `CounterpartyId` (FK), `Title`, `Note`, `Version`, creation/update times; no Order number. |
-| `OrderDraftLines` | `Id` | Lines: `DraftId` (FK), `ProductId`, positive `Quantity`; `DraftId/ProductId` pair is unique. |
+| `OrderDraftLines` | `Id` | Lines: `DraftId` (FK), `ProductId`, positive `Quantity`, `PriceAdjustment` (UAH per unit, default 0); `DraftId/ProductId` pair is unique. |
 | `OrderDraftIdempotencyRecords` | `Id` | Draft creation request key and hash, `DraftId` (FK). |
 
 ```mermaid

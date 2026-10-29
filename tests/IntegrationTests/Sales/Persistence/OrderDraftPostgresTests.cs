@@ -17,7 +17,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
-        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 2), OrderDraftLine.Create("102", 1)]);
+        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 2, -50.25m), OrderDraftLine.Create("102", 1)]);
 
         await using var db = postgres.CreateContext();
         var draft = await db.OrderDrafts.AsNoTracking().Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
@@ -25,8 +25,8 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         Assert.Equal("Draft", draft.Title);
         Assert.Equal(CounterpartyId, draft.CounterpartyId);
         Assert.Equal(32, draft.Version.Length);
-        Assert.Equal([("101", 2), ("102", 1)],
-            draft.Lines.OrderBy(x => x.ProductId).Select(x => (x.ProductId, x.Quantity)));
+        Assert.Equal([("101", 2, -50.25m), ("102", 1, 0m)],
+            draft.Lines.OrderBy(x => x.ProductId).Select(x => (x.ProductId, x.Quantity, x.PriceAdjustment)));
     }
 
     [SkippableFact]
