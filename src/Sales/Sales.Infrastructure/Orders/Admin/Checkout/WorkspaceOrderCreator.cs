@@ -20,7 +20,7 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         var hash = Hash(JsonSerializer.Serialize(new
         {
             customer = request.CounterpartyId?.Trim(),
-            lines = request.Lines?.Select(x => new { product = x.ProductId.Trim(), x.Quantity }).ToArray(),
+            lines = request.Lines?.Select(x => new { product = x.ProductId.Trim(), x.Quantity, adjustment = x.PriceAdjustment.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) }).ToArray(),
             fingerprint = request.QuoteFingerprint,
             comment = request.Comment?.Trim()
         }));
@@ -42,7 +42,7 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
             return (null!, false, new WorkspaceOrderConflict("quote_changed", quote));
         var now = DateTimeOffset.UtcNow;
         var order = Order.Create(await numberGenerator.GenerateAsync(now, ct), quote.CounterpartyId,
-            request.Comment, quote.Lines.Select(x => OrderLine.Create(x.ProductId, x.ProductName, x.Quantity, x.LineAmount)), now);
+            request.Comment, quote.Lines.Select(x => OrderLine.Create(x.ProductId, x.ProductName, x.Quantity, x.LineAmount, x.PriceAdjustment)), now);
         try
         {
             await orderStore.PersistAsync(order,

@@ -3,6 +3,7 @@ using Sales.Application.Contracts.Orders;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.Quote;
+using Sales.Application.Features.Orders.AdminWorkspace.Orders.CustomerPrices;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.Create;
 using Sales.Application.Features.Orders.AdminWorkspace.Drafts.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Drafts.GetById;
@@ -44,6 +45,13 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
     public async Task<ActionResult> Quote([FromBody] WorkspaceQuoteRequest request, CancellationToken cancellationToken)
     {
         try { return Ok((await sender.Send(new QuoteWorkspaceOrderQuery(request), cancellationToken)).Value); }
+        catch (WorkspaceException error) { return Error(error); }
+    }
+
+    [HttpPost("customer-prices", Name = "getAdminWorkspaceCustomerPrices")]
+    public async Task<ActionResult> CustomerPrices([FromBody] WorkspaceCustomerPricesRequest request, CancellationToken cancellationToken)
+    {
+        try { return Ok((await sender.Send(new GetWorkspaceCustomerPricesQuery(request), cancellationToken)).Value); }
         catch (WorkspaceException error) { return Error(error); }
     }
 

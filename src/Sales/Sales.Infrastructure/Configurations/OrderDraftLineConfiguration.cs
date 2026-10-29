@@ -17,6 +17,7 @@ internal sealed class OrderDraftLineConfiguration : IEntityTypeConfiguration<Ord
             .HasColumnType("bigint");
         builder.Property(line => line.ProductId).HasMaxLength(64).IsRequired();
         builder.Property(line => line.Quantity).IsRequired();
+        builder.Property(line => line.PriceAdjustment).HasPrecision(18, 2).IsRequired();
         builder.HasIndex("DraftId", nameof(OrderDraftLine.ProductId)).IsUnique();
         builder.ToTable(table => table.HasCheckConstraint("CK_OrderDraftLines_Quantity", "\"Quantity\" > 0"));
     }

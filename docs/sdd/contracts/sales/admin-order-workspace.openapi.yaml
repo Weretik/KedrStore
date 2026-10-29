@@ -100,7 +100,10 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Quote' }
         '400':
-          description: Invalid lines, insufficient product stock or unavailable UAH price.
+          description: >-
+            Invalid lines (invalid_lines), invalid price adjustment (invalid_price_adjustment), insufficient stock
+            (unavailable_product), unavailable UAH price (unavailable_price) or a discount larger than the price
+            (negative_price).
           content:
             application/json:
               schema:
@@ -112,9 +115,39 @@ paths:
         '404': { description: Selected customer or product does not exist. }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/order-workspace/customer-prices:
+    post:
+      operationId: getAdminWorkspaceCustomerPrices
+      summary: Read a customer's unit prices for products, ignoring stock
+      description: >-
+        Uses the price type of the nearest customer rule on the product's category or any parent category,
+        otherwise the customer's default price type. A product without such a UAH price, or an unknown product,
+        returns a null unitPrice.
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CustomerPricesRequest' }
+      responses:
+        '200':
+          description: Customer prices in the requested product order, duplicates removed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomerPrices' }
+        '400': { description: Missing customer or 1-100 valid product IDs not supplied (code invalid_products). }
+        '404': { description: Selected customer does not exist. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
 components:
   schemas:
     Money: { type: number, multipleOf: 0.01, minimum: 0 }
+    PriceAdjustment:
+      type: number
+      multipleOf: 0.01
+      minimum: -1000000
+      maximum: 1000000
+      description: Per-unit discount (negative) or markup (positive) in UAH applied on top of the customer price.
     PagedInfo:
       type: object
       required: [pageNumber, pageSize, totalPages, totalRecords]
@@ -131,7 +164,7 @@ components:
         value: { type: array, items: { $ref: '#/components/schemas/OrderListItem' } }
     OrderListItem:
       type: object
-      required: [orderId, orderNumber, counterpartyId, counterpartyName, createdAtUtc, lineCount, totalAmount, syncStatus]
+      required: [orderId, orderNumber, counterpartyId, counterpartyName, createdAtUtc, lineCount, totalAmount, syncStatus, adjustmentAmount]
       properties:
         orderId: { type: integer, format: int64, minimum: 1 }
         orderNumber: { type: string, maxLength: 64 }
@@ -141,6 +174,10 @@ components:
         lineCount: { type: integer, minimum: 1 }
         totalAmount: { $ref: '#/components/schemas/Money' }
         syncStatus: { type: string }
+        adjustmentAmount:
+          type: number
+          multipleOf: 0.01
+          description: Sum of discounts (negative) and markups (positive) over all units; 0 when none.
     OrderDetail:
       type: object
       required: [orderId, orderNumber, counterpartyId, counterpartyName, createdAtUtc, lines, totalAmount, syncStatus]
@@ -157,18 +194,22 @@ components:
         oneCDocumentNumber: { type: [string, 'null'] }
     StoredLine:
       type: object
-      required: [productId, productName, quantity, amount]
+      required: [productId, productName, quantity, amount, priceAdjustment]
       properties:
         productId: { type: string, maxLength: 64 }
         productName: { type: string, maxLength: 512 }
         quantity: { type: integer, minimum: 1 }
         amount: { $ref: '#/components/schemas/Money' }
+        priceAdjustment: { $ref: '#/components/schemas/PriceAdjustment' }
     InputLine:
       type: object
       required: [productId, quantity]
       properties:
         productId: { type: string, minLength: 1, maxLength: 64 }
         quantity: { type: integer, minimum: 1 }
+        priceAdjustment:
+          allOf: [{ $ref: '#/components/schemas/PriceAdjustment' }]
+          default: 0
     QuoteRequest:
       type: object
       required: [counterpartyId, lines]
@@ -177,13 +218,15 @@ components:
         lines: { type: array, minItems: 1, maxItems: 100, items: { $ref: '#/components/schemas/InputLine' } }
     QuoteLine:
       type: object
-      required: [productId, productName, quantity, unitPrice, lineAmount]
+      required: [productId, productName, quantity, unitPrice, lineAmount, baseUnitPrice, priceAdjustment]
       properties:
         productId: { type: string, maxLength: 64 }
         productName: { type: string, maxLength: 512 }
         quantity: { type: integer, minimum: 1 }
         unitPrice: { $ref: '#/components/schemas/Money' }
         lineAmount: { $ref: '#/components/schemas/Money' }
+        baseUnitPrice: { $ref: '#/components/schemas/Money' }
+        priceAdjustment: { $ref: '#/components/schemas/PriceAdjustment' }
     Quote:
       type: object
       required: [counterpartyId, lines, totalAmount, quoteFingerprint]
@@ -217,3 +260,22 @@ components:
           oneOf:
             - { $ref: '#/components/schemas/Quote' }
             - { type: 'null' }
+    CustomerPricesRequest:
+      type: object
+      required: [counterpartyId, productIds]
+      properties:
+        counterpartyId: { type: string, minLength: 1, maxLength: 64 }
+        productIds: { type: array, minItems: 1, maxItems: 100, items: { type: string, minLength: 1, maxLength: 10 } }
+    CustomerPrices:
+      type: object
+      required: [counterpartyId, prices]
+      properties:
+        counterpartyId: { type: string, maxLength: 64 }
+        prices:
+          type: array
+          items:
+            type: object
+            required: [productId, unitPrice]
+            properties:
+              productId: { type: string, maxLength: 64 }
+              unitPrice: { type: [number, 'null'], multipleOf: 0.01, minimum: 0 }

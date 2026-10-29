@@ -7,21 +7,35 @@ using Sales.Application.Contracts.Orders;
 
 namespace Sales.Infrastructure.Orders;
 
-internal sealed class AdminWorkspacePricing(SalesDbContext salesDb, IReadCatalogDbContext catalogDb) : IWorkspacePricing
+internal sealed class AdminWorkspacePricing(IReadCatalogDbContext catalogDb, CustomerPriceResolver prices) : IWorkspacePricing
 {
+    /// <summary>Largest per-unit discount or markup, in UAH, a manager may enter.</summary>
+    internal const decimal MaxPriceAdjustment = 1_000_000m;
+
+    internal static bool TryParseProductId(string? value, out int id)
+    {
+        id = 0;
+        return value is not null &&
+               int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out id) &&
+               id is >= 1 and <= 1_000_000_000 &&
+               value == id.ToString(CultureInfo.InvariantCulture);
+    }
+
     internal static void ValidateRequest(WorkspaceQuoteRequest? request)
     {
         if (request is null ||
             string.IsNullOrWhiteSpace(request.CounterpartyId) ||
             request.CounterpartyId.Trim().Length > 64 ||
             request.Lines is null || request.Lines.Count is < 1 or > 100 ||
-            request.Lines.Any(x => x is null || x.Quantity < 1 ||
-                !int.TryParse(x.ProductId, NumberStyles.None, CultureInfo.InvariantCulture, out var id) ||
-                id is < 1 or > 1_000_000_000 ||
-                x.ProductId != id.ToString(CultureInfo.InvariantCulture)) ||
+            request.Lines.Any(x => x is null || x.Quantity < 1 || !TryParseProductId(x.ProductId, out _)) ||
             request.Lines.Select(x => x.ProductId).Distinct(StringComparer.Ordinal).Count() != request.Lines.Count)
             throw new WorkspaceException(400, "invalid_lines", "Supply a customer and 1-100 unique products with positive quantities.");
+        if (request.Lines.Any(x => Math.Abs(x.PriceAdjustment) > MaxPriceAdjustment ||
+                                   decimal.Round(x.PriceAdjustment, 2) != x.PriceAdjustment))
+            throw new WorkspaceException(400, "invalid_price_adjustment",
+                "Знижка або націнка має бути сумою в гривнях з точністю до копійки.");
     }
+
     internal async Task<IReadOnlyList<WorkspaceDraftQuotedLine>> DescribeDraftLinesAsync(
         IReadOnlyCollection<OrderDraftLine> lines, CancellationToken ct)
     {
@@ -36,64 +50,49 @@ internal sealed class AdminWorkspacePricing(SalesDbContext salesDb, IReadCatalog
             string? name = null;
             if (int.TryParse(x.ProductId, out var id))
                 products.TryGetValue(id, out name);
-            return new WorkspaceDraftQuotedLine(x.ProductId, name, x.Quantity, null, null);
+            return new WorkspaceDraftQuotedLine(x.ProductId, name, x.Quantity, null, null, x.PriceAdjustment, null);
         }).ToArray();
     }
+
+    public Task<WorkspaceCustomerPrices> GetCustomerPricesAsync(WorkspaceCustomerPricesRequest request, CancellationToken ct)
+        => prices.GetCustomerPricesAsync(request, ct);
 
     public async Task<WorkspaceQuote> QuoteAsync(WorkspaceQuoteRequest request, CancellationToken ct)
     {
         ValidateRequest(request);
 
         var counterpartyId = request.CounterpartyId.Trim();
-        var customer = await salesDb.Counterparties.AsNoTracking()
-            .Where(x => x.Id == counterpartyId && !x.IsDeleted)
-            .Select(x => new { x.Id, x.DefaultPriceTypeId })
-            .SingleOrDefaultAsync(ct);
-        if (customer is null)
-            throw new WorkspaceException(404, "customer_not_found", "Customer does not exist.");
-
-        var rules = await salesDb.CounterpartyCategoryPriceTypes.AsNoTracking()
-            .Where(x => x.CounterpartyId == counterpartyId)
-            .Select(x => new { x.CategoryId, x.PriceTypeId })
-            .ToListAsync(ct);
         var ids = request.Lines.Select(x => int.Parse(x.ProductId, CultureInfo.InvariantCulture)).ToArray();
-        var productIds = ids.Select(ProductId.From).ToArray();
-        var products = await catalogDb.Products.AsNoTracking()
-            .Where(x => productIds.Contains(x.Id))
-            .Select(x => new { x.Id, x.Name, x.CategoryId, x.Stock })
-            .ToListAsync(ct);
+        var products = await prices.ResolveAsync(counterpartyId, ids, ct);
         if (products.Count != ids.Length)
             throw new WorkspaceException(404, "product_not_found", "Product does not exist.");
-
-        var prices = await catalogDb.ProductPrices.AsNoTracking()
-            .Where(x => productIds.Contains(x.ProductId))
-            .Select(x => new { x.ProductId, x.PriceTypeId, x.Amount, x.CurrencyIso })
-            .ToListAsync(ct);
 
         var quoteLines = new List<WorkspaceQuoteLine>(request.Lines.Count);
         foreach (var line in request.Lines)
         {
-            var productId = int.Parse(line.ProductId, CultureInfo.InvariantCulture);
-            var product = products.Single(x => x.Id.Value == productId);
+            var product = products[int.Parse(line.ProductId, CultureInfo.InvariantCulture)];
             if (product.Stock < line.Quantity)
                 throw new WorkspaceException(400, "unavailable_product",
                     $"Недостатньо товару «{product.Name}» на складі: доступно {product.Stock}, потрібно {line.Quantity}.");
-            var typeId = rules.FirstOrDefault(x => x.CategoryId == product.CategoryId.Value)?.PriceTypeId
-                ?? customer.DefaultPriceTypeId;
-            var price = prices.FirstOrDefault(x => x.ProductId.Value == productId && x.PriceTypeId.Value == typeId);
-            if (price is null || price.CurrencyIso != "UAH")
+            if (product.UnitPrice is not { } basePrice)
                 throw new WorkspaceException(400, "unavailable_price", "A UAH price is unavailable for a product.");
+            var unitPrice = basePrice + line.PriceAdjustment;
+            if (unitPrice < 0m)
+                throw new WorkspaceException(400, "negative_price",
+                    $"Знижка для «{product.Name}» більша за ціну: ціна {basePrice:0.00} ₴, знижка {-line.PriceAdjustment:0.00} ₴.");
             decimal lineAmount;
-            try { lineAmount = checked(price.Amount * line.Quantity); }
+            try { lineAmount = checked(unitPrice * line.Quantity); }
             catch (OverflowException) { throw new WorkspaceException(400, "amount_overflow", "The order amount is too large."); }
-            quoteLines.Add(new WorkspaceQuoteLine(line.ProductId, product.Name, line.Quantity, price.Amount, lineAmount));
+            quoteLines.Add(new WorkspaceQuoteLine(line.ProductId, product.Name, line.Quantity, unitPrice, lineAmount,
+                basePrice, line.PriceAdjustment));
         }
 
         decimal total;
         try { total = quoteLines.Aggregate(0m, (sum, line) => checked(sum + line.LineAmount)); }
         catch (OverflowException) { throw new WorkspaceException(400, "amount_overflow", "The order amount is too large."); }
         var canonical = string.Join("|", quoteLines.OrderBy(x => x.ProductId, StringComparer.Ordinal)
-            .Select(x => $"{x.ProductId}:{x.Quantity}:{x.UnitPrice.ToString(CultureInfo.InvariantCulture)}"));
+            .Select(x => string.Create(CultureInfo.InvariantCulture,
+                $"{x.ProductId}:{x.Quantity}:{x.BaseUnitPrice:0.00##}:{x.PriceAdjustment:0.00}")));
         var fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"{counterpartyId}|{canonical}")));
         return new WorkspaceQuote(counterpartyId, quoteLines, total, fingerprint);
     }

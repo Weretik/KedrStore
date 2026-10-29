@@ -283,6 +283,10 @@ namespace Sales.Infrastructure.Migrations
                     b.Property<long>("DraftId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("PriceAdjustment")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<string>("ProductId")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -316,6 +320,10 @@ namespace Sales.Infrastructure.Migrations
 
                     b.Property<long>("OrderId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("PriceAdjustment")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("ProductId")
                         .IsRequired()

@@ -22,5 +22,6 @@ public sealed class OrderLineConfiguration : IEntityTypeConfiguration<OrderLine>
         builder.Property(line => line.ProductName).HasMaxLength(512).IsRequired();
         builder.Property(line => line.Quantity).IsRequired();
         builder.Property(line => line.Amount).HasPrecision(18, 2).IsRequired();
+        builder.Property(line => line.PriceAdjustment).HasPrecision(18, 2).IsRequired();
     }
 }

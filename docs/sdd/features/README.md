@@ -17,7 +17,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 ## Sales
 
 - [Manager orders and 1C](sales/admin-orders.md) — order creation, reading, synchronization status, and retry.
-- [Admin order workspace](sales/admin-order-workspace.md) — separate protected operations for search, server-side quoting, checkout, and saved drafts in React Admin.
+- [Admin order workspace](sales/admin-order-workspace.md) — separate protected operations for search, customer prices, server-side quoting with per-unit discounts and markups, checkout, and saved drafts in React Admin.
 - [Customers and counterparties](sales/customers.md) — Admin counterparty list and details, local synchronization with 1C.
 - [Manager catalog](sales/manager-catalog.md) — authorized sales product list.
 
