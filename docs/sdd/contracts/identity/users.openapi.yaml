@@ -83,7 +83,7 @@ paths:
         '204': { description: Password set }
         '400': { description: Password too short or too weak }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator, or the target is an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
   /api/admin/users/{userId}/name:
     put:
@@ -102,7 +102,7 @@ paths:
         '204': { description: Name changed }
         '400': { description: Empty or longer than 100 characters }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator, or the target is an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
   /api/admin/users/{userId}/email:
     put:
@@ -121,7 +121,7 @@ paths:
         '204': { description: Email changed }
         '400': { description: Invalid email }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator, or the target is an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
         '409': { description: Email already used }
   /api/admin/users/{userId}/avatar:
@@ -139,9 +139,9 @@ paths:
         content: { multipart/form-data: { schema: { $ref: './profile.openapi.yaml#/components/schemas/AvatarUploadForm' } } }
       responses:
         '200': { description: Stored, content: { application/json: { schema: { $ref: './profile.openapi.yaml#/components/schemas/AvatarResponse' } } } }
-        '400': { description: Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB }
+        '400': { description: 'Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB' }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator, or the target is an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
         '413': { description: Request body over the upload limit }
         '503': { description: Avatar storage is not configured }
@@ -156,7 +156,7 @@ paths:
       responses:
         '204': { description: Removed (also when there was none) }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator, or the target is an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
 components:
   securitySchemes:

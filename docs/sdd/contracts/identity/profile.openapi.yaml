@@ -44,7 +44,7 @@ paths:
         content: { multipart/form-data: { schema: { $ref: '#/components/schemas/AvatarUploadForm' } } }
       responses:
         '200': { description: Stored, content: { application/json: { schema: { $ref: '#/components/schemas/AvatarResponse' } } } }
-        '400': { description: Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB }
+        '400': { description: 'Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB' }
         '401': { description: Not signed in }
         '403': { description: Not a staff account }
         '413': { description: Request body over the upload limit }
