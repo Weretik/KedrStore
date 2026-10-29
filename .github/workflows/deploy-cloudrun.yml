@@ -140,7 +140,7 @@ jobs:
             --region "${{ env.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,TrustedProxy__SharedSecret=api-proxy-shared-secret:latest" \
+            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,TrustedProxy__SharedSecret=api-proxy-shared-secret:latest,AvatarStorage__Ftp__Password=cdn-avatars-ftp-password:latest" \
             --quiet
 
       - name: Update Cloud Run Jobs to new image

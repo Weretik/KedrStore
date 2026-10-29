@@ -1,10 +1,12 @@
 using System.Net.Http.Json;
 using Identity.Domain.Authorization;
+using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Entities;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationTests.Identity.Api;
@@ -12,7 +14,8 @@ namespace IntegrationTests.Identity.Api;
 /// <summary>
 /// The real API over the Identity test database. Clients keep cookies like a browser.
 /// </summary>
-internal sealed class IdentityApiFactory(IdentityPostgresFixture fixture) : WebApplicationFactory<Program>
+internal sealed class IdentityApiFactory(IdentityPostgresFixture fixture, IAvatarStorage? avatarStorage = null)
+    : WebApplicationFactory<Program>
 {
     public const string Password = "Staff-Password-1";
 
@@ -20,6 +23,11 @@ internal sealed class IdentityApiFactory(IdentityPostgresFixture fixture) : WebA
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Default", fixture.ConnectionString);
+        builder.UseSetting("AvatarStorage:PublicBaseUrl", "https://cdn.test");
+        if (avatarStorage is not null)
+        {
+            builder.ConfigureTestServices(services => services.AddSingleton(avatarStorage));
+        }
     }
 
     public HttpClient CreateBrowserClient() =>

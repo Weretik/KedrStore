@@ -17,7 +17,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminCustomersController` | `/api/admin/customers` | `CanManageOrders` |
 | `AdminProductsController` | `/api/admin/products` | `CanManageProducts` |
 | `AdminCategoriesController` | `/api/categories` | `CanManageProducts` |
-| `AdminUsersController` | `/api/admin/users` | `CanManageUsers` |
+| `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
+| `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |

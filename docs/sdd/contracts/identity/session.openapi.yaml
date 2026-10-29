@@ -115,3 +115,4 @@ components:
         email: { type: string, format: email }
         fullName: { type: string }
         roles: { type: array, items: { type: string, enum: [Admin, Manager, User] } }
+        avatarUrl: { type: [string, 'null'], format: uri, description: 'Public 256×256 WebP avatar on the CDN; null when the user has none' }

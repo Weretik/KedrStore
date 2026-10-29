@@ -72,7 +72,7 @@ paths:
       summary: Set a new password for a staff account
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Ends the account's existing sessions.
+      description: Managers only; ends the account's existing sessions. An administrator account (including the caller's) returns 403 — administrators change their own password in the profile.
       parameters:
         - $ref: '#/components/parameters/UserId'
         - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
@@ -83,7 +83,80 @@ paths:
         '204': { description: Password set }
         '400': { description: Password too short or too weak }
         '401': { description: Not signed in }
-        '403': { description: Not an administrator }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
+        '404': { description: No staff account with this ID }
+  /api/admin/users/{userId}/name:
+    put:
+      operationId: changeStaffName
+      summary: Change a manager's name
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Managers only; an administrator target returns 403.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: './profile.openapi.yaml#/components/schemas/ChangeNameRequest' } } }
+      responses:
+        '204': { description: Name changed }
+        '400': { description: Empty or longer than 100 characters }
+        '401': { description: Not signed in }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
+        '404': { description: No staff account with this ID }
+  /api/admin/users/{userId}/email:
+    put:
+      operationId: changeStaffEmail
+      summary: Change a manager's sign-in email
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Managers only. Ends the manager's sessions (mobile at once, browser within 5 minutes).
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [email], properties: { email: { type: string, format: email, maxLength: 256 } } } } }
+      responses:
+        '204': { description: Email changed }
+        '400': { description: Invalid email }
+        '401': { description: Not signed in }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
+        '404': { description: No staff account with this ID }
+        '409': { description: Email already used }
+  /api/admin/users/{userId}/avatar:
+    put:
+      operationId: uploadStaffAvatar
+      summary: Upload a manager's avatar
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Managers only. Same limits as `uploadMyAvatar`.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { multipart/form-data: { schema: { $ref: './profile.openapi.yaml#/components/schemas/AvatarUploadForm' } } }
+      responses:
+        '200': { description: Stored, content: { application/json: { schema: { $ref: './profile.openapi.yaml#/components/schemas/AvatarResponse' } } } }
+        '400': { description: 'Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB' }
+        '401': { description: Not signed in }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
+        '404': { description: No staff account with this ID }
+        '413': { description: Request body over the upload limit }
+        '503': { description: Avatar storage is not configured }
+    delete:
+      operationId: removeStaffAvatar
+      summary: Remove a manager's avatar
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      responses:
+        '204': { description: Removed (also when there was none) }
+        '401': { description: Not signed in }
+        '403': { description: 'Not an administrator, or the target is an administrator' }
         '404': { description: No staff account with this ID }
 components:
   securitySchemes:
@@ -106,6 +179,7 @@ components:
         fullName: { type: string }
         role: { $ref: '#/components/schemas/StaffRole' }
         isBlocked: { type: boolean }
+        avatarUrl: { type: [string, 'null'], format: uri, description: Public avatar URL; null when the account has none }
     CreateStaffAccountRequest:
       type: object
       required: [email, fullName, role, password]

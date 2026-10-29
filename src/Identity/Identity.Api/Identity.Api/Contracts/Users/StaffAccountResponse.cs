@@ -7,8 +7,9 @@ public sealed record StaffAccountResponse(
     string Email,
     string FullName,
     string Role,
-    bool IsBlocked)
+    bool IsBlocked,
+    string? AvatarUrl)
 {
     public static StaffAccountResponse From(StaffAccountDto dto) =>
-        new(dto.Id, dto.Email, dto.FullName, dto.Role, dto.IsBlocked);
+        new(dto.Id, dto.Email, dto.FullName, dto.Role, dto.IsBlocked, dto.AvatarUrl);
 }

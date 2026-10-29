@@ -78,6 +78,22 @@ paths:
     $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1blocked
   /api/admin/users/{userId}/password:
     $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1password
+  /api/admin/users/{userId}/name:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1name
+  /api/admin/users/{userId}/email:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1email
+  /api/admin/users/{userId}/avatar:
+    $ref: ./identity/users.openapi.yaml#/paths/~1api~1admin~1users~1{userId}~1avatar
+  /api/profile:
+    $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile
+  /api/profile/name:
+    $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile~1name
+  /api/profile/avatar:
+    $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile~1avatar
+  /api/profile/email:
+    $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile~1email
+  /api/profile/password:
+    $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile~1password
   /api/sales/{lang}/catalog/products:
     $ref: ./sales/catalog.openapi.yaml#/paths/~1api~1sales~1{lang}~1catalog~1products
 components:

@@ -1,3 +1,4 @@
+using Identity.Infrastructure.Avatars;
 using Identity.Application.Features.Auth.SessionMe.DTOs;
 using Identity.Application.Services;
 using Identity.Infrastructure.Entities;
@@ -7,6 +8,7 @@ namespace Identity.Infrastructure.Services.Sessions;
 public sealed class CookieSessionService(
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
+    AvatarUrlBuilder avatarUrlBuilder,
     ILogger<CookieSessionService> logger) : ICookieSessionService
 {
     public async Task<SessionMeResult?> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -35,7 +37,7 @@ public sealed class CookieSessionService(
 
         var roles = await userManager.GetRolesAsync(user);
         logger.LogInformation("AUDIT: Cookie login success for userId {UserId}", user.Id);
-        return new SessionMeResult(user.Id.ToString(), user.Email ?? string.Empty, user.FullName, roles.ToArray());
+        return new SessionMeResult(user.Id.ToString(), user.Email ?? string.Empty, user.FullName, roles.ToArray(), avatarUrlBuilder.Build(user.AvatarPath));
     }
 
     public async Task SignOutAsync(CancellationToken cancellationToken = default)
