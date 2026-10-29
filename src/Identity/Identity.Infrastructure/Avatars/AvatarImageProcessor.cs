@@ -15,6 +15,8 @@ public sealed class AvatarImageProcessor
     public const string TooSmallMessage = "The photo must be at least 128×128 pixels.";
     public const string TooManyPixelsMessage = "The photo resolution is too high (more than 24 megapixels).";
 
+    public const string FileField = "file";
+
     private const int WebpQuality = 85;
 
     private static readonly SKEncodedImageFormat[] SupportedFormats =
@@ -127,6 +129,7 @@ public sealed class AvatarImageProcessor
         return surface.Snapshot();
     }
 
+    // The identifier names the multipart field, so clients can show the message next to the file picker.
     private static Result<byte[]> Invalid(string message) =>
-        Result<byte[]>.Invalid(new ValidationError(message));
+        Result<byte[]>.Invalid(new ValidationError(FileField, message, null, ValidationSeverity.Error));
 }

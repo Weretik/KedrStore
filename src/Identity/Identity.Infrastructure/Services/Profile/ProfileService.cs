@@ -76,7 +76,7 @@ public sealed class ProfileService(
 
         if (!await IsCurrentPasswordAsync(user, currentPassword))
         {
-            return Result.Invalid(new ValidationError(WrongPasswordMessage));
+            return WrongPassword();
         }
 
         var changed = await emailWriter.ChangeAsync(user, email);
@@ -100,7 +100,7 @@ public sealed class ProfileService(
 
         if (!await IsCurrentPasswordAsync(user, currentPassword))
         {
-            return Result.Invalid(new ValidationError(WrongPasswordMessage));
+            return WrongPassword();
         }
 
         var changed = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
@@ -140,6 +140,9 @@ public sealed class ProfileService(
         var principal = httpContextAccessor.HttpContext?.User;
         return principal is null ? null : await userManager.GetUserAsync(principal);
     }
+
+    private static Result WrongPassword() =>
+        Result.Invalid(new ValidationError("currentPassword", WrongPasswordMessage, null, ValidationSeverity.Error));
 
     private static Result Invalid(IdentityResult result) =>
         Result.Invalid(result.Errors.Select(error => new ValidationError(error.Description)).ToList());
