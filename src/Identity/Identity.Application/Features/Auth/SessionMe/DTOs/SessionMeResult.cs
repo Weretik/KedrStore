@@ -4,4 +4,5 @@ public sealed record SessionMeResult(
     string UserId,
     string Email,
     string FullName,
-    IReadOnlyList<string> Roles);
+    IReadOnlyList<string> Roles,
+    string? AvatarUrl = null);

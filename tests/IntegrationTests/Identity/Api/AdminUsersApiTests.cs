@@ -120,10 +120,11 @@ public sealed class AdminUsersApiTests(IdentityPostgresFixture fixture)
         using var adminClient = factory.CreateBrowserClient();
         await IdentityApiFactory.CookieLoginAsync(adminClient, admin.Email!);
 
-        using var role = await adminClient.PutAsJsonAsync($"/api/admin/users/{manager.Id}/role", new { role = RoleNames.Admin });
-        Assert.Equal(HttpStatusCode.NoContent, role.StatusCode);
+        // A password is set for managers only, so it comes before the promotion.
         using var password = await adminClient.PutAsJsonAsync($"/api/admin/users/{manager.Id}/password", new { password = "Changed-Pass-1" });
         Assert.Equal(HttpStatusCode.NoContent, password.StatusCode);
+        using var role = await adminClient.PutAsJsonAsync($"/api/admin/users/{manager.Id}/role", new { role = RoleNames.Admin });
+        Assert.Equal(HttpStatusCode.NoContent, role.StatusCode);
 
         using var promotedClient = factory.CreateBrowserClient();
         await IdentityApiFactory.CookieLoginAsync(promotedClient, manager.Email!, "Changed-Pass-1");

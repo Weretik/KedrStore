@@ -6,8 +6,9 @@ public sealed record SessionMeResponse(
     string UserId,
     string Email,
     string FullName,
-    IReadOnlyList<string> Roles)
+    IReadOnlyList<string> Roles,
+    string? AvatarUrl)
 {
     public static SessionMeResponse From(SessionMeResult result) =>
-        new(result.UserId, result.Email, result.FullName, result.Roles);
+        new(result.UserId, result.Email, result.FullName, result.Roles, result.AvatarUrl);
 }

@@ -4,7 +4,7 @@
 
 | Table | PK | Purpose |
 | --- | --- | --- |
-| `AspNetUsers` | `Id` | Users and credentials. |
+| `AspNetUsers` | `Id` | Users and credentials; `FullName`, `AvatarPath` (CDN file key, nullable). |
 | `AspNetRoles` | `Id` | Roles and access levels. |
 | `AspNetUserRoles` | `UserId`, `RoleId` | User role assignments. |
 | `AspNetUserClaims` | `Id` | User claims (`UserId` FK). |

@@ -8,6 +8,7 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
     {
         builder.ToTable("AspNetUsers");
         builder.Property(x => x.FullName).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.AvatarPath).HasMaxLength(200);
         builder
             .HasMany(x => x.UserRoles)
             .WithOne(x => x.User)

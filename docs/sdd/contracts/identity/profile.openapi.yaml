@@ -1,0 +1,140 @@
+openapi: 3.1.0
+info: { title: KedrStore Staff Profile API, version: 0.1.0 }
+paths:
+  /api/profile:
+    get:
+      operationId: getMyProfile
+      summary: The signed-in staff account's profile
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Policy `RequireManagerRole` (Manager or Admin). Customers get 403.
+      responses:
+        '200': { description: Profile, content: { application/json: { schema: { $ref: '#/components/schemas/ProfileResponse' } } } }
+        '401': { description: Not signed in }
+        '403': { description: Not a staff account }
+  /api/profile/name:
+    put:
+      operationId: changeMyName
+      summary: Change the own name
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ChangeNameRequest' } } }
+      responses:
+        '204': { description: Name changed }
+        '400': { description: Empty or longer than 100 characters }
+        '401': { description: Not signed in }
+        '403': { description: Not a staff account }
+  /api/profile/avatar:
+    put:
+      operationId: uploadMyAvatar
+      summary: Upload the own avatar
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        JPEG, PNG or WebP, at most 2 MB, at least 128×128 px, at most 24 megapixels.
+        The server stores the centre square as a 256×256 WebP under a new name and deletes the previous file.
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { multipart/form-data: { schema: { $ref: '#/components/schemas/AvatarUploadForm' } } }
+      responses:
+        '200': { description: Stored, content: { application/json: { schema: { $ref: '#/components/schemas/AvatarResponse' } } } }
+        '400': { description: Not JPEG/PNG/WebP, smaller than 128×128, over 24 megapixels, or over 2 MB }
+        '401': { description: Not signed in }
+        '403': { description: Not a staff account }
+        '413': { description: Request body over the upload limit }
+        '503': { description: Avatar storage is not configured }
+    delete:
+      operationId: removeMyAvatar
+      summary: Remove the own avatar
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      responses:
+        '204': { description: Removed (also when there was none) }
+        '401': { description: Not signed in }
+        '403': { description: Not a staff account }
+  /api/profile/email:
+    put:
+      operationId: changeMyEmail
+      summary: Change the own sign-in email (administrators)
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        Policy `RequireAdminRole`. Needs the current password; a wrong one counts towards lockout.
+        The calling browser session stays signed in; every other session ends.
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ChangeOwnEmailRequest' } } }
+      responses:
+        '204': { description: Email changed }
+        '400': { description: Invalid email or wrong current password }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '409': { description: Email already used }
+  /api/profile/password:
+    put:
+      operationId: changeMyPassword
+      summary: Change the own password (administrators)
+      tags: [Profile]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        Policy `RequireAdminRole`. Needs the current password. The calling browser session stays signed in;
+        every other session ends.
+      parameters:
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ChangeOwnPasswordRequest' } } }
+      responses:
+        '204': { description: Password changed }
+        '400': { description: Wrong current password or new password too short }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: Opaque }
+    cookieAuth: { type: apiKey, in: cookie, name: __Host-kedr.session }
+  schemas:
+    ProfileResponse:
+      type: object
+      required: [id, email, fullName, role]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        fullName: { type: string }
+        role: { type: string, enum: [Admin, Manager] }
+        avatarUrl: { type: [string, 'null'], format: uri, description: Public 256×256 WebP; null when there is none }
+    ChangeNameRequest:
+      type: object
+      required: [fullName]
+      properties: { fullName: { type: string, minLength: 1, maxLength: 100 } }
+    ChangeOwnEmailRequest:
+      type: object
+      required: [email, currentPassword]
+      properties:
+        email: { type: string, format: email, maxLength: 256 }
+        currentPassword: { type: string, format: password }
+    ChangeOwnPasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword: { type: string, format: password }
+        newPassword: { type: string, format: password, minLength: 8, maxLength: 128 }
+    AvatarUploadForm:
+      type: object
+      required: [file]
+      properties:
+        file: { type: string, format: binary, description: 'image/jpeg, image/png or image/webp, at most 2 MB' }
+    AvatarResponse:
+      type: object
+      required: [avatarUrl]
+      properties: { avatarUrl: { type: string, format: uri } }

@@ -1,3 +1,4 @@
+using Identity.Infrastructure.Avatars;
 using Identity.Application.Features.Auth.SessionLogin.DTOs;
 using Identity.Application.Features.Auth.SessionMe.DTOs;
 using Identity.Application.Features.Auth.SessionRefresh.DTOs;
@@ -12,6 +13,7 @@ public sealed class IdentitySessionService(
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     IdentityBearerTokenIssuer bearerTokenIssuer,
+    AvatarUrlBuilder avatarUrlBuilder,
     IHttpContextAccessor httpContextAccessor,
     ILogger<IdentitySessionService> logger,
     IOptions<IdentitySessionPerformanceOptions> performanceOptions,
@@ -170,7 +172,8 @@ public sealed class IdentitySessionService(
             UserId: user.Id.ToString(),
             Email: user.Email ?? string.Empty,
             FullName: user.FullName,
-            Roles: roles.ToArray());
+            Roles: roles.ToArray(),
+            AvatarUrl: avatarUrlBuilder.Build(user.AvatarPath));
     }
 
     public async Task<bool> LogoutAsync(string? refreshToken, CancellationToken cancellationToken = default)

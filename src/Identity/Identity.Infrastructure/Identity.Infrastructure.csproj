@@ -21,7 +21,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentFTP" Version="55.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.2" />
+      <PackageReference Include="SkiaSharp" Version="4.154.0" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.154.0" />
     </ItemGroup>
 
 </Project>

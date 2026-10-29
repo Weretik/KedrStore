@@ -2,7 +2,7 @@
 
 **Static code check:** 2026-10-28. **Module:** Identity. **Consumer:** React Admin "Users" page.
 
-An administrator lists administrators and managers, creates them with an initial password, changes their role, blocks or unblocks them, and sets a new password. Customers are not staff accounts. The first administrator comes from `IdentitySeeder`.
+An administrator lists administrators and managers (with avatar URLs), creates them with an initial password, changes their role, blocks or unblocks them, and sets a new password for a manager. Name, email and avatar edits of managers are in [staff profile](staff-profile.md). Customers are not staff accounts. The first administrator comes from `IdentitySeeder`.
 
 ## Structure and relationships
 

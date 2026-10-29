@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
+using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Services.Sessions;
@@ -11,6 +12,8 @@ public sealed class StaffAccountService(
     AppIdentityDbContext dbContext,
     UserManager<AppUser> userManager,
     RefreshSessionStore refreshSessionStore,
+    ManagedStaffResolver managedStaffResolver,
+    AvatarUrlBuilder avatarUrlBuilder,
     IHttpContextAccessor httpContextAccessor,
     ILogger<StaffAccountService> logger) : IStaffAccountService
 {
@@ -23,14 +26,14 @@ public sealed class StaffAccountService(
                 join role in dbContext.Roles on userRole.RoleId equals role.Id
                 where StaffRoles.All.Contains(role.Name!)
                 orderby user.Email
-                select new { user.Id, user.Email, user.FullName, Role = role.Name!, user.LockoutEnd })
+                select new { user.Id, user.Email, user.FullName, Role = role.Name!, user.LockoutEnd, user.AvatarPath })
             .ToListAsync(cancellationToken);
 
         // A user with both staff roles is listed once, with the stronger role first in StaffRoles.All.
         return rows
             .GroupBy(x => x.Id)
             .Select(group => group.OrderBy(x => IndexOfRole(x.Role)).First())
-            .Select(x => new StaffAccountDto(x.Id, x.Email ?? string.Empty, x.FullName, x.Role, x.LockoutEnd > now))
+            .Select(x => new StaffAccountDto(x.Id, x.Email ?? string.Empty, x.FullName, x.Role, x.LockoutEnd > now, avatarUrlBuilder.Build(x.AvatarPath)))
             .ToList();
     }
 
@@ -70,7 +73,7 @@ public sealed class StaffAccountService(
         }
 
         logger.LogInformation("AUDIT: Staff account {UserId} created with role {Role} by {ActorId}", user.Id, role, CurrentUserId());
-        return Result.Success(new StaffAccountDto(user.Id, email, user.FullName, role, IsBlocked: false));
+        return Result.Success(new StaffAccountDto(user.Id, email, user.FullName, role, IsBlocked: false, AvatarUrl: null));
     }
 
     public async Task<Result> ChangeRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
@@ -132,10 +135,11 @@ public sealed class StaffAccountService(
 
     public async Task<Result> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default)
     {
-        var user = await FindStaffAsync(userId);
-        if (user is null)
+        // Only managers' passwords are set here; an administrator changes their own in the profile.
+        var target = await managedStaffResolver.ResolveAsync(userId);
+        if (target.User is not { } user)
         {
-            return Result.NotFound();
+            return target.Failure;
         }
 
         var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);

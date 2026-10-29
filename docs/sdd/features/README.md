@@ -25,6 +25,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.
 - [Staff accounts](identity/staff-accounts.md) — administrators create, block, and re-role administrators and managers.
+- [Staff profile and avatars](identity/staff-profile.md) — own profile (name, avatar; admins also email and password), avatars on the CDN, manager edits on the Users page.
 
 ## Platform
 

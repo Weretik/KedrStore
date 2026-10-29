@@ -19,7 +19,7 @@ docs/sdd/contracts/
 - [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers currently registered controllers.
 - Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [quick orders](catalog/orders.openapi.yaml).
 - Sales: [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml).
-- Identity: [session](identity/session.openapi.yaml), [staff accounts](identity/users.openapi.yaml).
+- Identity: [session](identity/session.openapi.yaml), [staff accounts](identity/users.openapi.yaml), [staff profile](identity/profile.openapi.yaml).
 
 The OpenAPI files describe the current code contract. They do not grant endpoint access: authorization attributes and the host fallback access policy remain authoritative.
 
