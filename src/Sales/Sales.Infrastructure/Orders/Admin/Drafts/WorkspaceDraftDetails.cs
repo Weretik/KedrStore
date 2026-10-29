@@ -19,7 +19,7 @@ internal sealed class WorkspaceDraftDetails(SalesDbContext db, AdminWorkspacePri
                 quote.TotalAmount, "Available", null);
         }
         catch (WorkspaceException error) when (error.Code is "customer_not_found" or "product_not_found" or
-                   "unavailable_product" or "unavailable_price" or "negative_price" or "amount_overflow" or "invalid_lines" or
+                   "unavailable_product" or "unavailable_price" or "price_below_minimum" or "amount_overflow" or "invalid_lines" or
                    "invalid_price_adjustment")
         {
             var lines = await pricing.DescribeDraftLinesAsync(draft.Lines, ct);
