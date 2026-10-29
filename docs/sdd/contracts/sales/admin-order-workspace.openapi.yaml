@@ -103,7 +103,8 @@ paths:
           description: >-
             Invalid lines (invalid_lines), invalid price adjustment (invalid_price_adjustment), insufficient stock
             (unavailable_product), unavailable UAH price (unavailable_price) or a discount that takes the unit price below
-            1 UAH (price_below_minimum; a product cheaper than 1 UAH cannot be discounted).
+            1 UAH (price_below_minimum; a product cheaper than 1 UAH cannot be discounted). The message of unavailable_product, price_below_minimum and
+            invalid_price_adjustment is Ukrainian text for the manager and may be shown as is.
           content:
             application/json:
               schema:
