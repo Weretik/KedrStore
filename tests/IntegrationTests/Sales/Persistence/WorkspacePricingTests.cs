@@ -105,7 +105,8 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData(-200.01, "negative_price")]
+    [InlineData(-199.01, "price_below_minimum")]
+    [InlineData(-200.01, "price_below_minimum")]
     [InlineData(0.001, "invalid_price_adjustment")]
     [InlineData(1_000_000.01, "invalid_price_adjustment")]
     public async Task Quote_RejectsInvalidAdjustments(double adjustment, string code)
@@ -115,6 +116,16 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
 
         Assert.Equal(code, error.Code);
         Assert.Equal(400, error.StatusCode);
+    }
+
+    [Fact]
+    public async Task Quote_AllowsADiscountDownToOneHryvnia()
+    {
+        var quote = await Pricing.QuoteAsync(
+            new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 2, -199m)]), CancellationToken.None);
+
+        Assert.Equal(1m, quote.Lines[0].UnitPrice);
+        Assert.Equal(2m, quote.TotalAmount);
     }
 
     [Fact]

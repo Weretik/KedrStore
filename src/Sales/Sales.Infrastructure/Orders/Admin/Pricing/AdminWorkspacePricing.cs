@@ -12,6 +12,9 @@ internal sealed class AdminWorkspacePricing(IReadCatalogDbContext catalogDb, Cus
     /// <summary>Largest per-unit discount or markup, in UAH, a manager may enter.</summary>
     internal const decimal MaxPriceAdjustment = 1_000_000m;
 
+    /// <summary>Lowest unit price, in UAH, a discount may bring a product to.</summary>
+    internal const decimal MinDiscountedUnitPrice = 1m;
+
     internal static bool TryParseProductId(string? value, out int id)
     {
         id = 0;
@@ -77,9 +80,11 @@ internal sealed class AdminWorkspacePricing(IReadCatalogDbContext catalogDb, Cus
             if (product.UnitPrice is not { } basePrice)
                 throw new WorkspaceException(400, "unavailable_price", "A UAH price is unavailable for a product.");
             var unitPrice = basePrice + line.PriceAdjustment;
-            if (unitPrice < 0m)
-                throw new WorkspaceException(400, "negative_price",
-                    $"Знижка для «{product.Name}» більша за ціну: ціна {basePrice:0.00} ₴, знижка {-line.PriceAdjustment:0.00} ₴.");
+            // A discount may not take a unit below 1 ₴; a product already cheaper than that keeps its price.
+            if (line.PriceAdjustment < 0m && unitPrice < Math.Min(MinDiscountedUnitPrice, basePrice))
+                throw new WorkspaceException(400, "price_below_minimum", basePrice <= MinDiscountedUnitPrice
+                    ? $"Ціна «{product.Name}» {basePrice:0.00} ₴ — знижку застосувати не можна."
+                    : $"Ціна «{product.Name}» після знижки {unitPrice:0.00} ₴, а має бути щонайменше {MinDiscountedUnitPrice:0.00} ₴ за шт. Найбільша знижка — {basePrice - MinDiscountedUnitPrice:0.00} ₴.");
             decimal lineAmount;
             try { lineAmount = checked(unitPrice * line.Quantity); }
             catch (OverflowException) { throw new WorkspaceException(400, "amount_overflow", "The order amount is too large."); }
