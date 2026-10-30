@@ -19,6 +19,7 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public bool IsNew { get; private set; }
     public bool ExportToSite { get; private set; }
     public int QuantityInPack { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
     #endregion
 
     #region Constructors
@@ -69,17 +70,60 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         return product;
     }
 
-    public void Update(string name, string productSlug, ProductCategoryId categoryId,
-        string photo, int qtyInPack, string scheme, bool exportToSite, DateTimeOffset updatedDate)
+    /// <summary>
+    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
+    /// Returns whether anything changed; <see cref="BaseAuditableEntity{TId}.UpdatedAt"/> moves only then.
+    /// </summary>
+    public bool UpdateFromOneC(string name, ProductCategoryId categoryId, string photo, string scheme,
+        int qtyInPack, bool exportToSite, bool isNew, bool isSale, DateTimeOffset now)
     {
-        SetName(name);
-        SetProductSlug(productSlug);
+        var changed = !string.Equals(Name, name?.Trim(), StringComparison.Ordinal) ||
+                      CategoryId != categoryId ||
+                      !string.Equals(Photo, photo?.Trim(), StringComparison.Ordinal) ||
+                      !string.Equals(Sсheme, scheme?.Trim(), StringComparison.Ordinal) ||
+                      QuantityInPack != qtyInPack ||
+                      ExportToSite != exportToSite ||
+                      IsNew != isNew ||
+                      IsSale != isSale;
+
+        if (!changed)
+            return false;
+
+        SetName(name!);
         SetCategoryId(categoryId);
-        SetPhoto(photo);
-        SetSсheme(scheme);
+        SetPhoto(photo!);
+        SetSсheme(scheme!);
         SetQuantityInPack(qtyInPack);
         ExportToSite = exportToSite;
-        MarkAsUpdated(updatedDate);
+        IsNew = isNew;
+        IsSale = isSale;
+        MarkAsUpdated(now);
+        return true;
+    }
+    #endregion
+
+    #region Lifecycle
+    public void ChangeSlug(string slug, DateTimeOffset now)
+    {
+        SetProductSlug(slug);
+        MarkAsUpdated(now);
+    }
+
+    public bool MarkDeleted(DateTimeOffset now)
+    {
+        if (IsDeleted) return false;
+        MarkAsDeleted(now);
+        DeletedAt = now;
+        return true;
+    }
+
+    public bool Restore(DateTimeOffset now)
+    {
+        if (!IsDeleted) return false;
+        IsDeleted = false;
+        DeletedAt = null;
+        MarkAsUpdated(now);
+        return true;
     }
     #endregion
 

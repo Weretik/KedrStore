@@ -95,9 +95,9 @@ public sealed class MissingProductPhotosApiTests
         SeedMissing(db, 103);
         SeedMissing(db, 200);
         var categories = db.Categories.Local.ToDictionary(category => category.Id.Value);
-        categories[101].Update("Child", "child", CategoryPath.From("n100.n101"), ProductCategoryId.From(100));
-        categories[102].Update("Grandchild", "grandchild", CategoryPath.From("n100.n101.n102"), ProductCategoryId.From(101));
-        categories[103].Update("Deep", "deep", CategoryPath.From("n100.n101.n102.n103"), ProductCategoryId.From(102));
+        categories[101].UpdateFromOneC("Child", CategoryPath.From("n100.n101"), ProductCategoryId.From(100), DateTimeOffset.UtcNow);
+        categories[102].UpdateFromOneC("Grandchild", CategoryPath.From("n100.n101.n102"), ProductCategoryId.From(101), DateTimeOffset.UtcNow);
+        categories[103].UpdateFromOneC("Deep", CategoryPath.From("n100.n101.n102.n103"), ProductCategoryId.From(102), DateTimeOffset.UtcNow);
         categories[100].UpdatePresentationMetadata("Якір", "Якорь", 0, 0);
         categories[101].UpdatePresentationMetadata("Блок", "Блок", 0, 1);
         categories[102].UpdatePresentationMetadata("Абетка", "Азбука", 0, 2);

@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetList;
@@ -19,9 +20,12 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
 
         var pageNumber = query.Request.Page < 1 ? 1 : query.Request.Page;
         var pageSize = query.Request.PageSize < 1 ? 20 : Math.Min(query.Request.PageSize, MaxPageSize);
+        if (query.Request.Deleted == true)
+            return Result.Success(await DeletedAdminProducts.PageAsync(catalogDbContext, query.Request, pageNumber, pageSize, cancellationToken));
+
         var categoriesQuery = catalogDbContext.Categories.AsNoTracking();
         var categoryIds = query.Request.CategoryId is { } categoryId
-            ? await AdminProductCategoryIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
+            ? await CategoryTreeIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
             : null;
         var productsQuery = ApplySorting(
             ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), categoryIds, query.Request),

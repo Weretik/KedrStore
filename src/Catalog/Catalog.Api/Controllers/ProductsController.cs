@@ -1,6 +1,7 @@
 using Catalog.Application.Features.Products.GetBySlug;
 using Catalog.Application.Features.Products.GetBySlug.DTOs;
 using Catalog.Application.Features.Products.GetPublicList;
+using Catalog.Contracts.Category;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;
 
@@ -15,6 +16,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
     [HttpGet("{categorySlug}/products")]
     [ProducesResponseType(typeof(PagedResult<List<ProductListRowDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PagedResult<List<ProductListRowDto>>>> Get(
         [FromQuery] GetProductsRequest request,
         [FromRoute] string lang,
@@ -32,7 +34,7 @@ public sealed class ProductsController(ISender sender) : ControllerBase
     [HttpGet("product/{productSlug}")]
     [ProducesResponseType(typeof(ProductBySlugDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(CatalogRedirect), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductBySlugDto>> GetBySlug(
         [FromRoute] string lang,
         [FromRoute] string productSlug,
@@ -43,6 +45,6 @@ public sealed class ProductsController(ISender sender) : ControllerBase
         var query = new GetProductBySlugQuery(request);
         var result = await sender.Send(query, cancellationToken);
 
-        return this.ToActionResult(result);
+        return this.ToLookupActionResult(result);
     }
 }

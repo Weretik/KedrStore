@@ -1,11 +1,13 @@
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Category;
+using Catalog.Application.Slugs;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.GetPublicList;
 
-public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catalogDbContext)
+public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catalogDbContext, ISlugService slugService)
     : IQueryHandler<GetPublicProductListQuery, Result<PagedResult<List<ProductListRowDto>>>>
 {
     private const int MaxPageSize = 100;
@@ -23,6 +25,9 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             .AsNoTracking()
             .Where(projection => projection.ExportToSite);
         var categoryIds = await GetSelectedCategoryTreeIdsAsync(request, cancellationToken);
+        if (categoryIds is { Length: 0 } && !string.IsNullOrWhiteSpace(request.CategorySlug) && request.CategoryId is null)
+            return Result.NotFound();
+
         if (categoryIds is not null)
         {
             projectionsQuery = projectionsQuery.Where(projection => categoryIds.Contains(projection.CategoryId));
@@ -64,6 +69,10 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         return Result.Success(new PagedResult<List<ProductListRowDto>>(pagedInfo, items));
     }
 
+    /// <summary>
+    /// Selected category with descendants; empty when the category is unknown or deleted. A former category slug
+    /// still selects its category (R-017).
+    /// </summary>
     private async Task<ProductCategoryId[]?> GetSelectedCategoryTreeIdsAsync(
         GetProductsRequest request,
         CancellationToken cancellationToken)
@@ -73,33 +82,15 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             return null;
         }
 
-        var categories = await catalogDbContext.Categories
-            .AsNoTracking()
-            .Select(category => new { category.Id, category.ParentId, category.Slug })
-            .ToListAsync(cancellationToken);
-
-        var selected = request.CategoryId is { } categoryId
-            ? categories.FirstOrDefault(category => category.Id.Value == categoryId)
-            : categories.FirstOrDefault(category => category.Slug == request.CategorySlug!.Trim());
-        if (selected is null)
+        var selectedId = request.CategoryId
+            ?? await slugService.ResolveAsync(CatalogEntityType.Category, request.CategorySlug!, cancellationToken);
+        if (selectedId is null)
         {
             return [];
         }
 
-        var childrenByParent = categories
-            .Where(category => category.ParentId.HasValue)
-            .ToLookup(category => category.ParentId!.Value, category => category.Id);
-        var selectedIds = new HashSet<ProductCategoryId>();
-        var pending = new Stack<ProductCategoryId>();
-        pending.Push(selected.Id);
-
-        while (pending.TryPop(out var currentId))
-        {
-            if (!selectedIds.Add(currentId)) continue;
-            foreach (var childId in childrenByParent[currentId]) pending.Push(childId);
-        }
-
-        return [.. selectedIds];
+        return await CategoryTreeIds.ForSelectedTreeAsync(
+            catalogDbContext.Categories.AsNoTracking(), selectedId.Value, cancellationToken);
     }
 
     private static IQueryable<ProductListProjection> ApplyFilters(
@@ -124,7 +115,10 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             }
         }
 
-        if (request.InStock == true)
+        var inStockOnly = request.Availability is { } availability
+            ? availability == ProductAvailability.InStock
+            : request.InStock == true;
+        if (inStockOnly)
         {
             projectionsQuery = projectionsQuery.Where(projection => projection.InStock);
         }
@@ -187,6 +181,11 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
                     .Select(category => language == "ru" ? category.ShortNameRu : category.ShortNameUk)
                     .FirstOrDefault())
                 .ThenBy(projection => projection.ProductId),
+            ProductSort.AvailabilityThenName => language == "ru"
+                ? projectionsQuery.OrderByDescending(projection => projection.InStock)
+                    .ThenBy(projection => projection.NameRu).ThenBy(projection => projection.ProductId)
+                : projectionsQuery.OrderByDescending(projection => projection.InStock)
+                    .ThenBy(projection => projection.NameUk).ThenBy(projection => projection.ProductId),
             _ => projectionsQuery.OrderBy(projection => projection.ProductId)
         };
     }

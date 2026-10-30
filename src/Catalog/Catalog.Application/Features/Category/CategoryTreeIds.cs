@@ -1,9 +1,10 @@
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 
-namespace Catalog.Application.Features.Products;
+namespace Catalog.Application.Features.Category;
 
-internal static class AdminProductCategoryIds
+/// <summary>IDs of a selected category and all its descendants among the given categories.</summary>
+internal static class CategoryTreeIds
 {
     public static async Task<ProductCategoryId[]> ForSelectedTreeAsync(
         IQueryable<ProductCategory> categoriesQuery,

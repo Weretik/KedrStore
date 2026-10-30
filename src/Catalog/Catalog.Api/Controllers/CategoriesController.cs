@@ -27,13 +27,13 @@ public sealed class CategoriesController(ISender sender) : ControllerBase
     [HttpGet("categories/by-slug/{categorySlug}")]
     [ProducesResponseType(typeof(CategoryDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(CatalogRedirect), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CategoryDetailsResponse>> GetBySlug(
         [FromRoute] string lang,
         [FromRoute] string categorySlug,
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetCategoryBySlugQuery(categorySlug, lang), cancellationToken);
-        return this.ToActionResult(result);
+        return this.ToLookupActionResult(result);
     }
 }

@@ -1,6 +1,7 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Jobs.ProductPhotos;
+using Catalog.Application.Jobs.Slugs;
 using Host.Jobs;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;
@@ -65,6 +66,10 @@ try
     {
         case "migrate":
             await scopeServiceProvider.GetRequiredService<DatabaseMigrationJob>().RunAsync(cancellationToken);
+            break;
+
+        case "migrate-slugs":
+            await scopeServiceProvider.GetRequiredService<MigrateLegacySlugsJob>().RunAsync(cancellationToken);
             break;
 
         case "full":

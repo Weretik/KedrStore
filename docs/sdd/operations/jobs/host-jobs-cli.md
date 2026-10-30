@@ -10,6 +10,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | Job | Argument | Purpose |
 | --- | --- | --- |
 | `migrate` | — | Runs EF migrations for registered contexts in order, then seeders; changes schema and data |
+| `migrate-slugs` | — | One-off: replaces legacy product and category slugs (`name-<id>`) with stable KMU 2010 slugs and keeps the old ones in history; a rerun changes nothing. See the [rollout](../../specs/catalog/005-stable-urls-and-category-content/design.md#rollout-and-rollback) |
 | `full` | — | Full Catalog refresh for configured Doors, Hardware, and Cosmos root IDs |
 | `pricetypes` | — | Catalog price types |
 | `category`, `productdetails`, `stocks`, `prices` | One or more `--rootId=<id>` | Targeted Catalog root refresh |

@@ -10,12 +10,14 @@ public static class ProductFiltersAndJoinPriceExtensions
         IQueryable<ProductPrice> pricesQuery,
         IQueryable<ProductCategory> categoriesQuery,
         IQueryable<ProductTranslation> translationsQuery,
+        int productId,
         GetProductBySlugRequest request)
     {
         var language = NormalizeLanguage(request.Lang);
         translationsQuery = translationsQuery.Where(t => t.Language == language);
 
-        productsQuery = productsQuery.Where(p => p.ProductSlug == request.Slug);
+        var id = ProductId.From(productId);
+        productsQuery = productsQuery.Where(p => p.Id == id);
 
         var withCategoryAndTranslation = productsQuery.LeftJoin(
             translationsQuery,
@@ -40,10 +42,13 @@ public static class ProductFiltersAndJoinPriceExtensions
             productPrice => productPrice.ProductId,
             (query, productPrice) => new { query.product, query.translation, query.category, productPrice }
         );
-        return withCategoryAndPrice.Select(query => new ProductBySlugDto
+        // A product of a deleted category is not public (R-005): the inner category filter removes it.
+        return withCategoryAndPrice.Where(query => query.category != null).Select(query => new ProductBySlugDto
         {
             Id = query.product.Id.Value,
             Name = query.translation != null ? query.translation.Name : query.product.Name,
+            ProductSlug = query.product.ProductSlug,
+            UpdatedAt = query.product.UpdatedAt ?? query.product.CreatedAt,
             Photo = query.product.Photo,
             Scheme = query.product.Sсheme,
             Stock = query.product.Stock,

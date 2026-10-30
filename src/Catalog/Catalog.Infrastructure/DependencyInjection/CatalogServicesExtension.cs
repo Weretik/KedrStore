@@ -1,4 +1,6 @@
 using Catalog.Application.Contracts.ClosedXML;
+using Catalog.Application.Contracts.Content;
+using Catalog.Infrastructure.Content;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Orders.Create.Notifications;
 using Catalog.Infrastructure.Exports;
@@ -19,6 +21,7 @@ public static class CatalogServicesExtension
         services.AddScoped<ITelegramNotifier, TelegramBotNotifier>();
         services.AddScoped<IOrderExcelExporter, OrderExcelExporter>();
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
+        services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
         services.AddCatalogReferenceDataServices();
         services.AddProductPhotoCheckServices(configuration);
 

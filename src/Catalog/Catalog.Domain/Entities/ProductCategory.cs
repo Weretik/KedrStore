@@ -17,6 +17,9 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     public string ShortNameRu { get; private set; } = null!;
     public int SortOrder { get; private set; }
     public int Level { get; private set; }
+    public bool IsDeleted { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
     #endregion
 
     #region Constructors
@@ -39,13 +42,52 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         CategoryPath path, ProductCategoryId? parentId = null)
         => new(id, productTypeIdOneC, name, slug,path, parentId);
 
-    public void Update(string name, string slug, CategoryPath path, ProductCategoryId? parentId = null)
+    /// <summary>
+    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
+    /// Returns whether anything changed.
+    /// </summary>
+    public bool UpdateFromOneC(string name, CategoryPath path, ProductCategoryId? parentId, DateTimeOffset now)
     {
-        SetName(name);
-        SetSlug(slug);
+        var trimmedName = name?.Trim() ?? string.Empty;
+        if (string.Equals(Name, trimmedName, StringComparison.Ordinal) &&
+            Path.Value == path.Value &&
+            ParentId == parentId)
+        {
+            return false;
+        }
+
+        SetName(name!);
         SetPath(path);
         SetParentId(parentId);
         Level = GetLevelFromPath(path);
+        UpdatedAt = now;
+        return true;
+    }
+    #endregion
+
+    #region Lifecycle
+    public void ChangeSlug(string slug, DateTimeOffset now)
+    {
+        SetSlug(slug);
+        UpdatedAt = now;
+    }
+
+    public bool MarkDeleted(DateTimeOffset now)
+    {
+        if (IsDeleted) return false;
+        IsDeleted = true;
+        DeletedAt = now;
+        UpdatedAt = now;
+        return true;
+    }
+
+    public bool Restore(DateTimeOffset now)
+    {
+        if (!IsDeleted) return false;
+        IsDeleted = false;
+        DeletedAt = null;
+        UpdatedAt = now;
+        return true;
     }
     #endregion
 
@@ -118,7 +160,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         Level = GetLevelFromPath(Path);
     }
 
-    public void UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder, int level)
+    /// <summary>Sets presentation metadata and returns whether anything changed.</summary>
+    public bool UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder, int level)
     {
         var validatedShortNameUk = ValidateShortName(
             shortNameUk,
@@ -132,10 +175,16 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         GuardSortOrder(sortOrder);
         GuardLevel(level);
 
+        var changed = !string.Equals(ShortNameUk, validatedShortNameUk, StringComparison.Ordinal) ||
+                      !string.Equals(ShortNameRu, validatedShortNameRu, StringComparison.Ordinal) ||
+                      SortOrder != sortOrder ||
+                      Level != level;
+
         ShortNameUk = validatedShortNameUk;
         ShortNameRu = validatedShortNameRu;
         SortOrder = sortOrder;
         Level = level;
+        return changed;
     }
 
     public void Reparent(ProductCategoryId? newParentId, CategoryPath newParentPath)

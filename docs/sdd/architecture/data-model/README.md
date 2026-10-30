@@ -7,9 +7,12 @@ All three contexts use tables without an explicitly configured PostgreSQL schema
 ```text
 KedrStore PostgreSQL
 └── default schema (usually public)
-    ├── Catalog / CatalogDbContext — 7 tables
+    ├── Catalog / CatalogDbContext — 10 tables
     │   ├── Categories
-    │   │   └── ProductCategories          # category tree, slug, and names
+    │   │   ├── ProductCategories          # category tree, slug, names, soft delete
+    │   │   ├── CategoryContents           # SEO text per category and language
+    │   │   ├── CategoryFaqItems           # FAQ of one content row
+    │   │   └── CatalogSlugHistory         # former product and category slugs
     │   ├── Products and prices
     │   │   ├── Products                   # product and CategoryId
     │   │   ├── ProductPrices              # product prices

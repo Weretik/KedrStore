@@ -24,6 +24,7 @@ paths:
         - $ref: '#/components/parameters/PriceTypeId'
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/Availability'
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -38,8 +39,8 @@ paths:
         Returns public products of the category selected by `categorySlug` and of every descendant
         category at any depth; sibling branches are excluded. When `categoryId` is also supplied, it takes
         precedence over the slug. The category subtree and all other filters are applied before
-        `pagedInfo.totalRecords`, sorting, and paging. An unknown valid slug or ID returns `200` with an
-        empty page and `totalRecords = 0`.
+        `pagedInfo.totalRecords`, sorting, and paging. A former category slug selects its category. An
+        unknown or deleted category slug returns `404`; an unknown `categoryId` returns `200` with an empty page.
       tags: [Catalog]
       security: []
       parameters:
@@ -56,16 +57,21 @@ paths:
         - $ref: '#/components/parameters/PriceTypeId'
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/Availability'
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
       responses:
         '200': { description: Product page, content: { application/json: { schema: { $ref: '#/components/schemas/ProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Unknown or deleted category slug. }
   /api/catalog/{lang}/product/{productSlug}:
     get:
       operationId: getPublicProductBySlug
       summary: Get a public product by slug
+      description: >-
+        A former slug returns 200 with `productSlug` set to the current slug, so the client can redirect permanently.
+        A product of a deleted category is not public.
       tags: [Catalog]
       security: []
       parameters:
@@ -78,7 +84,13 @@ paths:
       responses:
         '200': { description: Product, content: { application/json: { schema: { $ref: '#/components/schemas/ProductDetails' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '404': { description: Product not found }
+        '404':
+          description: >-
+            Product not found. For a deleted product whose category is active the body names that category;
+            otherwise there is no body.
+          content:
+            application/json:
+              schema: { $ref: './category-read.openapi.yaml#/components/schemas/CatalogRedirect' }
   /api/admin/products:
     get:
       operationId: getAdminProducts
@@ -96,6 +108,12 @@ paths:
         - $ref: '#/components/parameters/ExportToSite'
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
+        - name: deleted
+          in: query
+          description: >-
+            `true` lists soft-deleted products only (newest deletion first; search by Ukrainian name or 1C code;
+            other filters and sort are ignored). Admin role only.
+          schema: { type: boolean }
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -103,7 +121,36 @@ paths:
         '200': { description: Admin product page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager or Admin role, or `deleted=true` without the Admin role. }
+  /api/admin/products/{id}/slug:
+    put:
+      operationId: changeAdminProductSlug
+      summary: Set or regenerate a product slug
+      description: >-
+        The previous slug moves to history and keeps resolving to this product. A slug used now or before by
+        another product is rejected. Repeating the same request is safe.
+      tags: [Admin products]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugRequest' }
+      responses:
+        '200':
+          description: Slug changed (or already equal).
+          content:
+            application/json:
+              schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Product not found or deleted. }
   /api/admin/products/all:
     get:
       operationId: getAllAdminProducts
@@ -171,7 +218,12 @@ components:
     PriceTypeId: { name: priceTypeId, in: query, schema: { type: integer, minimum: 1, default: 11 } }
     PriceFrom: { name: priceFrom, in: query, schema: { type: number, minimum: 0 } }
     PriceTo: { name: priceTo, in: query, schema: { type: number, minimum: 0 } }
-    ProductSort: { name: sort, in: query, schema: { type: string, enum: [IdAsc, IdDesc, NameAsc, NameDesc, PriceAsc, PriceDesc, CategoryAsc, CategoryDesc], default: IdAsc } }
+    ProductSort: { name: sort, in: query, schema: { type: string, enum: [IdAsc, IdDesc, NameAsc, NameDesc, PriceAsc, PriceDesc, CategoryAsc, CategoryDesc, AvailabilityThenName], default: IdAsc } }
+    Availability:
+      name: availability
+      in: query
+      description: '`InStock` or `All`. When supplied it takes precedence over `inStock`; when absent `inStock` applies as before.'
+      schema: { type: string, enum: [InStock, All] }
     Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
     PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
   responses:
@@ -219,10 +271,12 @@ components:
         price: { type: [number, 'null'] }
     ProductDetails:
       type: object
-      required: [id, name, photo, scheme, stock, categoryName, categorySlug, quantityInPack, breadcrumbs]
+      required: [id, name, productSlug, photo, scheme, stock, categoryName, categorySlug, quantityInPack, breadcrumbs, updatedAt]
       properties:
-        id: { type: integer }
+        id: { type: integer, description: 1C product code shown to customers as the article. }
         name: { type: string }
+        productSlug: { type: string, description: Current slug; differs from the request when a former slug was used. }
+        updatedAt: { type: string, format: date-time }
         photo: { type: string }
         scheme: { type: string }
         stock: { type: number }
@@ -255,6 +309,8 @@ components:
         price: { type: [number, 'null'] }
         stock: { type: number }
         quantityInPack: { type: integer }
+        isDeleted: { type: boolean }
+        deletedAt: { type: [string, 'null'], format: date-time }
     MissingProductPhoto:
       allOf:
         - $ref: '#/components/schemas/AdminProduct'

@@ -4,7 +4,7 @@
 
 | Table | PK | Purpose and important fields |
 | --- | --- | --- |
-| `Products` | `Id` | Product: `CategoryId` (FK), `ProductSlug`, `Name`, `Photo`, publication and deletion flags. |
+| `Products` | `Id` | Product: `CategoryId` (FK), `ProductSlug` (unique, stable), `Name`, `Photo`, publication flags, soft delete (`IsDeleted`, `DeletedAt`). |
 | `ProductPrices` | `Id` | Price: `ProductId` (FK), `PriceTypeId`, `Amount`, `CurrencyIso`, `ProductTypeIdOneC`. |
 | `ProductTranslations` | `Id` | Translation: `ProductId` (FK), `Language`, `Name`. |
 | `PriceType` | `Id` | Price type lookup: `PriceTypeName`; physical table name is singular. |

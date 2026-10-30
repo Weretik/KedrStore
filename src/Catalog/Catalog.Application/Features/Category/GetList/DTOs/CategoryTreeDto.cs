@@ -9,4 +9,5 @@ public sealed record CategoryTreeDto(
     string ShortNameRu,
     int SortOrder,
     int Level,
-    IReadOnlyList<CategoryTreeDto> Children);
+    IReadOnlyList<CategoryTreeDto> Children,
+    int ProductCount = 0);

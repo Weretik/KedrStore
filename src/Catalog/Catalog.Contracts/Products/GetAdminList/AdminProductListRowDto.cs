@@ -16,4 +16,6 @@ public sealed record AdminProductListRowDto
     public decimal? Price { get; init; }
     public decimal Stock { get; init; }
     public int QuantityInPack { get; init; }
+    public bool IsDeleted { get; init; }
+    public DateTimeOffset? DeletedAt { get; init; }
 }

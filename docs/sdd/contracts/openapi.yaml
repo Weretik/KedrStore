@@ -23,6 +23,12 @@ paths:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories
   /api/categories/{id}:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}
+  /api/categories/{id}/slug:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1slug
+  /api/categories/{id}/content:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1content
+  /api/categories/{id}/content/{lang}:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1content~1{lang}
   /api/admin/products:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products
   /api/admin/products/all:
@@ -31,6 +37,8 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1missing-photos
   /api/admin/products/by-slug/{productSlug}:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1by-slug~1{productSlug}
+  /api/admin/products/{id}/slug:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1slug
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:

@@ -13,7 +13,9 @@ paths:
         - $ref: '#/components/parameters/Lang'
       responses:
         '200':
-          description: Ordered forest of category roots and their recursive children; may be empty before category import.
+          description: >-
+            Ordered forest of category roots and their recursive children with product counts. Deleted categories and
+            categories without exported products are omitted with their subtrees. May be empty before category import.
           content:
             application/json:
               schema:
@@ -23,7 +25,9 @@ paths:
   /api/catalog/{lang}/categories/by-slug/{categorySlug}:
     get:
       operationId: getCategoryBySlug
-      summary: Get one localized category, its descendants, and breadcrumbs
+      summary: Get one localized category, its descendants, breadcrumbs, counts, price range, and content
+      description: >-
+        A former slug returns 200 with `slug` set to the current slug, so the client can redirect permanently.
       tags: [Catalog]
       security: []
       parameters:
@@ -31,18 +35,30 @@ paths:
         - $ref: '#/components/parameters/CategorySlug'
       responses:
         '200':
-          description: Requested category with ordered recursive children and root-to-category breadcrumbs.
+          description: Requested category with ordered recursive non-empty children and root-to-category breadcrumbs.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CategoryDetails' }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '404': { description: Category not found }
+        '404':
+          description: >-
+            Category not found. For a deleted category with an active ancestor the body names the nearest one;
+            otherwise there is no body.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CatalogRedirect' }
   /api/categories:
     get:
       operationId: getAdminCategories
       summary: List categories for catalog administration
       tags: [Admin categories]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - name: deleted
+          in: query
+          required: false
+          description: '`true` lists soft-deleted categories only (flat, newest first). Admin role only.'
+          schema: { type: boolean, default: false }
       responses:
         '200':
           description: Unpaged depth-first category rows; may be empty before category import.
@@ -52,7 +68,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AdminCategory' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager or Admin role, or `deleted=true` without the Admin role. }
   /api/categories/{id}:
     get:
       operationId: getAdminCategoryById
@@ -71,6 +87,78 @@ paths:
         '404': { description: Category not found }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
+  /api/categories/{id}/slug:
+    put:
+      operationId: changeAdminCategorySlug
+      summary: Set or regenerate a category slug
+      description: >-
+        The previous slug moves to history and keeps resolving to this category. A slug used now or before by
+        another category is rejected. Repeating the same request is safe.
+      tags: [Admin categories]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangeSlugRequest' }
+      responses:
+        '200':
+          description: Slug changed (or already equal).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChangeSlugResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Category not found or deleted. }
+  /api/categories/{id}/content:
+    get:
+      operationId: getAdminCategoryContent
+      summary: Get the SEO text and FAQ of a category in every language
+      tags: [Admin categories]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '200':
+          description: Stored languages, possibly none.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCategoryContent' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Category not found or deleted. }
+  /api/categories/{id}/content/{lang}:
+    put:
+      operationId: saveAdminCategoryContent
+      summary: Replace the SEO text and FAQ of a category in one language
+      description: >-
+        Full replacement: empty fields clear them and the FAQ list replaces the stored one. `bodyHtml` is sanitized to
+        p, br, strong, em, ul, ol, li, h2, h3, and a[href] (http, https, or a path starting with `/`); everything else is
+        removed. Repeating the same request is safe.
+      tags: [Admin categories]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+        - $ref: '#/components/parameters/Lang'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveCategoryContentRequest' }
+      responses:
+        '200':
+          description: Saved content as stored, with the sanitized body.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCategoryContentItem' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Category not found or deleted. }
 components:
   parameters:
     Lang:
@@ -100,7 +188,7 @@ components:
       items: { type: object, additionalProperties: true }
     CategoryTreeNode:
       type: object
-      required: [id, slug, name, parentId, sortOrder, level, children]
+      required: [id, slug, name, parentId, sortOrder, level, children, productCount]
       properties:
         id:
           type: integer
@@ -132,20 +220,26 @@ components:
           type: array
           description: Direct descendants, recursively using this same schema and already in display order.
           items: { $ref: '#/components/schemas/CategoryTreeNode' }
+        productCount:
+          type: integer
+          minimum: 0
+          description: Active exported products in this category and all its descendants.
       example:
         id: 5513
-        slug: furnitura-5513
+        slug: furnitura
         name: Фурнітура
         parentId: null
         sortOrder: 0
         level: 0
+        productCount: 418
         children:
           - id: 900001
-            slug: zavisy-900001
+            slug: zavisy
             name: Завіси
             parentId: 5513
             sortOrder: 0
             level: 1
+            productCount: 418
             children: []
     CategoryBreadcrumb:
       type: object
@@ -158,15 +252,98 @@ components:
       allOf:
         - $ref: '#/components/schemas/CategoryTreeNode'
         - type: object
-          required: [breadcrumbs]
+          required: [breadcrumbs, minPrice, maxPrice, content]
           properties:
             breadcrumbs:
               type: array
               description: Inclusive root-to-current-category path, ordered from root to the requested category.
               items: { $ref: '#/components/schemas/CategoryBreadcrumb' }
+            minPrice:
+              type: [number, 'null']
+              description: Lowest retail price over active exported products of the category and its descendants.
+            maxPrice:
+              type: [number, 'null']
+              description: Highest retail price over the same products.
+            content:
+              oneOf:
+                - $ref: '#/components/schemas/CategoryContent'
+                - type: 'null'
+              description: Admin-written content in the requested language, or null when there is none.
+    CatalogRedirect:
+      type: object
+      required: [redirectSlug, redirectType]
+      properties:
+        redirectSlug: { type: string, minLength: 1 }
+        redirectType: { type: string, enum: [category] }
+    CategoryFaqItem:
+      type: object
+      required: [question, answer]
+      properties:
+        question: { type: string, minLength: 1, maxLength: 200 }
+        answer: { type: string, minLength: 1, maxLength: 2000, description: Plain text. }
+    CategoryContent:
+      type: object
+      required: [seoTitle, metaDescription, h1, bodyHtml, faq, updatedAt]
+      properties:
+        seoTitle: { type: [string, 'null'], maxLength: 70 }
+        metaDescription: { type: [string, 'null'], maxLength: 160 }
+        h1: { type: [string, 'null'], maxLength: 120 }
+        bodyHtml: { type: [string, 'null'], maxLength: 20000, description: Sanitized HTML; safe to render as is. }
+        faq:
+          type: array
+          maxItems: 20
+          items: { $ref: '#/components/schemas/CategoryFaqItem' }
+        updatedAt: { type: string, format: date-time }
+    AdminCategoryContentItem:
+      allOf:
+        - $ref: '#/components/schemas/CategoryContent'
+        - type: object
+          required: [language, updatedBy]
+          properties:
+            language: { type: string, enum: [uk, ru] }
+            updatedBy: { type: string, description: Identity user ID of the last editor. }
+    AdminCategoryContent:
+      type: object
+      required: [categoryId, items]
+      properties:
+        categoryId: { type: integer, minimum: 1 }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/AdminCategoryContentItem' }
+    SaveCategoryContentRequest:
+      type: object
+      properties:
+        seoTitle: { type: [string, 'null'], maxLength: 70 }
+        metaDescription: { type: [string, 'null'], maxLength: 160 }
+        h1: { type: [string, 'null'], maxLength: 120 }
+        bodyHtml: { type: [string, 'null'], maxLength: 20000 }
+        faq:
+          type: [array, 'null']
+          maxItems: 20
+          items: { $ref: '#/components/schemas/CategoryFaqItem' }
+    ChangeSlugRequest:
+      type: object
+      properties:
+        slug:
+          type: [string, 'null']
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          minLength: 1
+          maxLength: 80
+          description: Required unless `regenerate` is true.
+        regenerate:
+          type: boolean
+          default: false
+          description: Rebuild the slug from the current name (KMU 2010 transliteration, collision suffix -2, -3, ...).
+    ChangeSlugResponse:
+      type: object
+      required: [id, slug, previousSlug]
+      properties:
+        id: { type: integer, minimum: 1 }
+        slug: { type: string }
+        previousSlug: { type: string }
     AdminCategory:
       type: object
-      required: [id, name, shortNameUk, shortNameRu, slug, productTypeIdOneC, parentId, sortOrder, level]
+      required: [id, name, shortNameUk, shortNameRu, slug, productTypeIdOneC, parentId, sortOrder, level, isDeleted, deletedAt]
       properties:
         id: { type: integer, minimum: 1 }
         name:
@@ -192,3 +369,5 @@ components:
           minimum: 1
         sortOrder: { type: integer, minimum: 0 }
         level: { type: integer, minimum: 0 }
+        isDeleted: { type: boolean }
+        deletedAt: { type: [string, 'null'], format: date-time }

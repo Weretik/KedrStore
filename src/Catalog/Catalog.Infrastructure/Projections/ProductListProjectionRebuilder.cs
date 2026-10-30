@@ -47,7 +47,9 @@ internal sealed class ProductListProjectionRebuilder(
             .Where(translation => translation.Language == RuLanguage && productIds.Contains(translation.ProductId))
             .ToDictionaryAsync(translation => translation.ProductId, translation => translation.Name, cancellationToken);
 
+        // Products of soft-deleted categories stay out of every list (R-005); the filter hides those categories.
         var projections = products
+            .Where(product => categorySlugs.ContainsKey(product.CategoryId))
             .Select(product => ProductListProjection.Create(
                 productId: product.Id,
                 nameUk: product.Name,
@@ -55,7 +57,7 @@ internal sealed class ProductListProjectionRebuilder(
                 productSlug: product.ProductSlug,
                 photo: product.Photo,
                 categoryId: product.CategoryId,
-                categorySlug: categorySlugs.GetValueOrDefault(product.CategoryId) ?? product.CategoryId.Value.ToString(CultureInfo.InvariantCulture),
+                categorySlug: categorySlugs[product.CategoryId],
                 inStock: product.ProductTypeIdOneC == hardwareRootCategoryId
                     ? product.Stock > 2
                     : product.Stock > 0,

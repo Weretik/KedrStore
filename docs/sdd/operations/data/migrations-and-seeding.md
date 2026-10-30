@@ -21,6 +21,14 @@ The current `.github/workflows/deploy-cloudrun.yml` creates or updates the Cloud
 
 The password is not read from `Identity:AdminUser:DefaultPassword`; the seeder uses `ADMIN_DEFAULT_PASSWORD`. Without it, administrator creation is skipped and logged. Do not record the password in documentation or execution logs.
 
+## Data steps after a migration
+
+Some features need a one-off data job after `migrate`. Run it once against the same database, before deploying the API that relies on it:
+
+| Migration | Data job | Feature |
+| --- | --- | --- |
+| `StableSlugsSoftDeleteCategoryContent` | `--job=migrate-slugs` (idempotent) | [Stable catalog URLs](../../specs/catalog/005-stable-urls-and-category-content/design.md#rollout-and-rollback) |
+
 ## Change rules
 
 - Add a migration only when a feature changes persistent schema or data contracts.

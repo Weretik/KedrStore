@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Contracts.Products.GetMissingPhotos;
 using Catalog.Contracts.Products.GetList;
@@ -20,7 +21,7 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
         var pageSize = query.Request.PageSize;
         var categoriesQuery = catalogDbContext.Categories.AsNoTracking();
         var categoryIds = query.Request.CategoryId is { } categoryId
-            ? await AdminProductCategoryIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
+            ? await CategoryTreeIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
             : null;
         var projections = ApplyFilters(
             catalogDbContext.ProductListProjections.AsNoTracking(),

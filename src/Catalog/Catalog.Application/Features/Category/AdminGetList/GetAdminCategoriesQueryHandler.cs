@@ -9,6 +9,12 @@ public sealed class GetAdminCategoriesQueryHandler(ICatalogReadRepository<Produc
 {
     public async ValueTask<Result<IReadOnlyList<AdminCategoryResponse>>> Handle(GetAdminCategoriesQuery query, CancellationToken cancellationToken)
     {
+        if (query.Deleted)
+        {
+            var deleted = await repository.ListAsync(new DeletedCategoriesSpec(), cancellationToken);
+            return Result.Success<IReadOnlyList<AdminCategoryResponse>>(deleted.Select(CategoryReadMapper.ToAdminResponse).ToList());
+        }
+
         var categories = await repository.ListAsync(new AllCategoriesSpec(null), cancellationToken);
         var byId = categories.ToDictionary(x => x.Id.Value);
         var children = categories.ToLookup(x => x.ParentId?.Value);
@@ -27,4 +33,11 @@ public sealed class GetAdminCategoriesQueryHandler(ICatalogReadRepository<Produc
         foreach (var orphan in categories.OrderBy(x => x.SortOrder).ThenBy(x => x.Id.Value)) Visit(orphan);
         return Result.Success<IReadOnlyList<AdminCategoryResponse>>(result);
     }
+}
+
+internal sealed class DeletedCategoriesSpec : Specification<ProductCategory>
+{
+    public DeletedCategoriesSpec()
+        => Query.AsNoTracking().IgnoreQueryFilters().Where(category => category.IsDeleted)
+            .OrderByDescending(category => category.DeletedAt).ThenBy(category => category.Id);
 }
