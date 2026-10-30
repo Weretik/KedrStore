@@ -28,6 +28,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(CatalogConverter.ProductCategoryIdConvert);
 
         builder.HasIndex(p => p.CategoryId);
+        builder.Property(p => p.ProductSlug)
+            .IsRequired();
+        builder.HasIndex(p => p.ProductSlug)
+            .IsUnique()
+            .HasDatabaseName("UX_Products_ProductSlug");
         builder.HasIndex(p => p.Name)
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops")

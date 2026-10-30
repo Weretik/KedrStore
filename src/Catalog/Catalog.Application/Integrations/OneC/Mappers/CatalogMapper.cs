@@ -1,6 +1,5 @@
 ﻿using Catalog.Application.Integrations.OneC.DTOs;
-using Unidecode.NET;
-
+using Catalog.Application.Integrations.OneC.Sync;
 
 namespace Catalog.Application.Integrations.OneC.Mappers;
 
@@ -13,7 +12,6 @@ public static class CatalogMapper
         string rootCategoryOneCId)
     {
         var categoryDtos = new List<CategoryDto>();
-        var helper = new SlugHelper();
 
         if (rootCategoryId is { } configuredRootId)
         {
@@ -22,7 +20,6 @@ public static class CatalogMapper
                 configuredRootId,
                 rootCategoryOneCId,
                 rootName,
-                rootName.SlugGenerate(configuredRootId, "category", helper),
                 null,
                 $"n{configuredRootId}"));
         }
@@ -86,7 +83,6 @@ public static class CatalogMapper
             if (string.IsNullOrWhiteSpace(name))
                 continue;
 
-            var slug = name.SlugGenerate(item.CategoryId,"category", helper);
             int? mappedParentId = item.ParentId is > 0
                 ? item.ParentId.Value
                 : rootCategoryId;
@@ -96,73 +92,44 @@ public static class CatalogMapper
 
             var path = BuildPath(id, new HashSet<int>());
 
-            categoryDtos.Add(new CategoryDto(id, rootCategoryOneCId, name, slug, mappedParentId, path));
+            categoryDtos.Add(new CategoryDto(id, rootCategoryOneCId, name, mappedParentId, path));
         }
         return categoryDtos;
     }
+    /// <summary>
+    /// Maps 1C products. With <paramref name="fallbackCategoryId"/> every product goes to that category;
+    /// otherwise the category is resolved by name and stays <c>null</c> when the name does not resolve.
+    /// </summary>
     public static IReadOnlyList<ProductRowOneCDto> MapProduct(
         IReadOnlyList<OneCProductDto> productListOneC,
-        Dictionary<string, int> categoryNameDictionary,
+        CategoryNameMap? categoryNames,
         string rootCategoryOneCId,
         int? fallbackCategoryId = null)
     {
-        var productsDtos = new List<ProductRowOneCDto>();
-        var helper = new SlugHelper();
+        var productsDtos = new List<ProductRowOneCDto>(productListOneC.Count);
 
         foreach (var item in productListOneC)
         {
             var id = item.Id;
-            var name = item.Name.Trim();
-
-            var categoryId = fallbackCategoryId
-                ?? GetCategoryIdForCategoryName(item.CategoryPath.Trim(), categoryNameDictionary);
-
-            var photo = $"https://images-kedr.cdn.express/products/{id}.jpg";
-            string? scheme = $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg";
-            int stock = 0;
-            bool isSale = item.IsSale;
-            bool isNew = item.IsNew;
-            var qtyInPack = item.QuantityInPack;
-
+            var categoryId = fallbackCategoryId ?? categoryNames?.Resolve(item.CategoryPath);
 
             productsDtos.Add(new ProductRowOneCDto(
                 Id: id,
                 ProductTypeIdOneC: rootCategoryOneCId,
-                Name: name,
-                ProducSlug: name.SlugGenerate(id, "product", helper),
+                Name: item.Name.Trim(),
                 CategoryId: categoryId,
-                Photo: photo,
-                Scheme: scheme,
-                Stock: stock,
-                IsSale: isSale,
-                IsNew: isNew,
+                Photo: $"https://images-kedr.cdn.express/products/{id}.jpg",
+                Scheme: $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg",
+                Stock: 0,
+                IsSale: item.IsSale,
+                IsNew: item.IsNew,
                 ExportToSite: item.ExportToSite,
-                QuantityInPack: qtyInPack)
-            );
+                QuantityInPack: item.QuantityInPack));
         }
+
         return productsDtos
             .GroupBy(product => product.Id)
             .Select(group => group.First())
             .ToList();
     }
-
-    private static int GetCategoryIdForCategoryName(string categoryName, Dictionary<string,int> categoryNameDictionary)
-        => categoryNameDictionary[categoryName];
-
-    private static string SlugGenerate(this string s, int id, string fallbackSlugBase, SlugHelper helper)
-    {
-        var ascii = (s ?? string.Empty).Unidecode();
-
-        var slugPart = helper.GenerateSlug(ascii)
-            .Replace('.', '-')
-            .Trim('-');
-
-        if (string.IsNullOrWhiteSpace(slugPart))
-            slugPart = fallbackSlugBase.Trim('-');
-
-        return $"{slugPart}-{id}";
-    }
-
-
-
 }

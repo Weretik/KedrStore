@@ -10,4 +10,6 @@ public enum ProductSort
     PriceDesc,
     CategoryAsc,
     CategoryDesc,
+    /// <summary>In stock first, then name in the requested language, then ID.</summary>
+    AvailabilityThenName,
 }

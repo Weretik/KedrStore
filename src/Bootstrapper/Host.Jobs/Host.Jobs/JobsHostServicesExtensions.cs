@@ -1,6 +1,8 @@
 using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Application.Integrations.OneC.Jobs;
+using Catalog.Application.Integrations.OneC.Sync;
+using Catalog.Application.Jobs.Slugs;
 using Catalog.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,8 @@ public static class JobsHostServicesExtensions
         services.AddScoped<SyncOneCPriceTypesJob>();
         services.AddScoped<SyncOneCCategoryJob>();
         services.AddScoped<SyncOneCProductDetailsJob>();
+        services.AddScoped<ProductTranslationImporter>();
+        services.AddScoped<MigrateLegacySlugsJob>();
         services.AddScoped<SyncOneCStocksJob>();
         services.AddScoped<SyncOneCPricesJob>();
         services.AddScoped<SyncOneCOrdersJob>();

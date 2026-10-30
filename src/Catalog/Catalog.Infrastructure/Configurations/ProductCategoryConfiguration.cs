@@ -39,6 +39,14 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.HasIndex(c => c.Slug)
+            .IsUnique()
+            .HasDatabaseName("UX_ProductCategories_Slug");
+
+        builder.Property(c => c.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(c => c.ProductTypeIdOneC)
             .HasMaxLength(10)
             .IsRequired();
@@ -63,5 +71,7 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
 
         builder.HasIndex(c => new { c.ParentId, c.SortOrder, c.Id })
             .HasDatabaseName("IX_ProductCategories_ParentId_SortOrder_Id");
+
+        builder.HasQueryFilter(c => !c.IsDeleted);
     }
 }

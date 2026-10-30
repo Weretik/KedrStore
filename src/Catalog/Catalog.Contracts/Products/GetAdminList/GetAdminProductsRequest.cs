@@ -12,6 +12,8 @@ public sealed record GetAdminProductsRequest
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
     public bool? ExportToSite { get; init; }
+    /// <summary><c>true</c> lists soft-deleted products only. Admin role only.</summary>
+    public bool? Deleted { get; init; }
 
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }

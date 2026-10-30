@@ -13,7 +13,7 @@ public sealed class CosmosProductMappingTests
             new OneCProductDto(42, "Cosmos product", "Ignored 1C category", "", false, false, true, 1)
         };
 
-        var result = CatalogMapper.MapProduct(source, [], "Космос", fallbackCategoryId: 920000);
+        var result = CatalogMapper.MapProduct(source, null, "Космос", fallbackCategoryId: 920000);
 
         var item = Assert.Single(result);
         Assert.Equal(920000, item.CategoryId);
@@ -28,7 +28,7 @@ public sealed class CosmosProductMappingTests
 
         var mapped = CatalogMapper.MapProduct(
             [product, product with { Name = "Repeated product" }],
-            new Dictionary<string, int>(),
+            null,
             "Космос",
             fallbackCategoryId: 920000);
 

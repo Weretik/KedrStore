@@ -8,6 +8,8 @@ public sealed record GetProductsRequest
     public int? CategoryId { get; init; }
 
     public bool? InStock { get; init; } = true;
+    /// <summary>When supplied, takes precedence over <see cref="InStock"/>.</summary>
+    public ProductAvailability? Availability { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
 
@@ -20,4 +22,10 @@ public sealed record GetProductsRequest
 
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 20;
+}
+
+public enum ProductAvailability
+{
+    InStock,
+    All
 }

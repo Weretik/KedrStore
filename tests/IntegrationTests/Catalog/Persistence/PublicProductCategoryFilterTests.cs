@@ -1,4 +1,6 @@
+using Ardalis.Result;
 using Catalog.Application.Features.Products.GetPublicList;
+using Catalog.Application.Slugs;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
@@ -24,7 +26,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 15, 3, "grandchild", exportToSite: false);
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db);
+        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db));
         var first = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest
         {
             CategorySlug = "parent", Page = 1, PageSize = 2
@@ -54,8 +56,7 @@ public sealed class PublicProductCategoryFilterTests
         Assert.Equal([11, 12, 13], first.Value.Value.Concat(second.Value.Value).Select(row => row.Id));
         Assert.Equal([11, 12, 13], byId.Value.Value.Select(row => row.Id));
         Assert.Equal([13], leaf.Value.Value.Select(row => row.Id));
-        Assert.Empty(unknown.Value.Value);
-        Assert.Equal(0, unknown.Value.PagedInfo.TotalRecords);
+        Assert.Equal(ResultStatus.NotFound, unknown.Status);
     }
 
     private static CatalogDbContext CreateContext()

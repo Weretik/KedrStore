@@ -1,5 +1,6 @@
 using System.Reflection;
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Category;
 using Catalog.Application.Features.Category.GetList;
 using Catalog.Application.Features.Category.GetList.DTOs;
 using Catalog.Application.Integrations.OneC.Options;
@@ -60,7 +61,11 @@ public sealed class CategoryPresentationApplicationTests
         var first = CreateCategory(900001, "n5513.n900001", "First", 1, 1);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [root, second, first];
-        var handler = new GetCategoriesQuryHandler(proxy);
+        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        {
+            [900001] = new(2, 10m, 20m),
+            [900002] = new(1, 5m, 5m)
+        }));
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
@@ -71,6 +76,34 @@ public sealed class CategoryPresentationApplicationTests
         Assert.Equal([900001, 900002], tree.Children.Select(child => child.Id));
         Assert.Equal("First uk", tree.Children[0].ShortNameUk);
         Assert.Equal(1, tree.Children[0].Level);
+        Assert.Equal(3, tree.ProductCount);
+        Assert.Equal(2, tree.Children[0].ProductCount);
+    }
+
+    [Fact]
+    public async Task GetCategoriesQuery_OmitsBranchesWithoutProducts()
+    {
+        var root = CreateCategory(5513, "n5513", "Root", 0, 0);
+        var empty = CreateCategory(900002, "n5513.n900002", "Empty", 2, 1);
+        var full = CreateCategory(900001, "n5513.n900001", "Full", 1, 1);
+        var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
+        ((ReadRepositoryProxy)(object)proxy).Categories = [root, empty, full];
+        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        {
+            [900001] = new(4, 10m, 20m)
+        }));
+
+        var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
+
+        var tree = Assert.Single(result.Value);
+        Assert.Equal([900001], tree.Children.Select(child => child.Id));
+        Assert.Equal(4, tree.ProductCount);
+    }
+
+    private sealed class FixedStatsReader(IReadOnlyDictionary<int, CategoryStats> stats) : ICategoryStatsReader
+    {
+        public Task<IReadOnlyDictionary<int, CategoryStats>> LoadDirectAsync(CancellationToken cancellationToken)
+            => Task.FromResult(stats);
     }
 
     private static ProductCategory CreateCategory(int id, string path, string name, int sortOrder, int level)

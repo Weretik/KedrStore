@@ -28,6 +28,18 @@ public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
         MarkAsUpdated(updatedAt);
     }
 
+    /// <summary>Sets the name and revives a soft-deleted translation. Returns whether anything changed.</summary>
+    public bool Apply(string name, DateTimeOffset now)
+    {
+        if (!IsDeleted && string.Equals(Name, name?.Trim(), StringComparison.Ordinal))
+            return false;
+
+        SetName(name!);
+        IsDeleted = false;
+        MarkAsUpdated(now);
+        return true;
+    }
+
     private void SetProductId(ProductId productId)
     {
         if (productId.Value <= 0)

@@ -1,11 +1,15 @@
 using Catalog.Application.Features.Products.GetAdminList;
 using Catalog.Application.Features.Products.GetAdminDetail;
 using Catalog.Application.Features.Products.GetMissingPhotos;
+using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetAdminDetail;
 using Catalog.Contracts.Products.GetMissingPhotos;
 using Catalog.Contracts.Products.GetList;
+using Catalog.Contracts.Slugs;
+using Catalog.Domain.ValueObjects;
 using Identity.Application.Security.Policies;
+using Identity.Domain.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;
@@ -17,10 +21,14 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(PagedResult<List<AdminProductListRowDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<PagedResult<List<AdminProductListRowDto>>>> Get(
         [FromQuery] GetAdminProductsRequest request,
         CancellationToken cancellationToken)
     {
+        if (request.Deleted == true && !User.IsInRole(RoleNames.Admin))
+            return Forbid();
+
         var result = await sender.Send(new GetAdminProductListQuery(request), cancellationToken);
 
         return this.ToActionResult(result);
@@ -44,6 +52,21 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetAdminProductBySlugQuery(productSlug), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPut("{id:int}/slug", Name = "changeAdminProductSlug")]
+    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [ProducesResponseType(typeof(ChangeSlugResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ChangeSlugResponse>> ChangeSlug(
+        [FromRoute] int id,
+        [FromBody] ChangeSlugRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new ChangeSlugCommand(CatalogEntityType.Product, id, request), cancellationToken);
         return this.ToActionResult(result);
     }
 

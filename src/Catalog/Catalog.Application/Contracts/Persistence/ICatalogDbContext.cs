@@ -9,4 +9,6 @@ public interface IReadCatalogDbContext
     DbSet<ProductPhotoCheck> ProductPhotoChecks { get; }
     DbSet<ProductCategory> Categories { get; }
     DbSet<PriceType> PriceTypes { get; }
+    DbSet<SlugHistoryEntry> SlugHistory { get; }
+    DbSet<CategoryContent> CategoryContents { get; }
 }

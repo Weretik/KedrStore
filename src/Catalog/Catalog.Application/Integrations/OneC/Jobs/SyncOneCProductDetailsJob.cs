@@ -1,4 +1,3 @@
-using System.Text;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Integrations.OneC.Contracts;
@@ -6,7 +5,8 @@ using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Integrations.OneC.Specifications;
-using Catalog.Domain.Entities;
+using Catalog.Application.Integrations.OneC.Sync;
+using Catalog.Application.Slugs;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
@@ -14,25 +14,26 @@ namespace Catalog.Application.Integrations.OneC.Jobs;
 public sealed class SyncOneCProductDetailsJob(
     IOneCClient oneC,
     ICatalogRepository<Product> productRepo,
-    ICatalogRepository<ProductTranslation> translationRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
+    ISlugService slugService,
+    ProductTranslationImporter translationImporter,
     IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     IProductListProjectionRebuilder productListProjectionRebuilder,
     IProductPhotoCheckStore productPhotoCheckStore,
-    ILogger<SyncOneCPricesJob> logger)
+    ILogger<SyncOneCProductDetailsJob> logger)
 {
-    private const string RuLanguage = "ru";
-    private const string TranslationFileRelativePath = "Translation/Imports/product-translations.ru.csv";
+    private const string Phase = "Product details import";
 
     public async Task RunAsync(
         string rootCategoryId,
         CancellationToken cancellationToken,
         bool rebuildProjection = true)
     {
-        logger.LogInformation("[DEBUG_LOG] SyncOneCProductDetailsJob started for {Root}", rootCategoryId);
-
+        var fetchTimer = Stopwatch.StartNew();
         var productsOneC = await oneC.GetProductDetailsAsync(rootCategoryId, cancellationToken);
-        logger.LogInformation("[DEBUG_LOG] Received {Count} products from 1C for root {Root}", productsOneC.Count, rootCategoryId);
+        logger.LogInformation(
+            "Received {Count} products from 1C for {Root} in {ElapsedMs} ms.",
+            productsOneC.Count, rootCategoryId, fetchTimer.ElapsedMilliseconds);
 
         if (productsOneC.Count == 0)
             return;
@@ -41,24 +42,21 @@ public sealed class SyncOneCProductDetailsJob(
             rootCategoryId,
             rootCategoryOptions.Value.CosmosRootCategoryId,
             StringComparison.Ordinal);
-        var categoryNameDictionary = new Dictionary<string, int>();
-        int? fallbackCategoryId = null;
 
+        CategoryNameMap? categoryNames = null;
+        int? fallbackCategoryId = null;
         if (isCosmosRoot)
         {
             fallbackCategoryId = rootCategoryOptions.Value.CosmosCategoryId;
         }
         else
         {
-            var rows = await categoryRepo.ListAsync(new CategoryIdSlugMapSpec(rootCategoryId), cancellationToken);
-            categoryNameDictionary = rows.ToDictionary(x => x.CategoryName, x => x.Id.Value);
+            var rows = await categoryRepo.ListAsync(new ActiveCategoryNamesByRootSpec(rootCategoryId), cancellationToken);
+            categoryNames = new CategoryNameMap(rows);
         }
 
-        var products = CatalogMapper.MapProduct(
-            productsOneC,
-            categoryNameDictionary,
-            rootCategoryId,
-            fallbackCategoryId);
+        var products = CatalogMapper.MapProduct(productsOneC, categoryNames, rootCategoryId, fallbackCategoryId);
+        categoryNames?.LogSummary(logger, rootCategoryId);
 
         if (products.Count < productsOneC.Count)
         {
@@ -70,36 +68,18 @@ public sealed class SyncOneCProductDetailsJob(
         }
 
         if (isCosmosRoot)
-        {
             products = await ExcludeProductsOwnedByOtherRootsAsync(products, rootCategoryId, cancellationToken);
-        }
-
-        logger.LogInformation(
-            "Mapped {MappedCount} products for root {Root}. Received: {ReceivedCount}.",
-            products.Count,
-            rootCategoryId,
-            productsOneC.Count);
 
         if (products.Count == 0)
         {
-            if (isCosmosRoot)
-            {
-                logger.LogWarning(
-                    "All mapped Cosmos products are already owned by another root. Catalog data was not changed.");
-                return;
-            }
-
-            throw new InvalidOperationException(
-                $"OneC returned {productsOneC.Count} products for root {rootCategoryId}, but none passed mapping. " +
-                "Catalog data was not changed to prevent accidental deletion.");
+            logger.LogWarning(
+                "All mapped Cosmos products are already owned by another root. Catalog data was not changed.");
+            return;
         }
 
-        await DeleteMissingAsync(products, rootCategoryId, cancellationToken);
-        var syncedProductIds = await CreateOrUpsertProductsAsync(products, rootCategoryId, cancellationToken);
-        logger.LogInformation(
-            "Synced {SyncedCount} products for root {Root}.",
-            syncedProductIds.Count,
-            rootCategoryId);
+        var counters = new ImportCounters { Received = products.Count };
+        var syncedProductIds = await ApplyAsync(products, rootCategoryId, counters, cancellationToken);
+        counters.Log(logger, Phase, rootCategoryId);
 
         await productPhotoCheckStore.ReconcileAsync(
             products
@@ -107,14 +87,10 @@ public sealed class SyncOneCProductDetailsJob(
                 .ToArray(),
             cancellationToken);
 
-        await UpsertTranslationsForSyncedProductsAsync(syncedProductIds, cancellationToken);
+        await translationImporter.ImportAsync(syncedProductIds, cancellationToken);
 
         if (rebuildProjection)
-        {
             await productListProjectionRebuilder.RebuildAsync(cancellationToken);
-        }
-
-        logger.LogInformation("SyncOneCProductDetailsJob finished for {Root}", rootCategoryId);
     }
 
     private async Task<IReadOnlyList<ProductRowOneCDto>> ExcludeProductsOwnedByOtherRootsAsync(
@@ -122,9 +98,6 @@ public sealed class SyncOneCProductDetailsJob(
         string cosmosRootId,
         CancellationToken cancellationToken)
     {
-        if (products.Count == 0)
-            return products;
-
         var productIds = products.Select(product => ProductId.From(product.Id)).ToArray();
         var conflicts = await productRepo.ListAsync(
             new ProductsByIdsFromOtherRootsSpec(productIds, cosmosRootId),
@@ -143,208 +116,96 @@ public sealed class SyncOneCProductDetailsJob(
             .ToList();
     }
 
-    private async Task DeleteMissingAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryOneCId, CancellationToken cancellationToken)
+    /// <summary>Creates, updates, restores, and soft-deletes the products of the root in one save.</summary>
+    private async Task<IReadOnlyCollection<ProductId>> ApplyAsync(
+        IReadOnlyList<ProductRowOneCDto> productDtos,
+        string rootCategoryId,
+        ImportCounters counters,
+        CancellationToken cancellationToken)
     {
-        var importProductsIds = productDtos
-            .Select(c => ProductId.From(c.Id))
-            .Distinct()
-            .ToArray();
-
-        var spec = new ProductsByIdsSpec(importProductsIds, rootCategoryOneCId, true);
-        await productRepo.DeleteRangeAsync(spec, cancellationToken);
-    }
-
-    private async Task<IReadOnlyCollection<ProductId>> CreateOrUpsertProductsAsync(IReadOnlyList<ProductRowOneCDto> productDtos, string rootCategoryId, CancellationToken cancellationToken)
-    {
-        var productIdsInBatch = productDtos.Select(x => ProductId.From(x.Id)).ToList();
-        var existingProducts = await productRepo.ListAsync(new ProductsByIdsSpec(productIdsInBatch, rootCategoryId), cancellationToken);
-        var existingDict = existingProducts.ToDictionary(x => x.Id, x => x);
+        var existingById = (await productRepo.ListAsync(new ProductsByRootSpec(rootCategoryId), cancellationToken))
+            .ToDictionary(product => product.Id.Value);
+        var now = DateTimeOffset.UtcNow;
+        var created = new List<Product>();
+        var synced = new List<ProductId>(productDtos.Count);
+        SlugAllocator? slugs = null;
 
         foreach (var item in productDtos)
         {
-            var productId = ProductId.From(item.Id);
-
-            if (!existingDict.TryGetValue(productId, out var existing))
+            if (existingById.TryGetValue(item.Id, out var existing))
             {
-                var product = Product.Create(
-                    id: productId,
-                    productTypeIdOneC: item.ProductTypeIdOneC,
-                    name: item.Name,
-                    productSlug: item.ProducSlug,
-                    categoryId: ProductCategoryId.From(item.CategoryId),
-                    photo: item.Photo,
-                    scheme: item.Scheme,
-                    stock: item.Stock,
-                    qtyInPack: item.QuantityInPack,
-                    isNew: item.IsNew,
-                    isSale: item.IsSale,
-                    exportToSite: item.ExportToSite,
-                    createdDate: DateTimeOffset.UtcNow
-                );
-                await productRepo.AddAsync(product, cancellationToken);
+                var restored = existing.Restore(now);
+                var categoryId = item.CategoryId is { } resolved ? ProductCategoryId.From(resolved) : existing.CategoryId;
+                var updated = existing.UpdateFromOneC(item.Name, categoryId, item.Photo, item.Scheme,
+                    item.QuantityInPack, item.ExportToSite, item.IsNew, item.IsSale, now);
 
-                existingDict[productId] = product;
-                logger.LogInformation("[DEBUG_LOG] Added new product: {Name} (ID: {Id})", product.Name, product.Id);
+                if (restored) counters.Restored++;
+                else if (updated) counters.Updated++;
+                else counters.Unchanged++;
+
+                synced.Add(existing.Id);
+                continue;
             }
-            else
+
+            if (item.CategoryId is not { } newCategoryId)
             {
-                existing.Update(
-                    name: item.Name,
-                    productSlug: item.ProducSlug,
-                    categoryId: ProductCategoryId.From(item.CategoryId),
-                    photo: item.Photo,
-                    scheme: item.Scheme,
-                    qtyInPack: item.QuantityInPack,
-                    exportToSite: item.ExportToSite,
-                    updatedDate: DateTimeOffset.UtcNow);
-
-                if (item.IsNew) existing.MarkAsNew();
-                else existing.RemoveNew();
-
-                if (item.IsSale) existing.MarkAsSale();
-                else existing.RemoveSale();
+                counters.Skipped++;
+                continue;
             }
+
+            slugs ??= await slugService.LoadAllocatorAsync(CatalogEntityType.Product, cancellationToken);
+            var product = Product.Create(
+                id: ProductId.From(item.Id),
+                productTypeIdOneC: item.ProductTypeIdOneC,
+                name: item.Name,
+                productSlug: slugs.Allocate(item.Name),
+                categoryId: ProductCategoryId.From(newCategoryId),
+                photo: item.Photo,
+                scheme: item.Scheme,
+                createdDate: now,
+                stock: item.Stock,
+                qtyInPack: item.QuantityInPack,
+                isNew: item.IsNew,
+                isSale: item.IsSale,
+                exportToSite: item.ExportToSite);
+            created.Add(product);
+            synced.Add(product.Id);
+            counters.Created++;
         }
+
+        MarkMissingDeleted(existingById.Values, productDtos, rootCategoryId, counters, now);
+
+        if (created.Count > 0)
+            await productRepo.AddRangeAsync(created, cancellationToken);
 
         await productRepo.SaveChangesAsync(cancellationToken);
-        return productIdsInBatch.Distinct().ToArray();
+        return synced;
     }
 
-    private async Task UpsertTranslationsForSyncedProductsAsync(
-        IReadOnlyCollection<ProductId> syncedProductIds,
-        CancellationToken cancellationToken)
+    private void MarkMissingDeleted(
+        IEnumerable<Product> existing,
+        IReadOnlyList<ProductRowOneCDto> productDtos,
+        string rootCategoryId,
+        ImportCounters counters,
+        DateTimeOffset now)
     {
-        if (syncedProductIds.Count == 0)
+        var receivedIds = productDtos.Select(product => product.Id).ToHashSet();
+        var active = existing.Where(product => !product.IsDeleted).ToList();
+        var missing = active.Where(product => !receivedIds.Contains(product.Id.Value)).ToList();
+
+        if (!MassDeletionGuard.Allows(active.Count, missing.Count))
+        {
+            counters.GuardBlocked = missing.Count;
+            logger.LogError(
+                "Mass deletion guard blocked soft-deleting {MissingCount} of {ActiveCount} active products for {Root}. Nothing was deleted.",
+                missing.Count, active.Count, rootCategoryId);
             return;
-
-        var translationsById = ReadTranslationsFromCsv();
-
-        var existingTranslations = await translationRepo.ListAsync(
-            new ProductTranslationsByProductIdsAndLanguageSpec(syncedProductIds, RuLanguage),
-            cancellationToken);
-
-        var existingByProductId = existingTranslations.ToDictionary(x => x.ProductId.Value, x => x);
-        var now = DateTimeOffset.UtcNow;
-
-        var created = 0;
-        var updated = 0;
-        var deleted = 0;
-
-        foreach (var productId in syncedProductIds)
-        {
-            var hasTranslation = translationsById.TryGetValue(productId.Value, out var nameRu) &&
-                                 !string.IsNullOrWhiteSpace(nameRu);
-
-            if (!hasTranslation)
-            {
-                if (existingByProductId.TryGetValue(productId.Value, out var existingToDelete) && !existingToDelete.IsDeleted)
-                {
-                    existingToDelete.MarkAsDeleted(now);
-                    deleted++;
-                }
-
-                continue;
-            }
-
-            if (existingByProductId.TryGetValue(productId.Value, out var existing))
-            {
-                existing.Update(nameRu!, now);
-                updated++;
-                continue;
-            }
-
-            var createdTranslation = ProductTranslation.Create(productId, RuLanguage, nameRu!, now);
-            await translationRepo.AddAsync(createdTranslation, cancellationToken);
-            created++;
         }
 
-        await translationRepo.SaveChangesAsync(cancellationToken);
-
-        logger.LogInformation(
-            "Product translations synced. Created: {Created}, Updated: {Updated}, Deleted: {Deleted}, TotalProducts: {TotalProducts}",
-            created, updated, deleted, syncedProductIds.Count);
-    }
-
-    private Dictionary<int, string> ReadTranslationsFromCsv()
-    {
-        var filePath = ResolveTranslationFilePath();
-        if (!File.Exists(filePath))
+        foreach (var product in missing)
         {
-            logger.LogWarning(
-                "Product translations file was not found. Expected path: {FilePath}. Translations sync will be skipped for this run.",
-                filePath);
-            return new Dictionary<int, string>();
+            if (product.MarkDeleted(now))
+                counters.Deleted++;
         }
-
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-        using var reader = new StreamReader(filePath, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        _ = reader.ReadLine();
-
-        var result = new Dictionary<int, string>();
-        while (reader.ReadLine() is { } line)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
-            var fields = ParseCsvLine(line);
-            if (fields.Count < 3)
-                continue;
-
-            if (!int.TryParse(fields[0].Trim(), out var productId) || productId <= 0)
-                continue;
-
-            var ruName = fields[2].Trim();
-            if (string.IsNullOrWhiteSpace(ruName))
-                continue;
-
-            result[productId] = ruName;
-        }
-
-        return result;
-    }
-
-    private static string ResolveTranslationFilePath()
-    {
-        return Path.Combine(AppContext.BaseDirectory, TranslationFileRelativePath);
-    }
-
-    private static List<string> ParseCsvLine(string line)
-    {
-        var fields = new List<string>();
-        var sb = new StringBuilder();
-        var inQuotes = false;
-
-        for (var i = 0; i < line.Length; i++)
-        {
-            var ch = line[i];
-
-            if (ch == '"')
-            {
-                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                {
-                    sb.Append('"');
-                    i++;
-                }
-                else
-                {
-                    inQuotes = !inQuotes;
-                }
-
-                continue;
-            }
-
-            if (ch == ',' && !inQuotes)
-            {
-                fields.Add(sb.ToString());
-                sb.Clear();
-                continue;
-            }
-
-            sb.Append(ch);
-        }
-
-        fields.Add(sb.ToString());
-        return fields;
     }
 }

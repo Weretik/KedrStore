@@ -13,6 +13,8 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<ProductListProjection> ProductListProjections => Set<ProductListProjection>();
     public DbSet<ProductPhotoCheck> ProductPhotoChecks => Set<ProductPhotoCheck>();
     public DbSet<PriceType> PriceTypes => Set<PriceType>();
+    public DbSet<SlugHistoryEntry> SlugHistory => Set<SlugHistoryEntry>();
+    public DbSet<CategoryContent> CategoryContents => Set<CategoryContent>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

@@ -24,6 +24,45 @@ namespace Catalog.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(2)
+                        .HasColumnType("character(2)")
+                        .IsFixedLength();
+
+                    b.Property<string>("BodyHtml")
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)");
+
+                    b.Property<string>("H1")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("MetaDescription")
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("SeoTitle")
+                        .HasMaxLength(70)
+                        .HasColumnType("character varying(70)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("CategoryId", "Language");
+
+                    b.ToTable("CategoryContents", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
                 {
                     b.Property<int>("Id")
@@ -48,6 +87,9 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("ExportToSite")
@@ -115,6 +157,10 @@ namespace Catalog.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
 
+                    b.HasIndex("ProductSlug")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Products_ProductSlug");
+
                     b.HasIndex("CategoryId", "IsDeleted", "IsSale", "IsNew")
                         .HasDatabaseName("IX_Products_ListFilters");
 
@@ -125,6 +171,14 @@ namespace Catalog.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("Level")
                         .HasColumnType("integer");
@@ -164,12 +218,19 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Path")
                         .HasDatabaseName("IX_ProductCategories_Path_gist");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("UX_ProductCategories_Slug");
 
                     b.HasIndex("ParentId", "SortOrder", "Id")
                         .HasDatabaseName("IX_ProductCategories_ParentId_SortOrder_Id");
@@ -287,6 +348,7 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("PhotoUrl")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -394,6 +456,81 @@ namespace Catalog.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ProductTranslations", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.SlugHistoryEntry", b =>
+                {
+                    b.Property<short>("EntityType")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("Slug")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("EntityType", "Slug");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("IX_CatalogSlugHistory_EntityType_EntityId");
+
+                    b.ToTable("CatalogSlugHistory", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("Catalog.Domain.Entities.CategoryFaqItem", "Faq", b1 =>
+                        {
+                            b1.Property<long>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<long>("Id"));
+
+                            b1.Property<string>("Answer")
+                                .IsRequired()
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)");
+
+                            b1.Property<int>("CategoryId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Language")
+                                .IsRequired()
+                                .HasMaxLength(2)
+                                .HasColumnType("character(2)")
+                                .IsFixedLength();
+
+                            b1.Property<string>("Question")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("CategoryId", "Language", "SortOrder")
+                                .HasDatabaseName("IX_CategoryFaqItems_Content_SortOrder");
+
+                            b1.ToTable("CategoryFaqItems", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId", "Language");
+                        });
+
+                    b.Navigation("Faq");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>

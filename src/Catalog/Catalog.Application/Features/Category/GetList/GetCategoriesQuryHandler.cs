@@ -5,7 +5,10 @@ using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Features.Category.GetList;
 
-public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> categoryRepository)
+/// <summary>Public tree: each node carries its product count; empty branches are omitted (R-015).</summary>
+public class GetCategoriesQuryHandler(
+    ICatalogReadRepository<ProductCategory> categoryRepository,
+    ICategoryStatsReader statsReader)
     : IQueryHandler<GetCategoriesQuery, Result<IReadOnlyList<CategoryTreeDto>>>
 {
     public async ValueTask<Result<IReadOnlyList<CategoryTreeDto>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
@@ -13,12 +16,18 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
         ArgumentNullException.ThrowIfNull(query);
 
         var categories = await categoryRepository.ListAsync(new AllCategoriesSpec(query.Filter.ProductTypeId), cancellationToken);
-        IReadOnlyList<CategoryTreeDto> tree = BuildTree(categories, query.Lang);
+        var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
+        IReadOnlyList<CategoryTreeDto> tree = BuildTree(categories, query.Lang, stats, hideEmpty: true);
         return Result.Success(tree);
     }
 
-    internal static IReadOnlyList<CategoryTreeDto> BuildTree(IEnumerable<ProductCategory> categories, string lang)
+    internal static IReadOnlyList<CategoryTreeDto> BuildTree(
+        IEnumerable<ProductCategory> categories,
+        string lang,
+        IReadOnlyDictionary<int, CategoryStats> stats,
+        bool hideEmpty)
     {
+        int CountOf(int id) => stats.TryGetValue(id, out var value) ? value.ProductCount : 0;
 
         var items = categories.ToList()
             .Select(c => new
@@ -46,6 +55,7 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
         IReadOnlyList<CategoryTreeDto> BuildBranch(string? parentKey, HashSet<string> ancestors)
         {
             return lookup[parentKey]
+                .Where(i => !hideEmpty || CountOf(i.Id) > 0)
                 .OrderBy(i => i.SortOrder)
                 .ThenBy(i => i.Id)
                 .Select(i => new CategoryTreeDto(
@@ -59,7 +69,8 @@ public class GetCategoriesQuryHandler(ICatalogReadRepository<ProductCategory> ca
                     Level: i.Level,
                     Children: ancestors.Contains(i.Path)
                         ? []
-                        : BuildBranch(i.Path, new HashSet<string>(ancestors, StringComparer.Ordinal) { i.Path })
+                        : BuildBranch(i.Path, new HashSet<string>(ancestors, StringComparer.Ordinal) { i.Path }),
+                    ProductCount: CountOf(i.Id)
                 ))
                 .ToList();
         }
