@@ -97,7 +97,7 @@ flowchart LR
 | `src/Catalog/Catalog.Application/Integrations/OneC/Mappers/CatalogMapper.cs` | drops slug generation and name lookup | C |
 | `src/Catalog/Catalog.Application/Features/Category/Content/{Get,Save}/` | Admin content query and command (+ validator) | N |
 | `src/Catalog/Catalog.Application/Features/Slugs/Change/` | one Admin slug command for both entity types (+ validator); updates projection rows after save | N |
-| `src/Catalog/Catalog.Application/Features/Category/CategoryProductStats.cs` | counts and price range from the projection, rolled up by path | N |
+| `src/Catalog/Catalog.Application/Features/Category/Stats/` (after the [code audit](code-audit/audit.md)) | counts and price range from the projection, rolled up by path | N |
 | `src/Catalog/Catalog.Application/Features/Products/GetAdminList/DeletedAdminProducts.cs` | Admin-only deleted list | N |
 | `src/Catalog/Catalog.Contracts/Category/CatalogRedirect.cs`, `Catalog.Contracts/Slugs/SlugDtos.cs` | redirect body and lookup result; slug DTOs | N |
 | `src/Catalog/Catalog.Application/Features/Category/GetList/GetCategoriesQuryHandler.cs` | counts and hiding | C |

@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category.Stats;
 using System.Reflection;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Category;

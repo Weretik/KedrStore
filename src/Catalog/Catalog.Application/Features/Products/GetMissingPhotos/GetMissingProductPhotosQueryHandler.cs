@@ -1,3 +1,4 @@
+using Catalog.Application.Querying;
 using Catalog.Application.Features.Category;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Contracts.Products.GetMissingPhotos;
@@ -109,7 +110,7 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
         {
             var tokens = request.SearchTerm.Trim()
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(EscapeLike);
+                .Select(LikePattern.Escape);
 
             foreach (var token in tokens)
             {
@@ -137,9 +138,4 @@ public sealed class GetMissingProductPhotosQueryHandler(IReadCatalogDbContext ca
 
         return projections;
     }
-
-    private static string EscapeLike(string text) => text
-        .Replace(@"\", @"\\", StringComparison.Ordinal)
-        .Replace("%", @"\%", StringComparison.Ordinal)
-        .Replace("_", @"\_", StringComparison.Ordinal);
 }
