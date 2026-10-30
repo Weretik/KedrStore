@@ -68,7 +68,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AdminCategory' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role, or `deleted=true` without the Admin role. }
+        '403': { description: 'Signed in without the Manager or Admin role, or `deleted=true` without the Admin role.' }
   /api/categories/{id}:
     get:
       operationId: getAdminCategoryById

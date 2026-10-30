@@ -121,7 +121,7 @@ paths:
         '200': { description: Admin product page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role, or `deleted=true` without the Admin role. }
+        '403': { description: 'Signed in without the Manager or Admin role, or `deleted=true` without the Admin role.' }
   /api/admin/products/{id}/slug:
     put:
       operationId: changeAdminProductSlug
