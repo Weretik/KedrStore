@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category.Stats;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Features.Category;

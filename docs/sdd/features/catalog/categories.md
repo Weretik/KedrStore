@@ -6,7 +6,7 @@ Public tree and category page by slug, Admin reads, Admin slug edit, and Admin-w
 
 ## Structure and relationships
 
-The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Entities/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Slugs/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryProductStats](../../../../src/Catalog/Catalog.Application/Features/Category/CategoryProductStats.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Entities/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Content/HtmlSanitizerService.cs) on save.
+The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Entities/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Slugs/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryStatsReader](../../../../src/Catalog/Catalog.Application/Features/Category/Stats/CategoryStatsReader.cs) and [CategoryStatsRollup](../../../../src/Catalog/Catalog.Application/Features/Category/Stats/CategoryStatsRollup.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Entities/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Content/HtmlSanitizerService.cs) on save.
 
 Access: reads need `CanManageProducts`; slug edit, content save, and `deleted=true` need the Admin role.
 
@@ -27,7 +27,7 @@ src/
     │   │   ├── Content/Get/, Content/Save/  # Admin content query and command
     │   │   ├── GetBySlug/GetCategoryBySlugQueryHandler.cs  # history, redirect, counts, prices, content
     │   │   ├── GetList/GetCategoriesQuryHandler.cs  # tree with counts, hides empty
-    │   │   ├── CategoryProductStats.cs  # counts and price range, rolled up the tree
+    │   │   ├── Stats/                   # counts and price range, rolled up the tree
     │   │   └── CategoryTreeIds.cs  # category + descendants
     │   ├── Features/Slugs/Change/  # Admin slug edit (products and categories)
     │   └── Slugs/  # transliteration, slug text, allocator, slug service

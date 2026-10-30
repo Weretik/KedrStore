@@ -1,3 +1,4 @@
+using Catalog.Application.Querying;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Category;
 using Catalog.Application.Slugs;
@@ -19,7 +20,7 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         ArgumentNullException.ThrowIfNull(query);
 
         var request = query.Request;
-        var language = NormalizeLanguage(request.Lang);
+        var language = CatalogLanguage.Normalize(request.Lang);
 
         var projectionsQuery = catalogDbContext.ProductListProjections
             .AsNoTracking()
@@ -103,7 +104,7 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
             var term = request.SearchTerm.Trim();
             var tokens = term
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(EscapeLike)
+                .Select(LikePattern.Escape)
                 .ToArray();
 
             foreach (var token in tokens)
@@ -188,18 +189,5 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
                     .ThenBy(projection => projection.NameUk).ThenBy(projection => projection.ProductId),
             _ => projectionsQuery.OrderBy(projection => projection.ProductId)
         };
-    }
-
-    private static string NormalizeLanguage(string? lang)
-    {
-        return string.Equals(lang, "ru", StringComparison.OrdinalIgnoreCase) ? "ru" : "uk";
-    }
-
-    private static string EscapeLike(string text)
-    {
-        return text
-            .Replace(@"\", @"\\", StringComparison.Ordinal)
-            .Replace("%", @"\%", StringComparison.Ordinal)
-            .Replace("_", @"\_", StringComparison.Ordinal);
     }
 }

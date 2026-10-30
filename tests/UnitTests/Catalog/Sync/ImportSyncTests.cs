@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category.Stats;
 using Catalog.Application.Features.Category;
 using Catalog.Application.Integrations.OneC.DTOs;
 using Catalog.Application.Integrations.OneC.Mappers;

@@ -1,3 +1,4 @@
+using Catalog.Application.Querying;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Domain.ValueObjects;
@@ -23,7 +24,7 @@ internal static class DeletedAdminProducts
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var term = request.SearchTerm.Trim();
-            var pattern = "%" + EscapeLike(term) + "%";
+            var pattern = "%" + LikePattern.Escape(term) + "%";
             products = int.TryParse(term, NumberStyles.None, CultureInfo.InvariantCulture, out var id)
                 ? products.Where(product => product.Id == ProductId.From(id))
                 : products.Where(product => EF.Functions.ILike(product.Name, pattern, @"\"));
@@ -59,9 +60,4 @@ internal static class DeletedAdminProducts
         var pagedInfo = new PagedInfo(pageNumber, pageSize, (long)Math.Ceiling(totalRecords / (double)pageSize), totalRecords);
         return new PagedResult<List<AdminProductListRowDto>>(pagedInfo, items);
     }
-
-    private static string EscapeLike(string text) => text
-        .Replace(@"\", @"\\", StringComparison.Ordinal)
-        .Replace("%", @"\%", StringComparison.Ordinal)
-        .Replace("_", @"\_", StringComparison.Ordinal);
 }
