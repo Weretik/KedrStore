@@ -3,6 +3,7 @@
 This section holds stable rules for backend changes. Frontend rules belong to the separate frontend project.
 
 - [Backend rules](backend-rules.md) — layers, CQRS, DDD, Mediator, and code organization.
+- [Module rules](module-rules.md) — owning module, when to propose a new module, module shape, schema per module, and FluentValidation.
 - [Identifier strategy](identifier-strategy.md) — required ID choice before creating or changing an entity.
 - [API rules](api-rules.md) — HTTP contracts, validation, results, and errors.
 - [Database rules](database-rules.md) — EF Core, reads, transactions, migrations, and data.
