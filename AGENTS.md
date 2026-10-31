@@ -41,6 +41,7 @@ A small fix that restores documented behavior needs no SDD, file-role map, or au
 | Task | Skill | Project rules |
 | --- | --- | --- |
 | Specify a new or changed feature | `$backend-feature-spec` | [Delivery rules](docs/sdd/standards/delivery-rules.md) |
+| New capability outside existing modules, new module, or its DB schema | `$backend-feature-spec` | [Module rules](docs/sdd/standards/module-rules.md) |
 | Implement an accepted specification | `$backend-feature-delivery` | [Delivery rules](docs/sdd/standards/delivery-rules.md) |
 | Multiple agents at the user's explicit request | `$backend-feature-orchestrator` | [Specifications and dependencies](docs/sdd/specs/README.md) |
 | Code audit / systemic remediation plan | `$backend-code-audit` / `$backend-remediation-plan` | [Architecture](docs/sdd/architecture/README.md) and [standards](docs/sdd/standards/README.md) |

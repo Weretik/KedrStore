@@ -9,6 +9,8 @@ Follow dependency direction `API → Application → Domain`. Infrastructure dep
 - Infrastructure contains persistence and integration adapters; business rules do not belong there.
 - API handles HTTP binding, authorization, and result mapping only; it contains no EF or business logic.
 
+Choose the owning module, or propose a new one, by the [module rules](module-rules.md). They also fix the shape of a new module, its database schema, and FluentValidation use.
+
 ## Entity identifiers
 
 Apply the [identifier strategy](identifier-strategy.md) before creating or changing an entity identifier. Do not default to `Guid`: the ID type depends on the creation lifecycle and integrations. In Domain, wrap the chosen scalar in a typed value object/readonly struct; do not use raw primitive IDs in `BaseEntity`, `BaseAuditableEntity`, or Domain foreign keys.
