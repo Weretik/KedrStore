@@ -1,5 +1,6 @@
 using Catalog.Application.Features.Category.Stats;
 using System.Reflection;
+using Microsoft.Extensions.Options;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Category;
 using Catalog.Application.Features.Category.GetList;
@@ -66,7 +67,7 @@ public sealed class CategoryPresentationApplicationTests
         {
             [900001] = new(2, 10m, 20m),
             [900002] = new(1, 5m, 5m)
-        }));
+        }), Roots);
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
@@ -92,7 +93,7 @@ public sealed class CategoryPresentationApplicationTests
         var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
         {
             [900001] = new(4, 10m, 20m)
-        }));
+        }), Roots);
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
@@ -100,6 +101,34 @@ public sealed class CategoryPresentationApplicationTests
         Assert.Equal([900001], tree.Children.Select(child => child.Id));
         Assert.Equal(4, tree.ProductCount);
     }
+
+    [Fact]
+    public async Task GetCategoriesQuery_OmitsTheCosmosRoot()
+    {
+        var hardware = CreateCategory(5513, "n5513", "Root", 0, 0);
+        var child = CreateCategory(900001, "n5513.n900001", "Child", 0, 1);
+        var cosmos = ProductCategory.Create(
+            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000"));
+        var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
+        ((ReadRepositoryProxy)(object)proxy).Categories = [hardware, child, cosmos];
+        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        {
+            [900001] = new(2, 10m, 20m),
+            [920000] = new(5, 1m, 9m)
+        }), Roots);
+
+        var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
+
+        Assert.Equal([5513], result.Value.Select(node => node.Id));
+    }
+
+    private static readonly IOptions<RootCategoryId> Roots = Options.Create(new RootCategoryId
+    {
+        DoorsRootCategoryId = "000007226",
+        HardwareRootCategoryId = "000005513",
+        CosmosRootCategoryId = "Космос",
+        CosmosCategoryId = 920000
+    });
 
     private sealed class FixedStatsReader(IReadOnlyDictionary<int, CategoryStats> stats) : ICategoryStatsReader
     {

@@ -4,6 +4,7 @@ using Catalog.Application.Features.Category.Content;
 using Catalog.Application.Features.Category.GetList;
 using Catalog.Application.Features.Category.GetList.DTOs;
 using Catalog.Application.Features.Category.GetList.Specifications;
+using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Category;
 using Catalog.Domain.ValueObjects;
@@ -12,13 +13,15 @@ namespace Catalog.Application.Features.Category.GetBySlug;
 
 /// <summary>
 /// Public category page (R-016): a former slug resolves to the current category; a deleted category points to its
-/// nearest active ancestor; the page carries counts, the price range, and content in the requested language.
+/// nearest active ancestor; a hidden import root (Cosmos) is not found; the page carries counts, the price range, and
+/// content in the requested language.
 /// </summary>
 public sealed class GetCategoryBySlugQueryHandler(
     ICatalogReadRepository<ProductCategory> repository,
     IReadCatalogDbContext catalogDbContext,
     ISlugService slugService,
-    ICategoryStatsReader statsReader)
+    ICategoryStatsReader statsReader,
+    IOptions<RootCategoryId> roots)
     : IQueryHandler<GetCategoryBySlugQuery, Result<CatalogLookup<CategoryDetailsResponse>>>
 {
     public async ValueTask<Result<CatalogLookup<CategoryDetailsResponse>>> Handle(GetCategoryBySlugQuery query,
@@ -38,6 +41,9 @@ public sealed class GetCategoryBySlugQueryHandler(
             var redirect = await RedirectForDeletedAsync(resolvedId.Value, map, cancellationToken);
             return Result.Success(CatalogLookup<CategoryDetailsResponse>.Gone(redirect));
         }
+
+        if (PublicCatalogScope.IsHidden(selected, roots.Value))
+            return Result.NotFound();
 
         var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
         var tree = GetCategoriesQuryHandler.BuildTree(categories, query.Lang, stats, hideEmpty: false);

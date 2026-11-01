@@ -5,7 +5,9 @@ using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 using Catalog.Infrastructure.DataBase;
+using Catalog.Application.Integrations.OneC.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace IntegrationTests.Catalog.Persistence;
 
@@ -26,7 +28,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 15, 3, "grandchild", exportToSite: false);
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db));
+        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
         var first = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest
         {
             CategorySlug = "parent", Page = 1, PageSize = 2
@@ -58,6 +60,33 @@ public sealed class PublicProductCategoryFilterTests
         Assert.Equal([13], leaf.Value.Value.Select(row => row.Id));
         Assert.Equal(ResultStatus.NotFound, unknown.Status);
     }
+
+    [Fact]
+    public async Task CosmosProducts_AreNeverListed()
+    {
+        await using var db = CreateContext();
+        SeedCategory(db, 1, "parent");
+        db.Categories.Add(ProductCategory.Create(
+            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")));
+        SeedProduct(db, 11, 1, "parent");
+        SeedProduct(db, 12, 920000, "kosmos");
+        await db.SaveChangesAsync();
+
+        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
+        var all = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest { PageSize = 10 }),
+            CancellationToken.None);
+
+        Assert.Equal([11], all.Value.Value.Select(row => row.Id));
+        Assert.Equal(1, all.Value.PagedInfo.TotalRecords);
+    }
+
+    private static readonly IOptions<RootCategoryId> Roots = Options.Create(new RootCategoryId
+    {
+        DoorsRootCategoryId = "000007226",
+        HardwareRootCategoryId = "000005513",
+        CosmosRootCategoryId = "Космос",
+        CosmosCategoryId = 920000
+    });
 
     private static CatalogDbContext CreateContext()
     {
