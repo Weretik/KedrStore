@@ -1,6 +1,7 @@
 using Catalog.Application.Querying;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Category;
+using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Entities;
@@ -8,7 +9,10 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Products.GetPublicList;
 
-public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catalogDbContext, ISlugService slugService)
+public sealed class GetPublicProductListQueryHandler(
+    IReadCatalogDbContext catalogDbContext,
+    ISlugService slugService,
+    IOptions<RootCategoryId> roots)
     : IQueryHandler<GetPublicProductListQuery, Result<PagedResult<List<ProductListRowDto>>>>
 {
     private const int MaxPageSize = 100;
@@ -25,6 +29,8 @@ public sealed class GetPublicProductListQueryHandler(IReadCatalogDbContext catal
         var projectionsQuery = catalogDbContext.ProductListProjections
             .AsNoTracking()
             .Where(projection => projection.ExportToSite);
+        var hiddenCategoryIds = PublicCatalogScope.HiddenCategoryIds(catalogDbContext.Categories.AsNoTracking(), roots.Value);
+        projectionsQuery = projectionsQuery.Where(projection => !hiddenCategoryIds.Contains(projection.CategoryId));
         var categoryIds = await GetSelectedCategoryTreeIdsAsync(request, cancellationToken);
         if (categoryIds is { Length: 0 } && !string.IsNullOrWhiteSpace(request.CategorySlug) && request.CategoryId is null)
             return Result.NotFound();

@@ -1,22 +1,29 @@
 using Catalog.Application.Features.Category.Stats;
 ﻿using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Features.Category.GetList.DTOs;
 using Catalog.Application.Features.Category.GetList.Specifications;
 using Catalog.Domain.Entities;
 
 namespace Catalog.Application.Features.Category.GetList;
 
-/// <summary>Public tree: each node carries its product count; empty branches are omitted (R-015).</summary>
+/// <summary>
+/// Public tree: each node carries its product count; empty branches and hidden import roots (Cosmos) are omitted
+/// (R-015).
+/// </summary>
 public class GetCategoriesQuryHandler(
     ICatalogReadRepository<ProductCategory> categoryRepository,
-    ICategoryStatsReader statsReader)
+    ICategoryStatsReader statsReader,
+    IOptions<RootCategoryId> roots)
     : IQueryHandler<GetCategoriesQuery, Result<IReadOnlyList<CategoryTreeDto>>>
 {
     public async ValueTask<Result<IReadOnlyList<CategoryTreeDto>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        var categories = await categoryRepository.ListAsync(new AllCategoriesSpec(query.Filter.ProductTypeId), cancellationToken);
+        var categories = (await categoryRepository.ListAsync(new AllCategoriesSpec(query.Filter.ProductTypeId), cancellationToken))
+            .Where(category => !PublicCatalogScope.IsHidden(category, roots.Value))
+            .ToList();
         var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
         IReadOnlyList<CategoryTreeDto> tree = BuildTree(categories, query.Lang, stats, hideEmpty: true);
         return Result.Success(tree);
