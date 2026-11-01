@@ -36,6 +36,12 @@ A new feature needs a concise description of its actual architecture in `docs/sd
 
 Implement a feature in stages (one scenario, task slice, or layer at a time). After each stage, run a short structure check on the files that stage touched: split files and classes that mix responsibilities, and move crowded folders into logical folders or modules under the [backend rules](backend-rules.md). Do not leave this for the end of the feature. The check is local to changed files and is not the full code audit. After the last stage, do a short final pass over the whole feature and compare the planned map with the actual tree in the feature map.
 
+## Closing checklist
+
+Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the staged structure checks are done.
+
+When changing an existing feature, open its card and the code and tests it lists before editing.
+
 ## Completion criteria
 
 Every scenario in the agreed scope is implemented or explicitly deferred; its required technical tasks are complete, and automated or documented manual verification passed. Contracts match the implementation. New and changed files are checked against the [backend rules](backend-rules.md): independent scenarios and roles are separated, and the planned map is compared with the actual tree in the feature map; file size alone does not require splitting. Focused tests for the changed feature and related components are run, or the reason they could not be run is recorded; general tests and a full suite run only at the user's explicit request under the [testing rules](testing-rules.md). The delivery report includes changed files, verification evidence, unrun checks, and residual risks.
