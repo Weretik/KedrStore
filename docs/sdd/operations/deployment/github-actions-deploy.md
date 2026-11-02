@@ -4,6 +4,6 @@
 
 ## Google Cloud sign-in
 
-The deploy job signs in without a key, through Workload Identity Federation: GitHub issues a short-lived OIDC token, pool `github` / provider `github-oidc` in project `classkedrproject` accepts it only for repository `Weretik/KedrStore`, and the job acts as `gha-deployer@classkedrproject.iam.gserviceaccount.com`. No service account key or `GCP_SA_KEY` secret is used. The service account keeps its existing deploy roles and has `roles/iam.workloadIdentityUser` for that repository principal set.
+The deploy job signs in without a key, through Workload Identity Federation: GitHub issues a short-lived OIDC token, pool `github` / provider `github-oidc` in project `classkedrproject` accepts it only for repository `Weretik/KedrStore`, and the job acts as `gha-deployer@classkedrproject.iam.gserviceaccount.com`. No service account key or `GCP_SA_KEY` secret is used. The service account keeps its existing deploy roles. The repository principal set has `roles/iam.workloadIdentityUser` on the project (the binding on the service account itself was refused), so it may impersonate service accounts of `classkedrproject`; only `Weretik/KedrStore` can obtain it.
 
-If sign-in fails at "Auth to Google Cloud", check the provider's attribute condition (repository name) and that binding before anything else.
+If sign-in fails at "Auth to Google Cloud", check the provider's attribute condition (repository name) and that project binding before anything else.
