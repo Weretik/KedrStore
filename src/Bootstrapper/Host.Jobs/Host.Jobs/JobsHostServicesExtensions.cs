@@ -6,6 +6,7 @@ using Catalog.Application.Jobs.Slugs;
 using Catalog.Infrastructure.DependencyInjection;
 using Content.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.DependencyInjection;
+using Media.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Infrastructure.DependencyInjection;
@@ -26,6 +27,7 @@ public static class JobsHostServicesExtensions
         services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
         services.AddIdentityInfrastructureServices(configuration);
         services.AddContentInfrastructureServices(configuration);
+        services.AddMediaInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);

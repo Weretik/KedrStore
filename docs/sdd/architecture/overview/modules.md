@@ -18,6 +18,12 @@ Layers: Content.Api, Content.Application, Content.Domain, Content.Infrastructure
 
 Owns site content written in the admin: articles and the company contacts now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history; it does not reference other modules.
 
+## Media
+
+Layers: Media.Api, Media.Application, Media.Domain, Media.Infrastructure.
+
+Owns the picture library on the CDN: virtual folders, file records with CDN keys, uploads over FTP, and the CDN sync job. Its tables live in the PostgreSQL schema `media` with their own migration history; it does not reference other modules. Other modules link to library files by `MediaFileId`.
+
 ## Identity
 
 Layers: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.

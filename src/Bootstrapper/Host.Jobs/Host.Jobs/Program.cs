@@ -3,6 +3,7 @@ using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Jobs.ProductPhotos;
 using Catalog.Application.Jobs.Slugs;
 using Host.Jobs;
+using Media.Application.Jobs.CdnSync;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;
 using Microsoft.Extensions.Configuration;
@@ -132,6 +133,17 @@ try
 
         case "rebuild-projections":
             await scopeServiceProvider.GetRequiredService<IProductListProjectionRebuilder>().RebuildAsync(cancellationToken);
+            break;
+
+        case "media-cdn-sync":
+            var syncReport = await scopeServiceProvider.GetRequiredService<SyncCdnMediaJob>()
+                .RunAsync(args.Contains("--dry-run", StringComparer.OrdinalIgnoreCase), cancellationToken);
+            Console.WriteLine(
+                $"[RESULT] media-cdn-sync dryRun={syncReport.DryRun}; found={syncReport.FoundOnCdn}; " +
+                $"known={syncReport.AlreadyKnown}; registered={syncReport.Registered}; notPictures={syncReport.NotPictures}; " +
+                $"orphans={syncReport.Orphans}; missingOnCdn={syncReport.MissingOnCdn}");
+            foreach (var (folder, count) in syncReport.RegisteredByFolder.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+                Console.WriteLine($"[RESULT] folder {folder}: {count} new");
             break;
 
         case "check-product-photos":

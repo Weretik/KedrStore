@@ -16,6 +16,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | `category`, `productdetails`, `stocks`, `prices` | One or more `--rootId=<id>` | Targeted Catalog root refresh |
 | `rebuild-projections` | — | Rebuild Catalog product-list read model |
 | `check-product-photos` | — | Checks photo URLs for every active product and saves the latest status |
+| `media-cdn-sync` | `--dry-run` (optional) | Registers CDN pictures in the media library; with `--dry-run` only reports ([runbook](media-cdn-sync-runbook.md)) |
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |
