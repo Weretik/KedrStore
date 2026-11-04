@@ -10,7 +10,7 @@
 
 ## Run
 
-1. Dry run: in Cloud Run → Jobs → `media-cdn-sync` → **Execute with overrides**, set the arguments to `--job=media-cdn-sync` and `--dry-run`. The log prints `[RESULT] media-cdn-sync dryRun=True; found=…; known=…; registered=…; notPictures=…; orphans=…; missingOnCdn=…` and one `[RESULT] folder …: N new` line per folder. Nothing is saved.
+1. Dry run: in Cloud Run → Jobs → `media-cdn-sync` → **Execute with overrides**, set the arguments to `--job=media-cdn-sync` and `--dry-run`. The log prints `[RESULT] media-cdn-sync dryRun=True; found=…; known=…; registered=…; notPictures=…; orphans=…; missingOnCdn=…; hiddenSkipped=…` (files in CDN service folders such as `.thumbs/`, never registered) and one `[RESULT] folder …: N new` line per folder. Nothing is saved.
 2. Read the numbers: `registered` is what the real run will add; `notPictures` are non-image files; `orphans` are unknown files in `library/` (uploads whose save failed); `missingOnCdn` are library rows whose CDN file is gone.
 3. Real run: **Execute** the job with its default arguments (`--job=media-cdn-sync`).
 4. Optional daily run: a Cloud Scheduler trigger for the job keeps files uploaded straight over FTP visible in the library.

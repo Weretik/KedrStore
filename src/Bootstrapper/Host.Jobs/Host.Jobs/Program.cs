@@ -141,7 +141,7 @@ try
             Console.WriteLine(
                 $"[RESULT] media-cdn-sync dryRun={syncReport.DryRun}; found={syncReport.FoundOnCdn}; " +
                 $"known={syncReport.AlreadyKnown}; registered={syncReport.Registered}; notPictures={syncReport.NotPictures}; " +
-                $"orphans={syncReport.Orphans}; missingOnCdn={syncReport.MissingOnCdn}");
+                $"orphans={syncReport.Orphans}; missingOnCdn={syncReport.MissingOnCdn}; hiddenSkipped={syncReport.HiddenSkipped}");
             foreach (var (folder, count) in syncReport.RegisteredByFolder.OrderBy(pair => pair.Key, StringComparer.Ordinal))
                 Console.WriteLine($"[RESULT] folder {folder}: {count} new");
             break;

@@ -39,13 +39,14 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         foreach (var key in new[]
                  {
                      "products/731.jpg", "products/732.JPG", "products/old/733.png", "product-scheme/s731.jpg",
-                     "products/readme.txt", "avatars/u1.webp", "library/2026/11/orphan.webp", "banners/main.webp"
+                     "products/readme.txt", "avatars/u1.webp", "library/2026/11/orphan.webp", "banners/main.webp",
+                     ".thumbs/fc33be99/731.jpg", "products/.cache/731.jpg"
                  })
             cdn.Files[key] = [1, 2, 3];
         await using var provider = BuildProvider(cdn);
 
         var dry = await RunSync(provider, dryRun: true);
-        Assert.Equal((7, 0, 5, 1, 1), (dry.FoundOnCdn, dry.AlreadyKnown, dry.Registered, dry.NotPictures, dry.Orphans));
+        Assert.Equal((7, 0, 5, 1, 1, 2), (dry.FoundOnCdn, dry.AlreadyKnown, dry.Registered, dry.NotPictures, dry.Orphans, dry.HiddenSkipped));
         Assert.Equal(3, dry.RegisteredByFolder["Товари"] + dry.RegisteredByFolder["Товари / old"]);
         await using (var db = postgres.CreateContext())
             Assert.Equal(0, await db.MediaFiles.CountAsync());

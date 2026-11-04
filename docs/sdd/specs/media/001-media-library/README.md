@@ -28,7 +28,7 @@ A new module `Media` (Domain, Application, Infrastructure, Api) under the [modul
 - R-5: replace uploads the new picture under a new key, keeps the file ID (so links stay), and deletes the old CDN file. A new key means no CDN or browser cache shows the old picture.
 - R-6: delete removes the CDN file and the row. A folder can be deleted only when it has no files and no subfolders.
 - R-7: the list is paged on the server (page size 1–200, default 60), filtered by folder (or all), and searched by display name (case-insensitive contains).
-- R-8: the CDN sync job lists the CDN recursively, skips `avatars/` and `library/`, and registers every unknown JPEG/PNG/WebP/GIF file: the first directory level becomes a top folder (`products` → «Товари», `product-scheme` → «Схеми», other names as they are), deeper levels become subfolders. Known keys are skipped; files missing on the CDN are only reported. `--dry-run` reports and saves nothing.
+- R-8: the CDN sync job lists the CDN recursively, skips `avatars/`, `library/`, and service directories whose name starts with a dot (`.thumbs/`, counted as hidden), and registers every unknown JPEG/PNG/WebP/GIF file: the first directory level becomes a top folder (`products` → «Товари», `product-scheme` → «Схеми», other names as they are), deeper levels become subfolders. Known keys are skipped; files missing on the CDN are only reported. `--dry-run` reports and saves nothing.
 - R-9: reads, upload, replace, move, rename, and folder create/rename/move need `CanManageMedia` (Manager, Admin); file and folder delete need `RequireAdminRole` (Admin).
 
 ## Scenarios

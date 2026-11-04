@@ -24,7 +24,10 @@ public sealed class SyncCdnMediaJob(
         if (!storage.IsConfigured)
             throw new InvalidOperationException("Media storage is not configured: set MediaStorage:Ftp.");
 
-        var objects = await storage.ListAsync(_options.ExcludedDirectories, cancellationToken);
+        var listed = await storage.ListAsync(_options.ExcludedDirectories, cancellationToken);
+        // The CDN keeps its own service folders such as `.thumbs/`; they are not pictures of the shop.
+        var objects = listed.Where(item => !IsHidden(item.Key)).ToList();
+        var hidden = listed.Count - objects.Count;
         var knownKeys = (await db.MediaFiles.AsNoTracking().Select(file => file.StorageKey).ToListAsync(cancellationToken))
             .ToHashSet(StringComparer.Ordinal);
         var cdnKeys = objects.Select(item => item.Key).ToHashSet(StringComparer.Ordinal);
@@ -41,7 +44,7 @@ public sealed class SyncCdnMediaJob(
             else toRegister.Add(item);
         }
 
-        var missing = knownKeys.Count(key => !cdnKeys.Contains(key) && !IsExcluded(key));
+        var missing = knownKeys.Count(key => !cdnKeys.Contains(key) && !IsExcluded(key) && !IsHidden(key));
         var byFolder = toRegister
             .GroupBy(item => FolderPathOf(item.Key) is { Length: > 0 } path ? string.Join(" / ", path) : "/", StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal);
@@ -49,11 +52,11 @@ public sealed class SyncCdnMediaJob(
         if (!dryRun && toRegister.Count > 0)
             await RegisterAsync(toRegister, cancellationToken);
 
-        var report = new MediaCdnSyncReport(dryRun, objects.Count, known, toRegister.Count, notPictures, orphans, missing, byFolder);
+        var report = new MediaCdnSyncReport(dryRun, objects.Count, known, toRegister.Count, notPictures, orphans, missing, hidden, byFolder);
         logger.LogInformation(
-            "Media CDN sync (dryRun={DryRun}): found {Found}, known {Known}, registered {Registered}, not pictures {NotPictures}, orphans {Orphans}, missing on CDN {Missing}",
+            "Media CDN sync (dryRun={DryRun}): found {Found}, known {Known}, registered {Registered}, not pictures {NotPictures}, orphans {Orphans}, missing on CDN {Missing}, hidden skipped {Hidden}",
             report.DryRun, report.FoundOnCdn, report.AlreadyKnown, report.Registered, report.NotPictures, report.Orphans,
-            report.MissingOnCdn);
+            report.MissingOnCdn, report.HiddenSkipped);
         foreach (var (folder, count) in byFolder.OrderBy(pair => pair.Key, StringComparer.Ordinal))
             logger.LogInformation("Media CDN sync folder {Folder}: {Count} new files", folder, count);
         return report;
@@ -108,6 +111,10 @@ public sealed class SyncCdnMediaJob(
             ? directory[..MediaFolder.NameMaxLength]
             : directory).ToArray();
     }
+
+    /// <summary>A file in a directory whose name starts with a dot (`.thumbs/…`) is a CDN service file.</summary>
+    private static bool IsHidden(string key)
+        => key.Split('/', StringSplitOptions.RemoveEmptyEntries)[..^1].Any(directory => directory.StartsWith('.'));
 
     private bool IsOwned(string key) => HasTopDirectory(key, _options.OwnedDirectories);
 

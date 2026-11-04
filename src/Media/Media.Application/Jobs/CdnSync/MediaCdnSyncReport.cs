@@ -9,4 +9,5 @@ public sealed record MediaCdnSyncReport(
     int NotPictures,
     int Orphans,
     int MissingOnCdn,
+    int HiddenSkipped,
     IReadOnlyDictionary<string, int> RegisteredByFolder);
