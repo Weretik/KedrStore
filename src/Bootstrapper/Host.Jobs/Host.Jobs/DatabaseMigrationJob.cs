@@ -43,6 +43,7 @@ public sealed class DatabaseMigrationJob(
             "CatalogDbContext" => 10,
             "SalesDbContext" => 20,
             "AppIdentityDbContext" => 30,
+            "ContentDbContext" => 40,
             _ => 100
         };
 

@@ -35,6 +35,8 @@
       <ProjectReference Include="..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Sales\Sales.Api\Sales.Api.csproj" />
       <ProjectReference Include="..\..\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Content\Content.Api\Content.Api.csproj" />
+      <ProjectReference Include="..\..\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

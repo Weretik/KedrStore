@@ -1,0 +1,302 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — site articles
+  version: 0.1.0
+  description: >-
+    Public reads of published site articles and their covers, and Manager/Admin management of articles.
+    `coverPath` is relative to the API base URL; the `v` query value changes with every new cover, so a
+    matching cover response may be cached for a year.
+paths:
+  /api/content/{lang}/articles:
+    get:
+      operationId: getArticles
+      summary: List published articles in one language, newest first
+      description: Public, because the site renders articles for anonymous visitors.
+      tags: [Articles]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Published articles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ArticleSummary' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/content/{lang}/articles/{slug}:
+    get:
+      operationId: getArticle
+      summary: Get one published article by slug
+      tags: [Articles]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string, maxLength: 120 }
+      responses:
+        '200':
+          description: The article.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Article' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: No published article with this slug. }
+  /api/content/articles/{id}/cover:
+    get:
+      operationId: getArticleCover
+      summary: Get the cover picture of an article
+      description: >-
+        Public. Drafts are included so the admin preview works; the path is only known from an article response.
+        With `v` equal to the current cover version the response is `Cache-Control: public, max-age=31536000, immutable`.
+      tags: [Articles]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+        - name: v
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: WebP picture.
+          content:
+            image/webp:
+              schema: { type: string, format: binary }
+        '404': { description: The article or its cover does not exist. }
+  /api/admin/articles:
+    get:
+      operationId: getAdminArticles
+      summary: List all articles, drafts included, newest first
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: Articles with Ukrainian titles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AdminArticleSummary' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+    post:
+      operationId: createAdminArticle
+      summary: Create an article
+      description: >-
+        An empty `slug` is generated from the Ukrainian title (KMU-2010 transliteration, `-2`, `-3`… on a clash).
+        `bodyHtml` is sanitized to p, br, strong, em, ul, ol, li, h2, h3, blockquote, and a[href] (http, https, or a
+        path starting with `/`). Not idempotent: repeating the request creates another article.
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveArticleRequest' }
+      responses:
+        '200':
+          description: The created article as stored.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminArticle' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/articles/{id}:
+    get:
+      operationId: getAdminArticle
+      summary: Get an article with both languages
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+      responses:
+        '200':
+          description: The article.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminArticle' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Article not found. }
+    put:
+      operationId: updateAdminArticle
+      summary: Replace an article's slug, date, publication flag, and both texts
+      description: Full replacement; `slug` is required and must not belong to another article. Repeating it is safe.
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveArticleRequest' }
+      responses:
+        '200':
+          description: The article as stored.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminArticle' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Article not found. }
+    delete:
+      operationId: deleteAdminArticle
+      summary: Delete an article and its cover for good
+      description: To hide an article from the site without losing it, save it with `isPublished = false`.
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+      responses:
+        '204': { description: Deleted. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Article not found. }
+  /api/admin/articles/{id}/cover:
+    put:
+      operationId: uploadAdminArticleCover
+      summary: Upload or replace the cover picture
+      description: >-
+        JPEG, PNG, or WebP up to 10 MB, at least 600 px wide. Stored as WebP at most 1600 px wide with the EXIF
+        orientation applied; the cover version grows by one.
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: The article with its new `coverPath`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminArticle' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Article not found. }
+        '413': { description: The request is larger than the upload limit. }
+    delete:
+      operationId: removeAdminArticleCover
+      summary: Remove the cover picture
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ArticleId'
+      responses:
+        '200':
+          description: The article without a cover.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminArticle' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Article not found. }
+components:
+  parameters:
+    Lang:
+      name: lang
+      in: path
+      required: true
+      schema: { type: string, enum: [uk, ru] }
+    ArticleId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64, minimum: 1 }
+  responses:
+    ValidationError:
+      description: Invalid input; each error names the field (`slug`, `texts`, `file`…).
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+  schemas:
+    CoverPath:
+      type: [string, 'null']
+      description: Path of the cover relative to the API base URL, with the version in `v`; null without a cover.
+      examples: ['/api/content/articles/4/cover?v=1']
+    ArticleSummary:
+      type: object
+      required: [id, slug, title, excerpt, publishedOn, coverPath, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        slug: { type: string }
+        title: { type: string }
+        excerpt: { type: string, description: Short plain-text description for cards and meta description. }
+        publishedOn: { type: string, format: date }
+        coverPath: { $ref: '#/components/schemas/CoverPath' }
+        updatedAt: { type: string, format: date-time }
+    Article:
+      allOf:
+        - $ref: '#/components/schemas/ArticleSummary'
+        - type: object
+          required: [bodyHtml]
+          properties:
+            bodyHtml: { type: string, description: Sanitized HTML; safe to render as is. }
+    AdminArticleSummary:
+      type: object
+      required: [id, slug, title, publishedOn, isPublished, coverPath, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        slug: { type: string }
+        title: { type: string, description: Ukrainian title. }
+        publishedOn: { type: string, format: date }
+        isPublished: { type: boolean }
+        coverPath: { $ref: '#/components/schemas/CoverPath' }
+        updatedAt: { type: string, format: date-time }
+    ArticleText:
+      type: object
+      required: [language, title, excerpt, bodyHtml]
+      properties:
+        language: { type: string, enum: [uk, ru] }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        excerpt: { type: string, minLength: 1, maxLength: 300 }
+        bodyHtml: { type: string, minLength: 1, maxLength: 50000 }
+    AdminArticle:
+      type: object
+      required: [id, slug, publishedOn, isPublished, coverPath, updatedAt, texts]
+      properties:
+        id: { type: integer, format: int64 }
+        slug: { type: string }
+        publishedOn: { type: string, format: date }
+        isPublished: { type: boolean }
+        coverPath: { $ref: '#/components/schemas/CoverPath' }
+        updatedAt: { type: string, format: date-time }
+        texts:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items: { $ref: '#/components/schemas/ArticleText' }
+    SaveArticleRequest:
+      type: object
+      required: [publishedOn, isPublished, texts]
+      properties:
+        slug:
+          type: [string, 'null']
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          maxLength: 120
+          description: Required on update; empty on create means "generate from the Ukrainian title".
+        publishedOn: { type: string, format: date }
+        isPublished: { type: boolean }
+        texts:
+          type: array
+          description: Exactly one `uk` and one `ru` text.
+          minItems: 2
+          maxItems: 2
+          items: { $ref: '#/components/schemas/ArticleText' }

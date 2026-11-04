@@ -5,7 +5,7 @@ namespace ArchitectureTests.Modules;
 public sealed class ProjectModuleIsolationTests
 {
     private static readonly RepositoryProjectGraph Graph = RepositoryProjectGraph.Load();
-    private static readonly string[] BusinessModules = ["Catalog", "Identity", "Sales"];
+    private static readonly string[] BusinessModules = ["Catalog", "Content", "Identity", "Sales"];
 
     [Fact]
     public void DomainAndApplicationProjects_DoNotReferenceAnotherBusinessModule()

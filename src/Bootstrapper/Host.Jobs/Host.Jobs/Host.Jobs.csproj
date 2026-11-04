@@ -28,6 +28,7 @@
       <ProjectReference Include="..\..\..\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
       <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
+      <ProjectReference Include="..\..\..\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

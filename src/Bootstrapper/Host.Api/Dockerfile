@@ -23,6 +23,12 @@ COPY ["src/Catalog/Catalog.Contracts/Catalog.Contracts.csproj", "src/Catalog/Cat
 COPY ["src/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Catalog/Catalog.Domain/"]
 COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]
 
+# Content
+COPY ["src/Content/Content.Api/Content.Api.csproj", "src/Content/Content.Api/"]
+COPY ["src/Content/Content.Application/Content.Application.csproj", "src/Content/Content.Application/"]
+COPY ["src/Content/Content.Domain/Content.Domain.csproj", "src/Content/Content.Domain/"]
+COPY ["src/Content/Content.Infrastructure/Content.Infrastructure.csproj", "src/Content/Content.Infrastructure/"]
+
 # Identity
 COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/Identity.Api/"]
 COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]

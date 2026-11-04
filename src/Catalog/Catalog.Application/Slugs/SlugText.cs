@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using BuildingBlocks.Application.Text;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Slugs;

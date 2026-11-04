@@ -1,3 +1,4 @@
+using Content.Infrastructure.DependencyInjection;
 using Host.Api.DependencyInjection.ServiceRegistration.Options;
 using Sales.Infrastructure.DependencyInjection;
 
@@ -17,6 +18,7 @@ public static class ModuleRegistrationsExtensions
         services.AddCatalogInfrastructureServices(configuration);
         services.AddCatalogIntegrationOneCServices(configuration);
         services.AddSalesInfrastructureServices(configuration);
+        services.AddContentInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();
 
