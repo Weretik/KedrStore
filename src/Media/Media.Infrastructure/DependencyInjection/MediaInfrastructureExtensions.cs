@@ -5,6 +5,7 @@ using Media.Application.Jobs.CdnSync;
 using Media.Contracts.Files;
 using Media.Infrastructure.Files;
 using Media.Infrastructure.Images;
+using Media.Infrastructure.Lookup;
 using Media.Infrastructure.Repositories;
 using Media.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,6 +23,7 @@ public static class MediaInfrastructureExtensions
         services.AddDbContext<MediaDbContext>(options => MediaDbContext.Configure(options, connectionString));
         services.AddScoped<IReadMediaDbContext>(sp => sp.GetRequiredService<MediaDbContext>());
         services.AddScoped(typeof(IMediaRepository<>), typeof(MediaEfRepository<>));
+        services.AddScoped<IMediaFileLookup, MediaFileLookup>();
         services.AddSingleton<IImageInspector, SkiaImageInspector>();
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IDatabaseMigrator, DbMigrator<MediaDbContext>>();

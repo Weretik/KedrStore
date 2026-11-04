@@ -22,6 +22,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminCompanyContactsController` | `/api/admin/content/contacts` | `CanManageContent` |
 | `CompanyRequisitesController` | `/api/content/requisites` | public (requisites page) |
 | `AdminCompanyRequisitesController` | `/api/admin/content/requisites` | `RequireAdminRole` |
+| `LegalDocumentsController` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
+| `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
 | `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |

@@ -8,4 +8,6 @@ public interface IReadContentDbContext
     DbSet<CompanyContacts> CompanyContacts { get; }
     DbSet<CompanyRequisites> CompanyRequisites { get; }
     DbSet<CompanyRequisitesChange> CompanyRequisitesChanges { get; }
+    DbSet<LegalDocumentVersion> LegalDocumentVersions { get; }
+    DbSet<GalleryItem> GalleryItems { get; }
 }

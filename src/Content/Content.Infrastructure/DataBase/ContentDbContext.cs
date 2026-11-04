@@ -1,6 +1,6 @@
 namespace Content.Infrastructure.DataBase;
 
-/// <summary>Site content (articles, company contacts and requisites) in its own PostgreSQL schema with its own migration history.</summary>
+/// <summary>Site content (articles, company contacts and requisites, legal documents, gallery) in its own PostgreSQL schema with its own migration history.</summary>
 public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options)
     : DbContext(options), IReadContentDbContext
 {
@@ -12,6 +12,8 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options)
     public DbSet<CompanyContacts> CompanyContacts => Set<CompanyContacts>();
     public DbSet<CompanyRequisites> CompanyRequisites => Set<CompanyRequisites>();
     public DbSet<CompanyRequisitesChange> CompanyRequisitesChanges => Set<CompanyRequisitesChange>();
+    public DbSet<LegalDocumentVersion> LegalDocumentVersions => Set<LegalDocumentVersion>();
+    public DbSet<GalleryItem> GalleryItems => Set<GalleryItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

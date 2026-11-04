@@ -16,13 +16,13 @@ Owns sales customers and counterparties, pricing policy, and sales integration w
 
 Layers: Content.Api, Content.Application, Content.Domain, Content.Infrastructure.
 
-Owns site content written in the admin: articles, company contacts and requisites now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history; it does not reference other modules.
+Owns site content written in the admin: articles, company contacts, requisites, the versioned site documents (offer, privacy, returns, delivery) and the site gallery now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history. Gallery photos are stored as `MediaFileId` values; Content.Infrastructure reads their URLs through `Media.Contracts` (no table, join or foreign key across modules).
 
 ## Media
 
-Layers: Media.Api, Media.Application, Media.Domain, Media.Infrastructure.
+Layers: Media.Api, Media.Application, Media.Contracts, Media.Domain, Media.Infrastructure.
 
-Owns the picture library on the CDN: virtual folders, file records with CDN keys, uploads over FTP, and the CDN sync job. Its tables live in the PostgreSQL schema `media` with their own migration history; it does not reference other modules. Other modules link to library files by `MediaFileId`.
+Owns the picture library on the CDN: virtual folders, file records with CDN keys, uploads over FTP, and the CDN sync job. Its tables live in the PostgreSQL schema `media` with their own migration history; it does not reference other modules. Other modules link to library files by `MediaFileId` and read them through `IMediaFileLookup` in Media.Contracts (URL, file name, size), implemented by Media.Infrastructure.
 
 ## Identity
 

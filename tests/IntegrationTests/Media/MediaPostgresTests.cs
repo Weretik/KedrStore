@@ -84,6 +84,28 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(inProducts[0].Url, Assert.Single(byId).Url);
     }
 
+    [SkippableFact]
+    public async Task Lookup_GivesOtherModulesTheUrlOfKnownFilesOnly()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        var cdn = new FakeMediaStorage();
+        cdn.Files["products/731.jpg"] = [1, 2, 3];
+        await using var provider = BuildProvider(cdn);
+        await RunSync(provider, dryRun: false);
+        await using var scope = provider.CreateAsyncScope();
+        var id = await scope.ServiceProvider.GetRequiredService<IReadMediaDbContext>().MediaFiles
+            .Select(file => file.Id.Value).SingleAsync();
+
+        var files = await scope.ServiceProvider.GetRequiredService<IMediaFileLookup>()
+            .GetFilesAsync([id, id + 1000], default);
+
+        var file = Assert.Single(files).Value;
+        Assert.Equal(id, file.Id);
+        Assert.Equal("731.jpg", file.FileName);
+        Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", file.Url);
+    }
+
     private static async Task<MediaCdnSyncReport> RunSync(ServiceProvider provider, bool dryRun)
     {
         await using var scope = provider.CreateAsyncScope();
