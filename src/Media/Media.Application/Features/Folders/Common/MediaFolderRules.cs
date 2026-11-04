@@ -35,6 +35,30 @@ internal static class MediaFolderRules
             : Result.Invalid(new ValidationError(field, "The folder does not exist."));
     }
 
+    /// <summary>The folder and all its subfolders, at any depth.</summary>
+    public static async Task<IReadOnlyList<MediaFolderId>> SelfAndDescendantsAsync(IReadMediaDbContext db,
+        MediaFolderId folderId, CancellationToken cancellationToken)
+    {
+        var folders = await db.MediaFolders.AsNoTracking()
+            .Select(folder => new { folder.Id, folder.ParentId })
+            .ToListAsync(cancellationToken);
+        var children = folders.Where(folder => folder.ParentId != null)
+            .ToLookup(folder => folder.ParentId!.Value, folder => folder.Id);
+
+        var result = new List<MediaFolderId>();
+        var visited = new HashSet<MediaFolderId>();
+        var pending = new Stack<MediaFolderId>([folderId]);
+        while (pending.TryPop(out var id))
+        {
+            if (!visited.Add(id))
+                continue;
+            result.Add(id);
+            foreach (var child in children[id])
+                pending.Push(child);
+        }
+        return result;
+    }
+
     /// <summary><c>true</c> when <paramref name="candidateParentId"/> is the folder itself or one of its subfolders.</summary>
     public static async Task<bool> IsSelfOrDescendantAsync(IReadMediaDbContext db, MediaFolderId folderId,
         long? candidateParentId, CancellationToken cancellationToken)

@@ -1,5 +1,6 @@
 using Media.Application.Contracts.Storage;
 using Media.Application.Features.Files.Common;
+using Media.Application.Features.Folders.Common;
 
 namespace Media.Application.Features.Files.GetList;
 
@@ -12,7 +13,16 @@ public sealed class GetMediaFilesQueryHandler(IReadMediaDbContext db, IMediaUrlB
         if (query.FolderId is { } folderId)
         {
             var id = MediaFolderId.Create(folderId);
-            files = files.Where(file => file.FolderId == id);
+            if (query.IncludeSubfolders)
+            {
+                var ids = (await MediaFolderRules.SelfAndDescendantsAsync(db, id, cancellationToken))
+                    .Select(folder => (MediaFolderId?)folder).ToList();
+                files = files.Where(file => ids.Contains(file.FolderId));
+            }
+            else
+            {
+                files = files.Where(file => file.FolderId == id);
+            }
         }
         else if (query.InRoot)
         {
