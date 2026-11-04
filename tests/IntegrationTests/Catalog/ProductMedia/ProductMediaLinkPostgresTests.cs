@@ -109,6 +109,43 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         }
     }
 
+    [SkippableFact]
+    public async Task FolderRun_PlacesEachFileByTheCategoryOfItsFirstActiveProduct()
+    {
+        postgres.SkipIfUnavailable();
+        await SeedAsync();
+        await using (var db = postgres.CreateContext())
+        {
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Петлі", "petli",
+                CategoryPath.From("n10.n11"), ProductCategoryId.From(10)));
+            db.Products.Add(Product.Create(ProductId.From(734), Root, "Петля 734", "petlia-734",
+                ProductCategoryId.From(11), Created, 5, 1, false, false, true));
+            await db.SaveChangesAsync();
+        }
+
+        var library = new FakeProductMediaLibrary();
+        var shared = library.Add(30, "products/731.jpg");
+        var own = library.Add(31, "products/734.jpg");
+        var scheme = library.Add(32, "product-scheme/s734.jpg");
+        await using var provider = BuildProvider(library);
+        await RunLinkAsync(provider, dryRun: false);
+        Assert.True((await SendAsync(provider, new SetProductMediaCommand(734,
+            new SetProductMediaRequest { PhotoIds = [own.Id, shared.Id], SchemeId = scheme.Id }))).IsSuccess);
+
+        await using (var scope = provider.CreateAsyncScope())
+            await scope.ServiceProvider.GetRequiredService<ArrangeProductMediaFoldersJob>().RunAsync(dryRun: true, default);
+
+        var photos = Assert.Single(library.Arranged, call => call.Directory == "products");
+        Assert.True(photos.DryRun);
+        Assert.Contains(new ProductMediaFolderNode(11, "Петлі", 10), photos.Categories);
+        Assert.Contains(new ProductMediaFolderNode(10, "Завіси", null), photos.Categories);
+        Assert.Equal(
+            [new ProductMediaFolderPlacement(shared.Id, 10), new ProductMediaFolderPlacement(own.Id, 11)],
+            photos.Placements.OrderBy(placement => placement.FileId));
+        var schemes = Assert.Single(library.Arranged, call => call.Directory == "product-scheme");
+        Assert.Equal([new ProductMediaFolderPlacement(scheme.Id, 11)], schemes.Placements);
+    }
+
     private static async Task<LinkProductMediaReport> RunLinkAsync(ServiceProvider provider, bool dryRun)
     {
         await using var scope = provider.CreateAsyncScope();

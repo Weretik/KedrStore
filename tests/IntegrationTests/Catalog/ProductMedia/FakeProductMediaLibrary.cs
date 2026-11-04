@@ -22,4 +22,15 @@ internal sealed class FakeProductMediaLibrary : IProductMediaLibrary
             .Where(file => file.StorageKey.StartsWith(directory + "/", StringComparison.Ordinal) &&
                            file.StorageKey.IndexOf('/', directory.Length + 1) < 0)
             .ToList());
+
+    public List<(string Directory, IReadOnlyCollection<ProductMediaFolderNode> Categories,
+        IReadOnlyCollection<ProductMediaFolderPlacement> Placements, bool DryRun)> Arranged { get; } = [];
+
+    public Task<ProductMediaFolderResult> ArrangeFoldersAsync(string directory,
+        IReadOnlyCollection<ProductMediaFolderNode> categories,
+        IReadOnlyCollection<ProductMediaFolderPlacement> placements, bool dryRun, CancellationToken cancellationToken)
+    {
+        Arranged.Add((directory, categories, placements, dryRun));
+        return Task.FromResult(new ProductMediaFolderResult(0, placements.Count, 0));
+    }
 }

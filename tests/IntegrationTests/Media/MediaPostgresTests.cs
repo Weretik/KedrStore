@@ -5,6 +5,7 @@ using Media.Application.Features.Folders.GetTree;
 using Media.Application.Jobs.CdnSync;
 using Media.Application.Contracts.Persistence;
 using Media.Contracts.Files;
+using Media.Contracts.Folders;
 using Media.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -104,6 +105,68 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(id, file.Id);
         Assert.Equal("731.jpg", file.FileName);
         Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", file.Url);
+    }
+
+    [SkippableFact]
+    public async Task Arranger_BuildsTheTreeInsideTheTopFolder_AndLeavesFilesPutElsewhere()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        var cdn = new FakeMediaStorage();
+        foreach (var key in new[] { "products/731.jpg", "products/732.jpg", "products/old/733.jpg", "banners/734.jpg" })
+            cdn.Files[key] = [1, 2, 3];
+        await using var provider = BuildProvider(cdn);
+        await RunSync(provider, dryRun: false);
+        Dictionary<string, long> ids;
+        await using (var db = postgres.CreateContext())
+            ids = await db.MediaFiles.ToDictionaryAsync(file => file.StorageKey, file => file.Id.Value);
+
+        MediaFolderTreeNode[] tree =
+        [
+            new(1, "Фурнітура", null), new(2, "Завіси", 1), new(3, "Ручки", 1), new(4, "Порожня", 1)
+        ];
+        MediaFilePlacement[] placements =
+        [
+            new(ids["products/731.jpg"], 2), new(ids["products/732.jpg"], 3), new(ids["products/old/733.jpg"], 2),
+            new(ids["banners/734.jpg"], 3), new(999_999, 2)
+        ];
+
+        var dry = await ArrangeAsync(provider, tree, placements, dryRun: true);
+        Assert.Equal(new MediaFolderArrangeResult(3, 3, 1), dry);
+        await using (var db = postgres.CreateContext())
+            Assert.Equal(3, await db.MediaFolders.CountAsync()); // Товари, old, banners from the sync
+
+        Assert.Equal(new MediaFolderArrangeResult(3, 3, 1), await ArrangeAsync(provider, tree, placements, dryRun: false));
+        Assert.Equal(new MediaFolderArrangeResult(0, 0, 1), await ArrangeAsync(provider, tree, placements, dryRun: false));
+
+        await using (var db = postgres.CreateContext())
+        {
+            var folders = await db.MediaFolders.AsNoTracking().ToListAsync();
+            string PathOf(long? id)
+            {
+                var names = new List<string>();
+                for (var folder = folders.SingleOrDefault(f => f.Id.Value == id); folder is not null;
+                     folder = folders.SingleOrDefault(f => f.Id == folder.ParentId))
+                    names.Insert(0, folder.Name);
+                return string.Join(" / ", names);
+            }
+
+            var files = await db.MediaFiles.AsNoTracking().ToListAsync();
+            string FolderOf(string key) => PathOf(files.Single(file => file.StorageKey == key).FolderId?.Value);
+            Assert.Equal("Товари / Фурнітура / Завіси", FolderOf("products/731.jpg"));
+            Assert.Equal("Товари / Фурнітура / Ручки", FolderOf("products/732.jpg"));
+            Assert.Equal("Товари / Фурнітура / Завіси", FolderOf("products/old/733.jpg"));
+            Assert.Equal("banners", FolderOf("banners/734.jpg"));
+            Assert.DoesNotContain(folders, folder => folder.Name == "Порожня");
+        }
+    }
+
+    private static async Task<MediaFolderArrangeResult> ArrangeAsync(ServiceProvider provider,
+        MediaFolderTreeNode[] tree, MediaFilePlacement[] placements, bool dryRun)
+    {
+        await using var scope = provider.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<IMediaFolderArranger>()
+            .ArrangeAsync("products", tree, placements, dryRun, default);
     }
 
     private static async Task<MediaCdnSyncReport> RunSync(ServiceProvider provider, bool dryRun)

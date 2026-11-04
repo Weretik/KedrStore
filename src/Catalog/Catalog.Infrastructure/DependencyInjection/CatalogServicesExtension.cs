@@ -42,6 +42,7 @@ public static class CatalogServicesExtension
         services.AddScoped<ProductMediaFileChanges>();
         services.AddScoped<IMediaFileChangeListener, CatalogMediaFileChangeListener>();
         services.AddScoped<LinkProductMediaJob>();
+        services.AddScoped<ArrangeProductMediaFoldersJob>();
 
         return services;
     }
