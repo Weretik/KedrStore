@@ -1,4 +1,5 @@
 using BuildingBlocks.Application.Contracts;
+using Content.Application.Features.Editing;
 using Content.Application.Features.Requisites.Common;
 
 namespace Content.Application.Features.Requisites.Update;
@@ -26,8 +27,7 @@ public sealed class UpdateCompanyRequisitesCommandHandler(
         if (changes.Count == 0)
             return Result.Success(CompanyRequisitesMapper.ToDetails(requisites));
 
-        var userName = new[] { currentUser.Email, currentUser.UserName, currentUser.UserId }
-            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? "unknown";
+        var userName = ContentEditor.Name(currentUser);
         // One SaveChanges writes the new values and their log entry together.
         await changesRepository.AddAsync(
             CompanyRequisitesChange.Record(changes, now, currentUser.UserId, userName), cancellationToken);

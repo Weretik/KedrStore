@@ -69,7 +69,7 @@ public sealed class ContentInfrastructureTests
         {
             var article = Article.Create(legacy.Slug, legacy.PublishedOn, true,
                 legacy.Texts.Select(t => new ArticleText(t.Language, t.Title, t.Excerpt, t.BodyHtml)).ToList(),
-                DateTimeOffset.UnixEpoch);
+                DateTimeOffset.UnixEpoch, "seed");
             Assert.Equal(2, article.Translations.Count);
 
             var name = $"Content.Infrastructure.Seed.Covers.article-{legacy.Id}.webp";

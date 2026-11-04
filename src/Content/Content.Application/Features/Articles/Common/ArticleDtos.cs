@@ -17,7 +17,8 @@ public sealed record AdminArticleListItem(
     DateOnly PublishedOn,
     bool IsPublished,
     int? CoverVersion,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? UpdatedBy);
 
 public sealed record AdminArticleDetails(
     long Id,
@@ -26,6 +27,7 @@ public sealed record AdminArticleDetails(
     bool IsPublished,
     int? CoverVersion,
     DateTimeOffset UpdatedAt,
+    string? UpdatedBy,
     IReadOnlyList<ArticleTextInput> Texts);
 
 public sealed record PublicArticleListItem(

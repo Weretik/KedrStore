@@ -15,6 +15,7 @@ internal sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
         builder.Property(article => article.IsPublished).IsRequired();
         builder.Property(article => article.CreatedAt).IsRequired();
         builder.Property(article => article.UpdatedAt).IsRequired();
+        builder.Property(article => article.UpdatedBy).HasMaxLength(EditorName.MaxLength);
         builder.HasIndex(article => new { article.IsPublished, article.PublishedOn });
 
         builder.OwnsMany(article => article.Translations, text =>

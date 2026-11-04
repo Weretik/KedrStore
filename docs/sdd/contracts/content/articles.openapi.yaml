@@ -249,9 +249,13 @@ components:
           required: [bodyHtml]
           properties:
             bodyHtml: { type: string, description: Sanitized HTML; safe to render as is. }
+    EditorName:
+      type: [string, 'null']
+      maxLength: 256
+      description: Email (else user name) of who saved the last change; null for articles saved before it was recorded.
     AdminArticleSummary:
       type: object
-      required: [id, slug, title, publishedOn, isPublished, coverPath, updatedAt]
+      required: [id, slug, title, publishedOn, isPublished, coverPath, updatedAt, updatedBy]
       properties:
         id: { type: integer, format: int64 }
         slug: { type: string }
@@ -260,6 +264,7 @@ components:
         isPublished: { type: boolean }
         coverPath: { $ref: '#/components/schemas/CoverPath' }
         updatedAt: { type: string, format: date-time }
+        updatedBy: { $ref: '#/components/schemas/EditorName' }
     ArticleText:
       type: object
       required: [language, title, excerpt, bodyHtml]
@@ -270,7 +275,7 @@ components:
         bodyHtml: { type: string, minLength: 1, maxLength: 50000 }
     AdminArticle:
       type: object
-      required: [id, slug, publishedOn, isPublished, coverPath, updatedAt, texts]
+      required: [id, slug, publishedOn, isPublished, coverPath, updatedAt, updatedBy, texts]
       properties:
         id: { type: integer, format: int64 }
         slug: { type: string }
@@ -278,6 +283,7 @@ components:
         isPublished: { type: boolean }
         coverPath: { $ref: '#/components/schemas/CoverPath' }
         updatedAt: { type: string, format: date-time }
+        updatedBy: { $ref: '#/components/schemas/EditorName' }
         texts:
           type: array
           minItems: 2

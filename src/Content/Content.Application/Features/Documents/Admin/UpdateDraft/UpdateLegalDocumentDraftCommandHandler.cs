@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Contracts;
 using Content.Application.Contracts.Html;
 using Content.Application.Features.Documents.Common;
+using Content.Application.Features.Editing;
 
 namespace Content.Application.Features.Documents.Admin.UpdateDraft;
 
@@ -22,7 +23,7 @@ public sealed class UpdateLegalDocumentDraftCommandHandler(
             return Result.Conflict("Only a draft can be changed; start a new draft to edit a published version.");
 
         version.UpdateDraft(LegalDocumentEditor.Sanitized(command.Texts, sanitizer), clock.GetUtcNow(),
-            LegalDocumentEditor.Name(currentUser));
+            ContentEditor.Name(currentUser));
         await versions.UpdateAsync(version, cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(version));
     }

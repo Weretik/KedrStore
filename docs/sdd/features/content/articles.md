@@ -10,6 +10,8 @@ The [public controller](../../../../src/Content/Content.Api/Controllers/Articles
 
 On save the body passes the [article sanitizer](../../../../src/Content/Content.Infrastructure/Html/ArticleHtmlSanitizer.cs); an uploaded cover goes through the [cover processor](../../../../src/Content/Content.Infrastructure/Images/CoverImageProcessor.cs) (JPEG/PNG/WebP up to 10 MB, at least 600 px wide, stored as WebP at most 1600 px wide with EXIF orientation applied). Without a slug, create builds one from the Ukrainian title with the shared [KMU-2010 transliterator](../../../../src/BuildingBlocks/BuildingBlocks.Application/Text/UkrainianTransliterator.cs) and adds `-2`, `-3`… on a clash.
 
+Every save (create, update, cover upload or removal) stores `UpdatedBy`, the editor's email from the session ([ContentEditor](../../../../src/Content/Content.Application/Features/Editing/ContentEditor.cs)); admin responses return it, public ones never do.
+
 Access: public reads are anonymous; `/api/admin/articles` needs `CanManageContent` (Manager or Admin).
 
 ## Code structure

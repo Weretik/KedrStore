@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Contracts;
+using Content.Application.Features.Editing;
 using Content.Application.Contracts.Images;
 using Content.Application.Features.Articles.Common;
 
@@ -8,6 +10,7 @@ public sealed class UploadArticleCoverCommandHandler(
     IContentRepository<Article> articles,
     IContentRepository<ArticleCover> covers,
     ICoverImageProcessor processor,
+    ICurrentUserService currentUser,
     TimeProvider clock)
     : ICommandHandler<UploadArticleCoverCommand, Result<AdminArticleDetails>>
 {
@@ -29,7 +32,7 @@ public sealed class UploadArticleCoverCommandHandler(
         else
             cover.Replace(processed.Value.Data, processed.Value.ContentType);
 
-        article.ReplaceCover(clock.GetUtcNow());
+        article.ReplaceCover(clock.GetUtcNow(), ContentEditor.Name(currentUser));
         await articles.SaveChangesAsync(cancellationToken);
         return Result.Success(ArticleMapper.ToAdmin(article));
     }

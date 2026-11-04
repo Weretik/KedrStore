@@ -10,13 +10,14 @@ public sealed record ArticleResponse(
     DateTimeOffset UpdatedAt);
 
 public sealed record AdminArticleSummaryResponse(
-    long Id, string Slug, string Title, DateOnly PublishedOn, bool IsPublished, string? CoverPath, DateTimeOffset UpdatedAt);
+    long Id, string Slug, string Title, DateOnly PublishedOn, bool IsPublished, string? CoverPath, DateTimeOffset UpdatedAt,
+    string? UpdatedBy);
 
 public sealed record ArticleTextDto(string Language, string Title, string Excerpt, string BodyHtml);
 
 public sealed record AdminArticleResponse(
     long Id, string Slug, DateOnly PublishedOn, bool IsPublished, string? CoverPath, DateTimeOffset UpdatedAt,
-    IReadOnlyList<ArticleTextDto> Texts);
+    string? UpdatedBy, IReadOnlyList<ArticleTextDto> Texts);
 
 /// <summary>Create and update body. On create an empty slug is generated from the Ukrainian title.</summary>
 public sealed record SaveArticleRequest(string? Slug, DateOnly PublishedOn, bool IsPublished, IReadOnlyList<ArticleTextDto> Texts);

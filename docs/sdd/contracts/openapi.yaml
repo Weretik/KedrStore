@@ -168,6 +168,8 @@ paths:
     $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1{id}
   /api/admin/content/home/brands/order:
     $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1order
+  /api/admin/content/site-refresh:
+    $ref: ./content/site-refresh.openapi.yaml#/paths/~1api~1admin~1content~1site-refresh
   /api/admin/media/folders:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders
   /api/admin/media/folders/{id}:

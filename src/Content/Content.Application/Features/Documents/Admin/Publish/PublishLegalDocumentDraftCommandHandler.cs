@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Contracts;
 using Content.Application.Features.Documents.Common;
+using Content.Application.Features.Editing;
 
 namespace Content.Application.Features.Documents.Admin.Publish;
 
@@ -33,7 +34,7 @@ public sealed class PublishLegalDocumentDraftCommandHandler(
         var lastNumber = await versions.ListAsync(new LegalDocumentNumbersSpec(kind), cancellationToken);
         published?.Archive();
         draft.Publish((lastNumber.Count == 0 ? 0 : lastNumber.Max()) + 1, command.EffectiveFrom, clock.GetUtcNow(),
-            LegalDocumentEditor.Name(currentUser));
+            ContentEditor.Name(currentUser));
         await versions.SaveChangesAsync(cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(draft));
     }

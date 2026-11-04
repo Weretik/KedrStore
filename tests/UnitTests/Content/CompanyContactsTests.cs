@@ -31,7 +31,7 @@ public sealed class CompanyContactsTests
     {
         var contacts = CompanyContacts.Create(Values(), Now);
 
-        var error = Assert.Throws<DomainException>(() => contacts.Update(Values(phone), Now));
+        var error = Assert.Throws<DomainException>(() => contacts.Update(Values(phone), Now, "manager"));
         Assert.Contains("SalesPhone", error.Message);
     }
 

@@ -10,6 +10,7 @@ public sealed class ArticleTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 4, 0, 0, 0, TimeSpan.Zero);
     private static readonly DateOnly Day = new(2026, 11, 4);
+    private const string Editor = "manager@classkedr.com.ua";
 
     private static ArticleText[] Texts(string ukTitle = "Петлі") =>
     [
@@ -20,11 +21,12 @@ public sealed class ArticleTests
     [Fact]
     public void Create_KeepsBothLanguagesSortedAndTrimmed()
     {
-        var article = Article.Create("prykhovani-petli", Day, true, Texts("  Петлі  "), Now);
+        var article = Article.Create("prykhovani-petli", Day, true, Texts("  Петлі  "), Now, " manager@classkedr.com.ua ");
 
         Assert.Equal(["ru", "uk"], article.Translations.Select(t => t.Language));
         Assert.Equal("Петлі", article.Text("uk").Title);
         Assert.Null(article.CoverVersion);
+        Assert.Equal("manager@classkedr.com.ua", article.UpdatedBy);
     }
 
     [Theory]
@@ -34,28 +36,29 @@ public sealed class ArticleTests
     [InlineData("-start")]
     [InlineData("пробіл")]
     public void Create_RejectsInvalidSlug(string slug)
-        => Assert.Throws<DomainException>(() => Article.Create(slug, Day, true, Texts(), Now));
+        => Assert.Throws<DomainException>(() => Article.Create(slug, Day, true, Texts(), Now, Editor));
 
     [Fact]
     public void Update_RequiresEachLanguageOnce()
     {
-        var article = Article.Create("a", Day, true, Texts(), Now);
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
         ArticleText[] onlyUk = [new("uk", "Т", "К", "<p>Т</p>"), new("uk", "Т2", "К", "<p>Т</p>")];
 
-        Assert.Throws<DomainException>(() => article.Update("a", Day, true, onlyUk, Now));
+        Assert.Throws<DomainException>(() => article.Update("a", Day, true, onlyUk, Now, Editor));
     }
 
     [Fact]
     public void Cover_VersionGrowsAndResetsOnRemove()
     {
-        var article = Article.Create("a", Day, true, Texts(), Now);
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
 
-        article.ReplaceCover(Now);
-        article.ReplaceCover(Now);
+        article.ReplaceCover(Now, Editor);
+        article.ReplaceCover(Now, Editor);
         Assert.Equal(2, article.CoverVersion);
 
-        article.RemoveCover(Now);
+        article.RemoveCover(Now, "");
         Assert.Null(article.CoverVersion);
+        Assert.Equal("unknown", article.UpdatedBy);
     }
 
     [Theory]

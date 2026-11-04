@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — refresh the public site now
+  version: 0.1.0
+  description: >-
+    «Оновити сайт зараз» in the admin. The API POSTs `{"tags":["content","catalog"]}` to the site's
+    `/api/revalidate` with the `x-revalidate-secret` header (configuration `SiteRevalidation:Url` and
+    `SiteRevalidation:Secret`), so the next visit reads fresh content instead of waiting for the cache lifetime.
+paths:
+  /api/admin/content/site-refresh:
+    post:
+      operationId: refreshSite
+      summary: Ask the public site to drop its cached content and catalog
+      description: Requires `CanManageContent` (Manager or Admin). No request body.
+      tags: [Site]
+      responses:
+        '200':
+          description: The site accepted the request.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SiteRefreshResult' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '502':
+          description: The site did not answer or refused the secret (`siteUnavailable`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SiteRefreshResult' }
+        '503':
+          description: The site address or secret is not set in this environment (`notConfigured`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SiteRefreshResult' }
+components:
+  schemas:
+    SiteRefreshResult:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string, enum: [refreshed, notConfigured, siteUnavailable] }

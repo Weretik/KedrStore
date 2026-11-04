@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Content.Domain.Editing;
 
 namespace Content.Domain.Articles;
 
@@ -23,20 +24,23 @@ public sealed partial class Article : IAggregateRoot
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
+
+    /// <summary>Who saved the last change; empty for articles saved before this was recorded.</summary>
+    public string? UpdatedBy { get; private set; }
     public IReadOnlyList<ArticleTranslation> Translations => _translations;
 
     private Article() { }
 
     public static Article Create(string slug, DateOnly publishedOn, bool isPublished,
-        IReadOnlyCollection<ArticleText> texts, DateTimeOffset now)
+        IReadOnlyCollection<ArticleText> texts, DateTimeOffset now, string editor)
     {
         var article = new Article { CreatedAt = now };
-        article.Update(slug, publishedOn, isPublished, texts, now);
+        article.Update(slug, publishedOn, isPublished, texts, now, editor);
         return article;
     }
 
     public void Update(string slug, DateOnly publishedOn, bool isPublished,
-        IReadOnlyCollection<ArticleText> texts, DateTimeOffset now)
+        IReadOnlyCollection<ArticleText> texts, DateTimeOffset now, string editor)
     {
         ArgumentNullException.ThrowIfNull(texts);
         var normalizedSlug = slug?.Trim() ?? string.Empty;
@@ -55,21 +59,27 @@ public sealed partial class Article : IAggregateRoot
         IsPublished = isPublished;
         _translations.Clear();
         _translations.AddRange(translations.OrderBy(t => t.Language, StringComparer.Ordinal));
-        UpdatedAt = now;
+        Touch(now, editor);
     }
 
     public ArticleTranslation Text(string language) => _translations.Single(t => t.Language == language);
 
-    public void ReplaceCover(DateTimeOffset now)
+    public void ReplaceCover(DateTimeOffset now, string editor)
     {
         CoverVersion = (CoverVersion ?? 0) + 1;
-        UpdatedAt = now;
+        Touch(now, editor);
     }
 
-    public void RemoveCover(DateTimeOffset now)
+    public void RemoveCover(DateTimeOffset now, string editor)
     {
         CoverVersion = null;
+        Touch(now, editor);
+    }
+
+    private void Touch(DateTimeOffset now, string editor)
+    {
         UpdatedAt = now;
+        UpdatedBy = EditorName.Normalize(editor);
     }
 
     public static bool IsValidSlug(string? slug)

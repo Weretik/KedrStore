@@ -13,14 +13,14 @@ public sealed class GetAdminArticlesQueryHandler(IReadContentDbContext db)
             .ThenByDescending(article => article.Id)
             .Select(article => new
             {
-                article.Id, article.Slug, article.PublishedOn, article.IsPublished, article.CoverVersion, article.UpdatedAt,
+                article.Id, article.Slug, article.PublishedOn, article.IsPublished, article.CoverVersion, article.UpdatedAt, article.UpdatedBy,
                 Title = article.Translations.Where(text => text.Language == "uk").Select(text => text.Title).FirstOrDefault()
             })
             .ToListAsync(cancellationToken);
 
         return Result.Success<IReadOnlyList<AdminArticleListItem>>(items
             .Select(item => new AdminArticleListItem(item.Id.Value, item.Slug, item.Title ?? item.Slug, item.PublishedOn,
-                item.IsPublished, item.CoverVersion, item.UpdatedAt))
+                item.IsPublished, item.CoverVersion, item.UpdatedAt, item.UpdatedBy))
             .ToList());
     }
 }

@@ -4,6 +4,7 @@ using Content.Application.Features.Contacts.Get;
 using Content.Application.Features.Contacts.Update;
 using Content.Domain.Contacts;
 using Content.Infrastructure.DependencyInjection;
+using IntegrationTests.TestSupport.Content;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,9 +46,11 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
             {
                 var result = await new UpdateCompanyContactsCommandHandler(
                         scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyContacts>>(),
+                        new TestContentEditor(),
                         TimeProvider.System)
                     .Handle(new UpdateCompanyContactsCommand(Original with { Email = "sales@classkedr.com.ua" }), default);
                 Assert.True(result.IsSuccess);
+                Assert.Equal(TestContentEditor.EmailAddress, result.Value.UpdatedBy);
             }
 
             await using var db = postgres.CreateContext();
@@ -64,6 +67,7 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
             await using var scope = provider.CreateAsyncScope();
             await new UpdateCompanyContactsCommandHandler(
                     scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyContacts>>(),
+                    new TestContentEditor(),
                     TimeProvider.System)
                 .Handle(new UpdateCompanyContactsCommand(Original), default);
         }

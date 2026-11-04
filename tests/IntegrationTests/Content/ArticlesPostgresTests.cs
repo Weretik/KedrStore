@@ -13,6 +13,7 @@ using Content.Application.Contracts.Persistence;
 using Content.Domain.Articles;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.Identity.Avatars;
+using IntegrationTests.TestSupport.Content;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -87,12 +88,14 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         Assert.Equal("prykhovani-petli-2", first.Value.Slug);
         Assert.Equal("prykhovani-petli-3", second.Value.Slug);
         Assert.Equal("<p>Текст</p>", first.Value.Texts[0].BodyHtml);
+        Assert.Equal(TestContentEditor.EmailAddress, first.Value.UpdatedBy);
 
         await using var scope = provider.CreateAsyncScope();
         var update = await new UpdateArticleCommandHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
                 scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
+                new TestContentEditor(),
                 TimeProvider.System)
             .Handle(new UpdateArticleCommand(second.Value.Id, Input("prykhovani-petli", "Інша")), default);
         Assert.Equal(ResultStatus.Invalid, update.Status);
@@ -114,6 +117,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
                     scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                     scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                     scope.ServiceProvider.GetRequiredService<ICoverImageProcessor>(),
+                    new TestContentEditor(),
                     TimeProvider.System)
                 .Handle(new UploadArticleCoverCommand(created.Value.Id,
                     new CoverUpload("c.jpg", "image/jpeg", bytes.Length, () => new MemoryStream(bytes))), default);
@@ -147,6 +151,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
                 scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
+                new TestContentEditor(),
                 TimeProvider.System)
             .Handle(new CreateArticleCommand(input), default);
     }

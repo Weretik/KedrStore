@@ -18,13 +18,14 @@ public sealed record CompanyContactsDetails(
     string MapUrl,
     string CityUk,
     string CityRu,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? UpdatedBy);
 
 internal static class CompanyContactsMapper
 {
     public static CompanyContactsDetails ToDetails(CompanyContacts contacts) => new(
         contacts.SalesPhone, contacts.Email, contacts.TelegramUrl, contacts.ViberPhone, contacts.MapUrl,
-        contacts.CityUk, contacts.CityRu, contacts.UpdatedAt);
+        contacts.CityUk, contacts.CityRu, contacts.UpdatedAt, contacts.UpdatedBy);
 
     public static CompanyContactsValues ToValues(CompanyContactsInput input) => new(
         input.SalesPhone, input.Email, input.TelegramUrl, input.ViberPhone, input.MapUrl,

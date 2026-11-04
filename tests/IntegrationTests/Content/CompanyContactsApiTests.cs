@@ -67,11 +67,14 @@ public sealed class CompanyContactsApiTests
 
         using var update = await manager.PutAsJsonAsync("/api/admin/content/contacts", ValidBody);
         Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+        using var saved = JsonDocument.Parse(await update.Content.ReadAsStringAsync());
+        Assert.False(string.IsNullOrEmpty(saved.RootElement.GetProperty("updatedBy").GetString()));
 
         using var client = factory.CreateClient();
         using var json = JsonDocument.Parse(await client.GetStringAsync("/api/content/contacts"));
         Assert.Equal("+380501112233", json.RootElement.GetProperty("salesPhone").GetString());
         Assert.Equal("https://t.me/classkedr", json.RootElement.GetProperty("telegramUrl").GetString());
+        Assert.False(json.RootElement.TryGetProperty("updatedBy", out _), "the site never sees who edited");
     }
 
     [Fact]
