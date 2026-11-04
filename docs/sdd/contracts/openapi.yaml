@@ -33,12 +33,12 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products
   /api/admin/products/all:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1all
-  /api/admin/products/missing-photos:
-    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1missing-photos
   /api/admin/products/by-slug/{productSlug}:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1by-slug~1{productSlug}
   /api/admin/products/{id}/slug:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1slug
+  /api/admin/products/{id}/media:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1media
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:

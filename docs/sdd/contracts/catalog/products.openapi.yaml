@@ -108,6 +108,10 @@ paths:
         - $ref: '#/components/parameters/ExportToSite'
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
+        - name: withoutPhoto
+          in: query
+          description: '`true` lists only products without a linked photo (`photo` is an empty string).'
+          schema: { type: boolean }
         - name: deleted
           in: query
           description: >-
@@ -162,30 +166,45 @@ paths:
         '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
-  /api/admin/products/missing-photos:
+  /api/admin/products/{id}/media:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
     get:
-      operationId: getAdminProductsWithUnavailablePhotos
-      summary: List active products whose latest photo check is unavailable
+      operationId: getAdminProductMedia
+      summary: Get the photos and the scheme linked to a product
       tags: [Admin products]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        Policy CanManageProducts. Reads persisted photo-check state only and does
-        not contact the CDN while handling the request.
-      parameters:
-        - $ref: '#/components/parameters/SearchTerm'
-        - $ref: '#/components/parameters/CategoryId'
-        - $ref: '#/components/parameters/AdminInStock'
-        - $ref: '#/components/parameters/IsSale'
-        - $ref: '#/components/parameters/IsNew'
-        - $ref: '#/components/parameters/ExportToSite'
-        - $ref: '#/components/parameters/ProductSort'
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/PageSize'
+        Policies CanManageProducts and CanManageMedia (Manager and Admin). Photos come in gallery order; file names
+        are read from the media library.
       responses:
-        '200': { description: Unavailable product-photo page, content: { application/json: { schema: { $ref: '#/components/schemas/MissingProductPhotoPage' } } } }
+        '200': { description: Product media set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found or deleted. }
+    put:
+      operationId: setAdminProductMedia
+      summary: Replace the photos and the scheme of a product
+      tags: [Admin products]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        Replaces the whole set with media library files: up to 20 photos in order (the first is the list photo)
+        and an optional scheme. A file can appear once. Every ID must exist in the library.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetProductMediaRequest' }
+      responses:
+        '200': { description: Saved set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found or deleted. }
   /api/admin/products/by-slug/{productSlug}:
     get:
       operationId: getAdminProductBySlug
@@ -250,12 +269,6 @@ components:
       properties:
         pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
         value: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } }
-    MissingProductPhotoPage:
-      type: object
-      required: [pagedInfo, value]
-      properties:
-        pagedInfo: { $ref: '#/components/schemas/PagedInfo' }
-        value: { type: array, items: { $ref: '#/components/schemas/MissingProductPhoto' } }
     ProductListItem:
       type: object
       required: [id, name, productSlug, photo, inStock, isSale, isNew]
@@ -263,7 +276,7 @@ components:
         id: { type: integer }
         name: { type: string }
         productSlug: { type: string }
-        photo: { type: string }
+        photo: { type: string, description: First photo URL; an empty string when the product has no photo. }
         categoryId: { type: [integer, 'null'] }
         inStock: { type: boolean }
         isSale: { type: boolean }
@@ -271,14 +284,15 @@ components:
         price: { type: [number, 'null'] }
     ProductDetails:
       type: object
-      required: [id, name, productSlug, photo, scheme, stock, categoryName, categorySlug, quantityInPack, breadcrumbs, updatedAt]
+      required: [id, name, productSlug, photo, scheme, photos, stock, categoryName, categorySlug, quantityInPack, breadcrumbs, updatedAt]
       properties:
         id: { type: integer, description: 1C product code shown to customers as the article. }
         name: { type: string }
         productSlug: { type: string, description: Current slug; differs from the request when a former slug was used. }
         updatedAt: { type: string, format: date-time }
-        photo: { type: string }
-        scheme: { type: string }
+        photo: { type: string, description: First photo URL; an empty string when the product has no photo. }
+        scheme: { type: string, description: Scheme URL; an empty string when the product has no scheme. }
+        photos: { type: array, items: { type: string }, description: All photo URLs in gallery order; the first equals photo. }
         stock: { type: number }
         categoryName: { type: string }
         categorySlug: { type: string }
@@ -297,7 +311,7 @@ components:
         nameUk: { type: string }
         nameRu: { type: string }
         productSlug: { type: string }
-        photo: { type: string }
+        photo: { type: string, description: First photo URL; an empty string when the product has no photo. }
         categoryId: { type: [integer, 'null'] }
         categoryName: { type: string, description: Ukrainian short category name; empty when the reference is unavailable. }
         inStock: { type: boolean }
@@ -311,16 +325,6 @@ components:
         quantityInPack: { type: integer }
         isDeleted: { type: boolean }
         deletedAt: { type: [string, 'null'], format: date-time }
-    MissingProductPhoto:
-      allOf:
-        - $ref: '#/components/schemas/AdminProduct'
-        - type: object
-          required: [photoAvailable, photoStatus, photoCheckedAtUtc, photoHttpStatusCode]
-          properties:
-            photoAvailable: { type: boolean, const: false }
-            photoStatus: { type: string, enum: [Missing, InvalidContentType, CheckFailed] }
-            photoCheckedAtUtc: { type: string, format: date-time }
-            photoHttpStatusCode: { type: [integer, 'null'], minimum: 100, maximum: 599 }
     AdminProductDetails:
       type: object
       required: [id, nameUk, nameRu, productSlug, photo, scheme, categoryId, categoryName, inStock, isSale, isNew, exportToSite, price, stock, quantityInPack]
@@ -329,8 +333,8 @@ components:
         nameUk: { type: string }
         nameRu: { type: string }
         productSlug: { type: string }
-        photo: { type: string }
-        scheme: { type: string, description: Stored scheme URL; the API does not probe media availability. }
+        photo: { type: string, description: First photo URL; an empty string when the product has no photo. }
+        scheme: { type: string, description: Scheme URL; an empty string when the product has no scheme. }
         categoryId: { type: integer }
         categoryName: { type: string }
         inStock: { type: boolean }
@@ -340,3 +344,26 @@ components:
         price: { type: [number, 'null'] }
         stock: { type: number }
         quantityInPack: { type: integer }
+    SetProductMediaRequest:
+      type: object
+      required: [photoIds]
+      properties:
+        photoIds: { type: array, maxItems: 20, uniqueItems: true, items: { type: integer, format: int64, minimum: 1 } }
+        schemeId: { type: [integer, 'null'], format: int64, minimum: 1, description: Must not be one of photoIds. }
+    ProductMediaItem:
+      type: object
+      required: [id, url, fileName]
+      properties:
+        id: { type: integer, format: int64, description: Media library file ID. }
+        url: { type: string }
+        fileName: { type: string, description: Library display name; empty if the file was deleted and the link is not yet dropped. }
+    ProductMedia:
+      type: object
+      required: [productId, photos, scheme]
+      properties:
+        productId: { type: integer }
+        photos: { type: array, items: { $ref: '#/components/schemas/ProductMediaItem' } }
+        scheme:
+          oneOf:
+            - { $ref: '#/components/schemas/ProductMediaItem' }
+            - { type: 'null' }

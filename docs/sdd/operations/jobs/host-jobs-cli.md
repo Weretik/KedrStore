@@ -15,8 +15,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | `pricetypes` | — | Catalog price types |
 | `category`, `productdetails`, `stocks`, `prices` | One or more `--rootId=<id>` | Targeted Catalog root refresh |
 | `rebuild-projections` | — | Rebuild Catalog product-list read model |
-| `check-product-photos` | — | Checks photo URLs for every active product and saves the latest status |
-| `media-cdn-sync` | `--dry-run` (optional) | Registers CDN pictures in the media library; with `--dry-run` only reports ([runbook](media-cdn-sync-runbook.md)) |
+| `media-cdn-sync` | `--dry-run` (optional) | Registers CDN pictures in the media library, then links them to products and refreshes the photo cache; with `--dry-run` only reports ([runbook](media-cdn-sync-runbook.md)) |
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |
@@ -31,8 +30,6 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 Repeat `--rootId` for multiple roots. Exit code `0` and `[SUCCESS] Job finished OK` mean no exception occurred; separately check the number of imported records. Exit code `1` means a job, argument, or execution error; code `2` means a required `--rootId` is missing. For `migrate`, verify the result using the [migration guide](../data/migrations-and-seeding.md).
 
 See the [Sales/1C runbook](sales-one-c-runbook.md#manager-order-delivery) for order delivery prerequisites, result interpretation, stopping, and dead-letter handling.
-
-The [Catalog photo-check runbook](catalog-photo-check-runbook.md) describes CDN classification, results, configuration, and Cloud Run execution.
 
 ## Manual 1C write smoke test
 

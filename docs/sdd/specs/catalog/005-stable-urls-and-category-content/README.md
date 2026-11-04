@@ -24,7 +24,7 @@ Owner decisions are recorded in the [backend analysis](https://claude.ai/artifac
 
 ### Soft delete
 
-- **R-001.** When a product present in the database is absent from a non-empty 1C product response for its root, the import marks it deleted (`IsDeleted=true`, `DeletedAt`) instead of removing the row. Its slug, slug history, translations, prices, photo-check state, and order references stay.
+- **R-001.** When a product present in the database is absent from a non-empty 1C product response for its root, the import marks it deleted (`IsDeleted=true`, `DeletedAt`) instead of removing the row. Its slug, slug history, translations, prices, photo-check state (removed later by Media 001 stage 3), and order references stay.
 - **R-002.** When a category present in the database is absent from a non-empty 1C category response for its root, the import marks it deleted. Its slug, history, and content stay. Manual groups and the virtual Cosmos category are never marked deleted by this rule.
 - **R-003.** A deleted product or category that appears again in 1C with the same 1C ID is restored (`IsDeleted=false`, `DeletedAt=null`) with its previous slug and content; 1C fields are updated as for any existing row.
 - **R-004.** Mass-deletion guard: if one run would mark more than 30% of the currently active products (or categories) of a root as deleted, the import marks none of them, logs an error with the counts, and continues with create/update. The existing «empty response → no deletion» behavior stays.

@@ -10,7 +10,7 @@ The work has four stages, each with its own PRs and structure check:
 
 1. **Backend library (this spec, R-1…R-9).** Module Media: folders, files, upload, replace, move, rename, delete, paged list, CDN sync job that registers the existing files.
 2. **Admin «Медіа».** Folder tree, grid, search, side panel, drag-and-drop upload (kedr-web).
-3. **Products + media.** Catalog links products to media files by ID (photos with order, one scheme), auto-links the imported files by name (`731.jpg` → photo of product 731, `s731.jpg` → its scheme), the 1C import stops writing photo URLs, product page picks or uploads photos, the photo check job and its table are removed. A revision of this spec will hold its rules.
+3. **Products + media.** Catalog links products to media files by ID (photos with order, one scheme), auto-links the imported files by name (`731.jpg` → photo of product 731, `s731.jpg` → its scheme), the 1C import stops writing photo URLs, product page picks or uploads photos, the photo check job and its table are removed. Rules R-30…R-36: [stage 3 spec](stage-3-product-media.md).
 4. **Previews.** Small images for grids and tables.
 
 Out of scope: avatars (Identity owns `avatars/`), video and documents, image editing.
