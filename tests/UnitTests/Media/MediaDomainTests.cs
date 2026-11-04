@@ -55,5 +55,7 @@ public sealed class MediaDomainTests
         Assert.False(list.Validate(new GetMediaFilesQuery(5, true, null)).IsValid);
         Assert.False(list.Validate(new GetMediaFilesQuery(null, false, null, PageSize: 500)).IsValid);
         Assert.True(list.Validate(new GetMediaFilesQuery(null, true, "731")).IsValid);
+        Assert.False(list.Validate(new GetMediaFilesQuery(null, false, null, IncludeSubfolders: true)).IsValid);
+        Assert.True(list.Validate(new GetMediaFilesQuery(5, false, null, IncludeSubfolders: true)).IsValid);
     }
 }

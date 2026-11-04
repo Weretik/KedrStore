@@ -81,7 +81,8 @@ paths:
       summary: A page of files by name
       description: >-
         `folderId` limits the list to one folder, `inRoot=true` to files outside any folder; with neither, the whole
-        library. `search` matches the display name (case-insensitive contains).
+        library. `includeSubfolders=true` (only with `folderId`) also returns the files of all its subfolders.
+        `search` matches the display name (case-insensitive contains).
       tags: [Media]
       parameters:
         - { name: folderId, in: query, schema: { type: integer, format: int64, minimum: 1 } }
@@ -89,6 +90,7 @@ paths:
         - { name: search, in: query, schema: { type: string, maxLength: 200 } }
         - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
         - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 60 } }
+        - { name: includeSubfolders, in: query, schema: { type: boolean, default: false } }
       responses:
         '200':
           description: The page.
