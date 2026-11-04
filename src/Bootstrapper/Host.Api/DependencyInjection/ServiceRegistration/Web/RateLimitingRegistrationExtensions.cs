@@ -41,7 +41,8 @@ public static class RateLimitingRegistrationExtensions
                     });
             });
 
-            // Anonymous quick orders: stops a bot from flooding the managers' Telegram chat.
+            // Anonymous quick orders: stops a bot from flooding the managers' Telegram chat. The public site sends
+            // orders from its server, so all site buyers share one address; the cap is a flood limit, not per buyer.
             options.AddPolicy("QuickOrder", context =>
             {
                 var partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -50,7 +51,7 @@ public static class RateLimitingRegistrationExtensions
                     partitionKey,
                     _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit = 10,
+                        PermitLimit = 60,
                         Window = TimeSpan.FromMinutes(10),
                         QueueLimit = 0,
                         AutoReplenishment = true
