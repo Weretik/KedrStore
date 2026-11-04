@@ -32,6 +32,9 @@ public static class AuthorizationPoliciesRegistrationExtensions
             options.AddPolicy(PolicyNames.CanManageContent, policy =>
                 policy.RequireRole(RoleNames.Manager, RoleNames.Admin));
 
+            options.AddPolicy(PolicyNames.CanManageMedia, policy =>
+                policy.RequireRole(RoleNames.Manager, RoleNames.Admin));
+
             options.AddPolicy(PolicyNames.CatalogRead, policy =>
                 policy.RequireRole(RoleNames.User, RoleNames.Manager, RoleNames.Admin));
 

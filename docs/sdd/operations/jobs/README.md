@@ -10,6 +10,7 @@ operator / cron / CI → Host.Jobs (--job=...) → scoped Catalog/Sales job → 
 - [Migrations and seed data](../data/migrations-and-seeding.md) — `--job=migrate`
 - [Catalog/1C runbook](catalog-one-c-runbook.md)
 - [Sales/1C runbook](sales-one-c-runbook.md)
+- [Media CDN sync runbook](media-cdn-sync-runbook.md) — `--job=media-cdn-sync`
 - [Troubleshooting](troubleshooting.md)
 
 Contracts and data ownership are described in the [1C integration architecture](../../architecture/integrations/one-c/README.md). Do not put secrets or real endpoint URLs in command output, tasks, or documentation.

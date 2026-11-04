@@ -56,6 +56,11 @@ KedrStore PostgreSQL
         ├── CompanyRequisites             # the one row of payment requisites
         ├── CompanyRequisitesChanges      # who changed requisites, when, old → new (jsonb)
         └── __EFMigrationsHistory         # Content migration history
+└── schema media
+    └── Media / MediaDbContext — 2 tables
+        ├── MediaFolders                  # virtual folders with an optional parent
+        ├── MediaFiles                    # CDN key, display name, type, size, folder
+        └── __EFMigrationsHistory         # Media migration history
 ```
 
 ## Open only the relevant part
@@ -70,5 +75,6 @@ KedrStore PostgreSQL
 | Orders, drafts, and sync | [Orders](sales-orders.md) | [Manager orders](../../features/sales/admin-orders.md), [Admin workspace](../../features/sales/admin-order-workspace.md) |
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |
 | Site articles, company contacts and requisites | [Content](content-articles.md) | [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md) |
+| Library folders and CDN files | [Media](media-library.md) | [Media library](../../features/media/media-library.md) |
 
 Each EF model table is described in exactly **one** document above. Physical FKs are shown in its ER diagram; ID references without an FK are explained separately. `__EFMigrationsHistory` is an infrastructure table and is not one of the EF model tables; its presence in a specific environment depends on applied migrations. After a schema change, update the relevant document and this tree only if the table list or placement changed.

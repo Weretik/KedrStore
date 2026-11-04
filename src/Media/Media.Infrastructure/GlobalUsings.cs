@@ -1,0 +1,11 @@
+global using Ardalis.Specification.EntityFrameworkCore;
+global using BuildingBlocks.Domain.Abstractions;
+global using BuildingBlocks.Infrastructure.Migrations;
+global using Media.Application.Contracts.Persistence;
+global using Media.Domain.Files;
+global using Media.Domain.Folders;
+global using Media.Infrastructure.DataBase;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;

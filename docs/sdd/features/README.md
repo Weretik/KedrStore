@@ -27,6 +27,10 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Company contacts](content/company-contacts.md) — the sales phone, email, messengers, map, and city every site page shows; Manager/Admin edit.
 - [Company requisites](content/company-requisites.md) — ФОП, code, IBAN and bank for the requisites page; Admin only, every change logged.
 
+## Media
+
+- [Media library](media/media-library.md) — CDN pictures in virtual folders: upload, replace, rename, move, Admin-only delete, and the job that registers files already on the CDN.
+
 ## Identity
 
 - [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.

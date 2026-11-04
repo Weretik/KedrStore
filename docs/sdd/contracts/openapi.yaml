@@ -128,6 +128,18 @@ paths:
     $ref: ./content/requisites.openapi.yaml#/paths/~1api~1admin~1content~1requisites
   /api/admin/content/requisites/history:
     $ref: ./content/requisites.openapi.yaml#/paths/~1api~1admin~1content~1requisites~1history
+  /api/admin/media/folders:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders
+  /api/admin/media/folders/{id}:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders~1{id}
+  /api/admin/media/files:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files
+  /api/admin/media/files/{id}:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files~1{id}
+  /api/admin/media/files/{id}/content:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files~1{id}~1content
+  /api/admin/media/files/move:
+    $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files~1move
 components:
   securitySchemes:
     bearerAuth:

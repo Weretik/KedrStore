@@ -1,6 +1,7 @@
 using Catalog.Api;
 using Content.Api;
 using Identity.Api;
+using Media.Api;
 using Sales.Api;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration.Web;
@@ -12,5 +13,6 @@ public static class ControllersRegistrationExtensions
             .AddApplicationPart(typeof(CatalogApiAssemblyMarker).Assembly)
             .AddApplicationPart(typeof(IdentityApiAssemblyMarker).Assembly)
             .AddApplicationPart(typeof(SalesApiAssemblyMarker).Assembly)
-            .AddApplicationPart(typeof(ContentApiAssemblyMarker).Assembly);
+            .AddApplicationPart(typeof(ContentApiAssemblyMarker).Assembly)
+            .AddApplicationPart(typeof(MediaApiAssemblyMarker).Assembly);
 }

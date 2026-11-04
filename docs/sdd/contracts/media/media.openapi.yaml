@@ -1,0 +1,296 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Media — media library
+  version: 0.1.0
+  description: >-
+    Pictures on the CDN (`images-kedr.cdn.express`) and the virtual folders that group them. Folders live only in the
+    database: moving a file or a folder never changes its CDN URL. Reads, uploads, replace, move, rename and folder
+    create/update need `CanManageMedia` (Manager or Admin); deletes need the Admin role.
+paths:
+  /api/admin/media/folders:
+    get:
+      operationId: getAdminMediaFolders
+      summary: All folders with file counts
+      description: A flat list ordered by name; the client builds the tree from `parentId`.
+      tags: [Media]
+      responses:
+        '200':
+          description: The folders.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFolderTree' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+    post:
+      operationId: createAdminMediaFolder
+      summary: Create a folder
+      tags: [Media]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveMediaFolderRequest' }
+      responses:
+        '200':
+          description: The new folder.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFolderItem' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '409': { description: A folder with this name (case-insensitive) already exists in the parent. }
+  /api/admin/media/folders/{id}:
+    put:
+      operationId: updateAdminMediaFolder
+      summary: Rename a folder and set its parent
+      description: Moving a folder into itself or its subfolder is `400` on `parentId`.
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveMediaFolderRequest' }
+      responses:
+        '200':
+          description: The saved folder.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFolderItem' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such folder. }
+        '409': { description: A folder with this name already exists in the target parent. }
+    delete:
+      operationId: deleteAdminMediaFolder
+      summary: Delete an empty folder
+      description: Admin only.
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Deleted. }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+        '404': { description: No such folder. }
+        '409': { description: The folder still has files or subfolders. }
+  /api/admin/media/files:
+    get:
+      operationId: getAdminMediaFiles
+      summary: A page of files by name
+      description: >-
+        `folderId` limits the list to one folder, `inRoot=true` to files outside any folder; with neither, the whole
+        library. `search` matches the display name (case-insensitive contains).
+      tags: [Media]
+      parameters:
+        - { name: folderId, in: query, schema: { type: integer, format: int64, minimum: 1 } }
+        - { name: inRoot, in: query, schema: { type: boolean, default: false } }
+        - { name: search, in: query, schema: { type: string, maxLength: 200 } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 60 } }
+      responses:
+        '200':
+          description: The page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFilePage' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+    post:
+      operationId: uploadAdminMediaFile
+      summary: Upload a picture
+      description: >-
+        JPEG, PNG, or WebP (checked by content) up to 15 MB, stored unchanged under a new unique CDN key. The display
+        name is the uploaded file name.
+      tags: [Media]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+                folderId: { type: integer, format: int64, minimum: 1, description: Omit for the library root. }
+      responses:
+        '200':
+          description: The new file.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFileItem' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '413': { description: The request is larger than 15 MB. }
+        '503': { description: CDN credentials are not configured. }
+  /api/admin/media/files/{id}:
+    get:
+      operationId: getAdminMediaFile
+      summary: One file
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200':
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFileItem' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such file. }
+    put:
+      operationId: updateAdminMediaFile
+      summary: Rename a file and set its folder
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateMediaFileRequest' }
+      responses:
+        '200':
+          description: The saved file.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFileItem' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such file. }
+    delete:
+      operationId: deleteAdminMediaFile
+      summary: Delete a file from the CDN and the library
+      description: Admin only.
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Deleted. }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+        '404': { description: No such file. }
+        '503': { description: CDN credentials are not configured. }
+  /api/admin/media/files/{id}/content:
+    put:
+      operationId: replaceAdminMediaFile
+      summary: Replace the picture of a file
+      description: The ID stays (links keep working), the URL changes, the old CDN file is deleted.
+      tags: [Media]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: The file with its new URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaFileItem' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such file. }
+        '413': { description: The request is larger than 15 MB. }
+        '503': { description: CDN credentials are not configured. }
+  /api/admin/media/files/move:
+    post:
+      operationId: moveAdminMediaFiles
+      summary: Move files to a folder
+      description: Up to 500 IDs; unknown IDs are ignored and not counted.
+      tags: [Media]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MoveMediaFilesRequest' }
+      responses:
+        '200':
+          description: How many files moved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [moved]
+                properties:
+                  moved: { type: integer }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64, minimum: 1 }
+  responses:
+    Invalid:
+      description: Invalid input; each error names its field (`name`, `parentId`, `folderId`, `fileName`, `file`, …).
+      content:
+        application/json:
+          schema: { type: object, additionalProperties: true }
+  schemas:
+    SaveMediaFolderRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        parentId: { type: [integer, 'null'], format: int64, minimum: 1, description: '`null` = library root.' }
+    UpdateMediaFileRequest:
+      type: object
+      required: [fileName]
+      properties:
+        fileName: { type: string, minLength: 1, maxLength: 200 }
+        folderId: { type: [integer, 'null'], format: int64, minimum: 1, description: '`null` = library root.' }
+    MoveMediaFilesRequest:
+      type: object
+      required: [fileIds]
+      properties:
+        fileIds: { type: array, minItems: 1, maxItems: 500, items: { type: integer, format: int64, minimum: 1 } }
+        folderId: { type: [integer, 'null'], format: int64, minimum: 1 }
+    MediaFolderItem:
+      type: object
+      required: [id, name, fileCount]
+      properties:
+        id: { type: integer, format: int64 }
+        parentId: { type: [integer, 'null'], format: int64 }
+        name: { type: string }
+        fileCount: { type: integer, description: Files directly in this folder. }
+    MediaFolderTree:
+      type: object
+      required: [folders, rootFileCount, totalFileCount]
+      properties:
+        folders: { type: array, items: { $ref: '#/components/schemas/MediaFolderItem' } }
+        rootFileCount: { type: integer, description: Files outside any folder. }
+        totalFileCount: { type: integer }
+    MediaFileItem:
+      type: object
+      required: [id, fileName, url, contentType, sizeBytes, createdAt, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        folderId: { type: [integer, 'null'], format: int64 }
+        fileName: { type: string, description: 'Display name, not the CDN file name.' }
+        url: { type: string, format: uri, examples: ['https://images-kedr.cdn.express/products/731.jpg'] }
+        contentType: { type: string, examples: [image/jpeg] }
+        sizeBytes: { type: integer, format: int64 }
+        width: { type: [integer, 'null'], description: Unknown for files registered by the CDN sync. }
+        height: { type: [integer, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    MediaFilePage:
+      type: object
+      required: [items, page, pageSize, totalCount]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/MediaFileItem' } }
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalCount: { type: integer }
