@@ -138,6 +138,20 @@ paths:
     $ref: ./content/documents.openapi.yaml#/paths/~1api~1admin~1content~1documents~1versions~1{id}
   /api/admin/content/documents/versions/{id}/publish:
     $ref: ./content/documents.openapi.yaml#/paths/~1api~1admin~1content~1documents~1versions~1{id}~1publish
+  /api/content/{lang}/gallery:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1content~1{lang}~1gallery
+  /api/admin/content/gallery:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery
+  /api/admin/content/gallery/photos:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1photos
+  /api/admin/content/gallery/videos:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1videos
+  /api/admin/content/gallery/youtube-preview:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1youtube-preview
+  /api/admin/content/gallery/items/{id}:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1items~1{id}
+  /api/admin/content/gallery/order:
+    $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1order
   /api/admin/media/folders:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders
   /api/admin/media/folders/{id}:

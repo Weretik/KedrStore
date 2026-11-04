@@ -4,6 +4,7 @@ using Media.Application.Features.Files.GetList;
 using Media.Application.Features.Folders.GetTree;
 using Media.Application.Jobs.CdnSync;
 using Media.Application.Contracts.Persistence;
+using Media.Contracts.Files;
 using Media.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -74,6 +75,28 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(4, page.TotalCount);
         Assert.Equal(["731.jpg", "732.JPG"], page.Items.Select(item => item.FileName));
         Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", page.Items[0].Url);
+    }
+
+    [SkippableFact]
+    public async Task Lookup_GivesOtherModulesTheUrlOfKnownFilesOnly()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        var cdn = new FakeMediaStorage();
+        cdn.Files["products/731.jpg"] = [1, 2, 3];
+        await using var provider = BuildProvider(cdn);
+        await RunSync(provider, dryRun: false);
+        await using var scope = provider.CreateAsyncScope();
+        var id = await scope.ServiceProvider.GetRequiredService<IReadMediaDbContext>().MediaFiles
+            .Select(file => file.Id.Value).SingleAsync();
+
+        var files = await scope.ServiceProvider.GetRequiredService<IMediaFileLookup>()
+            .GetFilesAsync([id, id + 1000], default);
+
+        var file = Assert.Single(files).Value;
+        Assert.Equal(id, file.Id);
+        Assert.Equal("731.jpg", file.FileName);
+        Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", file.Url);
     }
 
     private static async Task<MediaCdnSyncReport> RunSync(ServiceProvider provider, bool dryRun)

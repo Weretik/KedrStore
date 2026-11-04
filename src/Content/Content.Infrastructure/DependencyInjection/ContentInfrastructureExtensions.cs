@@ -1,5 +1,7 @@
+using Content.Application.Contracts.Gallery;
 using Content.Application.Contracts.Html;
 using Content.Application.Contracts.Images;
+using Content.Infrastructure.Gallery;
 using Content.Infrastructure.Html;
 using Content.Infrastructure.Images;
 using Content.Infrastructure.Repositories;
@@ -20,6 +22,8 @@ public static class ContentInfrastructureExtensions
         services.AddScoped(typeof(IContentRepository<>), typeof(ContentEfRepository<>));
         services.AddSingleton<IArticleHtmlSanitizer, ArticleHtmlSanitizer>();
         services.AddSingleton<ICoverImageProcessor, CoverImageProcessor>();
+        services.AddScoped<IGalleryImageReader, GalleryImageReader>();
+        services.AddHttpClient<IYoutubeVideoInfo, YoutubeOEmbedClient>(client => client.Timeout = TimeSpan.FromSeconds(5));
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IDatabaseMigrator, DbMigrator<ContentDbContext>>();
         return services;
