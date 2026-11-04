@@ -2,11 +2,13 @@ using Content.Application.Contracts.Gallery;
 using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Contracts.Html;
 using Content.Application.Contracts.Images;
+using Content.Application.Contracts.Site;
 using Content.Infrastructure.Gallery;
 using Content.Infrastructure.MediaLibrary;
 using Content.Infrastructure.Html;
 using Content.Infrastructure.Images;
 using Content.Infrastructure.Repositories;
+using Content.Infrastructure.Site;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Content.Infrastructure.DependencyInjection;
@@ -26,6 +28,8 @@ public static class ContentInfrastructureExtensions
         services.AddSingleton<ICoverImageProcessor, CoverImageProcessor>();
         services.AddScoped<IMediaImageReader, MediaImageReader>();
         services.AddHttpClient<IYoutubeVideoInfo, YoutubeOEmbedClient>(client => client.Timeout = TimeSpan.FromSeconds(5));
+        services.Configure<SiteRevalidationOptions>(configuration.GetSection(SiteRevalidationOptions.SectionName));
+        services.AddHttpClient<ISiteCacheRefresher, SiteCacheRefresher>(client => client.Timeout = TimeSpan.FromSeconds(10));
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IDatabaseMigrator, DbMigrator<ContentDbContext>>();
         return services;

@@ -14,6 +14,7 @@ erDiagram
         int CoverVersion "null without a cover"
         timestamptz CreatedAt
         timestamptz UpdatedAt
+        varchar256 UpdatedBy "editor; null before Content 007"
     }
     ArticleTranslations {
         bigint ArticleId PK
@@ -37,6 +38,7 @@ erDiagram
         varchar80 CityUk
         varchar80 CityRu
         timestamptz UpdatedAt
+        varchar256 UpdatedBy "editor; null for the migration row"
     }
     CompanyRequisites {
         int Id PK "always 1 (check constraint)"

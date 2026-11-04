@@ -31,7 +31,7 @@ paths:
           description: The contacts.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CompanyContacts' }
+              schema: { $ref: '#/components/schemas/AdminCompanyContacts' }
         '401': { description: Not signed in. }
         '403': { description: Not a Manager or Admin. }
         '404': { description: The contacts row is missing. }
@@ -50,7 +50,7 @@ paths:
           description: The saved contacts.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/CompanyContacts' }
+              schema: { $ref: '#/components/schemas/AdminCompanyContacts' }
         '400':
           description: Invalid input; each error names the field (`salesPhone`, `email`, `telegramUrl`, `viberPhone`, `mapUrl`, `cityUk`, `cityRu`).
           content:
@@ -83,3 +83,14 @@ components:
           required: [updatedAt]
           properties:
             updatedAt: { type: string, format: date-time }
+    AdminCompanyContacts:
+      description: The contacts with who saved the last change; the public read never shows the editor.
+      allOf:
+        - $ref: '#/components/schemas/CompanyContacts'
+        - type: object
+          required: [updatedBy]
+          properties:
+            updatedBy:
+              type: [string, 'null']
+              maxLength: 256
+              description: Email (else user name) of who saved last; null for the row created by the migration.

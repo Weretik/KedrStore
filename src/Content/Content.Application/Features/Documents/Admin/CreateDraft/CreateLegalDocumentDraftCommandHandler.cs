@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Contracts;
 using Content.Application.Contracts.Html;
 using Content.Application.Features.Documents.Common;
+using Content.Application.Features.Editing;
 
 namespace Content.Application.Features.Documents.Admin.CreateDraft;
 
@@ -33,7 +34,7 @@ public sealed class CreateLegalDocumentDraftCommandHandler(
                 ValidationSeverity.Error));
 
         var draft = LegalDocumentVersion.CreateDraft(command.Kind, LegalDocumentEditor.Sanitized(texts, sanitizer),
-            clock.GetUtcNow(), LegalDocumentEditor.Name(currentUser));
+            clock.GetUtcNow(), ContentEditor.Name(currentUser));
         await versions.AddAsync(draft, cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(draft));
     }

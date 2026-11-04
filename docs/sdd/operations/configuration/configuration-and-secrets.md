@@ -18,6 +18,7 @@ Use double underscores in environment variable keys: for example, `ConnectionStr
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
 | `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, SameSite, and the CSRF cookie domain (`CsrfCookieDomain`, set in `appsettings.Production.json`) | No |
 | `MediaStorage:PublicBaseUrl`, `Ftp:Host`, `Port`, `Username`, `Password` | Media library CDN over FTP (user with the CDN root as home); password from GCP secret `cdn-media-ftp-password`. Without it uploads answer 503 | Password only |
+| `SiteRevalidation:Url`, `Secret` | «Оновити сайт зараз»: the public site origin and the secret its `/api/revalidate` checks (`KEDR_REVALIDATE_SECRET` on the site). GCP secrets `site-revalidate-url` and `site-revalidate-secret`, attached by the deploy only when both exist; without them the button answers 503 «site not connected» | Both |
 | `TrustedProxy:SharedSecret` | Secret shared with the Cloudflare API proxy; enables the real client IP behind it ([Cloudflare API proxy](../deployment/cloudflare-api-proxy.md)) | Yes |
 | `Identity:SessionSecurity` | Access/refresh token lifetime limits, refresh reuse grace window | No |
 | `Identity:CookieSession` | Browser session cookie name, sliding lifetime, security-stamp check interval, `RequireSecure` (off only for local HTTP) | No |

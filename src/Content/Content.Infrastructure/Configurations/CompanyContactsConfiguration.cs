@@ -16,5 +16,6 @@ internal sealed class CompanyContactsConfiguration : IEntityTypeConfiguration<Co
         builder.Property(contacts => contacts.CityUk).HasMaxLength(CompanyContacts.CityMaxLength).IsRequired();
         builder.Property(contacts => contacts.CityRu).HasMaxLength(CompanyContacts.CityMaxLength).IsRequired();
         builder.Property(contacts => contacts.UpdatedAt).IsRequired();
+        builder.Property(contacts => contacts.UpdatedBy).HasMaxLength(EditorName.MaxLength);
     }
 }

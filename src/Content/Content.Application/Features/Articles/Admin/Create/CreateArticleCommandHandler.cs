@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Contracts;
+using Content.Application.Features.Editing;
 using Content.Application.Contracts.Html;
 using Content.Application.Features.Articles.Common;
 
@@ -8,6 +10,7 @@ public sealed class CreateArticleCommandHandler(
     IContentRepository<Article> articles,
     IReadContentDbContext db,
     IArticleHtmlSanitizer sanitizer,
+    ICurrentUserService currentUser,
     TimeProvider clock)
     : ICommandHandler<CreateArticleCommand, Result<AdminArticleDetails>>
 {
@@ -26,7 +29,7 @@ public sealed class CreateArticleCommandHandler(
         }
 
         var article = Article.Create(slug, input.PublishedOn, input.IsPublished,
-            ArticleTexts.Sanitized(input.Texts, sanitizer), clock.GetUtcNow());
+            ArticleTexts.Sanitized(input.Texts, sanitizer), clock.GetUtcNow(), ContentEditor.Name(currentUser));
         await articles.AddAsync(article, cancellationToken);
         return Result.Success(ArticleMapper.ToAdmin(article));
     }

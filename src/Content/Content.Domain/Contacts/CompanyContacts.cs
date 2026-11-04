@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Content.Domain.Editing;
 
 namespace Content.Domain.Contacts;
 
@@ -37,16 +38,25 @@ public sealed partial class CompanyContacts : IAggregateRoot
     public string CityRu { get; private set; } = null!;
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    /// <summary>Who saved the last change; empty for the row created by the migration.</summary>
+    public string? UpdatedBy { get; private set; }
+
     private CompanyContacts() { }
 
     public static CompanyContacts Create(CompanyContactsValues values, DateTimeOffset now)
     {
         var contacts = new CompanyContacts { Id = SingletonId };
-        contacts.Update(values, now);
+        contacts.Apply(values, now);
         return contacts;
     }
 
-    public void Update(CompanyContactsValues values, DateTimeOffset now)
+    public void Update(CompanyContactsValues values, DateTimeOffset now, string editor)
+    {
+        Apply(values, now);
+        UpdatedBy = EditorName.Normalize(editor);
+    }
+
+    private void Apply(CompanyContactsValues values, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(values);
         SalesPhone = Phone(values.SalesPhone, nameof(SalesPhone));
