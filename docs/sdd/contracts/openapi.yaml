@@ -116,8 +116,8 @@ paths:
     $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles
   /api/admin/articles/{id}:
     $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1{id}
-  /api/admin/articles/{id}/cover:
-    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1{id}~1cover
+  /api/admin/articles/covers:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1covers
   /api/content/contacts:
     $ref: ./content/contacts.openapi.yaml#/paths/~1api~1content~1contacts
   /api/admin/content/contacts:
