@@ -77,6 +77,12 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(["731.jpg", "732.JPG"], page.Items.Select(item => item.FileName));
         Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", page.Items[0].Url);
 
+        var handler = new GetMediaFilesQueryHandler(read, urls);
+        var direct = (await handler.Handle(new GetMediaFilesQuery(products.Id, false, null), default)).Value;
+        var withSubfolders = (await handler.Handle(
+            new GetMediaFilesQuery(products.Id, false, null, IncludeSubfolders: true), default)).Value;
+        Assert.Equal((2, 3), (direct.TotalCount, withSubfolders.TotalCount));
+
         // The Media contract for other modules: files directly in a CDN directory, and by ID.
         var directory = scope.ServiceProvider.GetRequiredService<IMediaFileDirectory>();
         var inProducts = await directory.ListInStorageDirectoryAsync("products", default);

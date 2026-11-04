@@ -26,9 +26,10 @@ public sealed class AdminMediaFilesController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<MediaFilePage>> GetList(
         [FromQuery] long? folderId, [FromQuery] bool inRoot = false, [FromQuery] string? search = null,
-        [FromQuery] int page = 1, [FromQuery] int pageSize = 60, CancellationToken cancellationToken = default)
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 60, [FromQuery] bool includeSubfolders = false,
+        CancellationToken cancellationToken = default)
         => this.ToActionResult(await sender.Send(
-            new GetMediaFilesQuery(folderId, inRoot, search, page, pageSize), cancellationToken));
+            new GetMediaFilesQuery(folderId, inRoot, search, page, pageSize, includeSubfolders), cancellationToken));
 
     [HttpGet("{id:long}", Name = "getAdminMediaFile")]
     [ProducesResponseType(typeof(MediaFileItem), StatusCodes.Status200OK)]
