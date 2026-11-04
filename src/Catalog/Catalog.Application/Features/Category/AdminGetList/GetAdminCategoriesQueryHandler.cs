@@ -1,10 +1,17 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Category.GetList.Specifications;
+using Catalog.Application.Features.Category.Stats;
 using Catalog.Contracts.Category;
 
 namespace Catalog.Application.Features.Category.AdminGetList;
 
-public sealed class GetAdminCategoriesQueryHandler(ICatalogReadRepository<ProductCategory> repository)
+/// <summary>
+/// Active rows come depth-first in tree order with product counts (including descendants) and the languages that
+/// have site texts; deleted rows come newest first without them.
+/// </summary>
+public sealed class GetAdminCategoriesQueryHandler(
+    ICatalogReadRepository<ProductCategory> repository,
+    IAdminCategoryInsightsReader insights)
     : IQueryHandler<GetAdminCategoriesQuery, Result<IReadOnlyList<AdminCategoryResponse>>>
 {
     public async ValueTask<Result<IReadOnlyList<AdminCategoryResponse>>> Handle(GetAdminCategoriesQuery query, CancellationToken cancellationToken)
@@ -16,6 +23,11 @@ public sealed class GetAdminCategoriesQueryHandler(ICatalogReadRepository<Produc
         }
 
         var categories = await repository.ListAsync(new AllCategoriesSpec(null), cancellationToken);
+        var directCounts = await insights.LoadDirectProductCountsAsync(cancellationToken);
+        var counts = CategoryStatsRollup.Rollup(
+            categories,
+            directCounts.ToDictionary(pair => pair.Key, pair => new CategoryStats(pair.Value, null, null)));
+        var languages = await insights.LoadFilledContentLanguagesAsync(cancellationToken);
         var byId = categories.ToDictionary(x => x.Id.Value);
         var children = categories.ToLookup(x => x.ParentId?.Value);
         var result = new List<AdminCategoryResponse>();
@@ -24,7 +36,11 @@ public sealed class GetAdminCategoriesQueryHandler(ICatalogReadRepository<Produc
         void Visit(ProductCategory item)
         {
             if (!visited.Add(item.Id.Value)) return;
-            result.Add(CategoryReadMapper.ToAdminResponse(item));
+            result.Add(CategoryReadMapper.ToAdminResponse(item) with
+            {
+                ProductCount = counts.TryGetValue(item.Id.Value, out var stats) ? stats.ProductCount : 0,
+                FilledContentLanguages = languages.TryGetValue(item.Id.Value, out var filled) ? filled : []
+            });
             foreach (var child in children[item.Id.Value].OrderBy(x => x.SortOrder).ThenBy(x => x.Id.Value)) Visit(child);
         }
 

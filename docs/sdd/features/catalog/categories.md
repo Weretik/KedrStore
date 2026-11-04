@@ -1,12 +1,14 @@
 # Catalog categories
 
-**Static code check:** 2026-10-30. **Module:** Catalog.
+**Static code check:** 2026-11-04. **Module:** Catalog.
 
 Public tree and category page by slug, Admin reads, Admin slug edit, and Admin-written SEO text and FAQ per language.
 
 ## Structure and relationships
 
 The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Entities/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Entities/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Slugs/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryStatsReader](../../../../src/Catalog/Catalog.Application/Features/Category/Stats/CategoryStatsReader.cs) and [CategoryStatsRollup](../../../../src/Catalog/Catalog.Application/Features/Category/Stats/CategoryStatsRollup.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Entities/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Content/HtmlSanitizerService.cs) on save. The public tree and category page never show the Cosmos import root ([PublicCatalogScope](../../../../src/Catalog/Catalog.Application/Features/Category/PublicCatalogScope.cs)): the tree omits it and its slug answers `404`; admin reads still list it.
+
+The active admin list also carries `productCount` (all active products of the category and its descendants, on the site or not) and `filledContentLanguages` (languages with any text or FAQ) from [AdminCategoryInsightsReader](../../../../src/Catalog/Catalog.Application/Features/Category/AdminGetList/AdminCategoryInsightsReader.cs); the Admin tree uses them to show counts and mark categories without texts. Deleted rows and the by-id read leave both `null`.
 
 Access: reads need `CanManageProducts`; slug edit, content save, and `deleted=true` need the Admin role.
 
@@ -23,7 +25,7 @@ src/
     │   └── CatalogLookupActionResult.cs  # 404 with redirect body
     ├── Catalog.Application/
     │   ├── Features/Category/
-    │   │   ├── AdminGetById/, AdminGetList/  # Admin reads (+ deleted filter)
+    │   │   ├── AdminGetById/, AdminGetList/  # Admin reads (+ deleted filter, counts and filled languages)
     │   │   ├── Content/Get/, Content/Save/  # Admin content query and command
     │   │   ├── GetBySlug/GetCategoryBySlugQueryHandler.cs  # history, redirect, counts, prices, content
     │   │   ├── GetList/GetCategoriesQuryHandler.cs  # tree with counts, hides empty
@@ -48,14 +50,15 @@ flowchart LR
     B["AdminCategoriesController"] --> D["Admin reads, ChangeSlug, Content"]
     C --> S["SlugService"]
     C --> T["CategoryStatsReader"]
+    D --> I["AdminCategoryInsightsReader"]
     D --> S
     D --> H["IHtmlSanitizerService"]
-    C & D & S & T --> F["CatalogDbContext"]
+    C & D & S & T & I --> F["CatalogDbContext"]
 ```
 
 ## Tests
 
-[CategoryPresentationApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/CategoryPresentationApplicationTests.cs) · [SlugTextTests.cs](../../../../tests/UnitTests/Catalog/Slugs/SlugTextTests.cs) · [ImportSyncTests.cs](../../../../tests/UnitTests/Catalog/Sync/ImportSyncTests.cs) · [CatalogSoftDeleteAndContentTests.cs](../../../../tests/UnitTests/Catalog/Domain/CatalogSoftDeleteAndContentTests.cs) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs) · [CategoryPresentationPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/CategoryPresentationPersistenceTests.cs)
+[CategoryPresentationApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/CategoryPresentationApplicationTests.cs) · [AdminCategoriesListApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/AdminCategoriesListApplicationTests.cs) · [AdminCategoryInsightsPostgresTests.cs](../../../../tests/IntegrationTests/Catalog/Categories/AdminCategoryInsightsPostgresTests.cs) · [SlugTextTests.cs](../../../../tests/UnitTests/Catalog/Slugs/SlugTextTests.cs) · [ImportSyncTests.cs](../../../../tests/UnitTests/Catalog/Sync/ImportSyncTests.cs) · [CatalogSoftDeleteAndContentTests.cs](../../../../tests/UnitTests/Catalog/Domain/CatalogSoftDeleteAndContentTests.cs) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs) · [CategoryPresentationPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/CategoryPresentationPersistenceTests.cs)
 
 Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Catalog"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~CatalogStableUrlsApiTests"` (in-memory, no Docker).
 

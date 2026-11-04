@@ -37,7 +37,9 @@ public sealed record AdminCategoryResponse(
     int SortOrder,
     int Level,
     bool IsDeleted,
-    DateTimeOffset? DeletedAt);
+    DateTimeOffset? DeletedAt,
+    int? ProductCount = null,
+    IReadOnlyList<string>? FilledContentLanguages = null);
 
 public sealed record CategoryFaqItemDto(string Question, string Answer);
 
