@@ -1,8 +1,8 @@
 # KedrStore database map
 
-**Checked:** 2026-10-21 against the three EF Core `DbContext` types, configurations, and snapshots under `src/`. This is the model structure in the repository, not confirmation that migrations have been applied in a particular environment.
+**Checked:** 2026-11-04 against the four EF Core `DbContext` types, configurations, and snapshots under `src/`. This is the model structure in the repository, not confirmation that migrations have been applied in a particular environment.
 
-All three contexts use tables without an explicitly configured PostgreSQL schema. Therefore the model does not define separate Catalog, Sales, and Identity schemas: their table names use the connection's default schema. With a standard `search_path`, that is `public`; the settings of any deployed database were not checked here.
+Catalog, Sales, and Identity contexts use tables without an explicitly configured PostgreSQL schema. Therefore the model does not define separate schemas for them: their table names use the connection's default schema. With a standard `search_path`, that is `public`; the settings of any deployed database were not checked here.
 
 ```text
 KedrStore PostgreSQL
@@ -45,8 +45,14 @@ KedrStore PostgreSQL
     │       ├── AspNetUserLogins          # external logins
     │       ├── AspNetUserTokens          # tokens
     │       └── AppRefreshSessions       # refresh sessions
-    └── infrastructure table
-        └── __EFMigrationsHistory         # applied EF migration history
+    ├── infrastructure table
+    │   └── __EFMigrationsHistory         # applied EF migration history
+└── schema content
+    └── Content / ContentDbContext — 3 tables
+        ├── Articles                      # slug, date, publication flag, cover version
+        ├── ArticleTranslations           # uk/ru title, excerpt, sanitized body
+        ├── ArticleCovers                 # cover WebP bytes
+        └── __EFMigrationsHistory         # Content migration history
 ```
 
 ## Open only the relevant part
@@ -60,5 +66,6 @@ KedrStore PostgreSQL
 | Counterparties and their prices | [Customers](sales-customers.md) | [Customers and counterparties](../../features/sales/customers.md) |
 | Orders, drafts, and sync | [Orders](sales-orders.md) | [Manager orders](../../features/sales/admin-orders.md), [Admin workspace](../../features/sales/admin-order-workspace.md) |
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |
+| Site articles | [Content articles](content-articles.md) | [Site articles](../../features/content/articles.md) |
 
-Each EF model table is described in exactly **one** document above. Physical FKs are shown in its ER diagram; ID references without an FK are explained separately. `__EFMigrationsHistory` is an infrastructure table and is not one of the 25 EF model tables; its presence in a specific environment depends on applied migrations. After a schema change, update the relevant document and this tree only if the table list or placement changed.
+Each EF model table is described in exactly **one** document above. Physical FKs are shown in its ER diagram; ID references without an FK are explained separately. `__EFMigrationsHistory` is an infrastructure table and is not one of the EF model tables; its presence in a specific environment depends on applied migrations. After a schema change, update the relevant document and this tree only if the table list or placement changed.

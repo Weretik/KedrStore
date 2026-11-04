@@ -17,10 +17,12 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminCustomersController` | `/api/admin/customers` | `CanManageOrders` |
 | `AdminProductsController` | `/api/admin/products` | `CanManageProducts` |
 | `AdminCategoriesController` | `/api/categories` | `CanManageProducts` |
+| `AdminArticlesController` | `/api/admin/articles` | `CanManageContent` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
+| `ArticlesController` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
 | `CookieAuthController`, `MobileAuthController`, `AuthSessionController` | login, refresh | public, rate-limited; logout and `me` need a session |
 
@@ -46,7 +48,7 @@ Policy names are defined in `Identity.Application/Security/Policies/PolicyNames.
 | Policy | Allowed roles |
 | --- | --- |
 | `RequireAdminRole` / `CanManageUsers` | Admin |
-| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` | Manager, Admin |
+| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` / `CanManageContent` | Manager, Admin |
 | `CatalogRead` / `OrderCreate` | User, Manager, Admin |
 | `RequireTenantAccess` | The constant exists, but the policy is not currently registered |
 

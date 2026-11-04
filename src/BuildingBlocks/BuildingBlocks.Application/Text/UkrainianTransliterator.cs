@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Catalog.Application.Slugs;
+namespace BuildingBlocks.Application.Text;
 
 /// <summary>
 /// Ukrainian national transliteration (Cabinet of Ministers resolution No. 55, 2010),

@@ -21,6 +21,10 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Customers and counterparties](sales/customers.md) — Admin counterparty list and details, local synchronization with 1C.
 - [Manager catalog](sales/manager-catalog.md) — authorized sales product list.
 
+## Content
+
+- [Site articles](content/articles.md) — public article reads with cached covers, and Manager/Admin article management.
+
 ## Identity
 
 - [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.

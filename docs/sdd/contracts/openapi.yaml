@@ -106,6 +106,18 @@ paths:
     $ref: ./identity/profile.openapi.yaml#/paths/~1api~1profile~1password
   /api/sales/{lang}/catalog/products:
     $ref: ./sales/catalog.openapi.yaml#/paths/~1api~1sales~1{lang}~1catalog~1products
+  /api/content/{lang}/articles:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1content~1{lang}~1articles
+  /api/content/{lang}/articles/{slug}:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1content~1{lang}~1articles~1{slug}
+  /api/content/articles/{id}/cover:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1content~1articles~1{id}~1cover
+  /api/admin/articles:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles
+  /api/admin/articles/{id}:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1{id}
+  /api/admin/articles/{id}/cover:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1{id}~1cover
 components:
   securitySchemes:
     bearerAuth:

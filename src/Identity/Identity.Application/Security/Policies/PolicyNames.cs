@@ -8,6 +8,7 @@ public static class PolicyNames
     public const string CanManageUsers = "CanManageUsers";
     public const string CanManageProducts = "CanManageProducts";
     public const string CanManageOrders = "CanManageOrders";
+    public const string CanManageContent = "CanManageContent";
     public const string CatalogRead = "CatalogRead";
     public const string OrderCreate = "OrderCreate";
 }

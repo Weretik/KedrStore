@@ -31,6 +31,8 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 | Admin catalog | `GET /api/categories`, `/api/categories/{id}`, `/api/admin/products/**` | Manager or Admin (`CanManageProducts`) |
 | Admin orders and customers | `/api/admin/orders/**`, `/api/admin/order-workspace/**`, `/api/admin/customers/**` | Manager or Admin (`CanManageOrders`) |
 | Staff accounts | `/api/admin/users/**` | Admin (`CanManageUsers`) |
+| Site articles | `GET /api/content/{lang}/articles`, `/api/content/{lang}/articles/{slug}`, `/api/content/articles/{id}/cover` | Anonymous; `coverPath` in responses is relative to the API base URL |
+| Admin articles | `/api/admin/articles/**` | Manager or Admin (`CanManageContent`) |
 | Quick order | `POST /api/orders` | Anonymous |
 | Session | cookie and mobile login, refresh, logout, current user | Login and refresh anonymous and rate-limited; see Identity contract |
 | Sales catalog | `POST /api/sales/{lang}/catalog/products` | Any signed-in user |

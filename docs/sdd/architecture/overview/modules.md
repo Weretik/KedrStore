@@ -12,6 +12,12 @@ Layers: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
 
 Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog through contracts and read abstractions, not Catalog.Infrastructure types.
 
+## Content
+
+Layers: Content.Api, Content.Application, Content.Domain, Content.Infrastructure.
+
+Owns site content written in the admin: articles now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history; it does not reference other modules.
+
 ## Identity
 
 Layers: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.

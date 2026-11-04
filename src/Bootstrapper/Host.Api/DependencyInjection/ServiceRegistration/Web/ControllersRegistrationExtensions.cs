@@ -1,4 +1,5 @@
 using Catalog.Api;
+using Content.Api;
 using Identity.Api;
 using Sales.Api;
 
@@ -10,5 +11,6 @@ public static class ControllersRegistrationExtensions
         => services.AddControllers()
             .AddApplicationPart(typeof(CatalogApiAssemblyMarker).Assembly)
             .AddApplicationPart(typeof(IdentityApiAssemblyMarker).Assembly)
-            .AddApplicationPart(typeof(SalesApiAssemblyMarker).Assembly);
+            .AddApplicationPart(typeof(SalesApiAssemblyMarker).Assembly)
+            .AddApplicationPart(typeof(ContentApiAssemblyMarker).Assembly);
 }
