@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Contracts.ClosedXML;
+﻿using System.Net;
+using Catalog.Application.Contracts.ClosedXML;
 using Catalog.Application.Features.Orders.Create.DTOs;
 using Catalog.Application.Features.Orders.Create.Notifications;
 
@@ -25,9 +26,9 @@ public sealed class CreateOrderCommandHandler(ITelegramNotifier telegram, IOrder
         var parts = new List<string>
         {
             "<b>Нове замовлення</b>",
-            $"🆔 <code>{orderId}</code>",
-            $"👨‍💼 {request.FirstName}",
-            $"📲 <code>{request.Phone}</code>",
+            $"🆔 <b>{orderId.ToString("N")[..8].ToUpperInvariant()}</b> <code>{orderId}</code>",
+            $"👨‍💼 {WebUtility.HtmlEncode(request.FirstName)}",
+            $"📲 <code>{WebUtility.HtmlEncode(request.Phone)}</code>",
             $"📅 {kyivTime:dd.MM.yyyy HH:mm}"
         };
 

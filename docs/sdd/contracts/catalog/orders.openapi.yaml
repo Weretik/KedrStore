@@ -17,6 +17,7 @@ paths:
         '200': { description: Created order, content: { application/json: { schema: { $ref: '#/components/schemas/QuickOrderResponse' } } } }
         '400': { description: Input validation failed }
         '409': { description: Business conflict, content: { application/json: { schema: { type: array, items: { type: string } } } } }
+        '429': { description: Quick order flood limit exceeded (60 per 10 minutes per calling address; the public site calls from its server) }
 components:
   schemas:
     CreateOrderRequest:
