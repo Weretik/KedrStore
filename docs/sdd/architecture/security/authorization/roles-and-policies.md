@@ -20,6 +20,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminArticlesController` | `/api/admin/articles` | `CanManageContent` |
 | `CompanyContactsController` | `/api/content/contacts` | public (site contacts) |
 | `AdminCompanyContactsController` | `/api/admin/content/contacts` | `CanManageContent` |
+| `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
@@ -50,7 +51,7 @@ Policy names are defined in `Identity.Application/Security/Policies/PolicyNames.
 | Policy | Allowed roles |
 | --- | --- |
 | `RequireAdminRole` / `CanManageUsers` | Admin |
-| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` / `CanManageContent` | Manager, Admin |
+| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` / `CanManageContent` / `CanManageMedia` | Manager, Admin |
 | `CatalogRead` / `OrderCreate` | User, Manager, Admin |
 | `RequireTenantAccess` | The constant exists, but the policy is not currently registered |
 

@@ -37,6 +37,8 @@
       <ProjectReference Include="..\..\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Content\Content.Api\Content.Api.csproj" />
       <ProjectReference Include="..\..\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Media\Media.Api\Media.Api.csproj" />
+      <ProjectReference Include="..\..\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

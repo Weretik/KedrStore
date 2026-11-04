@@ -144,7 +144,7 @@ jobs:
             --region "${{ env.GCP_REGION }}" \
             --platform managed \
             --allow-unauthenticated \
-            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,TrustedProxy__SharedSecret=api-proxy-shared-secret:latest,AvatarStorage__Ftp__Password=cdn-avatars-ftp-password:latest" \
+            --set-secrets "ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest,ADMIN_DEFAULT_PASSWORD=identity-admin-password:latest,Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,TrustedProxy__SharedSecret=api-proxy-shared-secret:latest,AvatarStorage__Ftp__Password=cdn-avatars-ftp-password:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest" \
             --quiet
 
       - name: Update Cloud Run Jobs to new image
@@ -183,6 +183,29 @@ jobs:
               --task-timeout 10m \
               --args="$ORDER_SYNC_ARGS" \
               --set-secrets "$ORDER_SYNC_SECRETS" \
+              --quiet
+          fi
+
+          # Registers CDN files in the media library; run it once with --dry-run, then without (see the media runbook).
+          MEDIA_SYNC_JOB="media-cdn-sync"
+          MEDIA_SYNC_SECRETS="ConnectionStrings__Default=db-connection:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest"
+
+          if gcloud run jobs describe "$MEDIA_SYNC_JOB" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+            gcloud run jobs update "$MEDIA_SYNC_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --set-secrets "$MEDIA_SYNC_SECRETS" \
+              --quiet
+          else
+            gcloud run jobs create "$MEDIA_SYNC_JOB" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 60m \
+              --args=--job=media-cdn-sync \
+              --set-secrets "$MEDIA_SYNC_SECRETS" \
               --quiet
           fi
 

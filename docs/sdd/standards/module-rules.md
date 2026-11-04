@@ -42,7 +42,7 @@ A new module follows the same clean architecture as the existing ones:
 
 ## KedrStore specifics
 
-- Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`). Projects live in `src/<Module>/<Module>.<Layer>/`.
+- Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`), `Media` (CDN picture library; schema `media`). Projects live in `src/<Module>/<Module>.<Layer>/`.
 - Hosts register modules in `src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/ModulesRegistrationExtensions.cs` and, for jobs, `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`.
 - Architecture tests list business modules in `BusinessModules` in `tests/ArchitectureTests/Modules/ProjectModuleIsolationTests.cs`; add the new module there.
 - All modules share one database and run migrations through `Host.Jobs --job=migrate` ([operations](../operations/data/migrations-and-seeding.md)).

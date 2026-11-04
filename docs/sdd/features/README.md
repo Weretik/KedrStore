@@ -26,6 +26,10 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Site articles](content/articles.md) — public article reads with cached covers, and Manager/Admin article management.
 - [Company contacts](content/company-contacts.md) — the sales phone, email, messengers, map, and city every site page shows; Manager/Admin edit.
 
+## Media
+
+- [Media library](media/media-library.md) — CDN pictures in virtual folders: upload, replace, rename, move, Admin-only delete, and the job that registers files already on the CDN.
+
 ## Identity
 
 - [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.

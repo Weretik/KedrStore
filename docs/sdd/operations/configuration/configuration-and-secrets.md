@@ -17,6 +17,7 @@ Use double underscores in environment variable keys: for example, `ConnectionStr
 | `Sales:OneCOrderSync` | Batch size, intervals, attempt limit, Kyiv sending window, and recovery for stale `Sent` state | No |
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
 | `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, SameSite, and the CSRF cookie domain (`CsrfCookieDomain`, set in `appsettings.Production.json`) | No |
+| `MediaStorage:PublicBaseUrl`, `Ftp:Host`, `Port`, `Username`, `Password` | Media library CDN over FTP (user with the CDN root as home); password from GCP secret `cdn-media-ftp-password`. Without it uploads answer 503 | Password only |
 | `TrustedProxy:SharedSecret` | Secret shared with the Cloudflare API proxy; enables the real client IP behind it ([Cloudflare API proxy](../deployment/cloudflare-api-proxy.md)) | Yes |
 | `Identity:SessionSecurity` | Access/refresh token lifetime limits, refresh reuse grace window | No |
 | `Identity:CookieSession` | Browser session cookie name, sliding lifetime, security-stamp check interval, `RequireSecure` (off only for local HTTP) | No |
