@@ -18,6 +18,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminProductsController` | `/api/admin/products` | `CanManageProducts` |
 | `AdminCategoriesController` | `/api/categories` | `CanManageProducts` |
 | `AdminArticlesController` | `/api/admin/articles` | `CanManageContent` |
+| `CompanyContactsController` | `/api/content/contacts` | public (site contacts) |
+| `AdminCompanyContactsController` | `/api/admin/content/contacts` | `CanManageContent` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |

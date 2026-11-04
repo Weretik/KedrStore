@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — company contacts
+  version: 0.1.0
+  description: >-
+    The one set of company contacts the site shows on every page (header, footer, contacts page, cart, JSON-LD).
+    Phones are Ukrainian numbers in E.164 (`+380XXXXXXXXX`); clients format them for display.
+paths:
+  /api/content/contacts:
+    get:
+      operationId: getCompanyContacts
+      summary: Get the company contacts
+      description: Public, because every site page renders them for anonymous visitors.
+      tags: [Contacts]
+      security: []
+      responses:
+        '200':
+          description: The contacts.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyContacts' }
+        '404': { description: The contacts row is missing (it is created by a migration). }
+  /api/admin/content/contacts:
+    get:
+      operationId: getAdminCompanyContacts
+      summary: Get the company contacts for editing
+      description: Requires `CanManageContent` (Manager or Admin).
+      tags: [Contacts]
+      responses:
+        '200':
+          description: The contacts.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyContacts' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: The contacts row is missing. }
+    put:
+      operationId: updateAdminCompanyContacts
+      summary: Replace all company contacts
+      description: Requires `CanManageContent` (Manager or Admin). All fields are required and replaced at once.
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveCompanyContactsRequest' }
+      responses:
+        '200':
+          description: The saved contacts.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyContacts' }
+        '400':
+          description: Invalid input; each error names the field (`salesPhone`, `email`, `telegramUrl`, `viberPhone`, `mapUrl`, `cityUk`, `cityRu`).
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: The contacts row is missing. }
+components:
+  schemas:
+    Phone:
+      type: string
+      pattern: '^\+380\d{9}$'
+      examples: ['+380687135049']
+    SaveCompanyContactsRequest:
+      type: object
+      required: [salesPhone, email, telegramUrl, viberPhone, mapUrl, cityUk, cityRu]
+      properties:
+        salesPhone: { $ref: '#/components/schemas/Phone' }
+        email: { type: string, format: email, maxLength: 120 }
+        telegramUrl: { type: string, format: uri, maxLength: 500, description: 'https://t.me/… or https://telegram.me/…' }
+        viberPhone: { $ref: '#/components/schemas/Phone' }
+        mapUrl: { type: string, format: uri, maxLength: 500, description: Any https link to the map. }
+        cityUk: { type: string, minLength: 1, maxLength: 80 }
+        cityRu: { type: string, minLength: 1, maxLength: 80 }
+    CompanyContacts:
+      allOf:
+        - $ref: '#/components/schemas/SaveCompanyContactsRequest'
+        - type: object
+          required: [updatedAt]
+          properties:
+            updatedAt: { type: string, format: date-time }

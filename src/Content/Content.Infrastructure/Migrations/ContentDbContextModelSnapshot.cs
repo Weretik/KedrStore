@@ -80,6 +80,57 @@ namespace Content.Infrastructure.Migrations
                     b.ToTable("ArticleCovers", "content");
                 });
 
+            modelBuilder.Entity("Content.Domain.Contacts.CompanyContacts", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CityRu")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("CityUk")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("MapUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SalesPhone")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)");
+
+                    b.Property<string>("TelegramUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ViberPhone")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyContacts", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_CompanyContacts_Singleton", "\"Id\" = 1");
+                        });
+                });
+
             modelBuilder.Entity("Content.Domain.Articles.Article", b =>
                 {
                     b.OwnsMany("Content.Domain.Articles.ArticleTranslation", "Translations", b1 =>

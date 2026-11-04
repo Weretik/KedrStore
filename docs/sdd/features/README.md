@@ -24,6 +24,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 ## Content
 
 - [Site articles](content/articles.md) — public article reads with cached covers, and Manager/Admin article management.
+- [Company contacts](content/company-contacts.md) — the sales phone, email, messengers, map, and city every site page shows; Manager/Admin edit.
 
 ## Identity
 
