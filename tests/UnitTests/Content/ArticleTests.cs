@@ -48,17 +48,31 @@ public sealed class ArticleTests
     }
 
     [Fact]
-    public void Cover_VersionGrowsAndResetsOnRemove()
+    public void Cover_IsALibraryFileAndRemovable()
     {
         var article = Article.Create("a", Day, true, Texts(), Now, Editor);
+        Assert.Null(article.CoverMediaFileId);
 
-        article.ReplaceCover(Now, Editor);
-        article.ReplaceCover(Now, Editor);
-        Assert.Equal(2, article.CoverVersion);
+        article.SetCover(42, Now, Editor);
+        Assert.Equal(42, article.CoverMediaFileId);
+        Assert.Null(article.CoverVersion);
+        Assert.Throws<DomainException>(() => article.SetCover(0, Now, Editor));
 
         article.RemoveCover(Now, "");
-        Assert.Null(article.CoverVersion);
+        Assert.Null(article.CoverMediaFileId);
         Assert.Equal("unknown", article.UpdatedBy);
+    }
+
+    [Fact]
+    public void Cover_SameFileAgainChangesNothing()
+    {
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
+        article.SetCover(42, Now, Editor);
+
+        article.SetCover(42, Now.AddDays(1), "other@classkedr.com.ua");
+
+        Assert.Equal(Now, article.UpdatedAt);
+        Assert.Equal(Editor, article.UpdatedBy);
     }
 
     [Theory]
@@ -87,6 +101,18 @@ public sealed class ArticleTests
 
         Assert.Contains(result.Errors, e => e.PropertyName == "slug");
         Assert.Contains(result.Errors, e => e.PropertyName == "texts");
+    }
+
+    [Fact]
+    public void Input_RejectsCoverTogetherWithRemove()
+    {
+        var input = new ArticleInput("a", Day, true,
+            [new ArticleTextInput("uk", "Т", "К", "<p>Т</p>"), new ArticleTextInput("ru", "Т", "К", "<p>Т</p>")],
+            CoverMediaFileId: 5, RemoveCover: true);
+
+        var result = new UpdateArticleCommandValidator().Validate(new UpdateArticleCommand(1, input));
+
+        Assert.Contains(result.Errors, e => e.PropertyName == "removeCover");
     }
 
     [Fact]

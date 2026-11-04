@@ -4,7 +4,7 @@ using Content.Application.Features.Articles.Admin.Create;
 using Content.Application.Features.Articles.Admin.Delete;
 using Content.Application.Features.Articles.Admin.GetById;
 using Content.Application.Features.Articles.Admin.GetList;
-using Content.Application.Features.Articles.Admin.RemoveCover;
+using Content.Application.Features.Articles.Admin.MoveLegacyCovers;
 using Content.Application.Features.Articles.Admin.Update;
 using Content.Application.Features.Articles.Admin.UploadCover;
 using Content.Application.Features.Articles.Common;
@@ -60,25 +60,36 @@ public sealed class AdminArticlesController(ISender sender) : ControllerBase
         return result.IsSuccess ? NoContent() : this.ToActionResult(result);
     }
 
-    [HttpPut("{id:long}/cover", Name = "uploadAdminArticleCover")]
+    /// <summary>
+    /// Puts a cover picture into the media library (CDN folder <c>articles</c>, library folder «Статті») before the
+    /// article is saved; send the answer's <c>mediaFileId</c> with the create or update.
+    /// </summary>
+    [HttpPost("covers", Name = "uploadAdminArticleCover")]
     [RequestSizeLimit(CoverRequestLimit)]
     [RequestFormLimits(MultipartBodyLengthLimit = CoverRequestLimit)]
-    [ProducesResponseType(typeof(AdminArticleResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ArticleCoverUploadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
-    public async Task<ActionResult<AdminArticleResponse>> UploadCover(
-        [FromRoute] long id, IFormFile file, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<ArticleCoverUploadResponse>> UploadCover(IFormFile file, CancellationToken cancellationToken)
     {
         var upload = new CoverUpload(file.FileName, file.ContentType, file.Length, file.OpenReadStream);
-        return Map(await sender.Send(new UploadArticleCoverCommand(id, upload), cancellationToken));
+        var result = await sender.Send(new UploadArticleCoverCommand(upload), cancellationToken);
+        return this.ToActionResult(result.Map(ArticleResponseMapper.ToResponse));
     }
 
-    [HttpDelete("{id:long}/cover", Name = "removeAdminArticleCover")]
-    [ProducesResponseType(typeof(AdminArticleResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AdminArticleResponse>> RemoveCover([FromRoute] long id, CancellationToken cancellationToken)
-        => Map(await sender.Send(new RemoveArticleCoverCommand(id), cancellationToken));
+    /// <summary>
+    /// Moves covers saved before Content 008 from the database to the CDN folder <c>articles</c> and the library
+    /// folder «Статті». Safe to repeat; answers how many were moved by this call.
+    /// </summary>
+    [HttpPost("covers/move-legacy", Name = "moveLegacyAdminArticleCovers")]
+    [ProducesResponseType(typeof(LegacyArticleCoversMovedResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<LegacyArticleCoversMovedResponse>> MoveLegacyCovers(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new MoveLegacyArticleCoversCommand(), cancellationToken);
+        return this.ToActionResult(result.Map(moved => new LegacyArticleCoversMovedResponse(moved.Moved)));
+    }
 
     private ActionResult<AdminArticleResponse> Map(Result<AdminArticleDetails> result)
         => this.ToActionResult(result.Map(ArticleResponseMapper.ToResponse));

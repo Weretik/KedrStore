@@ -181,6 +181,43 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         return await scope.ServiceProvider.GetRequiredService<SyncCdnMediaJob>().RunAsync(dryRun, default);
     }
 
+    [SkippableFact]
+    public async Task Uploader_PutsFilesUnderTheDirectory_IntoOneRootFolder()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        var cdn = new FakeMediaStorage();
+        await using var provider = BuildProvider(cdn);
+        var picture = IntegrationTests.Identity.Avatars.TestImages.Create(1200, 600);
+
+        MediaFileUploadResult first, second;
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            var uploader = scope.ServiceProvider.GetRequiredService<IMediaFileUploader>();
+            first = await uploader.UploadAsync(new MediaFileUploadRequest("articles", "Статті", "a.jpg", picture), default);
+            second = await uploader.UploadAsync(new MediaFileUploadRequest("/articles/", "статті", "b.jpg", picture), default);
+            var text = await uploader.UploadAsync(new MediaFileUploadRequest("articles", "Статті", "c.txt", [1, 2, 3]), default);
+            Assert.Equal(MediaFileUploadStatus.NotAPicture, text.Status);
+        }
+
+        Assert.Equal(MediaFileUploadStatus.Uploaded, first.Status);
+        Assert.StartsWith("articles/", first.File!.StorageKey, StringComparison.Ordinal);
+        Assert.Equal($"https://images-kedr.cdn.express/{first.File.StorageKey}", first.File.Url);
+        Assert.Equal(2, cdn.Files.Count);
+        await using var db = postgres.CreateContext();
+        var folder = Assert.Single(await db.MediaFolders.ToListAsync());
+        Assert.Equal("Статті", folder.Name);
+        Assert.Equal(2, await db.MediaFiles.CountAsync(file => file.FolderId == folder.Id));
+        Assert.NotEqual(first.File.Id, second.File!.Id);
+
+        await using var offline = BuildProvider(new FakeMediaStorage(isConfigured: false));
+        await using var offlineScope = offline.CreateAsyncScope();
+        var unavailable = await offlineScope.ServiceProvider.GetRequiredService<IMediaFileUploader>()
+            .UploadAsync(new MediaFileUploadRequest("articles", "Статті", "a.jpg", picture), default);
+        Assert.Equal(MediaFileUploadStatus.StorageUnavailable, unavailable.Status);
+        await ResetAsync();
+    }
+
     private async Task ResetAsync()
     {
         await using var db = postgres.CreateContext();

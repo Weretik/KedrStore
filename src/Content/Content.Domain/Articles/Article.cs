@@ -4,8 +4,9 @@ using Content.Domain.Editing;
 namespace Content.Domain.Articles;
 
 /// <summary>
-/// A site article in Ukrainian and Russian with one shared slug. Only published articles reach the site;
-/// the cover image lives in <see cref="ArticleCover"/> and is referenced by <see cref="CoverVersion"/>.
+/// A site article in Ukrainian and Russian with one shared slug. Only published articles reach the site.
+/// The cover is a media-library picture (<see cref="CoverMediaFileId"/>); covers saved before Content 008 are bytes in
+/// <see cref="ArticleCover"/> referenced by <see cref="CoverVersion"/> until they are replaced.
 /// </summary>
 public sealed partial class Article : IAggregateRoot
 {
@@ -19,8 +20,11 @@ public sealed partial class Article : IAggregateRoot
     public DateOnly PublishedOn { get; private set; }
     public bool IsPublished { get; private set; }
 
-    /// <summary>Changes with every new cover so its URL can be cached forever; <c>null</c> without a cover.</summary>
+    /// <summary>Version of a legacy cover kept in <see cref="ArticleCover"/>; <c>null</c> when there is none.</summary>
     public int? CoverVersion { get; private set; }
+
+    /// <summary>The cover picture in the media library (CDN folder <c>articles</c>); <c>null</c> without one.</summary>
+    public long? CoverMediaFileId { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -64,14 +68,25 @@ public sealed partial class Article : IAggregateRoot
 
     public ArticleTranslation Text(string language) => _translations.Single(t => t.Language == language);
 
-    public void ReplaceCover(DateTimeOffset now, string editor)
+    /// <summary>Uses a media-library picture as the cover; a legacy cover stops being used.</summary>
+    public void SetCover(long mediaFileId, DateTimeOffset now, string editor)
     {
-        CoverVersion = (CoverVersion ?? 0) + 1;
+        if (mediaFileId <= 0)
+            throw new DomainException(ArticleErrors.CoverInvalid(mediaFileId));
+        if (CoverMediaFileId == mediaFileId && CoverVersion is null)
+            return;
+
+        CoverMediaFileId = mediaFileId;
+        CoverVersion = null;
         Touch(now, editor);
     }
 
     public void RemoveCover(DateTimeOffset now, string editor)
     {
+        if (CoverMediaFileId is null && CoverVersion is null)
+            return;
+
+        CoverMediaFileId = null;
         CoverVersion = null;
         Touch(now, editor);
     }

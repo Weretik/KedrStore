@@ -16,6 +16,8 @@ internal sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
         builder.Property(article => article.CreatedAt).IsRequired();
         builder.Property(article => article.UpdatedAt).IsRequired();
         builder.Property(article => article.UpdatedBy).HasMaxLength(EditorName.MaxLength);
+        // A Media library file ID by value only: the module has no references to Media tables.
+        builder.Property(article => article.CoverMediaFileId);
         builder.HasIndex(article => new { article.IsPublished, article.PublishedOn });
 
         builder.OwnsMany(article => article.Translations, text =>

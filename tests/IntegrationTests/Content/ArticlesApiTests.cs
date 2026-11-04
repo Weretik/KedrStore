@@ -2,11 +2,13 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Contracts.Persistence;
 using Content.Domain.Articles;
 using Content.Infrastructure.DataBase;
 using IntegrationTests.Identity.Avatars;
 using IntegrationTests.TestSupport.Api;
+using IntegrationTests.TestSupport.Content;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +51,7 @@ public sealed class ArticlesApiTests
         Assert.Equal("petli", item.GetProperty("slug").GetString());
         Assert.Equal("2026-11-04", item.GetProperty("publishedOn").GetString());
         Assert.Equal($"/api/content/articles/{id}/cover?v=1", item.GetProperty("coverPath").GetString());
+        Assert.Equal(JsonValueKind.Null, item.GetProperty("coverUrl").ValueKind);
 
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/content/uk/articles/chernetka")).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/content/en/articles")).StatusCode);
@@ -59,16 +62,27 @@ public sealed class ArticlesApiTests
     }
 
     [Fact]
-    public async Task Manager_CreatesArticle_AndUploadsCover()
+    public async Task Manager_UploadsCoverFirst_ThenCreatesArticleWithIt()
     {
         await using var db = Seed();
         using var factory = CreateFactory(db);
         using var manager = factory.CreateClientWithRole("Manager");
 
+        using var form = new MultipartFormDataContent();
+        var file = new ByteArrayContent(TestImages.Create(1200, 600));
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        form.Add(file, "file", "cover.jpg");
+        using var upload = await manager.PostAsync("/api/admin/articles/covers", form);
+        Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
+        using var uploaded = JsonDocument.Parse(await upload.Content.ReadAsStringAsync());
+        var mediaFileId = uploaded.RootElement.GetProperty("mediaFileId").GetInt64();
+        Assert.Equal("https://cdn.example.test/articles/cover.webp", uploaded.RootElement.GetProperty("url").GetString());
+
         using var create = await manager.PostAsJsonAsync("/api/admin/articles", new
         {
             publishedOn = "2026-11-05",
             isPublished = true,
+            coverMediaFileId = mediaFileId,
             texts = new[]
             {
                 new { language = "uk", title = "Нова стаття", excerpt = "Коротко.", bodyHtml = "<p>Текст</p>" },
@@ -77,17 +91,10 @@ public sealed class ArticlesApiTests
         });
         Assert.Equal(HttpStatusCode.OK, create.StatusCode);
         using var created = JsonDocument.Parse(await create.Content.ReadAsStringAsync());
-        var id = created.RootElement.GetProperty("id").GetInt64();
         Assert.Equal("nova-stattia", created.RootElement.GetProperty("slug").GetString());
-
-        using var form = new MultipartFormDataContent();
-        var file = new ByteArrayContent(TestImages.Create(1200, 600));
-        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-        form.Add(file, "file", "cover.jpg");
-        using var upload = await manager.PutAsync($"/api/admin/articles/{id}/cover", form);
-        Assert.Equal(HttpStatusCode.OK, upload.StatusCode);
-        using var uploaded = JsonDocument.Parse(await upload.Content.ReadAsStringAsync());
-        Assert.Equal($"/api/content/articles/{id}/cover?v=1", uploaded.RootElement.GetProperty("coverPath").GetString());
+        Assert.Equal(mediaFileId, created.RootElement.GetProperty("coverMediaFileId").GetInt64());
+        Assert.Equal("https://cdn.example.test/articles/cover.webp", created.RootElement.GetProperty("coverUrl").GetString());
+        Assert.Equal(JsonValueKind.Null, created.RootElement.GetProperty("coverPath").ValueKind);
 
         using var invalid = await manager.PostAsJsonAsync("/api/admin/articles", new { publishedOn = "2026-11-05", texts = Array.Empty<object>() });
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
@@ -103,7 +110,7 @@ public sealed class ArticlesApiTests
         db.SaveChanges();
         db.Articles.Add(draft);
         db.SaveChanges();
-        published.ReplaceCover(Now, "seed");
+        db.Entry(published).Property(article => article.CoverVersion).CurrentValue = 1;
         db.ArticleCovers.Add(ArticleCover.Create(published.Id, [1, 2, 3], "image/webp"));
         db.SaveChanges();
         return db;
@@ -123,6 +130,11 @@ public sealed class ArticlesApiTests
                 services.RemoveAll<ContentDbContext>();
                 services.AddSingleton(db);
                 services.AddSingleton<IReadContentDbContext>(db);
+                var media = new FakeArticleMediaLibrary();
+                services.RemoveAll<IMediaImageReader>();
+                services.RemoveAll<IMediaImageWriter>();
+                services.AddSingleton<IMediaImageReader>(media);
+                services.AddSingleton<IMediaImageWriter>(media);
             });
         });
 }

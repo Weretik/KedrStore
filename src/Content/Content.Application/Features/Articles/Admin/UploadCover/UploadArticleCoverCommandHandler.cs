@@ -1,39 +1,30 @@
-using BuildingBlocks.Application.Contracts;
-using Content.Application.Features.Editing;
 using Content.Application.Contracts.Images;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Features.Articles.Common;
 
 namespace Content.Application.Features.Articles.Admin.UploadCover;
 
-/// <summary>Converts the picture to a web-sized WebP and stores it as the article cover with a new version.</summary>
-public sealed class UploadArticleCoverCommandHandler(
-    IContentRepository<Article> articles,
-    IContentRepository<ArticleCover> covers,
-    ICoverImageProcessor processor,
-    ICurrentUserService currentUser,
-    TimeProvider clock)
-    : ICommandHandler<UploadArticleCoverCommand, Result<AdminArticleDetails>>
+/// <summary>
+/// Converts the picture to a web-sized WebP and stores it on the CDN under <c>articles/</c>, in the library folder
+/// «Статті». Nothing about an article changes until it is saved with the returned ID.
+/// </summary>
+public sealed class UploadArticleCoverCommandHandler(ICoverImageProcessor processor, IMediaImageWriter writer)
+    : ICommandHandler<UploadArticleCoverCommand, Result<UploadedArticleCover>>
 {
-    public async ValueTask<Result<AdminArticleDetails>> Handle(UploadArticleCoverCommand command,
+    public const string StorageDirectory = "articles";
+    public const string LibraryFolder = "Статті";
+
+    public async ValueTask<Result<UploadedArticleCover>> Handle(UploadArticleCoverCommand command,
         CancellationToken cancellationToken)
     {
-        var id = ArticleId.Create(command.ArticleId);
-        var article = await articles.FirstOrDefaultAsync(new ArticleByIdSpec(id), cancellationToken);
-        if (article is null)
-            return Result.NotFound();
-
         var processed = await processor.ProcessAsync(command.File, cancellationToken);
         if (!processed.IsSuccess)
-            return processed.Map(_ => ArticleMapper.ToAdmin(article));
+            return processed.Map(_ => default(UploadedArticleCover)!);
 
-        var cover = await covers.FirstOrDefaultAsync(new ArticleCoverSpec(id), cancellationToken);
-        if (cover is null)
-            await covers.AddAsync(ArticleCover.Create(id, processed.Value.Data, processed.Value.ContentType), cancellationToken);
-        else
-            cover.Replace(processed.Value.Data, processed.Value.ContentType);
-
-        article.ReplaceCover(clock.GetUtcNow(), ContentEditor.Name(currentUser));
-        await articles.SaveChangesAsync(cancellationToken);
-        return Result.Success(ArticleMapper.ToAdmin(article));
+        var name = Path.GetFileNameWithoutExtension(command.File.FileName);
+        var fileName = $"{(string.IsNullOrWhiteSpace(name) ? "cover" : name)}.webp";
+        var stored = await writer.UploadAsync(
+            new MediaImageUpload(StorageDirectory, LibraryFolder, fileName, processed.Value.Data), cancellationToken);
+        return stored.Map(image => new UploadedArticleCover(image.MediaFileId, image.Url));
     }
 }
