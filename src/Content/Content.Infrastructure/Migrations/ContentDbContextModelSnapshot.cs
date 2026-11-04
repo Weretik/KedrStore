@@ -31,6 +31,9 @@ namespace Content.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("CoverMediaFileId")
+                        .HasColumnType("bigint");
+
                     b.Property<int?>("CoverVersion")
                         .HasColumnType("integer");
 

@@ -27,6 +27,7 @@ public static class ContentInfrastructureExtensions
         services.AddSingleton<IArticleHtmlSanitizer, ArticleHtmlSanitizer>();
         services.AddSingleton<ICoverImageProcessor, CoverImageProcessor>();
         services.AddScoped<IMediaImageReader, MediaImageReader>();
+        services.AddScoped<IMediaImageWriter, MediaImageWriter>();
         services.AddHttpClient<IYoutubeVideoInfo, YoutubeOEmbedClient>(client => client.Timeout = TimeSpan.FromSeconds(5));
         services.Configure<SiteRevalidationOptions>(configuration.GetSection(SiteRevalidationOptions.SectionName));
         services.AddHttpClient<ISiteCacheRefresher, SiteCacheRefresher>(client => client.Timeout = TimeSpan.FromSeconds(10));

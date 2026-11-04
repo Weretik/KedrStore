@@ -7,7 +7,6 @@ public sealed class UploadArticleCoverCommandValidator : AbstractValidator<Uploa
 
     public UploadArticleCoverCommandValidator()
     {
-        RuleFor(x => x.ArticleId).GreaterThan(0);
         RuleFor(x => x.File).NotNull().OverridePropertyName("file");
         RuleFor(x => x.File.Length)
             .GreaterThan(0).LessThanOrEqualTo(MaxUploadBytes)

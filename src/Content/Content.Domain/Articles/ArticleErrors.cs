@@ -12,6 +12,9 @@ public static class ArticleErrors
     public static DomainError LanguageInvalid(string? language) =>
         new("Content.Article.Translation.Language", $"Article language must be 'uk' or 'ru'. Actual: {language}");
 
+    public static DomainError CoverInvalid(long mediaFileId) =>
+        new("Content.Article.Cover.Invalid", $"Cover must be a media library file ID. Actual: {mediaFileId}");
+
     public static DomainError Required(string field) =>
         new($"Content.Article.{field}.Required", $"{field} is required");
 

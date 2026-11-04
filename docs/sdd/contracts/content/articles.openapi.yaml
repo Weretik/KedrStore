@@ -1,11 +1,12 @@
 openapi: 3.1.0
 info:
   title: KedrStore Content — site articles
-  version: 0.1.0
+  version: 0.2.0
   description: >-
     Public reads of published site articles and their covers, and Manager/Admin management of articles.
-    `coverPath` is relative to the API base URL; the `v` query value changes with every new cover, so a
-    matching cover response may be cached for a year.
+    A cover is a media-library picture on the CDN (`coverUrl`, CDN folder `articles`). Covers saved before
+    Content 008 are still served by the API (`coverPath`, relative to the API base URL, with a version in `v`)
+    until they are replaced. Clients use `coverUrl`, else `coverPath`.
 paths:
   /api/content/{lang}/articles:
     get:
@@ -159,17 +160,16 @@ paths:
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
         '404': { description: Article not found. }
-  /api/admin/articles/{id}/cover:
-    put:
+  /api/admin/articles/covers:
+    post:
       operationId: uploadAdminArticleCover
-      summary: Upload or replace the cover picture
+      summary: Upload a cover picture before saving the article
       description: >-
         JPEG, PNG, or WebP up to 10 MB, at least 600 px wide. Stored as WebP at most 1600 px wide with the EXIF
-        orientation applied; the cover version grows by one.
+        orientation applied, on the CDN under `articles/` and in the media library folder «Статті» (created when
+        missing). Nothing about an article changes: send `mediaFileId` as `coverMediaFileId` with the create or update.
       tags: [Admin articles]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      parameters:
-        - $ref: '#/components/parameters/ArticleId'
       requestBody:
         required: true
         content:
@@ -181,31 +181,15 @@ paths:
                 file: { type: string, format: binary }
       responses:
         '200':
-          description: The article with its new `coverPath`.
+          description: The picture in the media library.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AdminArticle' }
+              schema: { $ref: '#/components/schemas/ArticleCoverUpload' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
-        '404': { description: Article not found. }
         '413': { description: The request is larger than the upload limit. }
-    delete:
-      operationId: removeAdminArticleCover
-      summary: Remove the cover picture
-      tags: [Admin articles]
-      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      parameters:
-        - $ref: '#/components/parameters/ArticleId'
-      responses:
-        '200':
-          description: The article without a cover.
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/AdminArticle' }
-        '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
-        '404': { description: Article not found. }
+        '503': { description: The CDN is not configured. }
 components:
   parameters:
     Lang:
@@ -220,7 +204,7 @@ components:
       schema: { type: integer, format: int64, minimum: 1 }
   responses:
     ValidationError:
-      description: Invalid input; each error names the field (`slug`, `texts`, `file`…).
+      description: Invalid input; each error names the field (`slug`, `texts`, `coverMediaFileId`, `file`…).
       content:
         application/json:
           schema:
@@ -229,11 +213,24 @@ components:
   schemas:
     CoverPath:
       type: [string, 'null']
-      description: Path of the cover relative to the API base URL, with the version in `v`; null without a cover.
+      description: >-
+        Path of a cover saved before Content 008, relative to the API base URL, with the version in `v`;
+        null otherwise.
       examples: ['/api/content/articles/4/cover?v=1']
+    CoverUrl:
+      type: [string, 'null']
+      format: uri
+      description: Absolute CDN address of the cover; null without one or when its library file was deleted.
+      examples: ['https://images-kedr.cdn.express/articles/5f1c2b7e9a.webp']
+    ArticleCoverUpload:
+      type: object
+      required: [mediaFileId, url]
+      properties:
+        mediaFileId: { type: integer, format: int64 }
+        url: { type: string, format: uri }
     ArticleSummary:
       type: object
-      required: [id, slug, title, excerpt, publishedOn, coverPath, updatedAt]
+      required: [id, slug, title, excerpt, publishedOn, coverPath, coverUrl, updatedAt]
       properties:
         id: { type: integer, format: int64 }
         slug: { type: string }
@@ -241,6 +238,7 @@ components:
         excerpt: { type: string, description: Short plain-text description for cards and meta description. }
         publishedOn: { type: string, format: date }
         coverPath: { $ref: '#/components/schemas/CoverPath' }
+        coverUrl: { $ref: '#/components/schemas/CoverUrl' }
         updatedAt: { type: string, format: date-time }
     Article:
       allOf:
@@ -255,7 +253,7 @@ components:
       description: Email (else user name) of who saved the last change; null for articles saved before it was recorded.
     AdminArticleSummary:
       type: object
-      required: [id, slug, title, publishedOn, isPublished, coverPath, updatedAt, updatedBy]
+      required: [id, slug, title, publishedOn, isPublished, coverPath, coverUrl, updatedAt, updatedBy]
       properties:
         id: { type: integer, format: int64 }
         slug: { type: string }
@@ -263,6 +261,7 @@ components:
         publishedOn: { type: string, format: date }
         isPublished: { type: boolean }
         coverPath: { $ref: '#/components/schemas/CoverPath' }
+        coverUrl: { $ref: '#/components/schemas/CoverUrl' }
         updatedAt: { type: string, format: date-time }
         updatedBy: { $ref: '#/components/schemas/EditorName' }
     ArticleText:
@@ -275,13 +274,18 @@ components:
         bodyHtml: { type: string, minLength: 1, maxLength: 50000 }
     AdminArticle:
       type: object
-      required: [id, slug, publishedOn, isPublished, coverPath, updatedAt, updatedBy, texts]
+      required: [id, slug, publishedOn, isPublished, coverPath, coverUrl, coverMediaFileId, updatedAt, updatedBy, texts]
       properties:
         id: { type: integer, format: int64 }
         slug: { type: string }
         publishedOn: { type: string, format: date }
         isPublished: { type: boolean }
         coverPath: { $ref: '#/components/schemas/CoverPath' }
+        coverUrl: { $ref: '#/components/schemas/CoverUrl' }
+        coverMediaFileId:
+          type: [integer, 'null']
+          format: int64
+          description: Media library file of the cover; stays set when that file was deleted (then `coverUrl` is null).
         updatedAt: { type: string, format: date-time }
         updatedBy: { $ref: '#/components/schemas/EditorName' }
         texts:
@@ -300,6 +304,17 @@ components:
           description: Required on update; empty on create means "generate from the Ukrainian title".
         publishedOn: { type: string, format: date }
         isPublished: { type: boolean }
+        coverMediaFileId:
+          type: [integer, 'null']
+          format: int64
+          minimum: 1
+          description: >-
+            Sets the cover: a file from `uploadAdminArticleCover` or any media library picture. With neither this nor
+            `removeCover` the cover stays as it is.
+        removeCover:
+          type: boolean
+          default: false
+          description: Drops the cover; not together with `coverMediaFileId`.
         texts:
           type: array
           description: Exactly one `uk` and one `ru` text.

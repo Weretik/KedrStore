@@ -9,6 +9,7 @@ using Content.Application.Features.Articles.Public.GetBySlug;
 using Content.Application.Features.Articles.Public.GetCover;
 using Content.Application.Features.Articles.Public.GetList;
 using Content.Application.Contracts.Html;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Contracts.Persistence;
 using Content.Domain.Articles;
 using Content.Infrastructure.DependencyInjection;
@@ -18,6 +19,7 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace IntegrationTests.Content;
 
@@ -26,6 +28,7 @@ namespace IntegrationTests.Content;
 public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
 {
     private static readonly DateOnly Day = new(2026, 11, 4);
+    private readonly FakeArticleMediaLibrary _media = new();
 
     [SkippableFact]
     public async Task Migrations_CreateContentSchemaWithSixPublishedLegacyArticles()
@@ -60,10 +63,10 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
 
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<IReadContentDbContext>();
-        var list = await new GetPublicArticlesQueryHandler(db).Handle(new GetPublicArticlesQuery("ru"), default);
-        var page = await new GetPublicArticleQueryHandler(db)
+        var list = await new GetPublicArticlesQueryHandler(db, _media).Handle(new GetPublicArticlesQuery("ru"), default);
+        var page = await new GetPublicArticleQueryHandler(db, _media)
             .Handle(new GetPublicArticleQuery("uk", "prykhovani-petli"), default);
-        var hidden = await new GetPublicArticleQueryHandler(db)
+        var hidden = await new GetPublicArticleQueryHandler(db, _media)
             .Handle(new GetPublicArticleQuery("uk", draft.Value.Slug), default);
         var cover = await new GetArticleCoverQueryHandler(db).Handle(new GetArticleCoverQuery(4), default);
 
@@ -72,6 +75,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         Assert.StartsWith("<p>", page.Value.BodyHtml, StringComparison.Ordinal);
         Assert.Equal(ResultStatus.NotFound, hidden.Status);
         Assert.Equal("image/webp", cover.Value.ContentType);
+        Assert.All(list.Value, item => Assert.Equal(1, item.Cover.LegacyVersion));
     }
 
     [SkippableFact]
@@ -91,38 +95,33 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         Assert.Equal(TestContentEditor.EmailAddress, first.Value.UpdatedBy);
 
         await using var scope = provider.CreateAsyncScope();
-        var update = await new UpdateArticleCommandHandler(
-                scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
-                scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
-                new TestContentEditor(),
-                TimeProvider.System)
-            .Handle(new UpdateArticleCommand(second.Value.Id, Input("prykhovani-petli", "Інша")), default);
+        var update = await SendUpdate(provider, second.Value.Id, Input("prykhovani-petli", "Інша"));
         Assert.Equal(ResultStatus.Invalid, update.Status);
         Assert.Equal("slug", Assert.Single(update.ValidationErrors).Identifier);
     }
 
     [SkippableFact]
-    public async Task Cover_UploadBumpsVersion_AndDeleteRemovesArticleWithCover()
+    public async Task Cover_UploadedFirst_ThenSavedWithTheNewArticle_AndDeleteRemovesIt()
     {
         postgres.SkipIfUnavailable();
         await ResetAsync();
         await using var provider = BuildProvider();
-        var created = await SendCreate(provider, Input(null, "З обкладинкою"));
         var bytes = TestImages.Create(1200, 600);
 
+        Result<UploadedArticleCover> uploaded;
         await using (var scope = provider.CreateAsyncScope())
         {
-            var uploaded = await new UploadArticleCoverCommandHandler(
-                    scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                    scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
-                    scope.ServiceProvider.GetRequiredService<ICoverImageProcessor>(),
-                    new TestContentEditor(),
-                    TimeProvider.System)
-                .Handle(new UploadArticleCoverCommand(created.Value.Id,
-                    new CoverUpload("c.jpg", "image/jpeg", bytes.Length, () => new MemoryStream(bytes))), default);
-            Assert.Equal(1, uploaded.Value.CoverVersion);
+            uploaded = await new UploadArticleCoverCommandHandler(
+                    scope.ServiceProvider.GetRequiredService<ICoverImageProcessor>(), _media)
+                .Handle(new UploadArticleCoverCommand(
+                    new CoverUpload("Петлі.jpg", "image/jpeg", bytes.Length, () => new MemoryStream(bytes))), default);
         }
+        var stored = Assert.Single(_media.Uploads);
+        Assert.Equal(("articles", "Статті", "Петлі.webp"), (stored.StorageDirectory, stored.FolderName, stored.FileName));
+
+        var created = await SendCreate(provider, Input(null, "З обкладинкою") with { CoverMediaFileId = uploaded.Value.MediaFileId });
+        Assert.Equal(uploaded.Value.MediaFileId, created.Value.Cover.MediaFileId);
+        Assert.Equal(uploaded.Value.Url, created.Value.Cover.Url);
 
         await using (var scope = provider.CreateAsyncScope())
         {
@@ -135,7 +134,41 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
 
         await using var db = postgres.CreateContext();
         Assert.False(await db.Articles.AnyAsync(a => a.Id == ArticleId.Create(created.Value.Id)));
-        Assert.False(await db.ArticleCovers.AnyAsync(c => c.ArticleId == ArticleId.Create(created.Value.Id)));
+    }
+
+    [SkippableFact]
+    public async Task Cover_NewFileReplacesLegacyBytes_UnknownFileIsRefused_RemoveClearsIt()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        await using var provider = BuildProvider();
+        var created = await SendCreate(provider, Input(null, "Стара обкладинка"));
+        await using (var db = postgres.CreateContext())
+        {
+            await db.Database.ExecuteSqlRawAsync(
+                """UPDATE content."Articles" SET "CoverVersion" = 1 WHERE "Id" = {0}""", created.Value.Id);
+            await db.Database.ExecuteSqlRawAsync(
+                """INSERT INTO content."ArticleCovers" ("ArticleId", "Data", "ContentType") VALUES ({0}, {1}, 'image/webp')""",
+                created.Value.Id, new byte[] { 1, 2, 3 });
+        }
+
+        var unknown = await SendUpdate(provider, created.Value.Id,
+            Input(created.Value.Slug, "Стара обкладинка") with { CoverMediaFileId = 999_999 });
+        Assert.Equal("coverMediaFileId", Assert.Single(unknown.ValidationErrors).Identifier);
+
+        var fileId = _media.Add("https://cdn.example.test/articles/new.webp");
+        var replaced = await SendUpdate(provider, created.Value.Id,
+            Input(created.Value.Slug, "Стара обкладинка") with { CoverMediaFileId = fileId });
+        Assert.Equal(new ArticleCoverView(fileId, "https://cdn.example.test/articles/new.webp", null), replaced.Value.Cover);
+        await using (var db = postgres.CreateContext())
+            Assert.False(await db.ArticleCovers.AnyAsync(c => c.ArticleId == ArticleId.Create(created.Value.Id)));
+
+        var kept = await SendUpdate(provider, created.Value.Id, Input(created.Value.Slug, "Інший заголовок"));
+        Assert.Equal(fileId, kept.Value.Cover.MediaFileId);
+
+        var removed = await SendUpdate(provider, created.Value.Id,
+            Input(created.Value.Slug, "Інший заголовок") with { RemoveCover = true });
+        Assert.Equal(ArticleCoverView.None, removed.Value.Cover);
     }
 
     private static ArticleInput Input(string? slug, string ukTitle, bool isPublished = true) => new(slug, Day, isPublished,
@@ -144,16 +177,32 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         new ArticleTextInput("ru", ukTitle, "Коротко.", "<p>Текст</p>"),
     ]);
 
-    private static async Task<Result<AdminArticleDetails>> SendCreate(ServiceProvider provider, ArticleInput input)
+    private async Task<Result<AdminArticleDetails>> SendCreate(ServiceProvider provider, ArticleInput input)
     {
         await using var scope = provider.CreateAsyncScope();
         return await new CreateArticleCommandHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
+                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
+                _media,
                 scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
                 new TestContentEditor(),
                 TimeProvider.System)
             .Handle(new CreateArticleCommand(input), default);
+    }
+
+    private async Task<Result<AdminArticleDetails>> SendUpdate(ServiceProvider provider, long id, ArticleInput input)
+    {
+        await using var scope = provider.CreateAsyncScope();
+        return await new UpdateArticleCommandHandler(
+                scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
+                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
+                scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
+                _media,
+                scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
+                new TestContentEditor(),
+                TimeProvider.System)
+            .Handle(new UpdateArticleCommand(id, input), default);
     }
 
     private async Task ResetAsync()

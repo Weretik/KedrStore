@@ -35,6 +35,7 @@ public static class MediaInfrastructureExtensions
         services.AddSingleton<IMediaUrlBuilder, MediaUrlBuilder>();
         services.AddScoped<IMediaFileDirectory, MediaFileDirectory>();
         services.AddScoped<IMediaFolderArranger, MediaFolderArranger>();
+        services.AddScoped<IMediaFileUploader, MediaFileUploader>();
         services.AddScoped<MediaFileChangeNotifier>();
         // Without CDN credentials (local runs, tests) writes answer 503 instead of failing at startup.
         var storage = storageSection.Get<MediaStorageOptions>() ?? new MediaStorageOptions();
