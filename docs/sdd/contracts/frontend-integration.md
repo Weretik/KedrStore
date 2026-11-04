@@ -33,6 +33,8 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 | Staff accounts | `/api/admin/users/**` | Admin (`CanManageUsers`) |
 | Site articles | `GET /api/content/{lang}/articles`, `/api/content/{lang}/articles/{slug}`, `/api/content/articles/{id}/cover` | Anonymous; `coverPath` in responses is relative to the API base URL |
 | Admin articles | `/api/admin/articles/**` | Manager or Admin (`CanManageContent`) |
+| Company contacts | `GET /api/content/contacts` | Anonymous; phones in E.164, clients format them |
+| Admin company contacts | `GET`/`PUT /api/admin/content/contacts` | Manager or Admin (`CanManageContent`) |
 | Quick order | `POST /api/orders` | Anonymous |
 | Session | cookie and mobile login, refresh, logout, current user | Login and refresh anonymous and rate-limited; see Identity contract |
 | Sales catalog | `POST /api/sales/{lang}/catalog/products` | Any signed-in user |

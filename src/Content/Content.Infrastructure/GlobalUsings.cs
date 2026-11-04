@@ -4,6 +4,7 @@ global using BuildingBlocks.Domain.Abstractions;
 global using BuildingBlocks.Infrastructure.Migrations;
 global using Content.Application.Contracts.Persistence;
 global using Content.Domain.Articles;
+global using Content.Domain.Contacts;
 global using Content.Infrastructure.DataBase;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
