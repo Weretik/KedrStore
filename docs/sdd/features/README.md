@@ -25,6 +25,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Site articles](content/articles.md) — public article reads with cached covers, and Manager/Admin article management.
 - [Company contacts](content/company-contacts.md) — the sales phone, email, messengers, map, and city every site page shows; Manager/Admin edit.
+- [Company requisites](content/company-requisites.md) — ФОП, code, IBAN and bank for the requisites page; Admin only, every change logged.
 
 ## Identity
 

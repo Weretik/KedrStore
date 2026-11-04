@@ -35,6 +35,8 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 | Admin articles | `/api/admin/articles/**` | Manager or Admin (`CanManageContent`) |
 | Company contacts | `GET /api/content/contacts` | Anonymous; phones in E.164, clients format them |
 | Admin company contacts | `GET`/`PUT /api/admin/content/contacts` | Manager or Admin (`CanManageContent`) |
+| Company requisites | `GET /api/content/requisites` | Anonymous; IBAN without spaces, clients group it |
+| Admin company requisites | `GET`/`PUT /api/admin/content/requisites`, `GET …/history` | Admin only (`RequireAdminRole`); each change logged |
 | Quick order | `POST /api/orders` | Anonymous |
 | Session | cookie and mobile login, refresh, logout, current user | Login and refresh anonymous and rate-limited; see Identity contract |
 | Sales catalog | `POST /api/sales/{lang}/catalog/products` | Any signed-in user |
