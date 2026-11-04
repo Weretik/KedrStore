@@ -190,6 +190,69 @@ namespace Content.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Content.Domain.Gallery.GalleryItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CaptionRu")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CaptionUk")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<long?>("MediaFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TitleRu")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("TitleUk")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("YoutubeId")
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "MediaFileId" }, "IX_GalleryItems_MediaFileId")
+                        .IsUnique()
+                        .HasFilter("\"MediaFileId\" IS NOT NULL");
+
+                    b.HasIndex(new[] { "Position" }, "IX_GalleryItems_Position");
+
+                    b.HasIndex(new[] { "YoutubeId" }, "IX_GalleryItems_YoutubeId")
+                        .IsUnique()
+                        .HasFilter("\"YoutubeId\" IS NOT NULL");
+
+                    b.ToTable("GalleryItems", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_GalleryItems_Source", "(\"Kind\" = 'Photo' AND \"MediaFileId\" IS NOT NULL AND \"YoutubeId\" IS NULL) OR (\"Kind\" = 'Video' AND \"YoutubeId\" IS NOT NULL AND \"MediaFileId\" IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisites", b =>
                 {
                     b.Property<int>("Id")

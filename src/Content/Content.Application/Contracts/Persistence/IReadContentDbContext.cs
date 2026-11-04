@@ -9,4 +9,5 @@ public interface IReadContentDbContext
     DbSet<CompanyRequisites> CompanyRequisites { get; }
     DbSet<CompanyRequisitesChange> CompanyRequisitesChanges { get; }
     DbSet<LegalDocumentVersion> LegalDocumentVersions { get; }
+    DbSet<GalleryItem> GalleryItems { get; }
 }

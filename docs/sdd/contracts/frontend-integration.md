@@ -39,6 +39,8 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 | Admin company requisites | `GET`/`PUT /api/admin/content/requisites`, `GET …/history` | Admin only (`RequireAdminRole`); each change logged |
 | Site documents | `GET /api/content/{lang}/documents/{kind}` | Anonymous; published edition, sanitized HTML with `{site}`/`{email}`/`{phone}` placeholders the site fills |
 | Admin site documents | `GET /api/admin/content/documents`, `GET`/`POST …/{kind}/versions`, `GET`/`PUT`/`DELETE …/versions/{id}`, `POST …/versions/{id}/publish` | `CanManageContent`; one draft per document, publish with «Редакція від» |
+| Site gallery | `GET /api/content/{lang}/gallery` | Anonymous; photos and YouTube videos in site order, `imageUrl` is the CDN picture or YouTube poster |
+| Admin site gallery | `GET /api/admin/content/gallery`, `POST …/photos`, `POST …/videos`, `GET …/youtube-preview?url=`, `PUT`/`DELETE …/items/{id}`, `PUT …/order` | `CanManageContent`; every change answers with the whole gallery |
 | Quick order | `POST /api/orders` | Anonymous |
 | Session | cookie and mobile login, refresh, logout, current user | Login and refresh anonymous and rate-limited; see Identity contract |
 | Sales catalog | `POST /api/sales/{lang}/catalog/products` | Any signed-in user |
