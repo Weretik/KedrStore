@@ -1,4 +1,4 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Features.Gallery.Common;
 
 namespace Content.Application.Features.Gallery.Admin.Delete;
@@ -6,7 +6,7 @@ namespace Content.Application.Features.Gallery.Admin.Delete;
 public sealed class DeleteGalleryItemCommandHandler(
     IContentRepository<GalleryItem> repository,
     IReadContentDbContext db,
-    IGalleryImageReader images)
+    IMediaImageReader images)
     : ICommandHandler<DeleteGalleryItemCommand, Result<IReadOnlyList<AdminGalleryItem>>>
 {
     public async ValueTask<Result<IReadOnlyList<AdminGalleryItem>>> Handle(DeleteGalleryItemCommand command,

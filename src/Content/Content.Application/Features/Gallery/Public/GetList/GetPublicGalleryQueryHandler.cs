@@ -1,10 +1,10 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Features.Gallery.Common;
 
 namespace Content.Application.Features.Gallery.Public.GetList;
 
 /// <summary>The site gallery in one language; a photo whose library file was deleted is left out.</summary>
-public sealed class GetPublicGalleryQueryHandler(IReadContentDbContext db, IGalleryImageReader images)
+public sealed class GetPublicGalleryQueryHandler(IReadContentDbContext db, IMediaImageReader images)
     : IQueryHandler<GetPublicGalleryQuery, Result<IReadOnlyList<PublicGalleryItem>>>
 {
     public async ValueTask<Result<IReadOnlyList<PublicGalleryItem>>> Handle(GetPublicGalleryQuery query,

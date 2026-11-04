@@ -1,0 +1,263 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — home page FAQ and brands
+  version: 0.1.0
+  description: >-
+    The two editable lists of the site home page: questions with answers in Ukrainian and Russian, and brands with a
+    logo from the media library (linked by file ID), each in the order the admin sets. Every admin change answers
+    with both lists, so the page needs no second request.
+paths:
+  /api/content/{lang}/home:
+    get:
+      operationId: getPublicHomeBlocks
+      summary: Get the home page FAQ and brands in one language
+      description: >-
+        Public, in site order. A brand whose logo file was deleted from the library is left out. An empty `brands`
+        list means the admin has not added any.
+      tags: [Home]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Both lists.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicHomeBlocks' }
+        '400': { description: The language is not `uk` or `ru`. }
+  /api/admin/content/home:
+    get:
+      operationId: getAdminHomeBlocks
+      summary: List the home page FAQ and brands
+      description: Requires `CanManageContent` (Manager or Admin).
+      tags: [Home]
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+  /api/admin/content/home/faq:
+    post:
+      operationId: createAdminHomeFaqItem
+      summary: Add a question to the end of the FAQ
+      description: Requires `CanManageContent`. All four texts are required.
+      tags: [Home]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HomeFaqItemRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: A text is missing or over its limit. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+  /api/admin/content/home/faq/{id}:
+    put:
+      operationId: updateAdminHomeFaqItem
+      summary: Replace the texts of a question
+      description: Requires `CanManageContent`.
+      tags: [Home]
+      parameters:
+        - $ref: '#/components/parameters/RowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HomeFaqItemRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: A text is missing or over its limit. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such question. }
+    delete:
+      operationId: deleteAdminHomeFaqItem
+      summary: Remove a question
+      description: Requires `CanManageContent`.
+      tags: [Home]
+      parameters:
+        - $ref: '#/components/parameters/RowId'
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such question. }
+  /api/admin/content/home/faq/order:
+    put:
+      operationId: reorderAdminHomeFaq
+      summary: Save the order of all questions
+      description: >-
+        Requires `CanManageContent`. `ids` must hold every current question exactly once, first shown first; a list
+        built from a stale page answers 409.
+      tags: [Home]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReorderHomeRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: A repeated or invalid ID. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '409': { description: The list does not match the current FAQ. }
+  /api/admin/content/home/brands:
+    post:
+      operationId: createAdminHomeBrand
+      summary: Add a brand to the end of the list
+      description: Requires `CanManageContent`. The logo must be a media library file.
+      tags: [Home]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HomeBrandRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: 'No name, a name over 100 characters, or a logo that is not in the media library.' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+  /api/admin/content/home/brands/{id}:
+    put:
+      operationId: updateAdminHomeBrand
+      summary: Change a brand's name or logo
+      description: Requires `CanManageContent`.
+      tags: [Home]
+      parameters:
+        - $ref: '#/components/parameters/RowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HomeBrandRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: 'No name, a name over 100 characters, or a logo that is not in the media library.' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such brand. }
+    delete:
+      operationId: deleteAdminHomeBrand
+      summary: Remove a brand
+      description: Requires `CanManageContent`. The logo stays in the media library.
+      tags: [Home]
+      parameters:
+        - $ref: '#/components/parameters/RowId'
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such brand. }
+  /api/admin/content/home/brands/order:
+    put:
+      operationId: reorderAdminHomeBrands
+      summary: Save the order of all brands
+      description: >-
+        Requires `CanManageContent`. `ids` must hold every current brand exactly once; a stale list answers 409.
+      tags: [Home]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReorderHomeRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/HomeBlocks' }
+        '400': { description: A repeated or invalid ID. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '409': { description: The list does not match the current brands. }
+components:
+  parameters:
+    Lang:
+      name: lang
+      in: path
+      required: true
+      schema: { type: string, enum: [uk, ru] }
+    RowId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+  responses:
+    HomeBlocks:
+      description: Both lists in site order.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/AdminHomeBlocks' }
+  schemas:
+    PublicHomeBlocks:
+      type: object
+      required: [faq, brands]
+      properties:
+        faq:
+          type: array
+          items:
+            type: object
+            required: [question, answer]
+            properties:
+              question: { type: string }
+              answer: { type: string }
+        brands:
+          type: array
+          items:
+            type: object
+            required: [name, logoUrl, width, height]
+            properties:
+              name: { type: string }
+              logoUrl: { type: string, format: uri }
+              width: { type: [integer, 'null'], format: int32 }
+              height: { type: [integer, 'null'], format: int32 }
+    AdminHomeBlocks:
+      type: object
+      required: [faq, brands]
+      properties:
+        faq:
+          type: array
+          items: { $ref: '#/components/schemas/AdminHomeFaqItem' }
+        brands:
+          type: array
+          items: { $ref: '#/components/schemas/AdminHomeBrand' }
+    AdminHomeFaqItem:
+      type: object
+      required: [id, position, questionUk, questionRu, answerUk, answerRu, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        position: { type: integer, format: int32 }
+        questionUk: { type: string, maxLength: 200 }
+        questionRu: { type: string, maxLength: 200 }
+        answerUk: { type: string, maxLength: 2000 }
+        answerRu: { type: string, maxLength: 2000 }
+        updatedAt: { type: string, format: date-time }
+    AdminHomeBrand:
+      type: object
+      required: [id, position, name, logoMediaFileId, logoUrl, logoFileName, logoMissing, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        position: { type: integer, format: int32 }
+        name: { type: string, maxLength: 100 }
+        logoMediaFileId: { type: integer, format: int64 }
+        logoUrl: { type: [string, 'null'], description: CDN URL; null when the file is gone. }
+        logoFileName: { type: [string, 'null'] }
+        logoMissing: { type: boolean, description: The logo file was deleted; the site hides this brand. }
+        updatedAt: { type: string, format: date-time }
+    HomeFaqItemRequest:
+      type: object
+      required: [questionUk, questionRu, answerUk, answerRu]
+      properties:
+        questionUk: { type: string, maxLength: 200 }
+        questionRu: { type: string, maxLength: 200 }
+        answerUk: { type: string, maxLength: 2000 }
+        answerRu: { type: string, maxLength: 2000 }
+    HomeBrandRequest:
+      type: object
+      required: [name, logoMediaFileId]
+      properties:
+        name: { type: string, maxLength: 100 }
+        logoMediaFileId: { type: integer, format: int64 }
+    ReorderHomeRequest:
+      type: object
+      required: [ids]
+      properties:
+        ids:
+          type: array
+          items: { type: integer, format: int64 }
