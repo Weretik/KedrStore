@@ -40,6 +40,22 @@ public static class RateLimitingRegistrationExtensions
                         AutoReplenishment = true
                     });
             });
+
+            // Anonymous quick orders: stops a bot from flooding the managers' Telegram chat.
+            options.AddPolicy("QuickOrder", context =>
+            {
+                var partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromMinutes(10),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
         });
 
         return services;
