@@ -13,7 +13,7 @@ Catalog reads files only through its port [IProductMediaLibrary](../../../../src
 - `GET/PUT /api/admin/products/{id}/media` (CanManageProducts + CanManageMedia): read or replace the whole set. Unknown file IDs are `400`.
 - `GET /api/admin/products?withoutPhoto=true`: products whose cached photo is empty.
 - Public product details return `photo`, `scheme`, and `photos` (gallery order).
-- The [link job](../../../../src/Catalog/Catalog.Application/Jobs/ProductMedia/LinkProductMediaJob.cs) runs inside `--job=media-cdn-sync` after the sync, with the same `--dry-run`. It rereads link URLs, drops links to deleted files, rewrites the cache, and links `products/<id>.<jpg|jpeg|png|webp>` and `product-scheme/s<id>.<ext>` to active products without links of that kind. See the [runbook](../../operations/jobs/media-cdn-sync-runbook.md).
+- The [link job](../../../../src/Catalog/Catalog.Application/Jobs/ProductMedia/LinkProductMediaJob.cs) runs inside `--job=media-cdn-sync` after the sync, with the same `--dry-run`. It rereads link URLs, drops links to deleted files, rewrites the cache, and links `products/<id>.<jpg|jpeg|png|webp>` and `product-scheme/s<id>.<ext>` to active products without links of that kind. Then the [folder job](../../../../src/Catalog/Catalog.Application/Jobs/ProductMedia/ArrangeProductMediaFoldersJob.cs) lays out linked photos in «Товари» and schemes in «Схеми» as the category tree, through `IProductMediaLibrary.ArrangeFoldersAsync` and Media's `IMediaFolderArranger` (R-37). See the [runbook](../../operations/jobs/media-cdn-sync-runbook.md).
 
 Every change copies the cached photo into `ProductListProjections` with one SQL update (`RefreshPhotosAsync`).
 
@@ -48,6 +48,7 @@ flowchart LR
     M["Media replace / delete"] --> N["IMediaFileChangeListener"]
     N --> C["ProductMediaFileChanges"] --> P
     J["media-cdn-sync"] --> K["LinkProductMediaJob"] --> P
+    J --> F["ArrangeProductMediaFoldersJob"] --> L
     P --> R["ProductListProjections.Photo"]
 ```
 

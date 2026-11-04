@@ -3,7 +3,9 @@ using Media.Application.Contracts.Storage;
 using Media.Application.Features.Files.Common;
 using Media.Application.Jobs.CdnSync;
 using Media.Contracts.Files;
+using Media.Contracts.Folders;
 using Media.Infrastructure.Files;
+using Media.Infrastructure.Folders;
 using Media.Infrastructure.Images;
 using Media.Infrastructure.Lookup;
 using Media.Infrastructure.Repositories;
@@ -32,6 +34,7 @@ public static class MediaInfrastructureExtensions
         services.Configure<MediaStorageOptions>(storageSection);
         services.AddSingleton<IMediaUrlBuilder, MediaUrlBuilder>();
         services.AddScoped<IMediaFileDirectory, MediaFileDirectory>();
+        services.AddScoped<IMediaFolderArranger, MediaFolderArranger>();
         services.AddScoped<MediaFileChangeNotifier>();
         // Without CDN credentials (local runs, tests) writes answer 503 instead of failing at startup.
         var storage = storageSection.Get<MediaStorageOptions>() ?? new MediaStorageOptions();

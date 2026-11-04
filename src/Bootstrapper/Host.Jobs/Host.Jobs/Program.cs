@@ -136,7 +136,8 @@ try
             break;
 
         case "media-cdn-sync":
-            // One run, one schedule: register the CDN files, then link them to products (R-33, R-34).
+            // One run, one schedule: register the CDN files, link them to products (R-33, R-34), then lay them out
+            // in folders by category (R-37).
             var dryRun = args.Contains("--dry-run", StringComparer.OrdinalIgnoreCase);
             var syncReport = await scopeServiceProvider.GetRequiredService<SyncCdnMediaJob>()
                 .RunAsync(dryRun, cancellationToken);
@@ -152,6 +153,11 @@ try
                 $"[RESULT] product-media-link dryRun={linkReport.DryRun}; photosLinked={linkReport.PhotosLinked}; " +
                 $"schemesLinked={linkReport.SchemesLinked}; linksDropped={linkReport.LinksDropped}; " +
                 $"productsChanged={linkReport.ProductsChanged}; withoutPhoto={linkReport.ProductsWithoutPhoto}");
+            var folderReport = await scopeServiceProvider.GetRequiredService<ArrangeProductMediaFoldersJob>()
+                .RunAsync(dryRun, cancellationToken);
+            Console.WriteLine(
+                $"[RESULT] product-media-folders dryRun={folderReport.DryRun}; foldersCreated={folderReport.FoldersCreated}; " +
+                $"filesMoved={folderReport.FilesMoved}; keptOutside={folderReport.FilesKeptOutside}");
             break;
 
         default:

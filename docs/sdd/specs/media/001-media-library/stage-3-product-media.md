@@ -1,6 +1,6 @@
 # Media 001, stage 3 — Products linked to media files
 
-**Status:** backend implemented 2026-11-04 (branch `claude/project-thread-09y8qq`), waits for review; admin and site part in kedr-web. Feature card: [Product photos and schemes](../../../features/catalog/product-media.md). **Modules:** Catalog (owner of the links), Media (files, contract). Parent: [Media 001](README.md).
+**Status:** merged 2026-11-04 (KedrStore #157, kedr-web #42); folders by category (R-37) added after it, waits for review. Feature card: [Product photos and schemes](../../../features/catalog/product-media.md). **Modules:** Catalog (owner of the links), Media (files, contract). Parent: [Media 001](README.md).
 
 ## Goal
 
@@ -25,6 +25,7 @@ The owner asked (2026-11-04) that a product has several photos (a site gallery; 
 - R-34: every sync run also refreshes the cache: link URLs are reread from the library, links to files that no longer exist are dropped, and `Photo`/`Sсheme` are rewritten from the links (empty without them).
 - R-35: replacing a library file updates the URL in every product that uses it; deleting a library file removes its links.
 - R-36: `withoutPhoto=true` on the admin product list returns products whose cached photo is empty.
+- R-37 (owner, 2026-11-04): every sync run lays out linked files as folders that repeat the category tree (same names and nesting): photos under «Товари», schemes under «Схеми». A file goes to the folder of the category of its active product with the smallest ID. Only files inside «Товари»/«Схеми» or their subfolders move; a file someone put in another folder stays. Folders are made only for categories that get files and their parents; empty folders are never deleted. URLs never change (folders are virtual).
 
 ## Scenarios
 
@@ -34,6 +35,7 @@ The owner asked (2026-11-04) that a product has several photos (a site gallery; 
 - SC-33: replacing file A changes the product's photo URL; deleting it removes the link and moves the next photo to first place.
 - SC-34: the 1C import of a known product keeps its links and cache; a new product has no photo.
 - SC-35: `withoutPhoto=true` lists only products without a photo.
+- SC-36: photos of products in «Фурнітура / Завіси» and «Фурнітура / Ручки» move into «Товари / Фурнітура / Завіси» and «… / Ручки»; a file in «banners» stays; a dry run counts and saves nothing; a second run moves nothing; a file shared by two products follows the smaller product ID.
 
 ## Design
 
@@ -41,7 +43,8 @@ The owner asked (2026-11-04) that a product has several photos (a site gallery; 
 - `Catalog.Application/Contracts/Media/IProductMediaLibrary` is Catalog's own port; `Catalog.Infrastructure/MediaLibrary` serves it through the Media contract and implements the listener.
 - `Catalog.Domain`: `ProductMediaLink` (owned by `Product`, table `ProductMedia`); `Product.SetMedia`, `LinkPhotoIfNone`, `LinkSchemeIfNone`, `RefreshMedia`, `UpdateMediaUrl`, `RemoveMediaFile`; photo/scheme no longer required.
 - `Catalog.Application`: `Features/ProductMedia/{Get,Set}` with validators; `Features/ProductMedia/FileChanges/ProductMediaFileChanges`; `Jobs/ProductMedia/LinkProductMediaJob` (R-33, R-34). The list photo follows with one SQL update (`IProductListProjectionRebuilder.RefreshPhotosAsync`).
-- Host.Jobs `media-cdn-sync`: sync, then link; one `[RESULT]` line for each part.
+- Host.Jobs `media-cdn-sync`: sync, then link, then folders (R-37); one `[RESULT]` line for each part.
+- R-37: `Media.Contracts/Folders/IMediaFolderArranger` (implemented by `Media.Infrastructure/Folders/MediaFolderArranger`), reached by Catalog through `IProductMediaLibrary.ArrangeFoldersAsync`; `Catalog.Application/Jobs/ProductMedia/ArrangeProductMediaFoldersJob` builds the tree and placements.
 - Migration `ProductMediaLinks`: table `ProductMedia` (public schema, Catalog history), drop `ProductPhotoChecks`.
 - Removed: `ProductPhotoCheck*`, `ProductPhotoStatus`, `IProductPhotoProbe`, `CheckProductPhotosJob`, `GetMissingProductPhotos*`, `GET /api/admin/products/missing-photos`, Host.Jobs `check-product-photos`, Cloud Run job `catalog-product-photo-check` (the deploy no longer creates it; the owner deletes it and its schedule).
 
@@ -57,4 +60,5 @@ Order: kedr-web change that treats `photo = ""` as no photo and uses `withoutPho
 | TS-31 Catalog links, endpoints, validators | R-30, R-31, R-36 | `ProductMediaTests`, `SetProductMediaCommandValidatorTests`, `ProductMediaApiTests` |
 | TS-32 Auto-link and cache refresh in the sync run | R-33, R-34 | `ProductMediaLinkPostgresTests` |
 | TS-33 1C import without URLs | R-32 | `ProductImportSoftDeleteTests` (SC-34) |
+| TS-35 Folders by category | R-37 | `MediaPostgresTests` (arranger), `ProductMediaLinkPostgresTests` (placements) |
 | TS-34 Remove photo check | — | architecture tests, `ApiContractTests`, full integration suite 229/229 on 2026-11-04 |
