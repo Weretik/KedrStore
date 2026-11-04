@@ -1,11 +1,11 @@
 using Catalog.Application.Features.Products.GetAdminList;
 using Catalog.Application.Features.Products.GetAdminDetail;
-using Catalog.Application.Features.Products.GetMissingPhotos;
+using Catalog.Application.Features.ProductMedia.Get;
+using Catalog.Application.Features.ProductMedia.Set;
 using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetAdminDetail;
-using Catalog.Contracts.Products.GetMissingPhotos;
-using Catalog.Contracts.Products.GetList;
+using Catalog.Contracts.Products.Media;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.ValueObjects;
 using Identity.Application.Security.Policies;
@@ -70,57 +70,33 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         return this.ToActionResult(result);
     }
 
-    [HttpGet("missing-photos", Name = "getAdminProductsWithUnavailablePhotos")]
-    [ProducesResponseType(typeof(PagedResult<List<MissingProductPhotoListRowDto>>), StatusCodes.Status200OK)]
+    [HttpGet("{id:int}/media", Name = "getAdminProductMedia")]
+    [Authorize(Policy = PolicyNames.CanManageMedia)]
+    [ProducesResponseType(typeof(ProductMediaDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<PagedResult<List<MissingProductPhotoListRowDto>>>> GetMissingPhotos(
-        [FromQuery] GetMissingProductPhotosHttpRequest request,
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductMediaDto>> GetMedia(
+        [FromRoute] int id,
         CancellationToken cancellationToken)
     {
-        var applicationRequest = new GetMissingProductPhotosRequest
-        {
-            SearchTerm = request.SearchTerm,
-            CategoryId = request.CategoryId,
-            InStock = request.InStock,
-            IsSale = request.IsSale,
-            IsNew = request.IsNew,
-            ExportToSite = request.ExportToSite,
-            Sort = request.Sort,
-            Page = request.Page,
-            PageSize = request.PageSize
-        };
-        var result = await sender.Send(new GetMissingProductPhotosQuery(applicationRequest), cancellationToken);
-
+        var result = await sender.Send(new GetProductMediaQuery(id), cancellationToken);
         return this.ToActionResult(result);
     }
-}
 
-public sealed record GetMissingProductPhotosHttpRequest
-{
-    [FromQuery(Name = "searchTerm")]
-    public string? SearchTerm { get; init; }
-
-    [FromQuery(Name = "categoryId")]
-    public int? CategoryId { get; init; }
-
-    [FromQuery(Name = "inStock")]
-    public bool? InStock { get; init; }
-
-    [FromQuery(Name = "isSale")]
-    public bool? IsSale { get; init; }
-
-    [FromQuery(Name = "isNew")]
-    public bool? IsNew { get; init; }
-
-    [FromQuery(Name = "exportToSite")]
-    public bool? ExportToSite { get; init; }
-
-    [FromQuery(Name = "sort")]
-    public ProductSort Sort { get; init; } = ProductSort.IdAsc;
-
-    [FromQuery(Name = "page")]
-    public int Page { get; init; } = 1;
-
-    [FromQuery(Name = "pageSize")]
-    public int PageSize { get; init; } = 20;
+    /// <summary>Replaces the photos (in order) and the scheme of a product with library files (R-31).</summary>
+    [HttpPut("{id:int}/media", Name = "setAdminProductMedia")]
+    [Authorize(Policy = PolicyNames.CanManageMedia)]
+    [ProducesResponseType(typeof(ProductMediaDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductMediaDto>> SetMedia(
+        [FromRoute] int id,
+        [FromBody] SetProductMediaRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new SetProductMediaCommand(id, request), cancellationToken);
+        return this.ToActionResult(result);
+    }
 }

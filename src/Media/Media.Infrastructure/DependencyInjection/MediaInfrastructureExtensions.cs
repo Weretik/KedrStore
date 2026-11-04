@@ -1,6 +1,9 @@
 using Media.Application.Contracts.Images;
 using Media.Application.Contracts.Storage;
+using Media.Application.Features.Files.Common;
 using Media.Application.Jobs.CdnSync;
+using Media.Contracts.Files;
+using Media.Infrastructure.Files;
 using Media.Infrastructure.Images;
 using Media.Infrastructure.Repositories;
 using Media.Infrastructure.Storage;
@@ -26,6 +29,8 @@ public static class MediaInfrastructureExtensions
         var storageSection = configuration.GetSection(MediaStorageOptions.SectionName);
         services.Configure<MediaStorageOptions>(storageSection);
         services.AddSingleton<IMediaUrlBuilder, MediaUrlBuilder>();
+        services.AddScoped<IMediaFileDirectory, MediaFileDirectory>();
+        services.AddScoped<MediaFileChangeNotifier>();
         // Without CDN credentials (local runs, tests) writes answer 503 instead of failing at startup.
         var storage = storageSection.Get<MediaStorageOptions>() ?? new MediaStorageOptions();
         if (storage.IsConfigured)

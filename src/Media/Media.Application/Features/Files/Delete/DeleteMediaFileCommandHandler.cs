@@ -3,8 +3,10 @@ using Media.Application.Features.Files.Common;
 
 namespace Media.Application.Features.Files.Delete;
 
-/// <summary>Deletes the CDN file first, so a failure leaves the row and the admin can retry.</summary>
-public sealed class DeleteMediaFileCommandHandler(IMediaRepository<MediaFile> files, IMediaStorage storage)
+/// <summary>Deletes the CDN file first, so a failure leaves the row and the admin can retry;
+/// after the row is gone the linking modules drop their links (R-35).</summary>
+public sealed class DeleteMediaFileCommandHandler(IMediaRepository<MediaFile> files, IMediaStorage storage,
+    MediaFileChangeNotifier changes)
     : ICommandHandler<DeleteMediaFileCommand, Result>
 {
     public async ValueTask<Result> Handle(DeleteMediaFileCommand command, CancellationToken cancellationToken)
@@ -17,6 +19,7 @@ public sealed class DeleteMediaFileCommandHandler(IMediaRepository<MediaFile> fi
 
         await storage.DeleteAsync(file.StorageKey, cancellationToken);
         await files.DeleteAsync(file, cancellationToken);
+        await changes.DeletedAsync(file.Id.Value, cancellationToken);
         return Result.Success();
     }
 }

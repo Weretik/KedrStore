@@ -160,7 +160,7 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
         params (int Type, decimal Amount)[] prices)
     {
         db.Products.Add(Product.Create(ProductId.From(id), "000000001", $"Товар {id}", $"product-{id}",
-            ProductCategoryId.From(categoryId), $"https://example.test/{id}.jpg", "scheme", DateTimeOffset.UtcNow, stock, 1, false, false));
+            ProductCategoryId.From(categoryId), DateTimeOffset.UtcNow, stock, 1, false, false));
         foreach (var (type, amount) in prices)
             db.ProductPrices.Add(ProductPrice.Create("000000001", ProductId.From(id), PriceTypeId.From(type),
                 new Money(amount, "UAH")));

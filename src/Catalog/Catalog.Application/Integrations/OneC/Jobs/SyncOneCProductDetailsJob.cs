@@ -19,7 +19,6 @@ public sealed class SyncOneCProductDetailsJob(
     ProductTranslationImporter translationImporter,
     IOptionsSnapshot<RootCategoryId> rootCategoryOptions,
     IProductListProjectionRebuilder productListProjectionRebuilder,
-    IProductPhotoCheckStore productPhotoCheckStore,
     ILogger<SyncOneCProductDetailsJob> logger)
 {
     private const string Phase = "Product details import";
@@ -81,12 +80,6 @@ public sealed class SyncOneCProductDetailsJob(
         var syncedProductIds = await ApplyAsync(products, rootCategoryId, counters, cancellationToken);
         counters.Log(logger, Phase, rootCategoryId);
 
-        await productPhotoCheckStore.ReconcileAsync(
-            products
-                .Select(product => new ProductPhotoCandidate(ProductId.From(product.Id), product.Photo))
-                .ToArray(),
-            cancellationToken);
-
         await translationImporter.ImportAsync(syncedProductIds, cancellationToken);
 
         if (rebuildProjection)
@@ -136,7 +129,7 @@ public sealed class SyncOneCProductDetailsJob(
             {
                 var restored = existing.Restore(now);
                 var categoryId = item.CategoryId is { } resolved ? ProductCategoryId.From(resolved) : existing.CategoryId;
-                var updated = existing.UpdateFromOneC(item.Name, categoryId, item.Photo, item.Scheme,
+                var updated = existing.UpdateFromOneC(item.Name, categoryId,
                     item.QuantityInPack, item.ExportToSite, item.IsNew, item.IsSale, now);
 
                 if (restored) counters.Restored++;
@@ -160,8 +153,6 @@ public sealed class SyncOneCProductDetailsJob(
                 name: item.Name,
                 productSlug: slugs.Allocate(item.Name),
                 categoryId: ProductCategoryId.From(newCategoryId),
-                photo: item.Photo,
-                scheme: item.Scheme,
                 createdDate: now,
                 stock: item.Stock,
                 qtyInPack: item.QuantityInPack,

@@ -7,9 +7,12 @@ using Catalog.Infrastructure.Exports;
 using Catalog.Infrastructure.Notifications;
 using Catalog.Infrastructure.Products;
 using Catalog.Infrastructure.ReferenceData;
-using Catalog.Application.Contracts.Integrations;
-using Catalog.Application.Jobs.ProductPhotos;
-using Catalog.Infrastructure.Integrations.ProductPhotos;
+using Catalog.Application.Contracts.Media;
+using Catalog.Application.Features.ProductMedia.FileChanges;
+using Catalog.Application.Jobs.ProductMedia;
+using Catalog.Infrastructure.MediaLibrary;
+using Media.Contracts.Files;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 
@@ -23,24 +26,22 @@ public static class CatalogServicesExtension
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
         services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
         services.AddCatalogReferenceDataServices();
-        services.AddProductPhotoCheckServices(configuration);
+        services.AddProductMediaServices();
 
         return services;
     }
 
-    public static IServiceCollection AddProductPhotoCheckServices(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    /// <summary>
+    /// Product photos and schemes from the media library: the port to Media, the listener for file replace and
+    /// delete, and the link job. Needs the Media infrastructure registered too.
+    /// </summary>
+    public static IServiceCollection AddProductMediaServices(this IServiceCollection services)
     {
-        services.Configure<ProductPhotoCheckOptions>(
-            configuration.GetSection(ProductPhotoCheckOptions.SectionName));
-        services.AddSingleton(TimeProvider.System);
-        services.AddScoped<CheckProductPhotosJob>();
-        services.AddHttpClient<IProductPhotoProbe, ProductPhotoProbe>()
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-            {
-                AllowAutoRedirect = false
-            });
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddScoped<IProductMediaLibrary, ProductMediaLibrary>();
+        services.AddScoped<ProductMediaFileChanges>();
+        services.AddScoped<IMediaFileChangeListener, CatalogMediaFileChangeListener>();
+        services.AddScoped<LinkProductMediaJob>();
 
         return services;
     }

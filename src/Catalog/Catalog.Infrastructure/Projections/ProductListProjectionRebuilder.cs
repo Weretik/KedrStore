@@ -16,6 +16,19 @@ internal sealed class ProductListProjectionRebuilder(
 {
     private const string RuLanguage = "ru";
 
+    public async Task<int> RefreshPhotosAsync(CancellationToken cancellationToken = default)
+    {
+        await using var catalogDbContext = await catalogDbContextFactory.CreateDbContextAsync(cancellationToken);
+        return await catalogDbContext.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE "ProductListProjections" AS projection
+            SET "Photo" = product."Photo"
+            FROM "Products" AS product
+            WHERE product."Id" = projection."ProductId" AND projection."Photo" <> product."Photo"
+            """,
+            cancellationToken);
+    }
+
     public async Task RebuildAsync(CancellationToken cancellationToken = default)
     {
         await using var catalogDbContext = await catalogDbContextFactory.CreateDbContextAsync(cancellationToken);

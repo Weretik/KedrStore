@@ -3,7 +3,8 @@ using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Domain.Entities;
 
-public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
+/// <summary>A 1C product. Its photo and scheme links live in <c>Product.Media.cs</c>.</summary>
+public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 {
     public const decimal MaximumStock = 10_000m;
 
@@ -12,8 +13,10 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     public string Name { get; private set; } = null!;
     public string ProductSlug { get; private set; } = null!;
     public ProductCategoryId CategoryId { get; private set; }
-    public string Photo { get; private set; } = null!;
-    public string Sсheme { get; private set; } = null!;
+    /// <summary>Cache of the first photo URL; empty without photos. The links are the source (R-30).</summary>
+    public string Photo { get; private set; } = string.Empty;
+    /// <summary>Cache of the scheme URL; empty without a scheme.</summary>
+    public string Sсheme { get; private set; } = string.Empty;
     public decimal Stock { get; private set; }
     public bool IsSale { get; private set; }
     public bool IsNew { get; private set; }
@@ -25,14 +28,12 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #region Constructors
     private Product() { }
     private Product(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        string photo, DateTimeOffset createdDate, decimal stock, string sсheme, int qtyInPack, bool isNew, bool isSale)
+        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
     {
         SetProductId(id);
         SetName(name);
         SetProductSlug(productSlug);
         SetCategoryId(categoryId);
-        SetPhoto(photo);
-        SetSсheme(sсheme);
         SetStock(stock);
         MarkAsCreated(createdDate);
         SetQuantityInPack(qtyInPack);
@@ -44,12 +45,13 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #endregion
 
     #region Factories
+    /// <summary>A new product starts without photos and scheme; they are linked from the media library (R-32).</summary>
     public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
-        => new(id, productTypeIdOneC, name, productSlug, categoryId, photo, createdDate, stock, scheme, qtyInPack, isNew, isSale);
+        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
+        => new(id, productTypeIdOneC, name, productSlug, categoryId, createdDate, stock, qtyInPack, isNew, isSale);
 
     public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        string photo, string scheme, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale,
+        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale,
         bool exportToSite)
     {
         var product = Create(
@@ -58,8 +60,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
             name,
             productSlug,
             categoryId,
-            photo,
-            scheme,
             createdDate,
             stock,
             qtyInPack,
@@ -71,16 +71,14 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     }
 
     /// <summary>
-    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
+    /// Applies 1C-owned fields. The slug and the media links are not 1C-owned and never change here (R-32).
     /// Returns whether anything changed; <see cref="BaseAuditableEntity{TId}.UpdatedAt"/> moves only then.
     /// </summary>
-    public bool UpdateFromOneC(string name, ProductCategoryId categoryId, string photo, string scheme,
+    public bool UpdateFromOneC(string name, ProductCategoryId categoryId,
         int qtyInPack, bool exportToSite, bool isNew, bool isSale, DateTimeOffset now)
     {
         var changed = !string.Equals(Name, name?.Trim(), StringComparison.Ordinal) ||
                       CategoryId != categoryId ||
-                      !string.Equals(Photo, photo?.Trim(), StringComparison.Ordinal) ||
-                      !string.Equals(Sсheme, scheme?.Trim(), StringComparison.Ordinal) ||
                       QuantityInPack != qtyInPack ||
                       ExportToSite != exportToSite ||
                       IsNew != isNew ||
@@ -91,8 +89,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
         SetName(name!);
         SetCategoryId(categoryId);
-        SetPhoto(photo!);
-        SetSсheme(scheme!);
         SetQuantityInPack(qtyInPack);
         ExportToSite = exportToSite;
         IsNew = isNew;
@@ -159,21 +155,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         ProductSlug = slug.Trim();
     }
 
-    private void SetPhoto(string photo)
-    {
-        if (string.IsNullOrWhiteSpace(photo))
-            throw new DomainException(ProductErrors.PhotoRequired());
-
-        Photo = photo.Trim();
-    }
-
-    private void SetSсheme(string scheme)
-    {
-        if (string.IsNullOrWhiteSpace(scheme))
-            throw new DomainException(ProductErrors.SchemeInvalid());
-
-        Sсheme = scheme.Trim();
-    }
     private void SetStock(decimal stock)
     {
         if (stock < 0m || stock > MaximumStock)
@@ -209,7 +190,6 @@ public class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         IsNew = false;
     }
     #endregion
-
 
     #region Update API
     public void UpdateStock(decimal stock) => SetStock(stock);

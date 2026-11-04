@@ -14,7 +14,7 @@ public sealed class CatalogSoftDeleteAndContentTests
     {
         var product = NewProduct();
 
-        var changed = product.UpdateFromOneC("Замок", ProductCategoryId.From(10), "photo", "scheme", 1, true, false, false, Later);
+        var changed = product.UpdateFromOneC("Замок", ProductCategoryId.From(10), 1, true, false, false, Later);
 
         Assert.False(changed);
         Assert.Null(product.UpdatedAt);
@@ -26,7 +26,7 @@ public sealed class CatalogSoftDeleteAndContentTests
     {
         var product = NewProduct();
 
-        var changed = product.UpdateFromOneC("Новий замок", ProductCategoryId.From(10), "photo", "scheme", 1, true, true, false, Later);
+        var changed = product.UpdateFromOneC("Новий замок", ProductCategoryId.From(10), 1, true, true, false, Later);
 
         Assert.True(changed);
         Assert.Equal(Later, product.UpdatedAt);
@@ -96,6 +96,6 @@ public sealed class CatalogSoftDeleteAndContentTests
     }
 
     private static Product NewProduct()
-        => Product.Create(ProductId.From(1), "R", "Замок", "zamok", ProductCategoryId.From(10), "photo", "scheme",
+        => Product.Create(ProductId.From(1), "R", "Замок", "zamok", ProductCategoryId.From(10),
             Created, 0, 1, false, false, true);
 }

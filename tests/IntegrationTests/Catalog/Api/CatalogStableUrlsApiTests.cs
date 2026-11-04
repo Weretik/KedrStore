@@ -175,7 +175,6 @@ public sealed class CatalogStableUrlsApiTests
     private static Product AddProduct(CatalogDbContext db, int id, string name, string slug, decimal price)
     {
         var product = Product.Create(ProductId.From(id), "000005513", name, slug, ProductCategoryId.From(2),
-            $"https://images-kedr.cdn.express/products/{id}.jpg", $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg",
             Now, 5, 1, false, false, true);
         db.Products.Add(product);
         if (id != 22)

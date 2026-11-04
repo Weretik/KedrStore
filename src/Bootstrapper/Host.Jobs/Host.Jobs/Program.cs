@@ -1,6 +1,6 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Contracts.Projections;
-using Catalog.Application.Jobs.ProductPhotos;
+using Catalog.Application.Jobs.ProductMedia;
 using Catalog.Application.Jobs.Slugs;
 using Host.Jobs;
 using Media.Application.Jobs.CdnSync;
@@ -136,18 +136,22 @@ try
             break;
 
         case "media-cdn-sync":
+            // One run, one schedule: register the CDN files, then link them to products (R-33, R-34).
+            var dryRun = args.Contains("--dry-run", StringComparer.OrdinalIgnoreCase);
             var syncReport = await scopeServiceProvider.GetRequiredService<SyncCdnMediaJob>()
-                .RunAsync(args.Contains("--dry-run", StringComparer.OrdinalIgnoreCase), cancellationToken);
+                .RunAsync(dryRun, cancellationToken);
             Console.WriteLine(
                 $"[RESULT] media-cdn-sync dryRun={syncReport.DryRun}; found={syncReport.FoundOnCdn}; " +
                 $"known={syncReport.AlreadyKnown}; registered={syncReport.Registered}; notPictures={syncReport.NotPictures}; " +
                 $"orphans={syncReport.Orphans}; missingOnCdn={syncReport.MissingOnCdn}; hiddenSkipped={syncReport.HiddenSkipped}");
             foreach (var (folder, count) in syncReport.RegisteredByFolder.OrderBy(pair => pair.Key, StringComparer.Ordinal))
                 Console.WriteLine($"[RESULT] folder {folder}: {count} new");
-            break;
-
-        case "check-product-photos":
-            await scopeServiceProvider.GetRequiredService<CheckProductPhotosJob>().RunAsync(cancellationToken);
+            var linkReport = await scopeServiceProvider.GetRequiredService<LinkProductMediaJob>()
+                .RunAsync(dryRun, cancellationToken);
+            Console.WriteLine(
+                $"[RESULT] product-media-link dryRun={linkReport.DryRun}; photosLinked={linkReport.PhotosLinked}; " +
+                $"schemesLinked={linkReport.SchemesLinked}; linksDropped={linkReport.LinksDropped}; " +
+                $"productsChanged={linkReport.ProductsChanged}; withoutPhoto={linkReport.ProductsWithoutPhoto}");
             break;
 
         default:

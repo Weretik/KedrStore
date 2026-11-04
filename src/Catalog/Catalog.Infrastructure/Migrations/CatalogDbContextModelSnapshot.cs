@@ -17,7 +17,7 @@ namespace Catalog.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
@@ -117,8 +117,10 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Property<string>("Photo")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("ProductSlug")
                         .IsRequired()
@@ -141,8 +143,10 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Property<string>("Sсheme")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -328,49 +332,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductListProjections", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductPhotoCheck", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset?>("CheckedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DiagnosticCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("DiagnosticMessage")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<int?>("HttpStatusCode")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PhotoUrl")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Status", "Id")
-                        .HasDatabaseName("IX_ProductPhotoChecks_Status_ProductId");
-
-                    b.ToTable("ProductPhotoChecks", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_ProductPhotoChecks_State", "(\"Status\" = 'Unknown' AND \"CheckedAtUtc\" IS NULL AND \"HttpStatusCode\" IS NULL AND \"DiagnosticCode\" IS NULL AND \"DiagnosticMessage\" IS NULL)\nOR (\"Status\" = 'Available' AND \"CheckedAtUtc\" IS NOT NULL AND \"HttpStatusCode\" BETWEEN 200 AND 299 AND \"DiagnosticCode\" IS NULL AND \"DiagnosticMessage\" IS NULL)\nOR (\"Status\" = 'Missing' AND \"CheckedAtUtc\" IS NOT NULL AND \"HttpStatusCode\" IN (404, 410) AND \"DiagnosticCode\" IS NOT NULL)\nOR (\"Status\" = 'InvalidContentType' AND \"CheckedAtUtc\" IS NOT NULL AND \"HttpStatusCode\" BETWEEN 200 AND 299 AND \"DiagnosticCode\" IS NOT NULL)\nOR (\"Status\" = 'CheckFailed' AND \"CheckedAtUtc\" IS NOT NULL AND (\"HttpStatusCode\" IS NULL OR \"HttpStatusCode\" BETWEEN 100 AND 599) AND \"DiagnosticCode\" IS NOT NULL)");
-
-                            t.HasCheckConstraint("CK_ProductPhotoChecks_Status", "\"Status\" IN ('Unknown', 'Available', 'Missing', 'InvalidContentType', 'CheckFailed')");
-                        });
-                });
-
             modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>
                 {
                     b.Property<int>("Id")
@@ -540,15 +501,38 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductPhotoCheck", b =>
-                {
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
-                        .WithOne()
-                        .HasForeignKey("Catalog.Domain.Entities.ProductPhotoCheck", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsMany("Catalog.Domain.Entities.ProductMediaLink", "MediaLinks", b1 =>
+                        {
+                            b1.Property<int>("ProductId")
+                                .HasColumnType("integer");
+
+                            b1.Property<long>("MediaFileId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Position")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Url")
+                                .IsRequired()
+                                .HasMaxLength(1000)
+                                .HasColumnType("character varying(1000)");
+
+                            b1.HasKey("ProductId", "MediaFileId");
+
+                            b1.HasIndex("MediaFileId")
+                                .HasDatabaseName("IX_ProductMedia_MediaFileId");
+
+                            b1.ToTable("ProductMedia", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
+                    b.Navigation("MediaLinks");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>

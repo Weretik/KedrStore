@@ -75,13 +75,17 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/admin/products/all", out var allAdminProducts));
         Assert.True(allAdminProducts.TryGetProperty("get", out _));
 
-        Assert.True(paths.TryGetProperty("/api/admin/products/missing-photos", out var missingPhotoProducts));
-        Assert.True(missingPhotoProducts.TryGetProperty("get", out var missingPhotoProductsGet));
-        AssertOperationId(missingPhotoProductsGet, "getAdminProductsWithUnavailablePhotos");
-        AssertOperationHasQueryParameter(missingPhotoProductsGet, "page");
-        AssertOperationHasQueryParameter(missingPhotoProductsGet, "pageSize");
-        Assert.False(missingPhotoProductsGet.GetProperty("responses").TryGetProperty("401", out _));
-        Assert.False(missingPhotoProductsGet.GetProperty("responses").TryGetProperty("403", out _));
+        Assert.False(paths.TryGetProperty("/api/admin/products/missing-photos", out _));
+        Assert.True(adminProducts.TryGetProperty("get", out var adminProductsGet));
+        AssertOperationHasQueryParameter(adminProductsGet, "WithoutPhoto");
+
+        Assert.True(paths.TryGetProperty("/api/admin/products/{id}/media", out var productMedia));
+        Assert.True(productMedia.TryGetProperty("get", out var productMediaGet));
+        AssertOperationId(productMediaGet, "getAdminProductMedia");
+        AssertOperationHasPathParameter(productMediaGet, "id");
+        Assert.True(productMedia.TryGetProperty("put", out var productMediaPut));
+        AssertOperationId(productMediaPut, "setAdminProductMedia");
+        Assert.True(productMediaPut.TryGetProperty("requestBody", out _));
 
         Assert.True(paths.TryGetProperty("/api/orders", out var orders));
         Assert.True(orders.TryGetProperty("post", out var ordersPost));
