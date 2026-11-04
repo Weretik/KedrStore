@@ -41,6 +41,13 @@ COPY ["src/Sales/Sales.Application/Sales.Application.csproj", "src/Sales/Sales.A
 COPY ["src/Sales/Sales.Domain/Sales.Domain.csproj", "src/Sales/Sales.Domain/"]
 COPY ["src/Sales/Sales.Infrastructure/Sales.Infrastructure.csproj", "src/Sales/Sales.Infrastructure/"]
 
+# Media
+COPY ["src/Media/Media.Api/Media.Api.csproj", "src/Media/Media.Api/"]
+COPY ["src/Media/Media.Application/Media.Application.csproj", "src/Media/Media.Application/"]
+COPY ["src/Media/Media.Contracts/Media.Contracts.csproj", "src/Media/Media.Contracts/"]
+COPY ["src/Media/Media.Domain/Media.Domain.csproj", "src/Media/Media.Domain/"]
+COPY ["src/Media/Media.Infrastructure/Media.Infrastructure.csproj", "src/Media/Media.Infrastructure/"]
+
 # Bootstrapper
 COPY ["src/Bootstrapper/Host.Api/Host.Api.csproj", "src/Bootstrapper/Host.Api/"]
 
