@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Seed\Covers\*.webp" LogicalName="Content.Infrastructure.Seed.Covers.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Seed\LegalDocuments\legal-documents.json" LogicalName="Content.Infrastructure.Seed.LegalDocuments.legal-documents.json" />
   </ItemGroup>
 
   <PropertyGroup>
