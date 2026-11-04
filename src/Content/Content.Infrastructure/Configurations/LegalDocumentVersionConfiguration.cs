@@ -14,10 +14,10 @@ internal sealed class LegalDocumentVersionConfiguration : IEntityTypeConfigurati
         builder.Property(version => version.PublishedBy).HasMaxLength(LegalDocumentVersion.UserNameMaxLength);
 
         // At most one draft and one published version per kind; numbers never repeat within a kind.
-        builder.HasIndex(version => version.Kind).IsUnique().HasFilter("\"Status\" = 'Draft'")
-            .HasDatabaseName("IX_LegalDocumentVersions_Kind_Draft");
-        builder.HasIndex(version => version.Kind).IsUnique().HasFilter("\"Status\" = 'Published'")
-            .HasDatabaseName("IX_LegalDocumentVersions_Kind_Published");
+        builder.HasIndex(version => version.Kind, "IX_LegalDocumentVersions_Kind_Draft").IsUnique()
+            .HasFilter("\"Status\" = 'Draft'");
+        builder.HasIndex(version => version.Kind, "IX_LegalDocumentVersions_Kind_Published").IsUnique()
+            .HasFilter("\"Status\" = 'Published'");
         builder.HasIndex(version => new { version.Kind, version.Number }).IsUnique()
             .HasFilter("\"Number\" IS NOT NULL");
         builder.ToTable(table => table.HasCheckConstraint("CK_LegalDocumentVersions_Published",

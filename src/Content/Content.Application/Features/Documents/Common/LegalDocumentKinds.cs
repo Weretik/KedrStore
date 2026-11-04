@@ -1,6 +1,6 @@
 namespace Content.Application.Features.Documents.Common;
 
-/// <summary>URL names of the document kinds (<c>public-offer</c>, <c>privacy-policy</c>, <c>returns-policy</c>).</summary>
+/// <summary>URL names of the document kinds (<c>public-offer</c>, <c>privacy-policy</c>, <c>returns-policy</c>, <c>delivery-payment</c>).</summary>
 public static class LegalDocumentKinds
 {
     private static readonly IReadOnlyDictionary<string, LegalDocumentKind> BySlug =
@@ -9,6 +9,7 @@ public static class LegalDocumentKinds
             ["public-offer"] = LegalDocumentKind.PublicOffer,
             ["privacy-policy"] = LegalDocumentKind.PrivacyPolicy,
             ["returns-policy"] = LegalDocumentKind.ReturnsPolicy,
+            ["delivery-payment"] = LegalDocumentKind.DeliveryPayment,
         };
 
     public static IReadOnlyList<LegalDocumentKind> All { get; } = BySlug.Values.ToList();

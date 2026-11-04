@@ -1,0 +1,260 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — site documents
+  version: 0.1.0
+  description: >-
+    The public offer, privacy policy, returns policy and delivery & payment page, each in Ukrainian and Russian.
+    Every document has numbered editions: one draft at a time is edited in the admin, publishing it gives the next
+    number and the «Редакція від» date, and the edition it replaces becomes read-only history.
+    Document kinds in URLs: `public-offer`, `privacy-policy`, `returns-policy`, `delivery-payment`.
+paths:
+  /api/content/{lang}/documents/{kind}:
+    get:
+      operationId: getPublishedLegalDocument
+      summary: Get the published edition of a document
+      description: >-
+        Public. `bodyHtml` is sanitized HTML (h2, h3, p, lists, strong, em, blockquote, links); the site builds its
+        table of contents from the h2 headings and fills the `{site}`, `{email}` and `{phone}` placeholders.
+      tags: [Documents]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - $ref: '#/components/parameters/Kind'
+      responses:
+        '200':
+          description: The published edition.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublishedLegalDocument' }
+        '400': { description: The language is not `uk` or `ru`. }
+        '404': { description: Unknown kind, or nothing is published yet. }
+  /api/admin/content/documents:
+    get:
+      operationId: getAdminLegalDocuments
+      summary: List the documents with their published edition and waiting draft
+      description: Requires `CanManageContent` (Manager or Admin). Always four items, in a fixed order.
+      tags: [Documents]
+      responses:
+        '200':
+          description: One item per document kind.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LegalDocumentOverview' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+  /api/admin/content/documents/{kind}/versions:
+    get:
+      operationId: getAdminLegalDocumentVersions
+      summary: List all editions of a document
+      description: Requires `CanManageContent`. The draft first, then editions by number, newest first.
+      tags: [Documents]
+      parameters:
+        - $ref: '#/components/parameters/Kind'
+      responses:
+        '200':
+          description: The editions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LegalDocumentVersionSummary' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: Unknown kind. }
+    post:
+      operationId: createAdminLegalDocumentDraft
+      summary: Start a draft
+      description: >-
+        Requires `CanManageContent`. Without a body (or without `texts`) the draft copies the published texts;
+        with `texts` it starts from them (sanitized).
+      tags: [Documents]
+      parameters:
+        - $ref: '#/components/parameters/Kind'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveLegalDocumentDraftRequest' }
+      responses:
+        '200':
+          description: The new draft.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
+        '400': { description: Invalid texts, or nothing is published and no texts were given (`texts`). }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: Unknown kind. }
+        '409': { description: This document already has a draft. }
+  /api/admin/content/documents/versions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/VersionId'
+    get:
+      operationId: getAdminLegalDocumentVersion
+      summary: Get one edition with both texts
+      description: Requires `CanManageContent`.
+      tags: [Documents]
+      responses:
+        '200':
+          description: The edition.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such edition. }
+    put:
+      operationId: updateAdminLegalDocumentDraft
+      summary: Replace both texts of a draft
+      description: Requires `CanManageContent`. The HTML is sanitized on save.
+      tags: [Documents]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveLegalDocumentDraftRequest' }
+      responses:
+        '200':
+          description: The saved draft.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
+        '400':
+          description: >-
+            Invalid texts; errors name `texts`, `texts[0].title`, `texts[1].bodyHtml` and so on. Both `uk` and `ru` are
+            required; title up to 200 characters, body up to 100 000.
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such edition. }
+        '409': { description: The edition is published or archived and can no longer change. }
+    delete:
+      operationId: deleteAdminLegalDocumentDraft
+      summary: Delete a draft
+      description: Requires `CanManageContent`. Published and archived editions cannot be deleted.
+      tags: [Documents]
+      responses:
+        '204': { description: Deleted. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such edition. }
+        '409': { description: The edition is not a draft. }
+  /api/admin/content/documents/versions/{id}/publish:
+    parameters:
+      - $ref: '#/components/parameters/VersionId'
+    post:
+      operationId: publishAdminLegalDocumentDraft
+      summary: Publish a draft
+      description: >-
+        Requires `CanManageContent`. The draft gets the next number and the given «Редакція від» date and goes on the
+        site; the edition it replaces becomes archived. Both changes are saved together.
+      tags: [Documents]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublishLegalDocumentRequest' }
+      responses:
+        '200':
+          description: The published edition.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
+        '400': { description: '`effectiveFrom` is earlier than the date of the edition on the site.' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+        '404': { description: No such edition. }
+        '409': { description: The edition is already published or archived. }
+components:
+  parameters:
+    Lang:
+      name: lang
+      in: path
+      required: true
+      schema: { type: string, enum: [uk, ru] }
+    Kind:
+      name: kind
+      in: path
+      required: true
+      schema: { $ref: '#/components/schemas/LegalDocumentKind' }
+    VersionId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+  schemas:
+    LegalDocumentKind:
+      type: string
+      enum: [public-offer, privacy-policy, returns-policy, delivery-payment]
+    LegalDocumentStatus:
+      type: string
+      enum: [draft, published, archived]
+    PublishedLegalDocument:
+      type: object
+      required: [kind, number, effectiveFrom, title, bodyHtml, publishedAt]
+      properties:
+        kind: { $ref: '#/components/schemas/LegalDocumentKind' }
+        number: { type: integer, format: int32 }
+        effectiveFrom: { type: string, format: date, description: «Редакція від». }
+        title: { type: string }
+        bodyHtml: { type: string }
+        publishedAt: { type: string, format: date-time }
+    LegalDocumentVersionSummary:
+      type: object
+      required: [id, status, number, effectiveFrom, updatedAt, updatedBy, publishedAt, publishedBy]
+      properties:
+        id: { type: integer, format: int64 }
+        status: { $ref: '#/components/schemas/LegalDocumentStatus' }
+        number: { type: [integer, 'null'], format: int32, description: null while a draft. }
+        effectiveFrom: { type: [string, 'null'], format: date, description: null while a draft. }
+        updatedAt: { type: string, format: date-time }
+        updatedBy: { type: string, description: Email (or user name) of the last editor. }
+        publishedAt: { type: [string, 'null'], format: date-time }
+        publishedBy: { type: [string, 'null'] }
+    LegalDocumentOverview:
+      type: object
+      required: [kind, published, draft]
+      properties:
+        kind: { $ref: '#/components/schemas/LegalDocumentKind' }
+        published:
+          oneOf:
+            - { $ref: '#/components/schemas/LegalDocumentVersionSummary' }
+            - { type: 'null' }
+        draft:
+          oneOf:
+            - { $ref: '#/components/schemas/LegalDocumentVersionSummary' }
+            - { type: 'null' }
+    LegalDocumentText:
+      type: object
+      required: [language, title, bodyHtml]
+      properties:
+        language: { type: string, enum: [uk, ru] }
+        title: { type: string, maxLength: 200 }
+        bodyHtml: { type: string, maxLength: 100000 }
+    LegalDocumentVersion:
+      allOf:
+        - { $ref: '#/components/schemas/LegalDocumentVersionSummary' }
+        - type: object
+          required: [kind, texts]
+          properties:
+            kind: { $ref: '#/components/schemas/LegalDocumentKind' }
+            texts:
+              type: array
+              items: { $ref: '#/components/schemas/LegalDocumentText' }
+    SaveLegalDocumentDraftRequest:
+      type: object
+      required: [texts]
+      properties:
+        texts:
+          type: array
+          description: Exactly one `uk` and one `ru` text.
+          items: { $ref: '#/components/schemas/LegalDocumentText' }
+    PublishLegalDocumentRequest:
+      type: object
+      required: [effectiveFrom]
+      properties:
+        effectiveFrom: { type: string, format: date }

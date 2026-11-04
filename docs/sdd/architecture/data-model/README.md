@@ -48,13 +48,15 @@ KedrStore PostgreSQL
     ├── infrastructure table
     │   └── __EFMigrationsHistory         # applied EF migration history
 └── schema content
-    └── Content / ContentDbContext — 6 tables
+    └── Content / ContentDbContext — 8 tables
         ├── Articles                      # slug, date, publication flag, cover version
         ├── ArticleTranslations           # uk/ru title, excerpt, sanitized body
         ├── ArticleCovers                 # cover WebP bytes
         ├── CompanyContacts               # the one row of site contacts
         ├── CompanyRequisites             # the one row of payment requisites
         ├── CompanyRequisitesChanges      # who changed requisites, when, old → new (jsonb)
+        ├── LegalDocumentVersions         # offer/privacy/returns/delivery editions: draft, published, archived
+        ├── LegalDocumentTexts            # uk/ru title and sanitized body of an edition
         └── __EFMigrationsHistory         # Content migration history
 └── schema media
     └── Media / MediaDbContext — 2 tables
@@ -74,7 +76,7 @@ KedrStore PostgreSQL
 | Counterparties and their prices | [Customers](sales-customers.md) | [Customers and counterparties](../../features/sales/customers.md) |
 | Orders, drafts, and sync | [Orders](sales-orders.md) | [Manager orders](../../features/sales/admin-orders.md), [Admin workspace](../../features/sales/admin-order-workspace.md) |
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |
-| Site articles, company contacts and requisites | [Content](content-articles.md) | [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md) |
+| Site articles, company contacts, requisites and documents | [Content](content-articles.md) | [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md), [Site documents](../../features/content/legal-documents.md) |
 | Library folders and CDN files | [Media](media-library.md) | [Media library](../../features/media/media-library.md) |
 
 Each EF model table is described in exactly **one** document above. Physical FKs are shown in its ER diagram; ID references without an FK are explained separately. `__EFMigrationsHistory` is an infrastructure table and is not one of the EF model tables; its presence in a specific environment depends on applied migrations. After a schema change, update the relevant document and this tree only if the table list or placement changed.

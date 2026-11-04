@@ -16,7 +16,7 @@ Owns sales customers and counterparties, pricing policy, and sales integration w
 
 Layers: Content.Api, Content.Application, Content.Domain, Content.Infrastructure.
 
-Owns site content written in the admin: articles, company contacts and requisites now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history; it does not reference other modules.
+Owns site content written in the admin: articles, company contacts, requisites and the versioned site documents (offer, privacy, returns, delivery) now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history; it does not reference other modules.
 
 ## Media
 

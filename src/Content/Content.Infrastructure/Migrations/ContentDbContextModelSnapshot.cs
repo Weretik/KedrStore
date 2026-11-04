@@ -131,6 +131,65 @@ namespace Content.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Content.Domain.Documents.LegalDocumentVersion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateOnly?>("EffectiveFrom")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<int?>("Number")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PublishedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Kind", "Number")
+                        .IsUnique()
+                        .HasFilter("\"Number\" IS NOT NULL");
+
+                    b.HasIndex(new[] { "Kind" }, "IX_LegalDocumentVersions_Kind_Draft")
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 'Draft'");
+
+                    b.HasIndex(new[] { "Kind" }, "IX_LegalDocumentVersions_Kind_Published")
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 'Published'");
+
+                    b.ToTable("LegalDocumentVersions", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_LegalDocumentVersions_Published", "\"Status\" = 'Draft' OR (\"Number\" IS NOT NULL AND \"EffectiveFrom\" IS NOT NULL AND \"PublishedAt\" IS NOT NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisites", b =>
                 {
                     b.Property<int>("Id")
@@ -250,6 +309,39 @@ namespace Content.Infrastructure.Migrations
                         .HasForeignKey("Content.Domain.Articles.ArticleCover", "ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Content.Domain.Documents.LegalDocumentVersion", b =>
+                {
+                    b.OwnsMany("Content.Domain.Documents.LegalDocumentText", "Texts", b1 =>
+                        {
+                            b1.Property<long>("VersionId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<string>("Language")
+                                .HasMaxLength(2)
+                                .HasColumnType("character(2)")
+                                .IsFixedLength();
+
+                            b1.Property<string>("BodyHtml")
+                                .IsRequired()
+                                .HasMaxLength(100000)
+                                .HasColumnType("character varying(100000)");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
+
+                            b1.HasKey("VersionId", "Language");
+
+                            b1.ToTable("LegalDocumentTexts", "content");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VersionId");
+                        });
+
+                    b.Navigation("Texts");
                 });
 
             modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisitesChange", b =>
