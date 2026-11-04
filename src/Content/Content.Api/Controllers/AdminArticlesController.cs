@@ -4,6 +4,7 @@ using Content.Application.Features.Articles.Admin.Create;
 using Content.Application.Features.Articles.Admin.Delete;
 using Content.Application.Features.Articles.Admin.GetById;
 using Content.Application.Features.Articles.Admin.GetList;
+using Content.Application.Features.Articles.Admin.MoveLegacyCovers;
 using Content.Application.Features.Articles.Admin.Update;
 using Content.Application.Features.Articles.Admin.UploadCover;
 using Content.Application.Features.Articles.Common;
@@ -75,6 +76,19 @@ public sealed class AdminArticlesController(ISender sender) : ControllerBase
         var upload = new CoverUpload(file.FileName, file.ContentType, file.Length, file.OpenReadStream);
         var result = await sender.Send(new UploadArticleCoverCommand(upload), cancellationToken);
         return this.ToActionResult(result.Map(ArticleResponseMapper.ToResponse));
+    }
+
+    /// <summary>
+    /// Moves covers saved before Content 008 from the database to the CDN folder <c>articles</c> and the library
+    /// folder «Статті». Safe to repeat; answers how many were moved by this call.
+    /// </summary>
+    [HttpPost("covers/move-legacy", Name = "moveLegacyAdminArticleCovers")]
+    [ProducesResponseType(typeof(LegacyArticleCoversMovedResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<LegacyArticleCoversMovedResponse>> MoveLegacyCovers(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new MoveLegacyArticleCoversCommand(), cancellationToken);
+        return this.ToActionResult(result.Map(moved => new LegacyArticleCoversMovedResponse(moved.Moved)));
     }
 
     private ActionResult<AdminArticleResponse> Map(Result<AdminArticleDetails> result)

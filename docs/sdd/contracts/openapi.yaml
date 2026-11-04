@@ -118,6 +118,8 @@ paths:
     $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1{id}
   /api/admin/articles/covers:
     $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1covers
+  /api/admin/articles/covers/move-legacy:
+    $ref: ./content/articles.openapi.yaml#/paths/~1api~1admin~1articles~1covers~1move-legacy
   /api/content/contacts:
     $ref: ./content/contacts.openapi.yaml#/paths/~1api~1content~1contacts
   /api/admin/content/contacts:

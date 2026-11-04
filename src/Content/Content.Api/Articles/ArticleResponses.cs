@@ -35,3 +35,5 @@ public sealed record SaveArticleRequest(
 
 /// <summary>A cover just put into the media library (CDN folder <c>articles</c>).</summary>
 public sealed record ArticleCoverUploadResponse(long MediaFileId, string Url);
+
+public sealed record LegacyArticleCoversMovedResponse(int Moved);

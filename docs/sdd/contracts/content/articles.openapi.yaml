@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: KedrStore Content — site articles
-  version: 0.2.0
+  version: 0.3.0
   description: >-
     Public reads of published site articles and their covers, and Manager/Admin management of articles.
     A cover is a media-library picture on the CDN (`coverUrl`, CDN folder `articles`). Covers saved before
@@ -190,6 +190,25 @@ paths:
         '403': { description: Signed in without the Manager or Admin role. }
         '413': { description: The request is larger than the upload limit. }
         '503': { description: The CDN is not configured. }
+  /api/admin/articles/covers/move-legacy:
+    post:
+      operationId: moveLegacyAdminArticleCovers
+      summary: Move covers saved before Content 008 to the CDN
+      description: >-
+        Uploads each legacy cover to the CDN under `articles/` (library folder «Статті», named after the slug), sets it
+        as the article cover, and deletes the stored bytes. Safe to repeat: a second call moves nothing. Stops at the
+        first failed upload and keeps what was already moved.
+      tags: [Admin articles]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200':
+          description: How many covers this call moved.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegacyArticleCoversMoved' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '503': { description: The CDN is not configured. }
 components:
   parameters:
     Lang:
@@ -228,6 +247,11 @@ components:
       properties:
         mediaFileId: { type: integer, format: int64 }
         url: { type: string, format: uri }
+    LegacyArticleCoversMoved:
+      type: object
+      required: [moved]
+      properties:
+        moved: { type: integer, minimum: 0 }
     ArticleSummary:
       type: object
       required: [id, slug, title, excerpt, publishedOn, coverPath, coverUrl, updatedAt]

@@ -2,6 +2,7 @@ using Ardalis.Result;
 using Content.Application.Contracts.Images;
 using Content.Application.Features.Articles.Admin.Create;
 using Content.Application.Features.Articles.Admin.Delete;
+using Content.Application.Features.Articles.Admin.MoveLegacyCovers;
 using Content.Application.Features.Articles.Admin.Update;
 using Content.Application.Features.Articles.Admin.UploadCover;
 using Content.Application.Features.Articles.Common;
@@ -169,6 +170,58 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         var removed = await SendUpdate(provider, created.Value.Id,
             Input(created.Value.Slug, "Інший заголовок") with { RemoveCover = true });
         Assert.Equal(ArticleCoverView.None, removed.Value.Cover);
+    }
+
+    [SkippableFact]
+    public async Task MoveLegacyCovers_UploadsBytesBySlug_LinksTheFile_AndASecondRunMovesNothing()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        await using var provider = BuildProvider();
+        List<ArticleCover> seeded;
+        await using (var db = postgres.CreateContext())
+            seeded = await db.ArticleCovers.AsNoTracking().ToListAsync();
+
+        try
+        {
+            var first = await SendMoveLegacy(provider);
+            var second = await SendMoveLegacy(provider);
+
+            Assert.Equal(seeded.Count, first.Value.Moved);
+            Assert.Equal(0, second.Value.Moved);
+            var upload = _media.Uploads.First();
+            Assert.Equal(("articles", "Статті"), (upload.StorageDirectory, upload.FolderName));
+            Assert.EndsWith(".webp", upload.FileName, StringComparison.Ordinal);
+            await using var db = postgres.CreateContext();
+            Assert.False(await db.ArticleCovers.AnyAsync());
+            Assert.All((await db.Articles.AsNoTracking().ToListAsync()).Where(a => a.Id.Value <= 6), article =>
+            {
+                Assert.Null(article.CoverVersion);
+                Assert.NotNull(article.CoverMediaFileId);
+            });
+        }
+        finally
+        {
+            await using var db = postgres.CreateContext();
+            await db.Database.ExecuteSqlRawAsync(
+                """UPDATE content."Articles" SET "CoverVersion" = 1, "CoverMediaFileId" = NULL WHERE "Id" <= 6""");
+            foreach (var cover in seeded)
+                await db.Database.ExecuteSqlRawAsync(
+                    """INSERT INTO content."ArticleCovers" ("ArticleId", "Data", "ContentType") VALUES ({0}, {1}, {2}) ON CONFLICT DO NOTHING""",
+                    cover.ArticleId.Value, cover.Data, cover.ContentType);
+        }
+    }
+
+    private async Task<Result<LegacyArticleCoversMoved>> SendMoveLegacy(ServiceProvider provider)
+    {
+        await using var scope = provider.CreateAsyncScope();
+        return await new MoveLegacyArticleCoversCommandHandler(
+                scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
+                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
+                _media,
+                new TestContentEditor(),
+                TimeProvider.System)
+            .Handle(new MoveLegacyArticleCoversCommand(), default);
     }
 
     private static ArticleInput Input(string? slug, string ukTitle, bool isPublished = true) => new(slug, Day, isPublished,
