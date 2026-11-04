@@ -1,4 +1,4 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Features.Gallery.Common;
 
 namespace Content.Application.Features.Gallery.Admin.AddVideo;
@@ -7,7 +7,7 @@ namespace Content.Application.Features.Gallery.Admin.AddVideo;
 public sealed class AddGalleryVideoCommandHandler(
     IContentRepository<GalleryItem> repository,
     IReadContentDbContext db,
-    IGalleryImageReader images,
+    IMediaImageReader images,
     TimeProvider clock)
     : ICommandHandler<AddGalleryVideoCommand, Result<IReadOnlyList<AdminGalleryItem>>>
 {

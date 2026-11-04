@@ -152,6 +152,22 @@ paths:
     $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1items~1{id}
   /api/admin/content/gallery/order:
     $ref: ./content/gallery.openapi.yaml#/paths/~1api~1admin~1content~1gallery~1order
+  /api/content/{lang}/home:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1content~1{lang}~1home
+  /api/admin/content/home:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home
+  /api/admin/content/home/faq:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1faq
+  /api/admin/content/home/faq/{id}:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1faq~1{id}
+  /api/admin/content/home/faq/order:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1faq~1order
+  /api/admin/content/home/brands:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands
+  /api/admin/content/home/brands/{id}:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1{id}
+  /api/admin/content/home/brands/order:
+    $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1order
   /api/admin/media/folders:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders
   /api/admin/media/folders/{id}:

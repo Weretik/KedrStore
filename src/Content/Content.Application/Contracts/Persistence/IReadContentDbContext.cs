@@ -10,4 +10,6 @@ public interface IReadContentDbContext
     DbSet<CompanyRequisitesChange> CompanyRequisitesChanges { get; }
     DbSet<LegalDocumentVersion> LegalDocumentVersions { get; }
     DbSet<GalleryItem> GalleryItems { get; }
+    DbSet<HomeFaqItem> HomeFaqItems { get; }
+    DbSet<HomeBrand> HomeBrands { get; }
 }

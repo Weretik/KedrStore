@@ -1,4 +1,4 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Contracts.Persistence;
 using Content.Application.Features.Gallery.Public.GetList;
 using Content.Domain.Gallery;
@@ -54,10 +54,10 @@ public sealed class GalleryPostgresTests(ContentPostgresFixture postgres)
         return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
     }
 
-    private sealed class NoPhotos : IGalleryImageReader
+    private sealed class NoPhotos : IMediaImageReader
     {
-        public Task<IReadOnlyDictionary<long, GalleryImage>> GetImagesAsync(IReadOnlyCollection<long> mediaFileIds,
+        public Task<IReadOnlyDictionary<long, MediaImage>> GetImagesAsync(IReadOnlyCollection<long> mediaFileIds,
             CancellationToken cancellationToken)
-            => Task.FromResult<IReadOnlyDictionary<long, GalleryImage>>(new Dictionary<long, GalleryImage>());
+            => Task.FromResult<IReadOnlyDictionary<long, MediaImage>>(new Dictionary<long, MediaImage>());
     }
 }

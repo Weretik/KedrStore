@@ -1,4 +1,4 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Features.Gallery.Common;
 
 namespace Content.Application.Features.Gallery.Admin.Reorder;
@@ -10,7 +10,7 @@ namespace Content.Application.Features.Gallery.Admin.Reorder;
 public sealed class ReorderGalleryCommandHandler(
     IContentRepository<GalleryItem> repository,
     IReadContentDbContext db,
-    IGalleryImageReader images,
+    IMediaImageReader images,
     TimeProvider clock)
     : ICommandHandler<ReorderGalleryCommand, Result<IReadOnlyList<AdminGalleryItem>>>
 {

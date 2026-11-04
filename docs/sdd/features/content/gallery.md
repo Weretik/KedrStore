@@ -8,7 +8,7 @@ The cards of the site gallery page: photos picked from the media library and You
 
 [GalleryItem](../../../../src/Content/Content.Domain/Gallery/GalleryItem.cs) is the aggregate: a photo holds a `MediaFileId` (a value, not a foreign key), a video holds the 11-character YouTube ID, and both hold a position and the optional texts ([GalleryItemTexts](../../../../src/Content/Content.Domain/Gallery/GalleryItemTexts.cs): empty becomes none, title up to 150, caption up to 500). [YoutubeVideoId](../../../../src/Content/Content.Domain/Gallery/YoutubeVideoId.cs) reads the ID from watch, youtu.be, shorts, embed and live links or the bare ID and rejects other hosts.
 
-Photos come from the Media module only through [IMediaFileLookup](../../../../src/Media/Media.Contracts/Files/IMediaFileLookup.cs) (Media.Contracts): Content.Application asks its own port `IGalleryImageReader`, and [GalleryImageReader](../../../../src/Content/Content.Infrastructure/Gallery/GalleryImageReader.cs) adapts the lookup. A photo whose library file was deleted is hidden on the site and marked `fileMissing` in the admin. A video poster is YouTube's `hqdefault.jpg`. The paste preview asks YouTube's public oEmbed for the title ([YoutubeOEmbedClient](../../../../src/Content/Content.Infrastructure/Gallery/YoutubeOEmbedClient.cs), 5 s timeout, `null` on any failure).
+Photos come from the Media module only through [IMediaFileLookup](../../../../src/Media/Media.Contracts/Files/IMediaFileLookup.cs) (Media.Contracts): Content.Application asks its own port `IMediaImageReader`, and [MediaImageReader](../../../../src/Content/Content.Infrastructure/MediaLibrary/MediaImageReader.cs) adapts the lookup. A photo whose library file was deleted is hidden on the site and marked `fileMissing` in the admin. A video poster is YouTube's `hqdefault.jpg`. The paste preview asks YouTube's public oEmbed for the title ([YoutubeOEmbedClient](../../../../src/Content/Content.Infrastructure/Gallery/YoutubeOEmbedClient.cs), 5 s timeout, `null` on any failure).
 
 Handlers live in `Features/Gallery/{Public,Admin}`; every admin change answers with the whole gallery ([GalleryAdminList](../../../../src/Content/Content.Application/Features/Gallery/Common/GalleryAdminList.cs)):
 
@@ -28,7 +28,8 @@ src/Content/
 │   ├── Controllers/AdminGalleryController.cs    # list, photos, videos, youtube-preview, items/{id}, order
 │   └── Gallery/GalleryResponses.cs              # responses, requests, mapping
 ├── Content.Application/
-│   ├── Contracts/Gallery/                       # IGalleryImageReader, IYoutubeVideoInfo
+│   ├── Contracts/Gallery/IYoutubeVideoInfo.cs
+│   ├── Contracts/MediaLibrary/IMediaImageReader.cs  # shared with home brands
 │   └── Features/Gallery/
 │       ├── Common/                              # DTOs, admin list loader, texts validator, YouTube poster URL
 │       ├── Public/GetList/
@@ -36,7 +37,8 @@ src/Content/
 ├── Content.Domain/Gallery/                      # item aggregate, texts, kind, YouTube ID parser, errors
 └── Content.Infrastructure/
     ├── Configurations/GalleryItemConfiguration.cs
-    ├── Gallery/                                 # Media lookup adapter, YouTube oEmbed client
+    ├── Gallery/YoutubeOEmbedClient.cs
+    ├── MediaLibrary/MediaImageReader.cs         # Media lookup adapter (also home brand logos)
     ├── Seed/LegacyGallerySeed.cs                # the seven site videos
     └── Migrations/*_AddGallery.cs, *_SeedGallery.cs
 ```

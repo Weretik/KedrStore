@@ -1,4 +1,4 @@
-using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 
 namespace Content.Application.Features.Gallery.Common;
 
@@ -6,7 +6,7 @@ namespace Content.Application.Features.Gallery.Common;
 public static class GalleryAdminList
 {
     public static async Task<IReadOnlyList<AdminGalleryItem>> LoadAsync(IReadContentDbContext db,
-        IGalleryImageReader images, CancellationToken cancellationToken)
+        IMediaImageReader images, CancellationToken cancellationToken)
     {
         var items = await db.GalleryItems.AsNoTracking()
             .OrderBy(item => item.Position).ThenBy(item => item.Id)
@@ -17,7 +17,7 @@ public static class GalleryAdminList
 
         return items.Select(item =>
         {
-            GalleryImage? file = null;
+            MediaImage? file = null;
             if (item.MediaFileId is { } fileId)
                 files.TryGetValue(fileId, out file);
             var preview = item.Kind == GalleryItemKind.Video ? YoutubeThumbnails.Url(item.YoutubeId!) : file?.Url;

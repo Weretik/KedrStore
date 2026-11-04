@@ -28,6 +28,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Company requisites](content/company-requisites.md) — ФОП, code, IBAN and bank for the requisites page; Admin only, every change logged.
 - [Site documents](content/legal-documents.md) — offer, privacy, returns and delivery texts with numbered editions and «Редакція від».
 - [Site gallery](content/gallery.md) — media-library photos and YouTube videos by link, ordered, with optional uk/ru titles and captions.
+- [Home page FAQ and brands](content/home-blocks.md) — home FAQ in uk/ru and brands with media-library logos, ordered.
 
 ## Media
 

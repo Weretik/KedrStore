@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Content.Application.Contracts.Gallery;
+using Content.Application.Contracts.MediaLibrary;
 using Content.Application.Contracts.Persistence;
 using Content.Domain.Gallery;
 using Content.Infrastructure.DataBase;
@@ -139,20 +140,20 @@ public sealed class GalleryApiTests
                 services.RemoveAll<ContentDbContext>();
                 services.AddSingleton(db);
                 services.AddSingleton<IReadContentDbContext>(db);
-                services.RemoveAll<IGalleryImageReader>();
-                services.AddSingleton<IGalleryImageReader, FakeMediaLibrary>();
+                services.RemoveAll<IMediaImageReader>();
+                services.AddSingleton<IMediaImageReader, FakeMediaLibrary>();
                 services.RemoveAll<IYoutubeVideoInfo>();
                 services.AddSingleton<IYoutubeVideoInfo, FakeYoutube>();
             });
         });
 
-    private sealed class FakeMediaLibrary : IGalleryImageReader
+    private sealed class FakeMediaLibrary : IMediaImageReader
     {
-        public Task<IReadOnlyDictionary<long, GalleryImage>> GetImagesAsync(IReadOnlyCollection<long> mediaFileIds,
+        public Task<IReadOnlyDictionary<long, MediaImage>> GetImagesAsync(IReadOnlyCollection<long> mediaFileIds,
             CancellationToken cancellationToken)
-            => Task.FromResult<IReadOnlyDictionary<long, GalleryImage>>(mediaFileIds
+            => Task.FromResult<IReadOnlyDictionary<long, MediaImage>>(mediaFileIds
                 .Where(id => id is 7 or 8).Distinct()
-                .ToDictionary(id => id, id => new GalleryImage(
+                .ToDictionary(id => id, id => new MediaImage(
                     $"https://images-kedr.cdn.express/gallery/{id}.jpg", $"{id}.jpg", 1200, 800)));
     }
 
