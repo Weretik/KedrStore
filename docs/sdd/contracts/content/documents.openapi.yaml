@@ -27,7 +27,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PublishedLegalDocument' }
         '400': { description: The language is not `uk` or `ru`. }
-        '404': { description: Unknown kind, or nothing is published yet. }
+        '404': { description: 'Unknown kind, or nothing is published yet.' }
   /api/admin/content/documents:
     get:
       operationId: getAdminLegalDocuments
@@ -83,7 +83,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
-        '400': { description: Invalid texts, or nothing is published and no texts were given (`texts`). }
+        '400': { description: 'Invalid texts, or nothing is published and no texts were given (`texts`).' }
         '401': { description: Not signed in. }
         '403': { description: Not a Manager or Admin. }
         '404': { description: Unknown kind. }
