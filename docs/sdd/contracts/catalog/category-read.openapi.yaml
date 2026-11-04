@@ -371,3 +371,15 @@ components:
         level: { type: integer, minimum: 0 }
         isDeleted: { type: boolean }
         deletedAt: { type: [string, 'null'], format: date-time }
+        productCount:
+          type: [integer, 'null']
+          minimum: 0
+          description: >-
+            Active products of the category and all its descendants, on the site or not. Filled in the active list
+            (`deleted=false`) only; `null` elsewhere.
+        filledContentLanguages:
+          type: [array, 'null']
+          items: { type: string, enum: [uk, ru] }
+          description: >-
+            Languages that have at least one site text field or FAQ item, sorted. Filled in the active list only;
+            `null` elsewhere.

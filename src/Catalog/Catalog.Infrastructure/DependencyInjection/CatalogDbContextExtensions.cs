@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Category.AdminGetList;
 using Catalog.Application.Features.Category.Stats;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
@@ -29,6 +30,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped<IProductListProjectionRebuilder, ProductListProjectionRebuilder>();
         services.AddScoped<ISlugService, SlugService>();
         services.AddScoped<ICategoryStatsReader, CategoryStatsReader>();
+        services.AddScoped<IAdminCategoryInsightsReader, AdminCategoryInsightsReader>();
 
         services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();
 
