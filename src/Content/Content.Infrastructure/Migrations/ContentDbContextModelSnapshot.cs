@@ -131,6 +131,80 @@ namespace Content.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisites", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BankCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Iban")
+                        .IsRequired()
+                        .HasMaxLength(29)
+                        .HasColumnType("character varying(29)");
+
+                    b.Property<string>("LegalName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("RegistrationExtractNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyRequisites", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_CompanyRequisites_Singleton", "\"Id\" = 1");
+                        });
+                });
+
+            modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisitesChange", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ChangedByName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ChangedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedAt");
+
+                    b.ToTable("CompanyRequisitesChanges", "content");
+                });
+
             modelBuilder.Entity("Content.Domain.Articles.Article", b =>
                 {
                     b.OwnsMany("Content.Domain.Articles.ArticleTranslation", "Translations", b1 =>
@@ -176,6 +250,39 @@ namespace Content.Infrastructure.Migrations
                         .HasForeignKey("Content.Domain.Articles.ArticleCover", "ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisitesChange", b =>
+                {
+                    b.OwnsMany("Content.Domain.Requisites.RequisitesFieldChange", "Changes", b1 =>
+                        {
+                            b1.Property<long>("CompanyRequisitesChangeId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<string>("Field")
+                                .IsRequired();
+
+                            b1.Property<string>("NewValue")
+                                .IsRequired();
+
+                            b1.Property<string>("OldValue")
+                                .IsRequired();
+
+                            b1.HasKey("CompanyRequisitesChangeId", "__synthesizedOrdinal");
+
+                            b1.ToTable("CompanyRequisitesChanges", "content");
+
+                            b1
+                                .ToJson("Changes")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyRequisitesChangeId");
+                        });
+
+                    b.Navigation("Changes");
                 });
 #pragma warning restore 612, 618
         }

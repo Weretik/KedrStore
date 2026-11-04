@@ -122,6 +122,12 @@ paths:
     $ref: ./content/contacts.openapi.yaml#/paths/~1api~1content~1contacts
   /api/admin/content/contacts:
     $ref: ./content/contacts.openapi.yaml#/paths/~1api~1admin~1content~1contacts
+  /api/content/requisites:
+    $ref: ./content/requisites.openapi.yaml#/paths/~1api~1content~1requisites
+  /api/admin/content/requisites:
+    $ref: ./content/requisites.openapi.yaml#/paths/~1api~1admin~1content~1requisites
+  /api/admin/content/requisites/history:
+    $ref: ./content/requisites.openapi.yaml#/paths/~1api~1admin~1content~1requisites~1history
   /api/admin/media/folders:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1folders
   /api/admin/media/folders/{id}:

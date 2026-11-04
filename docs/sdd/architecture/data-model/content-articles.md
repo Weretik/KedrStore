@@ -1,4 +1,4 @@
-# Content: site articles and company contacts
+# Content: site articles, company contacts and requisites
 
 **Checked:** 2026-11-04 against `ContentDbContext` and its configurations. Schema `content`; migration history in `content."__EFMigrationsHistory"`.
 
@@ -38,8 +38,25 @@ erDiagram
         varchar80 CityRu
         timestamptz UpdatedAt
     }
+    CompanyRequisites {
+        int Id PK "always 1 (check constraint)"
+        varchar200 LegalName
+        varchar10 Code "ЄДРПОУ or РНОКПП"
+        varchar30 RegistrationExtractNumber
+        varchar29 Iban "no spaces"
+        varchar120 BankName
+        varchar6 BankCode "МФО"
+        timestamptz UpdatedAt
+    }
+    CompanyRequisitesChanges {
+        bigint Id PK
+        timestamptz ChangedAt
+        varchar64 ChangedByUserId
+        varchar256 ChangedByName
+        jsonb Changes "field, old, new"
+    }
 ```
 
-Index `(IsPublished, PublishedOn)` serves the public list. The `SeedLegacyArticles` migration inserts articles 1–6 and moves the identity sequence past them. `CompanyContacts` has exactly one row, inserted by the `AddCompanyContacts` migration. The module has no references to other modules' tables.
+Index `(IsPublished, PublishedOn)` serves the public list. The `SeedLegacyArticles` migration inserts articles 1–6 and moves the identity sequence past them. `CompanyContacts` has exactly one row, inserted by the `AddCompanyContacts` migration; `CompanyRequisites` likewise by `AddCompanyRequisites`, which also creates the change log (index on `ChangedAt`, no link to the row because there is only one). The module has no references to other modules' tables.
 
-Features: [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md).
+Features: [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md).

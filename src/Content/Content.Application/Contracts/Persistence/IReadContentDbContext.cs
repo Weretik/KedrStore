@@ -6,4 +6,6 @@ public interface IReadContentDbContext
     DbSet<Article> Articles { get; }
     DbSet<ArticleCover> ArticleCovers { get; }
     DbSet<CompanyContacts> CompanyContacts { get; }
+    DbSet<CompanyRequisites> CompanyRequisites { get; }
+    DbSet<CompanyRequisitesChange> CompanyRequisitesChanges { get; }
 }

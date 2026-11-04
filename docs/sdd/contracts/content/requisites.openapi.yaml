@@ -1,0 +1,127 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — company requisites
+  version: 0.1.0
+  description: >-
+    The one set of payment requisites the site shows on the requisites page (ФОП name, ЄДРПОУ/РНОКПП, extract number,
+    IBAN, bank). Editing is Admin only and every saved change is logged with who, when, and the old and new values.
+    The IBAN is stored without spaces; clients group it for display.
+paths:
+  /api/content/requisites:
+    get:
+      operationId: getCompanyRequisites
+      summary: Get the company requisites
+      description: Public, because the requisites page is shown to anonymous visitors.
+      tags: [Requisites]
+      security: []
+      responses:
+        '200':
+          description: The requisites.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyRequisites' }
+        '404': { description: The requisites row is missing (it is created by a migration). }
+  /api/admin/content/requisites:
+    get:
+      operationId: getAdminCompanyRequisites
+      summary: Get the company requisites for editing
+      description: Requires the Admin role.
+      tags: [Requisites]
+      responses:
+        '200':
+          description: The requisites.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyRequisites' }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+        '404': { description: The requisites row is missing. }
+    put:
+      operationId: updateAdminCompanyRequisites
+      summary: Replace all company requisites
+      description: >-
+        Requires the Admin role. All fields are required and replaced at once; values are trimmed and spaces are removed
+        from the IBAN. When something changed, one history entry is written in the same transaction; saving the same
+        values writes nothing.
+      tags: [Requisites]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveCompanyRequisitesRequest' }
+      responses:
+        '200':
+          description: The saved requisites.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompanyRequisites' }
+        '400':
+          description: >-
+            Invalid input; each error names the field (`legalName`, `code`, `registrationExtractNumber`, `iban`,
+            `bankName`, `bankCode`). A bank code that differs from the one inside the IBAN is reported on `bankCode`.
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+        '404': { description: The requisites row is missing. }
+  /api/admin/content/requisites/history:
+    get:
+      operationId: getAdminCompanyRequisitesHistory
+      summary: List the latest requisites changes
+      description: Requires the Admin role. The 50 newest entries, newest first.
+      tags: [Requisites]
+      responses:
+        '200':
+          description: The change log.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 50
+                items: { $ref: '#/components/schemas/CompanyRequisitesChange' }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+components:
+  schemas:
+    SaveCompanyRequisitesRequest:
+      type: object
+      required: [legalName, code, registrationExtractNumber, iban, bankName, bankCode]
+      properties:
+        legalName: { type: string, minLength: 1, maxLength: 200, examples: ['ФОП Овчинников Максим Володимирович'] }
+        code: { type: string, pattern: '^(\d{8}|\d{10})$', description: ЄДРПОУ (8 digits) or РНОКПП (10 digits). }
+        registrationExtractNumber: { type: string, pattern: '^\d{1,30}$' }
+        iban:
+          type: string
+          description: Ukrainian IBAN (`UA` + 27 digits) with a valid checksum; spaces are allowed and removed.
+          examples: ['UA303052990000026007025905216']
+        bankName: { type: string, minLength: 1, maxLength: 120 }
+        bankCode: { type: string, pattern: '^\d{6}$', description: МФО; must match digits 5–10 of the IBAN. }
+    CompanyRequisites:
+      allOf:
+        - $ref: '#/components/schemas/SaveCompanyRequisitesRequest'
+        - type: object
+          required: [updatedAt]
+          properties:
+            iban: { type: string, pattern: '^UA\d{27}$' }
+            updatedAt: { type: string, format: date-time }
+    RequisitesFieldChange:
+      type: object
+      required: [field, oldValue, newValue]
+      properties:
+        field:
+          type: string
+          enum: [legalName, code, registrationExtractNumber, iban, bankName, bankCode]
+        oldValue: { type: string }
+        newValue: { type: string }
+    CompanyRequisitesChange:
+      type: object
+      required: [id, changedAt, changedBy, changes]
+      properties:
+        id: { type: integer, format: int64 }
+        changedAt: { type: string, format: date-time }
+        changedBy: { type: string, description: The editor's email (or user name) at the time of the change. }
+        changes:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/RequisitesFieldChange' }
