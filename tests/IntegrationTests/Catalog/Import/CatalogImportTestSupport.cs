@@ -33,7 +33,6 @@ internal static class CatalogImportTestSupport
             new ProductTranslationImporter(new TestRepository<ProductTranslation>(db), NullLogger<ProductTranslationImporter>.Instance),
             new OptionsSnapshot<RootCategoryId>(Options()),
             new NoopProjectionRebuilder(),
-            new NoopPhotoCheckStore(),
             NullLogger<SyncOneCProductDetailsJob>.Instance);
 
     public static SyncOneCCategoryJob CategoryJob(CatalogDbContext db, FakeOneC oneC)
@@ -86,17 +85,7 @@ internal static class CatalogImportTestSupport
     private sealed class NoopProjectionRebuilder : IProductListProjectionRebuilder
     {
         public Task RebuildAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-    }
 
-    private sealed class NoopPhotoCheckStore : IProductPhotoCheckStore
-    {
-        public Task<IReadOnlyList<ProductPhotoCandidate>> GetActiveProductBatchAsync(int afterProductId, int take,
-            CancellationToken cancellationToken) => throw new NotSupportedException();
-
-        public Task ReconcileAsync(IReadOnlyCollection<ProductPhotoCandidate> products, CancellationToken cancellationToken)
-            => Task.CompletedTask;
-
-        public Task<int> SaveResultsAsync(IReadOnlyCollection<ProductPhotoCheckUpdate> updates, DateTimeOffset checkedAtUtc,
-            CancellationToken cancellationToken) => throw new NotSupportedException();
+        public Task<int> RefreshPhotosAsync(CancellationToken cancellationToken = default) => Task.FromResult(0);
     }
 }

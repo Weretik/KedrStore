@@ -41,13 +41,33 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(p => new { p.CategoryId, p.IsDeleted, p.IsSale, p.IsNew })
             .HasDatabaseName("IX_Products_ListFilters");
 
+        // Cache of the first photo and the scheme URL, empty without them; the links below are the source (R-30).
         builder.Property(p => p.Photo)
-            .HasMaxLength(1000)
+            .HasMaxLength(ProductMediaLink.UrlMaxLength)
+            .HasDefaultValue(string.Empty)
             .IsRequired();
 
         builder.Property(p => p.Sсheme)
-            .HasMaxLength(1000)
+            .HasMaxLength(ProductMediaLink.UrlMaxLength)
+            .HasDefaultValue(string.Empty)
             .IsRequired();
+
+        builder.OwnsMany(p => p.MediaLinks, links =>
+        {
+            links.ToTable("ProductMedia");
+            links.WithOwner().HasForeignKey("ProductId");
+            links.Property<ProductId>("ProductId").HasConversion(CatalogConverter.ProductIdConvert);
+            links.HasKey("ProductId", nameof(ProductMediaLink.MediaFileId));
+            links.Property(link => link.MediaFileId).ValueGeneratedNever();
+            links.Property(link => link.Kind).HasConversion<int>().IsRequired();
+            links.Property(link => link.Position).IsRequired();
+            links.Property(link => link.Url).HasMaxLength(ProductMediaLink.UrlMaxLength).IsRequired();
+            // Finds the products of a replaced or deleted library file (R-35).
+            links.HasIndex(link => link.MediaFileId).HasDatabaseName("IX_ProductMedia_MediaFileId");
+        });
+        builder.Navigation(p => p.MediaLinks).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Ignore(p => p.Photos);
+        builder.Ignore(p => p.Scheme);
 
         builder.Property(p => p.Stock)
             .HasPrecision(10, 2)

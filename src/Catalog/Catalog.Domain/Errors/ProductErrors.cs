@@ -18,14 +18,6 @@ public static class ProductErrors
         new("Catalog.Product.CategoryId.Required",
             "Product category id is required");
 
-    public static CatalogDomainError PhotoRequired() =>
-        new("Catalog.Product.Photo.Required",
-            "Product photo is required");
-
-    public static CatalogDomainError SchemeInvalid() =>
-        new("Catalog.Product.Scheme.Invalid",
-            "Product scheme cannot be empty or whitespace");
-
     public static CatalogDomainError StockOutOfRange(decimal value) =>
         new("Catalog.Product.Stock.OutOfRange",
             $"Stock must be between 0 and 10000. Actual: {value}");

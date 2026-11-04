@@ -14,14 +14,13 @@ KedrStore PostgreSQL
     │   │   ├── CategoryFaqItems           # FAQ of one content row
     │   │   └── CatalogSlugHistory         # former product and category slugs
     │   ├── Products and prices
-    │   │   ├── Products                   # product and CategoryId
+    │   │   ├── Products                   # product and CategoryId, photo/scheme cache
+    │   │   ├── ProductMedia               # photo and scheme links to media files
     │   │   ├── ProductPrices              # product prices
     │   │   ├── ProductTranslations        # localized names
     │   │   └── PriceType                  # price types
-    │   ├── List projection
-    │   │   └── ProductListProjections     # denormalized product reads
-    │   └── Photo check
-    │       └── ProductPhotoChecks         # photo-check result
+    │   └── List projection
+    │       └── ProductListProjections     # denormalized product reads
     ├── Sales / SalesDbContext — 10 tables
     │   ├── Customers
     │   │   ├── Counterparties             # counterparties
@@ -72,7 +71,7 @@ KedrStore PostgreSQL
 | Category tree | [Categories](catalog-categories.md) | [Catalog categories](../../features/catalog/categories.md) |
 | Products, translations, and prices | [Products and prices](catalog-products.md) | [Public products](../../features/catalog/public-products.md), [1C import](../../features/catalog/one-c-import.md) |
 | List and stock data | [List projection](catalog-stock-projection.md) | [Product projection](../../features/catalog/stock-projection.md) |
-| Photo status | [Photo check](catalog-photo-check.md) | [Photo check](../../features/catalog/photo-check.md) |
+| Product photos and schemes | [Products and prices](catalog-products.md) | [Product photos and schemes](../../features/catalog/product-media.md) |
 | Counterparties and their prices | [Customers](sales-customers.md) | [Customers and counterparties](../../features/sales/customers.md) |
 | Orders, drafts, and sync | [Orders](sales-orders.md) | [Manager orders](../../features/sales/admin-orders.md), [Admin workspace](../../features/sales/admin-order-workspace.md) |
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |

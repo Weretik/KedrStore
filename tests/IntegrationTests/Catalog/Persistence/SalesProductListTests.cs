@@ -91,7 +91,7 @@ public sealed class SalesProductListTests
     {
         var productId = ProductId.From(id);
         db.Products.Add(Product.Create(productId, Root, $"Product {id}", $"product-{id}",
-            ProductCategoryId.From(categoryId), $"https://example.test/{id}.jpg", $"https://example.test/{id}-scheme.jpg", DateTimeOffset.UnixEpoch, stock: 5, qtyInPack: 1,
+            ProductCategoryId.From(categoryId), DateTimeOffset.UnixEpoch, stock: 5, qtyInPack: 1,
             isNew: false, isSale: false));
         db.ProductPrices.Add(ProductPrice.Create(Root, productId, PriceTypeId.From(Retail), new Money(retail, "UAH")));
         if (wholesale is not null)

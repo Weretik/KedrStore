@@ -150,14 +150,7 @@ public sealed class ProductListProjection
         ProductSlug = productSlug.Trim();
     }
 
-    private void SetPhoto(string photo)
-    {
-        if (string.IsNullOrWhiteSpace(photo))
-        {
-            throw new DomainException(ProductErrors.PhotoRequired());
-        }
-
-        Photo = photo.Trim();
-    }
+    /// <summary>Empty when the product has no linked photo (R-30).</summary>
+    private void SetPhoto(string? photo) => Photo = photo?.Trim() ?? string.Empty;
     #endregion
 }

@@ -10,5 +10,3 @@ public interface IMediaFileLookup
         IReadOnlyCollection<long> ids, CancellationToken cancellationToken);
 }
 
-/// <summary>A library file as other modules see it: public CDN URL and pixel size when known.</summary>
-public sealed record MediaFileReference(long Id, string FileName, string Url, int? Width, int? Height);

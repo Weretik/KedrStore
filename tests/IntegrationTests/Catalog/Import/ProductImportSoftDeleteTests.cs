@@ -7,7 +7,7 @@ using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 
 namespace IntegrationTests.Catalog.Import;
 
-/// <summary>SC-001, SC-003, SC-004, SC-005, SC-013, SC-014 on the product import.</summary>
+/// <summary>SC-001, SC-003, SC-004, SC-005, SC-013, SC-014 and media SC-34 on the product import.</summary>
 public sealed class ProductImportSoftDeleteTests
 {
     [Fact]
@@ -35,6 +35,27 @@ public sealed class ProductImportSoftDeleteTests
         Assert.Equal("zamok-novyi", all[100].ProductSlug);
         Assert.False(all.ContainsKey(101));
         Assert.Equal(10, await db.Products.CountAsync());
+    }
+
+    [Fact]
+    public async Task Import_KeepsMediaLinksOfKnownProducts_AndStartsNewProductsWithoutPhoto()
+    {
+        await using var db = CreateContext();
+        Seed(db, productCount: 2);
+        var linked = await db.Products.SingleAsync(product => product.Id == ProductId.From(1));
+        linked.SetMedia([new ProductMediaFile(10, "https://images-kedr.cdn.express/products/1.jpg")],
+            new ProductMediaFile(11, "https://images-kedr.cdn.express/product-scheme/s1.jpg"), DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        var oneC = new FakeOneC { Products = [Row(1, "Замки", "Нова назва"), Row(2, "Замки"), Row(100, "Замки")] };
+
+        await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
+
+        db.ChangeTracker.Clear();
+        var all = await db.Products.ToDictionaryAsync(product => product.Id.Value);
+        Assert.Equal(2, all[1].MediaLinks.Count);
+        Assert.Equal("https://images-kedr.cdn.express/products/1.jpg", all[1].Photo);
+        Assert.Equal(string.Empty, all[100].Photo);
+        Assert.Equal(string.Empty, all[100].Sсheme);
     }
 
     [Fact]
@@ -104,7 +125,6 @@ public sealed class ProductImportSoftDeleteTests
         for (var id = 1; id <= productCount; id++)
         {
             db.Products.Add(Product.Create(ProductId.From(id), Root, $"Product {id}", $"product-{id}", ProductCategoryId.From(10),
-                $"https://images-kedr.cdn.express/products/{id}.jpg", $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg",
                 DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true));
         }
 

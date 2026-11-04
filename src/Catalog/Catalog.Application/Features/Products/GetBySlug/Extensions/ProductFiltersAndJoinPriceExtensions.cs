@@ -1,3 +1,4 @@
+using Catalog.Domain.Enums;
 using Catalog.Application.Features.Products.GetBySlug.DTOs;
 using Catalog.Domain.ValueObjects;
 
@@ -51,6 +52,11 @@ public static class ProductFiltersAndJoinPriceExtensions
             UpdatedAt = query.product.UpdatedAt ?? query.product.CreatedAt,
             Photo = query.product.Photo,
             Scheme = query.product.Sсheme,
+            Photos = query.product.MediaLinks
+                .Where(link => link.Kind == ProductMediaKind.Photo)
+                .OrderBy(link => link.Position)
+                .Select(link => link.Url)
+                .ToList(),
             Stock = query.product.Stock,
             CategoryName = query.category!.Name,
             CategorySlug = query.category.Slug,

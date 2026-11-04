@@ -14,6 +14,8 @@ public sealed record GetAdminProductsRequest
     public bool? ExportToSite { get; init; }
     /// <summary><c>true</c> lists soft-deleted products only. Admin role only.</summary>
     public bool? Deleted { get; init; }
+    /// <summary><c>true</c> lists products without a linked photo only (R-36).</summary>
+    public bool? WithoutPhoto { get; init; }
 
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }

@@ -114,6 +114,9 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
         if (request.ExportToSite.HasValue)
             productsQuery = productsQuery.Where(projection => projection.ExportToSite == request.ExportToSite.Value);
 
+        if (request.WithoutPhoto == true)
+            productsQuery = productsQuery.Where(projection => projection.Photo == string.Empty);
+
         if (request.PriceFrom is not null)
             productsQuery = productsQuery.Where(projection => projection.RetailPrice != null && projection.RetailPrice >= request.PriceFrom.Value);
 

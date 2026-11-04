@@ -19,6 +19,7 @@ internal sealed class MediaFileLookup(MediaDbContext db, IMediaUrlBuilder urls) 
 
         return files.ToDictionary(
             file => file.Id.Value,
-            file => new MediaFileReference(file.Id.Value, file.FileName, urls.Build(file.StorageKey), file.Width, file.Height));
+            file => new MediaFileReference(
+                file.Id.Value, file.StorageKey, file.FileName, urls.Build(file.StorageKey), file.Width, file.Height));
     }
 }

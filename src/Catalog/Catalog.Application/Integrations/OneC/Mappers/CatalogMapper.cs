@@ -118,8 +118,6 @@ public static class CatalogMapper
                 ProductTypeIdOneC: rootCategoryOneCId,
                 Name: item.Name.Trim(),
                 CategoryId: categoryId,
-                Photo: $"https://images-kedr.cdn.express/products/{id}.jpg",
-                Scheme: $"https://images-kedr.cdn.express/product-scheme/s{id}.jpg",
                 Stock: 0,
                 IsSale: item.IsSale,
                 IsNew: item.IsNew,

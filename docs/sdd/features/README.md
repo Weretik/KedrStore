@@ -8,8 +8,8 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Catalog categories](catalog/categories.md) — public list and details by slug, plus separate admin reads.
 - [Public products](catalog/public-products.md) — anonymous lists by language/category and details by slug.
-- [Admin products and photos](catalog/admin-products.md) — paged lists with server filters, full list, unavailable photos, and product details by slug.
-- [Product photo check](catalog/photo-check.md) — job that checks URLs and saves status.
+- [Admin products](catalog/admin-products.md) — paged lists with server filters (including `withoutPhoto`), full list, and product details by slug.
+- [Product photos and schemes](catalog/product-media.md) — photos in order and a scheme linked from the media library, auto-link in the CDN sync run.
 - [Quick order](catalog/quick-order.md) — public `POST /api/orders` with Excel generation and Telegram notification.
 - [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
 - [Product and stock projection](catalog/stock-projection.md) — separate read model for product lists and its updates.

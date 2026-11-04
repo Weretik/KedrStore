@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Media.Application.Features.Files.Replace;
 
 /// <summary>
-/// Uploads the new picture, saves the row, then deletes the old CDN file. A failed old-file delete only leaves
+/// Uploads the new picture, saves the row, then deletes the old CDN file and tells the linking modules
+/// about the new URL (R-35). A failed old-file delete only leaves
 /// an orphan on the CDN (logged), never a broken link.
 /// </summary>
 public sealed class ReplaceMediaFileCommandHandler(
@@ -15,6 +16,7 @@ public sealed class ReplaceMediaFileCommandHandler(
     IImageInspector inspector,
     IMediaStorage storage,
     IMediaUrlBuilder urls,
+    MediaFileChangeNotifier changes,
     TimeProvider clock,
     ILogger<ReplaceMediaFileCommandHandler> logger)
     : ICommandHandler<ReplaceMediaFileCommand, Result<MediaFileItem>>
@@ -53,6 +55,8 @@ public sealed class ReplaceMediaFileCommandHandler(
                 previousKey, file.Id.Value);
         }
 
-        return Result.Success(MediaFileMapper.ToItem(file, urls));
+        var item = MediaFileMapper.ToItem(file, urls);
+        await changes.ReplacedAsync(file.Id.Value, item.Url, cancellationToken);
+        return Result.Success(item);
     }
 }

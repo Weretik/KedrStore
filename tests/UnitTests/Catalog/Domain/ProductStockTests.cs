@@ -33,8 +33,6 @@ public sealed class ProductStockTests
             "Product",
             "product-1",
             ProductCategoryId.From(1),
-            "https://example.test/product.jpg",
-            "https://example.test/scheme.jpg",
             DateTimeOffset.UtcNow,
             0,
             1,
