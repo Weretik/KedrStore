@@ -101,6 +101,22 @@ paths:
         '200': { description: Attributes in order, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCatalogAttributeListItem' } } } } }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
+    post:
+      operationId: createAdminCatalogAttribute
+      summary: Add an attribute («Нова ознака», Admin)
+      description: >-
+        The attribute is manual from the start, so the dictionary import leaves it. Code and slug come from the request
+        or from the name (a slug made from the name gets a number when taken); a taken code or explicit slug is rejected.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateCatalogAttributeRequest' } } }
+      responses:
+        '200': { description: The new attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
   /api/admin/catalog-attributes/{id}:
     parameters:
       - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -360,6 +376,19 @@ components:
         nameUk: { type: string, maxLength: 120 }
         nameRu: { type: [string, 'null'], maxLength: 120 }
         isFilterable: { type: boolean }
+        sortOrder: { type: integer, minimum: 0, maximum: 100000 }
+    CreateCatalogAttributeRequest:
+      type: object
+      required: [nameUk, kind, isFilterable, isVariantAxis, sortOrder]
+      properties:
+        nameUk: { type: string, maxLength: 120 }
+        nameRu: { type: [string, 'null'], maxLength: 120 }
+        kind: { type: string, enum: [enum, number], description: '`enum` - a list of values; `number` - a number in `unit`.' }
+        unit: { type: [string, 'null'], maxLength: 16 }
+        code: { type: [string, 'null'], maxLength: 64, pattern: '^[a-z0-9_]+$' }
+        slug: { type: [string, 'null'], maxLength: 80, pattern: '^[a-z0-9]+(-[a-z0-9]+)*$' }
+        isFilterable: { type: boolean }
+        isVariantAxis: { type: boolean, description: The products of a model may differ by it (offered as a model switcher). }
         sortOrder: { type: integer, minimum: 0, maximum: 100000 }
     CreateAttributeValueRequest:
       type: object

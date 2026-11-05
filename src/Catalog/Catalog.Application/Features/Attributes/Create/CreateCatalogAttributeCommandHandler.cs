@@ -1,0 +1,54 @@
+using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Attributes.Common;
+using Catalog.Application.Slugs;
+using Catalog.Contracts.Attributes;
+using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Enums;
+
+namespace Catalog.Application.Features.Attributes.Create;
+
+/// <summary>
+/// Adds an attribute to the shared dictionary (spec catalog/007 M-06). Code and slug are unique among attributes; a slug
+/// made from the name gets a number when taken, an explicit taken code or slug is refused.
+/// </summary>
+public sealed class CreateCatalogAttributeCommandHandler(
+    IReadCatalogDbContext db,
+    ICatalogRepository<CatalogAttribute> attributes,
+    CatalogAttributeReader reader,
+    TimeProvider clock)
+    : ICommandHandler<CreateCatalogAttributeCommand, Result<AdminCatalogAttributeDto>>
+{
+    public async ValueTask<Result<AdminCatalogAttributeDto>> Handle(CreateCatalogAttributeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var request = command.Request;
+        var existing = await db.Attributes.AsNoTracking()
+            .Select(attribute => new { attribute.Code, attribute.Slug })
+            .ToListAsync(cancellationToken);
+
+        var slug = string.IsNullOrWhiteSpace(request.Slug) ? Shorten(SlugText.FromName(request.NameUk, "oznaka"), 70)
+            : request.Slug.Trim();
+        var usedSlugs = existing.Select(attribute => attribute.Slug).ToHashSet(StringComparer.Ordinal);
+        if (!string.IsNullOrWhiteSpace(request.Slug) && usedSlugs.Contains(slug))
+            return AttributeValidation.Invalid("slug", "Another attribute has this slug.", "SlugTaken");
+        var unique = slug;
+        for (var number = 2; usedSlugs.Contains(unique); number++)
+            unique = SlugText.WithSuffix(slug, number);
+
+        var code = string.IsNullOrWhiteSpace(request.Code) ? Shorten(unique.Replace('-', '_'), CatalogAttribute.CodeMaxLength)
+            : request.Code.Trim();
+        if (existing.Any(attribute => string.Equals(attribute.Code, code, StringComparison.OrdinalIgnoreCase)))
+            return AttributeValidation.Invalid("code", "Another attribute has this code.", "CodeTaken");
+
+        var now = clock.GetUtcNow();
+        var kind = request.Kind == "number" ? AttributeKind.Number : AttributeKind.Enum;
+        var attribute = CatalogAttribute.Create(code, request.NameUk, kind, request.Unit, unique, request.IsFilterable,
+            request.IsVariantAxis, request.SortOrder, now);
+        attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder, now);
+        await attributes.AddAsync(attribute, cancellationToken);
+        return Result.Success((await reader.ReadAsync(attribute.Id, cancellationToken))!);
+    }
+
+    private static string Shorten(string text, int maxLength)
+        => text.Length <= maxLength ? text : text[..maxLength].TrimEnd('-', '_');
+}

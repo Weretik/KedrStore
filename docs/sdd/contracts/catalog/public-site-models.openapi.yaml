@@ -66,7 +66,7 @@ paths:
       responses:
         '200': { description: A page of model cards, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelList' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '404': { description: Unknown category, or an unknown attribute or value slug in `filter`. }
+        '404': { description: 'Unknown category, or an unknown attribute or value slug in `filter`.' }
   /api/catalog/{lang}/model/{modelSlug}:
     get:
       operationId: getPublicSiteModel
@@ -201,7 +201,7 @@ components:
         texts: { $ref: '#/components/schemas/PublicSiteModelText' }
         mainProductSlug: { type: [string, 'null'] }
         axes: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelAxis' } }
-        products: { type: array, description: In stock first, then by name., items: { $ref: '#/components/schemas/PublicSiteModelProduct' } }
+        products: { type: array, description: 'In stock first, then by name.', items: { $ref: '#/components/schemas/PublicSiteModelProduct' } }
         characteristics: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelCharacteristic' } }
     PublicSiteModelCategory:
       type: object

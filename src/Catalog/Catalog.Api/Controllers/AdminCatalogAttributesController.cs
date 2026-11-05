@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Attributes.Create;
 using Catalog.Application.Features.Attributes.CreateValue;
 using Catalog.Application.Features.Attributes.DecideCode;
 using Catalog.Application.Features.Attributes.Get;
@@ -35,6 +36,16 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminCatalogAttributeDto>> Get([FromRoute] int id, CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(new GetCatalogAttributeQuery(id), cancellationToken));
+
+    /// <summary>«Нова ознака»: an attribute of the owner's own (Admin only).</summary>
+    [HttpPost(Name = "createAdminCatalogAttribute")]
+    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [ProducesResponseType(typeof(AdminCatalogAttributeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<AdminCatalogAttributeDto>> Create([FromBody] CreateCatalogAttributeRequest request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new CreateCatalogAttributeCommand(request), cancellationToken));
 
     [HttpPut("{id:int}", Name = "updateAdminCatalogAttribute")]
     [Authorize(Policy = PolicyNames.RequireAdminRole)]
