@@ -16,7 +16,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | `category`, `productdetails`, `stocks`, `prices` | One or more `--rootId=<id>` | Targeted Catalog root refresh |
 | `rebuild-projections` | — | Rebuild Catalog product-list read model |
 | `media-cdn-sync` | `--dry-run` (optional) | Registers CDN pictures in the media library, then links them to products, refreshes the photo cache, and lays out product files in folders by category; with `--dry-run` only reports ([runbook](media-cdn-sync-runbook.md)) |
-| `import-catalog-attributes` | `--dictionary=<path>`, `--csv=<path>` (default: `docs/catalog-attributes/…`), `--apply` | Loads the attribute dictionary and the recognizer CSV; without `--apply` only reports. Never changes manual or locked values or product names ([input files](../../../catalog-attributes/README.md)) |
+| `import-catalog-attributes` | `--dictionary=<path>`, `--csv=<path>` (default: `docs/catalog-attributes/…`), `--apply` | Loads the attribute dictionary and the recognizer CSV; without `--apply` only reports. Never changes manual or locked values or product names ([input files](../../../catalog-attributes/README.md)). The jobs image contains both files; Cloud Run jobs `catalog-attributes-import-dry-run` (report) and `catalog-attributes-import-apply` (`--apply`) run only by hand |
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |

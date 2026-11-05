@@ -42,4 +42,6 @@ RUN dotnet publish "./Host.Jobs.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Input files of import-catalog-attributes; the job reads them by its default relative paths.
+COPY --from=build ["/src/docs/catalog-attributes/dictionaries.json", "/src/docs/catalog-attributes/products_attributes.csv", "./docs/catalog-attributes/"]
 ENTRYPOINT ["dotnet", "Host.Jobs.dll"]
