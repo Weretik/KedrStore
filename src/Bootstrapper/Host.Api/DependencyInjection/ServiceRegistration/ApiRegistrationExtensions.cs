@@ -14,6 +14,7 @@ public static class ApiRegistrationsExtensions
 
         services.AddHealthChecks();
         services.AddProblemDetails();
+        services.AddMobileSyncCompression();
         services.AddSingleton(TimeProvider.System);
 
         return services;

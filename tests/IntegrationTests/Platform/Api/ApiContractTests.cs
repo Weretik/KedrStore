@@ -75,6 +75,11 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/admin/products/all", out var allAdminProducts));
         Assert.True(allAdminProducts.TryGetProperty("get", out _));
 
+        Assert.True(paths.TryGetProperty("/api/mobile/sync/catalog", out var catalogSnapshot));
+        Assert.True(catalogSnapshot.TryGetProperty("get", out _));
+        Assert.True(paths.TryGetProperty("/api/mobile/sync/customers", out var customersSnapshot));
+        Assert.True(customersSnapshot.TryGetProperty("get", out _));
+
         Assert.True(paths.TryGetProperty("/api/admin/products/{id}/group", out var productGroup));
         Assert.True(productGroup.TryGetProperty("get", out _));
         Assert.True(productGroup.TryGetProperty("put", out _));

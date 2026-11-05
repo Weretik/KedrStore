@@ -1,6 +1,6 @@
 # Platform 004: data snapshots for the offline mobile app
 
-**Status:** specified 2026-11-05, not implemented. **Owner modules:** Catalog (catalog snapshot), Sales (customers snapshot). **Client:** kedr-web spec `mobile/manager/001-manager-app` (Kedr Manager).
+**Status:** implemented 2026-11-05 ([feature card](../../../features/platform/mobile-offline-sync.md)). **Owner modules:** Catalog (catalog snapshot), Sales (customers snapshot). **Client:** kedr-web spec `mobile/manager/001-manager-app` (Kedr Manager).
 
 ## Goal
 
@@ -10,8 +10,8 @@ The owner chose (2026-11-05) to rebuild the mobile app for managers as an offlin
 
 ## Rules
 
-- R-001 `GET /api/mobile/sync/catalog` (`CanManageOrders`, bearer) returns `{ version, generatedAt, priceTypes[], categories[], products[] }`. Categories carry id, parentId, name, sortOrder. Each product carries id, slug, name, code, categoryId, stock, quantityInPack, description, photos[] (URL and thumbnail URL from the CDN media links), scheme URL, isSale, isNew and prices[] `{ priceTypeId, amount }`. Deleted products and products hidden from sale are left out; deleted categories are left out.
-- R-002 `GET /api/mobile/sync/customers` (`CanManageOrders`, bearer) returns `{ version, generatedAt, customers[] }`. Each customer carries counterpartyId, name, phone, email, defaultPriceTypeId, categoryPriceTypes[] `{ categoryId, priceTypeId }` (the same rules `CustomerPriceResolver` uses), `debt: null` and `balance: null`.
+- R-001 `GET /api/mobile/sync/catalog` (`CanManageOrders`, bearer) returns `{ version, generatedAt, priceTypes[], categories[], products[] }`. Categories carry id, parentId, name, sortOrder. Each product carries id (the 1C code), slug, Ukrainian name, categoryId, stock, inStock (the sales catalog rule), quantityInPack, photos[] (URLs from the CDN media links, main first), scheme URL, isSale, isNew and prices[] `{ priceTypeId, amount }` in UAH. The snapshot also carries `retailPriceTypeId`. Deleted products and categories are left out; the sales catalog has no other «hidden from sale» flag, so `exportToSite` does not filter (decision at delivery, 2026-11-05). Products have no description and the CDN has no thumbnails yet, so the app makes its own small copies.
+- R-002 `GET /api/mobile/sync/customers` (`CanManageOrders`, bearer) returns `{ version, generatedAt, customers[] }`. Each customer carries counterpartyId, name, phone, email, defaultPriceTypeId, categoryPriceTypes[] `{ categoryId, priceTypeId }` (the same rules `CustomerPriceResolver` uses: the nearest rule up the category tree wins, otherwise the default type), `debt: null` and `balance: null`.
 - R-003 Both endpoints send a strong `ETag` computed from the snapshot content and answer `304 Not Modified` with no body when `If-None-Match` matches. Responses are gzip-compressed when the client accepts it.
 - R-004 Amounts use the same units and rounding as `order-workspace`; the server quote stays the authority when an order is created.
 - R-005 The app's 7-day offline window must not outlive the refresh token: `IdentitySessionSecurityOptions.RefreshAbsoluteLifetimeDays` (default 30) stays at 7 or more. A refresh that fails after the window signs the manager out in the app.
@@ -28,7 +28,7 @@ The owner chose (2026-11-05) to rebuild the mobile app for managers as an offlin
 
 ## Design
 
-- Each module adds a query in its Application layer and a reader in its Infrastructure layer; no module reads another module's tables. The catalog snapshot lives in `Catalog.*`, the customers snapshot in `Sales.*`, each with its own controller under `/api/mobile/sync/`.
+- Each module adds a query in its Application layer that reads through its own read context (`IReadCatalogDbContext`, `IReadSalesDbContext`); no module reads another module's tables. The catalog snapshot lives in `Catalog.*`, the customers snapshot in `Sales.*`, each with its own controller under `/api/mobile/sync/`.
 - The `ETag` is a hash of the serialized snapshot; `version` is the same value for logging in the app.
 - Response compression is enabled for these two routes if it is not on for the API already.
 
@@ -42,6 +42,11 @@ No schema change. Deploy the backend before the app stage that needs it (kedr-we
 - TS-002 Customers snapshot query, reader, controller, ETag/304. Covers R-002, R-003; SC-001, SC-002, SC-005, SC-006.
 - TS-003 Compression for the two routes, OpenAPI contract and `ApiContractTests`, feature card. Covers R-003, R-006.
 - TS-004 Check `RefreshAbsoluteLifetimeDays` in every environment's configuration. Covers R-005.
+
+## Delivery notes
+
+- TS-004: `RefreshAbsoluteLifetimeDays` is 30 and `RefreshIdleTimeoutDays` 14 in `appsettings.json`; no environment overrides them, and start-up validation keeps idle ≤ absolute. Both stay above the 7-day window.
+- Compression is on only for `/api/mobile/sync/*`, so cookie pages are not exposed to compression side channels.
 
 ## Tests
 
