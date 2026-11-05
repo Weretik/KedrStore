@@ -11,7 +11,7 @@ This is an index of design decisions and delivery records; the [implemented feat
 | Content | [site articles](content/001-articles/README.md), [company contacts](content/002-company-contacts/README.md), [company requisites](content/003-company-requisites/README.md), [site documents](content/004-legal-documents/README.md), [site gallery](content/005-gallery/README.md), [home page FAQ and brands](content/006-home-blocks/README.md), [who changed it and refresh the site](content/007-admin-polish/README.md), [article cover on the CDN](content/008-article-cover-cdn/README.md), [page «Співпраця»](content/009-wholesale-page/README.md), [search texts of the site pages](content/010-page-seo/README.md) |
 | Media | [media library for CDN photos](media/001-media-library/README.md) |
 | Identity | [authentication and authorization rollout](identity/001-authentication-rollout/README.md) |
-| Platform | [separate migration job](platform/001-database-migration-job/README.md), [test architecture](platform/002-test-architecture/README.md), [admin «Огляд» data](platform/003-admin-overview/README.md) |
+| Platform | [separate migration job](platform/001-database-migration-job/README.md), [test architecture](platform/002-test-architecture/README.md), [admin «Огляд» data](platform/003-admin-overview/README.md), [data snapshots for the offline mobile app](platform/004-mobile-offline-sync/README.md) |
 
 This directory contains requirements, design decisions, contracts, task records, and verification evidence for individual changes. Update the specification for a nontrivial behavior change before implementation. A status or plan in a specification alone does not prove that the behavior exists in code.
 
