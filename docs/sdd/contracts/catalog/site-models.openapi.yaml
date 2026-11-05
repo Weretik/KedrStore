@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: KedrStore Catalog site models API
-  version: 0.1.0
+  version: 0.2.0
   description: >-
     Site models of spec catalog/007. A model is one site page in one final category that brings together products of
     that category; its axes (color, size, side) tell the products apart. Automation proposes models; a person
@@ -22,7 +22,7 @@ paths:
       parameters:
         - { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
         - { name: status, in: query, schema: { type: string, enum: [proposed, accepted] } }
-        - { name: problem, in: query, schema: { type: string, enum: [no_model, no_attributes, missing_axis_value, same_combination, model_no_axes, model_no_seo, model_no_photo] } }
+        - { name: problem, in: query, description: A problem code or `any` for every row with a problem., schema: { type: string, enum: [any, no_model, no_attributes, missing_axis_value, same_combination, model_no_axes, model_no_seo, model_no_photo] } }
         - { name: search, in: query, schema: { type: string, maxLength: 200 } }
         - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
         - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
@@ -46,6 +46,37 @@ paths:
       responses:
         '200': { description: Created model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/site-models/showcase:
+    get:
+      operationId: getAdminSiteShowcase
+      summary: «Вітрина сайту» - on-site products with model, variant values, and problems
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        On-site, not deleted products. Products outside accepted models come first, then other products with problems,
+        then by name. `search` matches part of the product name or its 1C code exactly.
+      parameters:
+        - { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
+        - { name: problem, in: query, schema: { type: string, enum: [any, no_model, no_attributes, missing_axis_value, same_combination] } }
+        - { name: search, in: query, schema: { type: string, maxLength: 200 } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        '200': { description: A page of products, content: { application/json: { schema: { $ref: '#/components/schemas/SiteShowcaseList' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/site-models/categories:
+    get:
+      operationId: getAdminSiteModelCategories
+      summary: Final categories with models and problems, for the «Моделі» sidebar
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Final categories (without children) that have on-site products or models, by parent name, then name.
+      responses:
+        '200': { description: Categories, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/SiteModelCategory' } } } } }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/site-models/health:
@@ -208,7 +239,7 @@ components:
         onSiteCount: { type: integer }
         minPrice: { type: [number, 'null'], description: Lowest retail price of its on-site products. }
         photo: { type: string, description: Photo of the main product; empty without one. }
-        axes: { type: array, items: { type: string }, description: Axis names (saved, or offered for a proposal). }
+        axes: { type: array, items: { type: string }, description: 'Axis names (saved, or offered for a proposal).' }
         problems: { type: array, items: { type: string }, description: Model codes and the product codes its products have. }
     SiteModelList:
       type: object
@@ -283,6 +314,58 @@ components:
         texts: { type: array, items: { $ref: '#/components/schemas/SiteModelText' }, description: 'Both languages, empty strings where nothing is saved.' }
         characteristics: { type: array, items: { $ref: '#/components/schemas/SiteModelCharacteristic' } }
         problems: { type: array, items: { type: string }, description: Model problem codes. }
+    SiteShowcaseItem:
+      type: object
+      required: [productId, name, slug, photo, categoryId, categoryName, inStock, values, problems]
+      properties:
+        productId: { type: integer, description: The 1C code. }
+        name: { type: string, description: Original 1C name. }
+        slug: { type: string }
+        photo: { type: string }
+        categoryId: { type: integer }
+        categoryName: { type: string }
+        retailPrice: { type: [number, 'null'] }
+        inStock: { type: boolean }
+        model:
+          description: Its model; null when it is in none.
+          oneOf:
+            - { $ref: '#/components/schemas/SiteShowcaseModel' }
+            - { type: 'null' }
+        values: { type: array, items: { $ref: '#/components/schemas/SiteShowcaseValue' }, description: 'Confirmed values of the variant attributes (color, size, side).' }
+        problems: { type: array, items: { type: string, enum: [no_model, no_attributes, missing_axis_value, same_combination] } }
+    SiteShowcaseModel:
+      type: object
+      required: [id, name, status]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        status: { type: string, enum: [proposed, accepted] }
+    SiteShowcaseValue:
+      type: object
+      required: [attributeId, attributeName, value]
+      properties:
+        attributeId: { type: integer }
+        attributeName: { type: string }
+        value: { type: string }
+    SiteShowcaseList:
+      type: object
+      required: [items, totalCount, page, pageSize]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/SiteShowcaseItem' } }
+        totalCount: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+    SiteModelCategory:
+      type: object
+      required: [id, name, onSiteProducts, acceptedModels, proposedModels, problemCount]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        parentName: { type: [string, 'null'] }
+        onSiteProducts: { type: integer, minimum: 0 }
+        acceptedModels: { type: integer, minimum: 0 }
+        proposedModels: { type: integer, minimum: 0 }
+        problemCount: { type: integer, minimum: 0, description: Accepted models with a problem plus on-site products outside accepted models. }
     SiteModelHealth:
       type: object
       required: [productsWithoutModel, productsWithoutAttributes, productsMissingAxisValue, productsWithSameCombination, modelsWithoutAxes, modelsWithoutSeo, modelsWithoutPhoto, proposedModels]

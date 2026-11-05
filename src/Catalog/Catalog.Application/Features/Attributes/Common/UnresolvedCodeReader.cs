@@ -8,8 +8,8 @@ namespace Catalog.Application.Features.Attributes.Common;
 
 /// <summary>
 /// Reads «Не розшифровані коди»: aliases without a value or with an unconfirmed decoding that the owner has not decided
-/// yet. A product counts for a code
-/// when its review mentions the code in «guillemets», as the recognizer writes it.
+/// yet. A product counts for a code when it is on the site, not deleted, and its review mentions the code in
+/// «guillemets», as the recognizer writes it (spec catalog/007 M-01).
 /// </summary>
 public sealed class UnresolvedCodeReader(IReadCatalogDbContext db)
 {
@@ -37,8 +37,11 @@ public sealed class UnresolvedCodeReader(IReadCatalogDbContext db)
         var valueNames = await db.AttributeValues.AsNoTracking()
             .Where(value => valueIds.Contains(value.Id))
             .ToDictionaryAsync(value => value.Id, value => value.NameUk, cancellationToken);
+        var onSite = db.Products.AsNoTracking()
+            .Where(product => product.ExportToSite)
+            .Select(product => product.Id);
         var texts = (await db.ProductAttributeReviews.AsNoTracking()
-                .Where(review => review.State != AttributeReviewState.Clear)
+                .Where(review => review.State != AttributeReviewState.Clear && onSite.Contains(review.ProductId))
                 .Select(review => review.Reasons)
                 .ToListAsync(cancellationToken))
             .Select(reasons => string.Join('\n', reasons.Select(reason => reason.Text)))

@@ -2,9 +2,11 @@ using Catalog.Application.Features.SiteModels.Accept;
 using Catalog.Application.Features.SiteModels.AddProducts;
 using Catalog.Application.Features.SiteModels.Create;
 using Catalog.Application.Features.SiteModels.FillFromNames;
+using Catalog.Application.Features.SiteModels.GetCategories;
 using Catalog.Application.Features.SiteModels.Get;
 using Catalog.Application.Features.SiteModels.GetHealth;
 using Catalog.Application.Features.SiteModels.GetList;
+using Catalog.Application.Features.SiteModels.GetShowcase;
 using Catalog.Application.Features.SiteModels.RemoveProduct;
 using Catalog.Application.Features.SiteModels.Rename;
 using Catalog.Application.Features.SiteModels.SetAxes;
@@ -38,6 +40,21 @@ public sealed class AdminSiteModelsController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<SiteModelHealthDto>> GetHealth(CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(new GetSiteModelHealthQuery(), cancellationToken));
+
+    [HttpGet("showcase", Name = "getAdminSiteShowcase")]
+    [ProducesResponseType(typeof(SiteShowcaseListDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<SiteShowcaseListDto>> GetShowcase(
+        [FromQuery] GetSiteShowcaseRequest request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new GetSiteShowcaseQuery(request), cancellationToken));
+
+    [HttpGet("categories", Name = "getAdminSiteModelCategories")]
+    [ProducesResponseType(typeof(List<SiteModelCategoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<List<SiteModelCategoryDto>>> GetCategories(CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new GetSiteModelCategoriesQuery(), cancellationToken));
 
     [HttpGet("{id:int}", Name = "getAdminSiteModel")]
     [ProducesResponseType(typeof(SiteModelDto), StatusCodes.Status200OK)]

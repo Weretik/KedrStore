@@ -94,6 +94,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         AssertOperationHasQueryParameter(siteModelsGet, "Problem");
         Assert.True(siteModels.TryGetProperty("post", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/health", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/showcase", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/categories", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/accept", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/axes", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/products", out _));

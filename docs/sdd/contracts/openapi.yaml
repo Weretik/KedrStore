@@ -51,6 +51,10 @@ paths:
     $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1slug
   /api/admin/site-models:
     $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models
+  /api/admin/site-models/showcase:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1showcase
+  /api/admin/site-models/categories:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1categories
   /api/admin/site-models/health:
     $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1health
   /api/admin/site-models/accept:

@@ -14,7 +14,7 @@ public sealed class GetSiteModelsQueryValidator : AbstractValidator<GetSiteModel
                 .OverridePropertyName("pageSize");
             RuleFor(query => query.Request.Status).Must(status => status is null or "proposed" or "accepted")
                 .WithMessage("Status is proposed or accepted.").OverridePropertyName("status");
-            RuleFor(query => query.Request.Problem).Must(problem => problem is null || SiteModelProblems.All.Contains(problem))
+            RuleFor(query => query.Request.Problem).Must(problem => problem is null || problem == SiteModelProblems.Any || SiteModelProblems.All.Contains(problem))
                 .WithMessage("Unknown problem code.").OverridePropertyName("problem");
             RuleFor(query => query.Request.Search).MaximumLength(200).OverridePropertyName("search");
         });

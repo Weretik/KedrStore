@@ -88,6 +88,8 @@ Rollback: the migration's `Down` drops the two tables and the three columns; not
 | `PUT /api/admin/site-models/{id}/texts/{language}` | Save the texts of one language |
 | `POST /api/admin/site-models/{id}/fill-from-names` | R-06 |
 | `GET /api/admin/site-models/health` | Counts of R-08 (also inside «Огляд») |
+| `GET /api/admin/site-models/showcase` | Stage 4: «Вітрина сайту», on-site products with model, variant values, problems (`categoryId`, `problem`, `search`, paging) |
+| `GET /api/admin/site-models/categories` | Stage 4: final categories with on-site products, accepted and proposed models, problem count |
 
 The main product (`PUT api/admin/product-groups/{id}/main`), the slug (`PUT api/admin/product-groups/{id}/slug`), and a product's attribute value (`PUT api/admin/products/{id}/attributes/{attributeId}`) keep their spec 006 routes. `api/admin/product-groups` stays until the admin moves to the new pages (stage 4) and is then removed.
 
@@ -122,7 +124,7 @@ src/Catalog/
 | 1 | This specification; owner plan and canvas | done 2026-11-05 |
 | 2 | Models in the database, proposals, health, admin API | done 2026-11-05 (migration `CatalogSiteModels`) |
 | 3 | Run the proposals on production (dry run, then on «да») | planned |
-| 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help | planned |
+| 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | in progress |
 | 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces KedrStore PR #175 | planned |
 | 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search | planned |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |

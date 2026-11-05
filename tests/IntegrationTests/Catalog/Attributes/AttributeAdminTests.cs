@@ -164,6 +164,24 @@ public sealed class AttributeAdminTests
     }
 
     [Fact]
+    public async Task UnresolvedCodes_CountOnlyOnSiteProducts()
+    {
+        await using var db = await ImportedAsync();
+        // A review reason that names the code, as the recognizer writes it.
+        var mention = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.From(2));
+        mention.SetSameVariants("Код «CP»", DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        var codes = new UnresolvedCodeReader(db);
+        Assert.Equal(1, Assert.Single(await codes.ListAsync(CancellationToken.None), code => code.RawValue == "CP").ProductCount);
+
+        var product = await db.Products.SingleAsync(item => item.Id == ProductId.From(2));
+        product.UpdateFromOneC(product.Name, product.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+
+        Assert.Equal(0, Assert.Single(await codes.ListAsync(CancellationToken.None), code => code.RawValue == "CP").ProductCount);
+    }
+
+    [Fact]
     public async Task CategoryFilters_SetByAdmin_SurviveTheImport()
     {
         await using var db = await ImportedAsync();
