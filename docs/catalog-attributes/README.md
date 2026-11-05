@@ -1,6 +1,6 @@
 # Catalog attribute input files
 
-Recognizer output for the [catalog attributes SDD](../sdd/specs/catalog/006-attributes-variants-filters/README.md), received from the owner on 2026-11-05. The files are data, not rules: the import reads them, and the parser test compares the .NET parser with them.
+Recognizer output for the [catalog attributes SDD](../sdd/specs/catalog/006-attributes-variants-filters/README.md), received from the owner on 2026-11-05. The files are data, not rules: the import reads them, and the parser test compares the .NET parser with them. `dictionaries.json` is also embedded in the application, so the recognizer after a 1C sync uses the committed version.
 
 | File | What it is |
 | --- | --- |

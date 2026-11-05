@@ -1,3 +1,4 @@
+using Catalog.Application.Attributes.Import;
 using Catalog.Application.Groups;
 using Catalog.Application.Jobs.Attributes;
 using Catalog.Application.Slugs;
@@ -18,14 +19,22 @@ internal static class AttributeImportTestSupport
         => new(
             db,
             new TestRepository<CatalogAttribute>(db),
-            new TestRepository<AttributeValue>(db),
             new TestRepository<AttributeAlias>(db),
-            new TestRepository<ProductAttributeValue>(db),
-            new TestRepository<ProductAttributeReview>(db),
-            new TestRepository<CategoryAttribute>(db),
+            Writer(db),
             GroupBuilder(db),
             TimeProvider.System,
             NullLogger<ImportCatalogAttributesJob>.Instance);
+
+    public static RecognizedProductWriter Writer(CatalogDbContext db)
+        => new(db,
+            new TestRepository<AttributeValue>(db),
+            new TestRepository<ProductAttributeValue>(db),
+            new TestRepository<ProductAttributeReview>(db),
+            new TestRepository<CategoryAttribute>(db));
+
+    public static RecognizeCatalogAttributesJob RecognitionJob(CatalogDbContext db)
+        => new(db, Writer(db), GroupBuilder(db), TimeProvider.System,
+            NullLogger<RecognizeCatalogAttributesJob>.Instance);
 
     public static ProductGroupBuilder GroupBuilder(CatalogDbContext db)
         => new(db, new TestRepository<ProductGroup>(db), new TestRepository<ProductGroupMember>(db), new SlugService(db),
@@ -62,6 +71,7 @@ internal static class AttributeImportTestSupport
         throw new FileNotFoundException($"Cannot find {relativePath} above {AppContext.BaseDirectory}.");
     }
 
+    /// <summary>A small dictionary; scopes match <c>dictionaries.json</c>, which the .NET recognizer reads.</summary>
     public const string Dictionary = """
         {
           "format_version": "1.0",
@@ -75,8 +85,8 @@ internal static class AttributeImportTestSupport
             { "attribute": "branding", "code": "NO_NAME", "name_uk": "Без маркування бренду" }
           ],
           "entries": [
-            { "attribute": "color", "scope": "general", "raw_value": "AB", "normalized_code": "AB", "status": "approved" },
-            { "attribute": "color", "scope": "general", "raw_value": "CP", "normalized_code": "CR", "status": "approved",
+            { "attribute": "color", "scope": "hardware_finish", "raw_value": "AB", "normalized_code": "AB", "status": "approved" },
+            { "attribute": "color", "scope": "hardware_finish", "raw_value": "CP", "normalized_code": "CR", "status": "approved",
               "selected_by": "assistant", "user_confirmed": false },
             { "attribute": "material_code", "scope": "general", "raw_value": "AL", "normalized_code": null,
               "status": "unresolved", "note": "Не розшифровано" }

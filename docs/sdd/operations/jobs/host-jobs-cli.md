@@ -11,12 +11,13 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --
 | --- | --- | --- |
 | `migrate` | — | Runs EF migrations for registered contexts in order, then seeders; changes schema and data |
 | `migrate-slugs` | — | One-off: replaces legacy product and category slugs (`name-<id>`) with stable KMU 2010 slugs and keeps the old ones in history; a rerun changes nothing. See the [rollout](../../specs/catalog/005-stable-urls-and-category-content/design.md#rollout-and-rollback) |
-| `full` | — | Full Catalog refresh for configured Doors, Hardware, and Cosmos root IDs |
+| `full` | — | Full Catalog refresh for configured Doors, Hardware, and Cosmos root IDs; ends with the attribute recognizer (as `recognize-catalog-attributes --apply`) and the list rebuild |
 | `pricetypes` | — | Catalog price types |
 | `category`, `productdetails`, `stocks`, `prices` | One or more `--rootId=<id>` | Targeted Catalog root refresh |
 | `rebuild-projections` | — | Rebuild Catalog product-list read model |
 | `media-cdn-sync` | `--dry-run` (optional) | Registers CDN pictures in the media library, then links them to products, refreshes the photo cache, and lays out product files in folders by category; with `--dry-run` only reports ([runbook](media-cdn-sync-runbook.md)) |
 | `import-catalog-attributes` | `--dictionary=<path>`, `--csv=<path>` (default: `docs/catalog-attributes/…`), `--apply` | Loads the attribute dictionary and the recognizer CSV; without `--apply` only reports. Never changes manual or locked values or product names ([input files](../../../catalog-attributes/README.md)). Ends with the variant group build (groups, members, «Однакові варіанти»), which never moves products a person pinned. The jobs image contains both files; Cloud Run jobs `catalog-attributes-import-dry-run` (report) and `catalog-attributes-import-apply` (`--apply`) run only by hand |
+| `recognize-catalog-attributes` | `--apply` | Recognizes attributes from current 1C names with the .NET recognizer and the embedded dictionary plus the owner's code decisions; without `--apply` only reports. Same rules as the import: manual and locked values and product names stay. Ends with the group build. Cloud Run jobs `catalog-attributes-recognize-dry-run` and `catalog-attributes-recognize-apply` run only by hand |
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |

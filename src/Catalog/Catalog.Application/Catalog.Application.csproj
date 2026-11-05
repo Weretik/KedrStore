@@ -16,4 +16,10 @@
       <None Remove="Catalog.Application.csproj.DotSettings" />
     </ItemGroup>
 
+    <ItemGroup>
+      <!-- The recognizer dictionary (rules, spellings, settings); the .NET recognizer reads it at run time. -->
+      <EmbeddedResource Include="..\..\..\docs\catalog-attributes\dictionaries.json"
+                        LogicalName="Catalog.Application.Attributes.Recognition.dictionaries.json" />
+    </ItemGroup>
+
 </Project>
