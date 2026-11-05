@@ -33,6 +33,7 @@ public sealed class GetSiteShowcaseQueryHandler(SiteModelStateReader reader)
 
         var rows = modelRows.Concat(loneRows)
             .Where(row => row.Products.Count > 0)
+            .Where(row => request.Status is null || StatusOf(row.Model) == request.Status)
             .Where(row => state.InCategory(row.CategoryId, request.CategoryId))
             .Where(row => string.IsNullOrEmpty(search) || Matches(state, row.Name, row.Products, search))
             .Select(row => ToRow(state, variantAttributes, row.Model, row.CategoryId, row.Name, row.Products))
@@ -46,6 +47,9 @@ public sealed class GetSiteShowcaseQueryHandler(SiteModelStateReader reader)
         var page = rows.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
         return Result.Success(new SiteShowcaseListDto(page, rows.Count, request.Page, request.PageSize));
     }
+
+    private static string StatusOf(ProductGroup? model)
+        => model is null ? GetSiteShowcaseQuery.NoModelStatus : SiteModelState.StatusText(model.Status);
 
     private static bool Matches(SiteModelState state, string name, IReadOnlyList<ProductId> products, string search)
         => name.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||

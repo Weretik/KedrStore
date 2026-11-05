@@ -68,8 +68,8 @@ public sealed record SiteModelDto(
     IReadOnlyList<string> Problems);
 
 /// <summary>
-/// Site health for «Огляд» (R-08). <c>ProductsWithoutModel</c> is the hard error: on-site products outside accepted
-/// models. The others are warnings.
+/// Site health for «Огляд» (R-08). <c>ProductsWithoutModel</c> is the hard error: on-site products in no model at all
+/// (products of a proposed model wait in <c>ProposedModels</c>). The others are warnings.
 /// </summary>
 public sealed record SiteModelHealthDto(
     int ProductsWithoutModel,

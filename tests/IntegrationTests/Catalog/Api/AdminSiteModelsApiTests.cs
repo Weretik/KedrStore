@@ -65,7 +65,7 @@ public sealed class AdminSiteModelsApiTests
 
         using var overview = JsonDocument.Parse(await manager.GetStringAsync("/api/admin/catalog/overview"));
         var siteModels = overview.RootElement.GetProperty("siteModels");
-        Assert.Equal(3, siteModels.GetProperty("productsWithoutModel").GetInt32());
+        Assert.Equal(0, siteModels.GetProperty("productsWithoutModel").GetInt32());
         Assert.Equal(2, siteModels.GetProperty("proposedModels").GetInt32());
 
         using var list = JsonDocument.Parse(await manager.GetStringAsync($"{Base}?status=proposed&search=ручка 2"));
@@ -79,7 +79,7 @@ public sealed class AdminSiteModelsApiTests
         using var accepted = await manager.PostAsJsonAsync($"{Base}/accept", new { ids = new[] { id } });
         Assert.Equal(HttpStatusCode.OK, accepted.StatusCode);
         using var health = JsonDocument.Parse(await accepted.Content.ReadAsStringAsync());
-        Assert.Equal(1, health.RootElement.GetProperty("productsWithoutModel").GetInt32());
+        Assert.Equal(0, health.RootElement.GetProperty("productsWithoutModel").GetInt32());
 
         using var renamed = await manager.PutAsJsonAsync($"{Base}/{id}", new { name = "Ручка KEDR" });
         Assert.Equal(HttpStatusCode.OK, renamed.StatusCode);

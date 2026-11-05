@@ -12,6 +12,9 @@ public sealed class GetSiteShowcaseQueryValidator : AbstractValidator<GetSiteSho
             RuleFor(query => query.Request.Page).GreaterThan(0).OverridePropertyName("page");
             RuleFor(query => query.Request.PageSize).InclusiveBetween(1, GetSiteShowcaseQuery.MaxPageSize)
                 .OverridePropertyName("pageSize");
+            RuleFor(query => query.Request.Status)
+                .Must(status => status is null or "proposed" or "accepted" or GetSiteShowcaseQuery.NoModelStatus)
+                .WithMessage("Status is proposed, accepted, or none.").OverridePropertyName("status");
             RuleFor(query => query.Request.Problem)
                 .Must(problem => problem is null || problem == SiteModelProblems.Any || SiteModelProblems.Product.Contains(problem))
                 .WithMessage("Unknown problem code.").OverridePropertyName("problem");

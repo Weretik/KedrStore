@@ -41,10 +41,12 @@ public sealed record SiteShowcaseRowDto(
 public sealed record SiteShowcaseListDto(IReadOnlyList<SiteShowcaseRowDto> Items, int TotalCount, int Page, int PageSize);
 
 /// <summary>
-/// A category shown on the site that has on-site products, for the category tree of «Моделі» and «Вітрина сайту».
-/// Counts include subcategories. <c>ProblemCount</c> counts accepted models with a problem and on-site products outside
-/// accepted models.
+/// A category shown on the site that has on-site products, for the category tree of «Вітрина сайту». Counts include
+/// subcategories, except <c>FilterCount</c>.
 /// </summary>
+/// <param name="ProblemCount">Accepted models with a problem (R-08).</param>
+/// <param name="LoneProducts">On-site products in no model (the hard error).</param>
+/// <param name="FilterCount">Attributes the category itself offers as site filters (R-20).</param>
 public sealed record SiteModelCategoryDto(
     int Id,
     string Name,
@@ -52,4 +54,6 @@ public sealed record SiteModelCategoryDto(
     int OnSiteProducts,
     int AcceptedModels,
     int ProposedModels,
-    int ProblemCount);
+    int ProblemCount,
+    int LoneProducts,
+    int FilterCount);

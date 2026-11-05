@@ -31,6 +31,9 @@ public sealed class SiteModelState
     /// <summary>Active categories marked «show on site» (R-18).</summary>
     public required IReadOnlySet<ProductCategoryId> ShownCategories { get; init; }
 
+    /// <summary>How many attributes each category offers as site filters (its own rows, not its subcategories').</summary>
+    public required IReadOnlyDictionary<ProductCategoryId, int> FilterCounts { get; init; }
+
     /// <summary>Whether a category is the selected one or inside it; no selection matches everything.</summary>
     public bool InCategory(ProductCategoryId categoryId, int? selected)
     {
@@ -47,6 +50,9 @@ public sealed class SiteModelState
 
         return false;
     }
+
+    /// <summary>An on-site product that is in no model at all, proposed or accepted (R-08).</summary>
+    public bool IsLone(ProductId id) => IsOnSite(id) && !ModelOfProduct.ContainsKey(id);
 
     public bool IsOnSite(ProductId id) => Products.TryGetValue(id, out var product) && product.IsOnSite;
 
@@ -88,14 +94,15 @@ public sealed class SiteModelState
     {
         if (!IsOnSite(productId))
             return [];
-        if (!ModelOfProduct.TryGetValue(productId, out var modelId) || !Models[modelId].IsAccepted)
+        if (!ModelOfProduct.TryGetValue(productId, out var modelId))
             return [SiteModelProblems.NoModel];
 
         var problems = new List<string>();
         if (!Values[productId].Any())
             problems.Add(SiteModelProblems.NoAttributes);
 
-        var axes = SavedAxes[modelId].Select(axis => axis.AttributeId).ToList();
+        // A proposed model is checked against its offered axes: the person sees what accepting it would leave.
+        var axes = AxesOf(modelId).Select(axis => axis.Attribute.Id).ToList();
         if (axes.Count == 0)
             return problems;
 
