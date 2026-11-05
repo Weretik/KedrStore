@@ -46,4 +46,4 @@ components:
         counterpartyName: { type: string }
         createdAtUtc: { type: string, format: date-time }
         syncStatus: { type: string, enum: [BusinessError, DeadLetter] }
-        errorMessage: { type: [string, 'null'], description: The last message 1C or the delivery gave, if any. }
+        errorMessage: { type: [string, 'null'], description: 'The last message 1C or the delivery gave, if any.' }

@@ -40,5 +40,5 @@ components:
       required: [id, title, updatedAt]
       properties:
         id: { type: integer, format: int64 }
-        title: { type: string, description: Ukrainian title, or the slug without one. }
+        title: { type: string, description: 'Ukrainian title, or the slug without one.' }
         updatedAt: { type: string, format: date-time }
