@@ -1,0 +1,258 @@
+openapi: 3.1.0
+info:
+  title: KedrStore public site models API
+  version: 0.1.0
+  description: >-
+    The public site's models of spec catalog/007 stage 5. A model is one site page in one final category; its axes
+    (color, size, side) are the switchers. An on-site product outside an accepted model is shown as a model of its
+    own under its product slug (`isAccepted` false). Only on-site, not deleted products of public categories count,
+    and only attribute values a person confirmed. Anonymous.
+paths:
+  /api/catalog/{lang}/models:
+    get:
+      operationId: getPublicSiteModels
+      summary: Search models
+      tags: [Catalog site models]
+      security: []
+      description: >-
+        Models over all categories, without attribute filters. `search` matches every word in the model name, or in
+        one product's Ukrainian or Russian name or 1C code. When the whole search is the 1C code of an on-site product,
+        `exactMatch` is its model address.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: A page of model cards, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelList' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+  /api/catalog/{lang}/{categorySlug}/models:
+    get:
+      operationId: getPublicCategorySiteModels
+      summary: Models of a category
+      tags: [Catalog site models]
+      security: []
+      description: >-
+        Models of the category and every category below it. A final category (without children) takes attribute
+        filters and returns them with counts in `filters`; a parent category gives `filters` empty and refuses
+        attribute filters with 400. A former category slug still selects its category. A model matches when one of
+        its on-site products matches every filter; the card's price, stock, sale, and new count only those products.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - { name: categorySlug, in: path, required: true, schema: { type: string } }
+        - name: filter
+          in: query
+          description: >-
+            `attribute-slug:value-slug[,value-slug]`, repeatable; values of one attribute match any of them, different
+            attributes all. At most 50 values.
+          style: form
+          explode: true
+          schema: { type: array, items: { type: string } }
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200': { description: A page of model cards, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelList' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: Unknown category, or an unknown attribute or value slug in `filter`. }
+  /api/catalog/{lang}/model/{modelSlug}:
+    get:
+      operationId: getPublicSiteModel
+      summary: The model page
+      tags: [Catalog site models]
+      security: []
+      description: >-
+        A current model slug, or the slug of an on-site product shown as a model of its own, gives the page. The page
+        lists the axis values its products have and each product's values, so the site can hide combinations no
+        product has and offer in-stock neighbours. Texts of `ru` fall back to `uk` field by field.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - { name: modelSlug, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: The model, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModel' } } } }
+        '404':
+          description: >-
+            Not a model. For a former model slug, or the slug of a product inside an accepted model, the body is the
+            address to redirect to permanently; otherwise there is no body.
+          content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelAddress' } } }
+  /api/catalog/{lang}/product/{productSlug}/model:
+    get:
+      operationId: getPublicProductModelAddress
+      summary: The model address of an old product address
+      tags: [Catalog site models]
+      security: []
+      description: >-
+        A current or former slug of an on-site product gives its model and the product's axis values, for the
+        permanent redirect of the old product page.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - { name: productSlug, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Model address, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelAddress' } } } }
+        '404':
+          description: >-
+            The product is unknown, or not on the site. For a product off the site or deleted whose category is public
+            the body names that category; otherwise there is no body.
+          content:
+            application/json:
+              schema: { $ref: './category-read.openapi.yaml#/components/schemas/CatalogRedirect' }
+components:
+  parameters:
+    Lang: { name: lang, in: path, required: true, description: '`uk` or `ru`; anything else reads as `uk`.', schema: { type: string } }
+    Search: { name: search, in: query, schema: { type: string, maxLength: 200 } }
+    InStock: { name: inStock, in: query, description: Only products in stock., schema: { type: boolean } }
+    IsSale: { name: isSale, in: query, schema: { type: boolean } }
+    IsNew: { name: isNew, in: query, schema: { type: boolean } }
+    PriceFrom: { name: priceFrom, in: query, schema: { type: number, minimum: 0 } }
+    PriceTo: { name: priceTo, in: query, schema: { type: number, minimum: 0 } }
+    Sort:
+      name: sort
+      in: query
+      description: '`default` - in stock first, then by name.'
+      schema: { type: string, enum: [default, price_asc, price_desc, name_asc, new], default: default }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 24 } }
+  responses:
+    ValidationError: { description: Input validation failed, content: { application/json: { schema: { type: array, items: { type: object, additionalProperties: true } } } } }
+  schemas:
+    PublicSiteModelList:
+      type: object
+      required: [categorySlug, isFinalCategory, page, pageSize, totalPages, totalRecords, items, filters, exactMatch]
+      properties:
+        categorySlug: { type: [string, 'null'], description: The current slug of the category; null for the search. }
+        isFinalCategory: { type: boolean }
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer }
+        totalRecords: { type: integer }
+        items: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelCard' } }
+        filters: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelFilter' } }
+        exactMatch: { oneOf: [{ $ref: '#/components/schemas/PublicSiteModelAddress' }, { type: 'null' }] }
+    PublicSiteModelCard:
+      type: object
+      required: [slug, name, categorySlug, photo, priceFrom, inStock, isSale, isNew, productCount, isAccepted, colors]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        categorySlug: { type: string }
+        photo: { type: string, description: The main product's photo or the first product photo; empty when none. }
+        priceFrom: { type: [number, 'null'] }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        productCount: { type: integer, description: On-site products of the model. }
+        isAccepted: { type: boolean, description: 'False for an on-site product shown as a model of its own.' }
+        colors: { type: array, description: Colors of the model's products when color is one of its axes., items: { $ref: '#/components/schemas/PublicSiteModelSwatch' } }
+    PublicSiteModelSwatch:
+      type: object
+      required: [slug, name, hex, textureUrl]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        hex: { type: [string, 'null'], description: '#RRGGBB' }
+        textureUrl: { type: [string, 'null'] }
+    PublicSiteModelFilter:
+      type: object
+      required: [code, slug, name, display, values]
+      properties:
+        code: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        display: { type: string, enum: [swatch, button, checkbox] }
+        values: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelFilterValue' } }
+    PublicSiteModelFilterValue:
+      type: object
+      required: [slug, name, hex, textureUrl, count, selected]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        hex: { type: [string, 'null'] }
+        textureUrl: { type: [string, 'null'] }
+        count: { type: integer, description: "Models with this value added to the other attributes' choices." }
+        selected: { type: boolean }
+    PublicSiteModelAddress:
+      type: object
+      required: [modelSlug, categorySlug, selection]
+      properties:
+        modelSlug: { type: string }
+        categorySlug: { type: string }
+        selection: { type: object, description: Axis slug to value key., additionalProperties: { type: string } }
+    PublicSiteModel:
+      type: object
+      required: [slug, name, isAccepted, category, breadcrumbs, texts, mainProductSlug, axes, products, characteristics]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        isAccepted: { type: boolean }
+        category: { $ref: '#/components/schemas/PublicSiteModelCategory' }
+        breadcrumbs: { type: array, description: From the root to the model's category., items: { $ref: '#/components/schemas/PublicSiteModelCategory' } }
+        texts: { $ref: '#/components/schemas/PublicSiteModelText' }
+        mainProductSlug: { type: [string, 'null'] }
+        axes: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelAxis' } }
+        products: { type: array, description: In stock first, then by name., items: { $ref: '#/components/schemas/PublicSiteModelProduct' } }
+        characteristics: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelCharacteristic' } }
+    PublicSiteModelCategory:
+      type: object
+      required: [id, slug, name]
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        name: { type: string }
+    PublicSiteModelText:
+      type: object
+      required: [shortDescription, description, seoTitle, seoDescription]
+      properties:
+        shortDescription: { type: string }
+        description: { type: string }
+        seoTitle: { type: string }
+        seoDescription: { type: string }
+    PublicSiteModelAxis:
+      type: object
+      required: [code, slug, name, display, values]
+      properties:
+        code: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        display: { type: string, enum: [swatch, button] }
+        values: { type: array, items: { $ref: '#/components/schemas/PublicSiteModelAxisValue' } }
+    PublicSiteModelAxisValue:
+      type: object
+      required: [key, name, hex, textureUrl]
+      properties:
+        key: { type: string, description: 'The value slug; several values of one product join with `_`; a number is its text.' }
+        name: { type: string }
+        hex: { type: [string, 'null'] }
+        textureUrl: { type: [string, 'null'] }
+    PublicSiteModelProduct:
+      type: object
+      required: [id, name, slug, photo, price, inStock, isSale, isNew, isMain, selection]
+      properties:
+        id: { type: integer, description: 1C code. }
+        name: { type: string }
+        slug: { type: string }
+        photo: { type: string }
+        price: { type: [number, 'null'] }
+        inStock: { type: boolean }
+        isSale: { type: boolean }
+        isNew: { type: boolean }
+        isMain: { type: boolean }
+        selection: { type: object, description: Axis slug to value key., additionalProperties: { type: string } }
+    PublicSiteModelCharacteristic:
+      type: object
+      required: [code, name, values]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        values: { type: array, items: { type: string } }

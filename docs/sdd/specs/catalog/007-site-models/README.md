@@ -1,6 +1,6 @@
 # 007 — Site models and their attributes
 
-**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification) and stage 2 (models in the database and the admin API) implemented 2026-11-05; stages 3–8 planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification), stage 2 (models in the database and the admin API), stage 4 (admin) and stage 5 (public API) implemented 2026-11-05; stages 3 and 6–8 planned. **Date:** 2026-11-05.
 
 The owner-facing plan with the audit, the screens, and every decision is the Russian document [«Кедр: модели и признаки — новый подход»](https://claude.ai/artifact/3NDXYvcRvtd7hWTTAgx7NT); the screen concept is the canvas [«Кедр: моделі та ознаки»](https://claude.ai/artifact/DYfVE9Kkxc6RGD293mjXNV). This file is the technical summary, the design, and the evidence log. It changes the direction of [spec 006](../006-attributes-variants-filters/README.md): phases 1–4 of 006 stay as they are and are reused; its phase 5 (filters per product) is reworked here into stage 5 (filters per model), and its phases 6–7 move to stages 7–8.
 
@@ -117,6 +117,53 @@ src/Catalog/
     └── Migrations/*_CatalogSiteModels.cs      # new
 ```
 
+## Stage 5: public API
+
+### Rules
+
+- **R-11.** The site reads only on-site, not deleted products of public categories (not under the Cosmos import root) and only confirmed attribute values. An accepted model shows its on-site products of its own category; a model without on-site products is not shown.
+- **R-12.** An on-site product outside an accepted model is a model of its own: its product slug, its product name in the requested language, no axes, no texts (M-04). When its slug equals an accepted model slug, the accepted model keeps the slug.
+- **R-13.** A list keeps a model when one of its on-site products matches every filter: attribute values (one attribute any, different attributes all), stock, sale, new, price range. The card's price, stock, sale, and new count only the matching products; colors are listed when color is one of the model's axes.
+- **R-14.** Attribute filters work in a final category only (M-09); a parent category refuses them (400) and lists its whole tree with the common filters. Filter counts are models per value of the category's filters («Фільтри категорій»), with the common filters and every other attribute's choice applied.
+- **R-15.** The search (`GET models?search=`) keeps a model when every word is in the model name or in one product's Ukrainian or Russian name or 1C code; a search that is exactly the 1C code of an on-site product also returns that product's model address (M-12).
+- **R-16.** The model page gives the axis values the products have and each product's value keys (`selection`, axis slug → value slug; several values join with `_`); the site hides combinations no product has and offers in-stock neighbours (M-10). Russian texts fall back to Ukrainian field by field.
+- **R-17.** Addresses (M-11): a current or former product slug gives the product's model and its values; a former model slug or the slug of a product inside an accepted model, asked as a model, answers 404 with the address to redirect to. A product off the site or deleted gives 404 with its category, as the product page does.
+
+### Scenarios
+
+- **SC-M07 (R-12, R-13, R-14).** A final category with the accepted model «Завіса» (left in stock, right out of stock) and a handle outside accepted models lists both; `side:right` keeps only «Завіса» with the right hinge's price and «немає в наявності», and still counts the left side; adding «у наявності» empties the list; an unknown value slug is 404.
+- **SC-M08 (R-14).** The parent lists the models of both children without filters; an attribute filter there is 400; an unknown category is 404.
+- **SC-M09 (R-15).** Search by model name, by words of a product name, in Russian, and by an exact 1C code with its address.
+- **SC-M10 (R-16, R-17).** Model page with axis, values, products, texts, breadcrumbs, and characteristics; a product of its own; a product slug of an accepted model gives the redirect address.
+- **SC-M11 (R-17).** The address of an old product slug: an accepted model with the side chosen, a product of its own, a product off the site → its category.
+
+### Public API (`api/catalog/{lang}`, anonymous)
+
+| Method and route | Purpose |
+| --- | --- |
+| `GET /api/catalog/{lang}/{categorySlug}/models` | Model cards of a category tree: `filter` (final category only), `search`, `inStock`, `isSale`, `isNew`, `priceFrom`, `priceTo`, `sort` (`default`, `price_asc`, `price_desc`, `name_asc`, `new`), `page`, `pageSize` (≤ 100); `filters` with counts |
+| `GET /api/catalog/{lang}/models` | The search over all models, same parameters without `filter`; `exactMatch` |
+| `GET /api/catalog/{lang}/model/{modelSlug}` | The model page; 404 with an address body for a redirect |
+| `GET /api/catalog/{lang}/product/{productSlug}/model` | The model address of an old product address |
+
+Contract: [public-site-models.openapi.yaml](../../../contracts/catalog/public-site-models.openapi.yaml). No schema change. The product endpoints stay for the current Angular site. The URL words on the site (`/uk/catalog/<category>/<model>?<axis>=<value>`) come from the attribute and value slugs; stage 7 decides which single-filter pages are indexable.
+
+### Files (stage 5)
+
+```text
+src/Catalog/
+├── Catalog.Contracts/SiteModels/Public/          # new: request, list (card, filter, address), page DTOs
+├── Catalog.Application/Features/SiteModels/Public/
+│   ├── Common/                                   # new: PublicModelCatalog + reader + facts, page mapper
+│   ├── GetList/                                  # new: query, validator, handler, filter, facets
+│   ├── Get/                                      # new: model page
+│   └── GetProductAddress/                        # new: product address → model
+├── Catalog.Api/Controllers/SiteModelsController.cs   # new
+└── Catalog.Infrastructure/DependencyInjection/   # + reader registration
+```
+
+**Residual risk.** Each request reads the on-site catalog (about 2.3 thousand products and their values) without a cache; the Next.js site caches pages (stage 6). A server cache is the next step if the load grows.
+
 ## Stages
 
 | Stage | Scope | Status |
@@ -124,8 +171,8 @@ src/Catalog/
 | 1 | This specification; owner plan and canvas | done 2026-11-05 |
 | 2 | Models in the database, proposals, health, admin API | done 2026-11-05 (migration `CatalogSiteModels`) |
 | 3 | Run the proposals on production (dry run, then on «да») | planned |
-| 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | in progress |
-| 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces KedrStore PR #175 | planned |
+| 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | done 2026-11-05 (KedrStore #176, kedr-web #65) |
+| 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces the reverted spec 006 phase 5 | done 2026-11-05 (no schema change) |
 | 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search | planned |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |
 | 8 | Optional AI drafts for SEO texts and unrecognized attributes (a person confirms) | planned |
@@ -141,3 +188,11 @@ src/Catalog/
 | Migration on a local copy with the 395 production groups | all 395 marked proposed (none was created by a person) |
 
 **Rollout note.** The full 1C sync runs the model build after recognition, so the first sync after deploy creates the one-product proposals on production by itself. They are proposals only: nothing on the site reads models before stage 5, and a proposal disappears when its product leaves the site or joins another model. Stage 3 then reviews the proposals with the owner.
+
+## Evidence (stage 5)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog\|FullyQualifiedName~ApiContractTests"` with local PostgreSQL for the PostgreSQL fixture | 97 passed: SC-M07–SC-M11 in `PublicSiteModelTests`, the routes over HTTP in `PublicSiteModelsApiTests`, the reader and filters on real PostgreSQL in `PublicSiteModelPostgresTests`, the four paths in `ApiContractTests` |
+| `dotnet test tests/ArchitectureTests` | 10 passed |
+| `python3 tools/docs/check_doc_links.py` | links valid |

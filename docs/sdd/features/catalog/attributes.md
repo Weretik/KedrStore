@@ -2,7 +2,7 @@
 
 **Static code check:** 2026-11-05 (spec 007 stage 2). **Module:** Catalog.
 
-Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–4 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, variant groups, the admin API, and the .NET recognizer. Groups are the site models of [spec 007](../../specs/catalog/007-site-models/README.md) (stage 2: status, axes, texts, health, admin API); site filters and the model page follow there.
+Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–4 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, variant groups, the admin API, and the .NET recognizer. Groups are the site models of [spec 007](../../specs/catalog/007-site-models/README.md) (stage 2: status, axes, texts, health, admin API); the public model API of stage 5 is in [public site models](public-site-models.md).
 
 ## Structure and relationships
 

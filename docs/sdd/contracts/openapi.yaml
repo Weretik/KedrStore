@@ -19,6 +19,14 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1products
   /api/catalog/{lang}/product/{productSlug}:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1product~1{productSlug}
+  /api/catalog/{lang}/models:
+    $ref: ./catalog/public-site-models.openapi.yaml#/paths/~1api~1catalog~1{lang}~1models
+  /api/catalog/{lang}/{categorySlug}/models:
+    $ref: ./catalog/public-site-models.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1models
+  /api/catalog/{lang}/model/{modelSlug}:
+    $ref: ./catalog/public-site-models.openapi.yaml#/paths/~1api~1catalog~1{lang}~1model~1{modelSlug}
+  /api/catalog/{lang}/product/{productSlug}/model:
+    $ref: ./catalog/public-site-models.openapi.yaml#/paths/~1api~1catalog~1{lang}~1product~1{productSlug}~1model
   /api/categories:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories
   /api/categories/{id}:
