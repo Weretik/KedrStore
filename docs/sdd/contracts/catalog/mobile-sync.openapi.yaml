@@ -38,7 +38,7 @@ components:
       type: object
       required: [version, generatedAt, retailPriceTypeId, priceTypes, categories, products]
       properties:
-        version: { type: string, description: Hash of the content, equal to the ETag without quotes. }
+        version: { type: string, description: 'Hash of the content, equal to the ETag without quotes.' }
         generatedAt: { type: string, format: date-time, description: When the answer was built; not part of the version. }
         retailPriceTypeId: { type: integer, description: Price type used without a customer. }
         priceTypes:
@@ -68,7 +68,7 @@ components:
       properties:
         id: { type: integer, description: The 1C product code. }
         slug: { type: string }
-        name: { type: string, description: Ukrainian name, or the 1C name without a translation. }
+        name: { type: string, description: 'Ukrainian name, or the 1C name without a translation.' }
         categoryId: { type: integer }
         stock: { type: number }
         inStock: { type: boolean, description: 'The sales catalog rule: hardware needs more than 2, other goods more than 0.' }

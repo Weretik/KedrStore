@@ -38,7 +38,7 @@ components:
       type: object
       required: [version, generatedAt, customers]
       properties:
-        version: { type: string, description: Hash of the content, equal to the ETag without quotes. }
+        version: { type: string, description: 'Hash of the content, equal to the ETag without quotes.' }
         generatedAt: { type: string, format: date-time }
         customers:
           type: array
