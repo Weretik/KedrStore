@@ -53,20 +53,6 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
         return true;
     }
 
-    /// <summary>
-    /// Gives a value without any swatch the built-in color circle (owner decision 2026-11-05: obvious colors are filled
-    /// in; decors get a texture picture from a person). Never changes a value a person edited. Returns whether it changed.
-    /// </summary>
-    public bool ApplyDefaultSwatch(string hex, DateTimeOffset now)
-    {
-        if (IsEditedManually || SwatchHex is not null || SwatchMediaFileId is not null)
-            return false;
-
-        SwatchHex = AttributeText.SwatchHex(hex);
-        UpdatedAt = now;
-        return true;
-    }
-
     /// <summary>A person adds a value in «Властивості». It is manual from the start.</summary>
     public static AttributeValue CreateManual(AttributeId attributeId, string code, string nameUk, string? nameRu,
         string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)

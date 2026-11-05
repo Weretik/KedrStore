@@ -76,7 +76,6 @@ public sealed class RecognizeCatalogAttributesJob(
         report.ProductsInFile = recognized.Count;
         var valueByKey = await writer.SyncValuesAsync(AttributeCsvFile.ToSizeValues(sizes), attributeByCode,
             updateExisting: false, apply, now, report, cancellationToken);
-        await writer.FillDefaultSwatchesAsync(attributeByCode, apply, now, report, cancellationToken);
         await writer.WriteProductsAsync(recognized, attributeByCode, valueByKey, AttributeValueSource.Parser, apply, now,
             report, cancellationToken);
         report.Groups = await groupBuilder.RunAsync(apply, cancellationToken);

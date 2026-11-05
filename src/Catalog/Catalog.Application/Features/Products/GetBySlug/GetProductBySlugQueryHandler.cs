@@ -1,7 +1,6 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Products.GetBySlug.DTOs;
 using Catalog.Application.Features.Products.GetBySlug.Extensions;
-using Catalog.Application.Querying;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Category;
 using Catalog.Domain.ValueObjects;
@@ -9,10 +8,7 @@ using Catalog.Domain.ValueObjects;
 namespace Catalog.Application.Features.Products.GetBySlug;
 
 /// <summary>Public product page: current or former slug resolves; a deleted product points to its category (R-018).</summary>
-public class GetProductBySlugQueryHandler(
-    IReadCatalogDbContext catalogDbContext,
-    ISlugService slugService,
-    ProductVariantsReader variantsReader)
+public class GetProductBySlugQueryHandler(IReadCatalogDbContext catalogDbContext, ISlugService slugService)
     : IQueryHandler<GetProductBySlugQuery, Result<CatalogLookup<ProductBySlugDto>>>
 {
     public async ValueTask<Result<CatalogLookup<ProductBySlugDto>>> Handle(GetProductBySlugQuery query,
@@ -44,15 +40,7 @@ public class GetProductBySlugQueryHandler(
             .AsNoTracking()
             .BuildCategoryBreadcrumbsAsync(result.CategorySlug, cancellationToken);
 
-        var (variants, characteristics) = await variantsReader.ReadAsync(result.Id,
-            CatalogLanguage.Normalize(request.Lang), cancellationToken);
-
-        return Result.Success(CatalogLookup<ProductBySlugDto>.Found(result with
-        {
-            Breadcrumbs = breadcrumbs,
-            Variants = variants,
-            Characteristics = characteristics
-        }));
+        return Result.Success(CatalogLookup<ProductBySlugDto>.Found(result with { Breadcrumbs = breadcrumbs }));
     }
 
     private Task<int?> FindDeletedBySlugAsync(string slug, CancellationToken cancellationToken)

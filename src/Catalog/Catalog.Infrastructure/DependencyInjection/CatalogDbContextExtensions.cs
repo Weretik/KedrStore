@@ -42,10 +42,6 @@ public static class CatalogDbContextExtensions
         services.AddScoped<Catalog.Application.Attributes.Import.RecognizedProductWriter>();
         services.AddScoped<Catalog.Application.Jobs.Attributes.RecognizeCatalogAttributesJob>();
         services.AddScoped<CategoryFilterReader>();
-        services.AddScoped<Catalog.Application.Features.Products.PublicListing.PublicProductQuery>();
-        services.AddScoped<Catalog.Application.Features.Products.PublicListing.AttributeFilters>();
-        services.AddScoped<Catalog.Application.Features.Products.PublicListing.VariantGroupReader>();
-        services.AddScoped<Catalog.Application.Features.Products.GetBySlug.ProductVariantsReader>();
         services.AddScoped<ICategoryStatsReader, CategoryStatsReader>();
         services.AddScoped<IAdminCategoryInsightsReader, AdminCategoryInsightsReader>();
 

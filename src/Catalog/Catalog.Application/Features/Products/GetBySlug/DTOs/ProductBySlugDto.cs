@@ -24,10 +24,4 @@ public record  ProductBySlugDto
     public DateTimeOffset UpdatedAt { get; init; }
 
     public IReadOnlyList<CategoryBreadcrumbDto> Breadcrumbs { get; init; } = [];
-
-    /// <summary>The variant group with at least two variants on the site; null otherwise.</summary>
-    public ProductVariantsDto? Variants { get; init; }
-
-    /// <summary>Confirmed attribute values for «Характеристики», in attribute order.</summary>
-    public IReadOnlyList<ProductCharacteristicDto> Characteristics { get; init; } = [];
 }
