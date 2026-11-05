@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Entities.Groups;
 
 namespace Catalog.Application.Contracts.Persistence;
 
@@ -18,4 +19,6 @@ public interface IReadCatalogDbContext
     DbSet<CategoryAttribute> CategoryAttributes { get; }
     DbSet<ProductAttributeValue> ProductAttributeValues { get; }
     DbSet<ProductAttributeReview> ProductAttributeReviews { get; }
+    DbSet<ProductGroup> ProductGroups { get; }
+    DbSet<ProductGroupMember> ProductGroupMembers { get; }
 }

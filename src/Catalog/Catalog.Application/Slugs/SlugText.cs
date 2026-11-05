@@ -52,7 +52,12 @@ public static partial class SlugText
         => slug is { Length: > 0 and <= MaxLength } && Pattern().IsMatch(slug);
 
     private static string Fallback(CatalogEntityType kind)
-        => kind == CatalogEntityType.Category ? "category" : "product";
+        => kind switch
+        {
+            CatalogEntityType.Category => "category",
+            CatalogEntityType.ProductGroup => "hrupa",
+            _ => "product"
+        };
 
     private static string Cut(string slug, int maxLength)
     {

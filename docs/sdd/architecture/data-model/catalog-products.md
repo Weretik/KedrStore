@@ -15,6 +15,8 @@
 | `CatalogCategoryAttributes` | `CategoryId`, `AttributeId` | Filters offered in a category: `IsFilterable`, `SortOrder`. |
 | `CatalogProductAttributeValues` | `ProductId`, `AttributeId`, `Position` | Product value: `ValueId` (FK) or `NumberValue`, `Source` (1 import, 2 parser, 3 manual), `IsLocked`, `IsConfirmed`. Index on `AttributeId, ValueId`. |
 | `CatalogProductAttributeReviews` | `ProductId` | Recognition state: `BaseName`, `State` (0 clear, 1 needs review, 2 accepted), `Reasons` (jsonb list of code and text), `AcceptedBy`, `AcceptedAt`. |
+| `CatalogProductGroups` | `Id` (identity) | Variant group: `CategoryId` (FK), `Name`, `GroupKey` (normalized base name, unique per category; empty for a group a person created), `Slug` (unique; history in slug history as type 3), `MainProductId` (FK, set null), `IsMainManual`, `IsCreatedManually`. |
+| `CatalogProductGroupMembers` | `ProductId` | Group of a product (at most one): `GroupId` (FK, cascade; empty for a product kept out of groups), `IsPinned` (a person set it; automation leaves it). |
 
 ```mermaid
 erDiagram
@@ -28,6 +30,9 @@ erDiagram
     CatalogAttributes ||--o{ CatalogAttributeAliases : "AttributeId FK"
     CatalogAttributeValues ||--o{ CatalogProductAttributeValues : "ValueId FK"
     ProductCategories ||--o{ CatalogCategoryAttributes : "CategoryId FK, cascade"
+    ProductCategories ||--o{ CatalogProductGroups : "CategoryId FK"
+    CatalogProductGroups ||--o{ CatalogProductGroupMembers : "GroupId FK, cascade"
+    Products ||--o| CatalogProductGroupMembers : "ProductId FK, cascade"
 ```
 
 `ProductPrices.PriceTypeId` semantically references `PriceType.Id`, but the snapshot has no physical FK. See [categories](catalog-categories.md) for `ProductCategories`. `ProductMedia.MediaFileId` refers to `media.MediaFiles.Id` by ID only, with no cross-module FK; Media tells Catalog about replaced and deleted files. The list projection has a separate [owner](README.md) and is not duplicated here.

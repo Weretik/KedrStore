@@ -35,16 +35,35 @@ public class ProductAttributeReview : IAggregateRoot
 
     /// <summary>
     /// Applies an automatic recognition result. An accepted product stays accepted (owner decision 2026-11-05);
-    /// its reasons are still updated so a person sees them when reopening. Returns whether anything changed.
+    /// its reasons are still updated so a person sees them when reopening. Reasons owned by the group build stay.
+    /// Returns whether anything changed.
     /// </summary>
     public bool ApplyAutomatic(string baseName, IReadOnlyList<AttributeReviewReason> reasons, DateTimeOffset now)
     {
-        var normalized = Normalize(reasons);
+        var normalized = Normalize(reasons.Where(reason => !AttributeReviewReason.IsOwnedByGroups(reason))
+            .Concat(_reasons.Where(AttributeReviewReason.IsOwnedByGroups)).ToList());
         var name = AttributeText.Required(baseName, BaseNameMaxLength, nameof(BaseName));
         if (BaseName == name && _reasons.SequenceEqual(normalized) && State == NextState(normalized))
             return false;
 
         Apply(name, normalized, now);
+        return true;
+    }
+
+    /// <summary>
+    /// Sets or clears the «Однакові варіанти» reason found by the group build; <paramref name="text"/> names the
+    /// matching products, <c>null</c> clears it. Returns whether anything changed.
+    /// </summary>
+    public bool SetSameVariants(string? text, DateTimeOffset now)
+    {
+        var others = _reasons.Where(reason => reason.Code != AttributeReviewReason.SameVariants);
+        var wanted = Normalize((text is null
+            ? others
+            : others.Append(new AttributeReviewReason(AttributeReviewReason.SameVariants, text))).ToList());
+        if (_reasons.SequenceEqual(wanted))
+            return false;
+
+        Apply(BaseName, wanted, now);
         return true;
     }
 

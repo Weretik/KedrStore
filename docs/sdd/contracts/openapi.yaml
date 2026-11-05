@@ -39,6 +39,16 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1slug
   /api/admin/products/{id}/media:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1media
+  /api/admin/products/{id}/group:
+    $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1products~1{id}~1group
+  /api/admin/product-groups:
+    $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups
+  /api/admin/product-groups/{id}:
+    $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}
+  /api/admin/product-groups/{id}/main:
+    $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1main
+  /api/admin/product-groups/{id}/slug:
+    $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1slug
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:

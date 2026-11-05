@@ -1,6 +1,9 @@
+using Catalog.Application.Groups;
 using Catalog.Application.Jobs.Attributes;
+using Catalog.Application.Slugs;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Entities.Groups;
 using Catalog.Domain.ValueObjects;
 using Catalog.Infrastructure.DataBase;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -20,8 +23,13 @@ internal static class AttributeImportTestSupport
             new TestRepository<ProductAttributeValue>(db),
             new TestRepository<ProductAttributeReview>(db),
             new TestRepository<CategoryAttribute>(db),
+            GroupBuilder(db),
             TimeProvider.System,
             NullLogger<ImportCatalogAttributesJob>.Instance);
+
+    public static ProductGroupBuilder GroupBuilder(CatalogDbContext db)
+        => new(db, new TestRepository<ProductGroup>(db), new TestRepository<ProductGroupMember>(db), new SlugService(db),
+            TimeProvider.System);
 
     public static async Task<AttributeImportReport> RunAsync(CatalogDbContext db, string dictionaryJson, string csv,
         bool apply)

@@ -163,6 +163,15 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
         Assert.Equal(0, second.ProductValues.Created + second.ProductValues.Updated + second.ProductValues.Removed);
         Assert.Equal(0, second.Reviews.Created + second.Reviews.Updated);
         Assert.Equal(0, second.Values.Created + second.Aliases.Created + second.CategoryAttributes.Created);
+
+        output.WriteLine($"groups {first.Groups.Groups}; members {first.Groups.Members}; same variants groups " +
+                         $"{first.Groups.GroupsWithSameVariants}, products {first.Groups.ProductsWithSameVariants}");
+        Assert.Equal(395, first.Groups.Groups.Created);
+        Assert.Equal(1531, first.Groups.Members.Created);
+        Assert.Equal(33, first.Groups.GroupsWithSameVariants);
+        Assert.Equal(0, second.Groups.Groups.Created + second.Groups.Groups.Updated + second.Groups.Groups.Removed);
+        Assert.Equal(0, second.Groups.Members.Created + second.Groups.Members.Updated + second.Groups.Members.Removed);
+        Assert.Equal(0, second.Groups.ReviewsChanged);
     }
 
     private static int CategoryOf(string[] lines, int lineNumber)
