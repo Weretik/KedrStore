@@ -1,5 +1,7 @@
+using Catalog.Application.Attributes.Recognition;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Attributes.Common;
+using Catalog.Application.Jobs.Attributes;
 using Catalog.Contracts.Attributes;
 using Catalog.Domain.Entities.Attributes;
 using Catalog.Domain.ValueObjects;
@@ -10,7 +12,9 @@ public sealed class DecideAttributeCodeCommandHandler(
     IReadCatalogDbContext db,
     ICatalogRepository<AttributeAlias> aliases,
     UnresolvedCodeReader reader,
-    TimeProvider clock)
+    RecognizeCatalogAttributesJob recognizer,
+    TimeProvider clock,
+    ILogger<DecideAttributeCodeCommandHandler> logger)
     : ICommandHandler<DecideAttributeCodeCommand, Result<DecideAttributeCodeResponse>>
 {
     public async ValueTask<Result<DecideAttributeCodeResponse>> Handle(DecideAttributeCodeCommand command,
@@ -44,7 +48,32 @@ public sealed class DecideAttributeCodeCommandHandler(
         }
 
         await aliases.SaveChangesAsync(cancellationToken);
+        await RecognizeAgainAsync(alias.RawValue, cancellationToken);
         return Result.Success(new DecideAttributeCodeResponse((await reader.ReadAsync(aliasId, cancellationToken))!,
             confirmed));
+    }
+
+    /// <summary>
+    /// The decision reaches the products at once: those whose names contain the code are recognized again. A failure
+    /// here keeps the decision; the next 1C sync recognizes them.
+    /// </summary>
+    private async Task RecognizeAgainAsync(string rawValue, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var names = await db.Products.IgnoreQueryFilters().AsNoTracking()
+                .Select(product => new { product.Id, product.Name })
+                .ToListAsync(cancellationToken);
+            var ids = names.Where(product => ProductAttributeRecognizer.Mentions(product.Name, rawValue))
+                .Select(product => product.Id.Value)
+                .ToList();
+            if (ids.Count > 0)
+                await recognizer.RunAsync(apply: true, ids, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            logger.LogError(exception, "Recognizing products with code {RawValue} after the owner's decision failed.",
+                rawValue);
+        }
     }
 }

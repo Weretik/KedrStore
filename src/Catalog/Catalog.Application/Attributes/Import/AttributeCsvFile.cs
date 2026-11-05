@@ -47,7 +47,7 @@ public static class AttributeCsvFile
 
             try
             {
-                products.Add(ReadRow(lineNumber, name => Cell(fields, columns, name), sizes));
+                products.Add(FromCells(lineNumber, name => Cell(fields, columns, name), sizes));
             }
             catch (Exception exception) when (exception is FormatException or System.Text.Json.JsonException or KeyNotFoundException
                                                   or InvalidOperationException)
@@ -56,21 +56,26 @@ public static class AttributeCsvFile
             }
         }
 
-        var sizeValues = sizes
+        return new Result(products, ToSizeValues(sizes), errors);
+    }
+
+    /// <summary>Size values found in the rows (code → text), ordered by their numbers.</summary>
+    public static IReadOnlyList<AttributeValueDefinition> ToSizeValues(IReadOnlyDictionary<string, string> sizes)
+        => sizes
             .OrderBy(size => SizeSortKey(size.Value), StringComparer.Ordinal)
             .Select((size, index) => new AttributeValueDefinition(AttributeImportCatalog.Size, size.Key, size.Value, index))
             .ToList();
-
-        return new Result(products, sizeValues, errors);
-    }
 
     /// <summary>Stable code of a size expression: «100×75×2.5 mm» → <c>100x75x2.5mm</c>.</summary>
     public static string SizeCode(string sizeText)
         => new string(sizeText.Trim().ToLowerInvariant().Replace('×', 'x').Replace('х', 'x')
             .Where(character => !char.IsWhiteSpace(character)).ToArray());
 
-    private static RecognizedProduct ReadRow(int lineNumber, Func<string, string?> cell,
-        Dictionary<string, string> sizes)
+    /// <summary>
+    /// One recognizer row (from the CSV or the .NET recognizer) as product values and review reasons. A cell is
+    /// null when empty. New size texts are added to <paramref name="sizes"/>.
+    /// </summary>
+    public static RecognizedProduct FromCells(int lineNumber, Func<string, string?> cell, Dictionary<string, string> sizes)
     {
         var productId = int.Parse(cell("product_id") ?? throw new FormatException("product_id is empty."),
             NumberStyles.Integer, CultureInfo.InvariantCulture);

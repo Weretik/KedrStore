@@ -1,12 +1,14 @@
 # Catalog attributes
 
-**Static code check:** 2026-11-05 (phase 3 backend). **Module:** Catalog.
+**Static code check:** 2026-11-05 (phase 4). **Module:** Catalog.
 
-Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–3 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, variant groups, and the admin API; parser, site filters, and SEO follow.
+Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–4 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, variant groups, the admin API, and the .NET recognizer; site filters and SEO follow.
 
 ## Structure and relationships
 
 [ImportCatalogAttributesJob](../../../../src/Catalog/Catalog.Application/Jobs/Attributes/ImportCatalogAttributesJob.cs) reads the [dictionary file](../../../../src/Catalog/Catalog.Application/Attributes/Import/AttributeDictionaryFile.cs) and the [recognizer CSV](../../../../src/Catalog/Catalog.Application/Attributes/Import/AttributeCsvFile.cs), then syncs attributes, values, and aliases by code, product values and reviews by product, and offers category filters. [AttributeImportCatalog](../../../../src/Catalog/Catalog.Application/Attributes/Import/AttributeImportCatalog.cs) holds the built-in settings (kind, unit, URL slug, filterable, variant axis).
+
+[RecognizeCatalogAttributesJob](../../../../src/Catalog/Catalog.Application/Jobs/Attributes/RecognizeCatalogAttributesJob.cs) recognizes current 1C names with [ProductAttributeRecognizer](../../../../src/Catalog/Catalog.Application/Attributes/Recognition/ProductAttributeRecognizer.cs), the port of `extract_attributes.py` v2.0, which gives the same row as the CSV. The [dictionary](../../../../src/Catalog/Catalog.Application/Attributes/Recognition/RecognitionDictionary.cs) is the embedded `dictionaries.json` with the owner's code decisions on top. Both the import and the recognizer store rows through [RecognizedProductWriter](../../../../src/Catalog/Catalog.Application/Attributes/Import/RecognizedProductWriter.cs); the recognizer's source is `parser`. It runs at the end of the full 1C sync and, for the products that contain a code, after the owner decides that code.
 
 [ProductGroupBuilder](../../../../src/Catalog/Catalog.Application/Groups/ProductGroupBuilder.cs) runs at the end of the import and after every admin group change. Products with the same base name ([ProductGroupKey](../../../../src/Catalog/Catalog.Application/Groups/ProductGroupKey.cs)) in one category form a [ProductGroup](../../../../src/Catalog/Catalog.Domain/Entities/Groups/ProductGroup.cs) when there are at least two; No name and deleted products never join automatically, and rows a person pinned ([ProductGroupMember](../../../../src/Catalog/Catalog.Domain/Entities/Groups/ProductGroupMember.cs)) are never moved. The main product stays while it is on the site; otherwise the builder takes the best one (on the site, with a photo, in stock, smallest 1C code). Variants that color, size, and side do not tell apart get the review reason `same_variants` («Однакові варіанти»), which the import keeps.
 
@@ -24,19 +26,20 @@ src/Catalog/
 │   ├── Attributes/  # attribute, value, alias, category filter, product value, review
 │   └── Groups/      # variant group and the group of each product
 ├── Catalog.Application/
-│   ├── Attributes/Import/  # file readers and built-in attribute settings
+│   ├── Attributes/Import/  # file readers, built-in attribute settings, writer shared with the recognizer
+│   ├── Attributes/Recognition/  # .NET port of the recognizer (dictionary, observations, base name, row)
 │   ├── Groups/             # group builder, key, report
 │   ├── Features/Groups/    # admin queries and commands (picker, group, move, create, rename, main)
 │   ├── Features/ProductAttributes/  # product panel: values, revert, review decisions
 │   ├── Features/Attributes/         # «Властивості»: attributes, values, codes, category filters, reasons
-│   └── Jobs/Attributes/ImportCatalogAttributesJob.cs  # the import and its report
+│   └── Jobs/Attributes/  # import (CSV) and recognition (1C names) jobs, report
 ├── Catalog.Api/Controllers/  # AdminProductGroups, AdminProductAttributes, AdminCatalogAttributes
 └── Catalog.Infrastructure/Configurations/{Attributes,Groups}/  # EF mappings
 ```
 
 ## Tests
 
-[AttributeImportTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeImportTests.cs) · [ProductGroupBuilderTests.cs](../../../../tests/IntegrationTests/Catalog/Groups/ProductGroupBuilderTests.cs) · [AttributeImportFilesTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeImportFilesTests.cs) · [ProductGroupTests.cs](../../../../tests/UnitTests/Catalog/Groups/ProductGroupTests.cs) · [AttributeAdminTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeAdminTests.cs) · [AdminAttributesApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/AdminAttributesApiTests.cs) · [AttributeManualEditTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeManualEditTests.cs)
+[AttributeImportTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeImportTests.cs) · [ProductGroupBuilderTests.cs](../../../../tests/IntegrationTests/Catalog/Groups/ProductGroupBuilderTests.cs) · [AttributeImportFilesTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeImportFilesTests.cs) · [ProductGroupTests.cs](../../../../tests/UnitTests/Catalog/Groups/ProductGroupTests.cs) · [AttributeAdminTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeAdminTests.cs) · [AdminAttributesApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/AdminAttributesApiTests.cs) · [AttributeManualEditTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeManualEditTests.cs) · [AttributeRecognizerGoldenTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeRecognizerGoldenTests.cs) · [AttributeRecognizerDecisionTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeRecognizerDecisionTests.cs) · [AttributeRecognitionTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeRecognitionTests.cs)
 
 Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog.Attributes|FullyQualifiedName~IntegrationTests.Catalog.Groups"` and `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Catalog.Attributes|FullyQualifiedName~UnitTests.Catalog.Groups"`.
 

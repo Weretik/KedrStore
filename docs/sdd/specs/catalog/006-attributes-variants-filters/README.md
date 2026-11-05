@@ -1,6 +1,6 @@
 # 006 — Catalog attributes, variant groups, filters, and SEO
 
-**Module:** Catalog. **Status:** phases 1 (model + import) and 2 (groups) implemented 2026-11-05; phases 3–7 planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 planned. **Date:** 2026-11-05.
 
 The owner-facing plan with every decision is the Russian document [«Каталог: атрибути, варіанти, фільтри і SEO — SDD»](https://claude.ai/artifact/5QwjXyutiyQg4FyzhdaPJR). This file is its technical summary and the evidence log. Input files and their description: [docs/catalog-attributes](../../../../catalog-attributes/README.md).
 
@@ -44,6 +44,11 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **R-16.** «Властивості» is read by Manager and Admin and changed by Admin only. An edited attribute, value, code, or category filter is marked manual and the dictionary import leaves it. A value swatch is a #RRGGBB color or a media-library texture. A decoded code confirms the product values that waited only for it; codes decoded for the first time reach products with the phase 4 parser.
 - **R-17.** «Огляд» counts on-site products that need review and the No name ones among them; the admin shows no line at zero.
 
+- **R-18.** The .NET recognizer gives, from the original name, the category path, and `dictionaries.json` (embedded in the application), exactly the row of `products_attributes.csv` for every product. It reads names only and never changes them.
+- **R-19.** The recognizer stores its rows with the import's rules (R-02, R-04, R-05, R-11) and source `parser`; it only creates missing size values and never renames values. Without `--apply` it only reports.
+- **R-20.** It runs at the end of the full 1C sync (`--job=full`), before the list rebuild; a failure there is logged and does not stop the sync. After a code decision in «Не розшифровані коди», products whose names may contain the code (Cyrillic look-alike letters and case included) are recognized again at once.
+- **R-21.** The owner's code decisions (aliases a person edited) win over the dictionary file: a decoded code gives the chosen value as confirmed, and «нічого не означає» makes the recognizer ignore the code, so its review reason disappears.
+
 ## Scenarios (phase 1)
 
 - **SC-A01 (R-03).** Without `--apply` the import reports counts and writes nothing.
@@ -70,14 +75,21 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **SC-A05 (R-16).** A category filter an Admin turns off stays off after the import.
 - **SC-A06 (R-15, R-17).** Over HTTP: rows show the group and the problems; «Тільки проблемні» and the reason filter list the right products; «Огляд» counts problems and No name; a Manager reads «Властивості» but gets 403 on a change; an accepted product leaves «Тільки проблемні».
 
+## Scenarios (phase 4)
+
+- **SC-P01 (R-18).** For all 2330 products of the CSV the .NET row equals the CSV row in every column (`extra_attributes` compared as JSON).
+- **SC-P02 (R-19).** Over the imported real catalog the recognizer reports no new values, rewrites the 7874 values only to source `parser`, changes no reviews or groups, and a second run changes nothing.
+- **SC-P03 (R-19, R-02).** A new product gets parser values and a review; a value a person set stays.
+- **SC-P04 (R-20, R-21).** Deciding `AL` as meaning nothing removes the `unresolved_material_code` reason from the products with `AL`; decoding it as a value gives that value.
+
 ## Phases
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Model, migration `CatalogAttributes`, import job `import-catalog-attributes` | done 2026-11-05 |
 | 2 | Product groups (`ProductGroup` slug type 3), main product, «Однакові варіанти», group API | done 2026-11-05 |
-| 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | backend done 2026-11-05 (migration `CatalogAttributesAdmin`); kedr-web screens next |
-| 4 | .NET parser port with a golden test against the CSV (2330/2330), runs on 1C sync and dictionary changes | planned |
+| 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | done 2026-11-05 (migration `CatalogAttributesAdmin`; kedr-web screens) |
+| 4 | .NET parser port with a golden test against the CSV (2330/2330), runs on 1C sync and dictionary changes | done 2026-11-05 (no migration) |
 | 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | planned |
 | 6 | Single-filter pages, templates, noindex/canonical, redirects, sitemap, `ProductGroup` JSON-LD | planned |
 | 7 | Optional AI suggestions for problem products (person confirms) | planned |
@@ -132,6 +144,31 @@ src/Catalog/
 ```
 
 Contract: [attributes.openapi.yaml](../../../contracts/catalog/attributes.openapi.yaml); `problemsOnly`, `problemReason`, and the row fields in [products.openapi.yaml](../../../contracts/catalog/products.openapi.yaml); counts in [admin-overview.openapi.yaml](../../../contracts/catalog/admin-overview.openapi.yaml).
+
+## Code (phase 4)
+
+```text
+src/Catalog/Catalog.Application/
+├── Attributes/Recognition/   # port of extract_attributes.py v2.0: dictionary (+ owner decisions), category paths,
+│                             # name observations, product kinds, measurements, base name, CSV-shaped row
+├── Attributes/Import/RecognizedProductWriter.cs  # shared by the import and the recognizer (values, reviews, filters)
+├── Jobs/Attributes/RecognizeCatalogAttributesJob.cs  # all or some products → parser values, then the group build
+├── Integrations/OneC/Jobs/SyncOneCFullJob.cs         # runs the recognizer before the list rebuild (R-20)
+└── Features/Attributes/DecideCode/                   # recognizes products with the decided code again (R-20)
+```
+
+`dictionaries.json` is an embedded resource of `Catalog.Application`. Host.Jobs: `--job=recognize-catalog-attributes [--apply]`; Cloud Run jobs `catalog-attributes-recognize-dry-run` and `catalog-attributes-recognize-apply`, run only by hand.
+
+## Evidence (phase 4, 2026-11-05)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/UnitTests/UnitTests.csproj` | 250 passed; `AttributeRecognizerGoldenTests` 2330/2330 rows equal (a broken base-name rule gives 22 diffs, so the test compares); `AttributeRecognizerDecisionTests` 9 passed |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Catalog"` | 55 passed, 4 skipped (Docker-only); SC-P02–SC-P04 in `AttributeRecognitionTests` |
+| `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj` | 10 passed |
+| Copy of the phase 3 PostgreSQL 16 test database: `--job=recognize-catalog-attributes`, then `--apply` twice | dry run and first apply: 2330 products, 0 new values, 7874 values to source `parser`, reviews and 395 groups unchanged, 0 errors, 8 s; second apply: all unchanged. With `AL` decided as meaning nothing: 234 reviews change, 1668 → 1504 need review |
+
+Not done here: running the recognizer on production. It runs by itself at the next full 1C sync after the deploy; the dry-run Cloud Run job shows the changes first.
 
 ## Evidence (phase 3 backend, 2026-11-05)
 

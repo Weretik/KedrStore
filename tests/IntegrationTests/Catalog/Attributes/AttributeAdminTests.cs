@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using global::Catalog.Application.Features.Attributes.Common;
 using global::Catalog.Application.Features.Attributes.DecideCode;
@@ -142,7 +143,7 @@ public sealed class AttributeAdminTests
         Assert.False(Assert.Single(await ColorsAsync(db, 2)).IsConfirmed);
 
         var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db), codes,
-            TimeProvider.System);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(cp.AliasId,
             new DecideAttributeCodeRequest(await ValueIdAsync(db, "CR"))), CancellationToken.None);
 

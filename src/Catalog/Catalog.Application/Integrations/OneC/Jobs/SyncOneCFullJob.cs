@@ -1,4 +1,5 @@
 using Catalog.Application.Contracts.Projections;
+using Catalog.Application.Jobs.Attributes;
 
 namespace Catalog.Application.Integrations.OneC.Jobs;
 
@@ -9,7 +10,9 @@ public sealed class SyncOneCFullJob(
     SyncOneCPricesJob prices,
     SyncOneCProductDetailsJob products,
     SyncOneCCategoryJob categories,
-    IProductListProjectionRebuilder productListProjectionRebuilder)
+    RecognizeCatalogAttributesJob attributes,
+    IProductListProjectionRebuilder productListProjectionRebuilder,
+    ILogger<SyncOneCFullJob> logger)
 {
     public async Task RunAsync(CancellationToken cancellationToken)
     {
@@ -35,7 +38,28 @@ public sealed class SyncOneCFullJob(
         await prices.RunAsync(hardware, cancellationToken, rebuildProjection: false);
         await prices.RunAsync(cosmos, cancellationToken, rebuildProjection: false);
 
+        await RecognizeAttributesAsync(cancellationToken);
+
         await productListProjectionRebuilder.RebuildAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// New and renamed products get attributes from their names (spec catalog/006, phase 4). A failure is logged and
+    /// does not stop prices, stocks, or the list rebuild.
+    /// </summary>
+    private async Task RecognizeAttributesAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var report = await attributes.RunAsync(apply: true, productIds: null, cancellationToken);
+            if (report.Errors.Count > 0)
+                logger.LogWarning("Attribute recognition after the 1C sync reported {Errors} errors; first: {First}",
+                    report.Errors.Count, report.Errors[0]);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            logger.LogError(exception, "Attribute recognition after the 1C sync failed.");
+        }
     }
 
     private static string Required(IConfiguration cfg, string key)

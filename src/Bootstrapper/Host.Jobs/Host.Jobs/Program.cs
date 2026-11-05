@@ -142,23 +142,15 @@ try
                 var importReport = await scopeServiceProvider.GetRequiredService<ImportCatalogAttributesJob>().RunAsync(
                     dictionaryStream, csvReader, args.Contains("--apply", StringComparer.OrdinalIgnoreCase),
                     cancellationToken);
-                Console.WriteLine($"[RESULT] import-catalog-attributes applied={importReport.Applied}; " +
-                                  $"products={importReport.ProductsInFile}; needReview={importReport.ProductsNeedingReview}");
-                Console.WriteLine($"[RESULT] attributes {importReport.Attributes}");
-                Console.WriteLine($"[RESULT] values {importReport.Values}");
-                Console.WriteLine($"[RESULT] aliases {importReport.Aliases}");
-                Console.WriteLine($"[RESULT] product values {importReport.ProductValues}");
-                Console.WriteLine($"[RESULT] reviews {importReport.Reviews}");
-                Console.WriteLine($"[RESULT] category filters {importReport.CategoryAttributes}");
-                var groupReport = importReport.Groups;
-                Console.WriteLine($"[RESULT] groups {groupReport.Groups}");
-                Console.WriteLine($"[RESULT] group members {groupReport.Members}; grouped products={groupReport.GroupedProducts}");
-                Console.WriteLine($"[RESULT] same variants groups={groupReport.GroupsWithSameVariants}; " +
-                                  $"products={groupReport.ProductsWithSameVariants}; reviews changed={groupReport.ReviewsChanged}");
-                Console.WriteLine($"[RESULT] errors={importReport.Errors.Count}");
-                foreach (var error in importReport.Errors.Take(AttributeImportReport.MaxErrorsShown))
-                    Console.WriteLine($"[ERROR] {error}");
+                PrintAttributeReport("import-catalog-attributes", importReport);
             }
+            break;
+
+        case "recognize-catalog-attributes":
+            // The .NET recognizer over current 1C names (spec catalog/006, phase 4); dry run without --apply.
+            var recognizeReport = await scopeServiceProvider.GetRequiredService<RecognizeCatalogAttributesJob>().RunAsync(
+                args.Contains("--apply", StringComparer.OrdinalIgnoreCase), productIds: null, cancellationToken);
+            PrintAttributeReport("recognize-catalog-attributes", recognizeReport);
             break;
 
         case "rebuild-projections":
@@ -202,6 +194,26 @@ catch (Exception ex)
 {
     logger.LogError(ex, "Job {JobKey} failed.", jobKey);
     return 1;
+}
+
+static void PrintAttributeReport(string jobName, AttributeImportReport report)
+{
+    Console.WriteLine($"[RESULT] {jobName} applied={report.Applied}; " +
+                      $"products={report.ProductsInFile}; needReview={report.ProductsNeedingReview}");
+    Console.WriteLine($"[RESULT] attributes {report.Attributes}");
+    Console.WriteLine($"[RESULT] values {report.Values}");
+    Console.WriteLine($"[RESULT] aliases {report.Aliases}");
+    Console.WriteLine($"[RESULT] product values {report.ProductValues}");
+    Console.WriteLine($"[RESULT] reviews {report.Reviews}");
+    Console.WriteLine($"[RESULT] category filters {report.CategoryAttributes}");
+    var groupReport = report.Groups;
+    Console.WriteLine($"[RESULT] groups {groupReport.Groups}");
+    Console.WriteLine($"[RESULT] group members {groupReport.Members}; grouped products={groupReport.GroupedProducts}");
+    Console.WriteLine($"[RESULT] same variants groups={groupReport.GroupsWithSameVariants}; " +
+                      $"products={groupReport.ProductsWithSameVariants}; reviews changed={groupReport.ReviewsChanged}");
+    Console.WriteLine($"[RESULT] errors={report.Errors.Count}");
+    foreach (var error in report.Errors.Take(AttributeImportReport.MaxErrorsShown))
+        Console.WriteLine($"[ERROR] {error}");
 }
 
 static string? GetArg(string[] args, string name)
