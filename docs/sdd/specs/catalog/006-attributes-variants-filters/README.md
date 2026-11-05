@@ -1,6 +1,6 @@
 # 006 — Catalog attributes, variant groups, filters, and SEO
 
-**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), 4 (.NET parser), and 5 backend (filters and variants API) implemented 2026-11-05; phase 5 site and phases 6–7 planned. **Date:** 2026-11-05.
 
 The owner-facing plan with every decision is the Russian document [«Каталог: атрибути, варіанти, фільтри і SEO — SDD»](https://claude.ai/artifact/5QwjXyutiyQg4FyzhdaPJR). This file is its technical summary and the evidence log. Input files and their description: [docs/catalog-attributes](../../../../catalog-attributes/README.md).
 
@@ -47,6 +47,11 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **R-18.** The .NET recognizer gives, from the original name, the category path, and `dictionaries.json` (embedded in the application), exactly the row of `products_attributes.csv` for every product. It reads names only and never changes them.
 - **R-19.** The recognizer stores its rows with the import's rules (R-02, R-04, R-05, R-11) and source `parser`; it only creates missing size values and never renames values. Without `--apply` it only reports.
 - **R-20.** It runs at the end of the full 1C sync (`--job=full`), before the list rebuild; a failure there is logged and does not stop the sync. After a code decision in «Не розшифровані коди», products whose names may contain the code (Cyrillic look-alike letters and case included) are recognized again at once.
+- **R-22.** The product list takes `filter=attribute-slug:value-slug[,value-slug]` (repeatable): values of one attribute match any, different attributes all; only confirmed values match (R-06). A malformed filter is `400`, an unknown attribute or value slug `404`. Without `filter` and `groupVariants` the list is unchanged.
+- **R-23.** With `groupVariants=true` a variant group is one card at the place of its first matching product. The card shows the main product when it matches, otherwise the first matching variant, with the number of the group's on-site variants and their main colors. Counts and pages are in cards.
+- **R-24.** `GET /api/catalog/{lang}/{categorySlug}/facets` lists the attributes the category tree offers as filters (category filter on, attribute filterable, not a number attribute) with card counts. A value's count applies the other attributes' choices but not its own; values without cards are hidden unless chosen.
+- **R-25.** The product page carries `variants` (axes among color, size, and side whose confirmed values differ inside the group; every on-site variant with slug, price, stock, and axis values; the main product slug) and `characteristics` (confirmed values in attribute order). A two-color value is one axis value.
+- **R-26.** Plain colors get a built-in circle color (owner decision 2026-11-05); decors (`DEC_*`) wait for a texture picture. The dictionary import and the recognizer fill only empty values a person did not edit.
 - **R-21.** The owner's code decisions (aliases a person edited) win over the dictionary file: a decoded code gives the chosen value as confirmed, and «нічого не означає» makes the recognizer ignore the code, so its review reason disappears.
 
 ## Scenarios (phase 1)
@@ -82,6 +87,13 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **SC-P03 (R-19, R-02).** A new product gets parser values and a review; a value a person set stays.
 - **SC-P04 (R-20, R-21).** Deciding `AL` as meaning nothing removes the `unresolved_material_code` reason from the products with `AL`; decoding it as a value gives that value.
 
+## Scenarios (phase 5)
+
+- **SC-F01 (R-22).** `kolir:antychna-bronza` lists the bronze products; an assistant-picked chrome (not confirmed) matches nothing; two colors match either; color and side match both; unknown slugs are `404`, a malformed filter `400`.
+- **SC-F02 (R-23).** Three products, two of them a group: three rows without `groupVariants`, two cards with it; the group card counts two variants and shows the confirmed bronze circle; a side filter shows the matching variant.
+- **SC-F03 (R-24).** Facets count cards (2 bronze cards from 3 products); with «Права» chosen the color counts shrink while the side counts stay; an unknown category is `404`.
+- **SC-F04 (R-25).** Without a confirmed second color the group has no axis; once confirmed, the color axis lists both values and the variants carry their keys; a product without a group has no `variants`.
+
 ## Phases
 
 | Phase | Scope | Status |
@@ -90,7 +102,7 @@ Products get structured attributes (color, size, side, type, material, and so on
 | 2 | Product groups (`ProductGroup` slug type 3), main product, «Однакові варіанти», group API | done 2026-11-05 |
 | 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | done 2026-11-05 (migration `CatalogAttributesAdmin`; kedr-web screens) |
 | 4 | .NET parser port with a golden test against the CSV (2330/2330), runs on 1C sync and dictionary changes | done 2026-11-05 (no migration) |
-| 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | planned |
+| 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | backend done 2026-11-05 (no migration); site next |
 | 6 | Single-filter pages, templates, noindex/canonical, redirects, sitemap, `ProductGroup` JSON-LD | planned |
 | 7 | Optional AI suggestions for problem products (person confirms) | planned |
 
@@ -158,6 +170,33 @@ src/Catalog/Catalog.Application/
 ```
 
 `dictionaries.json` is an embedded resource of `Catalog.Application`. Host.Jobs: `--job=recognize-catalog-attributes [--apply]`; Cloud Run jobs `catalog-attributes-recognize-dry-run` and `catalog-attributes-recognize-apply`, run only by hand.
+
+## Code (phase 5, backend)
+
+```text
+src/Catalog/
+├── Catalog.Contracts/Products/
+│   ├── GetList/GetProductsRequest.cs, ProductListRowDto.cs  # + filter, groupVariants; variantCount, swatches
+│   └── Facets/CategoryFacetsDto.cs
+├── Catalog.Application/Features/Products/
+│   ├── PublicListing/   # PublicProductQuery (base list), AttributeFilters, ProductCards, FacetCounter, VariantGroupReader
+│   ├── GetPublicList/   # list with filters and one card per group
+│   ├── GetFacets/       # category filters with counts
+│   └── GetBySlug/ProductVariantsReader.cs  # variants and characteristics of a product page
+├── Catalog.Application/Attributes/Import/AttributeImportCatalog.cs  # built-in color circles (R-26)
+└── Catalog.Api/Controllers/ProductsController.cs  # + GET {categorySlug}/facets
+```
+
+Contract: [products.openapi.yaml](../../../contracts/catalog/products.openapi.yaml).
+
+## Evidence (phase 5 backend, 2026-11-05)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/UnitTests/UnitTests.csproj` | 256 passed; `PublicListingTests` (filter syntax, cards, facet counts, default circle) |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Catalog\|FullyQualifiedName~ApiContractTests"` | 78 passed, 4 skipped (Docker-only); SC-F01–SC-F04 in `PublicFiltersAndVariantsTests` |
+| `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj` | 10 passed |
+| Copy of the phase 4 PostgreSQL 16 test database, `Host.Api` over HTTP | handles «На планці»: 59 cards, color/type/shape facets; `kolir:satyn` → 46 cards in the facets and in the list; with `forma:kvadratnyi` → 25 in both. «Завіса KEDR» page: 50 variants, axes color (9), size (6), side (2). Bad filter `400`, unknown value `404`, old list request `200`. The recognizer filled 26 circles |
 
 ## Evidence (phase 4, 2026-11-05)
 

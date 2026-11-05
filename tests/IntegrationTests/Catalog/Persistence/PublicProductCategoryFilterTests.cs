@@ -28,7 +28,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 15, 3, "grandchild", exportToSite: false);
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
+        var handler = IntegrationTests.Catalog.PublicListing.PublicListingTestSupport.ListHandler(db);
         var first = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest
         {
             CategorySlug = "parent", Page = 1, PageSize = 2
@@ -72,7 +72,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 12, 920000, "kosmos");
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
+        var handler = IntegrationTests.Catalog.PublicListing.PublicListingTestSupport.ListHandler(db);
         var all = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest { PageSize = 10 }),
             CancellationToken.None);
 

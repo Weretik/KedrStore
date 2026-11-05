@@ -1,7 +1,9 @@
 using Catalog.Application.Features.Products.GetBySlug;
 using Catalog.Application.Features.Products.GetBySlug.DTOs;
+using Catalog.Application.Features.Products.GetFacets;
 using Catalog.Application.Features.Products.GetPublicList;
 using Catalog.Contracts.Category;
+using Catalog.Contracts.Products.Facets;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;
 
@@ -28,6 +30,25 @@ public sealed class ProductsController(ISender sender) : ControllerBase
         var query = new GetPublicProductListQuery(request);
         var result = await sender.Send(query, cancellationToken);
 
+        return this.ToActionResult(result);
+    }
+
+    /// <summary>
+    /// Attribute filters of a category with card counts, for the same query as its product list (spec catalog/006,
+    /// phase 5). Unknown category or filter slug: 404.
+    /// </summary>
+    [HttpGet("{categorySlug}/facets")]
+    [ProducesResponseType(typeof(CategoryFacetsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CategoryFacetsDto>> GetFacets(
+        [FromQuery] GetProductsRequest request,
+        [FromRoute] string lang,
+        [FromRoute] string categorySlug,
+        CancellationToken cancellationToken)
+    {
+        request = request with { CategorySlug = categorySlug, Lang = lang };
+        var result = await sender.Send(new GetCategoryFacetsQuery(request), cancellationToken);
         return this.ToActionResult(result);
     }
 

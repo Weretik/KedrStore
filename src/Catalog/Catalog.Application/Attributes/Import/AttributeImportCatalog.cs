@@ -25,6 +25,21 @@ public static class AttributeImportCatalog
         "surface_texture", "guide_type", "key_configuration"
     };
 
+    /// <summary>
+    /// Circles for plain colors by value code (owner decision 2026-11-05). Wood and stone decors (<c>DEC_*</c>) have
+    /// none: a person picks a texture picture, and until then the site shows the name.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> DefaultColorSwatches =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["CR"] = "#C8CCD0", ["MCP"] = "#A9ADB0", ["SN"] = "#B9B6AE", ["NI"] = "#B6B1A6", ["MSN"] = "#A8A396",
+            ["SC"] = "#C0C0C0", ["AB"] = "#8C6A3F", ["AC"] = "#8A5A3B", ["COPPER"] = "#B87333", ["G"] = "#D4AF37",
+            ["GM"] = "#C5A253", ["SSG"] = "#CFB57A", ["BLACK"] = "#111111", ["MBP"] = "#2B2B2B", ["ORB"] = "#2E2622",
+            ["BN"] = "#3A3A3A", ["GRAFFIT"] = "#4A4A4D", ["RAL7024"] = "#474A51", ["GREY"] = "#8E9094",
+            ["WH"] = "#FFFFFF", ["MWH"] = "#F2F2EE", ["BROWN"] = "#6B4A2E", ["RAL8017"] = "#45322E",
+            ["MACC"] = "#6F4E37", ["YELLOW"] = "#F2C200", ["RED"] = "#C0392B"
+        };
+
     private static readonly HashSet<string> VariantAxes = new(StringComparer.Ordinal) { Color, Size, Side };
 
     /// <summary>Short names and URL slugs for the attributes people filter by most.</summary>

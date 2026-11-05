@@ -20,6 +20,15 @@ public sealed record GetProductsRequest
 
     public ProductSort Sort { get; init; } = ProductSort.IdAsc;
 
+    /// <summary>
+    /// Attribute filters <c>attribute-slug:value-slug[,value-slug]</c> (spec catalog/006, phase 5). Values of one
+    /// attribute match any of them, different attributes all. Only values a person confirmed match.
+    /// </summary>
+    public string[]? Filter { get; init; }
+
+    /// <summary>One row per variant group: the variant that matches best, its count, and the group's colors.</summary>
+    public bool GroupVariants { get; init; }
+
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 20;
 }

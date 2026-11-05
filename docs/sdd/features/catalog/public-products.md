@@ -1,6 +1,6 @@
 # Public products
 
-**Static code check:** 2026-10-30. **Module:** Catalog.
+**Static code check:** 2026-11-05. **Module:** Catalog.
 
 Anonymous product lists by language/category and details by slug.
 
@@ -11,6 +11,8 @@ Anonymous product lists by language/category and details by slug.
 When `categoryId` or `categorySlug` is supplied, the handler reads existing categories, chooses a root by ID (which takes precedence) or slug, then traverses all descendants by `ParentId` with no fixed depth. Public projections are filtered by the subtree ID set before counting, sorting, and paging. A former category slug resolves through [SlugService](../../../../src/Catalog/Catalog.Application/Slugs/SlugService.cs); an unknown or deleted category slug returns `404`, an unknown `categoryId` an empty page; without a category parameter, the general list is retained. `availability` (`InStock` or `All`) overrides `inStock` when supplied, and the `AvailabilityThenName` sort lists in-stock products first.
 
 Details resolve a current or former slug; the response carries the current `productSlug` and `updatedAt`. A deleted product returns `404` with a [CatalogRedirect](../../../../src/Catalog/Catalog.Contracts/Category/CatalogRedirect.cs) body naming its active category. Deleted products and products of deleted categories never appear: the projection leaves them out and the details query filters them. The list shows only `ExportToSite` products and never products of the Cosmos import root ([PublicCatalogScope](../../../../src/Catalog/Catalog.Application/Features/Category/PublicCatalogScope.cs), owner decision 2026-11-01).
+
+The base list (on site, category tree, search, stock, price) lives in [PublicProductQuery](../../../../src/Catalog/Catalog.Application/Features/Products/PublicListing/PublicProductQuery.cs), shared with the category facets. Attribute filters, one card per variant group, facets, and the variants of a product page are described in [catalog attributes](attributes.md) (spec catalog/006, phase 5).
 
 ## Code structure
 
@@ -24,7 +26,9 @@ src/
     │   ├── Contracts/Persistence/ICatalogDbContext.cs  # port and contract
     │   └── Features/Products/
     │       ├── GetBySlug/GetProductBySlugQueryHandler.cs  # use-case handler
-    │       └── GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
+    │       ├── GetFacets/GetCategoryFacetsQueryHandler.cs  # category filters with counts
+    │       ├── GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
+    │       └── PublicListing/  # base list, attribute filters, cards, facet counts
     └── Catalog.Domain/Entities/
         ├── Product.cs  # domain model
         ├── ProductCategory.cs  # category hierarchy

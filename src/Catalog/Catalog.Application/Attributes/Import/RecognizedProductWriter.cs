@@ -77,6 +77,30 @@ public sealed class RecognizedProductWriter(
     }
 
     /// <summary>
+    /// Fills the built-in circles of plain colors that have no swatch yet (<see cref="AttributeImportCatalog.DefaultColorSwatches"/>).
+    /// Values a person edited keep what they have.
+    /// </summary>
+    public async Task FillDefaultSwatchesAsync(Dictionary<string, CatalogAttribute> attributeByCode, bool apply,
+        DateTimeOffset now, AttributeImportReport report, CancellationToken cancellationToken)
+    {
+        if (!attributeByCode.TryGetValue(AttributeImportCatalog.Color, out var color) || color.IsTransient())
+            return;
+
+        var colors = await db.AttributeValues.Where(value => value.AttributeId == color.Id).ToListAsync(cancellationToken);
+        var changed = 0;
+        foreach (var value in colors)
+        {
+            if (AttributeImportCatalog.DefaultColorSwatches.TryGetValue(value.Code, out var hex)
+                && value.ApplyDefaultSwatch(hex, now))
+                changed++;
+        }
+
+        report.Values.Updated += changed;
+        if (apply && changed > 0)
+            await values.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Writes recognized products: automatic values from <paramref name="source"/>, review state and base name,
     /// and new category filters. Values a person set or locked are left as they are.
     /// </summary>

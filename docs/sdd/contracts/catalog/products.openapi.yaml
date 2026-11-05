@@ -25,6 +25,8 @@ paths:
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
         - $ref: '#/components/parameters/Availability'
+        - $ref: '#/components/parameters/AttributeFilter'
+        - $ref: '#/components/parameters/GroupVariants'
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -58,13 +60,45 @@ paths:
         - $ref: '#/components/parameters/PriceFrom'
         - $ref: '#/components/parameters/PriceTo'
         - $ref: '#/components/parameters/Availability'
+        - $ref: '#/components/parameters/AttributeFilter'
+        - $ref: '#/components/parameters/GroupVariants'
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
       responses:
         '200': { description: Product page, content: { application/json: { schema: { $ref: '#/components/schemas/ProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
-        '404': { description: Unknown or deleted category slug. }
+        '404': { description: 'Unknown or deleted category slug, or an unknown attribute or value slug in `filter`.' }
+  /api/catalog/{lang}/{categorySlug}/facets:
+    get:
+      operationId: getCategoryFacets
+      summary: Get the attribute filters of a category with counts
+      description: >-
+        Spec catalog/006, phase 5. The attributes the category tree offers as filters («Фільтри категорій»), with the
+        values its on-site products have. A count is the number of cards (a variant group is one card) the list would
+        show with that value added: other attributes' choices apply, the attribute's own do not. Only values a person
+        confirmed count. A value without cards is left out unless chosen; an attribute without values is left out.
+        Takes the same query as the category product list.
+      tags: [Catalog]
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: categorySlug
+          in: path
+          required: true
+          schema: { type: string, maxLength: 100 }
+        - $ref: '#/components/parameters/SearchTerm'
+        - $ref: '#/components/parameters/InStock'
+        - $ref: '#/components/parameters/IsSale'
+        - $ref: '#/components/parameters/IsNew'
+        - $ref: '#/components/parameters/PriceFrom'
+        - $ref: '#/components/parameters/PriceTo'
+        - $ref: '#/components/parameters/Availability'
+        - $ref: '#/components/parameters/AttributeFilter'
+      responses:
+        '200': { description: Filters with counts, content: { application/json: { schema: { $ref: '#/components/schemas/CategoryFacets' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { description: 'Unknown or deleted category slug, or an unknown attribute or value slug in `filter`.' }
   /api/catalog/{lang}/product/{productSlug}:
     get:
       operationId: getPublicProductBySlug
@@ -251,6 +285,23 @@ components:
       in: query
       description: '`InStock` or `All`. When supplied it takes precedence over `inStock`; when absent `inStock` applies as before.'
       schema: { type: string, enum: [InStock, All] }
+    AttributeFilter:
+      name: filter
+      in: query
+      description: >-
+        Attribute filter `attribute-slug:value-slug[,value-slug]`, repeatable (spec catalog/006). Values of one attribute
+        match any of them, different attributes all; only confirmed values match. At most 50 values. Malformed: `400`;
+        unknown attribute or value slug: `404`.
+      style: form
+      explode: true
+      schema: { type: array, items: { type: string, maxLength: 200 } }
+    GroupVariants:
+      name: groupVariants
+      in: query
+      description: >-
+        `true` returns one row per variant group, at the place of its first matching product: the group's main
+        product when it matches, otherwise the first matching variant. Counts and pages are in cards.
+      schema: { type: boolean, default: false }
     Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
     PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
   responses:
@@ -290,6 +341,45 @@ components:
         isSale: { type: boolean }
         isNew: { type: boolean }
         price: { type: [number, 'null'] }
+        variantCount: { type: [integer, 'null'], description: 'With `groupVariants`: on-site variants of the group, this one included; null for a single product.' }
+        swatches:
+          type: [array, 'null']
+          description: 'With `groupVariants`: colors of the group''s on-site variants in dictionary order.'
+          items: { $ref: '#/components/schemas/ProductSwatch' }
+    ProductSwatch:
+      type: object
+      required: [slug, name]
+      description: A color circle (`hex`), a texture picture (`textureUrl`), or only the name when neither is set.
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        hex: { type: [string, 'null'], pattern: '^#[0-9A-Fa-f]{6}$' }
+        textureUrl: { type: [string, 'null'] }
+    CategoryFacets:
+      type: object
+      required: [totalCards, facets]
+      properties:
+        totalCards: { type: integer, description: Cards with every choice applied. }
+        facets: { type: array, items: { $ref: '#/components/schemas/CategoryFacet' } }
+    CategoryFacet:
+      type: object
+      required: [code, slug, name, display, values]
+      properties:
+        code: { type: string }
+        slug: { type: string, description: The attribute part of `filter`. }
+        name: { type: string }
+        display: { type: string, enum: [swatch, button, checkbox] }
+        values: { type: array, items: { $ref: '#/components/schemas/CategoryFacetValue' } }
+    CategoryFacetValue:
+      type: object
+      required: [slug, name, count, selected]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        hex: { type: [string, 'null'] }
+        textureUrl: { type: [string, 'null'] }
+        count: { type: integer }
+        selected: { type: boolean }
     ProductDetails:
       type: object
       required: [id, name, productSlug, photo, scheme, photos, stock, categoryName, categorySlug, quantityInPack, breadcrumbs, updatedAt]
@@ -307,6 +397,60 @@ components:
         quantityInPack: { type: integer }
         price: { type: [number, 'null'] }
         breadcrumbs: { type: array, items: { $ref: '#/components/schemas/Breadcrumb' } }
+        variants:
+          oneOf:
+            - { $ref: '#/components/schemas/ProductVariants' }
+            - { type: 'null' }
+          description: The variant group when it has at least two variants on the site (spec catalog/006).
+        characteristics:
+          type: array
+          description: Confirmed attribute values for «Характеристики», in attribute order.
+          items:
+            type: object
+            required: [code, name, value]
+            properties: { code: { type: string }, name: { type: string }, value: { type: string } }
+    ProductVariants:
+      type: object
+      required: [groupName, groupSlug, axes, items]
+      properties:
+        groupName: { type: string }
+        groupSlug: { type: string }
+        mainProductSlug: { type: [string, 'null'], description: The group's main product on the site; the canonical page. }
+        axes:
+          type: array
+          description: Variant attributes (color, size, side) whose values differ inside the group.
+          items:
+            type: object
+            required: [code, slug, name, display, values]
+            properties:
+              code: { type: string }
+              slug: { type: string }
+              name: { type: string }
+              display: { type: string, enum: [swatch, button] }
+              values:
+                type: array
+                items:
+                  type: object
+                  required: [key, name, swatches]
+                  properties:
+                    key: { type: string, description: 'Value slug; a two-color value joins the slugs with `+`.' }
+                    name: { type: string }
+                    swatches: { type: array, items: { $ref: '#/components/schemas/ProductSwatch' } }
+        items:
+          type: array
+          items:
+            type: object
+            required: [id, productSlug, name, photo, inStock, isCurrent, isMain, values]
+            properties:
+              id: { type: integer }
+              productSlug: { type: string }
+              name: { type: string }
+              photo: { type: string }
+              price: { type: [number, 'null'] }
+              inStock: { type: boolean }
+              isCurrent: { type: boolean }
+              isMain: { type: boolean }
+              values: { type: object, additionalProperties: { type: string }, description: Axis code → value key; missing when the variant has none. }
     Breadcrumb:
       type: object
       required: [id, name, slug]

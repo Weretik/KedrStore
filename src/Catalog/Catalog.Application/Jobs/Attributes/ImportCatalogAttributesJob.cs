@@ -36,6 +36,7 @@ public sealed class ImportCatalogAttributesJob(
         var attributeByCode = await SyncAttributesAsync(dictionary.Attributes, apply, now, report, cancellationToken);
         var valueByKey = await writer.SyncValuesAsync(dictionary.Values.Concat(csv.SizeValues).ToList(), attributeByCode,
             updateExisting: true, apply, now, report, cancellationToken);
+        await writer.FillDefaultSwatchesAsync(attributeByCode, apply, now, report, cancellationToken);
         await SyncAliasesAsync(dictionary.Aliases, attributeByCode, valueByKey, apply, now, report, cancellationToken);
         await writer.WriteProductsAsync(csv.Products, attributeByCode, valueByKey, AttributeValueSource.Import, apply, now,
             report, cancellationToken);
