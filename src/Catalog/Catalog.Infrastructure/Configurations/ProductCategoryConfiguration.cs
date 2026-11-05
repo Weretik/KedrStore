@@ -47,6 +47,10 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(c => c.IsShownOnSite)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(c => c.ProductTypeIdOneC)
             .HasMaxLength(10)
             .IsRequired();

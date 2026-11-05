@@ -1,50 +1,67 @@
-using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.SiteModels.Common;
 using Catalog.Contracts.SiteModels;
+using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.SiteModels.GetCategories;
 
 /// <summary>
-/// Final categories (without children) that have on-site products or models, with their counts, for the «Моделі»
-/// sidebar; ordered by parent name, then name.
+/// The category tree of «Моделі» and «Вітрина сайту» (R-18): categories shown on the site with on-site products in them
+/// or below them, each with its parent, and counts that include subcategories; ordered by name within a parent.
 /// </summary>
-public sealed class GetSiteModelCategoriesQueryHandler(IReadCatalogDbContext db, SiteModelStateReader reader)
+public sealed class GetSiteModelCategoriesQueryHandler(SiteModelStateReader reader)
     : IQueryHandler<GetSiteModelCategoriesQuery, Result<List<SiteModelCategoryDto>>>
 {
     public async ValueTask<Result<List<SiteModelCategoryDto>>> Handle(GetSiteModelCategoriesQuery query,
         CancellationToken cancellationToken)
     {
-        var categories = await db.Categories.AsNoTracking()
-            .Select(category => new { category.Id, category.ShortNameUk, category.Name, category.ParentId })
-            .ToListAsync(cancellationToken);
-        var parents = categories.Where(category => category.ParentId is not null)
-            .Select(category => category.ParentId!.Value).ToHashSet();
-        var names = categories.ToDictionary(category => category.Id,
-            category => string.IsNullOrWhiteSpace(category.ShortNameUk) ? category.Name : category.ShortNameUk);
         var state = await reader.ReadAsync(cancellationToken);
+        var counts = new Dictionary<ProductCategoryId, Counts>();
 
-        var onSite = state.Products.Values.Where(product => product.IsOnSite).ToLookup(product => product.CategoryId);
-        var models = state.Models.Values
-            .Where(model => state.MembersByModel[model.Id].Any(id => !state.Products[id].IsDeleted))
-            .ToLookup(model => model.CategoryId);
-
-        var rows = categories
-            .Where(category => !parents.Contains(category.Id))
-            .Where(category => onSite[category.Id].Any() || models[category.Id].Any())
-            .Select(category =>
+        void AddUp(ProductCategoryId categoryId, Func<Counts, Counts> change)
+        {
+            var visited = new HashSet<ProductCategoryId>();
+            for (ProductCategoryId? current = categoryId; current is { } id && visited.Add(id);
+                 current = state.CategoryParents.GetValueOrDefault(id))
             {
-                var accepted = models[category.Id].Where(model => model.IsAccepted).ToList();
-                var problems = accepted.Count(model => state.ModelProblems(model.Id).Count > 0) +
-                               onSite[category.Id].Count(product =>
-                                   state.ProductProblems(product.Id).Contains(SiteModelProblems.NoModel));
-                return new SiteModelCategoryDto(category.Id.Value, names[category.Id],
-                    category.ParentId is { } parentId ? names.GetValueOrDefault(parentId) : null,
-                    onSite[category.Id].Count(), accepted.Count, models[category.Id].Count() - accepted.Count, problems);
-            })
-            .OrderBy(row => row.ParentName, StringComparer.CurrentCulture)
-            .ThenBy(row => row.Name, StringComparer.CurrentCulture)
+                counts[id] = change(counts.GetValueOrDefault(id, Counts.Zero));
+            }
+        }
+
+        foreach (var product in state.Products.Values.Where(product => product.IsOnSite))
+        {
+            var noModel = state.ProductProblems(product.Id).Contains(SiteModelProblems.NoModel);
+            AddUp(product.CategoryId, value => value with
+            {
+                Products = value.Products + 1, Problems = value.Problems + (noModel ? 1 : 0)
+            });
+        }
+
+        foreach (var model in state.Models.Values.Where(model => state.OnSiteMembers(model.Id).Any()))
+        {
+            var hasProblem = model.IsAccepted && state.ModelProblems(model.Id).Count > 0;
+            AddUp(model.CategoryId, value => value with
+            {
+                Accepted = value.Accepted + (model.IsAccepted ? 1 : 0),
+                Proposed = value.Proposed + (model.IsAccepted ? 0 : 1),
+                Problems = value.Problems + (hasProblem ? 1 : 0)
+            });
+        }
+
+        var rows = counts
+            .Where(entry => entry.Value.Products > 0 && state.ShownCategories.Contains(entry.Key))
+            .Select(entry => new SiteModelCategoryDto(entry.Key.Value,
+                state.CategoryNames.GetValueOrDefault(entry.Key) ?? string.Empty,
+                state.CategoryParents.GetValueOrDefault(entry.Key)?.Value,
+                entry.Value.Products, entry.Value.Accepted, entry.Value.Proposed, entry.Value.Problems))
+            .OrderBy(row => row.Name, StringComparer.CurrentCulture)
+            .ThenBy(row => row.Id)
             .ToList();
 
         return Result.Success(rows);
+    }
+
+    private sealed record Counts(int Products, int Accepted, int Proposed, int Problems)
+    {
+        public static readonly Counts Zero = new(0, 0, 0, 0);
     }
 }

@@ -12,5 +12,5 @@ public static class CategoryReadMapper
     public static AdminCategoryResponse ToAdminResponse(ProductCategory category) => new(
         category.Id.Value, category.Name, category.ShortNameUk, category.ShortNameRu, category.Slug,
         category.ProductTypeIdOneC, category.ParentId?.Value, category.SortOrder, category.Level,
-        category.IsDeleted, category.DeletedAt);
+        category.IsDeleted, category.DeletedAt, category.IsShownOnSite);
 }

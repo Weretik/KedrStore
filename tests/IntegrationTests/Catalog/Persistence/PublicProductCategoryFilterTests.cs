@@ -66,8 +66,11 @@ public sealed class PublicProductCategoryFilterTests
     {
         await using var db = CreateContext();
         SeedCategory(db, 1, "parent");
-        db.Categories.Add(ProductCategory.Create(
-            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")));
+        // Even marked «show on site», the Cosmos import root stays hidden.
+        var cosmos = ProductCategory.Create(
+            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000"));
+        cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
+        db.Categories.Add(cosmos);
         SeedProduct(db, 11, 1, "parent");
         SeedProduct(db, 12, 920000, "kosmos");
         await db.SaveChangesAsync();
@@ -105,9 +108,11 @@ public sealed class PublicProductCategoryFilterTests
             2 => CategoryPath.From($"n1.n2.n{id}"),
             _ => throw new ArgumentOutOfRangeException(nameof(parentId))
         };
-        db.Categories.Add(ProductCategory.Create(
+        var category = ProductCategory.Create(
             ProductCategoryId.From(id), "000005513", $"Category {id}", slug, path,
-            parentId is null ? null : ProductCategoryId.From(parentId.Value)));
+            parentId is null ? null : ProductCategoryId.From(parentId.Value));
+        category.SetShownOnSite(true, DateTimeOffset.UtcNow);
+        db.Categories.Add(category);
     }
 
     private static void SeedProduct(

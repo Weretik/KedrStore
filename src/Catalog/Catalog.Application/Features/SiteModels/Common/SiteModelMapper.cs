@@ -85,11 +85,12 @@ public static class SiteModelMapper
             .ToList();
     }
 
-    /// <summary>Members that are not deleted (a deleted product stays a row of the model but is not shown).</summary>
+    /// <summary>
+    /// On-site members only (R-18): a product that is deleted, not exported, or in a hidden category stays a row of
+    /// the model but is not shown.
+    /// </summary>
     private static List<ProductId> Visible(SiteModelState state, ProductGroupId modelId)
-        => state.MembersByModel[modelId]
-            .Where(id => state.Products.TryGetValue(id, out var product) && !product.IsDeleted)
-            .ToList();
+        => state.OnSiteMembers(modelId).ToList();
 
     private static string PhotoOf(SiteModelState state, ProductGroup model, IReadOnlyList<ProductId> members)
     {

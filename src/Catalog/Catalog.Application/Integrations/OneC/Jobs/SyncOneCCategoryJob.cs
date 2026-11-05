@@ -65,7 +65,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         }
 
         var counters = new ImportCounters { Received = categories.Count };
-        await ApplyAsync(categories, rootCategoryOneCId, allowDeletion, counters, cancellationToken);
+        await ApplyAsync(categories, rootCategoryOneCId, isHardwareRoot, allowDeletion, counters, cancellationToken);
         counters.Log(logger, Phase, rootCategoryOneCId);
     }
 
@@ -102,7 +102,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
     /// <summary>Creates, updates, restores, and soft-deletes the categories of the root in one save.</summary>
     private async Task ApplyAsync(IReadOnlyList<CategoryDto> categoryDtos, string rootCategoryOneCId,
-        bool allowDeletion, ImportCounters counters, CancellationToken cancellationToken)
+        bool isHardwareRoot, bool allowDeletion, ImportCounters counters, CancellationToken cancellationToken)
     {
         var existingById = (await categoryRepo.ListAsync(new CategoriesByRootSpec(rootCategoryOneCId), cancellationToken))
             .ToDictionary(category => category.Id.Value);
@@ -141,6 +141,8 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             counters.Created++;
         }
 
+        InheritSiteVisibility(created, existingById, isHardwareRoot, now);
+
         if (allowDeletion)
             MarkMissingDeleted(existingById.Values, categoryDtos, rootCategoryOneCId, counters, now);
 
@@ -148,6 +150,24 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             await categoryRepo.AddRangeAsync(created, cancellationToken);
 
         await categoryRepo.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// A new category takes its parent's «show on site» value; a new top category is shown only in the hardware root
+    /// (spec catalog/007 R-18). Parents come first by path, so a new child of a new parent sees the parent's value.
+    /// </summary>
+    private static void InheritSiteVisibility(IReadOnlyList<ProductCategory> created,
+        IReadOnlyDictionary<int, ProductCategory> existingById, bool isHardwareRoot, DateTimeOffset now)
+    {
+        var shown = existingById.Values.ToDictionary(category => category.Id, category => category.IsShownOnSite);
+        foreach (var category in created.OrderBy(category => category.Path.Value.Length))
+        {
+            var isShown = category.ParentId is { } parentId && shown.TryGetValue(parentId, out var parentShown)
+                ? parentShown
+                : isHardwareRoot;
+            category.SetShownOnSite(isShown, now);
+            shown[category.Id] = isShown;
+        }
     }
 
     private void MarkMissingDeleted(IEnumerable<ProductCategory> existing, IReadOnlyList<CategoryDto> categoryDtos,

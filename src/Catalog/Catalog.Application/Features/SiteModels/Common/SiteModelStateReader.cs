@@ -8,6 +8,15 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
 {
     public async Task<SiteModelState> ReadAsync(CancellationToken cancellationToken)
     {
+        var categories = await db.Categories.AsNoTracking()
+            .Select(category => new
+            {
+                category.Id, category.ParentId, category.ShortNameUk, category.Name, category.IsShownOnSite
+            })
+            .ToListAsync(cancellationToken);
+        var shownCategories = categories.Where(category => category.IsShownOnSite)
+            .Select(category => category.Id).ToHashSet();
+
         var prices = await db.ProductListProjections.AsNoTracking()
             .Select(projection => new { projection.ProductId, projection.RetailPrice })
             .ToDictionaryAsync(projection => projection.ProductId, projection => projection.RetailPrice,
@@ -21,7 +30,7 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
                 .ToListAsync(cancellationToken))
             .Select(product => new SiteModelProductFacts(product.Id, product.Name, product.ProductSlug,
                 product.CategoryId, product.Photo, prices.GetValueOrDefault(product.Id), product.Stock > 0,
-                product.ExportToSite, product.IsDeleted))
+                product.ExportToSite, product.IsDeleted, shownCategories.Contains(product.CategoryId)))
             .ToDictionary(product => product.Id);
 
         var models = await db.ProductGroups.AsNoTracking().ToDictionaryAsync(model => model.Id, cancellationToken);
@@ -45,9 +54,6 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
         var valueNames = await db.AttributeValues.AsNoTracking()
             .Select(value => new { value.Id, value.NameUk })
             .ToDictionaryAsync(value => value.Id, value => value.NameUk, cancellationToken);
-        var categoryNames = await db.Categories.AsNoTracking()
-            .Select(category => new { category.Id, category.ShortNameUk })
-            .ToDictionaryAsync(category => category.Id, category => category.ShortNameUk, cancellationToken);
 
         return new SiteModelState
         {
@@ -64,7 +70,10 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
                 value.Source == AttributeValueSource.Manual)),
             Attributes = attributes,
             ValueNames = valueNames,
-            CategoryNames = categoryNames
+            CategoryNames = categories.ToDictionary(category => category.Id,
+                category => string.IsNullOrWhiteSpace(category.ShortNameUk) ? category.Name : category.ShortNameUk),
+            CategoryParents = categories.ToDictionary(category => category.Id, category => category.ParentId),
+            ShownCategories = shownCategories
         };
     }
 }

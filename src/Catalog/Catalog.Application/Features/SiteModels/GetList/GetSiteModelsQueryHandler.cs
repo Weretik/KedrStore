@@ -5,8 +5,8 @@ using Catalog.Domain.ValueObjects;
 namespace Catalog.Application.Features.SiteModels.GetList;
 
 /// <summary>
-/// The «Моделі» list: models with products that are not deleted, problems first, then by name. The search matches the
-/// model name, a product name, or a product's 1C code.
+/// The «Моделі» list: models with on-site products (R-08, R-18), problems first, then by name. The category filter takes
+/// the category with its subcategories. The search matches the model name, an on-site product name, or its 1C code.
 /// </summary>
 public sealed class GetSiteModelsQueryHandler(SiteModelStateReader reader)
     : IQueryHandler<GetSiteModelsQuery, Result<SiteModelListDto>>
@@ -19,9 +19,9 @@ public sealed class GetSiteModelsQueryHandler(SiteModelStateReader reader)
         var search = request.Search?.Trim();
 
         var rows = state.Models.Values
-            .Where(model => request.CategoryId is not { } categoryId || model.CategoryId.Value == categoryId)
+            .Where(model => state.InCategory(model.CategoryId, request.CategoryId))
             .Where(model => request.Status is null || SiteModelState.StatusText(model.Status) == request.Status)
-            .Where(model => state.MembersByModel[model.Id].Any(id => !state.Products[id].IsDeleted))
+            .Where(model => state.OnSiteMembers(model.Id).Any())
             .Where(model => string.IsNullOrEmpty(search) || Matches(state, model.Id, model.Name, search))
             .Select(model => SiteModelMapper.ToListItem(state, model.Id))
             .Where(item => SiteModelProblems.Passes(item.Problems, request.Problem))
@@ -36,7 +36,7 @@ public sealed class GetSiteModelsQueryHandler(SiteModelStateReader reader)
 
     private static bool Matches(SiteModelState state, ProductGroupId modelId, string name, string search)
         => name.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
-           state.MembersByModel[modelId].Any(id =>
+           state.OnSiteMembers(modelId).Any(id =>
                id.Value.ToString() == search ||
                state.Products[id].Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
 }

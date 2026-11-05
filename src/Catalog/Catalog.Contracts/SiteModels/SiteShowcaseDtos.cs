@@ -1,6 +1,6 @@
 namespace Catalog.Contracts.SiteModels;
 
-/// <summary>A row of «Вітрина сайту»: an on-site product with its model, variant values, and problems.</summary>
+/// <summary>An on-site product inside a «Вітрина сайту» row, with its variant values and problems.</summary>
 /// <param name="Model">Its model, or <c>null</c> when it is in none.</param>
 /// <param name="Values">Confirmed values of the variant attributes (color, size, side), in attribute order.</param>
 public sealed record SiteShowcaseItemDto(
@@ -20,16 +20,35 @@ public sealed record SiteShowcaseModelDto(int Id, string Name, string Status);
 
 public sealed record SiteShowcaseValueDto(int AttributeId, string AttributeName, string Value);
 
-public sealed record SiteShowcaseListDto(IReadOnlyList<SiteShowcaseItemDto> Items, int TotalCount, int Page, int PageSize);
+/// <summary>
+/// A row of «Вітрина сайту»: a model with its on-site products, or one on-site product that is in no model.
+/// <c>Key</c> is <c>m{modelId}</c> or <c>p{productId}</c>.
+/// </summary>
+/// <param name="Model">The model, or <c>null</c> for a product in no model.</param>
+/// <param name="Problems">Problem codes of the model and of its products (R-08); empty when all is well.</param>
+public sealed record SiteShowcaseRowDto(
+    string Key,
+    SiteShowcaseModelDto? Model,
+    string Name,
+    string Photo,
+    int CategoryId,
+    string CategoryName,
+    decimal? MinPrice,
+    bool InStock,
+    IReadOnlyList<SiteShowcaseItemDto> Products,
+    IReadOnlyList<string> Problems);
+
+public sealed record SiteShowcaseListDto(IReadOnlyList<SiteShowcaseRowDto> Items, int TotalCount, int Page, int PageSize);
 
 /// <summary>
-/// A final category for the «Моделі» sidebar: its models and what needs attention. <c>ProblemCount</c> counts its
-/// accepted models with a problem and its on-site products outside accepted models.
+/// A category shown on the site that has on-site products, for the category tree of «Моделі» and «Вітрина сайту».
+/// Counts include subcategories. <c>ProblemCount</c> counts accepted models with a problem and on-site products outside
+/// accepted models.
 /// </summary>
 public sealed record SiteModelCategoryDto(
     int Id,
     string Name,
-    string? ParentName,
+    int? ParentId,
     int OnSiteProducts,
     int AcceptedModels,
     int ProposedModels,

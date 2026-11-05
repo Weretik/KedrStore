@@ -3,6 +3,7 @@ using Catalog.Application.Features.Category.AdminGetById;
 using Catalog.Application.Features.Category.AdminGetList;
 using Catalog.Application.Features.Category.Content.Get;
 using Catalog.Application.Features.Category.Content.Save;
+using Catalog.Application.Features.Category.SiteVisibility;
 using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.Slugs;
@@ -54,6 +55,21 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new ChangeSlugCommand(CatalogEntityType.Category, id, request), cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPut("{id:int}/site-visibility", Name = "setAdminCategorySiteVisibility")]
+    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [ProducesResponseType(typeof(CategorySiteVisibilityResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CategorySiteVisibilityResponse>> SetSiteVisibility(
+        [FromRoute] int id,
+        [FromBody] SetCategorySiteVisibilityRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new SetCategorySiteVisibilityCommand(id, request.IsShownOnSite), cancellationToken);
         return this.ToActionResult(result);
     }
 

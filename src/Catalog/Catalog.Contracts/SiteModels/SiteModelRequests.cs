@@ -1,7 +1,7 @@
 namespace Catalog.Contracts.SiteModels;
 
 /// <summary>
-/// The «Моделі» list. <c>Status</c>: <c>proposed</c> or <c>accepted</c>; <c>Problem</c>: a problem code (R-08);
+/// The «Моделі» list. <c>CategoryId</c> takes the category with its subcategories; <c>Status</c>: <c>proposed</c> or <c>accepted</c>; <c>Problem</c>: a problem code (R-08);
 /// <c>Search</c>: part of the model name, of a product name, or a 1C code.
 /// </summary>
 public sealed record GetSiteModelsRequest
@@ -53,8 +53,8 @@ public sealed record SetSiteModelTextRequest
 }
 
 /// <summary>
-/// «Вітрина сайту»: on-site products. <c>Problem</c>: a product problem code or <c>any</c>; <c>Search</c>: part of the
-/// product name or its 1C code.
+/// «Вітрина сайту»: models with their on-site products. <c>CategoryId</c> takes the category with its subcategories;
+/// <c>Problem</c>: a product problem code or <c>any</c>; <c>Search</c>: part of the model or product name, or a 1C code.
 /// </summary>
 public sealed record GetSiteShowcaseRequest
 {

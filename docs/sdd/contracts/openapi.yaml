@@ -33,6 +33,8 @@ paths:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}
   /api/categories/{id}/slug:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1slug
+  /api/categories/{id}/site-visibility:
+    $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1site-visibility
   /api/categories/{id}/content:
     $ref: ./catalog/category-read.openapi.yaml#/paths/~1api~1categories~1{id}~1content
   /api/categories/{id}/content/{lang}:

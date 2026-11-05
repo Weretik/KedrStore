@@ -50,9 +50,14 @@ internal static class AttributeImportTestSupport
         return report;
     }
 
+    /// <summary>A top category, shown on the site (spec catalog/007 R-18).</summary>
     public static void AddCategory(CatalogDbContext db, int id)
-        => db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(id), Root, $"Категорія {id}", $"katehoriia-{id}",
-            CategoryPath.From($"n{id}")));
+    {
+        var category = ProductCategory.Create(ProductCategoryId.From(id), Root, $"Категорія {id}", $"katehoriia-{id}",
+            CategoryPath.From($"n{id}"));
+        category.SetShownOnSite(true, DateTimeOffset.UtcNow);
+        db.Categories.Add(category);
+    }
 
     public static void AddProduct(CatalogDbContext db, int id, int categoryId, string name)
         => db.Products.Add(Product.Create(ProductId.From(id), Root, name, $"product-{id}", ProductCategoryId.From(categoryId),

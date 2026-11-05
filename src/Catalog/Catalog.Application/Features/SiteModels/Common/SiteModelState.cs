@@ -25,6 +25,29 @@ public sealed class SiteModelState
     public required IReadOnlyDictionary<AttributeValueId, string> ValueNames { get; init; }
     public required IReadOnlyDictionary<ProductCategoryId, string> CategoryNames { get; init; }
 
+    /// <summary>Parent of every active category (null for a top category).</summary>
+    public required IReadOnlyDictionary<ProductCategoryId, ProductCategoryId?> CategoryParents { get; init; }
+
+    /// <summary>Active categories marked «show on site» (R-18).</summary>
+    public required IReadOnlySet<ProductCategoryId> ShownCategories { get; init; }
+
+    /// <summary>Whether a category is the selected one or inside it; no selection matches everything.</summary>
+    public bool InCategory(ProductCategoryId categoryId, int? selected)
+    {
+        if (selected is not { } selectedId)
+            return true;
+
+        var visited = new HashSet<ProductCategoryId>();
+        for (ProductCategoryId? current = categoryId; current is { } id && visited.Add(id);
+             current = CategoryParents.GetValueOrDefault(id))
+        {
+            if (id.Value == selectedId)
+                return true;
+        }
+
+        return false;
+    }
+
     public bool IsOnSite(ProductId id) => Products.TryGetValue(id, out var product) && product.IsOnSite;
 
     public IEnumerable<ProductId> OnSiteMembers(ProductGroupId modelId)
@@ -148,9 +171,11 @@ public sealed record SiteModelProductFacts(
     decimal? RetailPrice,
     bool InStock,
     bool ExportToSite,
-    bool IsDeleted)
+    bool IsDeleted,
+    bool IsCategoryShown)
 {
-    public bool IsOnSite => ExportToSite && !IsDeleted;
+    /// <summary>Exported from 1C, not deleted, and its category is shown on the site (R-08, R-18).</summary>
+    public bool IsOnSite => ExportToSite && !IsDeleted && IsCategoryShown;
     public bool HasPhoto => Photo.Length > 0;
 }
 
