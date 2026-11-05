@@ -1,5 +1,6 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Domain.Entities;
+using Catalog.Domain.Entities.Attributes;
 
 namespace Catalog.Infrastructure.DataBase;
 
@@ -14,6 +15,12 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<PriceType> PriceTypes => Set<PriceType>();
     public DbSet<SlugHistoryEntry> SlugHistory => Set<SlugHistoryEntry>();
     public DbSet<CategoryContent> CategoryContents => Set<CategoryContent>();
+    public DbSet<CatalogAttribute> Attributes => Set<CatalogAttribute>();
+    public DbSet<AttributeValue> AttributeValues => Set<AttributeValue>();
+    public DbSet<AttributeAlias> AttributeAliases => Set<AttributeAlias>();
+    public DbSet<CategoryAttribute> CategoryAttributes => Set<CategoryAttribute>();
+    public DbSet<ProductAttributeValue> ProductAttributeValues => Set<ProductAttributeValue>();
+    public DbSet<ProductAttributeReview> ProductAttributeReviews => Set<ProductAttributeReview>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

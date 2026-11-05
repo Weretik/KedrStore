@@ -1,3 +1,4 @@
+using Catalog.Application.Jobs.Attributes;
 using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Application.Integrations.OneC.Jobs;
@@ -40,6 +41,7 @@ public static class JobsHostServicesExtensions
         services.AddScoped<SyncOneCProductDetailsJob>();
         services.AddScoped<ProductTranslationImporter>();
         services.AddScoped<MigrateLegacySlugsJob>();
+        services.AddScoped<ImportCatalogAttributesJob>();
         services.AddScoped<SyncOneCStocksJob>();
         services.AddScoped<SyncOneCPricesJob>();
         services.AddScoped<SyncOneCOrdersJob>();
