@@ -54,6 +54,9 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/categories/{id}", out var adminCategory));
         Assert.True(adminCategory.TryGetProperty("get", out var adminCategoryGet));
         AssertOperationHasPathParameter(adminCategoryGet, "id");
+        Assert.True(paths.TryGetProperty("/api/categories/{id}/site-visibility", out var siteVisibility));
+        Assert.True(siteVisibility.TryGetProperty("put", out var siteVisibilityPut));
+        AssertOperationHasPathParameter(siteVisibilityPut, "id");
 
         Assert.True(paths.TryGetProperty("/api/catalog/{lang}/products", out var catalogProducts));
         Assert.True(catalogProducts.TryGetProperty("get", out var catalogProductsGet));

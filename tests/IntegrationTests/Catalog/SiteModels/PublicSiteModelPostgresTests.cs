@@ -30,7 +30,9 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
         {
             await db.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")));
+            var category = ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10"));
+            category.SetShownOnSite(true, DateTimeOffset.UtcNow);
+            db.Categories.Add(category);
             foreach (var id in new[] { 801, 802, 803 })
             {
                 var product = Product.Create(ProductId.From(id), Root, $"Завіса {id}", $"zavisa-{id}",

@@ -7,8 +7,9 @@ using Catalog.Domain.ValueObjects;
 namespace Catalog.Application.Features.SiteModels.Public.Common;
 
 /// <summary>
-/// Reads <see cref="PublicModelCatalog"/> without tracking. Categories under the hidden import root (Cosmos) and their
-/// products stay out (owner decision 2026-11-01); only values a person confirmed count (spec catalog/006 R-06).
+/// Reads <see cref="PublicModelCatalog"/> without tracking. Hidden categories (R-18), the Cosmos import root (owner
+/// decision 2026-11-01), and everything under them stay out with their products; only values a person confirmed count
+/// (spec catalog/006 R-06).
 /// </summary>
 public sealed class PublicModelCatalogReader(
     IReadCatalogDbContext db,
@@ -118,7 +119,7 @@ public sealed class PublicModelCatalogReader(
         };
     }
 
-    /// <summary>Active categories outside the hidden import root and its subtree.</summary>
+    /// <summary>Active categories shown on the site, outside the hidden import root, and not under a hidden one.</summary>
     private async Task<Dictionary<ProductCategoryId, PublicCategoryFacts>> ReadCategoriesAsync(
         CancellationToken cancellationToken)
     {
@@ -127,12 +128,14 @@ public sealed class PublicModelCatalogReader(
             {
                 Facts = new PublicCategoryFacts(category.Id, category.ParentId, category.Slug, category.ShortNameUk,
                     category.ShortNameRu),
-                category.ProductTypeIdOneC
+                category.ProductTypeIdOneC,
+                category.IsShownOnSite
             })
             .ToListAsync(cancellationToken);
 
         var hiddenRoot = roots.Value.CosmosRootCategoryId;
-        var hidden = rows.Where(row => row.ProductTypeIdOneC == hiddenRoot).Select(row => row.Facts.Id).ToHashSet();
+        var hidden = rows.Where(row => !row.IsShownOnSite || row.ProductTypeIdOneC == hiddenRoot)
+            .Select(row => row.Facts.Id).ToHashSet();
         var childrenOf = rows.Where(row => row.Facts.ParentId is not null)
             .ToLookup(row => row.Facts.ParentId!.Value, row => row.Facts.Id);
         var pending = new Stack<ProductCategoryId>(hidden);

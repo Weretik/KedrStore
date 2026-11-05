@@ -164,6 +164,38 @@ src/Catalog/
 
 **Residual risk.** Each request reads the on-site catalog (about 2.3 thousand products and their values) without a cache; the Next.js site caches pages (stage 6). A server cache is the next step if the load grows.
 
+## Stage 4b: categories on the site and the showcase by model
+
+Owner requests 2026-11-05 18:22–18:27 after using stage 4: a «show on site» mark on categories, «Моделі» and «Вітрина сайту» limited to what goes to the site, a category tree, and the showcase by model without row checkboxes. Owner answer: a new 1C category takes its parent's mark.
+
+### Rules
+
+- **R-18.** A category has the Admin mark «show on site» (`IsShownOnSite`). Hiding hides every subcategory; showing shows every subcategory and every parent; the Cosmos import root is never shown. The 1C sync never changes the mark; a new category takes its parent's, a new top category is shown only in the hardware root. The migration shows the whole «Фурнітура» root (1C `000005513`) once; doors and the rest start hidden. A product is on the site when it is exported from 1C, not deleted, and in a shown category: this holds for the public site (R-11), «Вітрина сайту», «Моделі», the model card, the health counts, and the «Огляд» counts of categories without texts and of attribute problems.
+- **R-19.** «Вітрина сайту» lists one row per model with on-site products and one row per on-site product in no model; a row carries its on-site products. «Моделі» lists only models with on-site products, and the model card shows only on-site products. The category filter of both takes the category with its subcategories; the category list is a tree of shown categories with on-site products below them, with counts that include subcategories.
+
+### Scenarios
+
+- **SC-M12 (R-19).** The showcase lists the proposed one-product model with the hard error first, then the accepted model with both products and their values; the problem, search, and parent-category filters work; the category tree counts the parent and both children.
+- **SC-M13 (R-18).** Hiding a category removes its products and models from the showcase, the models list, the category tree, and the health counts.
+- **SC-M14 (R-18).** The 1C sync shows new hardware categories, hides new door categories, and gives a new child its hidden parent's mark; an Admin hides with subcategories, shows with parents, cannot show Cosmos; over HTTP a Manager gets 403 and a hidden category's public page is 404.
+
+### Files (stage 4b)
+
+```text
+src/Catalog/
+├── Catalog.Domain/Entities/ProductCategory.cs                 # + IsShownOnSite, SetShownOnSite
+├── Catalog.Infrastructure/Migrations/*_CategorySiteVisibility.cs  # column + one-time «Фурнітура» start
+├── Catalog.Application/
+│   ├── Features/Category/SiteVisibility/                     # new: Admin command with subcategories and parents
+│   ├── Features/Category/PublicCatalogScope.cs               # hidden = not shown or Cosmos
+│   ├── Integrations/OneC/Jobs/SyncOneCCategoryJob.cs         # new category takes its parent's mark
+│   ├── Features/SiteModels/Common/SiteModelState*.cs         # on site needs a shown category; category parents
+│   ├── Features/SiteModels/GetShowcase/                      # rows by model
+│   ├── Features/SiteModels/GetCategories/                    # category tree with rolled-up counts
+│   └── Features/SiteModels/Public/Common/PublicModelCatalogReader.cs  # shown categories only
+└── Catalog.Api/Controllers/AdminCategoriesController.cs      # PUT {id}/site-visibility (Admin)
+```
+
 ## Stages
 
 | Stage | Scope | Status |
@@ -172,6 +204,7 @@ src/Catalog/
 | 2 | Models in the database, proposals, health, admin API | done 2026-11-05 (migration `CatalogSiteModels`) |
 | 3 | Run the proposals on production (dry run, then on «да») | planned |
 | 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | done 2026-11-05 (KedrStore #176, kedr-web #65) |
+| 4b | Categories «show on site» mark (migration `CategorySiteVisibility`), showcase by model, category tree, only on-site models and products in «Моделі» | in review |
 | 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces the reverted spec 006 phase 5 | done 2026-11-05 (no schema change) |
 | 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search | planned |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |
@@ -196,3 +229,10 @@ src/Catalog/
 | `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog\|FullyQualifiedName~ApiContractTests"` with local PostgreSQL for the PostgreSQL fixture | 97 passed: SC-M07–SC-M11 in `PublicSiteModelTests`, the routes over HTTP in `PublicSiteModelsApiTests`, the reader and filters on real PostgreSQL in `PublicSiteModelPostgresTests`, the four paths in `ApiContractTests` |
 | `dotnet test tests/ArchitectureTests` | 10 passed |
 | `python3 tools/docs/check_doc_links.py` | links valid |
+
+## Evidence (stage 4b)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog\|FullyQualifiedName~ApiContractTests"` with local PostgreSQL (migrations applied there) | 103 passed: SC-M12, SC-M13 in `SiteModelTests`, SC-M14 in `CategorySiteVisibilityTests` and `CatalogStableUrlsApiTests`; test categories now carry the mark |
+| `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~Catalog"` | 110 passed |

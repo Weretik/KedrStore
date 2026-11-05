@@ -51,12 +51,14 @@ paths:
   /api/admin/site-models/showcase:
     get:
       operationId: getAdminSiteShowcase
-      summary: «Вітрина сайту» - on-site products with model, variant values, and problems
+      summary: «Вітрина сайту» - models with their on-site products, variant values, and problems
       tags: [Admin site models]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        On-site, not deleted products. Products outside accepted models come first, then other products with problems,
-        then by name. `search` matches part of the product name or its 1C code exactly.
+        One row per model with on-site products and one row per on-site product in no model (spec catalog/007 R-19).
+        On site means exported from 1C, not deleted, and in a category shown on the site (R-18). Rows with products
+        outside accepted models come first, then other rows with problems, then by name. `categoryId` takes the
+        category with its subcategories; `search` matches part of the model or product name, or a 1C code exactly.
       parameters:
         - { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
         - { name: problem, in: query, schema: { type: string, enum: [any, no_model, no_attributes, missing_axis_value, same_combination] } }
@@ -64,17 +66,19 @@ paths:
         - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
         - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
-        '200': { description: A page of products, content: { application/json: { schema: { $ref: '#/components/schemas/SiteShowcaseList' } } } }
+        '200': { description: A page of rows, content: { application/json: { schema: { $ref: '#/components/schemas/SiteShowcaseList' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
   /api/admin/site-models/categories:
     get:
       operationId: getAdminSiteModelCategories
-      summary: Final categories with models and problems, for the «Моделі» sidebar
+      summary: Category tree with models and problems, for «Моделі» and «Вітрина сайту»
       tags: [Admin site models]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Final categories (without children) that have on-site products or models, by parent name, then name.
+      description: >-
+        Categories shown on the site (R-18) with on-site products in them or below them, each with its parent; counts
+        include subcategories. Ordered by name; the client builds the tree from `parentId`.
       responses:
         '200': { description: Categories, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/SiteModelCategory' } } } } }
         '401': { description: Not signed in. }
@@ -314,6 +318,24 @@ components:
         texts: { type: array, items: { $ref: '#/components/schemas/SiteModelText' }, description: 'Both languages, empty strings where nothing is saved.' }
         characteristics: { type: array, items: { $ref: '#/components/schemas/SiteModelCharacteristic' } }
         problems: { type: array, items: { type: string }, description: Model problem codes. }
+    SiteShowcaseRow:
+      type: object
+      required: [key, name, photo, categoryId, categoryName, inStock, products, problems]
+      properties:
+        key: { type: string, description: '`m{modelId}` for a model, `p{productId}` for a product in no model.' }
+        model:
+          description: The model; null for a product in no model.
+          oneOf:
+            - { $ref: '#/components/schemas/SiteShowcaseModel' }
+            - { type: 'null' }
+        name: { type: string, description: The model name or the original 1C product name. }
+        photo: { type: string }
+        categoryId: { type: integer }
+        categoryName: { type: string }
+        minPrice: { type: [number, 'null'] }
+        inStock: { type: boolean, description: Any of its products is in stock. }
+        products: { type: array, items: { $ref: '#/components/schemas/SiteShowcaseItem' }, description: 'Its on-site products, the main one first.' }
+        problems: { type: array, items: { type: string }, description: Problem codes of the model and of its products. }
     SiteShowcaseItem:
       type: object
       required: [productId, name, slug, photo, categoryId, categoryName, inStock, values, problems]
@@ -351,7 +373,7 @@ components:
       type: object
       required: [items, totalCount, page, pageSize]
       properties:
-        items: { type: array, items: { $ref: '#/components/schemas/SiteShowcaseItem' } }
+        items: { type: array, items: { $ref: '#/components/schemas/SiteShowcaseRow' } }
         totalCount: { type: integer }
         page: { type: integer }
         pageSize: { type: integer }
@@ -361,8 +383,8 @@ components:
       properties:
         id: { type: integer }
         name: { type: string }
-        parentName: { type: [string, 'null'] }
-        onSiteProducts: { type: integer, minimum: 0 }
+        parentId: { type: [integer, 'null'], description: Null for a top category. }
+        onSiteProducts: { type: integer, minimum: 0, description: With subcategories. }
         acceptedModels: { type: integer, minimum: 0 }
         proposedModels: { type: integer, minimum: 0 }
         problemCount: { type: integer, minimum: 0, description: Accepted models with a problem plus on-site products outside accepted models. }

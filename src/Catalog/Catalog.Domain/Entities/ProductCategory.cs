@@ -18,6 +18,12 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     public int SortOrder { get; private set; }
     public int Level { get; private set; }
     public bool IsDeleted { get; private set; }
+
+    /// <summary>
+    /// Whether the category and its products are shown on the site, in «Вітрина сайту», and in «Моделі». An admin owns
+    /// it; the 1C sync never changes it and gives a new category its parent's value.
+    /// </summary>
+    public bool IsShownOnSite { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     #endregion
@@ -77,6 +83,15 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         if (IsDeleted) return false;
         IsDeleted = true;
         DeletedAt = now;
+        UpdatedAt = now;
+        return true;
+    }
+
+    /// <summary>Shows or hides the category on the site; returns whether it changed.</summary>
+    public bool SetShownOnSite(bool isShown, DateTimeOffset now)
+    {
+        if (IsShownOnSite == isShown) return false;
+        IsShownOnSite = isShown;
         UpdatedAt = now;
         return true;
     }

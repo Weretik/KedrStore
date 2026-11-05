@@ -113,6 +113,34 @@ paths:
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Admin role. }
         '404': { description: Category not found or deleted. }
+  /api/categories/{id}/site-visibility:
+    put:
+      operationId: setAdminCategorySiteVisibility
+      summary: Show or hide a category on the site
+      description: >-
+        Spec catalog/007 R-18. Hiding hides every subcategory too; showing shows every subcategory and every parent.
+        A hidden category and its products leave the public site, «Вітрина сайту», «Моделі», and the counts of
+        «Огляд». The 1C sync never changes the mark; a new category takes its parent's. The Cosmos import root is
+        never shown. Repeating the same request is safe.
+      tags: [Admin categories]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetCategorySiteVisibilityRequest' }
+      responses:
+        '200':
+          description: Mark set (or already equal).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategorySiteVisibilityResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Category not found or deleted. }
   /api/categories/{id}/content:
     get:
       operationId: getAdminCategoryContent
@@ -321,6 +349,18 @@ components:
           type: [array, 'null']
           maxItems: 20
           items: { $ref: '#/components/schemas/CategoryFaqItem' }
+    SetCategorySiteVisibilityRequest:
+      type: object
+      required: [isShownOnSite]
+      properties:
+        isShownOnSite: { type: boolean }
+    CategorySiteVisibilityResponse:
+      type: object
+      required: [id, isShownOnSite, changedCount]
+      properties:
+        id: { type: integer, minimum: 1 }
+        isShownOnSite: { type: boolean }
+        changedCount: { type: integer, minimum: 0, description: The category and its relatives whose mark changed. }
     ChangeSlugRequest:
       type: object
       properties:
@@ -343,7 +383,7 @@ components:
         previousSlug: { type: string }
     AdminCategory:
       type: object
-      required: [id, name, shortNameUk, shortNameRu, slug, productTypeIdOneC, parentId, sortOrder, level, isDeleted, deletedAt]
+      required: [id, name, shortNameUk, shortNameRu, slug, productTypeIdOneC, parentId, sortOrder, level, isDeleted, deletedAt, isShownOnSite]
       properties:
         id: { type: integer, minimum: 1 }
         name:
@@ -371,6 +411,7 @@ components:
         level: { type: integer, minimum: 0 }
         isDeleted: { type: boolean }
         deletedAt: { type: [string, 'null'], format: date-time }
+        isShownOnSite: { type: boolean, description: 'Shown on the site, in «Вітрина сайту», and in «Моделі» (R-18).' }
         productCount:
           type: [integer, 'null']
           minimum: 0

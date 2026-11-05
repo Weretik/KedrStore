@@ -38,8 +38,12 @@ public sealed class PublicSiteModelTests
         var db = CreateContext();
         AddCategory(db, Parent);
         foreach (var child in new[] { Final, OtherFinal })
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
-                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent)));
+        {
+            var category = ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
+                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent));
+            category.SetShownOnSite(true, DateTimeOffset.UtcNow);
+            db.Categories.Add(category);
+        }
         var products = new (int Id, int Category, string Name, bool InStock, bool OnSite)[]
         {
             (1, Final, "Завіса KEDR AB L", true, true), (2, Final, "Завіса KEDR AB R", false, true),

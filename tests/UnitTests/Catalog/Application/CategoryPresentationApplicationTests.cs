@@ -109,6 +109,7 @@ public sealed class CategoryPresentationApplicationTests
         var child = CreateCategory(900001, "n5513.n900001", "Child", 0, 1);
         var cosmos = ProductCategory.Create(
             ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000"));
+        cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [hardware, child, cosmos];
         var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
@@ -145,6 +146,7 @@ public sealed class CategoryPresentationApplicationTests
             $"category-{id}",
             CategoryPath.From(path));
         category.UpdatePresentationMetadata($"{name} uk", $"{name} ru", sortOrder, level);
+        category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         return category;
     }
 

@@ -9,9 +9,8 @@ namespace Catalog.Application.Features.Overview;
 
 /// <summary>
 /// Counts products without a photo as the «Без фото» tab lists them (the list projection already leaves out deleted
-/// products) and active
-/// categories missing a site text in a language; a text row counts as filled the same way the category list does.
-/// Also counts on-site products whose attributes need review, and the No name ones among them (spec catalog/006),
+/// products) and active categories shown on the site (R-18) missing a site text in a language; a text row counts as
+/// filled the same way the category list does. Also counts on-site products (in shown categories) whose attributes need review, and the No name ones among them (spec catalog/006),
 /// and the site model health (spec catalog/007).
 /// </summary>
 public sealed class GetAdminCatalogOverviewQueryHandler(
@@ -47,13 +46,17 @@ public sealed class GetAdminCatalogOverviewQueryHandler(
         var filledLanguages = filled.GroupBy(row => row.CategoryId.Value)
             .ToDictionary(group => group.Key, group => group.Select(row => row.Language).Distinct().Count());
         var categoryIds = await catalogDbContext.Categories.AsNoTracking()
+            .Where(category => category.IsShownOnSite)
             .Select(category => category.Id.Value)
             .ToListAsync(cancellationToken);
         var withoutText = categoryIds.Count(id =>
             filledLanguages.GetValueOrDefault(id) < CategoryContent.Languages.Count);
 
+        var shownCategories = catalogDbContext.Categories.AsNoTracking()
+            .Where(category => category.IsShownOnSite)
+            .Select(category => category.Id);
         var onSite = catalogDbContext.Products.AsNoTracking()
-            .Where(product => product.ExportToSite)
+            .Where(product => product.ExportToSite && shownCategories.Contains(product.CategoryId))
             .Select(product => product.Id);
         var problems = await catalogDbContext.ProductAttributeReviews.AsNoTracking()
             .Where(review => review.State == AttributeReviewState.NeedsReview && onSite.Contains(review.ProductId))

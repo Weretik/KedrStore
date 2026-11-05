@@ -38,6 +38,7 @@ public sealed record AdminCategoryResponse(
     int Level,
     bool IsDeleted,
     DateTimeOffset? DeletedAt,
+    bool IsShownOnSite,
     int? ProductCount = null,
     IReadOnlyList<string>? FilledContentLanguages = null);
 
@@ -72,3 +73,12 @@ public sealed record SaveCategoryContentRequest(
     string? H1,
     string? BodyHtml,
     IReadOnlyList<CategoryFaqItemDto>? Faq);
+
+/// <summary>A category shown or hidden on the site; <c>ChangedCount</c> counts it with its affected relatives.</summary>
+public sealed record CategorySiteVisibilityResponse(int Id, bool IsShownOnSite, int ChangedCount);
+
+/// <summary>Shows or hides a category, with its subcategories, on the site (spec catalog/007 R-18).</summary>
+public sealed record SetCategorySiteVisibilityRequest
+{
+    public bool IsShownOnSite { get; init; }
+}

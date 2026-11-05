@@ -22,6 +22,7 @@ public sealed class CatalogStableUrlsApiTests
     [Theory]
     [InlineData("PUT", "/api/categories/2/content/uk")]
     [InlineData("PUT", "/api/categories/2/slug")]
+    [InlineData("PUT", "/api/categories/2/site-visibility")]
     [InlineData("PUT", "/api/admin/products/20/slug")]
     [InlineData("GET", "/api/categories?deleted=true")]
     [InlineData("GET", "/api/admin/products?deleted=true")]
@@ -37,6 +38,23 @@ public sealed class CatalogStableUrlsApiTests
         using var response = await client.SendAsync(request);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Admin_HidesCategory_ThenItsPublicPageIsNotFound_SC_M14()
+    {
+        await using var db = Seed();
+        using var factory = CreateFactory(db);
+        using var admin = factory.CreateClientWithRole("Admin");
+
+        using var hide = await admin.PutAsJsonAsync("/api/categories/2/site-visibility", new { isShownOnSite = false });
+        Assert.Equal(HttpStatusCode.OK, hide.StatusCode);
+        using var list = JsonDocument.Parse(await (await admin.GetAsync("/api/categories")).Content.ReadAsStringAsync());
+        Assert.Contains(list.RootElement.EnumerateArray(), row =>
+            row.GetProperty("id").GetInt32() == 2 && !row.GetProperty("isShownOnSite").GetBoolean());
+
+        using var page = await factory.CreateClient().GetAsync("/api/catalog/uk/categories/by-slug/zamky");
+        Assert.Equal(HttpStatusCode.NotFound, page.StatusCode);
     }
 
     [Fact]
@@ -168,6 +186,7 @@ public sealed class CatalogStableUrlsApiTests
     {
         var category = ProductCategory.Create(ProductCategoryId.From(id), "000005513", name, slug, CategoryPath.From(path),
             parentId is null ? null : ProductCategoryId.From(parentId.Value));
+        category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
         return category;
     }

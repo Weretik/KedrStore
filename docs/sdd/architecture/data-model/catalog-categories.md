@@ -6,6 +6,8 @@
 
 Since [stable URLs](../../specs/catalog/005-stable-urls-and-category-content/README.md): `ProductCategories` also has `IsDeleted`, `DeletedAt`, `UpdatedAt` (a global query filter hides deleted rows) and a unique index on `Slug`.
 
+Since [site models](../../specs/catalog/007-site-models/README.md) (migration `CategorySiteVisibility`): `IsShownOnSite` (boolean, default `false`), the Admin «show on site» mark; the migration sets it for every row of the hardware root `000005513`.
+
 | Table | Key | Purpose |
 | --- | --- | --- |
 | `CategoryContents` | (`CategoryId`, `Language`) | Admin-written `SeoTitle`, `MetaDescription`, `H1`, sanitized `BodyHtml`, `UpdatedAt`, `UpdatedBy`; FK to `ProductCategories` (restrict). |

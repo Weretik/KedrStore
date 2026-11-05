@@ -78,6 +78,7 @@ public sealed class AdminCatalogOverviewApiTests
     {
         var category = ProductCategory.Create(ProductCategoryId.From(id), "000005513", name, slug, CategoryPath.From(path),
             parentId is null ? null : ProductCategoryId.From(parentId.Value));
+        category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
         return category;
     }

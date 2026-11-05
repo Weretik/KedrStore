@@ -43,8 +43,12 @@ public sealed class SiteModelTests
         var db = CreateContext();
         AddCategory(db, Parent);
         foreach (var child in new[] { Final, OtherFinal })
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
-                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent)));
+        {
+            var category = ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
+                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent));
+            category.SetShownOnSite(true, DateTimeOffset.UtcNow);
+            db.Categories.Add(category);
+        }
         foreach (var id in products)
             AddProduct(db, id, inOtherCategory?.Contains(id) == true ? OtherFinal : Final, $"Товар {id}");
         await db.SaveChangesAsync();
@@ -95,7 +99,7 @@ public sealed class SiteModelTests
                 CancellationToken.None)).Value;
 
         public async Task<List<SiteModelCategoryDto>> CategoriesAsync()
-            => (await new GetSiteModelCategoriesQueryHandler(db, State).Handle(new GetSiteModelCategoriesQuery(),
+            => (await new GetSiteModelCategoriesQueryHandler(State).Handle(new GetSiteModelCategoriesQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteModelListDto> ListAsync(GetSiteModelsRequest request)
@@ -284,7 +288,7 @@ public sealed class SiteModelTests
     }
 
     [Fact]
-    public async Task Showcase_ListsOnSiteProducts_WithModelValuesAndProblems_AndCategoriesCountThem()
+    public async Task Showcase_ListsModelsWithTheirOnSiteProducts_AndCategoryTreeCountsThem_SC_M12()
     {
         await using var db = await CatalogAsync([1, 2, 3, 4], inOtherCategory: [3], offSite: [4]);
         await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "AB", "R"),
@@ -295,25 +299,54 @@ public sealed class SiteModelTests
             CancellationToken.None);
 
         var all = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest());
-        // Off-site product 4 is not listed; product 3 is outside accepted models: the hard error comes first.
-        Assert.Equal([3, 1, 2], all.Items.Select(item => item.ProductId));
+        // Off-site product 4 is not listed; the proposed model of product 3 has the hard error and comes first.
+        Assert.Equal(["Ручка", "Завіса"], all.Items.Select(item => item.Name));
+        Assert.Equal("proposed", all.Items[0].Model!.Status);
+        Assert.Equal([3], all.Items[0].Products.Select(item => item.ProductId));
         Assert.Equal([SiteModelProblems.NoModel], all.Items[0].Problems);
-        Assert.Equal(("Завіса", "accepted"), (all.Items[1].Model!.Name, all.Items[1].Model!.Status));
-        Assert.Equal(["Антична бронза", "Ліва"], all.Items[1].Values.Select(value => value.Value));
-        Assert.Empty(all.Items[1].Problems);
+        Assert.Equal($"m{hinges.Id.Value}", all.Items[1].Key);
+        Assert.Equal([1, 2], all.Items[1].Products.Select(item => item.ProductId));
+        Assert.Equal(["Антична бронза", "Ліва"], all.Items[1].Products[0].Values.Select(value => value.Value));
+        // The accepted model has only model warnings (no texts, no photo); its products are fine.
+        Assert.Equal([SiteModelProblems.ModelNoSeo, SiteModelProblems.ModelNoPhoto], all.Items[1].Problems);
+        Assert.All(all.Items[1].Products, product => Assert.Empty(product.Problems));
 
-        var errors = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Problem = SiteModelProblems.Any });
-        Assert.Equal([3], errors.Items.Select(item => item.ProductId));
+        var errors = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Problem = SiteModelProblems.NoModel });
+        Assert.Equal(["Ручка"], errors.Items.Select(item => item.Name));
         var byCode = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Search = "2" });
-        Assert.Equal([2], byCode.Items.Select(item => item.ProductId));
+        Assert.Equal(["Завіса"], byCode.Items.Select(item => item.Name));
+        var inParent = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { CategoryId = Parent });
+        Assert.Equal(2, inParent.TotalCount);
 
         var categories = await handlers.CategoriesAsync();
-        Assert.Equal([Final, OtherFinal], categories.Select(category => category.Id));
-        Assert.Equal((2, 1, 0, 1), (categories[0].OnSiteProducts, categories[0].AcceptedModels,
+        Assert.Equal([Parent, Final, OtherFinal], categories.Select(category => category.Id));
+        Assert.Equal([null, Parent, Parent], categories.Select(category => category.ParentId));
+        Assert.Equal((3, 1, 1, 2), (categories[0].OnSiteProducts, categories[0].AcceptedModels,
             categories[0].ProposedModels, categories[0].ProblemCount));
-        Assert.Equal("Категорія 10", categories[0].ParentName);
-        Assert.Equal((1, 0, 1, 1), (categories[1].OnSiteProducts, categories[1].AcceptedModels,
+        Assert.Equal((2, 1, 0, 1), (categories[1].OnSiteProducts, categories[1].AcceptedModels,
             categories[1].ProposedModels, categories[1].ProblemCount));
+        Assert.Equal((1, 0, 1, 1), (categories[2].OnSiteProducts, categories[2].AcceptedModels,
+            categories[2].ProposedModels, categories[2].ProblemCount));
+    }
+
+    [Fact]
+    public async Task HiddenCategory_LeavesShowcaseModelsCategoriesAndHealth_SC_M13()
+    {
+        await using var db = await CatalogAsync([1, 2, 3], inOtherCategory: [3]);
+        await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "AB", "R"),
+            Row(3, "Ручка", "AB", "L")), apply: true);
+        var other = await db.Categories.SingleAsync(category => category.Id == ProductCategoryId.From(OtherFinal));
+        other.SetShownOnSite(false, DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
+        var handlers = new Handlers(db);
+
+        var showcase = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest());
+        Assert.Equal(["Завіса"], showcase.Items.Select(item => item.Name));
+        var models = await handlers.ListAsync(new GetSiteModelsRequest());
+        Assert.Equal(["Завіса"], models.Items.Select(item => item.Name));
+        Assert.Equal([Parent, Final], (await handlers.CategoriesAsync()).Select(category => category.Id));
+        Assert.Equal(2, (await handlers.HealthAsync()).ProductsWithoutModel);
     }
 
     private sealed class Manager : ICurrentUserService
