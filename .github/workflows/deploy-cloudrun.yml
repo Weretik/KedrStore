@@ -217,6 +217,36 @@ jobs:
               --quiet
           fi
 
+          # Catalog attributes import (spec catalog/006). The first job only reports changes; the second writes them.
+          # Both are idempotent and run only by hand.
+          ATTRIBUTE_SECRETS="ConnectionStrings__Default=db-connection:latest"
+          for JOB_DEF in \
+            "catalog-attributes-import-dry-run|--job=import-catalog-attributes" \
+            "catalog-attributes-import-apply|--job=import-catalog-attributes,--apply"
+          do
+            IFS='|' read -r JOB_NAME JOB_ARG <<< "$JOB_DEF"
+
+            if gcloud run jobs describe "$JOB_NAME" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+              gcloud run jobs update "$JOB_NAME" \
+                --image "${{ env.JOBS_IMAGE }}" \
+                --region "${{ env.GCP_REGION }}" \
+                --args="$JOB_ARG" \
+                --set-secrets "$ATTRIBUTE_SECRETS" \
+                --quiet
+            else
+              gcloud run jobs create "$JOB_NAME" \
+                --image "${{ env.JOBS_IMAGE }}" \
+                --region "${{ env.GCP_REGION }}" \
+                --tasks 1 \
+                --parallelism 1 \
+                --max-retries 0 \
+                --task-timeout 30m \
+                --args="$JOB_ARG" \
+                --set-secrets "$ATTRIBUTE_SECRETS" \
+                --quiet
+            fi
+          done
+
           # Primary customer-sync job. This is the only customer job that should be used for routine execution.
           for JOB_DEF in \
             "onec-sales-customers-full|--job=sales-customers-full"
