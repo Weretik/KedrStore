@@ -414,6 +414,40 @@ namespace Content.Infrastructure.Migrations
                     b.ToTable("CompanyRequisitesChanges", "content");
                 });
 
+            modelBuilder.Entity("Content.Domain.Seo.PageSeo", b =>
+                {
+                    b.Property<string>("Page")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("DescriptionRu")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("DescriptionUk")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("TitleRu")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("TitleUk")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Page");
+
+                    b.ToTable("PageSeo", "content");
+                });
+
             modelBuilder.Entity("Content.Domain.Wholesale.WholesalePage", b =>
                 {
                     b.Property<int>("Id")

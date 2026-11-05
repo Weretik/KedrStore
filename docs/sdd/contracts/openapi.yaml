@@ -174,6 +174,12 @@ paths:
     $ref: ./content/wholesale.openapi.yaml#/paths/~1api~1content~1{lang}~1wholesale
   /api/admin/content/wholesale:
     $ref: ./content/wholesale.openapi.yaml#/paths/~1api~1admin~1content~1wholesale
+  /api/content/{lang}/page-seo:
+    $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1content~1{lang}~1page-seo
+  /api/admin/content/page-seo:
+    $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo
+  /api/admin/content/page-seo/{page}:
+    $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo~1{page}
   /api/admin/content/site-refresh:
     $ref: ./content/site-refresh.openapi.yaml#/paths/~1api~1admin~1content~1site-refresh
   /api/admin/media/folders:
