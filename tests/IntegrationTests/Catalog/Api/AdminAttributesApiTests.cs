@@ -110,6 +110,42 @@ public sealed class AdminAttributesApiTests
     }
 
     [Fact]
+    public async Task NewAttribute_OnlyAdminCreates_WithUniqueSlugAndCode()
+    {
+        await using var db = await SeedAsync();
+        using var factory = CreateFactory(db);
+        using var manager = factory.CreateClientWithRole("Manager");
+        using var admin = factory.CreateClientWithRole("Admin");
+        var body = new { nameUk = "Матеріал ручки", nameRu = "Материал ручки", kind = "enum", isFilterable = true,
+            isVariantAxis = false, sortOrder = 40 };
+
+        Assert.Equal(HttpStatusCode.Forbidden,
+            (await manager.PostAsJsonAsync("/api/admin/catalog-attributes", body)).StatusCode);
+
+        using var created = await admin.PostAsJsonAsync("/api/admin/catalog-attributes", body);
+        Assert.Equal(HttpStatusCode.OK, created.StatusCode);
+        using var json = JsonDocument.Parse(await created.Content.ReadAsStringAsync());
+        var attribute = json.RootElement.GetProperty("attribute");
+        Assert.Equal(("material-ruchky", "material_ruchky", "enum", true), (attribute.GetProperty("slug").GetString(),
+            attribute.GetProperty("code").GetString(), attribute.GetProperty("kind").GetString(),
+            attribute.GetProperty("isEditedManually").GetBoolean()));
+
+        using var again = JsonDocument.Parse(await (await admin.PostAsJsonAsync("/api/admin/catalog-attributes",
+            body with { })).Content.ReadAsStringAsync());
+        Assert.Equal("material-ruchky-2", again.RootElement.GetProperty("attribute").GetProperty("slug").GetString());
+
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/catalog-attributes",
+            new { nameUk = "Ще колір", kind = "enum", code = "color", sortOrder = 1 })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/catalog-attributes",
+            new { nameUk = "Розмір", kind = "size", sortOrder = 1 })).StatusCode);
+
+        var id = attribute.GetProperty("id").GetInt32();
+        using var value = await admin.PostAsJsonAsync($"/api/admin/catalog-attributes/{id}/values",
+            new { nameUk = "Латунь", sortOrder = 1 });
+        Assert.Equal(HttpStatusCode.OK, value.StatusCode);
+    }
+
+    [Fact]
     public async Task ProductPanel_ManagerSetsValueAndAcceptsReview()
     {
         await using var db = await SeedAsync();

@@ -50,6 +50,22 @@ public sealed record AdminCatalogAttributeDto(
 
 public sealed record UpdateCatalogAttributeRequest(string NameUk, string? NameRu, bool IsFilterable, int SortOrder);
 
+/// <summary>
+/// A new attribute a person adds in «Ознаки». <c>Kind</c>: <c>enum</c> (a list of values) or <c>number</c> (a number in
+/// <c>Unit</c>). Code and slug are taken from <c>Code</c>/<c>Slug</c> or made from the name. <c>IsVariantAxis</c>: the
+/// products of a model may differ by it (it is offered as a model switcher).
+/// </summary>
+public sealed record CreateCatalogAttributeRequest(
+    string NameUk,
+    string? NameRu,
+    string Kind,
+    string? Unit,
+    string? Code,
+    string? Slug,
+    bool IsFilterable,
+    bool IsVariantAxis,
+    int SortOrder);
+
 /// <summary>A new value; its code and slug are taken from <c>Code</c>/<c>Slug</c> or made from the name.</summary>
 public sealed record CreateAttributeValueRequest(
     string NameUk,
