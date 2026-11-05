@@ -51,3 +51,16 @@ public sealed record SetSiteModelTextRequest
     public string? SeoTitle { get; init; }
     public string? SeoDescription { get; init; }
 }
+
+/// <summary>
+/// «Вітрина сайту»: on-site products. <c>Problem</c>: a product problem code or <c>any</c>; <c>Search</c>: part of the
+/// product name or its 1C code.
+/// </summary>
+public sealed record GetSiteShowcaseRequest
+{
+    public int? CategoryId { get; init; }
+    public string? Problem { get; init; }
+    public string? Search { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 50;
+}

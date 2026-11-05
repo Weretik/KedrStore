@@ -394,7 +394,7 @@ components:
         valueName: { type: [string, 'null'] }
         isConfirmed: { type: boolean }
         note: { type: [string, 'null'] }
-        productCount: { type: integer, description: Products whose review mentions the code. }
+        productCount: { type: integer, description: On-site products whose review mentions the code (spec catalog/007 M-01). }
     DecideAttributeCodeRequest:
       type: object
       properties:

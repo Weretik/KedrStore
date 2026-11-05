@@ -12,8 +12,21 @@ public static class SiteModelProblems
     public const string ModelNoSeo = "model_no_seo";
     public const string ModelNoPhoto = "model_no_photo";
 
+    /// <summary>List filter value: any problem at all.</summary>
+    public const string Any = "any";
+
     public static readonly IReadOnlySet<string> All = new HashSet<string>(StringComparer.Ordinal)
     {
         NoModel, NoAttributes, MissingAxisValue, SameCombination, ModelNoAxes, ModelNoSeo, ModelNoPhoto
     };
+
+    /// <summary>Codes a product can have.</summary>
+    public static readonly IReadOnlySet<string> Product = new HashSet<string>(StringComparer.Ordinal)
+    {
+        NoModel, NoAttributes, MissingAxisValue, SameCombination
+    };
+
+    /// <summary>Whether a row with these problems passes the list filter (a code, <see cref="Any"/>, or none).</summary>
+    public static bool Passes(IReadOnlyCollection<string> problems, string? filter)
+        => filter is null || (filter == Any ? problems.Count > 0 : problems.Contains(filter));
 }

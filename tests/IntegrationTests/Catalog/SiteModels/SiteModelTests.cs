@@ -8,7 +8,9 @@ using global::Catalog.Application.Features.SiteModels.Create;
 using global::Catalog.Application.Features.SiteModels.FillFromNames;
 using global::Catalog.Application.Features.SiteModels.Get;
 using global::Catalog.Application.Features.SiteModels.GetHealth;
+using global::Catalog.Application.Features.SiteModels.GetCategories;
 using global::Catalog.Application.Features.SiteModels.GetList;
+using global::Catalog.Application.Features.SiteModels.GetShowcase;
 using global::Catalog.Application.Features.SiteModels.SetAxes;
 using global::Catalog.Application.Features.SiteModels.SetTexts;
 using global::Catalog.Application.Attributes.Import;
@@ -86,6 +88,14 @@ public sealed class SiteModelTests
 
         public async Task<SiteModelHealthDto> HealthAsync()
             => (await new GetSiteModelHealthQueryHandler(State).Handle(new GetSiteModelHealthQuery(),
+                CancellationToken.None)).Value;
+
+        public async Task<SiteShowcaseListDto> ShowcaseAsync(GetSiteShowcaseRequest request)
+            => (await new GetSiteShowcaseQueryHandler(State).Handle(new GetSiteShowcaseQuery(request),
+                CancellationToken.None)).Value;
+
+        public async Task<List<SiteModelCategoryDto>> CategoriesAsync()
+            => (await new GetSiteModelCategoriesQueryHandler(db, State).Handle(new GetSiteModelCategoriesQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteModelListDto> ListAsync(GetSiteModelsRequest request)
@@ -271,6 +281,39 @@ public sealed class SiteModelTests
         Assert.Equal(0, fixedHealth.ModelsWithoutSeo);
         Assert.Equal(0, fixedHealth.ProductsWithoutModel);
         Assert.Equal(0, fixedHealth.ProposedModels);
+    }
+
+    [Fact]
+    public async Task Showcase_ListsOnSiteProducts_WithModelValuesAndProblems_AndCategoriesCountThem()
+    {
+        await using var db = await CatalogAsync([1, 2, 3, 4], inOtherCategory: [3], offSite: [4]);
+        await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "AB", "R"),
+            Row(3, "Ручка", "AB", "L"), Row(4, "Засувка", "AB", "L")), apply: true);
+        var handlers = new Handlers(db);
+        var hinges = await ModelOfAsync(db, 1);
+        await handlers.Accept.Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [hinges.Id.Value] }),
+            CancellationToken.None);
+
+        var all = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest());
+        // Off-site product 4 is not listed; product 3 is outside accepted models: the hard error comes first.
+        Assert.Equal([3, 1, 2], all.Items.Select(item => item.ProductId));
+        Assert.Equal([SiteModelProblems.NoModel], all.Items[0].Problems);
+        Assert.Equal(("Завіса", "accepted"), (all.Items[1].Model!.Name, all.Items[1].Model!.Status));
+        Assert.Equal(["Антична бронза", "Ліва"], all.Items[1].Values.Select(value => value.Value));
+        Assert.Empty(all.Items[1].Problems);
+
+        var errors = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Problem = SiteModelProblems.Any });
+        Assert.Equal([3], errors.Items.Select(item => item.ProductId));
+        var byCode = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Search = "2" });
+        Assert.Equal([2], byCode.Items.Select(item => item.ProductId));
+
+        var categories = await handlers.CategoriesAsync();
+        Assert.Equal([Final, OtherFinal], categories.Select(category => category.Id));
+        Assert.Equal((2, 1, 0, 1), (categories[0].OnSiteProducts, categories[0].AcceptedModels,
+            categories[0].ProposedModels, categories[0].ProblemCount));
+        Assert.Equal("Категорія 10", categories[0].ParentName);
+        Assert.Equal((1, 0, 1, 1), (categories[1].OnSiteProducts, categories[1].AcceptedModels,
+            categories[1].ProposedModels, categories[1].ProblemCount));
     }
 
     private sealed class Manager : ICurrentUserService
