@@ -112,6 +112,14 @@ paths:
           in: query
           description: '`true` lists only products without a linked photo (`photo` is an empty string).'
           schema: { type: boolean }
+        - name: problemsOnly
+          in: query
+          description: '`true` lists only products whose attributes need review («Тільки проблемні», spec catalog/006).'
+          schema: { type: boolean }
+        - name: problemReason
+          in: query
+          description: Lists only products that need review for this reason code, for example `no_name`.
+          schema: { type: string, maxLength: 64 }
         - name: deleted
           in: query
           description: >-
@@ -325,6 +333,12 @@ components:
         quantityInPack: { type: integer }
         isDeleted: { type: boolean }
         deletedAt: { type: [string, 'null'], format: date-time }
+        groupId: { type: [integer, 'null'], description: 'Variant group of the product (spec catalog/006); filled by the paged list only.' }
+        groupName: { type: [string, 'null'] }
+        problems:
+          type: array
+          description: Why the product's attributes need review; empty when they do not or the product was accepted. Filled by the paged list only.
+          items: { $ref: './attributes.openapi.yaml#/components/schemas/AdminAttributeProblem' }
     AdminProductDetails:
       type: object
       required: [id, nameUk, nameRu, productSlug, photo, scheme, categoryId, categoryName, inStock, isSale, isNew, exportToSite, price, stock, quantityInPack]

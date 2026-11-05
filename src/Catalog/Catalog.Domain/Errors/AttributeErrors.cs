@@ -11,6 +11,12 @@ public static class AttributeErrors
     public static CatalogDomainError SlugInvalid(string slug) =>
         new("Catalog.Attribute.Slug.Invalid", $"Slug must match ^[a-z0-9]+(-[a-z0-9]+)*$. Actual: {slug}");
 
+    public static CatalogDomainError SwatchHexInvalid(string value) =>
+        new("Catalog.AttributeValue.SwatchHex.Invalid", $"Swatch color must be #RRGGBB. Actual: {value}");
+
+    public static CatalogDomainError SwatchMediaInvalid(long id) =>
+        new("Catalog.AttributeValue.SwatchMedia.Invalid", $"Swatch picture must be a media library file ID. Actual: {id}");
+
     public static CatalogDomainError ValueOrNumberRequired() =>
         new("Catalog.ProductAttribute.Value.Required", "A product attribute needs a list value or a number");
 

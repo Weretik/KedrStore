@@ -38,6 +38,12 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **R-11.** Products of one group that color (main and second), size, and side do not tell apart get the review reason `same_variants` («Однакові варіанти») with the matching product codes. The group build owns this reason: the recognizer import keeps it, and it disappears when the variants differ again. An accepted product stays accepted (D-05).
 - **R-12.** Group slugs come from the group name (KMU-2010), live in the same slug history as products and categories (type 3), and only an Admin changes them. Renaming a group keeps its slug.
 
+- **R-13.** A value a person sets on a product is manual and locked; automation never changes it and adds no positions to that attribute. The latest automatic value of each position is kept, so «Повернути автоматичне» restores it; positions automation never had disappear. A change of color, size, or side rebuilds the groups (R-11).
+- **R-14.** «Прийняти як є» records who (email) and when; «Повернути на перевірку» undoes it (D-05). Manager and Admin decide; the original 1C name is shown read-only.
+- **R-15.** «Тільки проблемні» lists products whose review needs a person; the reason filter lists those with one reason code. List rows carry the group name and the problems (none for accepted products).
+- **R-16.** «Властивості» is read by Manager and Admin and changed by Admin only. An edited attribute, value, code, or category filter is marked manual and the dictionary import leaves it. A value swatch is a #RRGGBB color or a media-library texture. A decoded code confirms the product values that waited only for it; codes decoded for the first time reach products with the phase 4 parser.
+- **R-17.** «Огляд» counts on-site products that need review and the No name ones among them; the admin shows no line at zero.
+
 ## Scenarios (phase 1)
 
 - **SC-A01 (R-03).** Without `--apply` the import reports counts and writes nothing.
@@ -55,13 +61,22 @@ Products get structured attributes (color, size, side, type, material, and so on
 - **SC-G04 (R-11).** Two variants with the same color and side get «Однакові варіанти»; a reimport keeps the reason and an accepted product stays accepted; once the side differs, the reason is cleared.
 - **SC-G05 (R-09).** A new group a person creates pins its products; products of another category are refused; a product taken out of groups stays out after a reimport; back to automatic it regroups at once.
 
+## Scenarios (phase 3)
+
+- **SC-A01 (R-13).** A manual chrome color is locked, kept by a reimport, makes «Однакові варіанти» with a chrome twin; «Повернути автоматичне» brings back the imported bronze and clears the reason.
+- **SC-A02 (R-13).** A value of another attribute and an empty value list are refused.
+- **SC-A03 (R-14).** An accepted product stays accepted after a reimport; reopening returns it to review and clears who accepted it.
+- **SC-A04 (R-16).** Deciding an assistant-picked code confirms the product values behind it, removes it from «Не розшифровані коди», and survives the dictionary import; a value of another attribute is refused.
+- **SC-A05 (R-16).** A category filter an Admin turns off stays off after the import.
+- **SC-A06 (R-15, R-17).** Over HTTP: rows show the group and the problems; «Тільки проблемні» and the reason filter list the right products; «Огляд» counts problems and No name; a Manager reads «Властивості» but gets 403 on a change; an accepted product leaves «Тільки проблемні».
+
 ## Phases
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Model, migration `CatalogAttributes`, import job `import-catalog-attributes` | done 2026-11-05 |
 | 2 | Product groups (`ProductGroup` slug type 3), main product, «Однакові варіанти», group API | done 2026-11-05 |
-| 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | planned |
+| 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | backend done 2026-11-05 (migration `CatalogAttributesAdmin`); kedr-web screens next |
 | 4 | .NET parser port with a golden test against the CSV (2330/2330), runs on 1C sync and dictionary changes | planned |
 | 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | planned |
 | 6 | Single-filter pages, templates, noindex/canonical, redirects, sitemap, `ProductGroup` JSON-LD | planned |
@@ -99,6 +114,34 @@ src/Catalog/
 ```
 
 Contract: [product-groups.openapi.yaml](../../../contracts/catalog/product-groups.openapi.yaml). The import job ends with the group build, so the existing Cloud Run jobs `catalog-attributes-import-dry-run` and `-apply` also build the groups.
+
+## Code (phase 3, backend)
+
+```text
+src/Catalog/
+├── Catalog.Domain/Entities/Attributes/  # manual edits: kept automatic value, Decide, EditManually, swatch
+├── Catalog.Contracts/Attributes/        # panel, dictionary, codes, filters DTOs
+├── Catalog.Application/Features/
+│   ├── ProductAttributes/   # panel: Get, Set, Restore, AcceptReview, ReopenReview; Common: reader, reviewer name
+│   ├── Attributes/          # «Властивості»: GetList, Get, Update, CreateValue, UpdateValue, GetUnresolvedCodes,
+│   │                        # DecideCode, GetCategoryFilters, SetCategoryFilters, GetProblemReasons; Common: readers
+│   ├── Products/GetAdminList/AdminProductProblems.cs  # problem filters, «Група» and problem columns
+│   └── Overview/            # + problems and No name counts
+├── Catalog.Api/Controllers/AdminProductAttributesController.cs, AdminCatalogAttributesController.cs
+└── Catalog.Infrastructure/Migrations/*_CatalogAttributesAdmin.cs  # 5 nullable columns, 1 FK
+```
+
+Contract: [attributes.openapi.yaml](../../../contracts/catalog/attributes.openapi.yaml); `problemsOnly`, `problemReason`, and the row fields in [products.openapi.yaml](../../../contracts/catalog/products.openapi.yaml); counts in [admin-overview.openapi.yaml](../../../contracts/catalog/admin-overview.openapi.yaml).
+
+## Evidence (phase 3 backend, 2026-11-05)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Catalog"` | 97 passed (6 new: kept automatic value, code decision, swatch) |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog\|FullyQualifiedName~ApiContractTests"` | 65 passed, 4 skipped (Docker-only); SC-A01–SC-A06; the new routes and list parameters are in the generated OpenAPI |
+| `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj` | 10 passed |
+| PostgreSQL 16: `dotnet ef database update` on a clean database and on the phase 2 test database, down to `CatalogProductGroups` and up again | applied; no pending model changes |
+| Readers and list filters against the phase 2 test database (PostgreSQL) | 1668 on-site products in review, 36 No name; 52 attributes; 107 undecided codes (AL in 181 products); category filters and the product panel read correctly |
 
 ## Evidence (phase 2, 2026-11-05)
 

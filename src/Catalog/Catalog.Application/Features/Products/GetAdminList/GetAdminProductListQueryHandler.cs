@@ -28,16 +28,16 @@ public sealed class GetAdminProductListQueryHandler(IReadCatalogDbContext catalo
         var categoryIds = query.Request.CategoryId is { } categoryId
             ? await CategoryTreeIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
             : null;
-        var productsQuery = ApplySorting(
-            ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), categoryIds, query.Request),
-            categoriesQuery,
-            query.Request.Sort);
+        var filtered = ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), categoryIds, query.Request);
+        filtered = await AdminProductProblems.FilterAsync(catalogDbContext, filtered, query.Request, cancellationToken);
+        var productsQuery = ApplySorting(filtered, categoriesQuery, query.Request.Sort);
 
         var totalRecords = await productsQuery.LongCountAsync(cancellationToken);
         var items = await JoinProductDetails(productsQuery, catalogDbContext.Products.AsNoTracking(), categoriesQuery)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+        items = await AdminProductProblems.EnrichAsync(catalogDbContext, items, cancellationToken);
 
         var pagedInfo = new PagedInfo(
             pageNumber,

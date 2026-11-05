@@ -1,8 +1,8 @@
 # Catalog attributes
 
-**Static code check:** 2026-11-05 (phase 2). **Module:** Catalog.
+**Static code check:** 2026-11-05 (phase 3 backend). **Module:** Catalog.
 
-Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–2 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, and variant groups; Admin screens, parser, filters, and SEO follow.
+Product attributes (color, size, side, type, material, …), their dictionary, and the review state of each product. Phases 1–3 of the [attributes SDD](../../specs/catalog/006-attributes-variants-filters/README.md): data model, import, variant groups, and the admin API; parser, site filters, and SEO follow.
 
 ## Structure and relationships
 
@@ -12,7 +12,9 @@ Product attributes (color, size, side, type, material, …), their dictionary, a
 
 Admin API ([contract](../../contracts/catalog/product-groups.openapi.yaml), policy CanManageProducts; group slug Admin only): [AdminProductGroupsController](../../../../src/Catalog/Catalog.Api/Controllers/AdminProductGroupsController.cs) for groups and `GET/PUT /api/admin/products/{id}/group` in [AdminProductsController](../../../../src/Catalog/Catalog.Api/Controllers/AdminProductsController.cs) for one product.
 
-[ProductAttributeValue](../../../../src/Catalog/Catalog.Domain/Entities/Attributes/ProductAttributeValue.cs) refuses automatic changes when a person set or locked the value. [ProductAttributeReview](../../../../src/Catalog/Catalog.Domain/Entities/Attributes/ProductAttributeReview.cs) keeps the base name and reasons; an accepted review stays accepted until a person reopens it. Original 1C names are never changed.
+Admin attributes API ([contract](../../contracts/catalog/attributes.openapi.yaml)): [AdminProductAttributesController](../../../../src/Catalog/Catalog.Api/Controllers/AdminProductAttributesController.cs) serves the «Властивості» panel of a product (Manager and Admin: manual values, «Повернути автоматичне», «Прийняти як є», «Повернути на перевірку»); [AdminCatalogAttributesController](../../../../src/Catalog/Catalog.Api/Controllers/AdminCatalogAttributesController.cs) serves the «Властивості» page (Manager reads, Admin changes attributes, values, codes, and category filters). The admin product list filters by problems ([AdminProductProblems](../../../../src/Catalog/Catalog.Application/Features/Products/GetAdminList/AdminProductProblems.cs)) and the «Огляд» counts them.
+
+[ProductAttributeValue](../../../../src/Catalog/Catalog.Domain/Entities/Attributes/ProductAttributeValue.cs) refuses automatic changes when a person set or locked the value and keeps the latest automatic value for «Повернути автоматичне». [ProductAttributeReview](../../../../src/Catalog/Catalog.Domain/Entities/Attributes/ProductAttributeReview.cs) keeps the base name and reasons; an accepted review stays accepted until a person reopens it. Original 1C names are never changed.
 
 ## Code structure
 
@@ -25,14 +27,16 @@ src/Catalog/
 │   ├── Attributes/Import/  # file readers and built-in attribute settings
 │   ├── Groups/             # group builder, key, report
 │   ├── Features/Groups/    # admin queries and commands (picker, group, move, create, rename, main)
+│   ├── Features/ProductAttributes/  # product panel: values, revert, review decisions
+│   ├── Features/Attributes/         # «Властивості»: attributes, values, codes, category filters, reasons
 │   └── Jobs/Attributes/ImportCatalogAttributesJob.cs  # the import and its report
-├── Catalog.Api/Controllers/AdminProductGroupsController.cs
+├── Catalog.Api/Controllers/  # AdminProductGroups, AdminProductAttributes, AdminCatalogAttributes
 └── Catalog.Infrastructure/Configurations/{Attributes,Groups}/  # EF mappings
 ```
 
 ## Tests
 
-[AttributeImportTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeImportTests.cs) · [ProductGroupBuilderTests.cs](../../../../tests/IntegrationTests/Catalog/Groups/ProductGroupBuilderTests.cs) · [AttributeImportFilesTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeImportFilesTests.cs) · [ProductGroupTests.cs](../../../../tests/UnitTests/Catalog/Groups/ProductGroupTests.cs)
+[AttributeImportTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeImportTests.cs) · [ProductGroupBuilderTests.cs](../../../../tests/IntegrationTests/Catalog/Groups/ProductGroupBuilderTests.cs) · [AttributeImportFilesTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeImportFilesTests.cs) · [ProductGroupTests.cs](../../../../tests/UnitTests/Catalog/Groups/ProductGroupTests.cs) · [AttributeAdminTests.cs](../../../../tests/IntegrationTests/Catalog/Attributes/AttributeAdminTests.cs) · [AdminAttributesApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/AdminAttributesApiTests.cs) · [AttributeManualEditTests.cs](../../../../tests/UnitTests/Catalog/Attributes/AttributeManualEditTests.cs)
 
 Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog.Attributes|FullyQualifiedName~IntegrationTests.Catalog.Groups"` and `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Catalog.Attributes|FullyQualifiedName~UnitTests.Catalog.Groups"`.
 

@@ -10,10 +10,10 @@
 | `ProductTranslations` | `Id` | Translation: `ProductId` (FK), `Language`, `Name`. |
 | `PriceType` | `Id` | Price type lookup: `PriceTypeName`; physical table name is singular. |
 | `CatalogAttributes` | `Id` (identity) | Attribute: `Code` (unique), `NameUk`, `Kind` (1 list, 2 number, 3 size), `Unit`, `Slug` (unique, filter URL part), `IsFilterable`, `IsVariantAxis`, `SortOrder`, `IsEditedManually`. |
-| `CatalogAttributeValues` | `Id` (identity) | Value of an attribute: `AttributeId` (FK), `Code` and `Slug` (both unique per attribute), `NameUk`, `SwatchHex`. |
+| `CatalogAttributeValues` | `Id` (identity) | Value of an attribute: `AttributeId` (FK), `Code` and `Slug` (both unique per attribute), `NameUk`, `SwatchHex`, `SwatchMediaFileId` (media-library texture, no FK across modules), `IsEditedManually`. |
 | `CatalogAttributeAliases` | `Id` (identity) | Spelling in 1C names: `AttributeId` (FK), `Scope`, `RawValue` (unique together), `ValueId` (FK, empty for an undecoded code), `IsConfirmed`. |
 | `CatalogCategoryAttributes` | `CategoryId`, `AttributeId` | Filters offered in a category: `IsFilterable`, `SortOrder`. |
-| `CatalogProductAttributeValues` | `ProductId`, `AttributeId`, `Position` | Product value: `ValueId` (FK) or `NumberValue`, `Source` (1 import, 2 parser, 3 manual), `IsLocked`, `IsConfirmed`. Index on `AttributeId, ValueId`. |
+| `CatalogProductAttributeValues` | `ProductId`, `AttributeId`, `Position` | Product value: `ValueId` (FK) or `NumberValue`, `Source` (1 import, 2 parser, 3 manual), `IsLocked`, `IsConfirmed`; while manual, the kept automatic value `AutomaticValueId` (FK), `AutomaticNumberValue`, `AutomaticIsConfirmed`, `AutomaticSource`. Index on `AttributeId, ValueId`. |
 | `CatalogProductAttributeReviews` | `ProductId` | Recognition state: `BaseName`, `State` (0 clear, 1 needs review, 2 accepted), `Reasons` (jsonb list of code and text), `AcceptedBy`, `AcceptedAt`. |
 | `CatalogProductGroups` | `Id` (identity) | Variant group: `CategoryId` (FK), `Name`, `GroupKey` (normalized base name, unique per category; empty for a group a person created), `Slug` (unique; history in slug history as type 3), `MainProductId` (FK, set null), `IsMainManual`, `IsCreatedManually`. |
 | `CatalogProductGroupMembers` | `ProductId` | Group of a product (at most one): `GroupId` (FK, cascade; empty for a product kept out of groups), `IsPinned` (a person set it; automation leaves it). |

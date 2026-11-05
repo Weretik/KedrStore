@@ -163,10 +163,10 @@ components:
         stock: { type: number }
         isPinned: { type: boolean, description: A person put the product here; automation leaves it. }
         isMain: { type: boolean }
-        colors: { type: array, items: { type: string }, description: Main color first, then the second color. }
+        colors: { type: array, items: { type: string }, description: 'Main color first, then the second color.' }
         size: { type: [string, 'null'] }
         side: { type: [string, 'null'] }
-        hasSameVariants: { type: boolean, description: Color, size, and side do not tell it apart from another variant («Однакові варіанти»). }
+        hasSameVariants: { type: boolean, description: 'Color, size, and side do not tell it apart from another variant («Однакові варіанти»).' }
     AdminProductGroup:
       type: object
       required: [id, categoryId, name, slug, isMainManual, isCreatedManually, members]
@@ -178,7 +178,7 @@ components:
         mainProductId: { type: [integer, 'null'] }
         isMainManual: { type: boolean }
         isCreatedManually: { type: boolean }
-        members: { type: array, items: { $ref: '#/components/schemas/AdminProductGroupMember' }, description: Main product first, then by product ID. }
+        members: { type: array, items: { $ref: '#/components/schemas/AdminProductGroupMember' }, description: 'Main product first, then by product ID.' }
     AdminProductGroupMembership:
       type: object
       required: [productId, isPinned]

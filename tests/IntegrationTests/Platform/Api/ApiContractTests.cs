@@ -83,10 +83,22 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(productGroups.TryGetProperty("post", out _));
         Assert.True(paths.TryGetProperty("/api/admin/product-groups/{id}/main", out _));
         Assert.True(paths.TryGetProperty("/api/admin/product-groups/{id}/slug", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/attributes", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/attributes/{attributeId}", out var productAttribute));
+        Assert.True(productAttribute.TryGetProperty("put", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/attributes/{attributeId}/manual", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/review/accept", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/review/reopen", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/catalog-attributes/{id}/values/{valueId}", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/catalog-attributes/unresolved-codes", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/catalog-attributes/codes/{aliasId}", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/catalog-attributes/category-filters/{categoryId}", out _));
 
         Assert.False(paths.TryGetProperty("/api/admin/products/missing-photos", out _));
         Assert.True(adminProducts.TryGetProperty("get", out var adminProductsGet));
         AssertOperationHasQueryParameter(adminProductsGet, "WithoutPhoto");
+        AssertOperationHasQueryParameter(adminProductsGet, "ProblemsOnly");
+        AssertOperationHasQueryParameter(adminProductsGet, "ProblemReason");
 
         Assert.True(paths.TryGetProperty("/api/admin/products/{id}/media", out var productMedia));
         Assert.True(productMedia.TryGetProperty("get", out var productMediaGet));

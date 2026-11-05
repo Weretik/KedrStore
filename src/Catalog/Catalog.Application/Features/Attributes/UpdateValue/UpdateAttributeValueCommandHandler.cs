@@ -1,0 +1,32 @@
+using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Attributes.Common;
+using Catalog.Contracts.Attributes;
+using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.ValueObjects;
+
+namespace Catalog.Application.Features.Attributes.UpdateValue;
+
+public sealed class UpdateAttributeValueCommandHandler(
+    IReadCatalogDbContext db,
+    ICatalogRepository<AttributeValue> values,
+    CatalogAttributeReader reader,
+    TimeProvider clock)
+    : ICommandHandler<UpdateAttributeValueCommand, Result<AdminCatalogAttributeDto>>
+{
+    public async ValueTask<Result<AdminCatalogAttributeDto>> Handle(UpdateAttributeValueCommand command,
+        CancellationToken cancellationToken)
+    {
+        var attributeId = AttributeId.Create(command.AttributeId);
+        var valueId = AttributeValueId.Create(command.ValueId);
+        var value = await db.AttributeValues
+            .FirstOrDefaultAsync(item => item.Id == valueId && item.AttributeId == attributeId, cancellationToken);
+        if (value is null)
+            return Result.NotFound();
+
+        var request = command.Request;
+        value.EditManually(request.NameUk, request.NameRu, request.SortOrder, request.SwatchHex,
+            request.SwatchMediaFileId, clock.GetUtcNow());
+        await values.SaveChangesAsync(cancellationToken);
+        return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
+    }
+}

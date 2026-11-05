@@ -62,4 +62,15 @@ public class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
         UpdatedAt = now;
         return true;
     }
+
+    /// <summary>A person edits the attribute in «Властивості»; the dictionary import no longer changes it.</summary>
+    public void EditManually(string nameUk, string? nameRu, bool isFilterable, int sortOrder, DateTimeOffset now)
+    {
+        NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
+        NameRu = AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu));
+        IsFilterable = isFilterable;
+        SortOrder = sortOrder;
+        IsEditedManually = true;
+        UpdatedAt = now;
+    }
 }

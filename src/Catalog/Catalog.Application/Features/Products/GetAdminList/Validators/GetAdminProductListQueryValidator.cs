@@ -35,6 +35,10 @@ public sealed class GetAdminProductListQueryValidator : AbstractValidator<GetAdm
                 .LessThanOrEqualTo(maxPageSize)
                 .WithMessage($"Page size cannot exceed {maxPageSize}.");
 
+            RuleFor(query => query.Request.ProblemReason)
+                .MaximumLength(64)
+                .WithMessage("Problem reason cannot exceed 64 characters.");
+
             RuleFor(query => query.Request.CategorySlug)
                 .MaximumLength(maxSearchTermLength)
                 .WithMessage($"Category cannot exceed {maxSearchTermLength} characters.");

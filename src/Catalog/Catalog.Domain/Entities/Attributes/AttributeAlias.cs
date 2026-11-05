@@ -54,4 +54,21 @@ public class AttributeAlias : BaseEntity<AttributeAliasId>, IAggregateRoot
         UpdatedAt = now;
         return true;
     }
+
+    /// <summary>
+    /// The owner decodes the code in «Не розшифровані коди»: the chosen value, or <c>null</c> when the code means
+    /// nothing to filter by. Either way the decision is confirmed and the dictionary import no longer changes it.
+    /// Returns whether anything changed.
+    /// </summary>
+    public bool Decide(AttributeValueId? valueId, DateTimeOffset now)
+    {
+        if (IsEditedManually && IsConfirmed && ValueId == valueId)
+            return false;
+
+        ValueId = valueId;
+        IsConfirmed = true;
+        IsEditedManually = true;
+        UpdatedAt = now;
+        return true;
+    }
 }

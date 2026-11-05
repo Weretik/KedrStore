@@ -7,7 +7,8 @@ namespace Catalog.Domain.Entities.Attributes;
 /// <summary>
 /// One attribute value of a product. <see cref="Position"/> orders several values of one attribute (the second color
 /// of a two-tone handle is position 1). Values set by a person (<see cref="AttributeValueSource.Manual"/>) or locked
-/// are never changed by the import, the parser, or the 1C sync.
+/// are never changed by the import, the parser, or the 1C sync. While a value is manual, the latest automatic result
+/// for its position is kept in the <c>Automatic*</c> fields, so «Повернути автоматичне» restores it.
 /// </summary>
 public class ProductAttributeValue : IAggregateRoot
 {
@@ -23,6 +24,12 @@ public class ProductAttributeValue : IAggregateRoot
     /// <summary>False when the value came from a decoding the owner has not confirmed; such values stay off filters.</summary>
     public bool IsConfirmed { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
+
+    /// <summary>The automatic result kept while the value is manual; empty when automation has none.</summary>
+    public AttributeValueId? AutomaticValueId { get; private set; }
+    public decimal? AutomaticNumberValue { get; private set; }
+    public bool AutomaticIsConfirmed { get; private set; }
+    public AttributeValueSource? AutomaticSource { get; private set; }
 
     /// <summary>Whether automatic sources (import, parser, 1C sync) may change or remove this value.</summary>
     public bool IsAutomatic => Source != AttributeValueSource.Manual && !IsLocked;
@@ -45,12 +52,27 @@ public class ProductAttributeValue : IAggregateRoot
         return value;
     }
 
-    /// <summary>Applies an automatic result. Returns false and changes nothing for manual or locked values.</summary>
+    /// <summary>
+    /// Applies an automatic result. Returns false and changes nothing visible for manual or locked values; for them the
+    /// result is only kept for «Повернути автоматичне».
+    /// </summary>
     public bool ApplyAutomatic(AttributeValueId? valueId, decimal? numberValue, bool isConfirmed,
         AttributeValueSource source, DateTimeOffset now)
     {
-        if (!IsAutomatic || source == AttributeValueSource.Manual)
+        if (source == AttributeValueSource.Manual)
             return false;
+
+        if (!IsAutomatic)
+        {
+            if (valueId is null && numberValue is null)
+                throw new DomainException(AttributeErrors.ValueOrNumberRequired());
+
+            AutomaticValueId = valueId;
+            AutomaticNumberValue = numberValue;
+            AutomaticIsConfirmed = isConfirmed;
+            AutomaticSource = source;
+            return false;
+        }
 
         if (ValueId == valueId && NumberValue == numberValue && IsConfirmed == isConfirmed && Source == source)
             return false;
@@ -73,11 +95,61 @@ public class ProductAttributeValue : IAggregateRoot
         return value;
     }
 
-    /// <summary>A person changes the value. It becomes manual and locked.</summary>
-    public void SetManually(AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
+    /// <summary>
+    /// A person changes the value. It becomes manual and locked; the automatic value it replaces is kept.
+    /// Returns whether anything changed.
+    /// </summary>
+    public bool SetManually(AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
     {
+        if (!IsAutomatic && ValueId == valueId && NumberValue == numberValue)
+            return false;
+
+        if (IsAutomatic && Source != default)
+        {
+            AutomaticValueId = ValueId;
+            AutomaticNumberValue = NumberValue;
+            AutomaticIsConfirmed = IsConfirmed;
+            AutomaticSource = Source;
+        }
+
         Set(valueId, numberValue, true, AttributeValueSource.Manual, now);
         IsLocked = true;
+        return true;
+    }
+
+    /// <summary>
+    /// «Повернути автоматичне»: brings back the kept automatic value and unlocks the row. Returns false when automation
+    /// has no value for this position; the caller removes the row then.
+    /// </summary>
+    public bool RestoreAutomatic(DateTimeOffset now)
+    {
+        if (AutomaticSource is not { } source)
+            return false;
+
+        Set(AutomaticValueId, AutomaticNumberValue, AutomaticIsConfirmed, source, now);
+        IsLocked = false;
+        ClearAutomatic();
+        return true;
+    }
+
+    /// <summary>Automation no longer has a value for this manual position.</summary>
+    public void ClearAutomatic()
+    {
+        AutomaticValueId = null;
+        AutomaticNumberValue = null;
+        AutomaticIsConfirmed = false;
+        AutomaticSource = null;
+    }
+
+    /// <summary>The owner confirmed the decoding behind this automatic value.</summary>
+    public bool Confirm(DateTimeOffset now)
+    {
+        if (IsConfirmed || !IsAutomatic)
+            return false;
+
+        IsConfirmed = true;
+        UpdatedAt = now;
+        return true;
     }
 
     private void Set(AttributeValueId? valueId, decimal? numberValue, bool isConfirmed, AttributeValueSource source,

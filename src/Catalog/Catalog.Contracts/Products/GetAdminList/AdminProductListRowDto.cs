@@ -1,3 +1,5 @@
+using Catalog.Contracts.Attributes;
+
 namespace Catalog.Contracts.Products.GetAdminList;
 
 public sealed record AdminProductListRowDto
@@ -18,4 +20,9 @@ public sealed record AdminProductListRowDto
     public int QuantityInPack { get; init; }
     public bool IsDeleted { get; init; }
     public DateTimeOffset? DeletedAt { get; init; }
+    /// <summary>The variant group of the product, if any (spec catalog/006).</summary>
+    public int? GroupId { get; init; }
+    public string? GroupName { get; init; }
+    /// <summary>Why the product needs review; empty when it does not (accepted products have none).</summary>
+    public IReadOnlyList<AdminAttributeProblemDto> Problems { get; init; } = [];
 }

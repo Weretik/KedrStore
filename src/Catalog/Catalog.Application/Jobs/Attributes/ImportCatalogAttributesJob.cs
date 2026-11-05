@@ -260,6 +260,13 @@ public sealed class ImportCatalogAttributesJob(
                     continue;
                 }
 
+                // A person set this attribute by hand: automation adds no positions to it.
+                if (current.Values.Any(other => other.AttributeId == attribute.Id && !other.IsAutomatic))
+                {
+                    report.ProductValues.Skipped++;
+                    continue;
+                }
+
                 createdValues.Add(ProductAttributeValue.CreateAutomatic(productId, attribute.Id, item.Position, valueId,
                     item.Number, item.IsConfirmed, AttributeValueSource.Import, now));
                 report.ProductValues.Created++;
@@ -271,6 +278,10 @@ public sealed class ImportCatalogAttributesJob(
                 {
                     removedValues.Add(stale);
                     report.ProductValues.Removed++;
+                }
+                else
+                {
+                    stale.ClearAutomatic();
                 }
             }
 
