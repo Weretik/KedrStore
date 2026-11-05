@@ -40,6 +40,7 @@ app.UseTrustedProxyClientIp();
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
+app.UseMobileSyncCompression();
 app.UseRateLimiter();
 app.UseCookieCsrfProtection();
 app.UseAuthentication();

@@ -48,5 +48,6 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Migrations and seed](platform/database-migration.md) — separate job that changes the schema and initial data.
 - [Admin «Огляд» data](platform/admin-overview.md) — orders, catalog and content problems for the admin home page, one read endpoint per module.
+- [Offline app data snapshots](platform/mobile-offline-sync.md) — whole catalog and customers for the offline manager app, with `ETag`/`304` and compression.
 
 Planned capabilities from SDDs and technical classes without separate scenarios are not shown here as completed features.

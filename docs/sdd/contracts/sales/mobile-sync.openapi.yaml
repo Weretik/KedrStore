@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Sales — customers snapshot for the offline manager app
+  version: 0.1.0
+  description: >-
+    All active customers with their price rules in one answer (spec platform/004). Fields may be added later and the
+    app ignores fields it does not know.
+paths:
+  /api/mobile/sync/customers:
+    get:
+      operationId: getMobileCustomersSnapshot
+      summary: Customers and their price rules for offline work
+      description: >-
+        Requires `CanManageOrders` (Manager or Admin); the app sends its bearer token. Deleted customers are left out.
+        Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client
+        accepts it.
+      tags: [MobileSync]
+      parameters:
+        - name: If-None-Match
+          in: header
+          required: false
+          schema: { type: string }
+          description: The `ETag` of the snapshot the app already holds.
+      responses:
+        '200':
+          description: The snapshot.
+          headers:
+            ETag: { schema: { type: string }, description: Strong tag of the content. }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomersSnapshot' }
+        '304': { description: The app already holds this version; no body. }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  schemas:
+    CustomersSnapshot:
+      type: object
+      required: [version, generatedAt, customers]
+      properties:
+        version: { type: string, description: Hash of the content, equal to the ETag without quotes. }
+        generatedAt: { type: string, format: date-time }
+        customers:
+          type: array
+          items: { $ref: '#/components/schemas/CustomerSnapshot' }
+    CustomerSnapshot:
+      type: object
+      required: [counterpartyId, name, phone, email, defaultPriceTypeId, categoryPriceTypes, debt, balance]
+      properties:
+        counterpartyId: { type: string }
+        name: { type: string }
+        phone: { type: [string, 'null'] }
+        email: { type: string }
+        defaultPriceTypeId: { type: integer }
+        categoryPriceTypes:
+          type: array
+          description: >-
+            One rule per category. A product takes the rule of its category or of the nearest ancestor that has one,
+            otherwise `defaultPriceTypeId`, as the order workspace prices lines.
+          items:
+            type: object
+            required: [categoryId, priceTypeId]
+            properties:
+              categoryId: { type: integer }
+              priceTypeId: { type: integer }
+        debt: { type: [number, 'null'], description: Always null until 1C sends settlements. }
+        balance: { type: [number, 'null'], description: Always null until 1C sends settlements. }

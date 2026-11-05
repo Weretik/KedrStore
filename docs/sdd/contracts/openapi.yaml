@@ -222,6 +222,10 @@ paths:
     $ref: ./content/admin-overview.openapi.yaml#/paths/~1api~1admin~1content~1overview
   /api/admin/catalog/overview:
     $ref: ./catalog/admin-overview.openapi.yaml#/paths/~1api~1admin~1catalog~1overview
+  /api/mobile/sync/catalog:
+    $ref: ./catalog/mobile-sync.openapi.yaml#/paths/~1api~1mobile~1sync~1catalog
+  /api/mobile/sync/customers:
+    $ref: ./sales/mobile-sync.openapi.yaml#/paths/~1api~1mobile~1sync~1customers
   /api/admin/content/site-refresh:
     $ref: ./content/site-refresh.openapi.yaml#/paths/~1api~1admin~1content~1site-refresh
   /api/admin/media/folders:
