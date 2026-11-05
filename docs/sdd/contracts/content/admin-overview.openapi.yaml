@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — content block of the admin «Огляд»
+  version: 0.1.0
+  description: Site content waiting for someone, as the admin home page shows it.
+paths:
+  /api/admin/content/overview:
+    get:
+      operationId: getAdminContentOverview
+      summary: Article drafts, legacy covers and document drafts
+      description: Requires `CanManageContent` (Manager or Admin).
+      tags: [AdminOverview]
+      responses:
+        '200':
+          description: The content block.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminContentOverview' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  schemas:
+    AdminContentOverview:
+      type: object
+      required: [articleDrafts, oldestArticleDraft, legacyArticleCovers, documentDrafts]
+      properties:
+        articleDrafts: { type: integer, minimum: 0, description: Articles not published yet. }
+        oldestArticleDraft:
+          description: The draft edited longest ago; null without drafts.
+          oneOf:
+            - { $ref: '#/components/schemas/AdminContentOverviewDraft' }
+            - { type: 'null' }
+        legacyArticleCovers:
+          type: integer
+          minimum: 0
+          description: Articles whose cover is still in the database, not in the media library («Перенести в CDN»).
+        documentDrafts: { type: integer, minimum: 0, description: Unpublished document versions. }
+    AdminContentOverviewDraft:
+      type: object
+      required: [id, title, updatedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        title: { type: string, description: Ukrainian title, or the slug without one. }
+        updatedAt: { type: string, format: date-time }

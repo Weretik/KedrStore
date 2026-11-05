@@ -10,6 +10,7 @@ using Sales.Application.Features.Orders.AdminWorkspace.Drafts.GetById;
 using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Create;
 using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Update;
 using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Delete;
+using Sales.Application.Features.Orders.AdminWorkspace.Overview;
 
 namespace Sales.Api.Controllers;
 
@@ -18,6 +19,16 @@ namespace Sales.Api.Controllers;
 [Route("api/admin/order-workspace")]
 public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBase
 {
+    /// <summary>Counts and short lists for the admin «Огляд»; «today» is the current Kyiv day.</summary>
+    [HttpGet("overview", Name = "getAdminWorkspaceOverview")]
+    [ProducesResponseType(typeof(WorkspaceOverview), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WorkspaceOverview>> GetOverview(
+        [FromServices] TimeProvider clock, CancellationToken cancellationToken)
+    {
+        var todayFrom = WorkspaceDateRange.TodayStartUtc(clock.GetUtcNow());
+        return Ok((await sender.Send(new GetWorkspaceOverviewQuery(todayFrom), cancellationToken)).Value);
+    }
+
     [HttpGet("orders", Name = "getAdminWorkspaceOrders")]
     public async Task<ActionResult> GetOrders(
         [FromQuery] string? searchTerm, [FromQuery] string? counterpartyId,

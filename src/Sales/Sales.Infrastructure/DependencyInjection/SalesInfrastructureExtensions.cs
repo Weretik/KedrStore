@@ -34,6 +34,7 @@ public static class SalesInfrastructureExtensions
         services.AddScoped<AdminWorkspacePricing>();
         services.AddScoped<IWorkspacePricing>(sp => sp.GetRequiredService<AdminWorkspacePricing>());
         services.AddScoped<IWorkspaceOrderReader, WorkspaceOrderReader>();
+        services.AddScoped<IWorkspaceOverviewReader, WorkspaceOverviewReader>();
         services.AddScoped<IWorkspaceOrderCreator, WorkspaceOrderCreator>();
         services.AddScoped<WorkspaceDraftDetails>();
         services.AddScoped<IWorkspaceDraftReader, WorkspaceDraftReader>();

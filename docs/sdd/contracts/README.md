@@ -17,9 +17,9 @@ docs/sdd/contracts/
 
 - [Frontend integration guide](frontend-integration.md) describes authentication, CSRF, pagination, errors, and endpoint owners.
 - [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers currently registered controllers.
-- Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [quick orders](catalog/orders.openapi.yaml).
-- Sales: [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml).
-- Content: [site articles](content/articles.openapi.yaml), [company contacts](content/contacts.openapi.yaml), [company requisites](content/requisites.openapi.yaml), [site documents](content/documents.openapi.yaml), [site gallery](content/gallery.openapi.yaml), [home page FAQ and brands](content/home.openapi.yaml), [page «Співпраця»](content/wholesale.openapi.yaml), [search texts of the site pages](content/page-seo.openapi.yaml), [refresh the site now](content/site-refresh.openapi.yaml).
+- Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [quick orders](catalog/orders.openapi.yaml), [admin «Огляд» block](catalog/admin-overview.openapi.yaml).
+- Sales: [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml), [admin «Огляд» block](sales/admin-overview.openapi.yaml).
+- Content: [site articles](content/articles.openapi.yaml), [company contacts](content/contacts.openapi.yaml), [company requisites](content/requisites.openapi.yaml), [site documents](content/documents.openapi.yaml), [site gallery](content/gallery.openapi.yaml), [home page FAQ and brands](content/home.openapi.yaml), [page «Співпраця»](content/wholesale.openapi.yaml), [search texts of the site pages](content/page-seo.openapi.yaml), [refresh the site now](content/site-refresh.openapi.yaml), [admin «Огляд» block](content/admin-overview.openapi.yaml).
 - Identity: [session](identity/session.openapi.yaml), [staff accounts](identity/users.openapi.yaml), [staff profile](identity/profile.openapi.yaml).
 
 The OpenAPI files describe the current code contract. They do not grant endpoint access: authorization attributes and the host fallback access policy remain authoritative.
