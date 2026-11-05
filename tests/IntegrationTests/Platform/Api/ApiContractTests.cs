@@ -88,6 +88,18 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(productGroups.TryGetProperty("post", out _));
         Assert.True(paths.TryGetProperty("/api/admin/product-groups/{id}/main", out _));
         Assert.True(paths.TryGetProperty("/api/admin/product-groups/{id}/slug", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models", out var siteModels));
+        Assert.True(siteModels.TryGetProperty("get", out var siteModelsGet));
+        AssertOperationId(siteModelsGet, "getAdminSiteModels");
+        AssertOperationHasQueryParameter(siteModelsGet, "Problem");
+        Assert.True(siteModels.TryGetProperty("post", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/health", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/accept", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/axes", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/products", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/products/{productId}", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/texts/{language}", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/fill-from-names", out _));
         Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/attributes", out _));
         Assert.True(paths.TryGetProperty("/api/admin/products/{productId}/attributes/{attributeId}", out var productAttribute));
         Assert.True(productAttribute.TryGetProperty("put", out _));

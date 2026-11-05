@@ -360,6 +360,13 @@ namespace Catalog.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AcceptedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
@@ -386,6 +393,11 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<short>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)0);
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -404,6 +416,25 @@ namespace Catalog.Infrastructure.Migrations
                         .HasFilter("\"GroupKey\" IS NOT NULL");
 
                     b.ToTable("CatalogProductGroups", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupAxis", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<short>("Position")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("GroupId", "AttributeId");
+
+                    b.HasIndex("AttributeId")
+                        .HasDatabaseName("IX_CatalogProductGroupAxes_AttributeId");
+
+                    b.ToTable("CatalogProductGroupAxes", (string)null);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
@@ -426,6 +457,43 @@ namespace Catalog.Infrastructure.Migrations
                         .HasDatabaseName("IX_CatalogProductGroupMembers_GroupId");
 
                     b.ToTable("CatalogProductGroupMembers", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupText", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(8000)
+                        .HasColumnType("character varying(8000)");
+
+                    b.Property<string>("SeoDescription")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("SeoTitle")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("ShortDescription")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("GroupId", "Language");
+
+                    b.ToTable("CatalogProductGroupTexts", (string)null);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
@@ -945,6 +1013,21 @@ namespace Catalog.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupAxis", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
                 {
                     b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
@@ -955,6 +1038,15 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasOne("Catalog.Domain.Entities.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupText", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

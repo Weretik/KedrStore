@@ -1,0 +1,331 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog site models API
+  version: 0.1.0
+  description: >-
+    Site models of spec catalog/007. A model is one site page in one final category that brings together products of
+    that category; its axes (color, size, side) tell the products apart. Automation proposes models; a person
+    accepts or creates them, and automation never changes an accepted model. Policy CanManageProducts (Manager and
+    Admin). The model slug and main product keep their routes in product-groups.openapi.yaml (only Admin changes a
+    slug). Problem codes - product: `no_model` (hard error), `no_attributes`, `missing_axis_value`, `same_combination`;
+    model: `model_no_axes`, `model_no_seo`, `model_no_photo`. Problems concern on-site, not deleted products only.
+paths:
+  /api/admin/site-models:
+    get:
+      operationId: getAdminSiteModels
+      summary: The «Моделі» list
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        Models with problems first, then by name. `search` matches part of the model name, part of a product name,
+        or a 1C code exactly.
+      parameters:
+        - { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
+        - { name: status, in: query, schema: { type: string, enum: [proposed, accepted] } }
+        - { name: problem, in: query, schema: { type: string, enum: [no_model, no_attributes, missing_axis_value, same_combination, model_no_axes, model_no_seo, model_no_photo] } }
+        - { name: search, in: query, schema: { type: string, maxLength: 200 } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        '200': { description: A page of models, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelList' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+    post:
+      operationId: createAdminSiteModel
+      summary: Create a model («Нова модель»)
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        The model is accepted at once. The category must be final (no children); the products (up to 200) must be in
+        it and not in another accepted model; a proposed model gives its products up. Axes are offered from the
+        products and saved.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateSiteModelRequest' } } }
+      responses:
+        '200': { description: Created model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/site-models/health:
+    get:
+      operationId: getAdminSiteModelHealth
+      summary: Site model problem counts (also inside the «Огляд» catalog block)
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Counts, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelHealth' } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/site-models/accept:
+    post:
+      operationId: acceptAdminSiteModels
+      summary: Accept models («Прийняти»)
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        Accepts up to 500 models; offered axes are saved for models without saved axes; products are pinned.
+        Already accepted models stay as they are. Returns the new counts.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/AcceptSiteModelsRequest' } } }
+      responses:
+        '200': { description: Counts after accepting, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelHealth' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/site-models/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminSiteModel
+      summary: The model card
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+    put:
+      operationId: renameAdminSiteModel
+      summary: Rename a model
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: The slug stays as it is.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/RenameSiteModelRequest' } } }
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+  /api/admin/site-models/{id}/axes:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: setAdminSiteModelAxes
+      summary: Set the model's axes (switchers), in order
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Up to 6 attributes of the shared dictionary; number attributes are refused. An empty list clears the axes.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SetSiteModelAxesRequest' } } }
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+  /api/admin/site-models/{id}/products:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: addAdminSiteModelProducts
+      summary: Add products to a model
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: The products must be in the model's category and not in another accepted model; they are pinned.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/AddSiteModelProductsRequest' } } }
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+  /api/admin/site-models/{id}/products/{productId}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    delete:
+      operationId: removeAdminSiteModelProduct
+      summary: Take a product out of a model
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: The product is pinned out of models, so automation does not put it back.
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found or proposed model gone. }
+  /api/admin/site-models/{id}/texts/{language}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      - { name: language, in: path, required: true, schema: { type: string, enum: [uk, ru] } }
+    put:
+      operationId: setAdminSiteModelText
+      summary: Save the model's texts in one language
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: All four texts are replaced; a missing or blank text is stored empty.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SetSiteModelTextRequest' } } }
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+  /api/admin/site-models/{id}/fill-from-names:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: fillAdminSiteModelFromNames
+      summary: «Заповнити з назв»
+      tags: [Admin site models]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        For each product and axis without a value a person set, the confirmed value the recognizer read from the 1C
+        name becomes a manual value. Codes nobody decoded stay empty.
+      responses:
+        '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Model not found. }
+components:
+  responses:
+    ValidationError: { description: Input validation failed, content: { application/json: { schema: { type: array, items: { type: object, additionalProperties: true } } } } }
+  schemas:
+    SiteModelListItem:
+      type: object
+      required: [id, categoryId, categoryName, name, slug, status, productCount, onSiteCount, photo, axes, problems]
+      properties:
+        id: { type: integer }
+        categoryId: { type: integer }
+        categoryName: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        status: { type: string, enum: [proposed, accepted] }
+        productCount: { type: integer, description: Not deleted products. }
+        onSiteCount: { type: integer }
+        minPrice: { type: [number, 'null'], description: Lowest retail price of its on-site products. }
+        photo: { type: string, description: Photo of the main product; empty without one. }
+        axes: { type: array, items: { type: string }, description: Axis names (saved, or offered for a proposal). }
+        problems: { type: array, items: { type: string }, description: Model codes and the product codes its products have. }
+    SiteModelList:
+      type: object
+      required: [items, totalCount, page, pageSize]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/SiteModelListItem' } }
+        totalCount: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+    SiteModelAxis:
+      type: object
+      required: [attributeId, code, name, display, isSaved]
+      properties:
+        attributeId: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        display: { type: string, enum: [swatch, button, checkbox] }
+        isSaved: { type: boolean, description: False for axes only offered to a proposal. }
+    SiteModelProductValue:
+      type: object
+      required: [attributeId, isManual]
+      properties:
+        attributeId: { type: integer }
+        valueId: { type: [integer, 'null'], description: Null when the product has no confirmed value on this axis. }
+        name: { type: [string, 'null'] }
+        isManual: { type: boolean }
+    SiteModelProduct:
+      type: object
+      required: [productId, name, slug, photo, inStock, exportToSite, isMain, values, problems]
+      properties:
+        productId: { type: integer }
+        name: { type: string, description: Original 1C name. }
+        slug: { type: string }
+        photo: { type: string }
+        retailPrice: { type: [number, 'null'] }
+        inStock: { type: boolean }
+        exportToSite: { type: boolean }
+        isMain: { type: boolean }
+        values: { type: array, items: { $ref: '#/components/schemas/SiteModelProductValue' }, description: One per axis. }
+        problems: { type: array, items: { type: string } }
+    SiteModelText:
+      type: object
+      required: [language, shortDescription, description, seoTitle, seoDescription]
+      properties:
+        language: { type: string, enum: [uk, ru] }
+        shortDescription: { type: string, maxLength: 500 }
+        description: { type: string, maxLength: 8000 }
+        seoTitle: { type: string, maxLength: 120 }
+        seoDescription: { type: string, maxLength: 320 }
+    SiteModelCharacteristic:
+      type: object
+      required: [attributeId, name, values]
+      properties:
+        attributeId: { type: integer }
+        name: { type: string }
+        values: { type: array, items: { type: string }, description: Confirmed values shared by all on-site products. }
+    SiteModel:
+      type: object
+      required: [id, categoryId, categoryName, name, slug, status, axes, products, texts, characteristics, problems]
+      properties:
+        id: { type: integer }
+        categoryId: { type: integer }
+        categoryName: { type: string }
+        name: { type: string }
+        slug: { type: string }
+        status: { type: string, enum: [proposed, accepted] }
+        acceptedAt: { type: [string, 'null'], format: date-time }
+        acceptedBy: { type: [string, 'null'] }
+        mainProductId: { type: [integer, 'null'] }
+        axes: { type: array, items: { $ref: '#/components/schemas/SiteModelAxis' } }
+        products: { type: array, items: { $ref: '#/components/schemas/SiteModelProduct' } }
+        texts: { type: array, items: { $ref: '#/components/schemas/SiteModelText' }, description: 'Both languages, empty strings where nothing is saved.' }
+        characteristics: { type: array, items: { $ref: '#/components/schemas/SiteModelCharacteristic' } }
+        problems: { type: array, items: { type: string }, description: Model problem codes. }
+    SiteModelHealth:
+      type: object
+      required: [productsWithoutModel, productsWithoutAttributes, productsMissingAxisValue, productsWithSameCombination, modelsWithoutAxes, modelsWithoutSeo, modelsWithoutPhoto, proposedModels]
+      properties:
+        productsWithoutModel: { type: integer, minimum: 0, description: 'On-site products outside an accepted model: the hard error of «Огляд».' }
+        productsWithoutAttributes: { type: integer, minimum: 0 }
+        productsMissingAxisValue: { type: integer, minimum: 0 }
+        productsWithSameCombination: { type: integer, minimum: 0 }
+        modelsWithoutAxes: { type: integer, minimum: 0 }
+        modelsWithoutSeo: { type: integer, minimum: 0 }
+        modelsWithoutPhoto: { type: integer, minimum: 0 }
+        proposedModels: { type: integer, minimum: 0, description: Proposed models with on-site products. }
+    CreateSiteModelRequest:
+      type: object
+      required: [categoryId, name, productIds]
+      properties:
+        categoryId: { type: integer, minimum: 1 }
+        name: { type: string, minLength: 1, maxLength: 300 }
+        productIds: { type: array, items: { type: integer, minimum: 1 }, maxItems: 200 }
+    RenameSiteModelRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 300 }
+    AcceptSiteModelsRequest:
+      type: object
+      required: [ids]
+      properties:
+        ids: { type: array, items: { type: integer, minimum: 1 }, minItems: 1, maxItems: 500 }
+    SetSiteModelAxesRequest:
+      type: object
+      required: [attributeIds]
+      properties:
+        attributeIds: { type: array, items: { type: integer, minimum: 1 }, maxItems: 6 }
+    AddSiteModelProductsRequest:
+      type: object
+      required: [productIds]
+      properties:
+        productIds: { type: array, items: { type: integer, minimum: 1 }, minItems: 1, maxItems: 200 }
+    SetSiteModelTextRequest:
+      type: object
+      properties:
+        shortDescription: { type: [string, 'null'], maxLength: 500 }
+        description: { type: [string, 'null'], maxLength: 8000 }
+        seoTitle: { type: [string, 'null'], maxLength: 120 }
+        seoDescription: { type: [string, 'null'], maxLength: 320 }

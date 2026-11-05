@@ -1,3 +1,5 @@
+using Catalog.Contracts.SiteModels;
+
 namespace Catalog.Contracts.Overview;
 
 /// <summary>Catalog problems for the admin «Огляд»: only counts of what needs fixing.</summary>
@@ -6,11 +8,13 @@ namespace Catalog.Contracts.Overview;
 /// <param name="CategoriesWithoutText">Active categories without a site text or FAQ in Ukrainian or Russian.</param>
 /// <param name="ProductsWithProblems">On-site products whose attributes need review (spec catalog/006).</param>
 /// <param name="NoNameProducts">Those of them without brand marking (reason <c>no_name</c>).</param>
+/// <param name="SiteModels">Site model health (spec catalog/007); <c>ProductsWithoutModel</c> is the hard error.</param>
 public sealed record AdminCatalogOverviewResponse(
     int ProductsWithoutPhoto,
     AdminCatalogOverviewCategory? TopCategoryWithoutPhoto,
     int CategoriesWithoutText,
     int ProductsWithProblems = 0,
-    int NoNameProducts = 0);
+    int NoNameProducts = 0,
+    SiteModelHealthDto? SiteModels = null);
 
 public sealed record AdminCatalogOverviewCategory(int Id, string Name, int Count);

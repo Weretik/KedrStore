@@ -21,4 +21,6 @@ public interface IReadCatalogDbContext
     DbSet<ProductAttributeReview> ProductAttributeReviews { get; }
     DbSet<ProductGroup> ProductGroups { get; }
     DbSet<ProductGroupMember> ProductGroupMembers { get; }
+    DbSet<ProductGroupAxis> ProductGroupAxes { get; }
+    DbSet<ProductGroupText> ProductGroupTexts { get; }
 }
