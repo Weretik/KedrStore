@@ -391,7 +391,7 @@ components:
         proposedModels: { type: integer, minimum: 0 }
         problemCount: { type: integer, minimum: 0, description: Accepted models with a problem. }
         loneProducts: { type: integer, minimum: 0, description: On-site products in no model (the hard error). }
-        filterCount: { type: integer, minimum: 0, description: Attributes this category itself offers as site filters, without subcategories. }
+        filterCount: { type: integer, minimum: 0, description: 'Attributes this category itself offers as site filters, without subcategories.' }
     SiteModelHealth:
       type: object
       required: [productsWithoutModel, productsWithoutAttributes, productsMissingAxisValue, productsWithSameCombination, modelsWithoutAxes, modelsWithoutSeo, modelsWithoutPhoto, proposedModels]
