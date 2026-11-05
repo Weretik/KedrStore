@@ -19,7 +19,7 @@ public sealed class AdminCatalogOverviewApiTests
     private static readonly DateTimeOffset Now = new(2026, 11, 5, 9, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task Overview_CountsOnSiteProductsWithoutPhoto_AndActiveCategoriesMissingALanguage()
+    public async Task Overview_CountsProductsWithoutPhoto_AndActiveCategoriesMissingALanguage()
     {
         await using var db = Seed();
         using var factory = CreateFactory(db);
@@ -28,11 +28,11 @@ public sealed class AdminCatalogOverviewApiTests
         using var json = JsonDocument.Parse(await manager.GetStringAsync("/api/admin/catalog/overview"));
 
         var root = json.RootElement;
-        Assert.Equal(3, root.GetProperty("productsWithoutPhoto").GetInt32());
+        Assert.Equal(4, root.GetProperty("productsWithoutPhoto").GetInt32());
         var top = root.GetProperty("topCategoryWithoutPhoto");
         Assert.Equal(2, top.GetProperty("id").GetInt32());
         Assert.Equal("Замки", top.GetProperty("name").GetString());
-        Assert.Equal(2, top.GetProperty("count").GetInt32());
+        Assert.Equal(3, top.GetProperty("count").GetInt32());
         Assert.Equal(2, root.GetProperty("categoriesWithoutText").GetInt32());
     }
 

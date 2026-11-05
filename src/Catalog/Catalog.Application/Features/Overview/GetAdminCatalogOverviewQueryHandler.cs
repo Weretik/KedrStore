@@ -5,7 +5,8 @@ using Catalog.Domain.Entities;
 namespace Catalog.Application.Features.Overview;
 
 /// <summary>
-/// Counts on-site products without a photo (the list projection already leaves out deleted products) and active
+/// Counts products without a photo as the «Без фото» tab lists them (the list projection already leaves out deleted
+/// products) and active
 /// categories missing a site text in a language; a text row counts as filled the same way the category list does.
 /// </summary>
 public sealed class GetAdminCatalogOverviewQueryHandler(IReadCatalogDbContext catalogDbContext)
@@ -15,7 +16,7 @@ public sealed class GetAdminCatalogOverviewQueryHandler(IReadCatalogDbContext ca
         CancellationToken cancellationToken)
     {
         var withoutPhoto = await catalogDbContext.ProductListProjections.AsNoTracking()
-            .Where(projection => projection.ExportToSite && projection.Photo == string.Empty)
+            .Where(projection => projection.Photo == string.Empty)
             .GroupBy(projection => projection.CategoryId)
             .Select(group => new { CategoryId = group.Key, Count = group.Count() })
             .ToListAsync(cancellationToken);

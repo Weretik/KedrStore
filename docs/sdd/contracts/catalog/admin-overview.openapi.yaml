@@ -7,7 +7,7 @@ paths:
   /api/admin/catalog/overview:
     get:
       operationId: getAdminCatalogOverview
-      summary: Products on the site without a photo and categories without site text
+      summary: Products without a photo and categories without site text
       description: Requires `CanManageProducts` (Manager or Admin). Deleted products and categories are not counted.
       tags: [AdminOverview]
       responses:
@@ -24,7 +24,7 @@ components:
       type: object
       required: [productsWithoutPhoto, topCategoryWithoutPhoto, categoriesWithoutText]
       properties:
-        productsWithoutPhoto: { type: integer, minimum: 0, description: Products shown on the site without a linked photo. }
+        productsWithoutPhoto: { type: integer, minimum: 0, description: 'Active products without a linked photo, as the admin «Без фото» tab lists them.' }
         topCategoryWithoutPhoto:
           description: The category with most of them; null when there are none.
           oneOf:
