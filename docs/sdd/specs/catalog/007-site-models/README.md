@@ -93,7 +93,7 @@ The main product (`PUT api/admin/product-groups/{id}/main`), the slug (`PUT api/
 
 Contract: [site-models.openapi.yaml](../../../contracts/catalog/site-models.openapi.yaml); «Огляд» counts in [admin-overview.openapi.yaml](../../../contracts/catalog/admin-overview.openapi.yaml).
 
-### Planned files (stage 2)
+### Files (stage 2)
 
 ```text
 src/Catalog/
