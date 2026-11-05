@@ -17,6 +17,8 @@ paths:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1products
   /api/catalog/{lang}/{categorySlug}/products:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1products
+  /api/catalog/{lang}/{categorySlug}/facets:
+    $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1{categorySlug}~1facets
   /api/catalog/{lang}/product/{productSlug}:
     $ref: ./catalog/products.openapi.yaml#/paths/~1api~1catalog~1{lang}~1product~1{productSlug}
   /api/categories:
