@@ -52,6 +52,8 @@ paths:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync-status
   /api/admin/orders/{orderId}/sync/retry:
     $ref: ./sales/admin-order-one-c-sync.openapi.yaml#/paths/~1api~1admin~1orders~1{orderId}~1sync~1retry
+  /api/admin/order-workspace/overview:
+    $ref: ./sales/admin-overview.openapi.yaml#/paths/~1api~1admin~1order-workspace~1overview
   /api/admin/order-workspace/orders:
     $ref: ./sales/admin-order-workspace.openapi.yaml#/paths/~1api~1admin~1order-workspace~1orders
   /api/admin/order-workspace/orders/{orderId}:
@@ -180,6 +182,10 @@ paths:
     $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo
   /api/admin/content/page-seo/{page}:
     $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo~1{page}
+  /api/admin/content/overview:
+    $ref: ./content/admin-overview.openapi.yaml#/paths/~1api~1admin~1content~1overview
+  /api/admin/catalog/overview:
+    $ref: ./catalog/admin-overview.openapi.yaml#/paths/~1api~1admin~1catalog~1overview
   /api/admin/content/site-refresh:
     $ref: ./content/site-refresh.openapi.yaml#/paths/~1api~1admin~1content~1site-refresh
   /api/admin/media/folders:

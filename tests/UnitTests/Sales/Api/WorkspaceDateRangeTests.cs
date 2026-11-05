@@ -51,4 +51,11 @@ public sealed class WorkspaceDateRangeTests
         Assert.Equal(DateTimeOffset.Parse(expectedToUtc), range.ToUtcExclusive);
         Assert.Equal(TimeSpan.FromHours(expectedHours), range.ToUtcExclusive - range.FromUtc);
     }
+
+    [Theory]
+    [InlineData("2026-11-05T01:00:00Z", "2026-11-04T22:00:00Z")]
+    [InlineData("2026-11-04T21:59:00Z", "2026-11-03T22:00:00Z")]
+    [InlineData("2026-07-01T12:00:00Z", "2026-06-30T21:00:00Z")]
+    public void TodayStartUtc_IsTheCurrentKyivMidnight(string now, string expected)
+        => Assert.Equal(DateTimeOffset.Parse(expected), WorkspaceDateRange.TodayStartUtc(DateTimeOffset.Parse(now)));
 }

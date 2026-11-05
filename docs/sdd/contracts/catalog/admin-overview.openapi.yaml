@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog — catalog block of the admin «Огляд»
+  version: 0.1.0
+  description: Counts of catalog problems the admin home page shows; nothing is reported for what is fine.
+paths:
+  /api/admin/catalog/overview:
+    get:
+      operationId: getAdminCatalogOverview
+      summary: Products without a photo and categories without site text
+      description: Requires `CanManageProducts` (Manager or Admin). Deleted products and categories are not counted.
+      tags: [AdminOverview]
+      responses:
+        '200':
+          description: The catalog block.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminCatalogOverview' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  schemas:
+    AdminCatalogOverview:
+      type: object
+      required: [productsWithoutPhoto, topCategoryWithoutPhoto, categoriesWithoutText]
+      properties:
+        productsWithoutPhoto: { type: integer, minimum: 0, description: 'Active products without a linked photo, as the admin «Без фото» tab lists them.' }
+        topCategoryWithoutPhoto:
+          description: The category with most of them; null when there are none.
+          oneOf:
+            - { $ref: '#/components/schemas/AdminCatalogOverviewCategory' }
+            - { type: 'null' }
+        categoriesWithoutText:
+          type: integer
+          minimum: 0
+          description: Active categories without any site text or FAQ in Ukrainian or in Russian.
+    AdminCatalogOverviewCategory:
+      type: object
+      required: [id, name, count]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        count: { type: integer, minimum: 1 }

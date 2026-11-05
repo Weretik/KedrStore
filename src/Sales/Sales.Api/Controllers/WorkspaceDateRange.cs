@@ -23,6 +23,10 @@ internal readonly record struct WorkspaceDateRange(
             end is { } toDate ? AtKyivMidnightUtc(toDate.AddDays(1)) : null);
     }
 
+    /// <summary>Start of the current Kyiv day, as the date filters count days.</summary>
+    internal static DateTimeOffset TodayStartUtc(DateTimeOffset now)
+        => AtKyivMidnightUtc(DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, Kyiv).DateTime));
+
     private static DateOnly? ParseDate(string? value)
     {
         if (value is null) return null;

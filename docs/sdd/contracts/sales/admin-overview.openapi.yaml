@@ -1,0 +1,49 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Sales — orders block of the admin «Огляд»
+  version: 0.1.0
+  description: >-
+    Counts and short lists the admin home page shows about orders. «Today» is the current Kyiv day. A sync problem is an
+    order 1C refused or gave up on, the statuses a manager can retry from the order page.
+paths:
+  /api/admin/order-workspace/overview:
+    get:
+      operationId: getAdminWorkspaceOverview
+      summary: Orders today, drafts, 1C problems and the newest orders
+      description: Requires `CanManageOrders` (Manager or Admin). Lists hold at most 5 rows, newest first.
+      tags: [AdminOverview]
+      responses:
+        '200':
+          description: The orders block.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkspaceOverview' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  schemas:
+    WorkspaceOverview:
+      type: object
+      required: [ordersToday, draftCount, syncProblemCount, syncProblems, latestOrders]
+      properties:
+        ordersToday: { type: integer, minimum: 0, description: Orders created since Kyiv midnight. }
+        draftCount: { type: integer, minimum: 0, description: Saved drafts not turned into orders. }
+        syncProblemCount: { type: integer, minimum: 0, description: 'Orders with sync status `BusinessError` or `DeadLetter`.' }
+        syncProblems:
+          type: array
+          maxItems: 5
+          items: { $ref: '#/components/schemas/WorkspaceSyncProblem' }
+        latestOrders:
+          type: array
+          maxItems: 5
+          items: { $ref: './admin-order-workspace.openapi.yaml#/components/schemas/OrderListItem' }
+    WorkspaceSyncProblem:
+      type: object
+      required: [orderId, orderNumber, counterpartyName, createdAtUtc, syncStatus, errorMessage]
+      properties:
+        orderId: { type: integer, format: int64 }
+        orderNumber: { type: string }
+        counterpartyName: { type: string }
+        createdAtUtc: { type: string, format: date-time }
+        syncStatus: { type: string, enum: [BusinessError, DeadLetter] }
+        errorMessage: { type: [string, 'null'], description: 'The last message 1C or the delivery gave, if any.' }
