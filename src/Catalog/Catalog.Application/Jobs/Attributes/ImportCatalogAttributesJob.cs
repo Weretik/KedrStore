@@ -1,5 +1,6 @@
 using Catalog.Application.Attributes.Import;
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Groups;
 using Catalog.Application.Slugs;
 using Catalog.Domain.Entities.Attributes;
 using Catalog.Domain.Enums;
@@ -20,6 +21,7 @@ public sealed class ImportCatalogAttributesJob(
     ICatalogRepository<ProductAttributeValue> productValues,
     ICatalogRepository<ProductAttributeReview> reviews,
     ICatalogRepository<CategoryAttribute> categoryAttributes,
+    ProductGroupBuilder groupBuilder,
     TimeProvider clock,
     ILogger<ImportCatalogAttributesJob> logger)
 {
@@ -42,12 +44,15 @@ public sealed class ImportCatalogAttributesJob(
             cancellationToken);
         await SeedCategoryAttributesAsync(csv.Products, categoryByProduct, attributeByCode, apply, now, report,
             cancellationToken);
+        // Groups follow the stored base names; a dry run of a first import has none yet, so it reports no groups.
+        report.Groups = await groupBuilder.RunAsync(apply, cancellationToken);
 
         logger.LogInformation(
             "Attribute import applied={Applied}: attributes {Attributes}; values {Values}; aliases {Aliases}; " +
-            "product values {ProductValues}; reviews {Reviews}; category filters {CategoryAttributes}; errors {Errors}.",
+            "product values {ProductValues}; reviews {Reviews}; category filters {CategoryAttributes}; groups {Groups}; " +
+            "group members {GroupMembers}; errors {Errors}.",
             apply, report.Attributes, report.Values, report.Aliases, report.ProductValues, report.Reviews,
-            report.CategoryAttributes, report.Errors.Count);
+            report.CategoryAttributes, report.Groups.Groups, report.Groups.Members, report.Errors.Count);
         return report;
     }
 

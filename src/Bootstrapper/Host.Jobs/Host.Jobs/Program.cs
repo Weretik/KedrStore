@@ -150,6 +150,11 @@ try
                 Console.WriteLine($"[RESULT] product values {importReport.ProductValues}");
                 Console.WriteLine($"[RESULT] reviews {importReport.Reviews}");
                 Console.WriteLine($"[RESULT] category filters {importReport.CategoryAttributes}");
+                var groupReport = importReport.Groups;
+                Console.WriteLine($"[RESULT] groups {groupReport.Groups}");
+                Console.WriteLine($"[RESULT] group members {groupReport.Members}; grouped products={groupReport.GroupedProducts}");
+                Console.WriteLine($"[RESULT] same variants groups={groupReport.GroupsWithSameVariants}; " +
+                                  $"products={groupReport.ProductsWithSameVariants}; reviews changed={groupReport.ReviewsChanged}");
                 Console.WriteLine($"[RESULT] errors={importReport.Errors.Count}");
                 foreach (var error in importReport.Errors.Take(AttributeImportReport.MaxErrorsShown))
                     Console.WriteLine($"[ERROR] {error}");

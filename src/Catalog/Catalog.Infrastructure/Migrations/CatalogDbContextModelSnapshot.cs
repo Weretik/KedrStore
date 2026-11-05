@@ -334,6 +334,82 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CategoryContents", (string)null);
                 });
 
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GroupKey")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("IsCreatedManually")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsMainManual")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MainProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MainProductId")
+                        .HasDatabaseName("IX_CatalogProductGroups_MainProductId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogProductGroups_Slug");
+
+                    b.HasIndex("CategoryId", "GroupKey")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogProductGroups_Category_Key")
+                        .HasFilter("\"GroupKey\" IS NOT NULL");
+
+                    b.ToTable("CatalogProductGroups", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("GroupId")
+                        .HasDatabaseName("IX_CatalogProductGroupMembers_GroupId");
+
+                    b.ToTable("CatalogProductGroupMembers", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
                 {
                     b.Property<int>("Id")
@@ -830,6 +906,34 @@ namespace Catalog.Infrastructure.Migrations
                         });
 
                     b.Navigation("Faq");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroup", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("MainProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>

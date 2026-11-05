@@ -4,5 +4,6 @@ namespace Catalog.Domain.ValueObjects;
 public enum CatalogEntityType : short
 {
     Product = 1,
-    Category = 2
+    Category = 2,
+    ProductGroup = 3
 }

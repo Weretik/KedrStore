@@ -1,8 +1,11 @@
+using Catalog.Application.Features.Groups.GetForProduct;
+using Catalog.Application.Features.Groups.SetForProduct;
 using Catalog.Application.Features.Products.GetAdminList;
 using Catalog.Application.Features.Products.GetAdminDetail;
 using Catalog.Application.Features.ProductMedia.Get;
 using Catalog.Application.Features.ProductMedia.Set;
 using Catalog.Application.Features.Slugs.Change;
+using Catalog.Contracts.Groups;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetAdminDetail;
 using Catalog.Contracts.Products.Media;
@@ -99,4 +102,26 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         var result = await sender.Send(new SetProductMediaCommand(id, request), cancellationToken);
         return this.ToActionResult(result);
     }
+
+    [HttpGet("{id:int}/group", Name = "getAdminProductGroupOfProduct")]
+    [ProducesResponseType(typeof(AdminProductGroupMembershipDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AdminProductGroupMembershipDto>> GetGroup(
+        [FromRoute] int id,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new GetProductGroupForProductQuery(id), cancellationToken));
+
+    /// <summary>Moves the product to a group, out of groups, or back to automatic grouping (spec catalog/006).</summary>
+    [HttpPut("{id:int}/group", Name = "setAdminProductGroupOfProduct")]
+    [ProducesResponseType(typeof(AdminProductGroupMembershipDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AdminProductGroupMembershipDto>> SetGroup(
+        [FromRoute] int id,
+        [FromBody] SetProductGroupRequest request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new SetProductGroupCommand(id, request), cancellationToken));
 }

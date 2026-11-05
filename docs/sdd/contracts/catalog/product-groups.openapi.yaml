@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog product groups API
+  version: 0.1.0
+  description: >-
+    Variant groups of spec catalog/006 phase 2. A group links products of one model in one category that differ by
+    color, size, or side; each variant stays a separate product. Policy CanManageProducts (Manager and Admin);
+    only Admin changes a group slug. Every change rebuilds the automatic groups at once.
+paths:
+  /api/admin/product-groups:
+    get:
+      operationId: getAdminProductGroups
+      summary: Find groups by category and part of the name
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Up to 50 groups ordered by name, for the «Перенести в іншу групу» picker.
+      parameters:
+        - { name: categoryId, in: query, schema: { type: integer, minimum: 1 } }
+        - { name: search, in: query, schema: { type: string, maxLength: 100 } }
+      responses:
+        '200': { description: Groups, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProductGroupListItem' } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+    post:
+      operationId: createAdminProductGroup
+      summary: Create a group («Нова група»)
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        The listed products (up to 200, all in the category) move into the new group and are pinned: automation
+        never moves them again. The slug is built from the name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateProductGroupRequest' }
+      responses:
+        '200': { description: Created group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/product-groups/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminProductGroup
+      summary: Get a group with its variants
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Group not found. }
+    put:
+      operationId: renameAdminProductGroup
+      summary: Rename a group
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: The slug stays as it is.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RenameProductGroupRequest' }
+      responses:
+        '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Group not found. }
+  /api/admin/product-groups/{id}/main:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: setAdminProductGroupMain
+      summary: Choose the main product («Зробити головним»)
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        The product must be in the group and on the site. It stays main until it is deleted or taken off the site;
+        then automation picks the main product again.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetProductGroupMainRequest' }
+      responses:
+        '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Group not found. }
+  /api/admin/product-groups/{id}/slug:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: changeAdminProductGroupSlug
+      summary: Change a group slug
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Admin only. The old slug goes to the slug history and is never given to another group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugRequest' }
+      responses:
+        '200': { description: New slug, content: { application/json: { schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugResponse' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Group not found. }
+  /api/admin/products/{id}/group:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminProductGroupOfProduct
+      summary: Get the group of a product
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Group of the product, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroupMembership' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+    put:
+      operationId: setAdminProductGroupOfProduct
+      summary: Move a product to a group, out of groups, or back to automatic grouping
+      tags: [Admin product groups]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        `automatic: true` returns the product to automatic grouping (no `groupId`). Otherwise the product is pinned
+        to `groupId` (a group of the product's category) or, with `groupId: null`, kept out of groups.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetProductGroupRequest' }
+      responses:
+        '200': { description: Group of the product, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroupMembership' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+components:
+  responses:
+    ValidationError: { description: Input validation failed, content: { application/json: { schema: { type: array, items: { type: object, additionalProperties: true } } } } }
+  schemas:
+    AdminProductGroupMember:
+      type: object
+      required: [productId, name, slug, exportToSite, isDeleted, photo, stock, isPinned, isMain, colors, hasSameVariants]
+      properties:
+        productId: { type: integer }
+        name: { type: string, description: Original 1C name. }
+        slug: { type: string }
+        exportToSite: { type: boolean }
+        isDeleted: { type: boolean }
+        photo: { type: string, description: First photo URL; empty without photos. }
+        stock: { type: number }
+        isPinned: { type: boolean, description: A person put the product here; automation leaves it. }
+        isMain: { type: boolean }
+        colors: { type: array, items: { type: string }, description: Main color first, then the second color. }
+        size: { type: [string, 'null'] }
+        side: { type: [string, 'null'] }
+        hasSameVariants: { type: boolean, description: Color, size, and side do not tell it apart from another variant («Однакові варіанти»). }
+    AdminProductGroup:
+      type: object
+      required: [id, categoryId, name, slug, isMainManual, isCreatedManually, members]
+      properties:
+        id: { type: integer }
+        categoryId: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        mainProductId: { type: [integer, 'null'] }
+        isMainManual: { type: boolean }
+        isCreatedManually: { type: boolean }
+        members: { type: array, items: { $ref: '#/components/schemas/AdminProductGroupMember' }, description: Main product first, then by product ID. }
+    AdminProductGroupMembership:
+      type: object
+      required: [productId, isPinned]
+      properties:
+        productId: { type: integer }
+        isPinned: { type: boolean, description: With `group` null it means the product was taken out of groups on purpose. }
+        group: { oneOf: [{ $ref: '#/components/schemas/AdminProductGroup' }, { type: 'null' }] }
+    AdminProductGroupListItem:
+      type: object
+      required: [id, categoryId, name, slug, productCount, isCreatedManually]
+      properties:
+        id: { type: integer }
+        categoryId: { type: integer }
+        name: { type: string }
+        slug: { type: string }
+        productCount: { type: integer }
+        isCreatedManually: { type: boolean }
+    CreateProductGroupRequest:
+      type: object
+      required: [categoryId, name]
+      properties:
+        categoryId: { type: integer, minimum: 1 }
+        name: { type: string, minLength: 1, maxLength: 300 }
+        productIds: { type: array, maxItems: 200, items: { type: integer, minimum: 1 }, uniqueItems: true }
+    RenameProductGroupRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 300 }
+    SetProductGroupMainRequest:
+      type: object
+      required: [productId]
+      properties:
+        productId: { type: integer, minimum: 1 }
+    SetProductGroupRequest:
+      type: object
+      properties:
+        groupId: { type: [integer, 'null'], minimum: 1 }
+        automatic: { type: boolean, default: false }

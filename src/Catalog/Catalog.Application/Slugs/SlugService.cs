@@ -7,11 +7,7 @@ public sealed class SlugService(IReadCatalogDbContext catalogDbContext) : ISlugS
 {
     public async Task<SlugAllocator> LoadAllocatorAsync(CatalogEntityType entityType, CancellationToken cancellationToken)
     {
-        var current = entityType == CatalogEntityType.Product
-            ? await catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
-                .Select(product => product.ProductSlug).ToListAsync(cancellationToken)
-            : await catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
-                .Select(category => category.Slug).ToListAsync(cancellationToken);
+        var current = await CurrentSlugs(entityType).ToListAsync(cancellationToken);
 
         var history = await catalogDbContext.SlugHistory.AsNoTracking()
             .Where(entry => entry.EntityType == entityType)
@@ -25,13 +21,18 @@ public sealed class SlugService(IReadCatalogDbContext catalogDbContext) : ISlugS
     {
         var normalized = slug.Trim().ToLowerInvariant();
 
-        int? currentId = entityType == CatalogEntityType.Product
-            ? await catalogDbContext.Products.AsNoTracking()
+        int? currentId = entityType switch
+        {
+            CatalogEntityType.Product => await catalogDbContext.Products.AsNoTracking()
                 .Where(product => product.ProductSlug == normalized)
-                .Select(product => (int?)product.Id.Value).FirstOrDefaultAsync(cancellationToken)
-            : await catalogDbContext.Categories.AsNoTracking()
+                .Select(product => (int?)product.Id.Value).FirstOrDefaultAsync(cancellationToken),
+            CatalogEntityType.Category => await catalogDbContext.Categories.AsNoTracking()
                 .Where(category => category.Slug == normalized)
-                .Select(category => (int?)category.Id.Value).FirstOrDefaultAsync(cancellationToken);
+                .Select(category => (int?)category.Id.Value).FirstOrDefaultAsync(cancellationToken),
+            _ => await catalogDbContext.ProductGroups.AsNoTracking()
+                .Where(group => group.Slug == normalized)
+                .Select(group => (int?)group.Id.Value).FirstOrDefaultAsync(cancellationToken)
+        };
 
         if (currentId is not null)
             return currentId;
@@ -45,11 +46,15 @@ public sealed class SlugService(IReadCatalogDbContext catalogDbContext) : ISlugS
     public async Task<bool> IsTakenByOtherAsync(CatalogEntityType entityType, string slug, int entityId,
         CancellationToken cancellationToken)
     {
-        var usedAsCurrent = entityType == CatalogEntityType.Product
-            ? await catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
-                .AnyAsync(product => product.ProductSlug == slug && product.Id != ProductId.From(entityId), cancellationToken)
-            : await catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
-                .AnyAsync(category => category.Slug == slug && category.Id != ProductCategoryId.From(entityId), cancellationToken);
+        var usedAsCurrent = entityType switch
+        {
+            CatalogEntityType.Product => await catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
+                .AnyAsync(product => product.ProductSlug == slug && product.Id != ProductId.From(entityId), cancellationToken),
+            CatalogEntityType.Category => await catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
+                .AnyAsync(category => category.Slug == slug && category.Id != ProductCategoryId.From(entityId), cancellationToken),
+            _ => await catalogDbContext.ProductGroups.AsNoTracking()
+                .AnyAsync(group => group.Slug == slug && group.Id != ProductGroupId.FromStorage(entityId), cancellationToken)
+        };
 
         return usedAsCurrent || await catalogDbContext.SlugHistory.AsNoTracking()
             .AnyAsync(entry => entry.EntityType == entityType && entry.Slug == slug && entry.EntityId != entityId,
@@ -75,4 +80,13 @@ public sealed class SlugService(IReadCatalogDbContext catalogDbContext) : ISlugS
         else
             existing.Reassign(entityId, now);
     }
+
+    private IQueryable<string> CurrentSlugs(CatalogEntityType entityType) => entityType switch
+    {
+        CatalogEntityType.Product => catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
+            .Select(product => product.ProductSlug),
+        CatalogEntityType.Category => catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
+            .Select(category => category.Slug),
+        _ => catalogDbContext.ProductGroups.AsNoTracking().Select(group => group.Slug)
+    };
 }

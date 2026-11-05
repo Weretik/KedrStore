@@ -1,6 +1,7 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Slugs;
+using Catalog.Domain.Entities.Groups;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Application.Features.Slugs.Change;
@@ -9,6 +10,7 @@ namespace Catalog.Application.Features.Slugs.Change;
 public sealed class ChangeSlugCommandHandler(
     ICatalogRepository<Product> productRepo,
     ICatalogRepository<ProductCategory> categoryRepo,
+    ICatalogRepository<ProductGroup> groupRepo,
     IReadCatalogDbContext catalogDbContext,
     ISlugService slugService)
     : ICommandHandler<ChangeSlugCommand, Result<ChangeSlugResponse>>
@@ -51,6 +53,12 @@ public sealed class ChangeSlugCommandHandler(
             return product is null ? null : new Target(product.Name, product.ProductSlug, product.ChangeSlug);
         }
 
+        if (entityType == CatalogEntityType.ProductGroup)
+        {
+            var group = await groupRepo.GetByIdAsync(ProductGroupId.FromStorage(id), cancellationToken);
+            return group is null ? null : new Target(group.Name, group.Slug, group.ChangeSlug);
+        }
+
         var category = await categoryRepo.GetByIdAsync(ProductCategoryId.From(id), cancellationToken);
         return category is null ? null : new Target(category.Name, category.Slug, category.ChangeSlug);
     }
@@ -72,6 +80,10 @@ public sealed class ChangeSlugCommandHandler(
 
     private Task UpdateProjectionsAsync(CatalogEntityType entityType, int id, string slug, CancellationToken cancellationToken)
     {
+        // Group slugs are not in the list rows.
+        if (entityType == CatalogEntityType.ProductGroup)
+            return Task.CompletedTask;
+
         var projections = catalogDbContext.ProductListProjections;
         return entityType == CatalogEntityType.Product
             ? projections.Where(row => row.ProductId == ProductId.From(id))

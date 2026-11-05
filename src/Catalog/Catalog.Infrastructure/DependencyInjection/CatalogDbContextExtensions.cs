@@ -1,3 +1,5 @@
+using Catalog.Application.Features.Groups.Common;
+using Catalog.Application.Groups;
 using Catalog.Application.Features.Category.AdminGetList;
 using Catalog.Application.Features.Category.Stats;
 using Catalog.Application.Contracts.Persistence;
@@ -29,6 +31,9 @@ public static class CatalogDbContextExtensions
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
         services.AddScoped<IProductListProjectionRebuilder, ProductListProjectionRebuilder>();
         services.AddScoped<ISlugService, SlugService>();
+        services.AddScoped<ProductGroupBuilder>();
+        services.AddScoped<ProductGroupPins>();
+        services.AddScoped<ProductGroupReader>();
         services.AddScoped<ICategoryStatsReader, CategoryStatsReader>();
         services.AddScoped<IAdminCategoryInsightsReader, AdminCategoryInsightsReader>();
 

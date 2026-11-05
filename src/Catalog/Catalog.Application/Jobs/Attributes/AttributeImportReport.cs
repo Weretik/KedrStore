@@ -1,3 +1,5 @@
+using Catalog.Application.Groups;
+
 namespace Catalog.Application.Jobs.Attributes;
 
 /// <summary>Counters of one stage of the attribute import.</summary>
@@ -27,6 +29,7 @@ public sealed class AttributeImportReport
     public AttributeImportCounters ProductValues { get; } = new();
     public AttributeImportCounters Reviews { get; } = new();
     public AttributeImportCounters CategoryAttributes { get; } = new();
+    public ProductGroupBuildReport Groups { get; set; } = new();
     public int ProductsInFile { get; set; }
     public int ProductsNeedingReview { get; set; }
     public List<string> Errors { get; } = [];
