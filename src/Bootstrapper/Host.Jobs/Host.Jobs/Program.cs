@@ -1,6 +1,7 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Jobs.ProductMedia;
+using Catalog.Application.Jobs.Attributes;
 using Catalog.Application.Jobs.Slugs;
 using Host.Jobs;
 using Media.Application.Jobs.CdnSync;
@@ -129,6 +130,30 @@ try
 
             if (smokeResult.Outcome != OneCOrderDeliveryOutcome.Accepted)
                 return 3;
+            break;
+
+        case "import-catalog-attributes":
+            // Without --apply the job only reports what it would change (owner rule: no production data without «да»).
+            var dictionaryPath = GetArg(args, "--dictionary") ?? "docs/catalog-attributes/dictionaries.json";
+            var csvPath = GetArg(args, "--csv") ?? "docs/catalog-attributes/products_attributes.csv";
+            await using (var dictionaryStream = File.OpenRead(dictionaryPath))
+            using (var csvReader = new StreamReader(csvPath, System.Text.Encoding.UTF8))
+            {
+                var importReport = await scopeServiceProvider.GetRequiredService<ImportCatalogAttributesJob>().RunAsync(
+                    dictionaryStream, csvReader, args.Contains("--apply", StringComparer.OrdinalIgnoreCase),
+                    cancellationToken);
+                Console.WriteLine($"[RESULT] import-catalog-attributes applied={importReport.Applied}; " +
+                                  $"products={importReport.ProductsInFile}; needReview={importReport.ProductsNeedingReview}");
+                Console.WriteLine($"[RESULT] attributes {importReport.Attributes}");
+                Console.WriteLine($"[RESULT] values {importReport.Values}");
+                Console.WriteLine($"[RESULT] aliases {importReport.Aliases}");
+                Console.WriteLine($"[RESULT] product values {importReport.ProductValues}");
+                Console.WriteLine($"[RESULT] reviews {importReport.Reviews}");
+                Console.WriteLine($"[RESULT] category filters {importReport.CategoryAttributes}");
+                Console.WriteLine($"[RESULT] errors={importReport.Errors.Count}");
+                foreach (var error in importReport.Errors.Take(AttributeImportReport.MaxErrorsShown))
+                    Console.WriteLine($"[ERROR] {error}");
+            }
             break;
 
         case "rebuild-projections":

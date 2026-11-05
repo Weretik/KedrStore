@@ -10,7 +10,10 @@ public static partial class SlugText
 {
     public const int MaxLength = 80;
 
-    public static string FromName(string? name, CatalogEntityType kind)
+    public static string FromName(string? name, CatalogEntityType kind) => FromName(name, Fallback(kind));
+
+    /// <summary>Builds a slug from any Ukrainian text; <paramref name="fallback"/> is used when nothing is left.</summary>
+    public static string FromName(string? name, string fallback)
     {
         var latin = UkrainianTransliterator.Transliterate(name);
         var builder = new StringBuilder(latin.Length);
@@ -33,7 +36,7 @@ public static partial class SlugText
         }
 
         var slug = Cut(builder.ToString(), MaxLength);
-        return slug.Length == 0 ? Fallback(kind) : slug;
+        return slug.Length == 0 ? fallback : slug;
     }
 
     public static string WithSuffix(string baseSlug, int number)

@@ -12,6 +12,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Product photos and schemes](catalog/product-media.md) — photos in order and a scheme linked from the media library, auto-link in the CDN sync run.
 - [Quick order](catalog/quick-order.md) — public `POST /api/orders` with Excel generation and Telegram notification.
 - [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
+- [Catalog attributes](catalog/attributes.md) — attribute dictionary, product attribute values, review state, and the CSV import.
 - [Product and stock projection](catalog/stock-projection.md) — separate read model for product lists and its updates.
 
 ## Sales

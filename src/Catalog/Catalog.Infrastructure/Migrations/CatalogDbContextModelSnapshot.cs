@@ -24,6 +24,277 @@ namespace Catalog.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAlias", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEditedManually")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RawValue")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ValueId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ValueId");
+
+                    b.HasIndex("AttributeId", "Scope", "RawValue")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributeAliases_Attribute_Scope_Raw");
+
+                    b.ToTable("CatalogAttributeAliases", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("IsEditedManually")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NameRu")
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("NameUk")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SwatchHex")
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributeValues_Attribute_Code");
+
+                    b.HasIndex("AttributeId", "Slug")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributeValues_Attribute_Slug");
+
+                    b.ToTable("CatalogAttributeValues", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CatalogAttribute", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("IsEditedManually")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsFilterable")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVariantAxis")
+                        .HasColumnType("boolean");
+
+                    b.Property<short>("Kind")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("NameRu")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("NameUk")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributes_Code");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributes_Slug");
+
+                    b.ToTable("CatalogAttributes", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CategoryAttribute", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsEditedManually")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsFilterable")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("CategoryId", "AttributeId");
+
+                    b.HasIndex("AttributeId");
+
+                    b.ToTable("CatalogCategoryAttributes", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeReview", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AcceptedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("BaseName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Reasons")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<short>("State")
+                        .HasColumnType("smallint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("BaseName")
+                        .HasDatabaseName("IX_CatalogProductAttributeReviews_BaseName");
+
+                    b.HasIndex("State")
+                        .HasDatabaseName("IX_CatalogProductAttributeReviews_State");
+
+                    b.ToTable("CatalogProductAttributeReviews", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeValue", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<short>("Position")
+                        .HasColumnType("smallint");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("NumberValue")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<short>("Source")
+                        .HasColumnType("smallint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ValueId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProductId", "AttributeId", "Position");
+
+                    b.HasIndex("ValueId");
+
+                    b.HasIndex("AttributeId", "ValueId")
+                        .HasDatabaseName("IX_CatalogProductAttributeValues_Attribute_Value");
+
+                    b.ToTable("CatalogProductAttributeValues", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -440,6 +711,73 @@ namespace Catalog.Infrastructure.Migrations
                         .HasDatabaseName("IX_CatalogSlugHistory_EntityType_EntityId");
 
                     b.ToTable("CatalogSlugHistory", (string)null);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAlias", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CategoryAttribute", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeReview", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeValue", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
