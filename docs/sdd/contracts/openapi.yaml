@@ -170,6 +170,10 @@ paths:
     $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1{id}
   /api/admin/content/home/brands/order:
     $ref: ./content/home.openapi.yaml#/paths/~1api~1admin~1content~1home~1brands~1order
+  /api/content/{lang}/wholesale:
+    $ref: ./content/wholesale.openapi.yaml#/paths/~1api~1content~1{lang}~1wholesale
+  /api/admin/content/wholesale:
+    $ref: ./content/wholesale.openapi.yaml#/paths/~1api~1admin~1content~1wholesale
   /api/admin/content/site-refresh:
     $ref: ./content/site-refresh.openapi.yaml#/paths/~1api~1admin~1content~1site-refresh
   /api/admin/media/folders:

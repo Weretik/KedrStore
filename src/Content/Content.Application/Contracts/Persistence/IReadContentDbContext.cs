@@ -12,4 +12,5 @@ public interface IReadContentDbContext
     DbSet<GalleryItem> GalleryItems { get; }
     DbSet<HomeFaqItem> HomeFaqItems { get; }
     DbSet<HomeBrand> HomeBrands { get; }
+    DbSet<WholesalePage> WholesalePages { get; }
 }

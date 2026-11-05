@@ -11,3 +11,4 @@ global using Content.Domain.Documents;
 global using Content.Domain.Gallery;
 global using Content.Domain.Home;
 global using Content.Domain.Requisites;
+global using Content.Domain.Wholesale;

@@ -414,6 +414,26 @@ namespace Content.Infrastructure.Migrations
                     b.ToTable("CompanyRequisitesChanges", "content");
                 });
 
+            modelBuilder.Entity("Content.Domain.Wholesale.WholesalePage", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WholesalePages", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_WholesalePages_Singleton", "\"Id\" = 1");
+                        });
+                });
+
             modelBuilder.Entity("Content.Domain.Articles.Article", b =>
                 {
                     b.OwnsMany("Content.Domain.Articles.ArticleTranslation", "Translations", b1 =>
@@ -525,6 +545,229 @@ namespace Content.Infrastructure.Migrations
                         });
 
                     b.Navigation("Changes");
+                });
+
+            modelBuilder.Entity("Content.Domain.Wholesale.WholesalePage", b =>
+                {
+                    b.OwnsOne("Content.Domain.Wholesale.WholesalePageText", "Ru", b1 =>
+                        {
+                            b1.Property<int>("WholesalePageId");
+
+                            b1.Property<string>("AssortmentIntro")
+                                .IsRequired();
+
+                            b1.Property<string>("AssortmentTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("ClosingTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("CompanyText")
+                                .IsRequired();
+
+                            b1.Property<string>("CompanyTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("ContactCardNote")
+                                .IsRequired();
+
+                            b1.Property<string>("ContactCardTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("FaqTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("HeroLead")
+                                .IsRequired();
+
+                            b1.Property<string>("HeroTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("SelectionText")
+                                .IsRequired();
+
+                            b1.Property<string>("SelectionTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("StepsTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("WarehouseText")
+                                .IsRequired();
+
+                            b1.Property<string>("WarehouseTitle")
+                                .IsRequired();
+
+                            b1.HasKey("WholesalePageId");
+
+                            b1.ToTable("WholesalePages", "content");
+
+                            b1
+                                .ToJson("Ru")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WholesalePageId");
+
+                            b1.OwnsMany("Content.Domain.Wholesale.WholesaleFaqItem", "Faq", b2 =>
+                                {
+                                    b2.Property<int>("WholesalePageTextWholesalePageId");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<string>("Answer")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Question")
+                                        .IsRequired();
+
+                                    b2.HasKey("WholesalePageTextWholesalePageId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("WholesalePages", "content");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("WholesalePageTextWholesalePageId");
+                                });
+
+                            b1.OwnsMany("Content.Domain.Wholesale.WholesaleStep", "Steps", b2 =>
+                                {
+                                    b2.Property<int>("WholesalePageTextWholesalePageId");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<string>("Text")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Title")
+                                        .IsRequired();
+
+                                    b2.HasKey("WholesalePageTextWholesalePageId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("WholesalePages", "content");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("WholesalePageTextWholesalePageId");
+                                });
+
+                            b1.Navigation("Faq");
+
+                            b1.Navigation("Steps");
+                        });
+
+                    b.OwnsOne("Content.Domain.Wholesale.WholesalePageText", "Uk", b1 =>
+                        {
+                            b1.Property<int>("WholesalePageId");
+
+                            b1.Property<string>("AssortmentIntro")
+                                .IsRequired();
+
+                            b1.Property<string>("AssortmentTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("ClosingTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("CompanyText")
+                                .IsRequired();
+
+                            b1.Property<string>("CompanyTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("ContactCardNote")
+                                .IsRequired();
+
+                            b1.Property<string>("ContactCardTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("FaqTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("HeroLead")
+                                .IsRequired();
+
+                            b1.Property<string>("HeroTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("SelectionText")
+                                .IsRequired();
+
+                            b1.Property<string>("SelectionTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("StepsTitle")
+                                .IsRequired();
+
+                            b1.Property<string>("WarehouseText")
+                                .IsRequired();
+
+                            b1.Property<string>("WarehouseTitle")
+                                .IsRequired();
+
+                            b1.HasKey("WholesalePageId");
+
+                            b1.ToTable("WholesalePages", "content");
+
+                            b1
+                                .ToJson("Uk")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WholesalePageId");
+
+                            b1.OwnsMany("Content.Domain.Wholesale.WholesaleFaqItem", "Faq", b2 =>
+                                {
+                                    b2.Property<int>("WholesalePageTextWholesalePageId");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<string>("Answer")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Question")
+                                        .IsRequired();
+
+                                    b2.HasKey("WholesalePageTextWholesalePageId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("WholesalePages", "content");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("WholesalePageTextWholesalePageId");
+                                });
+
+                            b1.OwnsMany("Content.Domain.Wholesale.WholesaleStep", "Steps", b2 =>
+                                {
+                                    b2.Property<int>("WholesalePageTextWholesalePageId");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<string>("Text")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Title")
+                                        .IsRequired();
+
+                                    b2.HasKey("WholesalePageTextWholesalePageId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("WholesalePages", "content");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("WholesalePageTextWholesalePageId");
+                                });
+
+                            b1.Navigation("Faq");
+
+                            b1.Navigation("Steps");
+                        });
+
+                    b.Navigation("Ru")
+                        .IsRequired();
+
+                    b.Navigation("Uk")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

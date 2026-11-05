@@ -29,6 +29,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Site documents](content/legal-documents.md) — offer, privacy, returns and delivery texts with numbered editions and «Редакція від».
 - [Site gallery](content/gallery.md) — media-library photos and YouTube videos by link, ordered, with optional uk/ru titles and captions.
 - [Home page FAQ and brands](content/home-blocks.md) — home FAQ in uk/ru and brands with media-library logos, ordered.
+- [Page «Співпраця»](content/wholesale-page.md) — the wholesale offer texts in uk/ru: hero, company, three steps, questions.
 - [Refresh the site now](content/site-refresh.md) — «Оновити сайт зараз»: asks the public site to drop its cached content and catalog.
 
 ## Media
