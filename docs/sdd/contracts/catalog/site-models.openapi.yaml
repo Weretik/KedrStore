@@ -239,7 +239,7 @@ components:
         onSiteCount: { type: integer }
         minPrice: { type: [number, 'null'], description: Lowest retail price of its on-site products. }
         photo: { type: string, description: Photo of the main product; empty without one. }
-        axes: { type: array, items: { type: string }, description: Axis names (saved, or offered for a proposal). }
+        axes: { type: array, items: { type: string }, description: 'Axis names (saved, or offered for a proposal).' }
         problems: { type: array, items: { type: string }, description: Model codes and the product codes its products have. }
     SiteModelList:
       type: object
