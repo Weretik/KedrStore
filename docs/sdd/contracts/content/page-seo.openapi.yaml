@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — search texts of the site pages
+  version: 0.1.0
+  description: >-
+    Editor-set search titles and descriptions of the site pages that exist once (home, catalog, «Співпраця», delivery,
+    returns, contacts, gallery, articles, requisites, offer, privacy). Every value is optional: where none is set the
+    site keeps the text it has in code. Categories, products and articles have their own texts and are not here.
+paths:
+  /api/content/{lang}/page-seo:
+    get:
+      operationId: listPublicPageSeo
+      summary: List the set search texts in one language
+      description: Public, because the site builds page metadata for anonymous visitors. Only pages with a title or a description in this language are listed.
+      tags: [PageSeo]
+      security: []
+      parameters:
+        - name: lang
+          in: path
+          required: true
+          schema: { type: string, enum: [uk, ru] }
+      responses:
+        '200':
+          description: The pages in menu order.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PublicPageSeo' }
+        '400': { description: '`lang` is not `uk` or `ru`.' }
+  /api/admin/content/page-seo:
+    get:
+      operationId: listAdminPageSeo
+      summary: List every site page with its texts
+      description: Requires `CanManageContent` (Manager or Admin). Pages never saved have empty values.
+      tags: [PageSeo]
+      responses:
+        '200':
+          description: All pages in menu order.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AdminPageSeo' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+  /api/admin/content/page-seo/{page}:
+    put:
+      operationId: updateAdminPageSeo
+      summary: Replace the texts of one page
+      description: >-
+        Requires `CanManageContent` (Manager or Admin). Values are trimmed; an empty or missing value returns that text
+        to the site default. The first save creates the page row. Repeating it is safe.
+      tags: [PageSeo]
+      parameters:
+        - name: page
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/SitePage' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SavePageSeoRequest' }
+      responses:
+        '200':
+          description: The saved page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminPageSeo' }
+        '400': { description: 'Unknown page or a text over its limit; `errors` names the field.' }
+        '401': { description: Not signed in. }
+        '403': { description: Not a Manager or Admin. }
+components:
+  schemas:
+    SitePage:
+      type: string
+      enum:
+        [Home, Catalog, Wholesale, DeliveryPayment, ReturnsExchanges, Contacts, Gallery, Articles, Requisites,
+         PublicOffer, PrivacyPolicy]
+    PublicPageSeo:
+      type: object
+      required: [page, title, description]
+      properties:
+        page: { $ref: '#/components/schemas/SitePage' }
+        title: { type: [string, 'null'], maxLength: 120 }
+        description: { type: [string, 'null'], maxLength: 300 }
+    AdminPageSeo:
+      type: object
+      required: [page, titleUk, titleRu, descriptionUk, descriptionRu, updatedAt, updatedBy]
+      properties:
+        page: { $ref: '#/components/schemas/SitePage' }
+        titleUk: { type: [string, 'null'], maxLength: 120 }
+        titleRu: { type: [string, 'null'], maxLength: 120 }
+        descriptionUk: { type: [string, 'null'], maxLength: 300 }
+        descriptionRu: { type: [string, 'null'], maxLength: 300 }
+        updatedAt: { type: [string, 'null'], format: date-time, description: Null until the first save. }
+        updatedBy: { type: [string, 'null'], description: Who saved the last change. }
+    SavePageSeoRequest:
+      type: object
+      properties:
+        titleUk: { type: [string, 'null'], maxLength: 120 }
+        titleRu: { type: [string, 'null'], maxLength: 120 }
+        descriptionUk: { type: [string, 'null'], maxLength: 300 }
+        descriptionRu: { type: [string, 'null'], maxLength: 300 }

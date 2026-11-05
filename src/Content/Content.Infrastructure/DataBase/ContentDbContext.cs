@@ -17,6 +17,7 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options)
     public DbSet<HomeFaqItem> HomeFaqItems => Set<HomeFaqItem>();
     public DbSet<HomeBrand> HomeBrands => Set<HomeBrand>();
     public DbSet<WholesalePage> WholesalePages => Set<WholesalePage>();
+    public DbSet<PageSeo> PageSeo => Set<PageSeo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

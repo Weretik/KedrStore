@@ -10,6 +10,7 @@ global using Content.Domain.Editing;
 global using Content.Domain.Gallery;
 global using Content.Domain.Home;
 global using Content.Domain.Requisites;
+global using Content.Domain.Seo;
 global using Content.Domain.Wholesale;
 global using Content.Infrastructure.DataBase;
 global using Microsoft.EntityFrameworkCore;
