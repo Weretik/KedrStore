@@ -1,6 +1,6 @@
 # 006 — Catalog attributes, variant groups, filters, and SEO
 
-**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 moved to [spec 007](../007-site-models/README.md) on 2026-11-05 (filters per model, stages 5, 7, and 8). **Date:** 2026-11-05.
 
 The owner-facing plan with every decision is the Russian document [«Каталог: атрибути, варіанти, фільтри і SEO — SDD»](https://claude.ai/artifact/5QwjXyutiyQg4FyzhdaPJR). This file is its technical summary and the evidence log. Input files and their description: [docs/catalog-attributes](../../../../catalog-attributes/README.md).
 
@@ -90,9 +90,9 @@ Products get structured attributes (color, size, side, type, material, and so on
 | 2 | Product groups (`ProductGroup` slug type 3), main product, «Однакові варіанти», group API | done 2026-11-05 |
 | 3 | Admin: «На сайті» attributes and group panel, problems filter, «Прийняти як є», «Властивості» page, «Огляд» lines | done 2026-11-05 (migration `CatalogAttributesAdmin`; kedr-web screens) |
 | 4 | .NET parser port with a golden test against the CSV (2330/2330), runs on 1C sync and dictionary changes | done 2026-11-05 (no migration) |
-| 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | planned |
-| 6 | Single-filter pages, templates, noindex/canonical, redirects, sitemap, `ProductGroup` JSON-LD | planned |
-| 7 | Optional AI suggestions for problem products (person confirms) | planned |
+| 5 | Facet API and product list `filter`/`groupVariants`; site filter panel and variant switchers | moved: spec 007 stage 5 (filters per model) |
+| 6 | Single-filter pages, templates, noindex/canonical, redirects, sitemap, `ProductGroup` JSON-LD | moved: spec 007 stage 7 |
+| 7 | Optional AI suggestions for problem products (person confirms) | moved: spec 007 stage 8 |
 
 ## Code (phase 1)
 

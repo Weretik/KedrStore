@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: KedrStore Catalog — catalog block of the admin «Огляд»
-  version: 0.1.0
+  version: 0.2.0
   description: Counts of catalog problems the admin home page shows; nothing is reported for what is fine.
 paths:
   /api/admin/catalog/overview:
@@ -42,6 +42,13 @@ components:
           type: integer
           minimum: 0
           description: Those of them without brand marking (reason `no_name`).
+        siteModels:
+          description: >-
+            Site model health (spec catalog/007); `productsWithoutModel` is the hard error. The «Огляд» shows no line
+            at 0.
+          oneOf:
+            - { $ref: './site-models.openapi.yaml#/components/schemas/SiteModelHealth' }
+            - { type: 'null' }
     AdminCatalogOverviewCategory:
       type: object
       required: [id, name, count]

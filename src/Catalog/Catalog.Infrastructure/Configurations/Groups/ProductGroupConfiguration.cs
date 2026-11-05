@@ -1,5 +1,6 @@
 using Catalog.Domain.Entities;
 using Catalog.Domain.Entities.Groups;
+using Catalog.Domain.Enums;
 using Catalog.Domain.ValueObjects;
 using Catalog.Infrastructure.Converters;
 
@@ -20,6 +21,8 @@ public sealed class ProductGroupConfiguration : IEntityTypeConfiguration<Product
         builder.Property(x => x.GroupKey).HasMaxLength(ProductGroup.NameMaxLength);
         builder.Property(x => x.Slug).HasMaxLength(ProductGroup.SlugMaxLength).IsRequired();
         builder.Property(x => x.MainProductId).HasConversion(CatalogConverter.ProductIdConvert);
+        builder.Property(x => x.Status).HasConversion<short>().HasDefaultValue(ProductGroupStatus.Proposed);
+        builder.Property(x => x.AcceptedBy).HasMaxLength(ProductGroup.AcceptedByMaxLength);
 
         builder.HasOne<ProductCategory>().WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Product>().WithMany().HasForeignKey(x => x.MainProductId).OnDelete(DeleteBehavior.SetNull);

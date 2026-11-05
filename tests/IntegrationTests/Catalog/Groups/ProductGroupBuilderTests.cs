@@ -15,7 +15,10 @@ using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 
 namespace IntegrationTests.Catalog.Groups;
 
-/// <summary>Spec catalog/006 phase 2: automatic variant groups, main product, «Однакові варіанти», manual moves.</summary>
+/// <summary>
+/// Spec catalog/006 phase 2: automatic variant groups, main product, «Однакові варіанти», manual moves. Since spec
+/// catalog/007 R-02 an on-site product left without a group gets a proposed one-product group.
+/// </summary>
 public sealed class ProductGroupBuilderTests
 {
     private static string Csv(params string[] rows) => CsvHeader + "\n" + string.Join("\n", rows) + "\n";
@@ -43,18 +46,22 @@ public sealed class ProductGroupBuilderTests
             Row(1, "Завіса  KEDR", "AB", "L"), Row(2, "завіса kedr", "CR", "R"), Row(3, "Завіса KEDR", "AB", "R"),
             Row(4, "Ручка", "AB", "L")), apply: true);
 
-        var group = await db.ProductGroups.AsNoTracking().SingleAsync();
-        Assert.Equal("Завіса KEDR", group.Name);
+        var group = await db.ProductGroups.AsNoTracking().SingleAsync(item => item.Name == "Завіса KEDR");
         Assert.Equal("zavisa-kedr", group.Slug);
         Assert.Equal(1, group.MainProductId?.Value);
-        Assert.Equal([1, 2, 3], (await MembersAsync(db)).Select(member => member.ProductId.Value));
-        Assert.Equal(1, report.Groups.Groups.Created);
+        Assert.Equal(ProductGroupStatus.Proposed, group.Status);
+        var members = await MembersAsync(db);
+        Assert.Equal([1, 2, 3], members.Where(member => member.GroupId == group.Id).Select(member => member.ProductId.Value));
+        // The on-site «Ручка» is alone: it gets a one-product proposal (spec catalog/007 R-02).
+        var alone = await db.ProductGroups.AsNoTracking().SingleAsync(item => item.Name == "Ручка");
+        Assert.Equal(4, alone.MainProductId?.Value);
+        Assert.Equal(2, report.Groups.Groups.Created);
 
         var second = await RunAsync(db, Dictionary, Csv(
             Row(1, "Завіса  KEDR", "AB", "L"), Row(2, "завіса kedr", "CR", "R"), Row(3, "Завіса KEDR", "AB", "R"),
             Row(4, "Ручка", "AB", "L")), apply: true);
-        Assert.Equal(1, second.Groups.Groups.Unchanged);
-        Assert.Equal(3, second.Groups.Members.Unchanged);
+        Assert.Equal(2, second.Groups.Groups.Unchanged);
+        Assert.Equal(4, second.Groups.Members.Unchanged);
         Assert.Equal(0, second.Groups.ReviewsChanged);
     }
 
@@ -86,7 +93,17 @@ public sealed class ProductGroupBuilderTests
         await db.SaveChangesAsync();
         var report = await GroupBuilder(db).RunAsync(apply: true, CancellationToken.None);
 
-        Assert.Equal(1, report.Groups.Removed);
+        // Product 1 is left alone on the site: the group stays as its one-product proposal.
+        Assert.Equal(0, report.Groups.Removed);
+        Assert.Single(await db.ProductGroups.AsNoTracking().ToListAsync());
+        Assert.Equal([1], (await MembersAsync(db)).Select(member => member.ProductId.Value));
+
+        var first = await db.Products.SingleAsync(item => item.Id == ProductId.From(1));
+        first.UpdateFromOneC(first.Name, first.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        var offSite = await GroupBuilder(db).RunAsync(apply: true, CancellationToken.None);
+
+        Assert.Equal(1, offSite.Groups.Removed);
         Assert.Empty(await db.ProductGroups.AsNoTracking().ToListAsync());
         Assert.Empty(await MembersAsync(db));
     }
@@ -169,7 +186,7 @@ public sealed class ProductGroupBuilderTests
         var csv = Csv(Row(1, "Ручка", "AB", "L"), Row(2, "Ручка", "AB", "R"), Row(3, "Ручка", "CR", "L"),
             Row(4, "Засувка", "AB", "L"), Row(5, "Засувка", "AB", "L"));
         await RunAsync(db, Dictionary, csv, apply: true);
-        var handle = (await db.ProductGroups.AsNoTracking().SingleAsync()).Id;
+        var handle = (await db.ProductGroups.AsNoTracking().SingleAsync(group => group.Name == "Ручка")).Id;
 
         var create = new CreateProductGroupCommandHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
             Pins(db), GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
@@ -194,11 +211,11 @@ public sealed class ProductGroupBuilderTests
         Assert.True(outOfGroups.Value.IsPinned);
         Assert.Null(outOfGroups.Value.Group);
 
-        // Only product 1 is left automatic in «Ручка»: that group is dissolved; the reimport keeps the pins.
+        // Only product 1 is left automatic in «Ручка»: the group stays as its one-product proposal; the reimport keeps
+        // the pins.
         await RunAsync(db, Dictionary, csv, apply: true);
-        Assert.False(await db.ProductGroups.AnyAsync(group => group.Id == handle));
         var members = await MembersAsync(db);
-        Assert.DoesNotContain(members, member => member.ProductId == ProductId.From(1));
+        Assert.Contains(members, member => member.ProductId == ProductId.From(1) && member.GroupId == handle);
         Assert.Contains(members, member => member.ProductId == ProductId.From(2) && member.IsPinned && member.GroupId == null);
         Assert.Equal(2, members.Count(member => member.GroupId == ProductGroupId.Create(created.Value.Id)));
 

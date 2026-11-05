@@ -49,6 +49,24 @@ paths:
     $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1main
   /api/admin/product-groups/{id}/slug:
     $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1slug
+  /api/admin/site-models:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models
+  /api/admin/site-models/health:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1health
+  /api/admin/site-models/accept:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1accept
+  /api/admin/site-models/{id}:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}
+  /api/admin/site-models/{id}/axes:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}~1axes
+  /api/admin/site-models/{id}/products:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}~1products
+  /api/admin/site-models/{id}/products/{productId}:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}~1products~1{productId}
+  /api/admin/site-models/{id}/texts/{language}:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}~1texts~1{language}
+  /api/admin/site-models/{id}/fill-from-names:
+    $ref: ./catalog/site-models.openapi.yaml#/paths/~1api~1admin~1site-models~1{id}~1fill-from-names
   /api/admin/products/{productId}/attributes:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1attributes
   /api/admin/products/{productId}/attributes/{attributeId}:

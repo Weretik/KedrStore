@@ -1,4 +1,5 @@
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.SiteModels.Common;
 using Catalog.Contracts.Overview;
 using Catalog.Domain.Entities;
 using Catalog.Domain.Entities.Attributes;
@@ -10,9 +11,12 @@ namespace Catalog.Application.Features.Overview;
 /// Counts products without a photo as the «Без фото» tab lists them (the list projection already leaves out deleted
 /// products) and active
 /// categories missing a site text in a language; a text row counts as filled the same way the category list does.
-/// Also counts on-site products whose attributes need review, and the No name ones among them (spec catalog/006).
+/// Also counts on-site products whose attributes need review, and the No name ones among them (spec catalog/006),
+/// and the site model health (spec catalog/007).
 /// </summary>
-public sealed class GetAdminCatalogOverviewQueryHandler(IReadCatalogDbContext catalogDbContext)
+public sealed class GetAdminCatalogOverviewQueryHandler(
+    IReadCatalogDbContext catalogDbContext,
+    SiteModelStateReader siteModels)
     : IQueryHandler<GetAdminCatalogOverviewQuery, Result<AdminCatalogOverviewResponse>>
 {
     public async ValueTask<Result<AdminCatalogOverviewResponse>> Handle(GetAdminCatalogOverviewQuery query,
@@ -57,7 +61,9 @@ public sealed class GetAdminCatalogOverviewQueryHandler(IReadCatalogDbContext ca
             .ToListAsync(cancellationToken);
         var noName = problems.Count(reasons => reasons.Any(reason => reason.Code == AttributeReviewReason.NoName));
 
+        var health = (await siteModels.ReadAsync(cancellationToken)).Health();
+
         return Result.Success(new AdminCatalogOverviewResponse(withoutPhoto.Sum(row => row.Count), top, withoutText,
-            problems.Count, noName));
+            problems.Count, noName, health));
     }
 }

@@ -15,7 +15,9 @@
 | `CatalogCategoryAttributes` | `CategoryId`, `AttributeId` | Filters offered in a category: `IsFilterable`, `SortOrder`. |
 | `CatalogProductAttributeValues` | `ProductId`, `AttributeId`, `Position` | Product value: `ValueId` (FK) or `NumberValue`, `Source` (1 import, 2 parser, 3 manual), `IsLocked`, `IsConfirmed`; while manual, the kept automatic value `AutomaticValueId` (FK), `AutomaticNumberValue`, `AutomaticIsConfirmed`, `AutomaticSource`. Index on `AttributeId, ValueId`. |
 | `CatalogProductAttributeReviews` | `ProductId` | Recognition state: `BaseName`, `State` (0 clear, 1 needs review, 2 accepted), `Reasons` (jsonb list of code and text), `AcceptedBy`, `AcceptedAt`. |
-| `CatalogProductGroups` | `Id` (identity) | Variant group: `CategoryId` (FK), `Name`, `GroupKey` (normalized base name, unique per category; empty for a group a person created), `Slug` (unique; history in slug history as type 3), `MainProductId` (FK, set null), `IsMainManual`, `IsCreatedManually`. |
+| `CatalogProductGroups` | `Id` (identity) | Site model (variant group): `CategoryId` (FK), `Name`, `GroupKey` (normalized base name, unique per category; empty for a model a person created or accepted), `Slug` (unique; history in slug history as type 3), `MainProductId` (FK, set null), `IsMainManual`, `IsCreatedManually`, `Status` (0 proposed, 1 accepted), `AcceptedAt`, `AcceptedBy`. |
+| `CatalogProductGroupAxes` | `GroupId`, `AttributeId` | Model axis (switcher): `GroupId` (FK, cascade), `AttributeId` (FK to `CatalogAttributes`, restrict), `Position`. |
+| `CatalogProductGroupTexts` | `GroupId`, `Language` | Model texts per language (`uk`, `ru`): `ShortDescription`, `Description`, `SeoTitle`, `SeoDescription`, `UpdatedAt`. |
 | `CatalogProductGroupMembers` | `ProductId` | Group of a product (at most one): `GroupId` (FK, cascade; empty for a product kept out of groups), `IsPinned` (a person set it; automation leaves it). |
 
 ```mermaid
@@ -32,6 +34,9 @@ erDiagram
     ProductCategories ||--o{ CatalogCategoryAttributes : "CategoryId FK, cascade"
     ProductCategories ||--o{ CatalogProductGroups : "CategoryId FK"
     CatalogProductGroups ||--o{ CatalogProductGroupMembers : "GroupId FK, cascade"
+    CatalogProductGroups ||--o{ CatalogProductGroupAxes : "GroupId FK, cascade"
+    CatalogAttributes ||--o{ CatalogProductGroupAxes : "AttributeId FK"
+    CatalogProductGroups ||--o{ CatalogProductGroupTexts : "GroupId FK, cascade"
     Products ||--o| CatalogProductGroupMembers : "ProductId FK, cascade"
 ```
 

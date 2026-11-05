@@ -9,7 +9,9 @@ namespace Catalog.Application.Groups;
 
 /// <summary>
 /// Builds variant groups from the stored base names (spec catalog/006, phase 2). Products with the same base name in
-/// one category form a group when there are at least two of them. Rows a person pinned are never moved; No name
+/// one category form a group when there are at least two of them; an on-site product without such a group gets a
+/// one-product group (spec catalog/007 R-02). Every group it creates is a proposed site model; it never changes an
+/// accepted model (R-03), whose products are pinned. Rows a person pinned are never moved; No name
 /// products and deleted products never join automatically. The main product stays while it is on the site;
 /// otherwise the best product is chosen: on the site, with a photo, in stock, then the smallest 1C code.
 /// Products a switcher cannot tell apart get the review reason «Однакові варіанти». Idempotent.
@@ -60,7 +62,8 @@ public sealed class ProductGroupBuilder(
         {
             autoGroupByKey.TryGetValue(key, out var existing);
             var pinned = existing is null ? 0 : pinnedCount.GetValueOrDefault(existing.Id);
-            if (keyReviews.Count + pinned < 2)
+            var aloneOnSite = keyReviews.Count == 1 && pinned == 0 && products[keyReviews[0].ProductId].ExportToSite;
+            if (keyReviews.Count + pinned < 2 && !aloneOnSite)
                 continue;
 
             if (existing is null)
@@ -141,11 +144,11 @@ public sealed class ProductGroupBuilder(
                 await members.AddRangeAsync(createdRows, cancellationToken);
         }
 
-        // 3. Automatic groups left without products disappear; groups a person created stay.
+        // 3. Proposed groups left without products disappear; accepted models stay.
         var memberLists = final.GroupBy(pair => pair.Value)
             .ToDictionary(group => group.Key, group => group.Select(pair => products[pair.Key]).ToList());
         var removedGroups = existingGroups
-            .Where(group => !group.IsCreatedManually && !memberLists.ContainsKey(group))
+            .Where(group => !group.IsAccepted && !memberLists.ContainsKey(group))
             .ToList();
         report.Groups.Removed = removedGroups.Count;
         if (apply && removedGroups.Count > 0)
@@ -161,7 +164,7 @@ public sealed class ProductGroupBuilder(
 
             if (createdGroups.Contains(group))
                 continue;
-            if (group.IsCreatedManually && !changed)
+            if (group.IsAccepted && !changed)
                 report.Groups.Skipped++;
             else if (changed)
                 report.Groups.Updated++;

@@ -1,3 +1,4 @@
+using Catalog.Application.Features.SiteModels.Common;
 using Catalog.Application.Features.Attributes.Common;
 using Catalog.Application.Features.ProductAttributes.Common;
 using Catalog.Application.Features.Groups.Common;
@@ -38,6 +39,9 @@ public static class CatalogDbContextExtensions
         services.AddScoped<ProductGroupReader>();
         services.AddScoped<ProductAttributesReader>();
         services.AddScoped<CatalogAttributeReader>();
+        services.AddScoped<SiteModelStateReader>();
+        services.AddScoped<SiteModelReader>();
+        services.AddScoped<SiteModelChanges>();
         services.AddScoped<UnresolvedCodeReader>();
         services.AddScoped<Catalog.Application.Attributes.Import.RecognizedProductWriter>();
         services.AddScoped<Catalog.Application.Jobs.Attributes.RecognizeCatalogAttributesJob>();

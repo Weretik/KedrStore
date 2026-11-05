@@ -24,6 +24,8 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<ProductAttributeReview> ProductAttributeReviews => Set<ProductAttributeReview>();
     public DbSet<ProductGroup> ProductGroups => Set<ProductGroup>();
     public DbSet<ProductGroupMember> ProductGroupMembers => Set<ProductGroupMember>();
+    public DbSet<ProductGroupAxis> ProductGroupAxes => Set<ProductGroupAxis>();
+    public DbSet<ProductGroupText> ProductGroupTexts => Set<ProductGroupText>();
     public void DiscardChanges() => ChangeTracker.Clear();
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
