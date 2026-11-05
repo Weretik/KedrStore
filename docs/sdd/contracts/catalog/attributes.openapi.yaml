@@ -73,7 +73,7 @@ paths:
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       responses:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
-        '400': { description: The product has no recognized attributes yet, or invalid input. }
+        '400': { description: 'The product has no recognized attributes yet, or invalid input.' }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
         '404': { description: Product not found. }
@@ -87,7 +87,7 @@ paths:
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       responses:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
-        '400': { description: The product has no recognized attributes yet, or invalid input. }
+        '400': { description: 'The product has no recognized attributes yet, or invalid input.' }
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Manager or Admin role. }
         '404': { description: Product not found. }
@@ -286,7 +286,7 @@ components:
       properties:
         productId: { type: integer }
         originalName: { type: string, description: The 1C name; never changed. }
-        baseName: { type: [string, 'null'], description: Name without color, size, and side; used for grouping. }
+        baseName: { type: [string, 'null'], description: 'Name without color, size, and side; used for grouping.' }
         review: { $ref: '#/components/schemas/AdminProductReview' }
         attributes: { type: array, items: { $ref: '#/components/schemas/AdminProductAttribute' } }
     SetProductAttributeRequest:
@@ -390,7 +390,7 @@ components:
         attributeName: { type: string }
         scope: { type: string }
         rawValue: { type: string }
-        valueId: { type: [integer, 'null'], description: Decoding picked by an assistant, not confirmed yet. }
+        valueId: { type: [integer, 'null'], description: 'Decoding picked by an assistant, not confirmed yet.' }
         valueName: { type: [string, 'null'] }
         isConfirmed: { type: boolean }
         note: { type: [string, 'null'] }
