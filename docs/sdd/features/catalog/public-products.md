@@ -52,4 +52,4 @@ Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filte
 
 ## Related sources
 
-[Contract](../../contracts/catalog/products.openapi.yaml) · [Projection](stock-projection.md) · [Category subtree SDD](../../specs/catalog/002-category-read-api/requirements/public-product-category-filter.md) · [Stable URLs SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md).
+[Contract](../../contracts/catalog/products.openapi.yaml) · [Public site models](public-site-models.md) (the new site's model pages) · [Projection](stock-projection.md) · [Category subtree SDD](../../specs/catalog/002-category-read-api/requirements/public-product-category-filter.md) · [Stable URLs SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md).

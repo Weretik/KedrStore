@@ -1,3 +1,4 @@
+using Catalog.Application.Features.SiteModels.Public.Common;
 using Catalog.Application.Features.SiteModels.Common;
 using Catalog.Application.Features.Attributes.Common;
 using Catalog.Application.Features.ProductAttributes.Common;
@@ -41,6 +42,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped<CatalogAttributeReader>();
         services.AddScoped<SiteModelStateReader>();
         services.AddScoped<SiteModelReader>();
+        services.AddScoped<PublicModelCatalogReader>();
         services.AddScoped<SiteModelChanges>();
         services.AddScoped<UnresolvedCodeReader>();
         services.AddScoped<Catalog.Application.Attributes.Import.RecognizedProductWriter>();
