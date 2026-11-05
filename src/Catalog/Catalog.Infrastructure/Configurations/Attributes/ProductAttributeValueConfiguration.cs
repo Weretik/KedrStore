@@ -15,11 +15,15 @@ public sealed class ProductAttributeValueConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
         builder.Property(x => x.NumberValue).HasPrecision(18, 3);
         builder.Property(x => x.Source).HasColumnType("smallint");
+        builder.Property(x => x.AutomaticValueId).HasConversion(AttributeIdConverters.ValueId);
+        builder.Property(x => x.AutomaticNumberValue).HasPrecision(18, 3);
+        builder.Property(x => x.AutomaticSource).HasColumnType("smallint");
         builder.Ignore(x => x.IsAutomatic);
 
         builder.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne<CatalogAttribute>().WithMany().HasForeignKey(x => x.AttributeId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<AttributeValue>().WithMany().HasForeignKey(x => x.ValueId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne<AttributeValue>().WithMany().HasForeignKey(x => x.AutomaticValueId).OnDelete(DeleteBehavior.Restrict);
 
         // Filters and facet counts read by attribute value.
         builder.HasIndex(x => new { x.AttributeId, x.ValueId })

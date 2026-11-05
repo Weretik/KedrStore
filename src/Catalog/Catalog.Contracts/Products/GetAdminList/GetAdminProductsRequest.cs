@@ -17,6 +17,11 @@ public sealed record GetAdminProductsRequest
     /// <summary><c>true</c> lists products without a linked photo only (R-36).</summary>
     public bool? WithoutPhoto { get; init; }
 
+    /// <summary><c>true</c> lists products whose attributes need review only (spec catalog/006, «Тільки проблемні»).</summary>
+    public bool? ProblemsOnly { get; init; }
+    /// <summary>Lists products that need review for this reason code only, for example <c>unresolved_color</c>.</summary>
+    public string? ProblemReason { get; init; }
+
     public decimal? PriceFrom { get; init; }
     public decimal? PriceTo { get; init; }
 

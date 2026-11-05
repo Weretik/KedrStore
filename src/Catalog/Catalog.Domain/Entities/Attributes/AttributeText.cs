@@ -29,6 +29,18 @@ internal static partial class AttributeText
         return value;
     }
 
+    /// <summary>An optional <c>#RRGGBB</c> color, stored in upper case.</summary>
+    public static string? SwatchHex(string? value)
+    {
+        var trimmed = value?.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+            return null;
+        if (!HexPattern().IsMatch(trimmed))
+            throw new DomainException(AttributeErrors.SwatchHexInvalid(trimmed));
+
+        return trimmed.ToUpperInvariant();
+    }
+
     private static string MaxLength(string value, int maxLength, string field)
     {
         if (value.Length > maxLength)
@@ -39,4 +51,7 @@ internal static partial class AttributeText
 
     [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
     private static partial Regex SlugPattern();
+
+    [GeneratedRegex("^#[0-9A-Fa-f]{6}$")]
+    private static partial Regex HexPattern();
 }

@@ -24,4 +24,26 @@ public class CategoryAttribute : IAggregateRoot
             SortOrder = sortOrder,
             UpdatedAt = now
         };
+
+    /// <summary>A person sets the filter in «Фільтри категорій»; the dictionary import no longer changes it.</summary>
+    public static CategoryAttribute CreateManual(ProductCategoryId categoryId, AttributeId attributeId,
+        bool isFilterable, int sortOrder, DateTimeOffset now)
+    {
+        var filter = Create(categoryId, attributeId, isFilterable, sortOrder, now);
+        filter.IsEditedManually = true;
+        return filter;
+    }
+
+    /// <summary>A person changes the filter. Returns whether anything changed.</summary>
+    public bool EditManually(bool isFilterable, int sortOrder, DateTimeOffset now)
+    {
+        if (IsEditedManually && IsFilterable == isFilterable && SortOrder == sortOrder)
+            return false;
+
+        IsFilterable = isFilterable;
+        SortOrder = sortOrder;
+        IsEditedManually = true;
+        UpdatedAt = now;
+        return true;
+    }
 }

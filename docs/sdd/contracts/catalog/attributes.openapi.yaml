@@ -1,0 +1,438 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Catalog attributes admin API
+  version: 0.1.0
+  description: >-
+    Spec catalog/006 phase 3. The «Властивості» panel of a product (Manager and Admin edit values and the review;
+    the original 1C name never changes) and the «Властивості» dictionary page (Manager and Admin read it, only Admin
+    changes it). Kinds are `enum`, `number`, `size`; sources `import`, `parser`, `manual`; review states `clear`,
+    `needs_review`, `accepted`.
+paths:
+  /api/admin/products/{productId}/attributes:
+    parameters:
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminProductAttributes
+      summary: Get the «Властивості» panel of a product
+      tags: [Admin product attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Panel, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+  /api/admin/products/{productId}/attributes/{attributeId}:
+    parameters:
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      - { name: attributeId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: setAdminProductAttribute
+      summary: Set the values of one attribute by hand
+      description: >-
+        The values (in position order) become manual and locked: the import, the parser, and the 1C sync no longer
+        change them. List attributes take `valueId` from the attribute's list, number attributes take `number`.
+        Positions beyond the list are dropped. A change of color, size, or side rebuilds the variant groups.
+      tags: [Admin product attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SetProductAttributeRequest' } } }
+      responses:
+        '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+  /api/admin/products/{productId}/attributes/{attributeId}/manual:
+    parameters:
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      - { name: attributeId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    delete:
+      operationId: restoreAdminProductAttribute
+      summary: «Повернути автоматичне»
+      description: >-
+        Drops the manual values of the attribute and brings back the automatic ones kept for them (`hasAutomatic`).
+        Positions automation never had disappear; new automatic positions come with the next recognition run.
+      tags: [Admin product attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+  /api/admin/products/{productId}/review/accept:
+    parameters:
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: acceptAdminProductReview
+      summary: «Прийняти як є»
+      description: Permanent; automation keeps the product accepted until «Повернути на перевірку». Records who and when.
+      tags: [Admin product attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
+        '400': { description: The product has no recognized attributes yet, or invalid input. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+  /api/admin/products/{productId}/review/reopen:
+    parameters:
+      - { name: productId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: reopenAdminProductReview
+      summary: «Повернути на перевірку»
+      tags: [Admin product attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
+        '400': { description: The product has no recognized attributes yet, or invalid input. }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Product not found. }
+  /api/admin/catalog-attributes:
+    get:
+      operationId: getAdminCatalogAttributes
+      summary: List attributes of the «Властивості» page
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Attributes in order, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCatalogAttributeListItem' } } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/catalog-attributes/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminCatalogAttribute
+      summary: Get an attribute with its values and codes
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Attribute not found. }
+    put:
+      operationId: updateAdminCatalogAttribute
+      summary: Edit an attribute (Admin)
+      description: Names, filter flag, and order. The dictionary import no longer changes the attribute.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateCatalogAttributeRequest' } } }
+      responses:
+        '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Attribute not found. }
+  /api/admin/catalog-attributes/{id}/values:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: createAdminAttributeValue
+      summary: Add a value (Admin)
+      description: Code and slug come from the request or from the name; a taken code or explicit slug is rejected.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/CreateAttributeValueRequest' } } }
+      responses:
+        '200': { description: Attribute with the new value, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Attribute not found. }
+  /api/admin/catalog-attributes/{id}/values/{valueId}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+      - { name: valueId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: updateAdminAttributeValue
+      summary: Edit a value (Admin)
+      description: Names, order, and swatch (a color or a media-library texture). The dictionary import then leaves it.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateAttributeValueRequest' } } }
+      responses:
+        '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Value not found in this attribute. }
+  /api/admin/catalog-attributes/unresolved-codes:
+    get:
+      operationId: getAdminUnresolvedAttributeCodes
+      summary: «Не розшифровані коди»
+      description: Codes without a value or with an unconfirmed decoding that the owner has not decided yet.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Codes, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminUnresolvedCode' } } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/catalog-attributes/codes/{aliasId}:
+    parameters:
+      - { name: aliasId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    put:
+      operationId: decideAdminAttributeCode
+      summary: Decode a code (Admin)
+      description: >-
+        A value of the code's attribute, or null when the code means nothing to filter by. Product values that waited
+        only for this confirmation become confirmed at once; codes decoded for the first time reach products at the
+        next recognition run. The dictionary import no longer changes the code.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/DecideAttributeCodeRequest' } } }
+      responses:
+        '200': { description: Decision, content: { application/json: { schema: { $ref: '#/components/schemas/DecideAttributeCodeResponse' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Code not found. }
+  /api/admin/catalog-attributes/problem-reasons:
+    get:
+      operationId: getAdminAttributeProblemReasons
+      summary: Review reasons of on-site products, most frequent first
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Reasons, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProblemReason' } } } } }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+  /api/admin/catalog-attributes/category-filters/{categoryId}:
+    parameters:
+      - { name: categoryId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminCategoryAttributeFilters
+      summary: «Фільтри категорій» of one category
+      description: Filter rows in order, then attributes the category's products have that are not offered yet (off).
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Filters, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCategoryAttributeFilter' } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Manager or Admin role. }
+        '404': { description: Category not found. }
+    put:
+      operationId: setAdminCategoryAttributeFilters
+      summary: Turn category filters on or off and order them (Admin)
+      description: Attributes left out stay as they are. The attribute import no longer changes the listed filters.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SetCategoryAttributeFiltersRequest' } } }
+      responses:
+        '200': { description: Filters, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCategoryAttributeFilter' } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin role. }
+        '404': { description: Category not found. }
+components:
+  responses:
+    ValidationError: { description: Input validation failed, content: { application/json: { schema: { type: array, items: { type: object, additionalProperties: true } } } } }
+  schemas:
+    AdminAttributeProblem:
+      type: object
+      required: [code]
+      properties:
+        code: { type: string, description: 'Stable reason code, for example `unresolved_color`, `no_name`, `same_variants`.' }
+        text: { type: [string, 'null'], description: Recognizer explanation. }
+    AdminProductReview:
+      type: object
+      required: [state, reasons]
+      properties:
+        state: { type: string, enum: [clear, needs_review, accepted] }
+        reasons: { type: array, items: { $ref: '#/components/schemas/AdminAttributeProblem' } }
+        acceptedBy: { type: [string, 'null'] }
+        acceptedAt: { type: [string, 'null'], format: date-time }
+    AdminProductAttributeValue:
+      type: object
+      required: [position, source, isLocked, isConfirmed, hasAutomatic]
+      properties:
+        position: { type: integer, minimum: 0, maximum: 20 }
+        valueId: { type: [integer, 'null'] }
+        valueName: { type: [string, 'null'] }
+        number: { type: [number, 'null'] }
+        source: { type: string, enum: [import, parser, manual] }
+        isLocked: { type: boolean }
+        isConfirmed: { type: boolean, description: False while the decoding behind the value is not confirmed; such values stay off filters. }
+        hasAutomatic: { type: boolean, description: Whether «Повернути автоматичне» brings an automatic value back. }
+    AdminProductAttribute:
+      type: object
+      required: [attributeId, code, name, kind, isVariantAxis, values]
+      properties:
+        attributeId: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        kind: { type: string, enum: [enum, number, size] }
+        unit: { type: [string, 'null'] }
+        isVariantAxis: { type: boolean }
+        values: { type: array, items: { $ref: '#/components/schemas/AdminProductAttributeValue' } }
+    AdminProductAttributes:
+      type: object
+      required: [productId, originalName, review, attributes]
+      properties:
+        productId: { type: integer }
+        originalName: { type: string, description: The 1C name; never changed. }
+        baseName: { type: [string, 'null'], description: Name without color, size, and side; used for grouping. }
+        review: { $ref: '#/components/schemas/AdminProductReview' }
+        attributes: { type: array, items: { $ref: '#/components/schemas/AdminProductAttribute' } }
+    SetProductAttributeRequest:
+      type: object
+      required: [values]
+      properties:
+        values:
+          type: array
+          minItems: 1
+          maxItems: 21
+          items:
+            type: object
+            description: Exactly one of valueId and number.
+            properties:
+              valueId: { type: [integer, 'null'], minimum: 1 }
+              number: { type: [number, 'null'] }
+    AdminCatalogAttributeListItem:
+      type: object
+      required: [id, code, nameUk, kind, slug, isFilterable, isVariantAxis, sortOrder, isEditedManually, valueCount, productCount]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        nameUk: { type: string }
+        nameRu: { type: [string, 'null'] }
+        kind: { type: string, enum: [enum, number, size] }
+        unit: { type: [string, 'null'] }
+        slug: { type: string }
+        isFilterable: { type: boolean }
+        isVariantAxis: { type: boolean }
+        sortOrder: { type: integer }
+        isEditedManually: { type: boolean }
+        valueCount: { type: integer }
+        productCount: { type: integer, description: Products with a value of the attribute. }
+    AdminAttributeValue:
+      type: object
+      required: [id, code, nameUk, slug, sortOrder, isEditedManually, productCount]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        nameUk: { type: string }
+        nameRu: { type: [string, 'null'] }
+        slug: { type: string }
+        sortOrder: { type: integer }
+        swatchHex: { type: [string, 'null'], pattern: '^#[0-9A-F]{6}$' }
+        swatchMediaFileId: { type: [integer, 'null'], description: Media-library texture of a decor. }
+        swatchImageUrl: { type: [string, 'null'] }
+        isEditedManually: { type: boolean }
+        productCount: { type: integer }
+    AdminAttributeAlias:
+      type: object
+      required: [id, scope, rawValue, isConfirmed, isEditedManually]
+      properties:
+        id: { type: integer }
+        scope: { type: string }
+        rawValue: { type: string }
+        valueId: { type: [integer, 'null'] }
+        isConfirmed: { type: boolean }
+        note: { type: [string, 'null'] }
+        isEditedManually: { type: boolean }
+    AdminCatalogAttribute:
+      type: object
+      required: [attribute, values, aliases]
+      properties:
+        attribute: { $ref: '#/components/schemas/AdminCatalogAttributeListItem' }
+        values: { type: array, items: { $ref: '#/components/schemas/AdminAttributeValue' } }
+        aliases: { type: array, items: { $ref: '#/components/schemas/AdminAttributeAlias' } }
+    UpdateCatalogAttributeRequest:
+      type: object
+      required: [nameUk, isFilterable, sortOrder]
+      properties:
+        nameUk: { type: string, maxLength: 120 }
+        nameRu: { type: [string, 'null'], maxLength: 120 }
+        isFilterable: { type: boolean }
+        sortOrder: { type: integer, minimum: 0, maximum: 100000 }
+    CreateAttributeValueRequest:
+      type: object
+      required: [nameUk, sortOrder]
+      properties:
+        nameUk: { type: string, maxLength: 160 }
+        nameRu: { type: [string, 'null'], maxLength: 160 }
+        code: { type: [string, 'null'], maxLength: 64 }
+        slug: { type: [string, 'null'], maxLength: 80, pattern: '^[a-z0-9]+(-[a-z0-9]+)*$' }
+        sortOrder: { type: integer, minimum: 0, maximum: 100000 }
+        swatchHex: { type: [string, 'null'], pattern: '^#[0-9A-Fa-f]{6}$' }
+        swatchMediaFileId: { type: [integer, 'null'], minimum: 1 }
+    UpdateAttributeValueRequest:
+      type: object
+      required: [nameUk, sortOrder]
+      properties:
+        nameUk: { type: string, maxLength: 160 }
+        nameRu: { type: [string, 'null'], maxLength: 160 }
+        sortOrder: { type: integer, minimum: 0, maximum: 100000 }
+        swatchHex: { type: [string, 'null'], pattern: '^#[0-9A-Fa-f]{6}$' }
+        swatchMediaFileId: { type: [integer, 'null'], minimum: 1 }
+    AdminUnresolvedCode:
+      type: object
+      required: [aliasId, attributeId, attributeName, scope, rawValue, isConfirmed, productCount]
+      properties:
+        aliasId: { type: integer }
+        attributeId: { type: integer }
+        attributeName: { type: string }
+        scope: { type: string }
+        rawValue: { type: string }
+        valueId: { type: [integer, 'null'], description: Decoding picked by an assistant, not confirmed yet. }
+        valueName: { type: [string, 'null'] }
+        isConfirmed: { type: boolean }
+        note: { type: [string, 'null'] }
+        productCount: { type: integer, description: Products whose review mentions the code. }
+    DecideAttributeCodeRequest:
+      type: object
+      properties:
+        valueId: { type: [integer, 'null'], minimum: 1 }
+    DecideAttributeCodeResponse:
+      type: object
+      required: [code, valuesConfirmed]
+      properties:
+        code: { $ref: '#/components/schemas/AdminUnresolvedCode' }
+        valuesConfirmed: { type: integer }
+    AdminProblemReason:
+      type: object
+      required: [code, productCount]
+      properties:
+        code: { type: string }
+        productCount: { type: integer }
+    AdminCategoryAttributeFilter:
+      type: object
+      required: [attributeId, code, name, isFilterable, sortOrder, isEditedManually, productCount]
+      properties:
+        attributeId: { type: integer }
+        code: { type: string }
+        name: { type: string }
+        isFilterable: { type: boolean }
+        sortOrder: { type: integer }
+        isEditedManually: { type: boolean }
+        productCount: { type: integer }
+    SetCategoryAttributeFiltersRequest:
+      type: object
+      required: [filters]
+      properties:
+        filters:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            required: [attributeId, isFilterable, sortOrder]
+            properties:
+              attributeId: { type: integer, minimum: 1 }
+              isFilterable: { type: boolean }
+              sortOrder: { type: integer, minimum: 0, maximum: 100000 }

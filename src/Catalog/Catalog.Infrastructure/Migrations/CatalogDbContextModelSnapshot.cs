@@ -112,6 +112,9 @@ namespace Catalog.Infrastructure.Migrations
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)");
 
+                    b.Property<long?>("SwatchMediaFileId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -266,6 +269,19 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<short>("Position")
                         .HasColumnType("smallint");
 
+                    b.Property<bool>("AutomaticIsConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("AutomaticNumberValue")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<short?>("AutomaticSource")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("AutomaticValueId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
 
@@ -286,6 +302,8 @@ namespace Catalog.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("ProductId", "AttributeId", "Position");
+
+                    b.HasIndex("AutomaticValueId");
 
                     b.HasIndex("ValueId");
 
@@ -843,6 +861,11 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                        .WithMany()
+                        .HasForeignKey("AutomaticValueId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Catalog.Domain.Entities.Product", null)
                         .WithMany()

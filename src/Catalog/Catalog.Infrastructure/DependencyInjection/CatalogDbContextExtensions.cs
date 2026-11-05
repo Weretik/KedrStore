@@ -1,3 +1,5 @@
+using Catalog.Application.Features.Attributes.Common;
+using Catalog.Application.Features.ProductAttributes.Common;
 using Catalog.Application.Features.Groups.Common;
 using Catalog.Application.Groups;
 using Catalog.Application.Features.Category.AdminGetList;
@@ -34,6 +36,10 @@ public static class CatalogDbContextExtensions
         services.AddScoped<ProductGroupBuilder>();
         services.AddScoped<ProductGroupPins>();
         services.AddScoped<ProductGroupReader>();
+        services.AddScoped<ProductAttributesReader>();
+        services.AddScoped<CatalogAttributeReader>();
+        services.AddScoped<UnresolvedCodeReader>();
+        services.AddScoped<CategoryFilterReader>();
         services.AddScoped<ICategoryStatsReader, CategoryStatsReader>();
         services.AddScoped<IAdminCategoryInsightsReader, AdminCategoryInsightsReader>();
 

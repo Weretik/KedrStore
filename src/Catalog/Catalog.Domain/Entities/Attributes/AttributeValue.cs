@@ -1,3 +1,4 @@
+using Catalog.Domain.Errors;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Domain.Entities.Attributes;
@@ -17,6 +18,8 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
     public int SortOrder { get; private set; }
     /// <summary>Swatch color <c>#RRGGBB</c> for the site filter; empty means a text chip.</summary>
     public string? SwatchHex { get; private set; }
+    /// <summary>Media-library picture of a decor texture for the filter swatch; used instead of a color.</summary>
+    public long? SwatchMediaFileId { get; private set; }
     public bool IsEditedManually { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
@@ -48,5 +51,29 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
         SortOrder = sortOrder;
         UpdatedAt = now;
         return true;
+    }
+
+    /// <summary>A person adds a value in «Властивості». It is manual from the start.</summary>
+    public static AttributeValue CreateManual(AttributeId attributeId, string code, string nameUk, string? nameRu,
+        string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
+    {
+        var value = Create(attributeId, code, nameUk, slug, sortOrder, now);
+        value.EditManually(nameUk, nameRu, sortOrder, swatchHex, swatchMediaFileId, now);
+        return value;
+    }
+
+    /// <summary>A person edits the value; the dictionary import no longer changes it.</summary>
+    public void EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex, long? swatchMediaFileId,
+        DateTimeOffset now)
+    {
+        NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
+        NameRu = AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu));
+        SortOrder = sortOrder;
+        SwatchHex = AttributeText.SwatchHex(swatchHex);
+        if (swatchMediaFileId is <= 0)
+            throw new DomainException(AttributeErrors.SwatchMediaInvalid(swatchMediaFileId.Value));
+        SwatchMediaFileId = swatchMediaFileId;
+        IsEditedManually = true;
+        UpdatedAt = now;
     }
 }

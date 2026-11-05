@@ -4,9 +4,13 @@ namespace Catalog.Contracts.Overview;
 /// <param name="ProductsWithoutPhoto">Active products without a linked photo, as the «Без фото» tab lists them.</param>
 /// <param name="TopCategoryWithoutPhoto">The category with most of them, or <c>null</c> when there are none.</param>
 /// <param name="CategoriesWithoutText">Active categories without a site text or FAQ in Ukrainian or Russian.</param>
+/// <param name="ProductsWithProblems">On-site products whose attributes need review (spec catalog/006).</param>
+/// <param name="NoNameProducts">Those of them without brand marking (reason <c>no_name</c>).</param>
 public sealed record AdminCatalogOverviewResponse(
     int ProductsWithoutPhoto,
     AdminCatalogOverviewCategory? TopCategoryWithoutPhoto,
-    int CategoriesWithoutText);
+    int CategoriesWithoutText,
+    int ProductsWithProblems = 0,
+    int NoNameProducts = 0);
 
 public sealed record AdminCatalogOverviewCategory(int Id, string Name, int Count);

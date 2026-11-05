@@ -34,6 +34,14 @@ components:
           type: integer
           minimum: 0
           description: Active categories without any site text or FAQ in Ukrainian or in Russian.
+        productsWithProblems:
+          type: integer
+          minimum: 0
+          description: On-site products whose attributes need review (spec catalog/006); the «Огляд» shows no line at 0.
+        noNameProducts:
+          type: integer
+          minimum: 0
+          description: Those of them without brand marking (reason `no_name`).
     AdminCatalogOverviewCategory:
       type: object
       required: [id, name, count]

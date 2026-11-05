@@ -49,6 +49,32 @@ paths:
     $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1main
   /api/admin/product-groups/{id}/slug:
     $ref: ./catalog/product-groups.openapi.yaml#/paths/~1api~1admin~1product-groups~1{id}~1slug
+  /api/admin/products/{productId}/attributes:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1attributes
+  /api/admin/products/{productId}/attributes/{attributeId}:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1attributes~1{attributeId}
+  /api/admin/products/{productId}/attributes/{attributeId}/manual:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1attributes~1{attributeId}~1manual
+  /api/admin/products/{productId}/review/accept:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1review~1accept
+  /api/admin/products/{productId}/review/reopen:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1products~1{productId}~1review~1reopen
+  /api/admin/catalog-attributes:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes
+  /api/admin/catalog-attributes/{id}:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1{id}
+  /api/admin/catalog-attributes/{id}/values:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1{id}~1values
+  /api/admin/catalog-attributes/{id}/values/{valueId}:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1{id}~1values~1{valueId}
+  /api/admin/catalog-attributes/unresolved-codes:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1unresolved-codes
+  /api/admin/catalog-attributes/codes/{aliasId}:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1codes~1{aliasId}
+  /api/admin/catalog-attributes/problem-reasons:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1problem-reasons
+  /api/admin/catalog-attributes/category-filters/{categoryId}:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1category-filters~1{categoryId}
   /api/orders:
     $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:
