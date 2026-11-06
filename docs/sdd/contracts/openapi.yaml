@@ -103,6 +103,8 @@ paths:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1unresolved-codes
   /api/admin/catalog-attributes/codes/{aliasId}:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1codes~1{aliasId}
+  /api/admin/catalog-attributes/codes/{aliasId}/products:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1codes~1{aliasId}~1products
   /api/admin/catalog-attributes/problem-reasons:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1problem-reasons
   /api/admin/catalog-attributes/category-filters/{categoryId}:

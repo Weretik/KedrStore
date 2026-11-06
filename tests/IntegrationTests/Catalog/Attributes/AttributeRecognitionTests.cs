@@ -5,6 +5,7 @@ using global::Catalog.Application.Attributes.Import;
 using global::Catalog.Application.Jobs.Attributes;
 using global::Catalog.Application.Features.Attributes.Common;
 using global::Catalog.Application.Features.Attributes.DecideCode;
+using global::Catalog.Application.Features.Attributes.GetCodeProducts;
 using global::Catalog.Application.Features.ProductAttributes.Common;
 using global::Catalog.Application.Features.ProductAttributes.Set;
 using global::Catalog.Contracts.Attributes;
@@ -161,7 +162,8 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var before = await ReviewTextAsync(db, 60);
         Assert.Contains("AL", before);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db), codes,
+        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+            new TestRepository<AttributeAliasCategoryValue>(db), codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId, new DecideAttributeCodeRequest(null)),
             CancellationToken.None);
@@ -172,6 +174,50 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         output.WriteLine($"before: {before}\nafter: {after}");
         Assert.DoesNotContain("«AL»", after);
         Assert.Equal(0, Changes(await RecognizeAsync(db, apply: true, [60])));
+    }
+
+    [Fact]
+    public async Task OwnerDecidesACode_ForOneCategory_OnlyThatCategoryLosesTheReason_AndTheProductsAreListed()
+    {
+        await using var db = await ImportedRealCatalogAsync();
+        var codes = new UnresolvedCodeReader(db);
+        var al = (await codes.ListAsync(CancellationToken.None))
+            .First(code => code.RawValue == "AL" && code.ValueId is null);
+        // 60 is a handle «На планці» (5915), 80 a handle «На розетці (HRoz-06/HRoz-07)» (5854); both contain «AL».
+        Assert.Contains("«AL»", await ReviewTextAsync(db, 60));
+        Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
+
+        var listed = await new GetCodeProductsQueryHandler(db).Handle(new GetCodeProductsQuery(al.AliasId),
+            CancellationToken.None);
+        var handles = Assert.Single(listed.Value.Categories, category => category.CategoryId == 5915);
+        Assert.Contains(handles.Products, product => product.ProductId == 60);
+        Assert.False(handles.HasOwnValue);
+
+        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+            new TestRepository<AttributeAliasCategoryValue>(db), codes,
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+        var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId,
+                new DecideAttributeCodeRequest(null, ApplyToAll: false,
+                    [new DecideAttributeCodeCategoryRequest(5915, null)])),
+            CancellationToken.None);
+        db.ChangeTracker.Clear();
+
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.Value.Code.ValueId);
+        var alias = await db.AttributeAliases.AsNoTracking()
+            .SingleAsync(item => item.Id == AttributeAliasId.Create(al.AliasId));
+        Assert.False(alias.IsEditedManually);
+        Assert.DoesNotContain("«AL»", await ReviewTextAsync(db, 60));
+        Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
+        var after = await new GetCodeProductsQueryHandler(db).Handle(new GetCodeProductsQuery(al.AliasId),
+            CancellationToken.None);
+        Assert.True(Assert.Single(after.Value.Categories, category => category.CategoryId == 5915).HasOwnValue);
+
+        // An empty list removes the category's own decision again.
+        Assert.True((await decide.Handle(new DecideAttributeCodeCommand(al.AliasId,
+            new DecideAttributeCodeRequest(null, ApplyToAll: false, [])), CancellationToken.None)).IsSuccess);
+        db.ChangeTracker.Clear();
+        Assert.Contains("«AL»", await ReviewTextAsync(db, 60));
     }
 
     private static async Task<string> ReviewTextAsync(CatalogDbContext db, int productId)

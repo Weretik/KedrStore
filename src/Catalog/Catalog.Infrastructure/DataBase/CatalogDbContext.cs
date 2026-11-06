@@ -19,6 +19,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     public DbSet<CatalogAttribute> Attributes => Set<CatalogAttribute>();
     public DbSet<AttributeValue> AttributeValues => Set<AttributeValue>();
     public DbSet<AttributeAlias> AttributeAliases => Set<AttributeAlias>();
+    public DbSet<AttributeAliasCategoryValue> AttributeAliasCategoryValues => Set<AttributeAliasCategoryValue>();
     public DbSet<CategoryAttribute> CategoryAttributes => Set<CategoryAttribute>();
     public DbSet<ProductAttributeValue> ProductAttributeValues => Set<ProductAttributeValue>();
     public DbSet<ProductAttributeReview> ProductAttributeReviews => Set<ProductAttributeReview>();

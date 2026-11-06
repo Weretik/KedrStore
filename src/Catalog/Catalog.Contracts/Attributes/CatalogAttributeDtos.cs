@@ -100,9 +100,39 @@ public sealed record AdminUnresolvedCodeDto(
     int ProductCount);
 
 /// <summary>
-/// The owner's decoding: a value of the code's attribute, or <c>null</c> when the code means nothing to filter by.
+/// The owner's decoding. With <c>ApplyToAll</c> (the default) <c>ValueId</c> decodes the code for all products: a value
+/// of the code's attribute, or <c>null</c> when the code means nothing to filter by; without it the code stays
+/// undecided for all products. <c>Categories</c>, when given, replaces the code's own decodings per category
+/// (spec catalog/008); a category left out follows the decoding for all products.
 /// </summary>
-public sealed record DecideAttributeCodeRequest(int? ValueId);
+public sealed record DecideAttributeCodeRequest(
+    int? ValueId,
+    bool ApplyToAll = true,
+    IReadOnlyList<DecideAttributeCodeCategoryRequest>? Categories = null);
+
+/// <summary>The decoding of a code in one category: a value, or <c>null</c> when it means nothing there.</summary>
+public sealed record DecideAttributeCodeCategoryRequest(int CategoryId, int? ValueId);
+
+/// <summary>
+/// Where a code occurs (spec catalog/008): on-site products whose 1C names contain it, by category, with the code's own
+/// decoding in each category.
+/// </summary>
+public sealed record AdminCodeProductsDto(int AliasId, string RawValue, IReadOnlyList<AdminCodeCategoryDto> Categories);
+
+/// <summary>
+/// A category where the code occurs. <c>HasOwnValue</c>: the category has its own decoding (<c>ValueId</c>, or
+/// <c>null</c> when the code means nothing there); otherwise it follows the decoding for all products.
+/// </summary>
+public sealed record AdminCodeCategoryDto(
+    int CategoryId,
+    string CategoryPath,
+    bool HasOwnValue,
+    int? ValueId,
+    string? ValueName,
+    IReadOnlyList<AdminCodeProductDto> Products);
+
+/// <summary>A product whose original 1C name contains the code.</summary>
+public sealed record AdminCodeProductDto(int ProductId, string Name, string Photo);
 
 /// <summary>
 /// The result of a decoding. <c>ValuesConfirmed</c>: product values that became confirmed now; products with a code

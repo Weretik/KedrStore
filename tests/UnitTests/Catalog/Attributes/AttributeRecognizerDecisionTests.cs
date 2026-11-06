@@ -50,6 +50,26 @@ public sealed class AttributeRecognizerDecisionTests
         Assert.Contains("\"ALUMINIUM\"", row.Cell("extra_attributes"));
     }
 
+    [Fact]
+    public void CodeDecidedForTheProductCategory_WinsOverTheDecisionForAll()
+    {
+        var row = Recognize(
+            new AttributeCodeDecision("material_code", "general", "AL", "ALUMINIUM", "Алюміній"),
+            new AttributeCodeDecision("material_code", "general", "AL", null, null, HandleCategory));
+
+        Assert.DoesNotContain("ALUMINIUM", row.Cell("extra_attributes"));
+        Assert.DoesNotContain("unresolved_material_code", row.Cell("extra_attributes"));
+    }
+
+    [Fact]
+    public void CodeDecidedForAnotherCategory_LeavesTheProductUndecided()
+    {
+        var row = Recognize(new AttributeCodeDecision("material_code", "general", "AL", "ALUMINIUM", "Алюміній", 1));
+
+        Assert.Equal("true", row.Cell("needs_review"));
+        Assert.Contains("unresolved_material_code", row.Cell("extra_attributes"));
+    }
+
     [Theory]
     [InlineData("KEDR ручка HRoz-06.103-AL-AB", "AL", true)]
     [InlineData("KEDR ручка HRoz-06.103-АL-AB", "AL", true)]

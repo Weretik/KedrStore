@@ -72,6 +72,31 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeAliases", (string)null);
                 });
 
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasCategoryValue", b =>
+                {
+                    b.Property<int>("AliasId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ValueId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AliasId", "CategoryId");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("IX_CatalogAttributeAliasCategoryValues_CategoryId");
+
+                    b.HasIndex("ValueId")
+                        .HasDatabaseName("IX_CatalogAttributeAliasCategoryValues_ValueId");
+
+                    b.ToTable("CatalogAttributeAliasCategoryValues", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
                 {
                     b.Property<int>("Id")
@@ -886,6 +911,26 @@ namespace Catalog.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasCategoryValue", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeAlias", null)
+                        .WithMany()
+                        .HasForeignKey("AliasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
