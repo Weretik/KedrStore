@@ -1,5 +1,6 @@
 using Catalog.Application.Attributes.Recognition;
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Features.Attributes.Common;
 using Catalog.Contracts.Attributes;
 using Catalog.Domain.ValueObjects;
 
@@ -9,7 +10,7 @@ namespace Catalog.Application.Features.Attributes.GetCodeProducts;
 /// Lists the on-site, not deleted products whose original 1C names contain the code, grouped by their category with
 /// the code's own decoding there. Categories with more products come first.
 /// </summary>
-public sealed class GetCodeProductsQueryHandler(IReadCatalogDbContext db)
+public sealed class GetCodeProductsQueryHandler(IReadCatalogDbContext db, CodeMeaningReader meanings)
     : IQueryHandler<GetCodeProductsQuery, Result<AdminCodeProductsDto>>
 {
     public async ValueTask<Result<AdminCodeProductsDto>> Handle(GetCodeProductsQuery query,
@@ -42,6 +43,7 @@ public sealed class GetCodeProductsQueryHandler(IReadCatalogDbContext db)
                 select new { decision.CategoryId, decision.ValueId, ValueName = value == null ? null : value.NameUk })
             .ToListAsync(cancellationToken);
         var ownByCategory = own.ToDictionary(item => item.CategoryId.Value);
+        var meaningsByCategory = await meanings.ReadAsync([aliasId], cancellationToken);
 
         var categories = products
             .GroupBy(product => product.CategoryId.Value)
@@ -56,7 +58,8 @@ public sealed class GetCodeProductsQueryHandler(IReadCatalogDbContext db)
                     decision?.ValueName,
                     group.OrderBy(product => product.Name, StringComparer.Ordinal)
                         .Select(product => new AdminCodeProductDto(product.Id.Value, product.Name, product.Photo))
-                        .ToList());
+                        .ToList(),
+                    decision is null ? [] : meaningsByCategory.GetValueOrDefault((aliasId.Value, group.Key)) ?? []);
             })
             .OrderByDescending(category => category.Products.Count)
             .ThenBy(category => category.CategoryPath, StringComparer.Ordinal)

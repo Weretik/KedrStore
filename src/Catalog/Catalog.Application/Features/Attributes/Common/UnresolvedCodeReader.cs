@@ -11,7 +11,7 @@ namespace Catalog.Application.Features.Attributes.Common;
 /// yet. A product counts for a code when it is on the site, not deleted, and its review mentions the code in
 /// «guillemets», as the recognizer writes it (spec catalog/007 M-01).
 /// </summary>
-public sealed class UnresolvedCodeReader(IReadCatalogDbContext db)
+public sealed class UnresolvedCodeReader(IReadCatalogDbContext db, CodeMeaningReader meanings)
 {
     public async Task<List<AdminUnresolvedCodeDto>> ListAsync(CancellationToken cancellationToken)
     {
@@ -47,6 +47,8 @@ public sealed class UnresolvedCodeReader(IReadCatalogDbContext db)
             .Select(reasons => string.Join('\n', reasons.Select(reason => reason.Text)))
             .ToList();
 
+        var meaningsByCode = await meanings.ReadAsync(aliases.Select(alias => alias.Id).ToList(), cancellationToken);
+
         return aliases
             .OrderBy(alias => attributeNames.GetValueOrDefault(alias.AttributeId))
             .ThenBy(alias => alias.RawValue)
@@ -60,7 +62,8 @@ public sealed class UnresolvedCodeReader(IReadCatalogDbContext db)
                 alias.ValueId is { } id ? valueNames.GetValueOrDefault(id) : null,
                 alias.IsConfirmed,
                 alias.Note,
-                texts.Count(text => text.Contains($"«{alias.RawValue}»", StringComparison.Ordinal))))
+                texts.Count(text => text.Contains($"«{alias.RawValue}»", StringComparison.Ordinal)),
+                meaningsByCode.GetValueOrDefault((alias.Id.Value, null)) ?? []))
             .ToList();
     }
 }

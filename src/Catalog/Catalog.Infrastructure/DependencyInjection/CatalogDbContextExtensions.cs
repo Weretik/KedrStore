@@ -45,6 +45,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped<PublicModelCatalogReader>();
         services.AddScoped<SiteModelChanges>();
         services.AddScoped<UnresolvedCodeReader>();
+        services.AddScoped<CodeMeaningReader>();
         services.AddScoped<Catalog.Application.Attributes.Import.RecognizedProductWriter>();
         services.AddScoped<Catalog.Application.Jobs.Attributes.RecognizeCatalogAttributesJob>();
         services.AddScoped<CategoryFilterReader>();

@@ -12,6 +12,7 @@ public sealed class DecideAttributeCodeCommandHandler(
     IReadCatalogDbContext db,
     ICatalogRepository<AttributeAlias> aliases,
     ICatalogRepository<AttributeAliasCategoryValue> categoryValues,
+    ICatalogRepository<AttributeAliasMeaning> meanings,
     UnresolvedCodeReader reader,
     RecognizeCatalogAttributesJob recognizer,
     TimeProvider clock,
@@ -27,20 +28,26 @@ public sealed class DecideAttributeCodeCommandHandler(
             return Result.NotFound();
 
         var request = command.Request;
-        AttributeValueId? valueId = request.ValueId is { } id && request.ApplyToAll ? AttributeValueId.Create(id) : null;
+        var forAll = Split(alias.AttributeId, request.Meanings, request.ValueId);
+        var valueId = request.ApplyToAll ? forAll.Own : null;
         var ownValues = (request.Categories ?? [])
             .Select(item => (CategoryId: ProductCategoryId.From(item.CategoryId),
-                ValueId: item.ValueId is { } own ? AttributeValueId.Create(own) : (AttributeValueId?)null))
+                Decoding: Split(alias.AttributeId, item.Meanings, item.ValueId)))
             .ToList();
 
-        var valueIds = ownValues.Where(item => item.ValueId is not null).Select(item => item.ValueId!.Value).ToList();
-        if (valueId is not null)
-            valueIds.Add(valueId.Value);
-        valueIds = valueIds.Distinct().ToList();
-        var known = await db.AttributeValues
-            .CountAsync(value => valueIds.Contains(value.Id) && value.AttributeId == alias.AttributeId, cancellationToken);
-        if (known != valueIds.Count)
-            return AttributeValidation.Invalid("valueId", "The value is not in the code's attribute.", "ValueNotFound");
+        var wanted = ownValues.SelectMany(item => Pairs(alias.AttributeId, item.Decoding)).ToList();
+        if (request.ApplyToAll)
+            wanted.AddRange(Pairs(alias.AttributeId, forAll));
+        wanted = wanted.Distinct().ToList();
+        var wantedValueIds = wanted.Select(pair => pair.ValueId).ToList();
+        var known = (await db.AttributeValues
+                .Where(value => wantedValueIds.Contains(value.Id))
+                .Select(value => new { value.Id, value.AttributeId })
+                .ToListAsync(cancellationToken))
+            .Select(value => (value.AttributeId, ValueId: value.Id))
+            .ToHashSet();
+        if (wanted.Any(pair => !known.Contains(pair)))
+            return AttributeValidation.Invalid("valueId", "The value is not in the attribute.", "ValueNotFound");
 
         var categoryIds = ownValues.Select(item => item.CategoryId).ToList();
         var knownCategories = await db.Categories.IgnoreQueryFilters()
@@ -50,9 +57,19 @@ public sealed class DecideAttributeCodeCommandHandler(
 
         var now = clock.GetUtcNow();
         if (request.ApplyToAll)
+        {
             alias.Decide(valueId, now);
+            await ReplaceMeaningsAsync(aliasId, [(null, forAll.Others)], forAllProducts: true, now, cancellationToken);
+        }
+
         if (request.Categories is not null)
-            await ReplaceCategoryValuesAsync(aliasId, ownValues, now, cancellationToken);
+        {
+            await ReplaceCategoryValuesAsync(aliasId,
+                ownValues.Select(item => (item.CategoryId, item.Decoding.Own)).ToList(), now, cancellationToken);
+            await ReplaceMeaningsAsync(aliasId,
+                ownValues.Select(item => ((ProductCategoryId?)item.CategoryId, item.Decoding.Others)).ToList(),
+                forAllProducts: false, now, cancellationToken);
+        }
 
         // A product value stays unconfirmed while any code that leads to it is unconfirmed.
         var confirmed = 0;
@@ -71,6 +88,59 @@ public sealed class DecideAttributeCodeCommandHandler(
         return Result.Success(new DecideAttributeCodeResponse((await reader.ReadAsync(aliasId, cancellationToken))!,
             confirmed));
     }
+
+    /// <summary>
+    /// A decoding as the value of the code's own attribute and the values of other attributes (spec catalog/009).
+    /// Without meanings it is the older single value of the code's own attribute.
+    /// </summary>
+    private static Decoding Split(AttributeId ownAttribute, IReadOnlyList<CodeMeaningRequest>? meanings, int? valueId)
+    {
+        if (meanings is null)
+            return new Decoding(valueId is { } id ? AttributeValueId.Create(id) : null, []);
+
+        var pairs = meanings
+            .Select(item => (AttributeId: AttributeId.Create(item.AttributeId), ValueId: AttributeValueId.Create(item.ValueId)))
+            .ToList();
+        return new Decoding(
+            pairs.Where(pair => pair.AttributeId == ownAttribute).Select(pair => (AttributeValueId?)pair.ValueId).FirstOrDefault(),
+            pairs.Where(pair => pair.AttributeId != ownAttribute).ToList());
+    }
+
+    private static IEnumerable<(AttributeId AttributeId, AttributeValueId ValueId)> Pairs(AttributeId ownAttribute,
+        Decoding decoding)
+        => decoding.Own is { } own ? decoding.Others.Prepend((ownAttribute, own)) : decoding.Others;
+
+    /// <summary>
+    /// The code's other meanings become exactly the listed ones: those for all products, or those of every category
+    /// (a category left out loses its own meanings).
+    /// </summary>
+    private async Task ReplaceMeaningsAsync(AttributeAliasId aliasId,
+        IReadOnlyList<(ProductCategoryId? CategoryId, IReadOnlyList<(AttributeId AttributeId, AttributeValueId ValueId)> Pairs)> wanted,
+        bool forAllProducts, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var existing = await db.AttributeAliasMeanings
+            .Where(item => item.AliasId == aliasId)
+            .Where(item => forAllProducts ? item.CategoryId == null : item.CategoryId != null)
+            .ToListAsync(cancellationToken);
+        var rows = wanted.SelectMany(scope => scope.Pairs.Select(pair => (scope.CategoryId, pair.AttributeId, pair.ValueId)))
+            .ToList();
+        var removed = existing.Where(item => rows.All(row => row.CategoryId != item.CategoryId
+                                                             || row.AttributeId != item.AttributeId)).ToList();
+        foreach (var item in existing.Except(removed))
+            item.Change(rows.First(row => row.CategoryId == item.CategoryId && row.AttributeId == item.AttributeId).ValueId, now);
+        var created = rows
+            .Where(row => existing.All(item => item.CategoryId != row.CategoryId || item.AttributeId != row.AttributeId))
+            .Select(row => AttributeAliasMeaning.Create(aliasId, row.CategoryId, row.AttributeId, row.ValueId, now))
+            .ToList();
+
+        if (removed.Count > 0)
+            await meanings.DeleteRangeAsync(removed, cancellationToken);
+        if (created.Count > 0)
+            await meanings.AddRangeAsync(created, cancellationToken);
+    }
+
+    private sealed record Decoding(
+        AttributeValueId? Own, IReadOnlyList<(AttributeId AttributeId, AttributeValueId ValueId)> Others);
 
     /// <summary>The code's own decodings per category become exactly the listed ones (spec catalog/008).</summary>
     private async Task ReplaceCategoryValuesAsync(AttributeAliasId aliasId,

@@ -22,6 +22,8 @@ internal sealed partial class ProductNameRecognition
 
             if (entry is not null)
             {
+                _row.FoundCodes.Add((observation.Attribute, observation.Scope,
+                    RecognitionDictionary.Folded(observation.RawValue)));
                 if (entry.IsIgnored)
                 {
                     ignored.Add(observation);

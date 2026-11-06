@@ -433,7 +433,7 @@ components:
       properties:
         nameUk: { type: string, maxLength: 120 }
         nameRu: { type: [string, 'null'], maxLength: 120 }
-        kind: { type: string, enum: [enum, number], description: '`enum` - a list of values; `number` - a number in `unit`.' }
+        kind: { type: string, enum: [enum, number, yesno], description: '`enum` - a list of values; `yesno` - a list with «Так» and «Ні» created at once; `number` - a number in `unit`.' }
         unit: { type: [string, 'null'], maxLength: 16 }
         code: { type: [string, 'null'], maxLength: 64, pattern: '^[a-z0-9_]+$' }
         slug: { type: [string, 'null'], maxLength: 80, pattern: '^[a-z0-9]+(-[a-z0-9]+)*$' }
@@ -462,7 +462,7 @@ components:
         swatchMediaFileId: { type: [integer, 'null'], minimum: 1 }
     AdminUnresolvedCode:
       type: object
-      required: [aliasId, attributeId, attributeName, scope, rawValue, isConfirmed, productCount]
+      required: [aliasId, attributeId, attributeName, scope, rawValue, isConfirmed, productCount, meanings]
       properties:
         aliasId: { type: integer }
         attributeId: { type: integer }
@@ -474,6 +474,24 @@ components:
         isConfirmed: { type: boolean }
         note: { type: [string, 'null'] }
         productCount: { type: integer, description: On-site products whose review mentions the code (spec catalog/007 M-01). }
+        meanings:
+          type: array
+          description: What the code means for all products (spec catalog/009), the value of its own attribute first.
+          items: { $ref: '#/components/schemas/AdminCodeMeaning' }
+    AdminCodeMeaning:
+      type: object
+      required: [attributeId, attributeName, valueId, valueName]
+      properties:
+        attributeId: { type: integer }
+        attributeName: { type: string }
+        valueId: { type: integer }
+        valueName: { type: string }
+    CodeMeaning:
+      type: object
+      required: [attributeId, valueId]
+      properties:
+        attributeId: { type: integer, minimum: 1 }
+        valueId: { type: integer, minimum: 1, description: A value of that attribute. }
     DecideAttributeCodeRequest:
       type: object
       properties:
@@ -483,12 +501,22 @@ components:
           type: [array, 'null']
           description: The whole list of the code's own decodings per category; null leaves them as they are.
           items: { $ref: '#/components/schemas/DecideAttributeCodeCategory' }
+        meanings:
+          type: [array, 'null']
+          description: >-
+            The whole decoding for all products (spec catalog/009): values of any attributes, at most one per attribute;
+            empty when the code means nothing to filter by. Replaces valueId when given.
+          items: { $ref: '#/components/schemas/CodeMeaning' }
     DecideAttributeCodeCategory:
       type: object
       required: [categoryId]
       properties:
         categoryId: { type: integer, minimum: 1 }
         valueId: { type: [integer, 'null'], minimum: 1, description: 'Null: the code means nothing in this category.' }
+        meanings:
+          type: [array, 'null']
+          description: The whole decoding in this category (spec catalog/009); replaces valueId when given.
+          items: { $ref: '#/components/schemas/CodeMeaning' }
     AdminCodeProducts:
       type: object
       required: [aliasId, rawValue, categories]
@@ -498,7 +526,7 @@ components:
         categories: { type: array, items: { $ref: '#/components/schemas/AdminCodeCategory' } }
     AdminCodeCategory:
       type: object
-      required: [categoryId, categoryPath, hasOwnValue, products]
+      required: [categoryId, categoryPath, hasOwnValue, products, meanings]
       properties:
         categoryId: { type: integer }
         categoryPath: { type: string, description: 'Full path, for example «Фурнітура > Ручки > На планці».' }
@@ -506,6 +534,10 @@ components:
         valueId: { type: [integer, 'null'] }
         valueName: { type: [string, 'null'] }
         products: { type: array, items: { $ref: '#/components/schemas/AdminCodeProduct' } }
+        meanings:
+          type: array
+          description: The category's own decoding (spec catalog/009); empty when it has none or the code means nothing there.
+          items: { $ref: '#/components/schemas/AdminCodeMeaning' }
     AdminCodeProduct:
       type: object
       required: [productId, name, photo]

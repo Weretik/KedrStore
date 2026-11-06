@@ -6,5 +6,8 @@ namespace Catalog.Application.Features.Attributes.Create;
 public sealed record CreateCatalogAttributeCommand(CreateCatalogAttributeRequest Request)
     : ICommand<Result<AdminCatalogAttributeDto>>
 {
-    public static readonly IReadOnlyList<string> Kinds = ["enum", "number"];
+    public const string YesNo = "yesno";
+
+    /// <summary><c>yesno</c> is a list with the values «Так» and «Ні» created at once.</summary>
+    public static readonly IReadOnlyList<string> Kinds = ["enum", "number", YesNo];
 }

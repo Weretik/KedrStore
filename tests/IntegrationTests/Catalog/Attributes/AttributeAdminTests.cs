@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using global::Catalog.Application.Features.Attributes.Common;
+using global::Catalog.Application.Features.Attributes.Create;
 using global::Catalog.Application.Features.Attributes.DecideCode;
 using global::Catalog.Application.Features.Attributes.SetCategoryFilters;
 using global::Catalog.Application.Features.ProductAttributes.AcceptReview;
@@ -56,6 +57,24 @@ public sealed class AttributeAdminTests
     private static async Task<IReadOnlyList<AttributeReviewReason>> ReasonsAsync(CatalogDbContext db, int productId)
         => (await db.ProductAttributeReviews.AsNoTracking().SingleAsync(review => review.ProductId == ProductId.From(productId)))
             .Reasons;
+
+    [Fact]
+    public async Task YesNoAttribute_IsCreatedWithTheValuesTakAndNi()
+    {
+        await using var db = await ImportedAsync();
+        var create = new CreateCatalogAttributeCommandHandler(db, new TestRepository<CatalogAttribute>(db),
+            new TestRepository<AttributeValue>(db),
+            new CatalogAttributeReader(db, new global::IntegrationTests.Catalog.ProductMedia.FakeProductMediaLibrary()),
+            TimeProvider.System);
+
+        var result = await create.Handle(new CreateCatalogAttributeCommand(new CreateCatalogAttributeRequest(
+            "Пакування", null, CreateCatalogAttributeCommand.YesNo, null, null, null, true, false, 100)),
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("enum", result.Value.Attribute.Kind);
+        Assert.Equal(["Так", "Ні"], result.Value.Values.Select(value => value.NameUk));
+    }
 
     [Fact]
     public async Task ManualValue_IsLocked_KeptByImport_AndRestoredByRevert()
@@ -136,14 +155,14 @@ public sealed class AttributeAdminTests
     public async Task DecidingAnAssistantCode_ConfirmsItsProductValues_AndLeavesTheList()
     {
         await using var db = await ImportedAsync();
-        var codes = new UnresolvedCodeReader(db);
+        var codes = new UnresolvedCodeReader(db, new CodeMeaningReader(db));
         var before = await codes.ListAsync(CancellationToken.None);
         var cp = Assert.Single(before, code => code.RawValue == "CP");
         Assert.Contains(before, code => code.RawValue == "AL" && code.ValueId is null);
         Assert.False(Assert.Single(await ColorsAsync(db, 2)).IsConfirmed);
 
         var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
-            new TestRepository<AttributeAliasCategoryValue>(db), codes,
+            new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(cp.AliasId,
             new DecideAttributeCodeRequest(await ValueIdAsync(db, "CR"))), CancellationToken.None);
@@ -172,7 +191,7 @@ public sealed class AttributeAdminTests
         var mention = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.From(2));
         mention.SetSameVariants("Код «CP»", DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
-        var codes = new UnresolvedCodeReader(db);
+        var codes = new UnresolvedCodeReader(db, new CodeMeaningReader(db));
         Assert.Equal(1, Assert.Single(await codes.ListAsync(CancellationToken.None), code => code.RawValue == "CP").ProductCount);
 
         var product = await db.Products.SingleAsync(item => item.Id == ProductId.From(2));

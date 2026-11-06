@@ -51,7 +51,7 @@ public sealed record AdminCatalogAttributeDto(
 public sealed record UpdateCatalogAttributeRequest(string NameUk, string? NameRu, bool IsFilterable, int SortOrder);
 
 /// <summary>
-/// A new attribute a person adds in «Ознаки». <c>Kind</c>: <c>enum</c> (a list of values) or <c>number</c> (a number in
+/// A new attribute a person adds in «Ознаки». <c>Kind</c>: <c>enum</c> (a list of values), <c>yesno</c> (a list with «Так» and «Ні» created at once), or <c>number</c> (a number in
 /// <c>Unit</c>). Code and slug are taken from <c>Code</c>/<c>Slug</c> or made from the name. <c>IsVariantAxis</c>: the
 /// products of a model may differ by it (it is offered as a model switcher).
 /// </summary>
@@ -97,21 +97,39 @@ public sealed record AdminUnresolvedCodeDto(
     string? ValueName,
     bool IsConfirmed,
     string? Note,
-    int ProductCount);
+    int ProductCount,
+    IReadOnlyList<AdminCodeMeaningDto> Meanings);
 
 /// <summary>
-/// The owner's decoding. With <c>ApplyToAll</c> (the default) <c>ValueId</c> decodes the code for all products: a value
-/// of the code's attribute, or <c>null</c> when the code means nothing to filter by; without it the code stays
-/// undecided for all products. <c>Categories</c>, when given, replaces the code's own decodings per category
-/// (spec catalog/008); a category left out follows the decoding for all products.
+/// What a code means (spec catalog/009): a value of an attribute. The code's own attribute and any other attributes a
+/// composite code carries, such as a configuration and a colour in <c>ZCG</c>.
+/// </summary>
+public sealed record AdminCodeMeaningDto(int AttributeId, string AttributeName, int ValueId, string ValueName);
+
+/// <summary>
+/// The owner's decoding. With <c>ApplyToAll</c> (the default) the code is decoded for all products; without it the
+/// code stays undecided for all products. <c>Meanings</c>, when given, is the whole decoding (spec catalog/009): values
+/// of any attributes, at most one per attribute, empty when the code means nothing to filter by; it replaces
+/// <c>ValueId</c>, the older single value of the code's own attribute. <c>Categories</c>, when given, replaces the
+/// code's own decodings per category (spec catalog/008); a category left out follows the decoding for all products.
 /// </summary>
 public sealed record DecideAttributeCodeRequest(
     int? ValueId,
     bool ApplyToAll = true,
-    IReadOnlyList<DecideAttributeCodeCategoryRequest>? Categories = null);
+    IReadOnlyList<DecideAttributeCodeCategoryRequest>? Categories = null,
+    IReadOnlyList<CodeMeaningRequest>? Meanings = null);
 
-/// <summary>The decoding of a code in one category: a value, or <c>null</c> when it means nothing there.</summary>
-public sealed record DecideAttributeCodeCategoryRequest(int CategoryId, int? ValueId);
+/// <summary>
+/// The decoding of a code in one category: <c>Meanings</c> when given (spec catalog/009), otherwise <c>ValueId</c> of the
+/// code's own attribute; nothing means the code means nothing there.
+/// </summary>
+public sealed record DecideAttributeCodeCategoryRequest(
+    int CategoryId,
+    int? ValueId,
+    IReadOnlyList<CodeMeaningRequest>? Meanings = null);
+
+/// <summary>One thing a code means: a value of an attribute.</summary>
+public sealed record CodeMeaningRequest(int AttributeId, int ValueId);
 
 /// <summary>
 /// Where a code occurs (spec catalog/008): on-site products whose 1C names contain it, by category, with the code's own
@@ -129,7 +147,8 @@ public sealed record AdminCodeCategoryDto(
     bool HasOwnValue,
     int? ValueId,
     string? ValueName,
-    IReadOnlyList<AdminCodeProductDto> Products);
+    IReadOnlyList<AdminCodeProductDto> Products,
+    IReadOnlyList<AdminCodeMeaningDto> Meanings);
 
 /// <summary>A product whose original 1C name contains the code.</summary>
 public sealed record AdminCodeProductDto(int ProductId, string Name, string Photo);
