@@ -9,4 +9,12 @@ internal static class WorkTaskInputRules
 
     public static void Details<T>(IRuleBuilder<T, string?> rule) =>
         rule.MaximumLength(WorkTask.DetailsMaxLength);
+
+    /// <summary>R-9: up to 30 steps, each with text up to 200 characters.</summary>
+    public static void Steps<T>(IRuleBuilder<T, IReadOnlyList<WorkTaskStepInput>?> rule) =>
+        rule.Must(steps => steps is null || steps.Count <= WorkTask.StepsMaxCount)
+            .WithMessage($"A task may have at most {WorkTask.StepsMaxCount} steps.")
+            .Must(steps => steps is null || steps.All(step =>
+                !string.IsNullOrWhiteSpace(step.Title) && step.Title.Trim().Length <= WorkTaskStep.TitleMaxLength))
+            .WithMessage($"Each step needs text of at most {WorkTaskStep.TitleMaxLength} characters.");
 }

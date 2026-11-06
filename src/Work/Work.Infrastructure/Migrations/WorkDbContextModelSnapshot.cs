@@ -96,6 +96,9 @@ namespace Work.Infrastructure.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
+                    b.Property<DateOnly?>("DueDate")
+                        .HasColumnType("date");
+
                     b.Property<Guid>("OwnerUserId")
                         .HasColumnType("uuid");
 
@@ -126,6 +129,35 @@ namespace Work.Infrastructure.Migrations
                     b.HasIndex("OwnerUserId", "Status");
 
                     b.ToTable("WorkTasks", "work");
+                });
+
+            modelBuilder.Entity("Work.Domain.Tasks.WorkTask", b =>
+                {
+                    b.OwnsMany("Work.Domain.Tasks.WorkTaskStep", "Steps", b1 =>
+                        {
+                            b1.Property<long>("WorkTaskId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd();
+
+                            b1.Property<bool>("IsDone");
+
+                            b1.Property<string>("Title")
+                                .IsRequired();
+
+                            b1.HasKey("WorkTaskId", "__synthesizedOrdinal");
+
+                            b1.ToTable("WorkTasks", "work");
+
+                            b1
+                                .ToJson("Steps")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WorkTaskId");
+                        });
+
+                    b.Navigation("Steps");
                 });
 #pragma warning restore 612, 618
         }

@@ -30,14 +30,17 @@ The activity log is written by a global MVC result filter in `Work.Api`, so no o
 - R-5: after a `POST`, `PUT`, `PATCH` or `DELETE` to a controller named `Admin*` (every admin endpoint) answers `2xx`, the log stores the user ID, the sign-in email, the time, the area (controller name without `Admin` and `Controller`, for example `Categories`), the operation (action method name), the HTTP method, and the route values (for example `id=12, lang=uk`). Work's own endpoints are not logged. A failure to log never fails the request.
 - R-6: the same user repeating the same area, operation and route values within 10 minutes updates the last entry (time and count) instead of adding a row, so saving a text five times is one line.
 - R-7: the report takes a user and a period of at most 92 days (`from`, `to` as dates in Kyiv time, inclusive) and returns the tasks finished in the period, the tasks still open, and the activity entries of the period, newest first, at most 2000. A staff member reads their own report; an administrator reads anyone's.
+- R-8: (reserved: the admin «Для кого» choice is frontend only and uses R-4.)
+- R-9: a task has up to 30 steps in order, each a text of 1–200 characters (trimmed) with a done mark. Create and edit send the whole list, which replaces the saved one; `PUT /api/work/tasks/{id}/steps/{index}` ticks or unticks one step of an own task (`404` for a position that does not exist). Steps are stored with their task.
+- R-10: a task may have a due date (a calendar day, no time). It is overdue (`isOverdue`) while not `Done` and the due day has passed in Kyiv; a task due today is not overdue. The creation time (R-1) is when the task was set.
 
 ## Design
 
 | Layer | Files |
 | --- | --- |
-| Domain | `Tasks/WorkTask.cs`, `WorkTaskId.cs`, `WorkTaskStatus.cs`; `Activity/WorkActivity.cs`, `WorkActivityId.cs`; `WorkErrors.cs` |
-| Application | `Features/Tasks/{GetMine,Create,Update,ChangeStatus,Delete,CreateForUser,Common}`; `Features/Activity/{Record,Common}`; `Features/Report/GetReport`; `Contracts/Persistence` |
-| Infrastructure | `DataBase/WorkDbContext.cs` (schema `work`), design-time factory, configurations, repository, migration `InitialWork`, `DependencyInjection/WorkInfrastructureExtensions.cs` |
+| Domain | `Tasks/WorkTask.cs`, `WorkTaskStep.cs`, `WorkTaskId.cs`, `WorkTaskStatus.cs`; `Activity/WorkActivity.cs`, `WorkActivityId.cs`; `WorkErrors.cs` |
+| Application | `Features/Tasks/{GetMine,Create,Update,ChangeStatus,SetStep,Delete,CreateForUser,Common}` (`WorkCalendar`: Kyiv day); `Features/Activity/{Record,Common}`; `Features/Report/GetReport`; `Contracts/Persistence` |
+| Infrastructure | `DataBase/WorkDbContext.cs` (schema `work`), design-time factory, configurations, repository, migrations `InitialWork`, `WorkTaskStepsAndDueDate`, `DependencyInjection/WorkInfrastructureExtensions.cs` |
 | Api | `Controllers/WorkTasksController.cs` (`/api/work/tasks`, `/api/work/report`, policy `RequireManagerRole`), `Controllers/AdminWorkController.cs` (`/api/admin/work`, `RequireAdminRole`), `Activity/WorkActivityFilter.cs` |
 | Host | registration in `ModulesRegistrationExtensions`, Mediator and validators, controllers part and the global filter; Jobs host for the migration |
 
@@ -45,5 +48,5 @@ Contract: [work.openapi.yaml](../../../contracts/work/work.openapi.yaml).
 
 ## Tests
 
-- Unit: `WorkTaskTests` (R-1, R-3), `WorkActivityTests` (R-6), validators.
-- Integration: `WorkApiTests` (R-2, R-4, R-5, R-7) on the real API with PostgreSQL (CI).
+- Unit: `WorkTaskTests` (R-1, R-3, R-9, R-10), `WorkActivityTests` (R-6), validators.
+- Integration: `WorkApiTests` (R-2, R-4, R-5, R-7, R-9, R-10) on the real API with PostgreSQL (CI).

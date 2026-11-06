@@ -9,5 +9,6 @@ public sealed class UpdateMyWorkTaskCommandValidator : AbstractValidator<UpdateM
         RuleFor(x => x.Id).GreaterThan(0);
         WorkTaskInputRules.Title(RuleFor(x => x.Title));
         WorkTaskInputRules.Details(RuleFor(x => x.Details));
+        WorkTaskInputRules.Steps(RuleFor(x => x.Steps));
     }
 }

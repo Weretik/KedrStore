@@ -19,7 +19,8 @@ public sealed class AdminWorkController(ISender sender) : ControllerBase
     public async Task<ActionResult<WorkTaskDto>> CreateTask(
         [FromBody] CreateWorkTaskForUserRequest request, CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(
-            new CreateWorkTaskForUserCommand(request.OwnerUserId, request.Title, request.Details), cancellationToken));
+            new CreateWorkTaskForUserCommand(
+                request.OwnerUserId, request.Title, request.Details, request.DueDate, request.Steps), cancellationToken));
 
     [HttpGet("report", Name = "getAdminWorkReport")]
     [ProducesResponseType(typeof(WorkReportDto), StatusCodes.Status200OK)]

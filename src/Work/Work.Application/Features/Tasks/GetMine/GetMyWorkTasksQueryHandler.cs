@@ -22,6 +22,7 @@ public sealed class GetMyWorkTasksQueryHandler(IReadWorkDbContext db, ICurrentUs
             .OrderByDescending(task => task.UpdatedAt)
             .ToListAsync(cancellationToken);
 
-        return Result.Success<IReadOnlyList<WorkTaskDto>>(tasks.Select(WorkTaskDto.From).ToList());
+        var today = WorkCalendar.Today(clock);
+        return Result.Success<IReadOnlyList<WorkTaskDto>>(tasks.Select(task => WorkTaskDto.From(task, today)).ToList());
     }
 }

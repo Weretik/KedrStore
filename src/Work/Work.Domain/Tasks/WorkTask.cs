@@ -9,6 +9,9 @@ public sealed class WorkTask : IAggregateRoot
     public const int TitleMaxLength = 200;
     public const int DetailsMaxLength = 4000;
     public const int ResultMaxLength = 2000;
+    public const int StepsMaxCount = 30;
+
+    private readonly List<WorkTaskStep> _steps = [];
 
     public WorkTaskId Id { get; private set; }
     public Guid OwnerUserId { get; private set; }
@@ -17,6 +20,9 @@ public sealed class WorkTask : IAggregateRoot
     public string? Details { get; private set; }
     public WorkTaskStatus Status { get; private set; }
     public string? Result { get; private set; }
+    /// <summary>R-10: the day the task should be done by (Kyiv calendar); none means no deadline.</summary>
+    public DateOnly? DueDate { get; private set; }
+    public IReadOnlyList<WorkTaskStep> Steps => _steps;
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
     public DateTimeOffset? StartedAt { get; private set; }
@@ -24,29 +30,55 @@ public sealed class WorkTask : IAggregateRoot
 
     private WorkTask() { }
 
-    public static WorkTask Create(Guid ownerUserId, Guid createdByUserId, string title, string? details, DateTimeOffset now)
+    public static WorkTask Create(
+        Guid ownerUserId,
+        Guid createdByUserId,
+        string title,
+        string? details,
+        DateOnly? dueDate,
+        IReadOnlyList<WorkTaskStepInput>? steps,
+        DateTimeOffset now)
     {
         if (ownerUserId == Guid.Empty || createdByUserId == Guid.Empty)
             throw new DomainException(WorkErrors.UserRequired());
 
-        return new WorkTask
+        var task = new WorkTask
         {
             OwnerUserId = ownerUserId,
             CreatedByUserId = createdByUserId,
             Title = NormalizeTitle(title),
             Details = NormalizeOptional(details, nameof(Details), DetailsMaxLength),
+            DueDate = dueDate,
             Status = WorkTaskStatus.Planned,
             CreatedAt = now,
             UpdatedAt = now
         };
+        task.ReplaceSteps(steps);
+        return task;
     }
 
-    public void Edit(string title, string? details, DateTimeOffset now)
+    public void Edit(string title, string? details, DateOnly? dueDate, IReadOnlyList<WorkTaskStepInput>? steps,
+        DateTimeOffset now)
     {
         Title = NormalizeTitle(title);
         Details = NormalizeOptional(details, nameof(Details), DetailsMaxLength);
+        DueDate = dueDate;
+        ReplaceSteps(steps);
         UpdatedAt = now;
     }
+
+    /// <summary>R-9: ticks or unticks one step by its position; false when there is no such step.</summary>
+    public bool SetStepDone(int index, bool isDone, DateTimeOffset now)
+    {
+        if (index < 0 || index >= _steps.Count)
+            return false;
+        _steps[index].SetDone(isDone);
+        UpdatedAt = now;
+        return true;
+    }
+
+    /// <summary>R-10: an open task whose due day has passed in Kyiv.</summary>
+    public bool IsOverdue(DateOnly today) => Status != WorkTaskStatus.Done && DueDate is { } due && due < today;
 
     /// <summary>R-3: start time is set once, completion keeps the result, leaving «Готово» clears both.</summary>
     public void ChangeStatus(WorkTaskStatus status, string? result, DateTimeOffset now)
@@ -71,6 +103,16 @@ public sealed class WorkTask : IAggregateRoot
     }
 
     public bool IsCreatedByOwner => CreatedByUserId == OwnerUserId;
+
+    private void ReplaceSteps(IReadOnlyList<WorkTaskStepInput>? steps)
+    {
+        steps ??= [];
+        if (steps.Count > StepsMaxCount)
+            throw new DomainException(WorkErrors.TooManySteps(StepsMaxCount, steps.Count));
+        var created = steps.Select(step => WorkTaskStep.Create(step.Title, step.IsDone)).ToList();
+        _steps.Clear();
+        _steps.AddRange(created);
+    }
 
     private static string NormalizeTitle(string? title)
     {

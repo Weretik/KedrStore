@@ -6,7 +6,7 @@ Every staff member (Manager, Seo, Admin) keeps an own board «Мої задач�
 
 ## Structure and relationships
 
-[WorkTasksController](../../../../src/Work/Work.Api/Controllers/WorkTasksController.cs) (`/api/work`, `RequireManagerRole`) works only with the caller's own tasks: [OwnWorkTask](../../../../src/Work/Work.Application/Features/Tasks/Common/OwnWorkTask.cs) answers `404` for another person's task. [AdminWorkController](../../../../src/Work/Work.Api/Controllers/AdminWorkController.cs) (`/api/admin/work`, `RequireAdminRole`) creates a task for a user and reads anybody's report. [WorkTask](../../../../src/Work/Work.Domain/Tasks/WorkTask.cs) keeps the state rules (start time once, result only while done).
+[WorkTasksController](../../../../src/Work/Work.Api/Controllers/WorkTasksController.cs) (`/api/work`, `RequireManagerRole`) works only with the caller's own tasks: [OwnWorkTask](../../../../src/Work/Work.Application/Features/Tasks/Common/OwnWorkTask.cs) answers `404` for another person's task. [AdminWorkController](../../../../src/Work/Work.Api/Controllers/AdminWorkController.cs) (`/api/admin/work`, `RequireAdminRole`) creates a task for a user and reads anybody's report. [WorkTask](../../../../src/Work/Work.Domain/Tasks/WorkTask.cs) keeps the state rules (start time once, result only while done), up to 30 [steps](../../../../src/Work/Work.Domain/Tasks/WorkTaskStep.cs) in a jsonb column and an optional due date; `isOverdue` is computed for the Kyiv day by [WorkCalendar](../../../../src/Work/Work.Application/Features/Tasks/Common/WorkCalendar.cs).
 
 [WorkActivityFilter](../../../../src/Work/Work.Api/Activity/WorkActivityFilter.cs) is a global MVC result filter registered in [ControllersRegistrationExtensions](../../../../src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/Web/ControllersRegistrationExtensions.cs). After a staff member's `2xx` answer to `POST`, `PUT`, `PATCH` or `DELETE` on any `Admin*` controller of another module, it sends [RecordWorkActivityCommand](../../../../src/Work/Work.Application/Features/Activity/Record/RecordWorkActivityCommand.cs) with the area (`Categories`), operation (`UpdateContent`), method, and route values (`id=12, lang=uk`). The handler merges a repeat of the same change within 10 minutes into the last entry ([WorkActivity](../../../../src/Work/Work.Domain/Activity/WorkActivity.cs)). Other modules do not know about Work; a failed write is only logged.
 
@@ -22,13 +22,13 @@ src/Work/
 │   ├── Activity/WorkActivityFilter.cs       # writes the activity log after admin changes
 │   └── Requests/WorkRequests.cs
 ├── Work.Application/
-│   ├── Features/Tasks/                      # GetMine, Create, Update, ChangeStatus, Delete, CreateForUser
+│   ├── Features/Tasks/                      # GetMine, Create, Update, ChangeStatus, SetStep, Delete, CreateForUser
 │   ├── Features/Activity/Record/            # RecordWorkActivityCommand (filter only)
 │   └── Features/Report/GetReport/           # report for a user and a period
 ├── Work.Domain/                             # WorkTask, WorkActivity, errors
 └── Work.Infrastructure/
     ├── DataBase/WorkDbContext.cs            # schema work, own migration history
-    └── Migrations/*_InitialWork.cs
+    └── Migrations/*_InitialWork.cs, *_WorkTaskStepsAndDueDate.cs
 ```
 
 ## Structure diagram

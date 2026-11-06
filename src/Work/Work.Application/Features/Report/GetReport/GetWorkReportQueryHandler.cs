@@ -5,12 +5,10 @@ using Work.Application.Features.Tasks.Common;
 
 namespace Work.Application.Features.Report.GetReport;
 
-public sealed class GetWorkReportQueryHandler(IReadWorkDbContext db, ICurrentUserService user)
+public sealed class GetWorkReportQueryHandler(IReadWorkDbContext db, ICurrentUserService user, TimeProvider clock)
     : IQueryHandler<GetWorkReportQuery, Result<WorkReportDto>>
 {
     public const int ActivityLimit = 2000;
-
-    private static readonly TimeZoneInfo Kyiv = TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
 
     public async ValueTask<Result<WorkReportDto>> Handle(GetWorkReportQuery query, CancellationToken cancellationToken)
     {
@@ -36,19 +34,16 @@ public sealed class GetWorkReportQueryHandler(IReadWorkDbContext db, ICurrentUse
             .Take(ActivityLimit + 1)
             .ToListAsync(cancellationToken);
 
+        var today = WorkCalendar.Today(clock);
         return Result.Success(new WorkReportDto(
             owner,
             query.From,
             query.To,
-            done.Select(WorkTaskDto.From).ToList(),
-            open.Select(WorkTaskDto.From).ToList(),
+            done.Select(task => WorkTaskDto.From(task, today)).ToList(),
+            open.Select(task => WorkTaskDto.From(task, today)).ToList(),
             activity.Take(ActivityLimit).Select(WorkActivityDto.From).ToList(),
             activity.Count > ActivityLimit));
     }
 
-    internal static DateTimeOffset KyivMidnightUtc(DateOnly date)
-    {
-        var local = date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Unspecified);
-        return new DateTimeOffset(local, Kyiv.GetUtcOffset(local)).ToUniversalTime();
-    }
+    internal static DateTimeOffset KyivMidnightUtc(DateOnly date) => WorkCalendar.MidnightUtc(date);
 }
