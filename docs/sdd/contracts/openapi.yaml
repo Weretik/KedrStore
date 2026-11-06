@@ -278,6 +278,8 @@ paths:
     $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks~1{id}
   /api/work/tasks/{id}/status:
     $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks~1{id}~1status
+  /api/work/tasks/{id}/steps/{index}:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks~1{id}~1steps~1{index}
   /api/work/report:
     $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1report
   /api/admin/work/tasks:

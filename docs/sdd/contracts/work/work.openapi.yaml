@@ -96,6 +96,33 @@ paths:
         '401': { description: Not signed in. }
         '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such task of the caller. }
+  /api/work/tasks/{id}/steps/{index}:
+    put:
+      operationId: setMyWorkTaskStep
+      summary: Tick or untick one step of an own task
+      tags: [Work]
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+        - name: index
+          in: path
+          required: true
+          description: Position of the step, from 0.
+          schema: { type: integer, format: int32, minimum: 0, maximum: 29 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetWorkTaskStepRequest' }
+      responses:
+        '200':
+          description: The task with the step changed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkTask' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: No such task of the caller or no step at that position. }
   /api/work/report:
     get:
       operationId: getMyWorkReport
@@ -175,7 +202,7 @@ components:
     WorkTaskStatus: { type: string, enum: [Planned, InProgress, Done] }
     WorkTask:
       type: object
-      required: [id, ownerUserId, createdByUserId, createdByOwner, title, details, status, result, createdAt, updatedAt, startedAt, completedAt]
+      required: [id, ownerUserId, createdByUserId, createdByOwner, title, details, status, result, dueDate, isOverdue, steps, createdAt, updatedAt, startedAt, completedAt]
       properties:
         id: { type: integer, format: int64 }
         ownerUserId: { type: string, format: uuid }
@@ -185,10 +212,19 @@ components:
         details: { type: [string, 'null'], maxLength: 4000 }
         status: { $ref: '#/components/schemas/WorkTaskStatus' }
         result: { type: [string, 'null'], maxLength: 2000, description: What was done; only for `Done`. }
-        createdAt: { type: string, format: date-time }
+        dueDate: { type: [string, 'null'], format: date, description: Day the task should be done by; null means no deadline. }
+        isOverdue: { type: boolean, description: 'Not `Done` and the due day has passed in Kyiv.' }
+        steps: { type: array, maxItems: 30, items: { $ref: '#/components/schemas/WorkTaskStep' } }
+        createdAt: { type: string, format: date-time, description: When the task was set. }
         updatedAt: { type: string, format: date-time }
         startedAt: { type: [string, 'null'], format: date-time }
         completedAt: { type: [string, 'null'], format: date-time }
+    WorkTaskStep:
+      type: object
+      required: [title, isDone]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        isDone: { type: boolean }
     WorkActivity:
       type: object
       required: [id, userId, userEmail, area, operation, method, target, count, firstAt, occurredAt]
@@ -220,6 +256,17 @@ components:
       properties:
         title: { type: string, minLength: 1, maxLength: 200 }
         details: { type: [string, 'null'], maxLength: 4000 }
+        dueDate: { type: [string, 'null'], format: date }
+        steps:
+          type: [array, 'null']
+          maxItems: 30
+          description: The whole list in order; it replaces the saved one.
+          items: { $ref: '#/components/schemas/WorkTaskStep' }
+    SetWorkTaskStepRequest:
+      type: object
+      required: [isDone]
+      properties:
+        isDone: { type: boolean }
     ChangeWorkTaskStatusRequest:
       type: object
       required: [status]
@@ -233,3 +280,9 @@ components:
         ownerUserId: { type: string, format: uuid }
         title: { type: string, minLength: 1, maxLength: 200 }
         details: { type: [string, 'null'], maxLength: 4000 }
+        dueDate: { type: [string, 'null'], format: date }
+        steps:
+          type: [array, 'null']
+          maxItems: 30
+          description: The whole list in order; it replaces the saved one.
+          items: { $ref: '#/components/schemas/WorkTaskStep' }

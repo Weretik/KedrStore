@@ -17,7 +17,18 @@ internal sealed class WorkTaskConfiguration : IEntityTypeConfiguration<WorkTask>
         builder.Property(task => task.Result).HasMaxLength(WorkTask.ResultMaxLength);
         builder.Property(task => task.CreatedAt).IsRequired();
         builder.Property(task => task.UpdatedAt).IsRequired();
+        builder.Property(task => task.DueDate).HasColumnType("date");
         builder.Ignore(task => task.IsCreatedByOwner);
+
+        // Steps are read and saved only with their task, so they live in one jsonb column.
+        builder.OwnsMany(task => task.Steps, steps =>
+        {
+            steps.ToJson("Steps");
+            steps.Property(step => step.Title).IsRequired();
+            steps.Property(step => step.IsDone).IsRequired();
+        });
+        builder.Navigation(task => task.Steps)
+            .HasField("_steps").UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasIndex(task => new { task.OwnerUserId, task.Status });
         builder.HasIndex(task => new { task.OwnerUserId, task.CompletedAt });

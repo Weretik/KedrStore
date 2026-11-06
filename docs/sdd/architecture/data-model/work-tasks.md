@@ -12,6 +12,8 @@ erDiagram
         varchar4000 Details "null"
         varchar20 Status "Planned, InProgress, Done"
         varchar2000 Result "null; only while Done"
+        date DueDate "null; Kyiv day the task should be done by"
+        jsonb Steps "array of title and isDone, at most 30"
         timestamptz CreatedAt
         timestamptz UpdatedAt
         timestamptz StartedAt "null"

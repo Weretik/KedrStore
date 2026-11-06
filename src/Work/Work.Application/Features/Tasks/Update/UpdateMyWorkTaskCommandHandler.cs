@@ -12,11 +12,11 @@ public sealed class UpdateMyWorkTaskCommandHandler(
     {
         var found = await OwnWorkTask.FindAsync(tasks, user, command.Id, cancellationToken);
         if (!found.IsSuccess)
-            return found.Map(WorkTaskDto.From);
+            return found.Map(task => WorkTaskDto.From(task, WorkCalendar.Today(clock)));
 
         var task = found.Value;
-        task.Edit(command.Title, command.Details, clock.GetUtcNow());
+        task.Edit(command.Title, command.Details, command.DueDate, command.Steps, clock.GetUtcNow());
         await tasks.UpdateAsync(task, cancellationToken);
-        return Result.Success(WorkTaskDto.From(task));
+        return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }
 }

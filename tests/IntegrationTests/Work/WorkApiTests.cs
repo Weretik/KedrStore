@@ -100,6 +100,35 @@ public sealed class WorkApiTests
             (await seo.GetAsync($"/api/work/report?from={Today}&to={Yesterday}")).StatusCode);
     }
 
+    [Fact]
+    public async Task Task_KeepsDueDateAndSteps_AndMarksOverdue()
+    {
+        using var factory = CreateFactory();
+        using var seo = factory.CreateClientWithUser("Seo", Guid.NewGuid());
+
+        using var created = await seo.PostAsJsonAsync("/api/work/tasks", new
+        {
+            title = "Категорія «Петлі»",
+            dueDate = Yesterday,
+            steps = new[] { new { title = "SEO-заголовок", isDone = false }, new { title = "Опис", isDone = false } }
+        });
+        Assert.Equal(HttpStatusCode.OK, created.StatusCode);
+        var task = Json(await created.Content.ReadAsStringAsync());
+        var id = task.GetProperty("id").GetInt64();
+        Assert.True(task.GetProperty("isOverdue").GetBoolean());
+        Assert.Equal(2, task.GetProperty("steps").GetArrayLength());
+
+        using var ticked = await seo.PutAsJsonAsync($"/api/work/tasks/{id}/steps/1", new { isDone = true });
+        Assert.True(Json(await ticked.Content.ReadAsStringAsync()).GetProperty("steps")[1].GetProperty("isDone").GetBoolean());
+        Assert.Equal(HttpStatusCode.NotFound,
+            (await seo.PutAsJsonAsync($"/api/work/tasks/{id}/steps/5", new { isDone = true })).StatusCode);
+
+        using var moved = await seo.PutAsJsonAsync($"/api/work/tasks/{id}", new { title = "Категорія «Петлі»", dueDate = Tomorrow });
+        var edited = Json(await moved.Content.ReadAsStringAsync());
+        Assert.False(edited.GetProperty("isOverdue").GetBoolean());
+        Assert.Equal(0, edited.GetProperty("steps").GetArrayLength());
+    }
+
     private static async Task<long> CreateTask(HttpClient client, string title)
     {
         using var response = await client.PostAsJsonAsync("/api/work/tasks", new { title });

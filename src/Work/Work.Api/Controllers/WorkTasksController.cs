@@ -7,6 +7,7 @@ using Work.Application.Features.Tasks.Common;
 using Work.Application.Features.Tasks.Create;
 using Work.Application.Features.Tasks.Delete;
 using Work.Application.Features.Tasks.GetMine;
+using Work.Application.Features.Tasks.SetStep;
 using Work.Application.Features.Tasks.Update;
 
 namespace Work.Api.Controllers;
@@ -27,7 +28,8 @@ public sealed class WorkTasksController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WorkTaskDto>> Create(
         [FromBody] SaveWorkTaskRequest request, CancellationToken cancellationToken)
-        => this.ToActionResult(await sender.Send(new CreateMyWorkTaskCommand(request.Title, request.Details), cancellationToken));
+        => this.ToActionResult(await sender.Send(new CreateMyWorkTaskCommand(
+            request.Title, request.Details, request.DueDate, request.Steps), cancellationToken));
 
     [HttpPut("tasks/{id:long}", Name = "updateMyWorkTask")]
     [ProducesResponseType(typeof(WorkTaskDto), StatusCodes.Status200OK)]
@@ -35,7 +37,8 @@ public sealed class WorkTasksController(ISender sender) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<WorkTaskDto>> Update(
         [FromRoute] long id, [FromBody] SaveWorkTaskRequest request, CancellationToken cancellationToken)
-        => this.ToActionResult(await sender.Send(new UpdateMyWorkTaskCommand(id, request.Title, request.Details), cancellationToken));
+        => this.ToActionResult(await sender.Send(new UpdateMyWorkTaskCommand(
+            id, request.Title, request.Details, request.DueDate, request.Steps), cancellationToken));
 
     [HttpPut("tasks/{id:long}/status", Name = "changeMyWorkTaskStatus")]
     [ProducesResponseType(typeof(WorkTaskDto), StatusCodes.Status200OK)]
@@ -45,6 +48,16 @@ public sealed class WorkTasksController(ISender sender) : ControllerBase
         [FromRoute] long id, [FromBody] ChangeWorkTaskStatusRequest request, CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(
             new ChangeMyWorkTaskStatusCommand(id, request.Status, request.Result), cancellationToken));
+
+    [HttpPut("tasks/{id:long}/steps/{index:int}", Name = "setMyWorkTaskStep")]
+    [ProducesResponseType(typeof(WorkTaskDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<WorkTaskDto>> SetStep(
+        [FromRoute] long id, [FromRoute] int index, [FromBody] SetWorkTaskStepRequest request,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(
+            new SetMyWorkTaskStepCommand(id, index, request.IsDone), cancellationToken));
 
     [HttpDelete("tasks/{id:long}", Name = "deleteMyWorkTask")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

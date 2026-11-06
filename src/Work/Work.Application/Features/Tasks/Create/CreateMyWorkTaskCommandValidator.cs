@@ -8,5 +8,6 @@ public sealed class CreateMyWorkTaskCommandValidator : AbstractValidator<CreateM
     {
         WorkTaskInputRules.Title(RuleFor(x => x.Title));
         WorkTaskInputRules.Details(RuleFor(x => x.Details));
+        WorkTaskInputRules.Steps(RuleFor(x => x.Steps));
     }
 }

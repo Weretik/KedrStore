@@ -1,5 +1,7 @@
 namespace Work.Application.Features.Tasks.Common;
 
+public sealed record WorkTaskStepDto(string Title, bool IsDone);
+
 public sealed record WorkTaskDto(
     long Id,
     Guid OwnerUserId,
@@ -9,12 +11,16 @@ public sealed record WorkTaskDto(
     string? Details,
     string Status,
     string? Result,
+    DateOnly? DueDate,
+    bool IsOverdue,
+    IReadOnlyList<WorkTaskStepDto> Steps,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     DateTimeOffset? StartedAt,
     DateTimeOffset? CompletedAt)
 {
-    public static WorkTaskDto From(WorkTask task) => new(
+    /// <param name="today">Kyiv day the overdue mark is computed for.</param>
+    public static WorkTaskDto From(WorkTask task, DateOnly today) => new(
         task.Id.Value,
         task.OwnerUserId,
         task.CreatedByUserId,
@@ -23,6 +29,9 @@ public sealed record WorkTaskDto(
         task.Details,
         task.Status.ToString(),
         task.Result,
+        task.DueDate,
+        task.IsOverdue(today),
+        task.Steps.Select(step => new WorkTaskStepDto(step.Title, step.IsDone)).ToList(),
         task.CreatedAt,
         task.UpdatedAt,
         task.StartedAt,
