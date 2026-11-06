@@ -142,7 +142,7 @@ components:
         exactMatch: { oneOf: [{ $ref: '#/components/schemas/PublicSiteModelAddress' }, { type: 'null' }] }
     PublicSiteModelCard:
       type: object
-      required: [slug, name, categorySlug, photo, priceFrom, inStock, isSale, isNew, productCount, isAccepted, colors]
+      required: [slug, name, categorySlug, photo, priceFrom, inStock, isSale, isNew, productCount, isAccepted, colors, productId]
       properties:
         slug: { type: string }
         name: { type: string }
@@ -155,6 +155,7 @@ components:
         productCount: { type: integer, description: On-site products of the model. }
         isAccepted: { type: boolean, description: 'False for an on-site product shown as a model of its own.' }
         colors: { type: array, description: Colors of the model's products when color is one of its axes., items: { $ref: '#/components/schemas/PublicSiteModelSwatch' } }
+        productId: { type: [integer, 'null'], description: 'The 1C code of the only on-site product of a one-product model, for adding it to the cart from the list; null for a model of several products.' }
     PublicSiteModelSwatch:
       type: object
       required: [slug, name, hex, textureUrl]

@@ -114,8 +114,8 @@ public sealed class PublicSiteModelTests
         Assert.True(all.IsFinalCategory);
         Assert.Equal(["Завіса", "Ручка Linea AB"], all.Items.Select(card => card.Name));
         var hinges = all.Items[0];
-        Assert.Equal((true, 2, 101m, "photo-1.jpg"), (hinges.IsAccepted, hinges.ProductCount, hinges.PriceFrom, hinges.Photo));
-        Assert.Equal(("product-3", false, true), (all.Items[1].Slug, all.Items[1].IsAccepted, all.Items[1].IsNew));
+        Assert.Equal((true, 2, 101m, "photo-1.jpg", (int?)null), (hinges.IsAccepted, hinges.ProductCount, hinges.PriceFrom, hinges.Photo, hinges.ProductId));
+        Assert.Equal(("product-3", false, true, (int?)3), (all.Items[1].Slug, all.Items[1].IsAccepted, all.Items[1].IsNew, all.Items[1].ProductId));
         var sideFilter = Assert.Single(all.Filters, filter => filter.Slug == side.Attribute);
         Assert.Equal([(side.Left, 2), (side.Right, 1)], sideFilter.Values.Select(value => (value.Slug, value.Count)));
 

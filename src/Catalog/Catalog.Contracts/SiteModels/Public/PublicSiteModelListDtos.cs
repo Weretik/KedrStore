@@ -17,7 +17,8 @@ public sealed record PublicSiteModelListDto(
 
 /// <summary>
 /// A model card. Price, stock, sale and new count only the products that match the chosen filters.
-/// <c>IsAccepted</c> is false for an on-site product shown as a model of its own (M-04).
+/// <c>IsAccepted</c> is false for an on-site product shown as a model of its own (M-04). <c>ProductId</c> is the 1C code
+/// of the only on-site product of a one-product model, so the site can add it to the cart from the list.
 /// </summary>
 public sealed record PublicSiteModelCardDto(
     string Slug,
@@ -30,7 +31,8 @@ public sealed record PublicSiteModelCardDto(
     bool IsNew,
     int ProductCount,
     bool IsAccepted,
-    IReadOnlyList<PublicSiteModelSwatchDto> Colors);
+    IReadOnlyList<PublicSiteModelSwatchDto> Colors,
+    int? ProductId);
 
 /// <summary>A color of a value: <c>Hex</c> <c>#RRGGBB</c> or a texture picture; both empty means a text chip.</summary>
 public sealed record PublicSiteModelSwatchDto(string Slug, string Name, string? Hex, string? TextureUrl);

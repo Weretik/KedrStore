@@ -86,7 +86,8 @@ public sealed class GetPublicSiteModelsQueryHandler(PublicModelCatalogReader rea
             catalog.Categories[model.CategoryId].Slug, catalog.PhotoOf(model),
             matching.Select(product => product.Price).Where(price => price is not null).Min(),
             matching.Any(product => product.InStock), matching.Any(product => product.IsSale),
-            matching.Any(product => product.IsNew), model.Products.Count, model.IsAccepted, colors);
+            matching.Any(product => product.IsNew), model.Products.Count, model.IsAccepted, colors,
+            model.Products.Count == 1 ? model.Products[0].Value : null);
     }
 
     private static IEnumerable<PublicSiteModelCardDto> Sort(IEnumerable<PublicSiteModelCardDto> cards, string? sort)
