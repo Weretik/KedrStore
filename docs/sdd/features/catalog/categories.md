@@ -12,7 +12,7 @@ The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/Categori
 
 The active admin list also carries `productCount` (all active products of the category and its descendants, on the site or not) and `filledContentLanguages` (languages with any text or FAQ) from [AdminCategoryInsightsReader](../../../../src/Catalog/Catalog.Application/Features/Category/AdminGetList/AdminCategoryInsightsReader.cs); the Admin tree uses them to show counts and mark categories without texts. Deleted rows and the by-id read leave both `null`.
 
-Access: reads need `CanManageProducts`; slug edit, content save, the «show on site» mark, and `deleted=true` need the Admin role.
+Access: reads need `CanManageProducts`; slug edit, content save, the «show on site» mark, and `deleted=true` need `CanManageSiteCatalog` (Admin or Seo).
 
 ## Code structure
 

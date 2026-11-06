@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;
 
-/// <summary>Variant groups (spec catalog/006): Manager and Admin edit them; only Admin changes a group slug.</summary>
+/// <summary>Variant groups (spec catalog/006): Manager and Admin edit them; only Admin and Seo change a group slug.</summary>
 [ApiController]
 [Route("api/admin/product-groups")]
 [Authorize(Policy = PolicyNames.CanManageProducts)]
@@ -66,7 +66,7 @@ public sealed class AdminProductGroupsController(ISender sender) : ControllerBas
         => this.ToActionResult(await sender.Send(new SetProductGroupMainCommand(id, request), cancellationToken));
 
     [HttpPut("{id:int}/slug", Name = "changeAdminProductGroupSlug")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(ChangeSlugResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

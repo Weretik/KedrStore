@@ -13,6 +13,7 @@ public class RoleSeeder(RoleManager<AppRole> roleManager, ILogger<RoleSeeder> lo
         var roles = new List<AppRole>
         {
             new() { Name = RoleNames.Admin, Description = "Адміністратор системи", Scope = "system", IsSystemRole = true, AccessLevel = 100 },
+            new() { Name = RoleNames.Seo, Description = "SEO-спеціаліст", Scope = "content", IsSystemRole = true, AccessLevel = 70 },
             new() { Name = RoleNames.Manager, Description = "Контент-менеджер", Scope = "content", IsSystemRole = true, AccessLevel = 50 },
             new() { Name = RoleNames.User, Description = "Звичайний користувач", Scope = "user", IsSystemRole = true, AccessLevel = 10 }
         };

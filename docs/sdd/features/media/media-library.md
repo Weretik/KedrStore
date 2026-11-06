@@ -12,7 +12,7 @@ Uploads go through [MediaUploadStore](../../../../src/Media/Media.Application/Fe
 
 [SyncCdnMediaJob](../../../../src/Media/Media.Application/Jobs/CdnSync/SyncCdnMediaJob.cs) (`--job=media-cdn-sync [--dry-run]`) lists the CDN without `avatars/` and dot service directories such as `.thumbs/`, skips known keys, reports unknown files in `library/` as orphans, and registers other pictures: `products` → folder «Товари», `product-scheme` → «Схеми», deeper directories → subfolders. Other modules upload into a CDN directory and a root folder of their own through [IMediaFileUploader](../../../../src/Media/Media.Contracts/Files/IMediaFileUploader.cs) (Content: article covers → `articles/`, «Статті») and arrange files into their own virtual folder tree through [IMediaFolderArranger](../../../../src/Media/Media.Contracts/Folders/IMediaFolderArranger.cs) (Catalog: product photos by category).
 
-Access: everything needs `CanManageMedia` (Manager, Admin); file and folder delete also need `RequireAdminRole`.
+Access: everything needs `CanManageMedia` (Manager, Seo, Admin); file and folder delete also need `RequireAdminRole`.
 
 ## Code structure
 

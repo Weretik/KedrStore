@@ -26,7 +26,7 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
         [FromQuery] bool deleted,
         CancellationToken cancellationToken)
     {
-        if (deleted && !User.IsInRole(RoleNames.Admin))
+        if (deleted && !User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Seo))
             return Forbid();
 
         var result = await sender.Send(new GetAdminCategoriesQuery(deleted), cancellationToken);
@@ -44,7 +44,7 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}/slug")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(ChangeSlugResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -59,7 +59,7 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}/site-visibility", Name = "setAdminCategorySiteVisibility")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(CategorySiteVisibilityResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -85,7 +85,7 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}/content/{lang}")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(AdminCategoryContentItem), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

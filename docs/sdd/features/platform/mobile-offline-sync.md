@@ -10,7 +10,7 @@ Two read-only endpoints give the offline manager app «Кедр Менеджер
 - Sales: [GetCustomersSnapshotQueryHandler](../../../../src/Sales/Sales.Application/Features/MobileSync/GetCustomersSnapshotQueryHandler.cs) reads counterparties and their category price rules through `IReadSalesDbContext`. The app prices a product like `CustomerPriceResolver`: the rule of the nearest category up the tree, otherwise the customer's default type. `debt` and `balance` stay `null`.
 - Shared: [SnapshotVersion](../../../../src/BuildingBlocks/BuildingBlocks.Application/Snapshots/SnapshotVersion.cs) hashes the content without `generatedAt`; [SnapshotResult](../../../../src/BuildingBlocks/BuildingBlocks.Api/Snapshots/SnapshotResult.cs) sends it as a strong `ETag` and answers `304` on a matching `If-None-Match`.
 - Host: [MobileSyncCompressionRegistrationExtensions](../../../../src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/Web/MobileSyncCompressionRegistrationExtensions.cs) compresses (Brotli, gzip) only `/api/mobile/sync/*`.
-- Both endpoints require `CanManageOrders` (Manager or Admin).
+- Both endpoints require `CanManageOrders` (Manager, Seo, or Admin).
 
 ## Code structure
 

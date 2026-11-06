@@ -9,7 +9,7 @@ public sealed class CreateStaffCommandValidator : AbstractValidator<CreateStaffC
     {
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(256);
-        RuleFor(x => x.Role).Must(StaffRoles.IsStaffRole).WithMessage("Role must be Admin or Manager.");
+        RuleFor(x => x.Role).Must(StaffRoles.IsStaffRole).WithMessage("Role must be Admin, Seo or Manager.");
         RuleFor(x => x.Password).StaffPassword();
     }
 }

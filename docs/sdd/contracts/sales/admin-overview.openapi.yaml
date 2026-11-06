@@ -10,7 +10,7 @@ paths:
     get:
       operationId: getAdminWorkspaceOverview
       summary: Orders today, drafts, 1C problems and the newest orders
-      description: Requires `CanManageOrders` (Manager or Admin). Lists hold at most 5 rows, newest first.
+      description: Requires `CanManageOrders` (Manager, Seo, or Admin). Lists hold at most 5 rows, newest first.
       tags: [AdminOverview]
       responses:
         '200':
@@ -19,7 +19,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkspaceOverview' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
 components:
   schemas:
     WorkspaceOverview:

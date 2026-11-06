@@ -51,6 +51,7 @@ internal sealed class IdentityApiFactory(IdentityPostgresFixture fixture, IAvata
     {
         await using var scope = Services.CreateAsyncScope();
         await EnsureRoleAsync(scope.ServiceProvider, RoleNames.Admin);
+        await EnsureRoleAsync(scope.ServiceProvider, RoleNames.Seo);
         await EnsureRoleAsync(scope.ServiceProvider, RoleNames.Manager);
     }
 

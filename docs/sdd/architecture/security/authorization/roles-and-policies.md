@@ -8,15 +8,17 @@ Authentication answers **who is calling**; authorization answers **whether that 
 
 ## Endpoint access
 
-Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/001-authentication-rollout/README.md).
+Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/001-authentication-rollout/README.md); the Seo role added 2026-11-06.
 
 | Controller | Routes | Access |
 | --- | --- | --- |
 | `AdminOrderWorkspaceController` | `/api/admin/order-workspace` | `CanManageOrders` |
 | `AdminOrdersController` | `/api/admin/orders` | `CanManageOrders` |
 | `AdminCustomersController` | `/api/admin/customers` | `CanManageOrders` |
-| `AdminProductsController` | `/api/admin/products` | `CanManageProducts` |
-| `AdminCategoriesController` | `/api/categories` | `CanManageProducts` |
+| `AdminProductsController` | `/api/admin/products` | `CanManageProducts`; slug and `deleted=true` need `CanManageSiteCatalog` |
+| `AdminCategoriesController` | `/api/categories` | `CanManageProducts`; slug, content, «show on site», and `deleted=true` need `CanManageSiteCatalog` |
+| `AdminCatalogAttributesController` | `/api/admin/catalog-attributes` | `CanManageProducts`; every change needs `CanManageSiteCatalog` |
+| `AdminProductGroupsController` | `/api/admin/product-groups` | `CanManageProducts`; group slug needs `CanManageSiteCatalog` |
 | `AdminArticlesController` | `/api/admin/articles` | `CanManageContent` |
 | `CompanyContactsController` | `/api/content/contacts` | public (site contacts) |
 | `AdminCompanyContactsController` | `/api/admin/content/contacts` | `CanManageContent` |
@@ -25,7 +27,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `LegalDocumentsController` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
 | `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
 | `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
-| `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager targets (403 for Admin) |
+| `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
@@ -42,11 +44,12 @@ Role constants are defined in `Identity.Domain/Authorization/RoleNames.cs`.
 | Role | Current meaning | Created by `Host.Jobs --job=migrate` |
 | --- | --- | --- |
 | `Admin` | System administration | yes |
+| `Seo` | SEO specialist: the whole admin except «Система» (users, requisites); also edits site catalog structure | yes |
 | `Manager` | Content management | yes |
 | `User` | Regular authenticated user | yes |
 | `Guest` | Declared role constant | no |
 
-`RoleSeeder`, run by the separate migration job, creates only Admin, Manager, and User. Do not assign `Guest` until its provisioning and business meaning are defined.
+`RoleSeeder`, run by the separate migration job, creates only Admin, Seo, Manager, and User. Do not assign `Guest` until its provisioning and business meaning are defined.
 
 ## Access policies
 
@@ -55,8 +58,9 @@ Policy names are defined in `Identity.Application/Security/Policies/PolicyNames.
 | Policy | Allowed roles |
 | --- | --- |
 | `RequireAdminRole` / `CanManageUsers` | Admin |
-| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` / `CanManageContent` / `CanManageMedia` | Manager, Admin |
-| `CatalogRead` / `OrderCreate` | User, Manager, Admin |
+| `CanManageSiteCatalog` | Seo, Admin |
+| `RequireManagerRole` / `CanManageProducts` / `CanManageOrders` / `CanManageContent` / `CanManageMedia` | Manager, Seo, Admin |
+| `CatalogRead` / `OrderCreate` | User, Manager, Seo, Admin |
 | `RequireTenantAccess` | The constant exists, but the policy is not currently registered |
 
 Do not use `RequireTenantAccess` on an endpoint until it is registered in the host and its semantics are defined.

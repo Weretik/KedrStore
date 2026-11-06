@@ -3,9 +3,9 @@ info:
   title: KedrStore Catalog attributes admin API
   version: 0.1.0
   description: >-
-    Spec catalog/006 phase 3. The «Властивості» panel of a product (Manager and Admin edit values and the review;
-    the original 1C name never changes) and the «Властивості» dictionary page (Manager and Admin read it, only Admin
-    changes it). Kinds are `enum`, `number`, `size`; sources `import`, `parser`, `manual`; review states `clear`,
+    Spec catalog/006 phase 3. The «Властивості» panel of a product (Manager, Seo, and Admin edit values and the review;
+    the original 1C name never changes) and the «Властивості» dictionary page (Manager, Seo, and Admin read it, only Admin
+    and Seo change it). Kinds are `enum`, `number`, `size`; sources `import`, `parser`, `manual`; review states `clear`,
     `needs_review`, `accepted`.
 paths:
   /api/admin/products/{productId}/attributes:
@@ -20,7 +20,7 @@ paths:
         '200': { description: Panel, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found. }
   /api/admin/products/{productId}/attributes/{attributeId}:
     parameters:
@@ -42,7 +42,7 @@ paths:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found. }
   /api/admin/products/{productId}/attributes/{attributeId}/manual:
     parameters:
@@ -60,7 +60,7 @@ paths:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found. }
   /api/admin/products/{productId}/review/accept:
     parameters:
@@ -75,7 +75,7 @@ paths:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
         '400': { description: 'The product has no recognized attributes yet, or invalid input.' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found. }
   /api/admin/products/{productId}/review/reopen:
     parameters:
@@ -89,7 +89,7 @@ paths:
         '200': { description: Panel after the change, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductAttributes' } } } }
         '400': { description: 'The product has no recognized attributes yet, or invalid input.' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found. }
   /api/admin/catalog-attributes:
     get:
@@ -100,7 +100,7 @@ paths:
       responses:
         '200': { description: Attributes in order, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCatalogAttributeListItem' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
     post:
       operationId: createAdminCatalogAttribute
       summary: Add an attribute («Нова ознака», Admin)
@@ -116,7 +116,7 @@ paths:
         '200': { description: The new attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
   /api/admin/catalog-attributes/{id}:
     parameters:
       - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -129,7 +129,7 @@ paths:
         '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Attribute not found. }
     put:
       operationId: updateAdminCatalogAttribute
@@ -144,7 +144,7 @@ paths:
         '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Attribute not found. }
   /api/admin/catalog-attributes/{id}/values:
     parameters:
@@ -162,7 +162,7 @@ paths:
         '200': { description: Attribute with the new value, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Attribute not found. }
   /api/admin/catalog-attributes/{id}/values/{valueId}:
     parameters:
@@ -181,7 +181,7 @@ paths:
         '200': { description: Attribute, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCatalogAttribute' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Value not found in this attribute. }
   /api/admin/catalog-attributes/unresolved-codes:
     get:
@@ -193,7 +193,7 @@ paths:
       responses:
         '200': { description: Codes, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminUnresolvedCode' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
   /api/admin/catalog-attributes/codes/{aliasId}:
     parameters:
       - { name: aliasId, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -213,7 +213,7 @@ paths:
         '200': { description: Decision, content: { application/json: { schema: { $ref: '#/components/schemas/DecideAttributeCodeResponse' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Code not found. }
   /api/admin/catalog-attributes/problem-reasons:
     get:
@@ -224,7 +224,7 @@ paths:
       responses:
         '200': { description: Reasons, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProblemReason' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
   /api/admin/catalog-attributes/category-filters/{categoryId}:
     parameters:
       - { name: categoryId, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -238,7 +238,7 @@ paths:
         '200': { description: Filters, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCategoryAttributeFilter' } } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Category not found. }
     put:
       operationId: setAdminCategoryAttributeFilters
@@ -253,7 +253,7 @@ paths:
         '200': { description: Filters, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminCategoryAttributeFilter' } } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Category not found. }
 components:
   responses:

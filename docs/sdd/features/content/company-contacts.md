@@ -10,7 +10,7 @@ The [public controller](../../../../src/Content/Content.Api/Controllers/CompanyC
 
 A save stores `UpdatedBy`, the editor's email ([ContentEditor](../../../../src/Content/Content.Application/Features/Editing/ContentEditor.cs)); only the admin responses (`AdminCompanyContacts`) return it.
 
-Access: `GET /api/content/contacts` is anonymous; `/api/admin/content/contacts` needs `CanManageContent` (Manager or Admin).
+Access: `GET /api/content/contacts` is anonymous; `/api/admin/content/contacts` needs `CanManageContent` (Manager, Seo, or Admin).
 
 ## Code structure
 

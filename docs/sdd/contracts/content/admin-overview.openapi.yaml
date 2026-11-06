@@ -8,7 +8,7 @@ paths:
     get:
       operationId: getAdminContentOverview
       summary: Article drafts, legacy covers and document drafts
-      description: Requires `CanManageContent` (Manager or Admin).
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
       tags: [AdminOverview]
       responses:
         '200':
@@ -17,7 +17,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminContentOverview' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
 components:
   schemas:
     AdminContentOverview:

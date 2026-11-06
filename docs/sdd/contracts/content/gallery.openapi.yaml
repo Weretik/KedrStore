@@ -31,12 +31,12 @@ paths:
     get:
       operationId: getAdminGallery
       summary: List the gallery cards with previews
-      description: Requires `CanManageContent` (Manager or Admin).
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
       tags: [Gallery]
       responses:
         '200': { $ref: '#/components/responses/Gallery' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/gallery/photos:
     post:
       operationId: addAdminGalleryPhotos
@@ -54,7 +54,7 @@ paths:
         '200': { $ref: '#/components/responses/Gallery' }
         '400': { description: 'No IDs, more than 100, or a file that is not in the media library.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/gallery/videos:
     post:
       operationId: addAdminGalleryVideo
@@ -72,7 +72,7 @@ paths:
         '200': { $ref: '#/components/responses/Gallery' }
         '400': { description: 'Not a YouTube video link, or a text over its limit.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '409': { description: The video is already in the gallery. }
   /api/admin/content/gallery/youtube-preview:
     get:
@@ -95,7 +95,7 @@ paths:
               schema: { $ref: '#/components/schemas/YoutubePreview' }
         '400': { description: Not a YouTube video link. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/gallery/items/{id}:
     put:
       operationId: updateAdminGalleryItem
@@ -113,7 +113,7 @@ paths:
         '200': { $ref: '#/components/responses/Gallery' }
         '400': { description: A text over its limit. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such card. }
     delete:
       operationId: deleteAdminGalleryItem
@@ -125,7 +125,7 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/Gallery' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such card. }
   /api/admin/content/gallery/order:
     put:
@@ -144,7 +144,7 @@ paths:
         '200': { $ref: '#/components/responses/Gallery' }
         '400': { description: A repeated or invalid ID. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '409': { description: The list does not match the current gallery. }
 components:
   parameters:

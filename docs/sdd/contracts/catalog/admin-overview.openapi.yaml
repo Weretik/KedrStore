@@ -8,7 +8,7 @@ paths:
     get:
       operationId: getAdminCatalogOverview
       summary: Products without a photo and categories without site text
-      description: Requires `CanManageProducts` (Manager or Admin). Deleted products and categories are not counted.
+      description: Requires `CanManageProducts` (Manager, Seo, or Admin). Deleted products and categories are not counted.
       tags: [AdminOverview]
       responses:
         '200':
@@ -17,7 +17,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCatalogOverview' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
 components:
   schemas:
     AdminCatalogOverview:

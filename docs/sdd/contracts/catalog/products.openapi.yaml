@@ -97,7 +97,7 @@ paths:
       summary: List admin product rows
       tags: [Admin products]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Policy CanManageProducts (Manager and Admin).
+      description: Policy CanManageProducts (Manager, Seo, and Admin).
       parameters:
         - $ref: '#/components/parameters/SearchTerm'
         - $ref: '#/components/parameters/CategorySlug'
@@ -124,7 +124,7 @@ paths:
           in: query
           description: >-
             `true` lists soft-deleted products only (newest deletion first; search by Ukrainian name or 1C code;
-            other filters and sort are ignored). Admin role only.
+            other filters and sort are ignored). Admin or Seo role only.
           schema: { type: boolean }
         - $ref: '#/components/parameters/ProductSort'
         - $ref: '#/components/parameters/Page'
@@ -133,7 +133,7 @@ paths:
         '200': { description: Admin product page, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductPage' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: 'Signed in without the Manager or Admin role, or `deleted=true` without the Admin role.' }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role, or `deleted=true` without the Admin or Seo role.' }
   /api/admin/products/{id}/slug:
     put:
       operationId: changeAdminProductSlug
@@ -161,7 +161,7 @@ paths:
               schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugResponse' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Product not found or deleted. }
   /api/admin/products/all:
     get:
@@ -169,11 +169,11 @@ paths:
       summary: List all admin product rows
       tags: [Admin products]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Policy CanManageProducts (Manager and Admin). Returns the unpaged admin row model.
+      description: Policy CanManageProducts (Manager, Seo, and Admin). Returns the unpaged admin row model.
       responses:
         '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
   /api/admin/products/{id}/media:
     parameters:
       - name: id
@@ -186,13 +186,13 @@ paths:
       tags: [Admin products]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: >-
-        Policies CanManageProducts and CanManageMedia (Manager and Admin). Photos come in gallery order; file names
+        Policies CanManageProducts and CanManageMedia (Manager, Seo, and Admin). Photos come in gallery order; file names
         are read from the media library.
       responses:
         '200': { description: Product media set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found or deleted. }
     put:
       operationId: setAdminProductMedia
@@ -211,7 +211,7 @@ paths:
         '200': { description: Saved set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
         '404': { description: Product not found or deleted. }
   /api/admin/products/by-slug/{productSlug}:
     get:
@@ -219,7 +219,7 @@ paths:
       summary: Get one admin product by slug
       tags: [Admin products]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Policy CanManageProducts (Manager and Admin).
+      description: Policy CanManageProducts (Manager, Seo, and Admin).
       parameters:
         - name: productSlug
           in: path
@@ -230,7 +230,7 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Product not found }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: Signed in without the Manager, Seo, or Admin role. }
 components:
   parameters:
     Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }

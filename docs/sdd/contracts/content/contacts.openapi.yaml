@@ -24,7 +24,7 @@ paths:
     get:
       operationId: getAdminCompanyContacts
       summary: Get the company contacts for editing
-      description: Requires `CanManageContent` (Manager or Admin).
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
       tags: [Contacts]
       responses:
         '200':
@@ -33,12 +33,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCompanyContacts' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: The contacts row is missing. }
     put:
       operationId: updateAdminCompanyContacts
       summary: Replace all company contacts
-      description: Requires `CanManageContent` (Manager or Admin). All fields are required and replaced at once.
+      description: Requires `CanManageContent` (Manager, Seo, or Admin). All fields are required and replaced at once.
       tags: [Contacts]
       requestBody:
         required: true
@@ -57,7 +57,7 @@ paths:
             application/json:
               schema: { type: object, additionalProperties: true }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: The contacts row is missing. }
 components:
   schemas:

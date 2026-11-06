@@ -29,12 +29,12 @@ paths:
     get:
       operationId: getAdminHomeBlocks
       summary: List the home page FAQ and brands
-      description: Requires `CanManageContent` (Manager or Admin).
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
       tags: [Home]
       responses:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/home/faq:
     post:
       operationId: createAdminHomeFaqItem
@@ -50,7 +50,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: A text is missing or over its limit. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/home/faq/{id}:
     put:
       operationId: updateAdminHomeFaqItem
@@ -68,7 +68,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: A text is missing or over its limit. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such question. }
     delete:
       operationId: deleteAdminHomeFaqItem
@@ -80,7 +80,7 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such question. }
   /api/admin/content/home/faq/order:
     put:
@@ -99,7 +99,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: A repeated or invalid ID. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '409': { description: The list does not match the current FAQ. }
   /api/admin/content/home/brands:
     post:
@@ -116,7 +116,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: 'No name, a name over 100 characters, or a logo that is not in the media library.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
   /api/admin/content/home/brands/{id}:
     put:
       operationId: updateAdminHomeBrand
@@ -134,7 +134,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: 'No name, a name over 100 characters, or a logo that is not in the media library.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such brand. }
     delete:
       operationId: deleteAdminHomeBrand
@@ -146,7 +146,7 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '404': { description: No such brand. }
   /api/admin/content/home/brands/order:
     put:
@@ -164,7 +164,7 @@ paths:
         '200': { $ref: '#/components/responses/HomeBlocks' }
         '400': { description: A repeated or invalid ID. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: Not a Manager, Seo, or Admin. }
         '409': { description: The list does not match the current brands. }
 components:
   parameters:
