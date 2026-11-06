@@ -14,7 +14,7 @@ public sealed class CreateCatalogAttributeCommandValidator : AbstractValidator<C
             RuleFor(command => command.Request.NameRu).MaximumLength(CatalogAttribute.NameMaxLength)
                 .OverridePropertyName("nameRu");
             RuleFor(command => command.Request.Kind).Must(kind => CreateCatalogAttributeCommand.Kinds.Contains(kind))
-                .WithMessage("Kind is enum or number.").OverridePropertyName("kind");
+                .WithMessage("Kind is enum, number, or yesno.").OverridePropertyName("kind");
             RuleFor(command => command.Request.Unit).MaximumLength(CatalogAttribute.UnitMaxLength)
                 .OverridePropertyName("unit");
             RuleFor(command => command.Request.Code).MaximumLength(CatalogAttribute.CodeMaxLength)

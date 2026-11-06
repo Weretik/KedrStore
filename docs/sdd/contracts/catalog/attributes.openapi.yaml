@@ -433,7 +433,7 @@ components:
       properties:
         nameUk: { type: string, maxLength: 120 }
         nameRu: { type: [string, 'null'], maxLength: 120 }
-        kind: { type: string, enum: [enum, number], description: '`enum` - a list of values; `number` - a number in `unit`.' }
+        kind: { type: string, enum: [enum, number, yesno], description: '`enum` - a list of values; `yesno` - a list with «Так» and «Ні» created at once; `number` - a number in `unit`.' }
         unit: { type: [string, 'null'], maxLength: 16 }
         code: { type: [string, 'null'], maxLength: 64, pattern: '^[a-z0-9_]+$' }
         slug: { type: [string, 'null'], maxLength: 80, pattern: '^[a-z0-9]+(-[a-z0-9]+)*$' }

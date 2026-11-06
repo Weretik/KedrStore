@@ -9,11 +9,13 @@ namespace Catalog.Application.Features.Attributes.Create;
 
 /// <summary>
 /// Adds an attribute to the shared dictionary (spec catalog/007 M-06). Code and slug are unique among attributes; a slug
-/// made from the name gets a number when taken, an explicit taken code or slug is refused.
+/// made from the name gets a number when taken, an explicit taken code or slug is refused. A «Так / Ні» attribute
+/// (<c>yesno</c>) is a list that gets the values «Так» and «Ні» at once.
 /// </summary>
 public sealed class CreateCatalogAttributeCommandHandler(
     IReadCatalogDbContext db,
     ICatalogRepository<CatalogAttribute> attributes,
+    ICatalogRepository<AttributeValue> values,
     CatalogAttributeReader reader,
     TimeProvider clock)
     : ICommandHandler<CreateCatalogAttributeCommand, Result<AdminCatalogAttributeDto>>
@@ -46,6 +48,15 @@ public sealed class CreateCatalogAttributeCommandHandler(
             request.IsVariantAxis, request.SortOrder, now);
         attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder, now);
         await attributes.AddAsync(attribute, cancellationToken);
+        if (request.Kind == CreateCatalogAttributeCommand.YesNo)
+        {
+            await values.AddRangeAsync(
+            [
+                AttributeValue.CreateManual(attribute.Id, "yes", "Так", "Да", "tak", 1, null, null, now),
+                AttributeValue.CreateManual(attribute.Id, "no", "Ні", "Нет", "ni", 2, null, null, now)
+            ], cancellationToken);
+        }
+
         return Result.Success((await reader.ReadAsync(attribute.Id, cancellationToken))!);
     }
 
