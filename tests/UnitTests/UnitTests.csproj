@@ -31,6 +31,8 @@
       <ProjectReference Include="..\..\src\Content\Content.Application\Content.Application.csproj" />
       <ProjectReference Include="..\..\src\Content\Content.Domain\Content.Domain.csproj" />
       <ProjectReference Include="..\..\src\Media\Media.Application\Media.Application.csproj" />
+      <ProjectReference Include="..\..\src\Work\Work.Application\Work.Application.csproj" />
+      <ProjectReference Include="..\..\src\Work\Work.Api\Work.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

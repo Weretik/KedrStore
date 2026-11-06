@@ -5,6 +5,7 @@ using Content.Application;
 using Identity.Application;
 using Media.Application;
 using Sales.Application;
+using Work.Application;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration.Pipeline;
 
@@ -24,6 +25,7 @@ public static class MediatorRegistrationExtensions
                 typeof(SalesApplicationAssemblyMarker).Assembly,
                 typeof(ContentApplicationAssemblyMarker).Assembly,
                 typeof(MediaApplicationAssemblyMarker).Assembly,
+                typeof(WorkApplicationAssemblyMarker).Assembly,
                 typeof(ApplicationAssemblyMarker).Assembly
             ];
 

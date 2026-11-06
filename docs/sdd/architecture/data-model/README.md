@@ -62,6 +62,11 @@ KedrStore PostgreSQL
         ├── MediaFolders                  # virtual folders with an optional parent
         ├── MediaFiles                    # CDN key, display name, type, size, folder
         └── __EFMigrationsHistory         # Media migration history
+└── schema work
+    └── Work / WorkDbContext — 2 tables
+        ├── WorkTasks                     # a staff member's own tasks: title, state, result
+        ├── WorkActivities                # automatic log of admin changes, repeats merged
+        └── __EFMigrationsHistory         # Work migration history
 ```
 
 ## Open only the relevant part
@@ -77,5 +82,6 @@ KedrStore PostgreSQL
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |
 | Site articles, company contacts, requisites, documents, gallery, home page blocks, the page «Співпраця» and search texts of the site pages | [Content](content-articles.md) | [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md), [Site documents](../../features/content/legal-documents.md), [Site gallery](../../features/content/gallery.md), [Home page FAQ and brands](../../features/content/home-blocks.md), [Page «Співпраця»](../../features/content/wholesale-page.md), [Search texts of the site pages](../../features/content/page-seo.md) |
 | Library folders and CDN files | [Media](media-library.md) | [Media library](../../features/media/media-library.md) |
+| Staff tasks and the activity log | [Work](work-tasks.md) | [Staff tasks and the activity log](../../features/work/staff-work.md) |
 
 Each EF model table is described in exactly **one** document above. Physical FKs are shown in its ER diagram; ID references without an FK are explained separately. `__EFMigrationsHistory` is an infrastructure table and is not one of the EF model tables; its presence in a specific environment depends on applied migrations. After a schema change, update the relevant document and this tree only if the table list or placement changed.

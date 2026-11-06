@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Infrastructure.DependencyInjection;
 using Sales.Infrastructure.Integrations.OneC.Jobs;
+using Work.Infrastructure.DependencyInjection;
 
 namespace Host.Jobs;
 
@@ -29,6 +30,7 @@ public static class JobsHostServicesExtensions
         services.AddIdentityInfrastructureServices(configuration);
         services.AddContentInfrastructureServices(configuration);
         services.AddMediaInfrastructureServices(configuration);
+        services.AddWorkInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);

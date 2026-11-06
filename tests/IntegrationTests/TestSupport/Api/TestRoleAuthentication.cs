@@ -10,12 +10,13 @@ namespace IntegrationTests.TestSupport.Api;
 
 /// <summary>
 /// Replaces real sign-in in API tests: a request with <see cref="RoleHeader"/> is a user in that role;
-/// a request without it is anonymous.
+/// a request without it is anonymous. <see cref="UserHeader"/> optionally sets the user ID (default <c>test-user</c>).
 /// </summary>
 public static class TestRoleAuthentication
 {
     public const string SchemeName = "TestRole";
     public const string RoleHeader = "X-Test-Role";
+    public const string UserHeader = "X-Test-User";
 
     public static IServiceCollection AddTestRoleAuthentication(this IServiceCollection services)
     {
@@ -36,6 +37,13 @@ public static class TestRoleAuthentication
         return client;
     }
 
+    public static HttpClient CreateClientWithUser(this WebApplicationFactory<Program> factory, string role, Guid userId)
+    {
+        var client = factory.CreateClientWithRole(role);
+        client.DefaultRequestHeaders.Add(UserHeader, userId.ToString());
+        return client;
+    }
+
     private sealed class Handler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
@@ -47,8 +55,11 @@ public static class TestRoleAuthentication
             if (!Request.Headers.TryGetValue(RoleHeader, out var role) || string.IsNullOrWhiteSpace(role))
                 return Task.FromResult(AuthenticateResult.NoResult());
 
+            var userId = Request.Headers.TryGetValue(UserHeader, out var user) && !string.IsNullOrWhiteSpace(user)
+                ? user.ToString()
+                : "test-user";
             var identity = new ClaimsIdentity(
-                [new Claim(ClaimTypes.NameIdentifier, "test-user"), new Claim(ClaimTypes.Role, role.ToString())],
+                [new Claim(ClaimTypes.NameIdentifier, userId), new Claim(ClaimTypes.Role, role.ToString())],
                 SchemeName);
             return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName)));
         }

@@ -1,0 +1,11 @@
+global using Ardalis.Specification.EntityFrameworkCore;
+global using BuildingBlocks.Domain.Abstractions;
+global using BuildingBlocks.Infrastructure.Migrations;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Work.Application.Contracts.Persistence;
+global using Work.Domain.Activity;
+global using Work.Domain.Tasks;
+global using Work.Infrastructure.DataBase;

@@ -28,6 +28,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
 | `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
+| `WorkTasksController` | `/api/work` | `RequireManagerRole`; only the caller's own tasks and report |
+| `AdminWorkController` | `/api/admin/work` | `RequireAdminRole` |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
