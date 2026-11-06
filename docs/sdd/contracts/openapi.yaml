@@ -99,6 +99,8 @@ paths:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1{id}~1values
   /api/admin/catalog-attributes/{id}/values/{valueId}:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1{id}~1values~1{valueId}
+  /api/admin/catalog-attributes/swatches:
+    $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1swatches
   /api/admin/catalog-attributes/unresolved-codes:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1unresolved-codes
   /api/admin/catalog-attributes/codes/{aliasId}:
