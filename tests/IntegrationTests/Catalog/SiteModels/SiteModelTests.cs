@@ -11,6 +11,7 @@ using global::Catalog.Application.Features.SiteModels.GetHealth;
 using global::Catalog.Application.Features.SiteModels.GetCategories;
 using global::Catalog.Application.Features.SiteModels.GetList;
 using global::Catalog.Application.Features.SiteModels.GetShowcase;
+using global::Catalog.Application.Features.SiteModels.RemoveProduct;
 using global::Catalog.Application.Features.SiteModels.SetAxes;
 using global::Catalog.Application.Features.SiteModels.SetTexts;
 using global::Catalog.Application.Attributes.Import;
@@ -86,6 +87,8 @@ public sealed class SiteModelTests
         public FillSiteModelFromNamesCommandHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
             State, Changes, Reader, TimeProvider.System);
 
+        public RemoveSiteModelProductCommandHandler Remove => new(db, Changes, Reader, TimeProvider.System);
+
         public async Task<SiteModelDto> GetAsync(int id)
             => (await new GetSiteModelQueryHandler(Reader).Handle(new GetSiteModelQuery(id), CancellationToken.None))
                 .Value;
@@ -153,7 +156,8 @@ public sealed class SiteModelTests
         var health = await handlers.Accept.Handle(
             new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [model.Id.Value] }), CancellationToken.None);
         Assert.True(health.IsSuccess);
-        Assert.Equal(1, health.Value.ProductsWithoutModel);
+        // Product 3 waits in the proposed «Ручка»: that is review work, not the hard error.
+        Assert.Equal(0, health.Value.ProductsWithoutModel);
         Assert.Equal(1, health.Value.ProposedModels);
 
         // Product 2 now reads as «Ручка»: the accepted model keeps it, its name, and its status.
@@ -242,7 +246,7 @@ public sealed class SiteModelTests
         var handle = await ModelOfAsync(db, 3);
 
         var before = await handlers.HealthAsync();
-        Assert.Equal(3, before.ProductsWithoutModel);
+        Assert.Equal(0, before.ProductsWithoutModel);
         Assert.Equal(2, before.ProposedModels);
 
         await handlers.Accept.Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest
@@ -299,20 +303,23 @@ public sealed class SiteModelTests
             CancellationToken.None);
 
         var all = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest());
-        // Off-site product 4 is not listed; the proposed model of product 3 has the hard error and comes first.
-        Assert.Equal(["Ручка", "Завіса"], all.Items.Select(item => item.Name));
-        Assert.Equal("proposed", all.Items[0].Model!.Status);
-        Assert.Equal([3], all.Items[0].Products.Select(item => item.ProductId));
-        Assert.Equal([SiteModelProblems.NoModel], all.Items[0].Problems);
-        Assert.Equal($"m{hinges.Id.Value}", all.Items[1].Key);
-        Assert.Equal([1, 2], all.Items[1].Products.Select(item => item.ProductId));
-        Assert.Equal(["Антична бронза", "Ліва"], all.Items[1].Products[0].Values.Select(value => value.Value));
+        // Off-site product 4 is not listed; the accepted model has problems and comes before the clean proposal.
+        Assert.Equal(["Завіса", "Ручка"], all.Items.Select(item => item.Name));
+        Assert.Equal($"m{hinges.Id.Value}", all.Items[0].Key);
+        Assert.Equal([1, 2], all.Items[0].Products.Select(item => item.ProductId));
+        Assert.Equal(["Антична бронза", "Ліва"], all.Items[0].Products[0].Values.Select(value => value.Value));
         // The accepted model has only model warnings (no texts, no photo); its products are fine.
-        Assert.Equal([SiteModelProblems.ModelNoSeo, SiteModelProblems.ModelNoPhoto], all.Items[1].Problems);
-        Assert.All(all.Items[1].Products, product => Assert.Empty(product.Problems));
+        Assert.Equal([SiteModelProblems.ModelNoSeo, SiteModelProblems.ModelNoPhoto], all.Items[0].Problems);
+        Assert.All(all.Items[0].Products, product => Assert.Empty(product.Problems));
+        // A product of a proposed model waits for review; it is not the hard error.
+        Assert.Equal("proposed", all.Items[1].Model!.Status);
+        Assert.Equal([3], all.Items[1].Products.Select(item => item.ProductId));
+        Assert.Empty(all.Items[1].Problems);
 
         var errors = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Problem = SiteModelProblems.NoModel });
-        Assert.Equal(["Ручка"], errors.Items.Select(item => item.Name));
+        Assert.Empty(errors.Items);
+        var toReview = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Status = "proposed" });
+        Assert.Equal(["Ручка"], toReview.Items.Select(item => item.Name));
         var byCode = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Search = "2" });
         Assert.Equal(["Завіса"], byCode.Items.Select(item => item.Name));
         var inParent = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { CategoryId = Parent });
@@ -321,12 +328,37 @@ public sealed class SiteModelTests
         var categories = await handlers.CategoriesAsync();
         Assert.Equal([Parent, Final, OtherFinal], categories.Select(category => category.Id));
         Assert.Equal([null, Parent, Parent], categories.Select(category => category.ParentId));
-        Assert.Equal((3, 1, 1, 2), (categories[0].OnSiteProducts, categories[0].AcceptedModels,
-            categories[0].ProposedModels, categories[0].ProblemCount));
-        Assert.Equal((2, 1, 0, 1), (categories[1].OnSiteProducts, categories[1].AcceptedModels,
-            categories[1].ProposedModels, categories[1].ProblemCount));
-        Assert.Equal((1, 0, 1, 1), (categories[2].OnSiteProducts, categories[2].AcceptedModels,
-            categories[2].ProposedModels, categories[2].ProblemCount));
+        Assert.Equal((3, 1, 1, 1, 0), (categories[0].OnSiteProducts, categories[0].AcceptedModels,
+            categories[0].ProposedModels, categories[0].ProblemCount, categories[0].LoneProducts));
+        Assert.Equal((2, 1, 0, 1, 0), (categories[1].OnSiteProducts, categories[1].AcceptedModels,
+            categories[1].ProposedModels, categories[1].ProblemCount, categories[1].LoneProducts));
+        Assert.Equal((1, 0, 1, 0, 0), (categories[2].OnSiteProducts, categories[2].AcceptedModels,
+            categories[2].ProposedModels, categories[2].ProblemCount, categories[2].LoneProducts));
+        // The import offered a filter in the category of the two hinges; the parent has none of its own.
+        Assert.Equal([0, 1, 0], categories.Select(category => category.FilterCount));
+    }
+
+    [Fact]
+    public async Task ProductTakenOutOfEveryModel_IsTheHardError_AndTheStatusFilterFindsIt_SC_M15()
+    {
+        await using var db = await CatalogAsync([1, 2]);
+        await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "CR", "L")), apply: true);
+        var handlers = new Handlers(db);
+        var hinges = await ModelOfAsync(db, 1);
+
+        var removed = await handlers.Remove.Handle(new RemoveSiteModelProductCommand(hinges.Id.Value, 2),
+            CancellationToken.None);
+        Assert.True(removed.IsSuccess);
+        db.ChangeTracker.Clear();
+
+        Assert.Equal(1, (await handlers.HealthAsync()).ProductsWithoutModel);
+        var lone = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Status = "none" });
+        Assert.Equal(["p2"], lone.Items.Select(item => item.Key));
+        Assert.Equal([SiteModelProblems.NoModel], lone.Items[0].Problems);
+        var proposed = await handlers.ShowcaseAsync(new GetSiteShowcaseRequest { Status = "proposed" });
+        Assert.Equal([$"m{hinges.Id.Value}"], proposed.Items.Select(item => item.Key));
+        var final = (await handlers.CategoriesAsync()).Single(category => category.Id == Final);
+        Assert.Equal((2, 1, 1), (final.OnSiteProducts, final.ProposedModels, final.LoneProducts));
     }
 
     [Fact]
@@ -346,7 +378,7 @@ public sealed class SiteModelTests
         var models = await handlers.ListAsync(new GetSiteModelsRequest());
         Assert.Equal(["Завіса"], models.Items.Select(item => item.Name));
         Assert.Equal([Parent, Final], (await handlers.CategoriesAsync()).Select(category => category.Id));
-        Assert.Equal(2, (await handlers.HealthAsync()).ProductsWithoutModel);
+        Assert.Equal(1, (await handlers.HealthAsync()).ProposedModels);
     }
 
     private sealed class Manager : ICurrentUserService

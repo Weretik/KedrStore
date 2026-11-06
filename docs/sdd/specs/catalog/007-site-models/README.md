@@ -41,9 +41,9 @@ Models and attributes are a layer for the site only. The 1C products, their name
 - **R-06.** «Заповнити з назв» copies, for each product of the model and each axis without a value a person set, the confirmed automatic value the recognizer stored, as a manual value (spec 006 R-13). The person's click is the confirmation; codes nobody decoded or confirmed stay empty (spec 006 D-03).
 - **R-07.** Model texts are stored per language (`uk`, `ru`): short description (≤ 500), full description (≤ 8000), SEO title (≤ 120), SEO description (≤ 320). Empty strings are stored as empty values.
 - **R-08.** Health of the site, counted only for on-site, not deleted products:
-  - `no_model` — not in an accepted model (hard error, M-04);
-  - `no_attributes` — in an accepted model, but without a confirmed attribute value;
-  - `missing_axis_value` — an axis of its accepted model has no confirmed value on it;
+  - `no_model` — in no model at all, proposed or accepted (hard error, M-04; stage 4c: a product of a proposed model waits for review and is counted in `proposed_waiting`);
+  - `no_attributes` — in a model, but without a confirmed attribute value;
+  - `missing_axis_value` — an axis of its model (saved, or offered for a proposed model) has no confirmed value on it;
   - `same_combination` — another on-site product of the model has the same axis values;
   - for accepted models with on-site products: `model_no_axes` (two or more on-site products and no axes), `model_no_seo` (a short description or an SEO description is empty in `uk` or `ru`), `model_no_photo` (no on-site product of the model has a photo);
   - `proposed_waiting` — the number of proposed models with on-site products.
@@ -196,6 +196,30 @@ src/Catalog/
 └── Catalog.Api/Controllers/AdminCategoriesController.cs      # PUT {id}/site-visibility (Admin)
 ```
 
+## Stage 4c: one «Вітрина сайту» page, review queue
+
+Owner requests 2026-11-05 23:03 after the UX audit, and the choice of canvas variant B («черга + картка») at 23:15: «Вітрина сайту», «Моделі», and «Ознаки» become one page with tabs Моделі / Ознаки / Не розшифровані коди / Фільтри категорій; a person reviews every model one by one (no bulk accept); models show no photo, products do; «Фільтри категорій» lists only categories shown on the site. The admin work is in kedr-web; the server gives honest statuses and the counts the queue needs.
+
+### Rules
+
+- **R-20.** R-08 changes: `no_model` is only for an on-site product in no model; a product of a proposed model is review work, checked against the offered axes. The showcase takes `status` = `proposed`, `accepted`, or `none` (products in no model). Each category of the tree also carries its products in no model, its accepted models with a problem, and how many attributes it offers as site filters itself.
+
+### Scenarios
+
+- **SC-M12 (R-19, R-20).** The showcase lists the accepted model with problems first, then the proposed one-product model with no problem; `problem=no_model` finds nothing, `status=proposed` finds the proposal; the category tree counts problems, products in no model, and filters.
+- **SC-M15 (R-20).** A product taken out of its model is the hard error: health counts it, `status=none` lists it alone, and its category counts it.
+
+### Files (stage 4c)
+
+```text
+src/Catalog/
+├── Catalog.Contracts/SiteModels/SiteModelRequests.cs, SiteShowcaseDtos.cs  # status filter; tree counts
+└── Catalog.Application/Features/SiteModels/
+    ├── Common/SiteModelState*.cs           # no_model only outside every model; filter counts
+    ├── GetShowcase/                        # status filter
+    └── GetCategories/                      # lone products, accepted models with problems, filter count
+```
+
 ## Stages
 
 | Stage | Scope | Status |
@@ -205,6 +229,7 @@ src/Catalog/
 | 3 | Run the proposals on production (dry run, then on «да») | planned |
 | 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | done 2026-11-05 (KedrStore #176, kedr-web #65) |
 | 4b | Categories «show on site» mark (migration `CategorySiteVisibility`), showcase by model, category tree, only on-site models and products in «Моделі» | in review |
+| 4c | One «Вітрина сайту» page with tabs and the review queue (canvas variant B); server: honest statuses, showcase `status`, tree counts (R-20) | in review |
 | 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces the reverted spec 006 phase 5 | done 2026-11-05 (no schema change) |
 | 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search | planned |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |
@@ -236,3 +261,9 @@ src/Catalog/
 | --- | --- |
 | `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Catalog\|FullyQualifiedName~ApiContractTests"` with local PostgreSQL (migrations applied there) | 103 passed: SC-M12, SC-M13 in `SiteModelTests`, SC-M14 in `CategorySiteVisibilityTests` and `CatalogStableUrlsApiTests`; test categories now carry the mark |
 | `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~Catalog"` | 110 passed |
+
+## Evidence (stage 4c)
+
+| Check | Result |
+| --- | --- |
+| `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~SiteModel\|FullyQualifiedName~Overview\|FullyQualifiedName~Showcase"` with local PostgreSQL | 31 passed: SC-M12 updated, SC-M15 new in `SiteModelTests`; health counts in `AdminSiteModelsApiTests` follow R-20 |

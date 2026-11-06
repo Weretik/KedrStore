@@ -3,7 +3,7 @@ namespace Catalog.Application.Features.SiteModels.Common;
 /// <summary>Problem codes of the site models (spec catalog/007 R-08).</summary>
 public static class SiteModelProblems
 {
-    /// <summary>Hard error: an on-site product outside accepted models.</summary>
+    /// <summary>Hard error: an on-site product in no model, proposed or accepted.</summary>
     public const string NoModel = "no_model";
     public const string NoAttributes = "no_attributes";
     public const string MissingAxisValue = "missing_axis_value";

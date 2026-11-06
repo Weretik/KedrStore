@@ -5,8 +5,9 @@ using Catalog.Domain.ValueObjects;
 namespace Catalog.Application.Features.SiteModels.GetCategories;
 
 /// <summary>
-/// The category tree of «Моделі» and «Вітрина сайту» (R-18): categories shown on the site with on-site products in them
-/// or below them, each with its parent, and counts that include subcategories; ordered by name within a parent.
+/// The category tree of «Вітрина сайту» (R-18): categories shown on the site with on-site products in them or below
+/// them, each with its parent, and counts that include subcategories; ordered by name within a parent. The filter
+/// count is the category's own (R-20).
 /// </summary>
 public sealed class GetSiteModelCategoriesQueryHandler(SiteModelStateReader reader)
     : IQueryHandler<GetSiteModelCategoriesQuery, Result<List<SiteModelCategoryDto>>>
@@ -29,10 +30,10 @@ public sealed class GetSiteModelCategoriesQueryHandler(SiteModelStateReader read
 
         foreach (var product in state.Products.Values.Where(product => product.IsOnSite))
         {
-            var noModel = state.ProductProblems(product.Id).Contains(SiteModelProblems.NoModel);
+            var lone = state.IsLone(product.Id);
             AddUp(product.CategoryId, value => value with
             {
-                Products = value.Products + 1, Problems = value.Problems + (noModel ? 1 : 0)
+                Products = value.Products + 1, Lone = value.Lone + (lone ? 1 : 0)
             });
         }
 
@@ -52,7 +53,8 @@ public sealed class GetSiteModelCategoriesQueryHandler(SiteModelStateReader read
             .Select(entry => new SiteModelCategoryDto(entry.Key.Value,
                 state.CategoryNames.GetValueOrDefault(entry.Key) ?? string.Empty,
                 state.CategoryParents.GetValueOrDefault(entry.Key)?.Value,
-                entry.Value.Products, entry.Value.Accepted, entry.Value.Proposed, entry.Value.Problems))
+                entry.Value.Products, entry.Value.Accepted, entry.Value.Proposed, entry.Value.Problems,
+                entry.Value.Lone, state.FilterCounts.GetValueOrDefault(entry.Key)))
             .OrderBy(row => row.Name, StringComparer.CurrentCulture)
             .ThenBy(row => row.Id)
             .ToList();
@@ -60,8 +62,8 @@ public sealed class GetSiteModelCategoriesQueryHandler(SiteModelStateReader read
         return Result.Success(rows);
     }
 
-    private sealed record Counts(int Products, int Accepted, int Proposed, int Problems)
+    private sealed record Counts(int Products, int Accepted, int Proposed, int Problems, int Lone)
     {
-        public static readonly Counts Zero = new(0, 0, 0, 0);
+        public static readonly Counts Zero = new(0, 0, 0, 0, 0);
     }
 }

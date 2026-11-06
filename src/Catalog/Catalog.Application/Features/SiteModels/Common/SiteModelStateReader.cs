@@ -51,6 +51,11 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
             .Select(attribute => new SiteModelAttributeFacts(attribute.Id, attribute.Code, attribute.NameUk,
                 attribute.IsVariantAxis, attribute.SortOrder, attribute.Kind))
             .ToDictionaryAsync(attribute => attribute.Id, cancellationToken);
+        var filterCounts = await db.CategoryAttributes.AsNoTracking()
+            .Where(row => row.IsFilterable)
+            .GroupBy(row => row.CategoryId)
+            .Select(group => new { group.Key, Count = group.Count() })
+            .ToDictionaryAsync(item => item.Key, item => item.Count, cancellationToken);
         var valueNames = await db.AttributeValues.AsNoTracking()
             .Select(value => new { value.Id, value.NameUk })
             .ToDictionaryAsync(value => value.Id, value => value.NameUk, cancellationToken);
@@ -73,7 +78,8 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db)
             CategoryNames = categories.ToDictionary(category => category.Id,
                 category => string.IsNullOrWhiteSpace(category.ShortNameUk) ? category.Name : category.ShortNameUk),
             CategoryParents = categories.ToDictionary(category => category.Id, category => category.ParentId),
-            ShownCategories = shownCategories
+            ShownCategories = shownCategories,
+            FilterCounts = filterCounts
         };
     }
 }

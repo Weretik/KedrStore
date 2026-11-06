@@ -54,11 +54,13 @@ public sealed record SetSiteModelTextRequest
 
 /// <summary>
 /// «Вітрина сайту»: models with their on-site products. <c>CategoryId</c> takes the category with its subcategories;
+/// <c>Status</c>: <c>proposed</c>, <c>accepted</c>, or <c>none</c> (products in no model);
 /// <c>Problem</c>: a product problem code or <c>any</c>; <c>Search</c>: part of the model or product name, or a 1C code.
 /// </summary>
 public sealed record GetSiteShowcaseRequest
 {
     public int? CategoryId { get; init; }
+    public string? Status { get; init; }
     public string? Problem { get; init; }
     public string? Search { get; init; }
     public int Page { get; init; } = 1;
