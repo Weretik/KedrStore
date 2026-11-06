@@ -15,7 +15,8 @@ internal sealed partial class ProductNameRecognition
         var ignored = new HashSet<NameObservation>();
         foreach (var observation in observations)
         {
-            var entry = _dictionary.Find(observation.Attribute, observation.Scope, observation.RawValue);
+            var entry = _dictionary.Find(observation.Attribute, observation.Scope, observation.RawValue,
+                _product.CategoryId);
             if (entry?.EligibleNamePattern is { } eligible && PythonRegex.Search(eligible, _name) is null)
                 entry = null;
 

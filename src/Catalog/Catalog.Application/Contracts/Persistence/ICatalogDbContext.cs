@@ -16,6 +16,7 @@ public interface IReadCatalogDbContext
     DbSet<CatalogAttribute> Attributes { get; }
     DbSet<AttributeValue> AttributeValues { get; }
     DbSet<AttributeAlias> AttributeAliases { get; }
+    DbSet<AttributeAliasCategoryValue> AttributeAliasCategoryValues { get; }
     DbSet<CategoryAttribute> CategoryAttributes { get; }
     DbSet<ProductAttributeValue> ProductAttributeValues { get; }
     DbSet<ProductAttributeReview> ProductAttributeReviews { get; }

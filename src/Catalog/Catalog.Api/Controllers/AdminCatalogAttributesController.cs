@@ -1,6 +1,7 @@
 using Catalog.Application.Features.Attributes.Create;
 using Catalog.Application.Features.Attributes.CreateValue;
 using Catalog.Application.Features.Attributes.DecideCode;
+using Catalog.Application.Features.Attributes.GetCodeProducts;
 using Catalog.Application.Features.Attributes.Get;
 using Catalog.Application.Features.Attributes.GetCategoryFilters;
 using Catalog.Application.Features.Attributes.GetList;
@@ -85,6 +86,15 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
     public async Task<ActionResult<List<AdminUnresolvedCodeDto>>> GetUnresolvedCodes(
         CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(new GetUnresolvedCodesQuery(), cancellationToken));
+
+    /// <summary>On-site products whose names contain the code, by category, with its own decoding there.</summary>
+    [HttpGet("codes/{aliasId:int}/products", Name = "getAdminAttributeCodeProducts")]
+    [ProducesResponseType(typeof(AdminCodeProductsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AdminCodeProductsDto>> GetCodeProducts([FromRoute] int aliasId,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(new GetCodeProductsQuery(aliasId), cancellationToken));
 
     [HttpPut("codes/{aliasId:int}", Name = "decideAdminAttributeCode")]
     [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]

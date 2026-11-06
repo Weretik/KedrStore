@@ -194,6 +194,22 @@ paths:
         '200': { description: Codes, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminUnresolvedCode' } } } } }
         '401': { description: Not signed in. }
         '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
+  /api/admin/catalog-attributes/codes/{aliasId}/products:
+    parameters:
+      - { name: aliasId, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    get:
+      operationId: getAdminAttributeCodeProducts
+      summary: Where a code occurs (spec catalog/008)
+      description: >-
+        On-site, not deleted products whose original 1C names contain the code, grouped by category (most products
+        first), with the code's own decoding in each category.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      responses:
+        '200': { description: Products by category, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCodeProducts' } } } }
+        '401': { description: Not signed in. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
+        '404': { description: Code not found. }
   /api/admin/catalog-attributes/codes/{aliasId}:
     parameters:
       - { name: aliasId, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -201,9 +217,11 @@ paths:
       operationId: decideAdminAttributeCode
       summary: Decode a code (Admin)
       description: >-
-        A value of the code's attribute, or null when the code means nothing to filter by. Product values that waited
-        only for this confirmation become confirmed at once; codes decoded for the first time reach products at the
-        next recognition run. The dictionary import no longer changes the code.
+        With applyToAll (default true): a value of the code's attribute for all products, or null when the code means
+        nothing to filter by. Product values that waited only for this confirmation become confirmed at once. The
+        dictionary import no longer changes the code. categories, when sent, replaces the code's own decodings per
+        category (spec catalog/008): they win over the decoding for all; a category left out follows it. The products
+        whose names contain the code are recognized again at once.
       tags: [Admin catalog attributes]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       requestBody:
@@ -428,6 +446,41 @@ components:
       type: object
       properties:
         valueId: { type: [integer, 'null'], minimum: 1 }
+        applyToAll: { type: boolean, default: true, description: 'False keeps the code undecided for all products.' }
+        categories:
+          type: [array, 'null']
+          description: The whole list of the code's own decodings per category; null leaves them as they are.
+          items: { $ref: '#/components/schemas/DecideAttributeCodeCategory' }
+    DecideAttributeCodeCategory:
+      type: object
+      required: [categoryId]
+      properties:
+        categoryId: { type: integer, minimum: 1 }
+        valueId: { type: [integer, 'null'], minimum: 1, description: 'Null: the code means nothing in this category.' }
+    AdminCodeProducts:
+      type: object
+      required: [aliasId, rawValue, categories]
+      properties:
+        aliasId: { type: integer }
+        rawValue: { type: string }
+        categories: { type: array, items: { $ref: '#/components/schemas/AdminCodeCategory' } }
+    AdminCodeCategory:
+      type: object
+      required: [categoryId, categoryPath, hasOwnValue, products]
+      properties:
+        categoryId: { type: integer }
+        categoryPath: { type: string, description: 'Full path, for example «Фурнітура > Ручки > На планці».' }
+        hasOwnValue: { type: boolean, description: 'The category has its own decoding; otherwise it follows the one for all.' }
+        valueId: { type: [integer, 'null'] }
+        valueName: { type: [string, 'null'] }
+        products: { type: array, items: { $ref: '#/components/schemas/AdminCodeProduct' } }
+    AdminCodeProduct:
+      type: object
+      required: [productId, name, photo]
+      properties:
+        productId: { type: integer }
+        name: { type: string, description: Original 1C name. }
+        photo: { type: string }
     DecideAttributeCodeResponse:
       type: object
       required: [code, valuesConfirmed]

@@ -88,14 +88,33 @@ public sealed class RecognizeCatalogAttributesJob(
         return report;
     }
 
-    /// <summary>Codes the owner decoded in «Не розшифровані коди»: they win over the dictionary file.</summary>
+    /// <summary>
+    /// Codes the owner decoded in «Не розшифровані коди», for all products and per category: they win over the
+    /// dictionary file.
+    /// </summary>
     private async Task<List<AttributeCodeDecision>> DecisionsAsync(CancellationToken cancellationToken)
-        => await (from alias in db.AttributeAliases.AsNoTracking()
+    {
+        var decisions = await (from alias in db.AttributeAliases.AsNoTracking()
                 where alias.IsEditedManually
                 join attribute in db.Attributes on alias.AttributeId equals attribute.Id
                 join value in db.AttributeValues on alias.ValueId equals value.Id into decided
                 from value in decided.DefaultIfEmpty()
                 select new AttributeCodeDecision(attribute.Code, alias.Scope, alias.RawValue,
-                    value == null ? null : value.Code, value == null ? null : value.NameUk))
+                    value == null ? null : value.Code, value == null ? null : value.NameUk, null))
             .ToListAsync(cancellationToken);
+        var byCategory = await (from own in db.AttributeAliasCategoryValues.AsNoTracking()
+                join alias in db.AttributeAliases on own.AliasId equals alias.Id
+                join attribute in db.Attributes on alias.AttributeId equals attribute.Id
+                join value in db.AttributeValues on own.ValueId equals value.Id into decided
+                from value in decided.DefaultIfEmpty()
+                select new
+                {
+                    attribute.Code, alias.Scope, alias.RawValue, ValueCode = value == null ? null : value.Code,
+                    ValueName = value == null ? null : value.NameUk, own.CategoryId
+                })
+            .ToListAsync(cancellationToken);
+        decisions.AddRange(byCategory.Select(item => new AttributeCodeDecision(item.Code, item.Scope, item.RawValue,
+            item.ValueCode, item.ValueName, item.CategoryId.Value)));
+        return decisions;
+    }
 }

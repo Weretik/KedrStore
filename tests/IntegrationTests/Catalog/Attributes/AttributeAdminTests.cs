@@ -142,7 +142,8 @@ public sealed class AttributeAdminTests
         Assert.Contains(before, code => code.RawValue == "AL" && code.ValueId is null);
         Assert.False(Assert.Single(await ColorsAsync(db, 2)).IsConfirmed);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db), codes,
+        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+            new TestRepository<AttributeAliasCategoryValue>(db), codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(cp.AliasId,
             new DecideAttributeCodeRequest(await ValueIdAsync(db, "CR"))), CancellationToken.None);

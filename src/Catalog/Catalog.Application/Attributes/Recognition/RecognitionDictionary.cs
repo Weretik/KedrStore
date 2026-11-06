@@ -20,8 +20,12 @@ internal sealed record DictionaryEntry(
     public bool IsIgnored { get; init; }
 }
 
-/// <summary>A person's decision in «Не розшифровані коди»: the value the spelling means, or none.</summary>
-public sealed record AttributeCodeDecision(string Attribute, string Scope, string RawValue, string? ValueCode, string? ValueNameUk);
+/// <summary>
+/// A person's decision in «Не розшифровані коди»: the value the spelling means, or none; for all products, or only for
+/// products of <c>CategoryId</c> (spec catalog/008), which wins over the decision for all.
+/// </summary>
+public sealed record AttributeCodeDecision(
+    string Attribute, string Scope, string RawValue, string? ValueCode, string? ValueNameUk, int? CategoryId = null);
 
 /// <summary>
 /// The recognizer dictionary: regex rules, known spellings, and parser settings from
@@ -33,6 +37,7 @@ public sealed class RecognitionDictionary
 
     private readonly Dictionary<(string, string, string), DictionaryEntry> _entries = new();
     private readonly Dictionary<(string, string, string), DictionaryEntry> _foldedEntries = new();
+    private readonly Dictionary<(string, string, string, int), DictionaryEntry> _categoryEntries = new();
     private readonly HashSet<(string, string?, string?)> _allowed = [];
     private readonly Dictionary<(string, string), string> _canonicalNames = new();
 
@@ -113,9 +118,15 @@ public sealed class RecognitionDictionary
         return dictionary;
     }
 
-    /// <summary>The known spelling for what was found, if any; exact text first, then folded (case, і/i, spaces).</summary>
-    internal DictionaryEntry? Find(string attribute, string scope, string rawValue)
-        => _entries.GetValueOrDefault((attribute, scope, rawValue))
+    /// <summary>
+    /// The known spelling for what was found, if any: the owner's decision for the product's category first, then exact
+    /// text, then folded (case, і/i, spaces).
+    /// </summary>
+    internal DictionaryEntry? Find(string attribute, string scope, string rawValue, int? categoryId = null)
+        => (categoryId is { } category
+               ? _categoryEntries.GetValueOrDefault((attribute, scope, Folded(rawValue), category))
+               : null)
+           ?? _entries.GetValueOrDefault((attribute, scope, rawValue))
            ?? _foldedEntries.GetValueOrDefault((attribute, scope, Folded(rawValue)));
 
     internal bool IsAllowed(string attribute, string? code, string? nameUk) => _allowed.Contains((attribute, code, nameUk));
@@ -161,9 +172,14 @@ public sealed class RecognitionDictionary
             IsIgnored = decision.ValueCode is null
         };
 
-        var key = (decided.Attribute, decided.Scope, decided.RawValue);
-        _entries[key] = decided;
-        _foldedEntries[(decided.Attribute, decided.Scope, Folded(decided.RawValue))] = decided;
+        if (decision.CategoryId is { } categoryId)
+            _categoryEntries[(decided.Attribute, decided.Scope, Folded(decided.RawValue), categoryId)] = decided;
+        else
+        {
+            _entries[(decided.Attribute, decided.Scope, decided.RawValue)] = decided;
+            _foldedEntries[(decided.Attribute, decided.Scope, Folded(decided.RawValue))] = decided;
+        }
+
         if (decided.NormalizedCode is not null && name is not null)
             _allowed.Add((decided.Attribute, decided.NormalizedCode, name));
     }
