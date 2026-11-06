@@ -162,6 +162,8 @@ src/Catalog/
 └── Catalog.Infrastructure/DependencyInjection/   # + reader registration
 ```
 
+- **R-21 (stage 6).** A model card carries `productId`, the 1C code of its only on-site product when the model has one product, so the site adds it to the cart from the list; a model of several products gives null. SC-M07 checks both.
+
 **Residual risk.** Each request reads the on-site catalog (about 2.3 thousand products and their values) without a cache; the Next.js site caches pages (stage 6). A server cache is the next step if the load grows.
 
 ## Stage 4b: categories on the site and the showcase by model
@@ -231,7 +233,7 @@ src/Catalog/
 | 4b | Categories «show on site» mark (migration `CategorySiteVisibility`), showcase by model, category tree, only on-site models and products in «Моделі» | in review |
 | 4c | One «Вітрина сайту» page with tabs and the review queue (canvas variant B); server: honest statuses, showcase `status`, tree counts (R-20) | in review |
 | 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces the reverted spec 006 phase 5 | done 2026-11-05 (no schema change) |
-| 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search | planned |
+| 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search; server: `productId` on a one-product card (R-21) | in progress (kedr-web spec site/product/002) |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |
 | 8 | Optional AI drafts for SEO texts and unrecognized attributes (a person confirms) | planned |
 
