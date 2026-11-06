@@ -97,6 +97,49 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeAliasCategoryValues", (string)null);
                 });
 
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasMeaning", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AliasId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ValueId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeId")
+                        .HasDatabaseName("IX_CatalogAttributeAliasMeanings_AttributeId");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("IX_CatalogAttributeAliasMeanings_CategoryId");
+
+                    b.HasIndex("ValueId")
+                        .HasDatabaseName("IX_CatalogAttributeAliasMeanings_ValueId");
+
+                    b.HasIndex("AliasId", "CategoryId", "AttributeId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CatalogAttributeAliasMeanings_Alias_Category_Attribute");
+
+                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("AliasId", "CategoryId", "AttributeId"), false);
+
+                    b.ToTable("CatalogAttributeAliasMeanings", (string)null);
+                });
+
             modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
                 {
                     b.Property<int>("Id")
@@ -937,6 +980,32 @@ namespace Catalog.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ValueId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasMeaning", b =>
+                {
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeAlias", null)
+                        .WithMany()
+                        .HasForeignKey("AliasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                        .WithMany()
+                        .HasForeignKey("ValueId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>

@@ -13,6 +13,7 @@
 | `CatalogAttributeValues` | `Id` (identity) | Value of an attribute: `AttributeId` (FK), `Code` and `Slug` (both unique per attribute), `NameUk`, `SwatchHex`, `SwatchMediaFileId` (media-library texture, no FK across modules), `IsEditedManually`. |
 | `CatalogAttributeAliases` | `Id` (identity) | Spelling in 1C names: `AttributeId` (FK), `Scope`, `RawValue` (unique together), `ValueId` (FK, empty for an undecoded code), `IsConfirmed`. |
 | `CatalogAttributeAliasCategoryValues` | `AliasId`, `CategoryId` | The owner's decoding of a code in one category (spec catalog/008): `AliasId` (FK, cascade), `CategoryId` (FK, cascade), `ValueId` (FK, restrict; empty: the code means nothing there), `UpdatedAt`. Wins over the alias decoding for products of that category. |
+| `CatalogAttributeAliasMeanings` | `Id` | What a code also means in other attributes (spec catalog/009): `AliasId` (FK, cascade), `CategoryId` (FK, cascade; empty: for all products), `AttributeId` (FK, restrict), `ValueId` (FK, restrict), `UpdatedAt`; unique (`AliasId`, `CategoryId`, `AttributeId`), nulls not distinct. |
 | `CatalogCategoryAttributes` | `CategoryId`, `AttributeId` | Filters offered in a category: `IsFilterable`, `SortOrder`. |
 | `CatalogProductAttributeValues` | `ProductId`, `AttributeId`, `Position` | Product value: `ValueId` (FK) or `NumberValue`, `Source` (1 import, 2 parser, 3 manual), `IsLocked`, `IsConfirmed`; while manual, the kept automatic value `AutomaticValueId` (FK), `AutomaticNumberValue`, `AutomaticIsConfirmed`, `AutomaticSource`. Index on `AttributeId, ValueId`. |
 | `CatalogProductAttributeReviews` | `ProductId` | Recognition state: `BaseName`, `State` (0 clear, 1 needs review, 2 accepted), `Reasons` (jsonb list of code and text), `AcceptedBy`, `AcceptedAt`. |
@@ -33,6 +34,8 @@ erDiagram
     CatalogAttributes ||--o{ CatalogAttributeAliases : "AttributeId FK"
     CatalogAttributeAliases ||--o{ CatalogAttributeAliasCategoryValues : "AliasId FK, cascade"
     ProductCategories ||--o{ CatalogAttributeAliasCategoryValues : "CategoryId FK, cascade"
+    CatalogAttributeAliases ||--o{ CatalogAttributeAliasMeanings : "AliasId FK, cascade"
+    ProductCategories ||--o{ CatalogAttributeAliasMeanings : "CategoryId FK, cascade"
     CatalogAttributeValues ||--o{ CatalogProductAttributeValues : "ValueId FK"
     ProductCategories ||--o{ CatalogCategoryAttributes : "CategoryId FK, cascade"
     ProductCategories ||--o{ CatalogProductGroups : "CategoryId FK"

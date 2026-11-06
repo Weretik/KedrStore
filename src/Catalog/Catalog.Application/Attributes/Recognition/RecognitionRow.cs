@@ -37,6 +37,12 @@ public sealed class RecognitionRow
     public string? ReviewReason { get; set; }
     public string? Notes { get; set; }
 
+    /// <summary>
+    /// Known spellings found in the name, decoded or not: (attribute, scope, folded text). The owner's extra meanings
+    /// of a code (spec catalog/009) reach exactly these products. Not a CSV column.
+    /// </summary>
+    public HashSet<(string Attribute, string Scope, string Code)> FoundCodes { get; } = [];
+
     /// <summary>A cell as the CSV holds it; <c>null</c> for an empty value.</summary>
     public string? Cell(string column) => column switch
     {

@@ -44,6 +44,7 @@ public sealed class RecognizeCatalogAttributesJob(
 
         await using var file = RecognitionDictionaryFile.Open();
         var dictionary = RecognitionDictionary.Read(file, categories, await DecisionsAsync(cancellationToken));
+        var meanings = await MeaningsAsync(cancellationToken);
 
         var query = db.Products.IgnoreQueryFilters().AsNoTracking();
         if (productIds is not null)
@@ -65,7 +66,8 @@ public sealed class RecognizeCatalogAttributesJob(
                 new RecognitionProduct(product.Id.Value, product.CategoryId.Value, product.Name), dictionary, categories);
             try
             {
-                recognized.Add(AttributeCsvFile.FromCells(product.Id.Value, row.Cell, sizes));
+                recognized.Add(CodeMeanings.Apply(AttributeCsvFile.FromCells(product.Id.Value, row.Cell, sizes),
+                    product.CategoryId.Value, row.FoundCodes, meanings));
             }
             catch (FormatException exception)
             {
@@ -116,5 +118,50 @@ public sealed class RecognizeCatalogAttributesJob(
         decisions.AddRange(byCategory.Select(item => new AttributeCodeDecision(item.Code, item.Scope, item.RawValue,
             item.ValueCode, item.ValueName, item.CategoryId.Value)));
         return decisions;
+    }
+
+    /// <summary>
+    /// The owner's extra meanings of codes (spec catalog/009) by code. A category with its own decoding of the code
+    /// (spec catalog/008) gets an entry even without extra meanings, so the meanings for all products do not reach it.
+    /// </summary>
+    private async Task<Dictionary<(string Attribute, string Scope, string Code), CodeMeaningSet>> MeaningsAsync(
+        CancellationToken cancellationToken)
+    {
+        var rows = await (from meaning in db.AttributeAliasMeanings.AsNoTracking()
+                join attribute in db.Attributes on meaning.AttributeId equals attribute.Id
+                join value in db.AttributeValues on meaning.ValueId equals value.Id
+                select new { meaning.AliasId, meaning.CategoryId, Attribute = attribute.Code, Value = value.Code })
+            .ToListAsync(cancellationToken);
+        if (rows.Count == 0)
+            return [];
+
+        var aliasIds = rows.Select(row => row.AliasId).Distinct().ToList();
+        var codes = await (from alias in db.AttributeAliases.AsNoTracking()
+                where aliasIds.Contains(alias.Id)
+                join attribute in db.Attributes on alias.AttributeId equals attribute.Id
+                select new { alias.Id, attribute.Code, alias.Scope, alias.RawValue })
+            .ToListAsync(cancellationToken);
+        var ownCategories = (await db.AttributeAliasCategoryValues.AsNoTracking()
+                .Where(item => aliasIds.Contains(item.AliasId))
+                .Select(item => new { item.AliasId, item.CategoryId })
+                .ToListAsync(cancellationToken))
+            .ToLookup(item => item.AliasId, item => item.CategoryId.Value);
+        var rowsByAlias = rows.ToLookup(row => row.AliasId);
+
+        var result = new Dictionary<(string Attribute, string Scope, string Code), CodeMeaningSet>();
+        foreach (var code in codes)
+        {
+            var own = rowsByAlias[code.Id].ToList();
+            var byCategory = ownCategories[code.Id].ToDictionary(category => category,
+                category => (IReadOnlyList<(string Attribute, string ValueCode)>)own
+                    .Where(row => row.CategoryId?.Value == category)
+                    .Select(row => (row.Attribute, row.Value))
+                    .ToList());
+            result[(code.Code, code.Scope, RecognitionDictionary.Folded(code.RawValue))] = new CodeMeaningSet(
+                own.Where(row => row.CategoryId is null).Select(row => (row.Attribute, row.Value)).ToList(),
+                byCategory);
+        }
+
+        return result;
     }
 }

@@ -1,9 +1,17 @@
+using Catalog.Contracts.Attributes;
+
 namespace Catalog.Application.Features.Attributes.DecideCode;
 
 public sealed class DecideAttributeCodeCommandValidator : AbstractValidator<DecideAttributeCodeCommand>
 {
+    private const string TwiceMessage = "An attribute is listed twice.";
+
     public DecideAttributeCodeCommandValidator()
     {
+        RuleFor(command => command.Request.Meanings).Must(OnePerAttribute!).WithMessage(TwiceMessage)
+            .When(command => command.Request?.Meanings is not null).OverridePropertyName("meanings");
+        RuleForEach(command => command.Request.Meanings).SetValidator(new CodeMeaningValidator())
+            .When(command => command.Request?.Meanings is not null).OverridePropertyName("meanings");
         RuleFor(command => command.AliasId).GreaterThan(0);
         RuleFor(command => command.Request).NotNull();
         RuleFor(command => command.Request.ValueId).GreaterThan(0)
@@ -16,6 +24,21 @@ public sealed class DecideAttributeCodeCommandValidator : AbstractValidator<Deci
         {
             category.RuleFor(item => item.CategoryId).GreaterThan(0);
             category.RuleFor(item => item.ValueId).GreaterThan(0).When(item => item.ValueId is not null);
+            category.RuleFor(item => item.Meanings).Must(OnePerAttribute!).WithMessage(TwiceMessage)
+                .When(item => item.Meanings is not null);
+            category.RuleForEach(item => item.Meanings).SetValidator(new CodeMeaningValidator());
         }).When(command => command.Request?.Categories is not null).OverridePropertyName("categories");
+    }
+
+    private static bool OnePerAttribute(IReadOnlyList<CodeMeaningRequest> meanings)
+        => meanings.Select(item => item.AttributeId).Distinct().Count() == meanings.Count;
+
+    private sealed class CodeMeaningValidator : AbstractValidator<CodeMeaningRequest>
+    {
+        public CodeMeaningValidator()
+        {
+            RuleFor(item => item.AttributeId).GreaterThan(0);
+            RuleFor(item => item.ValueId).GreaterThan(0);
+        }
     }
 }
