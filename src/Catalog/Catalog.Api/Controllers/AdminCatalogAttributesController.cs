@@ -10,6 +10,7 @@ using Catalog.Application.Features.Attributes.GetUnresolvedCodes;
 using Catalog.Application.Features.Attributes.SetCategoryFilters;
 using Catalog.Application.Features.Attributes.Update;
 using Catalog.Application.Features.Attributes.UpdateValue;
+using Catalog.Application.Features.Attributes.UploadSwatch;
 using Catalog.Contracts.Attributes;
 using Identity.Application.Security.Policies;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,8 @@ namespace Catalog.Api.Controllers;
 [Authorize(Policy = PolicyNames.CanManageProducts)]
 public sealed class AdminCatalogAttributesController(ISender sender) : ControllerBase
 {
+    private const long SwatchRequestLimit = UploadAttributeSwatchCommandValidator.MaxUploadBytes + 64 * 1024;
+
     [HttpGet(Name = "getAdminCatalogAttributes")]
     [ProducesResponseType(typeof(List<AdminCatalogAttributeListItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -77,6 +80,25 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
     public async Task<ActionResult<AdminCatalogAttributeDto>> UpdateValue([FromRoute] int id, [FromRoute] int valueId,
         [FromBody] UpdateAttributeValueRequest request, CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(new UpdateAttributeValueCommand(id, valueId, request),
+            cancellationToken));
+
+    /// <summary>
+    /// Puts a color or decor picture into the media library (CDN folder <c>swatches</c>, library folder «Кольори»)
+    /// before the value is saved; send the answer's <c>mediaFileId</c> as the value's <c>swatchMediaFileId</c>.
+    /// </summary>
+    [HttpPost("swatches", Name = "uploadAdminAttributeSwatch")]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
+    [RequestSizeLimit(SwatchRequestLimit)]
+    [RequestFormLimits(MultipartBodyLengthLimit = SwatchRequestLimit)]
+    [ProducesResponseType(typeof(AdminAttributeSwatchUploadDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<AdminAttributeSwatchUploadDto>> UploadSwatch(IFormFile file,
+        CancellationToken cancellationToken)
+        => this.ToActionResult(await sender.Send(
+            new UploadAttributeSwatchCommand(new SwatchUpload(file.FileName, file.Length, file.OpenReadStream)),
             cancellationToken));
 
     /// <summary>«Не розшифровані коди».</summary>

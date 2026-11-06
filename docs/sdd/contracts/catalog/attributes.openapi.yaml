@@ -183,6 +183,32 @@ paths:
         '401': { description: Not signed in. }
         '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Value not found in this attribute. }
+  /api/admin/catalog-attributes/swatches:
+    post:
+      operationId: uploadAdminAttributeSwatch
+      summary: Upload a color or decor picture for a value (Admin)
+      description: >-
+        JPEG, PNG, or WebP up to 5 MB, stored as it is on the CDN under `swatches/` and in the media library folder
+        «Кольори» (created when missing). No value changes: send `mediaFileId` as `swatchMediaFileId` with the value
+        create or update.
+      tags: [Admin catalog attributes]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: The picture in the media library, content: { application/json: { schema: { $ref: '#/components/schemas/AdminAttributeSwatchUpload' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { description: Not signed in. }
+        '403': { description: Signed in without the Admin or Seo role. }
+        '413': { description: The request is larger than the upload limit. }
+        '503': { description: The CDN is not configured. }
   /api/admin/catalog-attributes/unresolved-codes:
     get:
       operationId: getAdminUnresolvedAttributeCodes
@@ -354,6 +380,12 @@ components:
         isEditedManually: { type: boolean }
         valueCount: { type: integer }
         productCount: { type: integer, description: Products with a value of the attribute. }
+    AdminAttributeSwatchUpload:
+      type: object
+      required: [mediaFileId, url]
+      properties:
+        mediaFileId: { type: integer, format: int64 }
+        url: { type: string }
     AdminAttributeValue:
       type: object
       required: [id, code, nameUk, slug, sortOrder, isEditedManually, productCount]

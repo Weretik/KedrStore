@@ -157,3 +157,6 @@ public sealed record SetCategoryAttributeFiltersRequest(IReadOnlyList<SetCategor
 
 /// <summary>A review reason with the number of on-site products that need review for it (filter «За причиною»).</summary>
 public sealed record AdminProblemReasonDto(string Code, int ProductCount);
+
+/// <summary>A swatch picture just put into the media library; send <c>MediaFileId</c> as the value's swatch.</summary>
+public sealed record AdminAttributeSwatchUploadDto(long MediaFileId, string Url);

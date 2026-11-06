@@ -39,6 +39,7 @@ public static class CatalogServicesExtension
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IProductMediaLibrary, ProductMediaLibrary>();
+        services.AddScoped<IAttributeSwatchStorage, AttributeSwatchStorage>();
         services.AddScoped<ProductMediaFileChanges>();
         services.AddScoped<IMediaFileChangeListener, CatalogMediaFileChangeListener>();
         services.AddScoped<LinkProductMediaJob>();
