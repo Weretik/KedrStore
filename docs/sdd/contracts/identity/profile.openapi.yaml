@@ -7,7 +7,7 @@ paths:
       summary: The signed-in staff account's profile
       tags: [Profile]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Policy `RequireManagerRole` (Manager or Admin). Customers get 403.
+      description: Policy `RequireManagerRole` (Manager, Seo, or Admin). Customers get 403.
       responses:
         '200': { description: Profile, content: { application/json: { schema: { $ref: '#/components/schemas/ProfileResponse' } } } }
         '401': { description: Not signed in }
@@ -111,7 +111,7 @@ components:
         id: { type: string, format: uuid }
         email: { type: string, format: email }
         fullName: { type: string }
-        role: { type: string, enum: [Admin, Manager] }
+        role: { type: string, enum: [Admin, Seo, Manager] }
         avatarUrl: { type: [string, 'null'], format: uri, description: Public 256×256 WebP; null when there is none }
     ChangeNameRequest:
       type: object

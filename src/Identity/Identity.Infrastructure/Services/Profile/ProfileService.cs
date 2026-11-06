@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Identity.Application.Features.Avatars;
 using Identity.Application.Features.Profile.Shared;
+using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
 using Identity.Domain.Authorization;
 using Identity.Infrastructure.Avatars;
@@ -35,7 +36,7 @@ public sealed class ProfileService(
         }
 
         var roles = await userManager.GetRolesAsync(user);
-        var role = roles.Contains(RoleNames.Admin, StringComparer.Ordinal) ? RoleNames.Admin : RoleNames.Manager;
+        var role = StaffRoles.All.FirstOrDefault(staffRole => roles.Contains(staffRole, StringComparer.Ordinal)) ?? RoleNames.Manager;
         return Result.Success(new ProfileDto(user.Id, user.Email ?? string.Empty, user.FullName, role, avatarUrlBuilder.Build(user.AvatarPath)));
     }
 

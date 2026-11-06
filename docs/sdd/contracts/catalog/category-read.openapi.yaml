@@ -57,7 +57,7 @@ paths:
         - name: deleted
           in: query
           required: false
-          description: '`true` lists soft-deleted categories only (flat, newest first). Admin role only.'
+          description: '`true` lists soft-deleted categories only (flat, newest first). Admin or Seo role only.'
           schema: { type: boolean, default: false }
       responses:
         '200':
@@ -68,7 +68,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AdminCategory' }
         '401': { description: Not signed in. }
-        '403': { description: 'Signed in without the Manager or Admin role, or `deleted=true` without the Admin role.' }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role, or `deleted=true` without the Admin or Seo role.' }
   /api/categories/{id}:
     get:
       operationId: getAdminCategoryById
@@ -86,7 +86,7 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Category not found }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/categories/{id}/slug:
     put:
       operationId: changeAdminCategorySlug
@@ -111,7 +111,7 @@ paths:
               schema: { $ref: '#/components/schemas/ChangeSlugResponse' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Category not found or deleted. }
   /api/categories/{id}/site-visibility:
     put:
@@ -139,7 +139,7 @@ paths:
               schema: { $ref: '#/components/schemas/CategorySiteVisibilityResponse' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Category not found or deleted. }
   /api/categories/{id}/content:
     get:
@@ -157,7 +157,7 @@ paths:
               schema: { $ref: '#/components/schemas/AdminCategoryContent' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Category not found or deleted. }
   /api/categories/{id}/content/{lang}:
     put:
@@ -185,7 +185,7 @@ paths:
               schema: { $ref: '#/components/schemas/AdminCategoryContentItem' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Category not found or deleted. }
 components:
   parameters:

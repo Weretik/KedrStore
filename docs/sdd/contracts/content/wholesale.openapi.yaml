@@ -31,7 +31,7 @@ paths:
     get:
       operationId: getAdminWholesalePage
       summary: Get both languages for editing
-      description: Requires `CanManageContent` (Manager or Admin).
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
       tags: [Wholesale]
       responses:
         '200':
@@ -40,12 +40,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminWholesalePage' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: The page row is missing. }
     put:
       operationId: updateAdminWholesalePage
       summary: Replace both languages at once
-      description: Requires `CanManageContent` (Manager or Admin). Every text is required. Repeating it is safe.
+      description: Requires `CanManageContent` (Manager, Seo, or Admin). Every text is required. Repeating it is safe.
       tags: [Wholesale]
       requestBody:
         required: true
@@ -64,7 +64,7 @@ paths:
             application/json:
               schema: { type: object, additionalProperties: true }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: The page row is missing. }
 components:
   schemas:

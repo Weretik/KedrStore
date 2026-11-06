@@ -16,8 +16,8 @@ using Microsoft.AspNetCore.Authorization;
 namespace Catalog.Api.Controllers;
 
 /// <summary>
-/// The «Властивості» page (spec catalog/006, phase 3): attributes, values, codes, and category filters. Manager and
-/// Admin read it; only Admin changes it (owner decision 2026-11-05).
+/// The «Властивості» page (spec catalog/006, phase 3): attributes, values, codes, and category filters. Manager, Seo, and
+/// Admin read it; only Admin and Seo change it (owner decisions 2026-11-05, 2026-11-06).
 /// </summary>
 [ApiController]
 [Route("api/admin/catalog-attributes")]
@@ -37,9 +37,9 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
     public async Task<ActionResult<AdminCatalogAttributeDto>> Get([FromRoute] int id, CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(new GetCatalogAttributeQuery(id), cancellationToken));
 
-    /// <summary>«Нова ознака»: an attribute of the owner's own (Admin only).</summary>
+    /// <summary>«Нова ознака»: an attribute of the owner's own (Admin and Seo only).</summary>
     [HttpPost(Name = "createAdminCatalogAttribute")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(AdminCatalogAttributeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -48,7 +48,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
         => this.ToActionResult(await sender.Send(new CreateCatalogAttributeCommand(request), cancellationToken));
 
     [HttpPut("{id:int}", Name = "updateAdminCatalogAttribute")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(AdminCatalogAttributeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -58,7 +58,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
         => this.ToActionResult(await sender.Send(new UpdateCatalogAttributeCommand(id, request), cancellationToken));
 
     [HttpPost("{id:int}/values", Name = "createAdminAttributeValue")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(AdminCatalogAttributeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -68,7 +68,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
         => this.ToActionResult(await sender.Send(new CreateAttributeValueCommand(id, request), cancellationToken));
 
     [HttpPut("{id:int}/values/{valueId:int}", Name = "updateAdminAttributeValue")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(AdminCatalogAttributeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -87,7 +87,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
         => this.ToActionResult(await sender.Send(new GetUnresolvedCodesQuery(), cancellationToken));
 
     [HttpPut("codes/{aliasId:int}", Name = "decideAdminAttributeCode")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(DecideAttributeCodeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -113,7 +113,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
         => this.ToActionResult(await sender.Send(new GetCategoryAttributeFiltersQuery(categoryId), cancellationToken));
 
     [HttpPut("category-filters/{categoryId:int}", Name = "setAdminCategoryAttributeFilters")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(List<AdminCategoryAttributeFilterDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -5,8 +5,8 @@ info:
   description: >-
     Site models of spec catalog/007. A model is one site page in one final category that brings together products of
     that category; its axes (color, size, side) tell the products apart. Automation proposes models; a person
-    accepts or creates them, and automation never changes an accepted model. Policy CanManageProducts (Manager and
-    Admin). The model slug and main product keep their routes in product-groups.openapi.yaml (only Admin changes a
+    accepts or creates them, and automation never changes an accepted model. Policy CanManageProducts (Manager, Seo, and
+    Admin). The model slug and main product keep their routes in product-groups.openapi.yaml (only Admin or Seo changes a
     slug). Problem codes - product: `no_model` (hard error), `no_attributes`, `missing_axis_value`, `same_combination`;
     model: `model_no_axes`, `model_no_seo`, `model_no_photo`. Problems concern on-site, not deleted products only.
 paths:
@@ -30,7 +30,7 @@ paths:
         '200': { description: A page of models, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelList' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     post:
       operationId: createAdminSiteModel
       summary: Create a model («Нова модель»)
@@ -47,7 +47,7 @@ paths:
         '200': { description: Created model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/site-models/showcase:
     get:
       operationId: getAdminSiteShowcase
@@ -71,7 +71,7 @@ paths:
         '200': { description: A page of rows, content: { application/json: { schema: { $ref: '#/components/schemas/SiteShowcaseList' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/site-models/categories:
     get:
       operationId: getAdminSiteModelCategories
@@ -84,7 +84,7 @@ paths:
       responses:
         '200': { description: Categories, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/SiteModelCategory' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/site-models/health:
     get:
       operationId: getAdminSiteModelHealth
@@ -94,7 +94,7 @@ paths:
       responses:
         '200': { description: Counts, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelHealth' } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/site-models/accept:
     post:
       operationId: acceptAdminSiteModels
@@ -111,7 +111,7 @@ paths:
         '200': { description: Counts after accepting, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModelHealth' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/site-models/{id}:
     parameters:
       - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -123,7 +123,7 @@ paths:
       responses:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
     put:
       operationId: renameAdminSiteModel
@@ -138,7 +138,7 @@ paths:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
   /api/admin/site-models/{id}/axes:
     parameters:
@@ -156,7 +156,7 @@ paths:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
   /api/admin/site-models/{id}/products:
     parameters:
@@ -174,7 +174,7 @@ paths:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
   /api/admin/site-models/{id}/products/{productId}:
     parameters:
@@ -190,7 +190,7 @@ paths:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found or proposed model gone. }
   /api/admin/site-models/{id}/texts/{language}:
     parameters:
@@ -209,7 +209,7 @@ paths:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
   /api/admin/site-models/{id}/fill-from-names:
     parameters:
@@ -225,7 +225,7 @@ paths:
       responses:
         '200': { description: Model, content: { application/json: { schema: { $ref: '#/components/schemas/SiteModel' } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Model not found. }
 components:
   responses:

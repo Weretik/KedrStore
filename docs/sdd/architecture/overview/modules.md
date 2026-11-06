@@ -24,6 +24,12 @@ Layers: Media.Api, Media.Application, Media.Contracts, Media.Domain, Media.Infra
 
 Owns the picture library on the CDN: virtual folders, file records with CDN keys, uploads over FTP, and the CDN sync job. Its tables live in the PostgreSQL schema `media` with their own migration history; it does not reference other modules. Other modules link to library files by `MediaFileId` and read them through `IMediaFileLookup` in Media.Contracts (URL, file name, size), implemented by Media.Infrastructure.
 
+## Work
+
+Layers: Work.Api, Work.Application, Work.Domain, Work.Infrastructure.
+
+Owns the staff members' own tasks and the automatic log of their admin changes (spec work/001). Its tables live in the PostgreSQL schema `work` with their own migration history; users are Identity user IDs as values. The log is written by `WorkActivityFilter`, a global MVC filter in Work.Api, so other modules neither reference nor call Work.
+
 ## Identity
 
 Layers: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.

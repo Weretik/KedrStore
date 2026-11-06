@@ -2,6 +2,7 @@ using Content.Infrastructure.DependencyInjection;
 using Host.Api.DependencyInjection.ServiceRegistration.Options;
 using Media.Infrastructure.DependencyInjection;
 using Sales.Infrastructure.DependencyInjection;
+using Work.Infrastructure.DependencyInjection;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration;
 
@@ -21,6 +22,7 @@ public static class ModuleRegistrationsExtensions
         services.AddSalesInfrastructureServices(configuration);
         services.AddContentInfrastructureServices(configuration);
         services.AddMediaInfrastructureServices(configuration);
+        services.AddWorkInfrastructureServices(configuration);
 
         services.AddOneCIntegrationServices();
 

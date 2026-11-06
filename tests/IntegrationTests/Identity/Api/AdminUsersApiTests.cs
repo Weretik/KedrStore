@@ -27,6 +27,27 @@ public sealed class AdminUsersApiTests(IdentityPostgresFixture fixture)
     }
 
     [SkippableFact]
+    public async Task Seo_Works_In_The_Admin_But_Not_In_The_System_Section()
+    {
+        fixture.SkipIfUnavailable();
+        await using var factory = new IdentityApiFactory(fixture);
+        var seo = await factory.CreateUserAsync(RoleNames.Seo);
+        using var client = factory.CreateBrowserClient();
+        await IdentityApiFactory.CookieLoginAsync(client, seo.Email!);
+
+        using var profile = await client.GetAsync("/api/profile");
+        Assert.Equal(HttpStatusCode.OK, profile.StatusCode);
+        using var profileBody = JsonDocument.Parse(await profile.Content.ReadAsStringAsync());
+        Assert.Equal(RoleNames.Seo, profileBody.RootElement.GetProperty("role").GetString());
+
+        using var users = await client.GetAsync("/api/admin/users");
+        Assert.Equal(HttpStatusCode.Forbidden, users.StatusCode);
+
+        using var requisites = await client.GetAsync("/api/admin/content/requisites");
+        Assert.Equal(HttpStatusCode.Forbidden, requisites.StatusCode);
+    }
+
+    [SkippableFact]
     public async Task Admin_Creates_Manager_Who_Can_Sign_In()
     {
         fixture.SkipIfUnavailable();

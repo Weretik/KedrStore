@@ -10,6 +10,9 @@ public static class PolicyNames
     public const string CanManageOrders = "CanManageOrders";
     public const string CanManageContent = "CanManageContent";
     public const string CanManageMedia = "CanManageMedia";
+
+    /// <summary>Site-facing catalog structure: addresses, category texts, visibility, attributes, deleted rows.</summary>
+    public const string CanManageSiteCatalog = "CanManageSiteCatalog";
     public const string CatalogRead = "CatalogRead";
     public const string OrderCreate = "OrderCreate";
 }

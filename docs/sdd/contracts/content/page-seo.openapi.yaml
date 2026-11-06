@@ -32,7 +32,7 @@ paths:
     get:
       operationId: listAdminPageSeo
       summary: List every site page with its texts
-      description: Requires `CanManageContent` (Manager or Admin). Pages never saved have empty values.
+      description: Requires `CanManageContent` (Manager, Seo, or Admin). Pages never saved have empty values.
       tags: [PageSeo]
       responses:
         '200':
@@ -43,13 +43,13 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AdminPageSeo' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
   /api/admin/content/page-seo/{page}:
     put:
       operationId: updateAdminPageSeo
       summary: Replace the texts of one page
       description: >-
-        Requires `CanManageContent` (Manager or Admin). Values are trimmed; an empty or missing value returns that text
+        Requires `CanManageContent` (Manager, Seo, or Admin). Values are trimmed; an empty or missing value returns that text
         to the site default. The first save creates the page row. Repeating it is safe.
       tags: [PageSeo]
       parameters:
@@ -70,7 +70,7 @@ paths:
               schema: { $ref: '#/components/schemas/AdminPageSeo' }
         '400': { description: 'Unknown page or a text over its limit; `errors` names the field.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
 components:
   schemas:
     SitePage:

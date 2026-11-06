@@ -28,13 +28,13 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 | --- | --- | --- |
 | Public catalog | `GET /api/catalog/{lang}/products`, product details | Anonymous |
 | Public category navigation | `GET /api/catalog/{lang}/categories`, `GET /api/catalog/{lang}/categories/by-slug/{categorySlug}` | Anonymous |
-| Admin catalog | `GET /api/categories`, `/api/categories/{id}`, `/api/admin/products/**` | Manager or Admin (`CanManageProducts`) |
-| Admin orders and customers | `/api/admin/orders/**`, `/api/admin/order-workspace/**`, `/api/admin/customers/**` | Manager or Admin (`CanManageOrders`) |
+| Admin catalog | `GET /api/categories`, `/api/categories/{id}`, `/api/admin/products/**` | Manager, Seo, or Admin (`CanManageProducts`) |
+| Admin orders and customers | `/api/admin/orders/**`, `/api/admin/order-workspace/**`, `/api/admin/customers/**` | Manager, Seo, or Admin (`CanManageOrders`) |
 | Staff accounts | `/api/admin/users/**` | Admin (`CanManageUsers`) |
 | Site articles | `GET /api/content/{lang}/articles`, `/api/content/{lang}/articles/{slug}`, `/api/content/articles/{id}/cover` | Anonymous; `coverPath` in responses is relative to the API base URL |
-| Admin articles | `/api/admin/articles/**` | Manager or Admin (`CanManageContent`) |
+| Admin articles | `/api/admin/articles/**` | Manager, Seo, or Admin (`CanManageContent`) |
 | Company contacts | `GET /api/content/contacts` | Anonymous; phones in E.164, clients format them |
-| Admin company contacts | `GET`/`PUT /api/admin/content/contacts` | Manager or Admin (`CanManageContent`) |
+| Admin company contacts | `GET`/`PUT /api/admin/content/contacts` | Manager, Seo, or Admin (`CanManageContent`) |
 | Company requisites | `GET /api/content/requisites` | Anonymous; IBAN without spaces, clients group it |
 | Admin company requisites | `GET`/`PUT /api/admin/content/requisites`, `GET …/history` | Admin only (`RequireAdminRole`); each change logged |
 | Site documents | `GET /api/content/{lang}/documents/{kind}` | Anonymous; published edition, sanitized HTML with `{site}`/`{email}`/`{phone}` placeholders the site fills |

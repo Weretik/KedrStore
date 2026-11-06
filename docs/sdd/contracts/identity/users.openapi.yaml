@@ -4,7 +4,7 @@ paths:
   /api/admin/users:
     get:
       operationId: getStaffAccounts
-      summary: List administrators and managers
+      summary: List administrators, SEO specialists, and managers
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       description: Policy `CanManageUsers` (role Admin). Customers are not listed.
@@ -14,7 +14,7 @@ paths:
         '403': { description: Not an administrator }
     post:
       operationId: createStaffAccount
-      summary: Create an administrator or manager
+      summary: Create an administrator, SEO specialist, or manager
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       parameters:
@@ -72,7 +72,7 @@ paths:
       summary: Set a new password for a staff account
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Managers only; ends the account's existing sessions. An administrator account (including the caller's) returns 403 — administrators change their own password in the profile.
+      description: Manager and Seo accounts only; ends the account's existing sessions. An administrator account (including the caller's) returns 403 — administrators change their own password in the profile.
       parameters:
         - $ref: '#/components/parameters/UserId'
         - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
@@ -91,7 +91,7 @@ paths:
       summary: Change a manager's name
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Managers only; an administrator target returns 403.
+      description: Manager and Seo accounts only; an administrator target returns 403.
       parameters:
         - $ref: '#/components/parameters/UserId'
         - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
@@ -110,7 +110,7 @@ paths:
       summary: Change a manager's sign-in email
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Managers only. Ends the manager's sessions (mobile at once, browser within 5 minutes).
+      description: Manager and Seo accounts only. Ends the manager's sessions (mobile at once, browser within 5 minutes).
       parameters:
         - $ref: '#/components/parameters/UserId'
         - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
@@ -130,7 +130,7 @@ paths:
       summary: Upload a manager's avatar
       tags: [Users]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Managers only. Same limits as `uploadMyAvatar`.
+      description: Manager and Seo accounts only. Same limits as `uploadMyAvatar`.
       parameters:
         - $ref: '#/components/parameters/UserId'
         - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
@@ -169,7 +169,7 @@ components:
       required: true
       schema: { type: string, format: uuid }
   schemas:
-    StaffRole: { type: string, enum: [Admin, Manager] }
+    StaffRole: { type: string, enum: [Admin, Seo, Manager] }
     StaffAccountResponse:
       type: object
       required: [id, email, fullName, role, isBlocked]

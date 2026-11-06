@@ -11,7 +11,7 @@ paths:
     post:
       operationId: refreshSite
       summary: Ask the public site to drop its cached content and catalog
-      description: Requires `CanManageContent` (Manager or Admin). No request body.
+      description: Requires `CanManageContent` (Manager, Seo, or Admin). No request body.
       tags: [Site]
       responses:
         '200':
@@ -20,7 +20,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SiteRefreshResult' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '502':
           description: The site did not answer or refused the secret (`siteUnavailable`).
           content:

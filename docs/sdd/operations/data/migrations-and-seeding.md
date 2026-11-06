@@ -16,7 +16,7 @@ The current `.github/workflows/deploy-cloudrun.yml` creates or updates the Cloud
 
 ## Current Identity seeders
 
-- `RoleSeeder` ensures the Admin, Manager, and User roles exist.
+- `RoleSeeder` ensures the Admin, Seo, Manager, and User roles exist.
 - `IdentitySeeder` creates a configured administrator only when none exists and `ADMIN_DEFAULT_PASSWORD` is set.
 
 The password is not read from `Identity:AdminUser:DefaultPassword`; the seeder uses `ADMIN_DEFAULT_PASSWORD`. Without it, administrator creation is skipped and logged. Do not record the password in documentation or execution logs.

@@ -272,6 +272,18 @@ paths:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files~1{id}~1content
   /api/admin/media/files/move:
     $ref: ./media/media.openapi.yaml#/paths/~1api~1admin~1media~1files~1move
+  /api/work/tasks:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks
+  /api/work/tasks/{id}:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks~1{id}
+  /api/work/tasks/{id}/status:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1tasks~1{id}~1status
+  /api/work/report:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1work~1report
+  /api/admin/work/tasks:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1admin~1work~1tasks
+  /api/admin/work/report:
+    $ref: ./work/work.openapi.yaml#/paths/~1api~1admin~1work~1report
 components:
   securitySchemes:
     bearerAuth:

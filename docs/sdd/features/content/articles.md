@@ -12,7 +12,7 @@ On save the body passes the [article sanitizer](../../../../src/Content/Content.
 
 Every save (create, update, including the cover) stores `UpdatedBy`, the editor's email from the session ([ContentEditor](../../../../src/Content/Content.Application/Features/Editing/ContentEditor.cs)); admin responses return it, public ones never do.
 
-Access: public reads are anonymous; `/api/admin/articles` needs `CanManageContent` (Manager or Admin).
+Access: public reads are anonymous; `/api/admin/articles` needs `CanManageContent` (Manager, Seo, or Admin).
 
 ## Code structure
 

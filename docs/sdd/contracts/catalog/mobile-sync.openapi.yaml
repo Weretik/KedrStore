@@ -11,7 +11,7 @@ paths:
       operationId: getMobileCatalogSnapshot
       summary: Products, prices, categories and price types for offline work
       description: >-
-        Requires `CanManageOrders` (Manager or Admin); the app sends its bearer token. Deleted products and categories
+        Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted products and categories
         are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed
         when the client accepts it.
       tags: [MobileSync]
@@ -31,7 +31,7 @@ paths:
               schema: { $ref: '#/components/schemas/CatalogSnapshot' }
         '304': { description: The app already holds this version; no body. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
 components:
   schemas:
     CatalogSnapshot:

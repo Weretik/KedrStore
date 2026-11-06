@@ -39,6 +39,8 @@
       <ProjectReference Include="..\..\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Media\Media.Api\Media.Api.csproj" />
       <ProjectReference Include="..\..\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

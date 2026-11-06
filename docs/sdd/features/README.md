@@ -39,6 +39,10 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Media library](media/media-library.md) — CDN pictures in virtual folders: upload, replace, rename, move, Admin-only delete, and the job that registers files already on the CDN.
 
+## Work
+
+- [Staff tasks and the activity log](work/staff-work.md) — own board «Мої задачі», a task from the administrator, the automatic change log, and the work report.
+
 ## Identity
 
 - [User session](identity/session.md) — browser cookie login, mobile token login and refresh, logout, and me.

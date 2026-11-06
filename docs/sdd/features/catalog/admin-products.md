@@ -10,7 +10,7 @@ Paged and full product lists, Admin product details by slug, deleted products, a
 
 Both paged Admin lists return `categoryName` from the category's Ukrainian short name, accept `categoryId` including all descendants, and sort `CategoryAsc/CategoryDesc` before paging. The [tree traversal helper](../../../../src/Catalog/Catalog.Application/Features/Category/CategoryTreeIds.cs) stops cycles with a visited-ID set. `GET /api/categories` provides the complete ordered lookup for the Admin selector. Changes are specified in the [category SDD](../../specs/catalog/admin-product-list/category-table-2026-10-19.md).
 
-Soft-deleted products leave the projection, so ordinary lists never show them. With `deleted=true` (Admin role only; Manager gets `403`) the list reads [deleted products](../../../../src/Catalog/Catalog.Application/Features/Products/GetAdminList/DeletedAdminProducts.cs) directly, newest deletion first. `PUT /api/admin/products/{id}/slug` (Admin role only) sets or regenerates the slug through the [slug command](../../../../src/Catalog/Catalog.Application/Features/Slugs/Change/ChangeSlugCommandHandler.cs); the old slug goes to history and the projection row follows.
+Soft-deleted products leave the projection, so ordinary lists never show them. With `deleted=true` (Admin or Seo role only; Manager gets `403`) the list reads [deleted products](../../../../src/Catalog/Catalog.Application/Features/Products/GetAdminList/DeletedAdminProducts.cs) directly, newest deletion first. `PUT /api/admin/products/{id}/slug` (`CanManageSiteCatalog`: Admin or Seo) sets or regenerates the slug through the [slug command](../../../../src/Catalog/Catalog.Application/Features/Slugs/Change/ChangeSlugCommandHandler.cs); the old slug goes to history and the projection row follows.
 
 ## Code structure
 
@@ -22,7 +22,7 @@ src/
     ├── Catalog.Api/Controllers/AdminProductsController.cs  # HTTP entry point
     ├── Catalog.Application/Features/Products/
     │   ├── GetAdminList/
-    │   │   ├── DeletedAdminProducts.cs  # Admin-only deleted list
+    │   │   ├── DeletedAdminProducts.cs  # Admin and Seo deleted list
     │   │   ├── GetAdminProductListQueryHandler.cs  # use-case handler
     │   │   └── GetAllAdminProductsQueryHandler.cs  # use-case handler
     │   └── GetAdminDetail/GetAdminProductBySlugQueryHandler.cs  # details by slug

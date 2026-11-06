@@ -29,7 +29,7 @@ paths:
               schema: { $ref: '#/components/schemas/DraftPage' }
         '400': { description: Invalid query. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     post:
       operationId: createAdminOrderDraft
       summary: Save a reusable draft
@@ -59,7 +59,7 @@ paths:
         '404': { description: Selected customer or product does not exist. }
         '409': { description: Idempotency key reused with different body. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/order-workspace/drafts/{draftId}:
     parameters:
       - name: draftId
@@ -78,7 +78,7 @@ paths:
               schema: { $ref: '#/components/schemas/DraftDetail' }
         '404': { description: Draft not found. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     put:
       operationId: updateAdminOrderDraft
       summary: Replace editable draft fields
@@ -103,7 +103,7 @@ paths:
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     delete:
       operationId: deleteAdminOrderDraft
       summary: Delete one draft and its lines
@@ -118,7 +118,7 @@ paths:
         '404': { description: Draft not found. }
         '409': { description: Draft changed since supplied version. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
 components:
   schemas:
     PagedInfo:

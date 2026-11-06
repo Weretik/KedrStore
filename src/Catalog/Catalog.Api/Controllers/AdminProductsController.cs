@@ -29,7 +29,7 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         [FromQuery] GetAdminProductsRequest request,
         CancellationToken cancellationToken)
     {
-        if (request.Deleted == true && !User.IsInRole(RoleNames.Admin))
+        if (request.Deleted == true && !User.IsInRole(RoleNames.Admin) && !User.IsInRole(RoleNames.Seo))
             return Forbid();
 
         var result = await sender.Send(new GetAdminProductListQuery(request), cancellationToken);
@@ -59,7 +59,7 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}/slug", Name = "changeAdminProductSlug")]
-    [Authorize(Policy = PolicyNames.RequireAdminRole)]
+    [Authorize(Policy = PolicyNames.CanManageSiteCatalog)]
     [ProducesResponseType(typeof(ChangeSlugResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

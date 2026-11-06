@@ -19,7 +19,7 @@ namespace Catalog.Api.Controllers;
 
 /// <summary>
 /// Site models (spec catalog/007): the models the public site is built from, their axes, products, and texts.
-/// Manager and Admin edit them; the model slug keeps its spec 006 route, where only Admin changes it.
+/// Manager and Admin edit them; the model slug keeps its spec 006 route, where only Admin and Seo change it.
 /// </summary>
 [ApiController]
 [Route("api/admin/site-models")]

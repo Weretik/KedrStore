@@ -29,7 +29,7 @@ paths:
               schema: { $ref: '#/components/schemas/OrderPage' }
         '400': { description: Invalid query. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     post:
       operationId: createAdminWorkspaceOrder
       summary: Create one priced order and pending 1C sync
@@ -63,7 +63,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/OrderConflict' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/order-workspace/orders/{orderId}:
     get:
       operationId: getAdminWorkspaceOrderById
@@ -82,7 +82,7 @@ paths:
               schema: { $ref: '#/components/schemas/OrderDetail' }
         '404': { description: Order not found. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/order-workspace/quote:
     post:
       operationId: quoteAdminWorkspaceOrder
@@ -115,7 +115,7 @@ paths:
                   message: { type: string, example: Недостатньо товару на складі. }
         '404': { description: Selected customer or product does not exist. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/order-workspace/customer-prices:
     post:
       operationId: getAdminWorkspaceCustomerPrices
@@ -139,7 +139,7 @@ paths:
         '400': { description: Missing customer or 1-100 valid product IDs not supplied (code invalid_products). }
         '404': { description: Selected customer does not exist. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
 components:
   schemas:
     Money: { type: number, multipleOf: 0.01, minimum: 0 }

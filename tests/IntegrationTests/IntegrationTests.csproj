@@ -35,6 +35,7 @@
       <ProjectReference Include="..\..\src\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

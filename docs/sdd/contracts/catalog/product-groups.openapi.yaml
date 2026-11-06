@@ -4,8 +4,8 @@ info:
   version: 0.1.0
   description: >-
     Variant groups of spec catalog/006 phase 2. A group links products of one model in one category that differ by
-    color, size, or side; each variant stays a separate product. Policy CanManageProducts (Manager and Admin);
-    only Admin changes a group slug. Every change rebuilds the automatic groups at once.
+    color, size, or side; each variant stays a separate product. Policy CanManageProducts (Manager, Seo, and Admin);
+    only Admin or Seo changes a group slug. Every change rebuilds the automatic groups at once.
 paths:
   /api/admin/product-groups:
     get:
@@ -21,7 +21,7 @@ paths:
         '200': { description: Groups, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProductGroupListItem' } } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
     post:
       operationId: createAdminProductGroup
       summary: Create a group («Нова група»)
@@ -39,7 +39,7 @@ paths:
         '200': { description: Created group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/product-groups/{id}:
     parameters:
       - { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
@@ -52,7 +52,7 @@ paths:
         '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Group not found. }
     put:
       operationId: renameAdminProductGroup
@@ -69,7 +69,7 @@ paths:
         '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Group not found. }
   /api/admin/product-groups/{id}/main:
     parameters:
@@ -91,7 +91,7 @@ paths:
         '200': { description: Group, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroup' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Group not found. }
   /api/admin/product-groups/{id}/slug:
     parameters:
@@ -101,7 +101,7 @@ paths:
       summary: Change a group slug
       tags: [Admin product groups]
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
-      description: Admin only. The old slug goes to the slug history and is never given to another group.
+      description: Admin or Seo only. The old slug goes to the slug history and is never given to another group.
       requestBody:
         required: true
         content:
@@ -111,7 +111,7 @@ paths:
         '200': { description: New slug, content: { application/json: { schema: { $ref: './category-read.openapi.yaml#/components/schemas/ChangeSlugResponse' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Admin role. }
+        '403': { description: Signed in without the Admin or Seo role. }
         '404': { description: Group not found. }
   /api/admin/products/{id}/group:
     parameters:
@@ -125,7 +125,7 @@ paths:
         '200': { description: Group of the product, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroupMembership' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Product not found. }
     put:
       operationId: setAdminProductGroupOfProduct
@@ -144,7 +144,7 @@ paths:
         '200': { description: Group of the product, content: { application/json: { schema: { $ref: '#/components/schemas/AdminProductGroupMembership' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Product not found. }
 components:
   responses:

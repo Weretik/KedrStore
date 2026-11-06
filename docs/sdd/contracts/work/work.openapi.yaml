@@ -1,0 +1,235 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Work — staff tasks and the activity log
+  version: 0.1.0
+  description: >-
+    Spec work/001. A staff member's own board «Мої задачі» (`Planned`, `InProgress`, `Done`) and own report under
+    `/api/work` need `RequireManagerRole` (Manager, Seo, or Admin) and only ever touch the caller's own tasks; another
+    person's task is `404`. `/api/admin/work` needs the Admin role. The activity log is written automatically after a
+    staff member's successful `POST`, `PUT`, `PATCH`, or `DELETE` to any `Admin*` controller; the same change repeated
+    within 10 minutes updates the last entry (`count`).
+paths:
+  /api/work/tasks:
+    get:
+      operationId: getMyWorkTasks
+      summary: The caller's board
+      description: Open tasks and tasks done in the last 30 days, most recently changed first.
+      tags: [Work]
+      responses:
+        '200':
+          description: The caller's tasks.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/WorkTask' } }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+    post:
+      operationId: createMyWorkTask
+      summary: Create an own task in «План»
+      tags: [Work]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveWorkTaskRequest' }
+      responses:
+        '200':
+          description: The new task.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkTask' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+  /api/work/tasks/{id}:
+    put:
+      operationId: updateMyWorkTask
+      summary: Change an own task's title and details
+      tags: [Work]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveWorkTaskRequest' }
+      responses:
+        '200':
+          description: The saved task.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkTask' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: No such task of the caller. }
+    delete:
+      operationId: deleteMyWorkTask
+      summary: Delete an own task
+      tags: [Work]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Deleted. }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: No such task of the caller. }
+  /api/work/tasks/{id}/status:
+    put:
+      operationId: changeMyWorkTaskStatus
+      summary: Move an own task to another column
+      description: >-
+        `InProgress` and `Done` set the start time once; `Done` sets the completion time and keeps `result`;
+        leaving `Done` clears both.
+      tags: [Work]
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangeWorkTaskStatusRequest' }
+      responses:
+        '200':
+          description: The moved task.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkTask' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: No such task of the caller. }
+  /api/work/report:
+    get:
+      operationId: getMyWorkReport
+      summary: The caller's own report
+      tags: [Work]
+      parameters:
+        - { $ref: '#/components/parameters/From' }
+        - { $ref: '#/components/parameters/To' }
+      responses:
+        '200':
+          description: The report.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkReport' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+  /api/admin/work/tasks:
+    post:
+      operationId: createAdminWorkTask
+      summary: Put a task on a staff member's board
+      tags: [Work]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateWorkTaskForUserRequest' }
+      responses:
+        '200':
+          description: The new task, with `createdByOwner` false.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkTask' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+  /api/admin/work/report:
+    get:
+      operationId: getAdminWorkReport
+      summary: A staff member's report
+      tags: [Work]
+      parameters:
+        - { name: userId, in: query, required: true, schema: { type: string, format: uuid } }
+        - { $ref: '#/components/parameters/From' }
+        - { $ref: '#/components/parameters/To' }
+      responses:
+        '200':
+          description: The report.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkReport' }
+        '400': { $ref: '#/components/responses/Invalid' }
+        '401': { description: Not signed in. }
+        '403': { description: Not an Admin. }
+components:
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+    From:
+      name: from
+      in: query
+      required: true
+      description: First Kyiv calendar day of the period.
+      schema: { type: string, format: date }
+    To:
+      name: to
+      in: query
+      required: true
+      description: Last Kyiv calendar day, inclusive; at most 92 days after `from`.
+      schema: { type: string, format: date }
+  responses:
+    Invalid:
+      description: Invalid input; each error names its field (`title`, `status`, `to`, …).
+      content:
+        application/json:
+          schema: { type: object, additionalProperties: true }
+  schemas:
+    WorkTaskStatus: { type: string, enum: [Planned, InProgress, Done] }
+    WorkTask:
+      type: object
+      required: [id, ownerUserId, createdByUserId, createdByOwner, title, details, status, result, createdAt, updatedAt, startedAt, completedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        ownerUserId: { type: string, format: uuid }
+        createdByUserId: { type: string, format: uuid }
+        createdByOwner: { type: boolean, description: 'False when an administrator gave the task («Від адміністратора»).' }
+        title: { type: string, maxLength: 200 }
+        details: { type: [string, 'null'], maxLength: 4000 }
+        status: { $ref: '#/components/schemas/WorkTaskStatus' }
+        result: { type: [string, 'null'], maxLength: 2000, description: What was done; only for `Done`. }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        startedAt: { type: [string, 'null'], format: date-time }
+        completedAt: { type: [string, 'null'], format: date-time }
+    WorkActivity:
+      type: object
+      required: [id, userId, userEmail, area, operation, method, target, count, firstAt, occurredAt]
+      properties:
+        id: { type: integer, format: int64 }
+        userId: { type: string, format: uuid }
+        userEmail: { type: string, description: Sign-in email at the time of the change. }
+        area: { type: string, description: 'Controller name without `Admin`, for example `Categories`, `PageSeo`, `MediaFiles`.' }
+        operation: { type: string, description: 'Action method name, for example `UpdateContent`.' }
+        method: { type: string, enum: [POST, PUT, PATCH, DELETE] }
+        target: { type: string, description: 'Route values in name order, for example `id=12, lang=uk`; may be empty.' }
+        count: { type: integer, minimum: 1, description: How many times the same change was saved within 10 minutes. }
+        firstAt: { type: string, format: date-time }
+        occurredAt: { type: string, format: date-time }
+    WorkReport:
+      type: object
+      required: [userId, from, to, doneTasks, openTasks, activity, activityTruncated]
+      properties:
+        userId: { type: string, format: uuid }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        doneTasks: { type: array, items: { $ref: '#/components/schemas/WorkTask' }, description: Finished in the period. }
+        openTasks: { type: array, items: { $ref: '#/components/schemas/WorkTask' }, description: Not finished now. }
+        activity: { type: array, items: { $ref: '#/components/schemas/WorkActivity' }, description: 'Newest first, at most 2000.' }
+        activityTruncated: { type: boolean }
+    SaveWorkTaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        details: { type: [string, 'null'], maxLength: 4000 }
+    ChangeWorkTaskStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status: { $ref: '#/components/schemas/WorkTaskStatus' }
+        result: { type: [string, 'null'], maxLength: 2000 }
+    CreateWorkTaskForUserRequest:
+      type: object
+      required: [ownerUserId, title]
+      properties:
+        ownerUserId: { type: string, format: uuid }
+        title: { type: string, minLength: 1, maxLength: 200 }
+        details: { type: [string, 'null'], maxLength: 4000 }

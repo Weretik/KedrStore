@@ -5,7 +5,7 @@ info:
   description: >-
     Pictures on the CDN (`images-kedr.cdn.express`) and the virtual folders that group them. Folders live only in the
     database: moving a file or a folder never changes its CDN URL. Reads, uploads, replace, move, rename and folder
-    create/update need `CanManageMedia` (Manager or Admin); deletes need the Admin role.
+    create/update need `CanManageMedia` (Manager, Seo, or Admin); deletes need the Admin role.
 paths:
   /api/admin/media/folders:
     get:
@@ -20,7 +20,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MediaFolderTree' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
     post:
       operationId: createAdminMediaFolder
       summary: Create a folder
@@ -38,7 +38,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFolderItem' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '409': { description: A folder with this name (case-insensitive) already exists in the parent. }
   /api/admin/media/folders/{id}:
     put:
@@ -60,7 +60,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFolderItem' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such folder. }
         '409': { description: A folder with this name already exists in the target parent. }
     delete:
@@ -99,7 +99,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFilePage' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
     post:
       operationId: uploadAdminMediaFile
       summary: Upload a picture
@@ -125,7 +125,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFileItem' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '413': { description: The request is larger than 15 MB. }
         '503': { description: CDN credentials are not configured. }
   /api/admin/media/files/{id}:
@@ -141,7 +141,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MediaFileItem' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such file. }
     put:
       operationId: updateAdminMediaFile
@@ -161,7 +161,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFileItem' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such file. }
     delete:
       operationId: deleteAdminMediaFile
@@ -199,7 +199,7 @@ paths:
               schema: { $ref: '#/components/schemas/MediaFileItem' }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such file. }
         '413': { description: The request is larger than 15 MB. }
         '503': { description: CDN credentials are not configured. }
@@ -226,7 +226,7 @@ paths:
                   moved: { type: integer }
         '400': { $ref: '#/components/responses/Invalid' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
 components:
   parameters:
     Id:
