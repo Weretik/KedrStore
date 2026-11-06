@@ -17,7 +17,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCatalogOverview' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
 components:
   schemas:
     AdminCatalogOverview:

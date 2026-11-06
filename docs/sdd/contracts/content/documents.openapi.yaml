@@ -43,7 +43,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/LegalDocumentOverview' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
   /api/admin/content/documents/{kind}/versions:
     get:
       operationId: getAdminLegalDocumentVersions
@@ -61,7 +61,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/LegalDocumentVersionSummary' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: Unknown kind. }
     post:
       operationId: createAdminLegalDocumentDraft
@@ -85,7 +85,7 @@ paths:
               schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
         '400': { description: 'Invalid texts, or nothing is published and no texts were given (`texts`).' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: Unknown kind. }
         '409': { description: This document already has a draft. }
   /api/admin/content/documents/versions/{id}:
@@ -103,7 +103,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such edition. }
     put:
       operationId: updateAdminLegalDocumentDraft
@@ -129,7 +129,7 @@ paths:
             application/json:
               schema: { type: object, additionalProperties: true }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such edition. }
         '409': { description: The edition is published or archived and can no longer change. }
     delete:
@@ -140,7 +140,7 @@ paths:
       responses:
         '204': { description: Deleted. }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such edition. }
         '409': { description: The edition is not a draft. }
   /api/admin/content/documents/versions/{id}/publish:
@@ -166,7 +166,7 @@ paths:
               schema: { $ref: '#/components/schemas/LegalDocumentVersion' }
         '400': { description: '`effectiveFrom` is earlier than the date of the edition on the site.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: No such edition. }
         '409': { description: The edition is already published or archived. }
 components:

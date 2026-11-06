@@ -43,7 +43,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/AdminPageSeo' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
   /api/admin/content/page-seo/{page}:
     put:
       operationId: updateAdminPageSeo
@@ -70,7 +70,7 @@ paths:
               schema: { $ref: '#/components/schemas/AdminPageSeo' }
         '400': { description: 'Unknown page or a text over its limit; `errors` names the field.' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
 components:
   schemas:
     SitePage:

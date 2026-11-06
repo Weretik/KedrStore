@@ -173,7 +173,7 @@ paths:
       responses:
         '200': { description: All admin products, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminProduct' } } } } }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/products/{id}/media:
     parameters:
       - name: id
@@ -192,7 +192,7 @@ paths:
         '200': { description: Product media set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Product not found or deleted. }
     put:
       operationId: setAdminProductMedia
@@ -211,7 +211,7 @@ paths:
         '200': { description: Saved set, content: { application/json: { schema: { $ref: '#/components/schemas/ProductMedia' } } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Product not found or deleted. }
   /api/admin/products/by-slug/{productSlug}:
     get:
@@ -230,7 +230,7 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Product not found }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
 components:
   parameters:
     Lang: { name: lang, in: path, required: true, schema: { type: string, enum: [uk, ru] } }

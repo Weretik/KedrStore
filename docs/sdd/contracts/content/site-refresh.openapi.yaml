@@ -20,7 +20,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SiteRefreshResult' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '502':
           description: The site did not answer or refused the secret (`siteUnavailable`).
           content:

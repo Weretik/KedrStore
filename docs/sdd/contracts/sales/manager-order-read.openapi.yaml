@@ -33,7 +33,7 @@ paths:
               schema: { $ref: '#/components/schemas/ManagerOrderPage' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/admin/orders/{orderId}:
     get:
       operationId: getAdminOrderById
@@ -53,7 +53,7 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: No manager order exists for the supplied identifier. }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
 components:
   schemas:
     PagedInfo:

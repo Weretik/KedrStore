@@ -33,7 +33,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCompanyContacts' }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: The contacts row is missing. }
     put:
       operationId: updateAdminCompanyContacts
@@ -57,7 +57,7 @@ paths:
             application/json:
               schema: { type: object, additionalProperties: true }
         '401': { description: Not signed in. }
-        '403': { description: Not a Manager, Seo, or Admin. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
         '404': { description: The contacts row is missing. }
 components:
   schemas:

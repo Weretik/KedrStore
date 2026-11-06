@@ -86,7 +86,7 @@ paths:
         '400': { $ref: '#/components/responses/ValidationError' }
         '404': { description: Category not found }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
   /api/categories/{id}/slug:
     put:
       operationId: changeAdminCategorySlug
@@ -157,7 +157,7 @@ paths:
               schema: { $ref: '#/components/schemas/AdminCategoryContent' }
         '400': { $ref: '#/components/responses/ValidationError' }
         '401': { description: Not signed in. }
-        '403': { description: Signed in without the Manager, Seo, or Admin role. }
+        '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Category not found or deleted. }
   /api/categories/{id}/content/{lang}:
     put:
