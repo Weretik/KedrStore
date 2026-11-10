@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
+using Identity.Domain.Authorization;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;
@@ -17,6 +18,8 @@ public sealed class StaffAccountService(
     IHttpContextAccessor httpContextAccessor,
     ILogger<StaffAccountService> logger) : IStaffAccountService
 {
+    private const int CandidateLimit = 20;
+
     public async Task<IReadOnlyList<StaffAccountDto>> GetListAsync(CancellationToken cancellationToken = default)
     {
         var now = DateTimeOffset.UtcNow;
@@ -74,6 +77,92 @@ public sealed class StaffAccountService(
 
         logger.LogInformation("AUDIT: Staff account {UserId} created with role {Role} by {ActorId}", user.Id, role, CurrentUserId());
         return Result.Success(new StaffAccountDto(user.Id, email, user.FullName, role, IsBlocked: false, AvatarUrl: null));
+    }
+
+    public async Task<IReadOnlyList<StaffCandidateDto>> SearchCandidatesAsync(
+        string search,
+        CancellationToken cancellationToken = default)
+    {
+        var term = search.Trim().ToUpperInvariant();
+        var staffUserIds =
+            from userRole in dbContext.UserRoles
+            join role in dbContext.Roles on userRole.RoleId equals role.Id
+            where StaffRoles.All.Contains(role.Name!)
+            select userRole.UserId;
+        var customerUserIds =
+            from userRole in dbContext.UserRoles
+            join role in dbContext.Roles on userRole.RoleId equals role.Id
+            where role.Name == RoleNames.User
+            select userRole.UserId;
+
+        return await dbContext.Users
+            .AsNoTracking()
+            .Where(user => !staffUserIds.Contains(user.Id))
+            .Where(user => user.NormalizedEmail!.Contains(term) || user.FullName.ToUpper().Contains(term))
+            .OrderBy(user => user.Email)
+            .Take(CandidateLimit)
+            .Select(user => new StaffCandidateDto(
+                user.Id,
+                user.Email ?? string.Empty,
+                user.FullName,
+                customerUserIds.Contains(user.Id)))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result<StaffAccountDto>> GrantAccessAsync(
+        Guid userId,
+        string fullName,
+        string role,
+        string password,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return Result.NotFound();
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+        if (roles.Any(StaffRoles.IsStaffRole))
+        {
+            return Result.Conflict("This account already has staff access.");
+        }
+
+        user.FullName = fullName.Trim();
+        user.EmailConfirmed = true;
+        user.LockoutEnabled = true;
+        user.LockoutEnd = null;
+        user.AccessFailedCount = 0;
+        var updated = await userManager.UpdateAsync(user);
+        if (!updated.Succeeded)
+        {
+            return Invalid(updated);
+        }
+
+        var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+        var reset = await userManager.ResetPasswordAsync(user, resetToken, password);
+        if (!reset.Succeeded)
+        {
+            return Invalid(reset);
+        }
+
+        // The customer role stays: the same person can still order on the site.
+        var assigned = await userManager.AddToRoleAsync(user, role);
+        if (!assigned.Succeeded)
+        {
+            return Invalid(assigned);
+        }
+
+        // Old customer sessions end, so the next sign-in carries the staff role.
+        await refreshSessionStore.RevokeAllActiveByUserAsync(user.Id, DateTimeOffset.UtcNow, "StaffAccessGranted", cancellationToken);
+        logger.LogInformation("AUDIT: Existing account {UserId} given staff role {Role} by {ActorId}", user.Id, role, CurrentUserId());
+        return Result.Success(new StaffAccountDto(
+            user.Id,
+            user.Email ?? string.Empty,
+            user.FullName,
+            role,
+            IsBlocked: false,
+            avatarUrlBuilder.Build(user.AvatarPath)));
     }
 
     public async Task<Result> ChangeRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)

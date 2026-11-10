@@ -55,7 +55,7 @@ existing Counterparty.IdentityUserId → find AppUser by ID
                               create AppUser + User role
 ```
 
-For a new user, the service sets username/email/full name, `EmailConfirmed`, and `LockoutEnabled` from `Identity:ImportedCounterparties`, then creates an account using the 1C `CounterpartyId` as the initial password input. For an existing user, it updates those fields, resets the password to the current `CounterpartyId`, and ensures the `User` role. ASP.NET Identity hashes passwords; the application must not log or expose the input value.
+For a new user, the service sets username/email/full name, `EmailConfirmed`, and `LockoutEnabled` from `Identity:ImportedCounterparties`, then creates an account using the 1C `CounterpartyId` as the initial password input. For an existing user, it updates those fields, resets the password to the current `CounterpartyId`, and ensures the `User` role. An existing user with a staff role (Admin, Seo, Manager), for example a customer an administrator gave staff access on the Users page, keeps its email, name, password and lockout; the sync only ensures the `User` role. When such a counterparty becomes stale, only the `User` role is removed and the account stays. ASP.NET Identity hashes passwords; the application must not log or expose the input value.
 
 ## Security and operational effects
 

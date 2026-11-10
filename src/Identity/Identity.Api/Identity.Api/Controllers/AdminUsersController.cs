@@ -6,7 +6,9 @@ using Identity.Application.Features.Users.ChangeStaffName;
 using Identity.Application.Features.Users.ChangeStaffRole;
 using Identity.Application.Features.Users.CreateStaff;
 using Identity.Application.Features.Users.GetStaffList;
+using Identity.Application.Features.Users.GrantStaffAccess;
 using Identity.Application.Features.Users.RemoveStaffAvatar;
+using Identity.Application.Features.Users.SearchStaffCandidates;
 using Identity.Application.Features.Users.SetStaffBlocked;
 using Identity.Application.Features.Users.SetStaffPassword;
 using Identity.Application.Features.Users.UploadStaffAvatar;
@@ -47,6 +49,40 @@ public sealed class AdminUsersController(ISender sender) : ControllerBase
 
         return result.Status == Ardalis.Result.ResultStatus.Ok
             ? StatusCode(StatusCodes.Status201Created, StaffAccountResponse.From(result.Value))
+            : this.ToActionResult(result);
+    }
+
+    /// <summary>Existing accounts without staff access (usually customers), up to 20, by part of the email or name.</summary>
+    [HttpGet("candidates", Name = "searchStaffCandidates")]
+    [ProducesResponseType(typeof(IReadOnlyList<StaffCandidateResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<StaffCandidateResponse>>> SearchCandidates(
+        [FromQuery] string? search,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new SearchStaffCandidatesQuery(search ?? string.Empty), cancellationToken);
+        return result.Status == Ardalis.Result.ResultStatus.Ok
+            ? Ok(result.Value.Select(StaffCandidateResponse.From).ToList())
+            : this.ToActionResult(result);
+    }
+
+    /// <summary>Gives an existing account a staff role and a new password; it keeps its customer role.</summary>
+    [HttpPost("{userId:guid}/staff-access", Name = "grantStaffAccess")]
+    [ProducesResponseType(typeof(StaffAccountResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<StaffAccountResponse>> GrantStaffAccess(
+        Guid userId,
+        [FromBody] GrantStaffAccessRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new GrantStaffAccessCommand(userId, request.FullName, request.Role, request.Password),
+            cancellationToken);
+
+        return result.Status == Ardalis.Result.ResultStatus.Ok
+            ? Ok(StaffAccountResponse.From(result.Value))
             : this.ToActionResult(result);
     }
 

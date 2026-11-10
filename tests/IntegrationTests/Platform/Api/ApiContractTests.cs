@@ -205,6 +205,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
     [InlineData("/api/admin/users/{userId}/role", "put", "changeStaffRole")]
     [InlineData("/api/admin/users/{userId}/blocked", "put", "setStaffBlocked")]
     [InlineData("/api/admin/users/{userId}/password", "put", "setStaffPassword")]
+    [InlineData("/api/admin/users/candidates", "get", "searchStaffCandidates")]
+    [InlineData("/api/admin/users/{userId}/staff-access", "post", "grantStaffAccess")]
     public async Task OpenApi_Contains_Identity_Operations(string path, string method, string operationId)
     {
         using var client = _factory.CreateClient();

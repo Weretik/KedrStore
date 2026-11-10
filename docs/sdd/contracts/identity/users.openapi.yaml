@@ -27,7 +27,45 @@ paths:
         '400': { description: 'Invalid email, name, role or password' }
         '401': { description: Not signed in }
         '403': { description: Not an administrator }
-        '409': { description: Email already used }
+        '409': { description: 'Email already used; give the existing account access through grantStaffAccess instead' }
+  /api/admin/users/candidates:
+    get:
+      operationId: searchStaffCandidates
+      summary: Find existing accounts without staff access
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: Up to 20 accounts without a staff role (usually customers imported from 1C) whose email or name contains the search text, case ignored, ordered by email.
+      parameters:
+        - { name: search, in: query, required: true, schema: { type: string, minLength: 2, maxLength: 256 } }
+      responses:
+        '200': { description: Matching accounts, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/StaffCandidateResponse' } } } } }
+        '400': { description: Search shorter than 2 characters }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+  /api/admin/users/{userId}/staff-access:
+    post:
+      operationId: grantStaffAccess
+      summary: Give an existing account a staff role and a password
+      tags: [Users]
+      security: [{ cookieAuth: [] }, { bearerAuth: [] }]
+      description: >-
+        The account gets the role, the name, and a new password; its email stays. A customer keeps the customer
+        role, orders and prices, and signs in on the site with the new password too. Its active refresh sessions end.
+        Later 1C customer syncs no longer change the email, name, password, or block state of a staff account, and a
+        customer removed from 1C keeps the staff account without the customer role.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: './session.openapi.yaml#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/GrantStaffAccessRequest' } } }
+      responses:
+        '200': { description: Staff access given, content: { application/json: { schema: { $ref: '#/components/schemas/StaffAccountResponse' } } } }
+        '400': { description: 'Invalid name, role or password' }
+        '401': { description: Not signed in }
+        '403': { description: Not an administrator }
+        '404': { description: No account with this ID }
+        '409': { description: The account already has staff access }
   /api/admin/users/{userId}/role:
     put:
       operationId: changeStaffRole
@@ -185,6 +223,21 @@ components:
       required: [email, fullName, role, password]
       properties:
         email: { type: string, format: email, maxLength: 256 }
+        fullName: { type: string, maxLength: 256 }
+        role: { $ref: '#/components/schemas/StaffRole' }
+        password: { type: string, format: password, minLength: 8, maxLength: 128 }
+    StaffCandidateResponse:
+      type: object
+      required: [id, email, fullName, isCustomer]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        fullName: { type: string }
+        isCustomer: { type: boolean, description: The account has the customer role }
+    GrantStaffAccessRequest:
+      type: object
+      required: [fullName, role, password]
+      properties:
         fullName: { type: string, maxLength: 256 }
         role: { $ref: '#/components/schemas/StaffRole' }
         password: { type: string, format: password, minLength: 8, maxLength: 128 }
