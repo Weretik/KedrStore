@@ -226,7 +226,8 @@ public sealed class AdminUsersApiTests(IdentityPostgresFixture fixture)
         var staffCustomer = await factory.CreateUserAsync(RoleNames.User);
         await using var scope = factory.Services.CreateAsyncScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-        Assert.True((await userManager.AddToRoleAsync(staffCustomer, RoleNames.Manager)).Succeeded);
+        var tracked = await userManager.FindByIdAsync(staffCustomer.Id.ToString());
+        Assert.True((await userManager.AddToRoleAsync(tracked!, RoleNames.Manager)).Succeeded);
         var provisioning = scope.ServiceProvider.GetRequiredService<IImportedCounterpartyIdentityProvisioningService>();
 
         var synced = await provisioning.EnsureUserAsync(
