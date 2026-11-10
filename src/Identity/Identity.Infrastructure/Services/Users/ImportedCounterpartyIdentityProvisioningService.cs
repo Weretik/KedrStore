@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
 using Identity.Domain.Authorization;
 using Identity.Infrastructure.Entities;
@@ -64,6 +65,14 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
             return Result.Success(appUser.Id);
         }
 
+        if (await IsStaffAsync(appUser))
+        {
+            // A customer who was given staff access keeps the email, name, password and
+            // block state an administrator set; 1C only keeps the customer role in place.
+            await EnsureUserRoleAsync(appUser);
+            return Result.Success(appUser.Id);
+        }
+
         appUser.UserName = userData.Email;
         appUser.Email = userData.Email;
         appUser.FullName = userData.FullName;
@@ -100,6 +109,22 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
         if (appUser is null)
             return Result.Success();
 
+        if (await IsStaffAsync(appUser))
+        {
+            // The staff account stays; it only stops being a customer.
+            var removeResult = await userManager.RemoveFromRoleAsync(appUser, RoleNames.User);
+            if (!removeResult.Succeeded && await userManager.IsInRoleAsync(appUser, RoleNames.User))
+            {
+                return Result.Error(FormatErrors(removeResult.Errors));
+            }
+
+            logger.LogInformation(
+                "Staff AppUser {UserId} kept; customer role removed for stale counterparty {CounterpartyId}",
+                identityUserId,
+                counterpartyId);
+            return Result.Success();
+        }
+
         var deleteResult = await userManager.DeleteAsync(appUser);
         if (!deleteResult.Succeeded)
         {
@@ -125,6 +150,9 @@ public sealed class ImportedCounterpartyIdentityProvisioningService(
 
         return Result.Success(appUser.Id);
     }
+
+    private async Task<bool> IsStaffAsync(AppUser appUser)
+        => (await userManager.GetRolesAsync(appUser)).Any(StaffRoles.IsStaffRole);
 
     private async Task EnsureUserRoleAsync(AppUser appUser)
     {

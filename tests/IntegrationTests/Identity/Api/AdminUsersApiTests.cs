@@ -1,7 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Identity.Application.Services;
 using Identity.Domain.Authorization;
+using Identity.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
 
 namespace IntegrationTests.Identity.Api;
@@ -151,5 +155,96 @@ public sealed class AdminUsersApiTests(IdentityPostgresFixture fixture)
         await IdentityApiFactory.CookieLoginAsync(promotedClient, manager.Email!, "Changed-Pass-1");
         using var list = await promotedClient.GetAsync("/api/admin/users");
         Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+    }
+
+    [SkippableFact]
+    public async Task Admin_Finds_A_Customer_And_Gives_It_Staff_Access()
+    {
+        fixture.SkipIfUnavailable();
+        await using var factory = new IdentityApiFactory(fixture);
+        await factory.EnsureStaffRolesAsync();
+        var admin = await factory.CreateUserAsync(RoleNames.Admin);
+        var customer = await factory.CreateUserAsync(RoleNames.User);
+        using var adminClient = factory.CreateBrowserClient();
+        await IdentityApiFactory.CookieLoginAsync(adminClient, admin.Email!);
+
+        using var tooShort = await adminClient.GetAsync("/api/admin/users/candidates?search=a");
+        Assert.Equal(HttpStatusCode.BadRequest, tooShort.StatusCode);
+
+        // Part of the email in another case finds the customer; staff accounts are not offered.
+        var part = customer.Email![..12].ToUpperInvariant();
+        using var found = await adminClient.GetAsync($"/api/admin/users/candidates?search={Uri.EscapeDataString(part)}");
+        Assert.Equal(HttpStatusCode.OK, found.StatusCode);
+        using (var rows = JsonDocument.Parse(await found.Content.ReadAsStringAsync()))
+        {
+            var row = Assert.Single(rows.RootElement.EnumerateArray(), item => item.GetProperty("id").GetGuid() == customer.Id);
+            Assert.True(row.GetProperty("isCustomer").GetBoolean());
+        }
+
+        using var granted = await adminClient.PostAsJsonAsync($"/api/admin/users/{customer.Id}/staff-access", new
+        {
+            fullName = "Клієнт-адмін",
+            role = RoleNames.Admin,
+            password = "Granted-Pass-1"
+        });
+        Assert.Equal(HttpStatusCode.OK, granted.StatusCode);
+
+        using var again = await adminClient.PostAsJsonAsync($"/api/admin/users/{customer.Id}/staff-access", new
+        {
+            fullName = "Клієнт-адмін",
+            role = RoleNames.Manager,
+            password = "Granted-Pass-1"
+        });
+        Assert.Equal(HttpStatusCode.Conflict, again.StatusCode);
+
+        using var list = await adminClient.GetAsync("/api/admin/users");
+        using (var rows = JsonDocument.Parse(await list.Content.ReadAsStringAsync()))
+        {
+            var row = Assert.Single(rows.RootElement.EnumerateArray(), item => item.GetProperty("id").GetGuid() == customer.Id);
+            Assert.Equal(RoleNames.Admin, row.GetProperty("role").GetString());
+            Assert.Equal("Клієнт-адмін", row.GetProperty("fullName").GetString());
+        }
+
+        using var promotedClient = factory.CreateBrowserClient();
+        using var login = await IdentityApiFactory.CookieLoginAsync(promotedClient, customer.Email!, "Granted-Pass-1");
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+        using var adminPage = await promotedClient.GetAsync("/api/admin/users");
+        Assert.Equal(HttpStatusCode.OK, adminPage.StatusCode);
+
+        await using var scope = factory.Services.CreateAsyncScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var stored = await userManager.FindByIdAsync(customer.Id.ToString());
+        Assert.True(await userManager.IsInRoleAsync(stored!, RoleNames.User));
+    }
+
+    [SkippableFact]
+    public async Task One_C_Sync_Keeps_A_Staff_Account_Of_A_Customer()
+    {
+        fixture.SkipIfUnavailable();
+        await using var factory = new IdentityApiFactory(fixture);
+        await factory.EnsureStaffRolesAsync();
+        var staffCustomer = await factory.CreateUserAsync(RoleNames.User);
+        await using var scope = factory.Services.CreateAsyncScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var tracked = await userManager.FindByIdAsync(staffCustomer.Id.ToString());
+        Assert.True((await userManager.AddToRoleAsync(tracked!, RoleNames.Manager)).Succeeded);
+        var provisioning = scope.ServiceProvider.GetRequiredService<IImportedCounterpartyIdentityProvisioningService>();
+
+        var synced = await provisioning.EnsureUserAsync(
+            new ImportedCounterpartyIdentityUserData("CP-STAFF-0001", "changed-in-1c@example.com", "Назва з 1С"),
+            staffCustomer.Id,
+            CancellationToken.None);
+        Assert.True(synced.IsSuccess);
+
+        var stored = await userManager.FindByIdAsync(staffCustomer.Id.ToString());
+        Assert.Equal(staffCustomer.Email, stored!.Email);
+        Assert.True(await userManager.CheckPasswordAsync(stored, IdentityApiFactory.Password));
+
+        var removed = await provisioning.DeleteUserAsync(staffCustomer.Id, "CP-STAFF-0001", CancellationToken.None);
+        Assert.True(removed.IsSuccess);
+        var kept = await userManager.FindByIdAsync(staffCustomer.Id.ToString());
+        Assert.NotNull(kept);
+        Assert.False(await userManager.IsInRoleAsync(kept!, RoleNames.User));
+        Assert.True(await userManager.IsInRoleAsync(kept!, RoleNames.Manager));
     }
 }
