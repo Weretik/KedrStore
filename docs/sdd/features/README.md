@@ -33,6 +33,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Home page FAQ and brands](content/home-blocks.md) — home FAQ in uk/ru and brands with media-library logos, ordered.
 - [Page «Співпраця»](content/wholesale-page.md) — the wholesale offer texts in uk/ru: hero, company, three steps, questions.
 - [Search texts of the site pages](content/page-seo.md) — optional uk/ru search title and description of eleven site pages; the site keeps its own otherwise.
+- [Site SEO settings](content/site-seo-settings.md) — Google Analytics, Tag Manager, Search Console and Bing codes and the link-preview picture every site page carries.
 - [Refresh the site now](content/site-refresh.md) — «Оновити сайт зараз»: asks the public site to drop its cached content and catalog.
 
 ## Media

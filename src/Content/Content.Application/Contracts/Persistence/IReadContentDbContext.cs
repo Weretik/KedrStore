@@ -14,4 +14,5 @@ public interface IReadContentDbContext
     DbSet<HomeBrand> HomeBrands { get; }
     DbSet<WholesalePage> WholesalePages { get; }
     DbSet<PageSeo> PageSeo { get; }
+    DbSet<SiteSeoSettings> SiteSeoSettings { get; }
 }
