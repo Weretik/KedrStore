@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: KedrStore Content — site SEO settings
+  version: 0.1.0
+  description: >-
+    Site-wide codes that every site page carries: the Google Analytics 4 measurement id, the Google Tag Manager
+    container id, the Google Search Console and Bing Webmaster verification codes, and the picture shown when a page
+    without its own picture is shared. One record, created empty by the migration; an empty value adds nothing to the
+    site. The SEO specialist connects the services; the admin only stores the codes.
+paths:
+  /api/content/seo-settings:
+    get:
+      operationId: getSiteSeoSettings
+      summary: Read the codes the site places on every page
+      description: Public, because the site renders pages for anonymous visitors. Never returns who edited.
+      tags: [SiteSeoSettings]
+      security: []
+      responses:
+        '200':
+          description: The settings; empty codes are null.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SiteSeoSettings' }
+        '404': { description: The settings row is missing (the migration was not applied). }
+  /api/admin/content/seo-settings:
+    get:
+      operationId: getAdminSiteSeoSettings
+      summary: Read the settings for editing
+      description: Requires `CanManageContent` (Manager, Seo, or Admin).
+      tags: [SiteSeoSettings]
+      responses:
+        '200':
+          description: The settings with the chosen picture and who saved them.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminSiteSeoSettings' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: The settings row is missing. }
+    put:
+      operationId: updateAdminSiteSeoSettings
+      summary: Replace all settings
+      description: >-
+        Requires `CanManageContent` (Manager, Seo, or Admin). Ids are trimmed and upper-cased; for a verification code
+        the whole meta tag may be sent and its `content` is kept. A blank or missing value removes that code or
+        picture. A new picture must be in the media library. Repeating it is safe.
+      tags: [SiteSeoSettings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SaveSiteSeoSettingsRequest' }
+      responses:
+        '200':
+          description: The saved settings.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminSiteSeoSettings' }
+        '400': { description: 'An id or code of another shape, or a picture not in the media library; `errors` names the field.' }
+        '401': { description: Not signed in. }
+        '403': { description: 'Not a Manager, Seo, or Admin.' }
+        '404': { description: The settings row is missing. }
+components:
+  schemas:
+    SiteShareImage:
+      type: object
+      required: [url, width, height]
+      properties:
+        url: { type: string, format: uri }
+        width: { type: [integer, 'null'] }
+        height: { type: [integer, 'null'] }
+    SiteSeoSettings:
+      type: object
+      required: [googleAnalyticsId, googleTagManagerId, googleSiteVerification, bingSiteVerification, shareImage]
+      properties:
+        googleAnalyticsId: { type: [string, 'null'], pattern: '^G-[A-Z0-9]{4,15}$', example: G-AB12CD34EF }
+        googleTagManagerId: { type: [string, 'null'], pattern: '^GTM-[A-Z0-9]{4,12}$', example: GTM-AB12CD3 }
+        googleSiteVerification: { type: [string, 'null'], pattern: '^[A-Za-z0-9_-]{8,100}$' }
+        bingSiteVerification: { type: [string, 'null'], pattern: '^[A-Za-z0-9_-]{8,100}$' }
+        shareImage:
+          description: Null when none is chosen or its file was deleted; the site keeps its own picture then.
+          oneOf:
+            - $ref: '#/components/schemas/SiteShareImage'
+            - type: 'null'
+    AdminSiteShareImage:
+      type: object
+      required: [mediaFileId, url, fileName, width, height, missing]
+      properties:
+        mediaFileId: { type: integer, format: int64 }
+        url: { type: [string, 'null'], format: uri }
+        fileName: { type: [string, 'null'] }
+        width: { type: [integer, 'null'] }
+        height: { type: [integer, 'null'] }
+        missing: { type: boolean, description: The file was deleted from the media library. }
+    AdminSiteSeoSettings:
+      type: object
+      required:
+        [googleAnalyticsId, googleTagManagerId, googleSiteVerification, bingSiteVerification, shareImage, updatedAt,
+         updatedBy]
+      properties:
+        googleAnalyticsId: { type: [string, 'null'] }
+        googleTagManagerId: { type: [string, 'null'] }
+        googleSiteVerification: { type: [string, 'null'] }
+        bingSiteVerification: { type: [string, 'null'] }
+        shareImage:
+          oneOf:
+            - $ref: '#/components/schemas/AdminSiteShareImage'
+            - type: 'null'
+        updatedAt: { type: string, format: date-time }
+        updatedBy: { type: [string, 'null'], description: Who saved the last change; null for the migration row. }
+    SaveSiteSeoSettingsRequest:
+      type: object
+      properties:
+        googleAnalyticsId: { type: [string, 'null'], maxLength: 20 }
+        googleTagManagerId: { type: [string, 'null'], maxLength: 20 }
+        googleSiteVerification: { type: [string, 'null'], maxLength: 300, description: The code or the whole meta tag. }
+        bingSiteVerification: { type: [string, 'null'], maxLength: 300, description: The code or the whole meta tag. }
+        shareImageMediaFileId: { type: [integer, 'null'], format: int64, minimum: 1 }

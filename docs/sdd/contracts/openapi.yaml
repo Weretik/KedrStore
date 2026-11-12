@@ -258,6 +258,10 @@ paths:
     $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo
   /api/admin/content/page-seo/{page}:
     $ref: ./content/page-seo.openapi.yaml#/paths/~1api~1admin~1content~1page-seo~1{page}
+  /api/content/seo-settings:
+    $ref: ./content/seo-settings.openapi.yaml#/paths/~1api~1content~1seo-settings
+  /api/admin/content/seo-settings:
+    $ref: ./content/seo-settings.openapi.yaml#/paths/~1api~1admin~1content~1seo-settings
   /api/admin/content/overview:
     $ref: ./content/admin-overview.openapi.yaml#/paths/~1api~1admin~1content~1overview
   /api/admin/catalog/overview:

@@ -448,6 +448,45 @@ namespace Content.Infrastructure.Migrations
                     b.ToTable("PageSeo", "content");
                 });
 
+            modelBuilder.Entity("Content.Domain.Seo.SiteSeoSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BingSiteVerification")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("GoogleAnalyticsId")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("GoogleSiteVerification")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("GoogleTagManagerId")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<long?>("ShareImageMediaFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteSeoSettings", "content", t =>
+                        {
+                            t.HasCheckConstraint("CK_SiteSeoSettings_Singleton", "\"Id\" = 1");
+                        });
+                });
+
             modelBuilder.Entity("Content.Domain.Wholesale.WholesalePage", b =>
                 {
                     b.Property<int>("Id")
