@@ -3,7 +3,7 @@
   "version": "8.0.0",
   "options": {
     "inputs": [
-      "http://91.218.214.105:8081/YTP82/ws/ws1.1cws?wsdl"
+      "https://onec.example.invalid/base/ws/ws1.1cws?wsdl"
     ],
     "namespaceMappings": [
       "*, BuildingBlocks.Integrations.OneC.Generated"

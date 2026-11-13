@@ -362,3 +362,11 @@ Desktop.ini
 .history/
 .ionide/
 
+
+# Credentials that must never be committed
+data-protection-keys/
+*service-account*.json
+*-sa-key.json
+gcp-key*.json
+*.pem
+.dev.vars
