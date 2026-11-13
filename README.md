@@ -4,10 +4,16 @@ Kedr is a door hardware company in Kharkiv, Ukraine. It sells wholesale to about
 
 This project is the platform built around 1C:
 
-- **Public catalog site** [classkedr.com.ua](https://classkedr.com.ua) in Ukrainian and Russian, built for search engines, with a quick order form.
+- **Public catalog site** [classkedr.com.ua](https://classkedr.com.ua) in two languages, built for search engines, with a quick order form.
 - **Admin app** for the staff (managers, executives, an SEO specialist): catalog and product attributes, site content, the CDN media library, customers, orders at customer prices, staff tasks and access.
 - **«Kedr Manager» mobile app** for sales managers on the road: works offline for up to 7 days, shows big product photos and technical schemes, calculates an order at the customer's prices and sends it to 1C.
 - **API** that syncs with 1C and serves all three clients.
+
+| Public site: home | Public site: product |
+| --- | --- |
+| ![Home page](docs/screenshots/site-home.png) | ![Product page](docs/screenshots/site-product.png) |
+
+**In numbers:** 6 modules · ~180 endpoints · ~50 tables · ~1,070 tests (backend and frontends). It replaced the company's old desktop app, and managers now work **about 25% faster**.
 
 The whole system was designed and built by one developer: backend, web, mobile, CI/CD and cloud setup. AI coding assistants (Claude Code, Codex) were used for coding, reviews and documentation.
 
