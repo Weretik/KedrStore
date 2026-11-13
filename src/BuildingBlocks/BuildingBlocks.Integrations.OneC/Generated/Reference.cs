@@ -1168,11 +1168,11 @@ namespace BuildingBlocks.Integrations.OneC.Generated
         {
             if ((endpointConfiguration == EndpointConfiguration.Kontra1Soap))
             {
-                return new System.ServiceModel.EndpointAddress("http://91.218.214.105:8081/YTP82/ws/ws1.1cws");
+                return new System.ServiceModel.EndpointAddress("https://onec.example.invalid/base/ws/ws1.1cws");
             }
             if ((endpointConfiguration == EndpointConfiguration.Kontra1Soap12))
             {
-                return new System.ServiceModel.EndpointAddress("http://91.218.214.105:8081/YTP82/ws/ws1.1cws");
+                return new System.ServiceModel.EndpointAddress("https://onec.example.invalid/base/ws/ws1.1cws");
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
