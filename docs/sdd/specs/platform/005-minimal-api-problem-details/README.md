@@ -61,8 +61,8 @@ src/<Module>/<Module>.Api/
 └── DependencyInjection/<Module>Module.cs       existing: adds Map<Module>Endpoints()
 src/Bootstrapper/Host.Api/Program.cs            existing: MapControllers() → Map<Module>Endpoints() for each module
 tests/IntegrationTests/Platform/Api/
-├── OpenApiSnapshotTests.cs + openapi.v1.json  planned: golden document (EN-001)
-└── ProblemDetailsContractTests.cs             planned: SC-001…SC-007 bodies
+├── OpenApiSnapshotTests.cs + openapi.v1.json  existing: golden document (EN-001)
+└── ProblemDetailsContractTests.cs             planned: SC-001…SC-007 bodies (EN-002)
 tests/ArchitectureTests/Folders/               existing: controller rule becomes an endpoint rule (TS-007)
 ```
 
@@ -82,8 +82,8 @@ tests/ArchitectureTests/Folders/               existing: controller rule becomes
 
 ## Tasks
 
-- EN-001 Golden OpenAPI snapshot test and error-body contract tests (Red for R-004 bodies).
-- EN-002 `ResultHttp` + `ProblemDetails` for every controller (controllers call it; `WorkspaceErrorAnswers` and `ResultToActionResult` removed). Depends on F-001. Error bodies switch here, once, for all modules.
+- EN-001 Golden OpenAPI snapshot test (`UPDATE_OPENAPI_SNAPSHOT=1` rewrites it after an intended contract change).
+- EN-002 Error-body contract tests (Red for R-004…R-006), then `ResultHttp` + `ProblemDetails` for every controller (controllers call it; `WorkspaceErrorAnswers` and `ResultToActionResult` removed). Depends on F-001. Error bodies switch here, once, for all modules.
 - TS-001 … TS-006 Move Work, Media, Sales, Identity, Content, Catalog to `Endpoints/` (one PR each): snapshot identical, module API tests green, Request records split from commands.
 - TS-007 Remove MVC: `AddControllers`, `MapControllers`, `Ardalis.Result.AspNetCore`; architecture tests for R-009; module rules, API rules, `frontend-integration.md` errors section, feature cards updated.
 
