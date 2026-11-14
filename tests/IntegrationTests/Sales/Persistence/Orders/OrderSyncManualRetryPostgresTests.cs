@@ -24,6 +24,7 @@ public sealed class OrderSyncManualRetryPostgresTests(SalesPostgresFixture postg
             await cleanupDb.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
             await cleanupDb.OneCOrderSyncs.ExecuteDeleteAsync();
             await cleanupDb.Orders.ExecuteDeleteAsync();
+            await cleanupDb.OrderDrafts.ExecuteDeleteAsync();
             await cleanupDb.Counterparties.ExecuteDeleteAsync();
         }
 

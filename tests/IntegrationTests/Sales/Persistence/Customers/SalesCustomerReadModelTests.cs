@@ -193,6 +193,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         await db.OneCOrderSyncs.ExecuteDeleteAsync();
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
+        await db.OrderDrafts.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
     }
 

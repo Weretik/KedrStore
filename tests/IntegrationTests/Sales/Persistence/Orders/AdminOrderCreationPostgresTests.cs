@@ -74,6 +74,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
         await db.OneCOrderSyncs.ExecuteDeleteAsync();
         await db.Orders.ExecuteDeleteAsync();
+        await db.OrderDrafts.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
     }
 

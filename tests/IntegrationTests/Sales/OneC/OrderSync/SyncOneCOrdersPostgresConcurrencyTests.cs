@@ -18,6 +18,7 @@ public sealed class SyncOneCOrdersPostgresConcurrencyTests(SalesPostgresFixture 
         {
             await cleanupDb.OneCOrderSyncs.ExecuteDeleteAsync();
             await cleanupDb.Orders.ExecuteDeleteAsync();
+            await cleanupDb.OrderDrafts.ExecuteDeleteAsync();
             await cleanupDb.Counterparties.ExecuteDeleteAsync();
         }
 

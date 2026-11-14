@@ -147,6 +147,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         await using var db = postgres.CreateContext();
         await db.OneCOrderSyncs.ExecuteDeleteAsync();
         await db.Orders.ExecuteDeleteAsync();
+        await db.OrderDrafts.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
     }
 
