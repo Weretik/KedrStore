@@ -10,15 +10,15 @@ public sealed class SetProductAttributeValidator : AbstractValidator<SetProductA
         RuleFor(command => command.AttributeId).GreaterThan(0);
         RuleFor(command => command.Request).NotNull();
         RuleFor(command => command.Request.Values).NotEmpty()
-            .WithMessage("Set at least one value; use «Повернути автоматичне» to drop manual values.")
+            .WithMessage("Вкажіть хоча б одне значення; щоб прибрати ручні значення, натисніть «Повернути автоматичне».")
             .Must(values => values.Count <= ProductAttributeValue.MaxPosition + 1)
-            .WithMessage($"At most {ProductAttributeValue.MaxPosition + 1} values.")
+            .WithMessage($"Не більше {ProductAttributeValue.MaxPosition + 1} значень.")
             .When(command => command.Request is not null).OverridePropertyName("values");
         RuleForEach(command => command.Request.Values)
             .Must(value => value is not null && (value.ValueId is null) != (value.Number is null))
-            .WithMessage("Each value needs either valueId or number.")
+            .WithMessage("Для кожного значення вкажіть варіант або число.")
             .Must(value => value?.ValueId is null or > 0)
-            .WithMessage("valueId must be positive.")
+            .WithMessage("Некоректний варіант значення.")
             .When(command => command.Request?.Values is not null).OverridePropertyName("values");
     }
 }

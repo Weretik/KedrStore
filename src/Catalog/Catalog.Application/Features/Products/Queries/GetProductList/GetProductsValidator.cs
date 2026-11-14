@@ -10,72 +10,72 @@ public sealed class GetProductsValidator : AbstractValidator<GetProductListQuery
 
         RuleFor(x => x.Request)
             .NotNull()
-            .WithMessage("Request cannot be empty.");
+            .WithMessage("Запит не може бути порожнім.");
 
         When(x => true, () =>
         {
             RuleFor(x => x.Request.SearchTerm)
                 .MaximumLength(maxSearchTermLength)
-                .WithMessage($"Search term cannot exceed {maxSearchTermLength} characters.");
+                .WithMessage($"Пошуковий запит — не більше {maxSearchTermLength} символів.");
 
             RuleFor(x => x.Request.Sort)
                 .IsInEnum()
-                .WithMessage("Invalid sort parameter.");
+                .WithMessage("Некоректне сортування.");
 
             RuleFor(x => x.Request.Page)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Page number must be >= 1.");
+                .WithMessage("Номер сторінки має бути не менше 1.");
 
             RuleFor(x => x.Request.PageSize)
                 .GreaterThanOrEqualTo(1)
-                .WithMessage("Page size must be >= 1.")
+                .WithMessage("Розмір сторінки має бути не менше 1.")
                 .LessThanOrEqualTo(maxPageSize)
-                .WithMessage($"Page size cannot exceed {maxPageSize}.");
+                .WithMessage($"Розмір сторінки — не більше {maxPageSize}.");
 
             RuleFor(x => x.Request.CategorySlug)
                 .MaximumLength(maxSearchTermLength)
-                .WithMessage($"Category cannot exceed {maxSearchTermLength} characters.");
+                .WithMessage($"Категорія — не більше {maxSearchTermLength} символів.");
 
             RuleFor(x => x.Request.CategoryId)
                 .GreaterThan(0)
                 .When(x => x.Request.CategoryId.HasValue)
-                .WithMessage("Invalid category.");
+                .WithMessage("Некоректна категорія.");
 
             RuleFor(x => x.Request.PriceTypeId)
                 .GreaterThan(0)
                 .When(x => x.Request.PriceTypeId.HasValue)
-                .WithMessage("Invalid price type.");
+                .WithMessage("Некоректний тип ціни.");
 
             RuleForEach(x => x.Request.PriceTypeRules).ChildRules(rule =>
             {
                 rule.RuleFor(x => x.CategoryId)
                     .GreaterThan(0)
-                    .WithMessage("Invalid category for price type rule.");
+                    .WithMessage("Некоректна категорія для правила типу ціни.");
 
                 rule.RuleFor(x => x.PriceTypeId)
                     .GreaterThan(0)
-                    .WithMessage("Invalid price type for category rule.");
+                    .WithMessage("Некоректний тип ціни для правила категорії.");
             });
 
             RuleFor(x => x.Request.PriceFrom)
                 .GreaterThanOrEqualTo(0)
                 .When(x => x.Request.PriceFrom.HasValue)
-                .WithMessage("Minimum price cannot be less than 0.");
+                .WithMessage("Мінімальна ціна не може бути менше 0.");
 
             RuleFor(x => x.Request.PriceTo)
                 .GreaterThanOrEqualTo(0)
                 .When(x => x.Request.PriceTo.HasValue)
-                .WithMessage("Maximum price cannot be less than 0.");
+                .WithMessage("Максимальна ціна не може бути менше 0.");
 
             RuleFor(x => x.Request.Lang)
                 .Must(lang => string.IsNullOrWhiteSpace(lang) ||
                               lang.Equals("uk", StringComparison.OrdinalIgnoreCase) ||
                               lang.Equals("ru", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("Lang parameter can only be 'uk' or 'ru'.");
+                .WithMessage("Мова може бути лише uk або ru.");
 
             RuleFor(x => x.Request)
                 .Must(r => !r.PriceFrom.HasValue || !r.PriceTo.HasValue || r.PriceFrom <= r.PriceTo)
-                .WithMessage("Minimum price cannot be greater than maximum price.");
+                .WithMessage("Мінімальна ціна не може бути більшою за максимальну.");
         });
     }
 }

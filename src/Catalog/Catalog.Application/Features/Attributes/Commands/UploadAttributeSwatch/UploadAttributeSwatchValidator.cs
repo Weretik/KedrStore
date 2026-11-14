@@ -11,7 +11,7 @@ public sealed class UploadAttributeSwatchValidator : AbstractValidator<UploadAtt
         RuleFor(x => x.File.Length)
             .GreaterThan(0).LessThanOrEqualTo(MaxUploadBytes)
             .When(x => x.File is not null)
-            .WithMessage("The picture must be between 1 byte and 5 MB.")
+            .WithMessage("Зображення має бути не більше 5 МБ.")
             .OverridePropertyName("file");
     }
 }

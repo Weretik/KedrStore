@@ -11,23 +11,23 @@ public sealed class UpdateCompanyRequisitesValidator : AbstractValidator<UpdateC
             RuleFor(x => x.Input.LegalName).NotEmpty().MaximumLength(CompanyRequisites.LegalNameMaxLength)
                 .OverridePropertyName("legalName");
             RuleFor(x => x.Input.Code).Must(value => CompanyRequisites.IsValidCode(value?.Trim()))
-                .WithMessage("Use 8 digits (ЄДРПОУ) or 10 digits (РНОКПП).").OverridePropertyName("code");
+                .WithMessage("Введіть 8 цифр (ЄДРПОУ) або 10 цифр (РНОКПП).").OverridePropertyName("code");
             RuleFor(x => x.Input.RegistrationExtractNumber)
                 .Must(value => CompanyRequisites.IsValidExtractNumber(value?.Trim()))
-                .WithMessage($"Use digits only, at most {CompanyRequisites.ExtractNumberMaxLength}.")
+                .WithMessage($"Лише цифри, не більше {CompanyRequisites.ExtractNumberMaxLength}.")
                 .OverridePropertyName("registrationExtractNumber");
             RuleFor(x => x.Input.Iban)
                 .Must(value => CompanyRequisites.IsValidIban(CompanyRequisites.NormalizeIban(value)))
-                .WithMessage("Enter a valid Ukrainian IBAN (UA and 27 digits).").OverridePropertyName("iban");
+                .WithMessage("Введіть коректний український IBAN (UA і 27 цифр).").OverridePropertyName("iban");
             RuleFor(x => x.Input.BankName).NotEmpty().MaximumLength(CompanyRequisites.BankNameMaxLength)
                 .OverridePropertyName("bankName");
             RuleFor(x => x.Input.BankCode).Must(value => CompanyRequisites.IsValidBankCode(value?.Trim()))
-                .WithMessage("Use 6 digits.").OverridePropertyName("bankCode");
+                .WithMessage("Введіть 6 цифр.").OverridePropertyName("bankCode");
             RuleFor(x => x.Input).Must(input => !CompanyRequisites.IsValidBankCode(input.BankCode?.Trim())
                     || !CompanyRequisites.IsValidIban(CompanyRequisites.NormalizeIban(input.Iban))
                     || CompanyRequisites.BankCodeMatchesIban(CompanyRequisites.NormalizeIban(input.Iban),
                         input.BankCode.Trim()))
-                .WithMessage("The bank code must match digits 5-10 of the IBAN.").OverridePropertyName("bankCode");
+                .WithMessage("Код банку має збігатися з 5–10 цифрами IBAN.").OverridePropertyName("bankCode");
         });
     }
 }

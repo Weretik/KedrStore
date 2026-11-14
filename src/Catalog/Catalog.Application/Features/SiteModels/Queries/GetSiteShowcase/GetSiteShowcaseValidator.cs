@@ -14,10 +14,10 @@ public sealed class GetSiteShowcaseValidator : AbstractValidator<GetSiteShowcase
                 .OverridePropertyName("pageSize");
             RuleFor(query => query.Request.Status)
                 .Must(status => status is null or "proposed" or "accepted" or GetSiteShowcaseQuery.NoModelStatus)
-                .WithMessage("Status is proposed, accepted, or none.").OverridePropertyName("status");
+                .WithMessage("Статус: proposed, accepted або none.").OverridePropertyName("status");
             RuleFor(query => query.Request.Problem)
                 .Must(problem => problem is null || problem == SiteModelProblems.Any || SiteModelProblems.Product.Contains(problem))
-                .WithMessage("Unknown problem code.").OverridePropertyName("problem");
+                .WithMessage("Невідомий код проблеми.").OverridePropertyName("problem");
             RuleFor(query => query.Request.Search).MaximumLength(200).OverridePropertyName("search");
         });
     }

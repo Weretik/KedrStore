@@ -14,9 +14,9 @@ public sealed class CreateProductGroupValidator : AbstractValidator<CreateProduc
         RuleFor(command => command.Request.ProductIds)
             .NotNull()
             .Must(ids => ids.Count <= CreateProductGroupCommand.MaxProducts)
-            .WithMessage($"A new group can take at most {CreateProductGroupCommand.MaxProducts} products.")
+            .WithMessage($"У нову групу можна додати не більше {CreateProductGroupCommand.MaxProducts} товарів.")
             .Must(ids => ids.All(id => id > 0) && ids.Distinct().Count() == ids.Count)
-            .WithMessage("Product IDs must be positive and distinct.")
+            .WithMessage("Ідентифікатори товарів мають бути додатні й без повторів.")
             .When(command => command.Request is not null).OverridePropertyName("productIds");
     }
 }

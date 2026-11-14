@@ -25,7 +25,7 @@ public sealed class HomeOrderValidator : AbstractValidator<IReadOnlyList<long>>
     public HomeOrderValidator()
     {
         RuleFor(x => x).NotNull()
-            .Must(ids => ids.Distinct().Count() == ids.Count).WithMessage("Each row must appear once.")
+            .Must(ids => ids.Distinct().Count() == ids.Count).WithMessage("Кожен рядок має бути лише один раз.")
             .OverridePropertyName("ids");
         RuleForEach(x => x).GreaterThan(0).OverridePropertyName("ids");
     }

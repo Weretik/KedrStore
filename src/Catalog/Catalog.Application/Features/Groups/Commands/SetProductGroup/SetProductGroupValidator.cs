@@ -9,7 +9,7 @@ public sealed class SetProductGroupValidator : AbstractValidator<SetProductGroup
         RuleFor(command => command.Request.GroupId).GreaterThan(0)
             .When(command => command.Request?.GroupId is not null).OverridePropertyName("groupId");
         RuleFor(command => command.Request.GroupId).Null()
-            .WithMessage("Automatic grouping does not take a group.")
+            .WithMessage("Для автоматичного групування групу не вказують.")
             .When(command => command.Request is { Automatic: true }).OverridePropertyName("groupId");
     }
 }

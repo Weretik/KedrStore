@@ -6,7 +6,7 @@ public sealed class GetPublishedLegalDocumentValidator : AbstractValidator<GetPu
     {
         RuleFor(x => x.Language).Must(language => language is not null &&
                                                   LegalDocumentVersion.Languages.Contains(language))
-            .WithMessage("Language must be 'uk' or 'ru'.").OverridePropertyName("lang");
+            .WithMessage("Мова може бути лише uk або ru.").OverridePropertyName("lang");
         RuleFor(x => x.Kind).NotEmpty();
     }
 }

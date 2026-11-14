@@ -11,12 +11,12 @@ public sealed class ChangeSlugValidator : AbstractValidator<ChangeSlugCommand>
 
         RuleFor(x => x.Request.Slug)
             .NotEmpty()
-            .WithMessage("Slug is required unless regenerate is true.")
+            .WithMessage("Вкажіть slug або увімкніть його автоматичне створення.")
             .When(x => x.Request is { Regenerate: false });
 
         RuleFor(x => x.Request.Slug)
             .Must(slug => SlugText.IsValid(slug))
-            .WithMessage($"Slug must use a-z, 0-9 and single hyphens, 1-{SlugText.MaxLength} characters.")
+            .WithMessage($"Slug: латинські літери a-z, цифри та одинарні дефіси, від 1 до {SlugText.MaxLength} символів.")
             .When(x => x.Request is { Regenerate: false } && !string.IsNullOrEmpty(x.Request.Slug))
             .OverridePropertyName("slug");
     }

@@ -4,7 +4,7 @@ namespace Work.Application.Features.Tasks.Common;
 internal static class WorkTaskInputRules
 {
     public static void Title<T>(IRuleBuilder<T, string> rule) =>
-        rule.NotEmpty().Must(value => value.Trim().Length > 0).WithMessage("Title is required.")
+        rule.NotEmpty().Must(value => value.Trim().Length > 0).WithMessage("Вкажіть заголовок.")
             .MaximumLength(WorkTask.TitleMaxLength);
 
     public static void Details<T>(IRuleBuilder<T, string?> rule) =>
@@ -13,8 +13,8 @@ internal static class WorkTaskInputRules
     /// <summary>R-9: up to 30 steps, each with text up to 200 characters.</summary>
     public static void Steps<T>(IRuleBuilder<T, IReadOnlyList<WorkTaskStepInput>?> rule) =>
         rule.Must(steps => steps is null || steps.Count <= WorkTask.StepsMaxCount)
-            .WithMessage($"A task may have at most {WorkTask.StepsMaxCount} steps.")
+            .WithMessage($"У завданні не більше {WorkTask.StepsMaxCount} кроків.")
             .Must(steps => steps is null || steps.All(step =>
                 !string.IsNullOrWhiteSpace(step.Title) && step.Title.Trim().Length <= WorkTaskStep.TitleMaxLength))
-            .WithMessage($"Each step needs text of at most {WorkTaskStep.TitleMaxLength} characters.");
+            .WithMessage($"Кожному кроку потрібен текст до {WorkTaskStep.TitleMaxLength} символів.");
 }

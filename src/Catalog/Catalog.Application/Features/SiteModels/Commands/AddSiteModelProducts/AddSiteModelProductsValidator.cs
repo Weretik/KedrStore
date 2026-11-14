@@ -8,9 +8,9 @@ public sealed class AddSiteModelProductsValidator : AbstractValidator<AddSiteMod
         RuleFor(command => command.Request).NotNull();
         RuleFor(command => command.Request.ProductIds).NotEmpty()
             .Must(ids => ids.Count <= AddSiteModelProductsCommand.MaxProducts)
-            .WithMessage($"At most {AddSiteModelProductsCommand.MaxProducts} products at once.")
+            .WithMessage($"За раз не більше {AddSiteModelProductsCommand.MaxProducts} товарів.")
             .Must(ids => ids.All(id => id > 0) && ids.Distinct().Count() == ids.Count)
-            .WithMessage("Product IDs must be positive and distinct.")
+            .WithMessage("Ідентифікатори товарів мають бути додатні й без повторів.")
             .When(command => command.Request is not null).OverridePropertyName("productIds");
     }
 }

@@ -4,7 +4,7 @@ namespace Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
 
 public sealed class DecideAttributeCodeValidator : AbstractValidator<DecideAttributeCodeCommand>
 {
-    private const string TwiceMessage = "An attribute is listed twice.";
+    private const string TwiceMessage = "Характеристика вказана двічі.";
 
     public DecideAttributeCodeValidator()
     {
@@ -18,7 +18,7 @@ public sealed class DecideAttributeCodeValidator : AbstractValidator<DecideAttri
             .When(command => command.Request?.ValueId is not null).OverridePropertyName("valueId");
         RuleFor(command => command.Request.Categories)
             .Must(categories => categories!.Select(item => item.CategoryId).Distinct().Count() == categories!.Count)
-            .WithMessage("A category is listed twice.")
+            .WithMessage("Категорія вказана двічі.")
             .When(command => command.Request?.Categories is not null).OverridePropertyName("categories");
         RuleForEach(command => command.Request.Categories).ChildRules(category =>
         {

@@ -4,7 +4,7 @@ public sealed class UpdatePageSeoValidator : AbstractValidator<UpdatePageSeoComm
 {
     public UpdatePageSeoValidator()
     {
-        RuleFor(x => x.Page).Must(SitePages.IsKnown).WithMessage("Unknown site page.").OverridePropertyName("page");
+        RuleFor(x => x.Page).Must(SitePages.IsKnown).WithMessage("Невідома сторінка сайту.").OverridePropertyName("page");
         Text(x => x.TitleUk, "titleUk", PageSeo.TitleMaxLength);
         Text(x => x.TitleRu, "titleRu", PageSeo.TitleMaxLength);
         Text(x => x.DescriptionUk, "descriptionUk", PageSeo.DescriptionMaxLength);
@@ -14,5 +14,5 @@ public sealed class UpdatePageSeoValidator : AbstractValidator<UpdatePageSeoComm
     private void Text(System.Linq.Expressions.Expression<Func<UpdatePageSeoCommand, string?>> field, string name,
         int maxLength) =>
         RuleFor(field).Must(value => (value?.Trim().Length ?? 0) <= maxLength)
-            .WithMessage($"At most {maxLength} characters.").OverridePropertyName(name);
+            .WithMessage($"Не більше {maxLength} символів.").OverridePropertyName(name);
 }

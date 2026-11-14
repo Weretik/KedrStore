@@ -9,7 +9,7 @@ public sealed class GrantStaffAccessCommandValidator : AbstractValidator<GrantSt
     {
         RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(256);
-        RuleFor(x => x.Role).Must(StaffRoles.IsStaffRole).WithMessage("Role must be Admin, Seo or Manager.");
+        RuleFor(x => x.Role).Must(StaffRoles.IsStaffRole).WithMessage("Роль може бути лише Admin, Seo або Manager.");
         RuleFor(x => x.Password).StaffPassword();
     }
 }

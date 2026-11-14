@@ -16,7 +16,7 @@ internal static class AttributeValueRules
             .When(hasRequest).OverridePropertyName("nameRu");
         validator.RuleFor(item => sortOrder(item)).InclusiveBetween(0, 100_000)
             .When(hasRequest).OverridePropertyName("sortOrder");
-        validator.RuleFor(item => swatchHex(item)).Matches(HexPattern).WithMessage("Swatch color must be #RRGGBB.")
+        validator.RuleFor(item => swatchHex(item)).Matches(HexPattern).WithMessage("Колір зразка — у форматі #RRGGBB.")
             .When(item => hasRequest(item) && !string.IsNullOrWhiteSpace(swatchHex(item)))
             .OverridePropertyName("swatchHex");
         validator.RuleFor(item => swatchMedia(item)).GreaterThan(0)

@@ -14,9 +14,9 @@ public sealed class CreateSiteModelValidator : AbstractValidator<CreateSiteModel
                 .OverridePropertyName("name");
             RuleFor(command => command.Request.ProductIds).NotNull()
                 .Must(ids => ids.Count <= CreateSiteModelCommand.MaxProducts)
-                .WithMessage($"A new model can take at most {CreateSiteModelCommand.MaxProducts} products.")
+                .WithMessage($"У нову модель можна додати не більше {CreateSiteModelCommand.MaxProducts} товарів.")
                 .Must(ids => ids.All(id => id > 0) && ids.Distinct().Count() == ids.Count)
-                .WithMessage("Product IDs must be positive and distinct.")
+                .WithMessage("Ідентифікатори товарів мають бути додатні й без повторів.")
                 .OverridePropertyName("productIds");
         });
     }

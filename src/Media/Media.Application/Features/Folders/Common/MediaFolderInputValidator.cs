@@ -4,7 +4,7 @@ namespace Media.Application.Features.Folders.Common;
 internal static class MediaFolderInputValidator
 {
     public static void NameRules<T>(IRuleBuilder<T, string> rule)
-        => rule.Must(name => !string.IsNullOrWhiteSpace(name)).WithMessage("Name is required.")
+        => rule.Must(name => !string.IsNullOrWhiteSpace(name)).WithMessage("Вкажіть назву.")
             .Must(name => name is null || name.Trim().Length <= MediaFolder.NameMaxLength)
-            .WithMessage($"Name must be at most {MediaFolder.NameMaxLength} characters.");
+            .WithMessage($"Назва — не більше {MediaFolder.NameMaxLength} символів.");
 }

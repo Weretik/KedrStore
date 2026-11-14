@@ -4,6 +4,6 @@ public sealed class PreviewYoutubeVideoValidator : AbstractValidator<PreviewYout
 {
     public PreviewYoutubeVideoValidator() =>
         RuleFor(x => x.Url).Must(url => YoutubeVideoId.TryParse(url, out _))
-            .WithMessage("Paste a YouTube video link, for example https://www.youtube.com/watch?v=… or https://youtu.be/….")
+            .WithMessage("Вставте посилання на відео YouTube, наприклад https://www.youtube.com/watch?v=… або https://youtu.be/….")
             .WithErrorCode("Content.Gallery.Youtube.Invalid").OverridePropertyName("url");
 }

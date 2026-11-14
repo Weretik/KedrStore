@@ -8,9 +8,9 @@ public sealed class SetSiteModelAxesValidator : AbstractValidator<SetSiteModelAx
         RuleFor(command => command.Request).NotNull();
         RuleFor(command => command.Request.AttributeIds).NotNull()
             .Must(ids => ids.Count <= SetSiteModelAxesCommand.MaxAxes)
-            .WithMessage($"A model has at most {SetSiteModelAxesCommand.MaxAxes} axes.")
+            .WithMessage($"У моделі не більше {SetSiteModelAxesCommand.MaxAxes} осей.")
             .Must(ids => ids.All(id => id > 0) && ids.Distinct().Count() == ids.Count)
-            .WithMessage("Attribute IDs must be positive and distinct.")
+            .WithMessage("Ідентифікатори характеристик мають бути додатні й без повторів.")
             .When(command => command.Request is not null).OverridePropertyName("attributeIds");
     }
 }
