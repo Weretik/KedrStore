@@ -18,7 +18,7 @@ Until these steps are done the tick answers `404` and nothing changes: the old C
 2. **EN-02.** Create a service account for the scheduler (for example `kedr-scheduler`) and set on the API `Scheduler__Audience=https://<api run.app URL>/internal/scheduler/tick` and `Scheduler__SchedulerServiceAccount=<that account's e-mail>` (`gcloud run services update api --update-env-vars …`).
 3. **EN-03.** Create one Cloud Scheduler job `kedr-tick`: every minute (`* * * * *`, time zone Europe/Kyiv), `POST` to that URL, OIDC token of that account with that audience. Check on the page that «Досилання повідомлень» shows a recent success.
 4. The same day: on the page enable «Залишки з 1С», «Ціни з 1С», «Каталог з 1С», «Клієнти з 1С», «Замовлення в 1С», «Фото з CDN» (adjust the times if needed) and **pause** the old Cloud Scheduler entries of `onec-*` and `media-cdn-sync`.
-5. A week later, when the page shows regular successes, delete the paused Cloud Scheduler entries and the old jobs `onec-stocks`, `onec-prices`, `onec-category`, `onec-productdetails`, `onec-pricetypes`, `onec-full`, `onec-orders-sync`, `onec-sales-customers-full`, `media-cdn-sync`, and remove their update lines from the deploy workflow.
+5. Done 2026-11-14: the deploy no longer updates the old jobs `onec-stocks`, `onec-prices`, `onec-category`, `onec-productdetails`, `onec-pricetypes`, `onec-full`, `onec-orders-sync`, `onec-sales-customers-full`, `media-cdn-sync`; the owner deletes them and their paused Cloud Scheduler entries. A one-off run of any Host.Jobs command goes through `kedr-tasks`: `gcloud run jobs execute kedr-tasks --region europe-central2 --args=--job=<command>,...`.
 
 Rollback: pause `kedr-tick` and resume the old entries; the tasks stay in the database and are ignored.
 
