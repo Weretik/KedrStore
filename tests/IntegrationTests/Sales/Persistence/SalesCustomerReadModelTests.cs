@@ -107,8 +107,8 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         await using (var db = postgres.CreateContext())
         {
             db.CounterpartyCategoryPriceTypes.AddRange(
-                CounterpartyCategoryPriceType.Create("customer-detail", 20, 202),
-                CounterpartyCategoryPriceType.Create("customer-detail", 10, 101));
+                CounterpartyCategoryPriceType.Create("customer-detail", 20, 202).Value,
+                CounterpartyCategoryPriceType.Create("customer-detail", 10, 101).Value);
             await db.SaveChangesAsync();
         }
 
@@ -212,7 +212,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
             $"{id}@example.com",
             phone,
             1,
-            now);
+            now).Value;
         if (deleted)
             customer.MarkAsDeleted(now.AddMinutes(1));
 
@@ -233,7 +233,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
                 $"{id}@example.com",
                 null,
                 1,
-                now));
+                now).Value);
         }
 
         await db.SaveChangesAsync();

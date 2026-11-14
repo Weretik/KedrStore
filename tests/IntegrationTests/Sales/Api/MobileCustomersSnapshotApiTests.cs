@@ -58,7 +58,7 @@ public sealed class MobileCustomersSnapshotApiTests
         using var notModified = await manager.SendAsync(again);
         Assert.Equal(HttpStatusCode.NotModified, notModified.StatusCode);
 
-        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-2", 30, 14));
+        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-2", 30, 14).Value);
         db.SaveChanges();
 
         using var changed = new HttpRequestMessage(HttpMethod.Get, Route);
@@ -88,14 +88,14 @@ public sealed class MobileCustomersSnapshotApiTests
         var db = new SalesDbContext(new DbContextOptionsBuilder<SalesDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
 
-        db.Counterparties.Add(Counterparty.Create("c-2", Guid.NewGuid(), "ФОП Бета", "b@example.com", null, 14, Now));
-        db.Counterparties.Add(Counterparty.Create("c-1", Guid.NewGuid(), "ТОВ Альфа", "a@example.com", "+380501112233", 12, Now));
-        var gone = Counterparty.Create("c-3", Guid.NewGuid(), "Видалений", "d@example.com", null, 12, Now);
+        db.Counterparties.Add(Counterparty.Create("c-2", Guid.NewGuid(), "ФОП Бета", "b@example.com", null, 14, Now).Value);
+        db.Counterparties.Add(Counterparty.Create("c-1", Guid.NewGuid(), "ТОВ Альфа", "a@example.com", "+380501112233", 12, Now).Value);
+        var gone = Counterparty.Create("c-3", Guid.NewGuid(), "Видалений", "d@example.com", null, 12, Now).Value;
         gone.MarkAsDeleted(Now);
         db.Counterparties.Add(gone);
-        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-1", 20, 15));
-        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-1", 10, 14));
-        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-3", 10, 14));
+        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-1", 20, 15).Value);
+        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-1", 10, 14).Value);
+        db.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create("c-3", 10, 14).Value);
 
         db.SaveChanges();
         return db;

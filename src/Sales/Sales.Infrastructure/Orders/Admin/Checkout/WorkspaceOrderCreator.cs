@@ -41,8 +41,11 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         if (!string.Equals(quote.QuoteFingerprint, request.QuoteFingerprint, StringComparison.Ordinal))
             return (null!, false, new WorkspaceOrderConflict("quote_changed", quote));
         var now = DateTimeOffset.UtcNow;
-        var order = Order.Create(await numberGenerator.GenerateAsync(now, ct), quote.CounterpartyId,
-            request.Comment, quote.Lines.Select(x => OrderLine.Create(x.ProductId, x.ProductName, x.Quantity, x.LineAmount, x.PriceAdjustment)), now);
+        var lines = new List<OrderLine>(quote.Lines.Count);
+        foreach (var line in quote.Lines)
+            lines.Add(Valid(OrderLine.Create(line.ProductId, line.ProductName, line.Quantity, line.LineAmount, line.PriceAdjustment)));
+        var order = Valid(Order.Create(await numberGenerator.GenerateAsync(now, ct), quote.CounterpartyId,
+            request.Comment, lines, now));
         try
         {
             await orderStore.PersistAsync(order,
@@ -64,4 +67,8 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         }
         return (new WorkspaceCreatedOrder(order.Id.Value, order.OrderNumber, quote.TotalAmount, "Pending"), false, null);
     }
+
+    // The workspace still reports problems through WorkspaceException until the Sales stage moves it to results.
+    private static T Valid<T>(DomainResult<T> result)
+        => result.IsSuccess ? result.Value : throw new WorkspaceException(400, result.Error!.Code, result.Error.Message);
 }

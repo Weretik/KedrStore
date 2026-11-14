@@ -2,6 +2,9 @@ namespace Sales.Domain.Customers.Entities;
 
 public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, IAuditableEntity, ISoftDelete
 {
+    public const int NameMaxLength = 300;
+    public const int EmailMaxLength = 320;
+
     public Guid IdentityUserId { get; private set; }
     public string Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
@@ -10,7 +13,7 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
 
     private Counterparty() { }
 
-    private Counterparty(
+    public static DomainResult<Counterparty> Create(
         string id,
         Guid identityUserId,
         string name,
@@ -19,26 +22,19 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         int defaultPriceTypeId,
         DateTimeOffset createdAt)
     {
-        SetId(id);
-        SetIdentityUserId(identityUserId);
-        SetName(name);
-        SetEmail(email);
-        SetPhone(phone);
-        SetDefaultPriceTypeId(defaultPriceTypeId);
-        MarkAsCreated(createdAt);
+        if (string.IsNullOrWhiteSpace(id))
+            return CounterpartyErrors.IdRequired();
+
+        var counterparty = new Counterparty { Id = id.Trim() };
+        var set = counterparty.Set(identityUserId, name, email, phone, defaultPriceTypeId);
+        if (set.IsFailure)
+            return set.Error!;
+
+        counterparty.MarkAsCreated(createdAt);
+        return counterparty;
     }
 
-    public static Counterparty Create(
-        string id,
-        Guid identityUserId,
-        string name,
-        string email,
-        string? phone,
-        int defaultPriceTypeId,
-        DateTimeOffset createdAt)
-        => new(id, identityUserId, name, email, phone, defaultPriceTypeId, createdAt);
-
-    public void Update(
+    public DomainResult Update(
         Guid identityUserId,
         string name,
         string email,
@@ -46,12 +42,12 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         int defaultPriceTypeId,
         DateTimeOffset updatedAt)
     {
-        SetIdentityUserId(identityUserId);
-        SetName(name);
-        SetEmail(email);
-        SetPhone(phone);
-        SetDefaultPriceTypeId(defaultPriceTypeId);
+        var set = Set(identityUserId, name, email, phone, defaultPriceTypeId);
+        if (set.IsFailure)
+            return set;
+
         MarkAsUpdated(updatedAt);
+        return DomainResult.Success();
     }
 
     public void Restore(DateTimeOffset updatedAt)
@@ -63,70 +59,28 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         MarkAsUpdated(updatedAt);
     }
 
-    private void SetId(string id)
-    {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            throw new DomainException(CounterpartyErrors.IdRequired());
-        }
-
-        Id = id.Trim();
-    }
-
-    private void SetIdentityUserId(Guid identityUserId)
+    private DomainResult Set(Guid identityUserId, string name, string email, string? phone, int defaultPriceTypeId)
     {
         if (identityUserId == Guid.Empty)
-        {
-            throw new DomainException(CounterpartyErrors.IdentityUserIdInvalid(identityUserId));
-        }
+            return CounterpartyErrors.IdentityUserIdInvalid(identityUserId);
+        if (string.IsNullOrWhiteSpace(name))
+            return CounterpartyErrors.NameRequired();
+        var trimmedName = name.Trim();
+        if (trimmedName.Length > NameMaxLength)
+            return CounterpartyErrors.NameTooLong(trimmedName.Length);
+        if (string.IsNullOrWhiteSpace(email))
+            return CounterpartyErrors.EmailRequired();
+        var trimmedEmail = email.Trim();
+        if (trimmedEmail.Length > EmailMaxLength)
+            return CounterpartyErrors.EmailTooLong(trimmedEmail.Length);
+        if (defaultPriceTypeId <= 0)
+            return CounterpartyErrors.PriceTypeInvalid(defaultPriceTypeId);
 
         IdentityUserId = identityUserId;
-    }
-
-    private void SetName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new DomainException(CounterpartyErrors.NameRequired());
-        }
-
-        var trimmed = name.Trim();
-        if (trimmed.Length > 300)
-        {
-            throw new DomainException(CounterpartyErrors.NameTooLong(trimmed.Length));
-        }
-
-        Name = trimmed;
-    }
-
-    private void SetEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new DomainException(CounterpartyErrors.EmailRequired());
-        }
-
-        var trimmed = email.Trim();
-        if (trimmed.Length > 320)
-        {
-            throw new DomainException(CounterpartyErrors.EmailTooLong(trimmed.Length));
-        }
-
-        Email = trimmed;
-    }
-
-    private void SetPhone(string? phone)
-    {
+        Name = trimmedName;
+        Email = trimmedEmail;
         Phone = string.IsNullOrWhiteSpace(phone) ? null : phone.Trim();
-    }
-
-    private void SetDefaultPriceTypeId(int defaultPriceTypeId)
-    {
-        if (defaultPriceTypeId <= 0)
-        {
-            throw new DomainException(CounterpartyErrors.PriceTypeInvalid(defaultPriceTypeId));
-        }
-
         DefaultPriceTypeId = defaultPriceTypeId;
+        return DomainResult.Success();
     }
 }

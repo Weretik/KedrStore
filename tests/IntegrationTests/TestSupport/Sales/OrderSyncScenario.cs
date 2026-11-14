@@ -59,13 +59,13 @@ internal static class OrderSyncScenario
             $"test-{suffix}@example.com",
             null,
             1,
-            now);
+            now).Value;
         var order = Order.Create(
             $"SO-{suffix}",
             counterparty.Id,
             null,
-            [OrderLine.Create($"p-{suffix}", "Product", 1, 10m)],
-            now);
+            [OrderLine.Create($"p-{suffix}", "Product", 1, 10m).Value],
+            now).Value;
         db.Counterparties.Add(counterparty);
         db.Orders.Add(order);
         await db.SaveChangesAsync();

@@ -40,16 +40,23 @@ public sealed class CreateOrderCommandHandler(
             command.Request.Lines.Select(line => line.ProductId).Distinct(StringComparer.Ordinal).ToArray(),
             cancellationToken);
         if (products.Count != command.Request.Lines.Select(line => line.ProductId).Distinct(StringComparer.Ordinal).Count())
-            return Result.Invalid(new ValidationError("lines", "One or more products do not exist in the local Catalog."));
+            return Result.Invalid(new ValidationError("lines", "Деяких товарів немає в каталозі."));
 
         var now = DateTimeOffset.UtcNow;
         var orderNumber = await orderNumberGenerator.GenerateAsync(now, cancellationToken);
-        var order = Order.Create(
-            orderNumber,
-            command.Request.CounterpartyId,
-            command.Request.Comment,
-            command.Request.Lines.Select(line => OrderLine.Create(line.ProductId, products[line.ProductId].Name, line.Quantity, line.Amount)),
-            now);
+        var lines = new List<OrderLine>(command.Request.Lines.Count);
+        foreach (var line in command.Request.Lines)
+        {
+            var created = OrderLine.Create(line.ProductId, products[line.ProductId].Name, line.Quantity, line.Amount);
+            if (created.IsFailure)
+                return created.Error!.ToResult<CreateOrderResult>();
+            lines.Add(created.Value);
+        }
+
+        var placed = Order.Create(orderNumber, command.Request.CounterpartyId, command.Request.Comment, lines, now);
+        if (placed.IsFailure)
+            return placed.Error!.ToResult<CreateOrderResult>();
+        var order = placed.Value;
 
         await orderCreationStore.PersistAsync(
             order,

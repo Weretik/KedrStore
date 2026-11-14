@@ -2,15 +2,15 @@ namespace Sales.Domain.Orders.Errors;
 
 public static class OrderErrors
 {
-    public static IDomainError CounterpartyIdRequired() => new DomainError("sales.order.counterparty_id_required", "Counterparty id is required.");
-    public static IDomainError LinesRequired() => new DomainError("sales.order.lines_required", "At least one order line is required.");
-    public static IDomainError ProductIdRequired() => new DomainError("sales.order.product_id_required", "Product id is required.");
-    public static IDomainError ProductNameRequired() => new DomainError("sales.order.product_name_required", "Product name is required.");
-    public static IDomainError QuantityInvalid() => new DomainError("sales.order.quantity_invalid", "Quantity must be positive.");
-    public static IDomainError AmountInvalid() => new DomainError("sales.order.amount_invalid", "Line amount must be non-negative.");
-    public static IDomainError CommentTooLong() => new DomainError("sales.order.comment_too_long", "Order comment is too long.");
-    public static IDomainError OrderNumberRequired() => new DomainError("sales.order.order_number_required", "Order number is required.");
-    public static IDomainError OrderNumberTooLong() => new DomainError("sales.order.order_number_too_long", "Order number is too long.");
-    public static IDomainError IdempotencyKeyRequired() => new DomainError("sales.order.idempotency_key_required", "Idempotency key is required.");
-    public static IDomainError RequestHashRequired() => new DomainError("sales.order.request_hash_required", "Request hash is required.");
+    public static DomainError CounterpartyIdRequired() => new("sales.order.counterparty_id_required", "Виберіть клієнта.", Field: "CounterpartyId");
+    public static DomainError LinesRequired() => new("sales.order.lines_required", "Додайте хоча б один товар.", Field: "Lines");
+    public static DomainError ProductIdRequired() => new("sales.order.product_id_required", "Потрібен код товару.", Field: "ProductId");
+    public static DomainError ProductNameRequired() => new("sales.order.product_name_required", "Потрібна назва товару.", Field: "ProductName");
+    public static DomainError QuantityInvalid() => new("sales.order.quantity_invalid", "Кількість має бути більшою за 0.", Field: "Quantity");
+    public static DomainError AmountInvalid() => new("sales.order.amount_invalid", "Сума рядка не може бути від'ємною.", Field: "Amount");
+    public static DomainError CommentTooLong() => new("sales.order.comment_too_long", $"Коментар — не більше {Entities.Order.CommentMaxLength} символів.", Field: "Comment");
+    public static DomainError OrderNumberRequired() => new("sales.order.order_number_required", "Потрібен номер замовлення.", Field: "OrderNumber");
+    public static DomainError OrderNumberTooLong() => new("sales.order.order_number_too_long", $"Номер замовлення — не більше {Entities.Order.OrderNumberMaxLength} символів.", Field: "OrderNumber");
+    public static DomainError IdempotencyKeyRequired() => new("sales.order.idempotency_key_required", "Потрібен ключ повтору запиту.", Field: "IdempotencyKey");
+    public static DomainError RequestHashRequired() => new("sales.order.request_hash_required", "Потрібен відбиток запиту.");
 }

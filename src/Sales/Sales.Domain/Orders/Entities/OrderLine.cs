@@ -14,26 +14,25 @@ public sealed class OrderLine : BaseEntity<OrderLineId>
 
     private OrderLine() { }
 
-    private OrderLine(string productId, string productName, int quantity, decimal amount, decimal priceAdjustment)
-    {
-        ProductId = Required(productId, OrderErrors.ProductIdRequired());
-        ProductName = Required(productName, OrderErrors.ProductNameRequired());
-
-        if (quantity <= 0)
-            throw new DomainException(OrderErrors.QuantityInvalid());
-
-        if (amount < 0m)
-            throw new DomainException(OrderErrors.AmountInvalid());
-
-        Quantity = quantity;
-        Amount = amount;
-        PriceAdjustment = priceAdjustment;
-    }
-
-    public static OrderLine Create(string productId, string productName, int quantity, decimal amount,
+    public static DomainResult<OrderLine> Create(string productId, string productName, int quantity, decimal amount,
         decimal priceAdjustment = 0m)
-        => new(productId, productName, quantity, amount, priceAdjustment);
+    {
+        if (string.IsNullOrWhiteSpace(productId))
+            return OrderErrors.ProductIdRequired();
+        if (string.IsNullOrWhiteSpace(productName))
+            return OrderErrors.ProductNameRequired();
+        if (quantity <= 0)
+            return OrderErrors.QuantityInvalid();
+        if (amount < 0m)
+            return OrderErrors.AmountInvalid();
 
-    private static string Required(string value, IDomainError error)
-        => string.IsNullOrWhiteSpace(value) ? throw new DomainException(error) : value.Trim();
+        return new OrderLine
+        {
+            ProductId = productId.Trim(),
+            ProductName = productName.Trim(),
+            Quantity = quantity,
+            Amount = amount,
+            PriceAdjustment = priceAdjustment,
+        };
+    }
 }

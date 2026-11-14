@@ -36,14 +36,14 @@ public sealed class SalesCustomerReferenceNamesTests
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
         var now = DateTimeOffset.UtcNow;
-        db.Counterparties.Add(Counterparty.Create("customer-1", Guid.NewGuid(), "Клієнт", "test@example.com", null, 1, now));
+        db.Counterparties.Add(Counterparty.Create("customer-1", Guid.NewGuid(), "Клієнт", "test@example.com", null, 1, now).Value);
         db.Counterparties.AddRange(
-            Counterparty.Create("match-2", Guid.NewGuid(), "Alpha Two", "two@example.com", "+38022", 1, now),
-            Counterparty.Create("match-1", Guid.NewGuid(), "Alpha One", "one@example.com", "+38011", 1, now),
-            Counterparty.Create("other", Guid.NewGuid(), "Bravo", "other@example.com", "+38033", 1, now));
+            Counterparty.Create("match-2", Guid.NewGuid(), "Alpha Two", "two@example.com", "+38022", 1, now).Value,
+            Counterparty.Create("match-1", Guid.NewGuid(), "Alpha One", "one@example.com", "+38011", 1, now).Value,
+            Counterparty.Create("other", Guid.NewGuid(), "Bravo", "other@example.com", "+38033", 1, now).Value);
         db.CounterpartyCategoryPriceTypes.AddRange(
-            CounterpartyCategoryPriceType.Create("customer-1", 5513, 7),
-            CounterpartyCategoryPriceType.Create("customer-1", 9999, 99));
+            CounterpartyCategoryPriceType.Create("customer-1", 5513, 7).Value,
+            CounterpartyCategoryPriceType.Create("customer-1", 9999, 99).Value);
         await db.SaveChangesAsync();
 
         var result = await scope.ServiceProvider.GetRequiredService<ICustomerReadService>()

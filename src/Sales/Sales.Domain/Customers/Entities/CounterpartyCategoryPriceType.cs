@@ -8,46 +8,23 @@ public sealed class CounterpartyCategoryPriceType
 
     private CounterpartyCategoryPriceType() { }
 
-    private CounterpartyCategoryPriceType(string counterpartyId, int categoryId, int priceTypeId)
-    {
-        SetCounterpartyId(counterpartyId);
-        SetCategoryId(categoryId);
-        SetPriceTypeId(priceTypeId);
-    }
-
-    public static CounterpartyCategoryPriceType Create(
+    public static DomainResult<CounterpartyCategoryPriceType> Create(
         string counterpartyId,
         int categoryId,
         int priceTypeId)
-        => new(counterpartyId, categoryId, priceTypeId);
-
-    private void SetCounterpartyId(string counterpartyId)
     {
         if (string.IsNullOrWhiteSpace(counterpartyId))
-        {
-            throw new DomainException(CounterpartyErrors.IdRequired());
-        }
-
-        CounterpartyId = counterpartyId.Trim();
-    }
-
-    private void SetCategoryId(int categoryId)
-    {
+            return CounterpartyErrors.IdRequired();
         if (categoryId <= 0)
-        {
-            throw new DomainException(CounterpartyErrors.CategoryInvalid(categoryId));
-        }
-
-        CategoryId = categoryId;
-    }
-
-    private void SetPriceTypeId(int priceTypeId)
-    {
+            return CounterpartyErrors.CategoryInvalid(categoryId);
         if (priceTypeId <= 0)
-        {
-            throw new DomainException(CounterpartyErrors.PriceTypeInvalid(priceTypeId));
-        }
+            return CounterpartyErrors.PriceTypeInvalid(priceTypeId);
 
-        PriceTypeId = priceTypeId;
+        return new CounterpartyCategoryPriceType
+        {
+            CounterpartyId = counterpartyId.Trim(),
+            CategoryId = categoryId,
+            PriceTypeId = priceTypeId,
+        };
     }
 }
