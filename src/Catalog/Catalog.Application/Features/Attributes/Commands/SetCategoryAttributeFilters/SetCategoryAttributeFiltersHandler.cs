@@ -24,7 +24,7 @@ public sealed class SetCategoryAttributeFiltersHandler(
         if (await db.Attributes.CountAsync(attribute => attributeIds.Contains(attribute.Id), cancellationToken)
             != attributeIds.Count)
         {
-            return AttributeValidation.Invalid("filters", "An attribute was not found.", "NotFound");
+            return AttributeValidation.Invalid("filters", "Одну з властивостей не знайдено.", "NotFound");
         }
 
         var rows = await db.CategoryAttributes

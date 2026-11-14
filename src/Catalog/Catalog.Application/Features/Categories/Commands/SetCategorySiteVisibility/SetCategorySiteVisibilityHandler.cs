@@ -24,7 +24,7 @@ public sealed class SetCategorySiteVisibilityHandler(
         if (command.IsShownOnSite &&
             string.Equals(selected.ProductTypeIdOneC, roots.Value.CosmosRootCategoryId, StringComparison.Ordinal))
         {
-            return Result.Invalid(new ValidationError("isShownOnSite", "The Cosmos categories are never shown on the site.",
+            return Result.Invalid(new ValidationError("isShownOnSite", "Категорії Cosmos ніколи не показуються на сайті.",
                 "Catalog.Category.CosmosHidden", ValidationSeverity.Error));
         }
 

@@ -44,5 +44,5 @@ internal readonly record struct WorkspaceDateRange(
     }
 
     private static WorkspaceException InvalidRange()
-        => new(400, "invalid_date_range", "Use valid YYYY-MM-DD dates with createdFrom not after createdTo.");
+        => new(400, "invalid_date_range", "Вкажіть коректні дати; початок не може бути пізніше за кінець.");
 }

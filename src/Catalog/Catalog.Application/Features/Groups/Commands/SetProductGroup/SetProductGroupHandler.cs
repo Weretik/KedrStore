@@ -46,11 +46,11 @@ public sealed class SetProductGroupHandler(
                     .Select(group => (ProductCategoryId?)group.CategoryId)
                     .FirstOrDefaultAsync(cancellationToken);
                 if (groupCategory is null)
-                    return ProductGroupValidation.Invalid("groupId", "Group not found.", "GroupNotFound");
+                    return ProductGroupValidation.Invalid("groupId", "Групу не знайдено.", "GroupNotFound");
                 if (groupCategory != product.CategoryId)
                 {
                     return ProductGroupValidation.Invalid("groupId",
-                        "The group is in another category than the product.", "OtherCategory");
+                        "Група належить до іншої категорії, ніж товар.", "OtherCategory");
                 }
             }
 

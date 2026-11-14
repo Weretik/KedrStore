@@ -25,7 +25,7 @@ public sealed class ProfileService(
     IHttpContextAccessor httpContextAccessor,
     ILogger<ProfileService> logger) : IProfileService
 {
-    public const string WrongPasswordMessage = "The current password is incorrect.";
+    public const string WrongPasswordMessage = "Поточний пароль неправильний.";
 
     public async Task<Result<ProfileDto>> GetAsync(CancellationToken cancellationToken = default)
     {

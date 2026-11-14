@@ -27,7 +27,7 @@ public sealed class AcceptSiteModelsHandler(
         var found = await db.ProductGroups.Where(group => ids.Contains(group.Id)).ToListAsync(cancellationToken);
         var missing = ids.Except(found.Select(group => group.Id)).Select(id => id.Value).ToList();
         if (missing.Count > 0)
-            return SiteModelValidation.Invalid("ids", $"Models not found: {string.Join(", ", missing)}.", "NotFound");
+            return SiteModelValidation.Invalid("ids", $"Моделей не знайдено: {string.Join(", ", missing)}.", "NotFound");
 
         // Offered axes are read while the models are still proposed.
         await changes.SaveOfferedAxesAsync(found.Where(model => !model.IsAccepted).Select(model => model.Id).ToList(),

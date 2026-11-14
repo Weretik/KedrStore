@@ -23,13 +23,13 @@ public sealed class SetProductGroupMainHandler(
         var isMember = await db.ProductGroupMembers
             .AnyAsync(member => member.ProductId == productId && member.GroupId == group.Id, cancellationToken);
         if (!isMember)
-            return ProductGroupValidation.Invalid("productId", "The product is not in this group.", "NotMember");
+            return ProductGroupValidation.Invalid("productId", "Товару немає в цій групі.", "NotMember");
 
         var onSite = await db.Products
             .AnyAsync(product => product.Id == productId && product.ExportToSite, cancellationToken);
         if (!onSite)
         {
-            return ProductGroupValidation.Invalid("productId", "Only a product shown on the site can be main.",
+            return ProductGroupValidation.Invalid("productId", "Головним може бути лише товар, показаний на сайті.",
                 "MainNotOnSite");
         }
 

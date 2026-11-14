@@ -125,7 +125,7 @@ public sealed class StaffAccountService(
         var roles = await userManager.GetRolesAsync(user);
         if (roles.Any(StaffRoles.IsStaffRole))
         {
-            return Result.Conflict("This account already has staff access.");
+            return Result.Conflict("Цей обліковий запис вже має доступ працівника.");
         }
 
         user.FullName = fullName.Trim();
@@ -169,7 +169,7 @@ public sealed class StaffAccountService(
     {
         if (userId == CurrentUserId())
         {
-            return SelfChangeRejected("You cannot change your own role.");
+            return SelfChangeRejected("Не можна змінити власну роль.");
         }
 
         var user = await FindStaffAsync(userId);
@@ -196,7 +196,7 @@ public sealed class StaffAccountService(
     {
         if (blocked && userId == CurrentUserId())
         {
-            return SelfChangeRejected("You cannot block your own account.");
+            return SelfChangeRejected("Не можна заблокувати власний обліковий запис.");
         }
 
         var user = await FindStaffAsync(userId);

@@ -35,7 +35,7 @@ public sealed class GetPublicSiteModelsHandler(PublicModelCatalogReader reader, 
         var isFinal = categoryId is { } selected && catalog.IsFinal(selected);
         var parsed = PublicModelFilter.Parse(request.Filter)!;
         if (parsed.Count > 0 && !isFinal)
-            return Result.Invalid(new ValidationError("filter", "Attribute filters work in a final category only.",
+            return Result.Invalid(new ValidationError("filter", "Фільтри за властивостями працюють лише в кінцевій категорії.",
                 "Catalog.SiteModels.FilterNotFinal", ValidationSeverity.Error));
         var filter = PublicModelFilter.Resolve(request, parsed, catalog);
         if (filter is null)
