@@ -26,6 +26,7 @@ public static class SalesInfrastructure
         services.AddOneCOrderSyncConfiguration(configuration);
 
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddOutbox<SalesDbContext>(SalesDbContext.Schema);
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();

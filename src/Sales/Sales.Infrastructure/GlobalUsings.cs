@@ -1,3 +1,5 @@
+global using BuildingBlocks.Infrastructure.Outbox;
+global using BuildingBlocks.Infrastructure.DependencyInjection;
 global using BuildingBlocks.Infrastructure.Migrations;
 global using BuildingBlocks.Infrastructure.Seeding;
 global using BuildingBlocks.Domain.Abstractions;

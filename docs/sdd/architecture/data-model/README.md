@@ -46,6 +46,9 @@ KedrStore PostgreSQL
     │       └── AppRefreshSessions       # refresh sessions
     ├── infrastructure table
     │   └── __EFMigrationsHistory         # applied EF migration history
+└── schema sales
+    └── Sales / SalesDbContext — 1 table
+        └── OutboxMessages                # messages sent after the commit (platform spec 006)
 └── schema content
     └── Content / ContentDbContext — 8 tables
         ├── Articles                      # slug, date, publication flag, cover version

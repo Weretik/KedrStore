@@ -3,6 +3,12 @@ namespace Sales.Infrastructure.Persistence;
 public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     : DbContext(options), IReadSalesDbContext
 {
+    /// <summary>
+    /// The module's own schema. Sales tables are still in <c>public</c>; new tables, starting with the outbox, go here
+    /// (platform spec 006, R-001).
+    /// </summary>
+    public const string Schema = "sales";
+
     public DbSet<Counterparty> Counterparties => Set<Counterparty>();
     public DbSet<CounterpartyCategoryPriceType> CounterpartyCategoryPriceTypes =>
         Set<CounterpartyCategoryPriceType>();
@@ -29,5 +35,6 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(SalesDbContext).Assembly,
             type => type.Namespace?.StartsWith("Sales.Infrastructure.Persistence", StringComparison.Ordinal) ?? false);
+        modelBuilder.ApplyOutbox(Schema);
     }
 }
