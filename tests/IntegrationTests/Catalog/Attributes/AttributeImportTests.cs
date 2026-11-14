@@ -1,7 +1,15 @@
 using Xunit.Abstractions;
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 using Catalog.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;

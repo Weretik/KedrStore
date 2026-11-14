@@ -1,7 +1,21 @@
-using Catalog.Domain.Entities;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 using Catalog.Infrastructure.Converters;
 
 namespace Catalog.Infrastructure.Configurations.Groups;

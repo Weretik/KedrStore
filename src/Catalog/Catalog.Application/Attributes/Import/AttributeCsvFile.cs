@@ -160,7 +160,7 @@ public static class AttributeCsvFile
         if (values.Any(value => value.AttributeCode == AttributeImportCatalog.Branding
                                 && value.ValueCode == AttributeImportCatalog.NoNameCode))
         {
-            reasons.Add(new RecognizedReason(Domain.Entities.Attributes.AttributeReviewReason.NoName, null));
+            reasons.Add(new RecognizedReason(Domain.Attributes.AttributeReviewReason.NoName, null));
         }
 
         return reasons;

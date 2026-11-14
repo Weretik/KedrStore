@@ -7,7 +7,13 @@ using Catalog.Application.Features.Category.SiteVisibility;
 using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.Slugs;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 

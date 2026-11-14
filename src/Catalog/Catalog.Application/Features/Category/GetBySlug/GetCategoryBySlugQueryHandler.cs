@@ -7,7 +7,13 @@ using Catalog.Application.Features.Category.GetList.Specifications;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Category;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.Category.GetBySlug;
 

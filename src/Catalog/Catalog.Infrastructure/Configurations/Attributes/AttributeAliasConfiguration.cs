@@ -1,4 +1,4 @@
-using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Attributes;
 
 namespace Catalog.Infrastructure.Configurations.Attributes;
 

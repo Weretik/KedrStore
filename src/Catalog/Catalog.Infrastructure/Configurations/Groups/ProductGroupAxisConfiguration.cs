@@ -1,5 +1,5 @@
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Entities.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
 using Catalog.Infrastructure.Configurations.Attributes;
 
 namespace Catalog.Infrastructure.Configurations.Groups;

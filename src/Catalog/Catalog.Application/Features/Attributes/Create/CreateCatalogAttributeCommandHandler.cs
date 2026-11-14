@@ -2,8 +2,10 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Attributes.Common;
 using Catalog.Application.Slugs;
 using Catalog.Contracts.Attributes;
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Enums;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
 
 namespace Catalog.Application.Features.Attributes.Create;
 

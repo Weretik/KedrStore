@@ -1,5 +1,7 @@
 using Catalog.Application.Contracts.Persistence;
-using Catalog.Domain.Enums;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
 
 namespace Catalog.Application.Features.SiteModels.Common;
 

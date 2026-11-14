@@ -27,7 +27,7 @@ namespace Catalog.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAlias", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAlias", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,7 +75,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeAliases", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasCategoryValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAliasCategoryValue", b =>
                 {
                     b.Property<int>("AliasId")
                         .HasColumnType("integer");
@@ -100,7 +100,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeAliasCategoryValues", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasMeaning", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAliasMeaning", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,7 +143,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeAliasMeanings", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,7 +202,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributeValues", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CatalogAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.CatalogAttribute", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -264,7 +264,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogAttributes", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CategoryAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.CategoryAttribute", b =>
                 {
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
@@ -291,7 +291,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogCategoryAttributes", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeReview", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.ProductAttributeReview", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -329,7 +329,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductAttributeReviews", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.ProductAttributeValue", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -384,7 +384,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductAttributeValues", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
+            modelBuilder.Entity("Catalog.Domain.Categories.Content.CategoryContent", b =>
                 {
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
@@ -423,7 +423,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CategoryContents", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroup", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -489,7 +489,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductGroups", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupAxis", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupAxis", b =>
                 {
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
@@ -508,7 +508,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductGroupAxes", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupMember", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -530,7 +530,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductGroupMembers", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupText", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupText", b =>
                 {
                     b.Property<int>("GroupId")
                         .HasColumnType("integer");
@@ -567,7 +567,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogProductGroupTexts", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.PriceType", b =>
+            modelBuilder.Entity("Catalog.Domain.PriceTypes.PriceType", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer");
@@ -582,7 +582,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("PriceType", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.Product", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer");
@@ -675,7 +675,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductCategory", b =>
+            modelBuilder.Entity("Catalog.Domain.Categories.ProductCategory", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer");
@@ -751,7 +751,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductCategories", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductListProjection", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.ProductListProjection", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
@@ -841,7 +841,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductListProjections", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.Prices.ProductPrice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -881,7 +881,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductPrices", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductTranslation", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.ProductTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -928,7 +928,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductTranslations", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.SlugHistoryEntry", b =>
+            modelBuilder.Entity("Catalog.Domain.Slugs.SlugHistoryEntry", b =>
                 {
                     b.Property<short>("EntityType")
                         .HasColumnType("smallint");
@@ -951,133 +951,133 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("CatalogSlugHistory", (string)null);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAlias", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAlias", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeValue", null)
                         .WithMany()
                         .HasForeignKey("ValueId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasCategoryValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAliasCategoryValue", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeAlias", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeAlias", null)
                         .WithMany()
                         .HasForeignKey("AliasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeValue", null)
                         .WithMany()
                         .HasForeignKey("ValueId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeAliasMeaning", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeAliasMeaning", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeAlias", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeAlias", null)
                         .WithMany()
                         .HasForeignKey("AliasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeValue", null)
                         .WithMany()
                         .HasForeignKey("ValueId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.AttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.AttributeValue", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.CategoryAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.CategoryAttribute", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeReview", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.ProductAttributeReview", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Attributes.ProductAttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Attributes.ProductAttributeValue", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeValue", null)
                         .WithMany()
                         .HasForeignKey("AutomaticValueId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Attributes.AttributeValue", null)
+                    b.HasOne("Catalog.Domain.Attributes.AttributeValue", null)
                         .WithMany()
                         .HasForeignKey("ValueId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.CategoryContent", b =>
+            modelBuilder.Entity("Catalog.Domain.Categories.Content.CategoryContent", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsMany("Catalog.Domain.Entities.CategoryFaqItem", "Faq", b1 =>
+                    b.OwnsMany("Catalog.Domain.Categories.Content.CategoryFaqItem", "Faq", b1 =>
                         {
                             b1.Property<long>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1121,67 +1121,67 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("Faq");
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroup", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroup", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("MainProductId")
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupAxis", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupAxis", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Attributes.CatalogAttribute", null)
+                    b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                    b.HasOne("Catalog.Domain.Groups.ProductGroup", null)
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupMember", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupMember", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                    b.HasOne("Catalog.Domain.Groups.ProductGroup", null)
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Groups.ProductGroupText", b =>
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupText", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Groups.ProductGroup", null)
+                    b.HasOne("Catalog.Domain.Groups.ProductGroup", null)
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.Product", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.ProductCategory", null)
+                    b.HasOne("Catalog.Domain.Categories.ProductCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsMany("Catalog.Domain.Entities.ProductMediaLink", "MediaLinks", b1 =>
+                    b.OwnsMany("Catalog.Domain.Products.Media.ProductMediaLink", "MediaLinks", b1 =>
                         {
                             b1.Property<int>("ProductId")
                                 .HasColumnType("integer");
@@ -1214,18 +1214,18 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("MediaLinks");
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductPrice", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.Prices.ProductPrice", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Catalog.Domain.Entities.ProductTranslation", b =>
+            modelBuilder.Entity("Catalog.Domain.Products.ProductTranslation", b =>
                 {
-                    b.HasOne("Catalog.Domain.Entities.Product", null)
+                    b.HasOne("Catalog.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)

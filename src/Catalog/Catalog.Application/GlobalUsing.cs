@@ -15,7 +15,13 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
 
 //  Catalog.Domain namespaces
-global using Catalog.Domain.Entities;
+global using Catalog.Domain.Categories;
+global using Catalog.Domain.Categories.Content;
+global using Catalog.Domain.PriceTypes;
+global using Catalog.Domain.Products;
+global using Catalog.Domain.Products.Media;
+global using Catalog.Domain.Products.Prices;
+global using Catalog.Domain.Slugs;
 
 // BuildingBlocks namespaces
 global using BuildingBlocks.Application.Behaviors;

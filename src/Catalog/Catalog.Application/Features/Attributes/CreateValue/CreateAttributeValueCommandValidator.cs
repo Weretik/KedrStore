@@ -1,5 +1,5 @@
 using Catalog.Application.Features.Attributes.Common;
-using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Attributes;
 
 namespace Catalog.Application.Features.Attributes.CreateValue;
 

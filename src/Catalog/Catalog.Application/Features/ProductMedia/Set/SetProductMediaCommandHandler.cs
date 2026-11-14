@@ -3,7 +3,13 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Features.ProductMedia.Common;
 using Catalog.Contracts.Products.Media;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.ProductMedia.Set;
 

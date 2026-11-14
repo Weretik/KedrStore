@@ -2,8 +2,14 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Groups.Common;
 using Catalog.Application.Groups;
 using Catalog.Contracts.Groups;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.Groups.SetForProduct;
 

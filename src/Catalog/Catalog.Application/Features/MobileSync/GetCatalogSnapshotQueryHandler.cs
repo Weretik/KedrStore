@@ -4,7 +4,9 @@ using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Querying;
 using Catalog.Contracts.MobileSync;
 using Catalog.Contracts.Pricing;
-using Catalog.Domain.Enums;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
 
 namespace Catalog.Application.Features.MobileSync;
 

@@ -1,8 +1,14 @@
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.Groups.Common;
 using Catalog.Application.Groups;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.SiteModels.Common;
 
@@ -34,7 +40,7 @@ public sealed class SiteModelChanges(
 
         var taken = await db.ProductGroupMembers
             .Where(member => productIds.Contains(member.ProductId) && member.GroupId != null && member.GroupId != modelId)
-            .Join(db.ProductGroups.Where(group => group.Status == Domain.Enums.ProductGroupStatus.Accepted),
+            .Join(db.ProductGroups.Where(group => group.Status == Domain.Groups.ProductGroupStatus.Accepted),
                 member => member.GroupId, group => (ProductGroupId?)group.Id,
                 (member, group) => new { member.ProductId, group.Name })
             .ToListAsync(cancellationToken);

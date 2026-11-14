@@ -1,0 +1,282 @@
+﻿using Catalog.Domain;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+
+namespace Catalog.Domain.Categories;
+
+public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
+{
+    public const int ShortNameMaxLength = 100;
+
+    #region Properties
+    public string ProductTypeIdOneC { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
+    public ProductCategoryId? ParentId { get; private set; }
+    public CategoryPath  Path { get; private set; }
+    public string ShortNameUk { get; private set; } = null!;
+    public string ShortNameRu { get; private set; } = null!;
+    public int SortOrder { get; private set; }
+    public int Level { get; private set; }
+    public bool IsDeleted { get; private set; }
+
+    /// <summary>
+    /// Whether the category and its products are shown on the site, in «Вітрина сайту», and in «Моделі». An admin owns
+    /// it; the 1C sync never changes it and gives a new category its parent's value.
+    /// </summary>
+    public bool IsShownOnSite { get; private set; }
+    public DateTimeOffset? DeletedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
+    #endregion
+
+    #region Constructors
+    private ProductCategory() { }
+    private ProductCategory(ProductCategoryId id, string productTypeIdOneC, string name, string slug, CategoryPath path,
+        ProductCategoryId? parentId = null)
+    {
+        Id = id;
+        SetProductTypeIdOneC(productTypeIdOneC);
+        SetName(name);
+        SetSlug(slug);
+        SetPath(path);
+        SetParentId(parentId);
+        UpdatePresentationMetadata(Name, Name, int.MaxValue, GetLevelFromPath(path));
+    }
+    #endregion
+
+    #region Factories
+    public static ProductCategory Create(ProductCategoryId id, string productTypeIdOneC, string name, string slug,
+        CategoryPath path, ProductCategoryId? parentId = null)
+        => new(id, productTypeIdOneC, name, slug,path, parentId);
+
+    /// <summary>
+    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
+    /// Returns whether anything changed.
+    /// </summary>
+    public bool UpdateFromOneC(string name, CategoryPath path, ProductCategoryId? parentId, DateTimeOffset now)
+    {
+        var trimmedName = name?.Trim() ?? string.Empty;
+        if (string.Equals(Name, trimmedName, StringComparison.Ordinal) &&
+            Path.Value == path.Value &&
+            ParentId == parentId)
+        {
+            return false;
+        }
+
+        SetName(name!);
+        SetPath(path);
+        SetParentId(parentId);
+        Level = GetLevelFromPath(path);
+        UpdatedAt = now;
+        return true;
+    }
+    #endregion
+
+    #region Lifecycle
+    public void ChangeSlug(string slug, DateTimeOffset now)
+    {
+        SetSlug(slug);
+        UpdatedAt = now;
+    }
+
+    public bool MarkDeleted(DateTimeOffset now)
+    {
+        if (IsDeleted) return false;
+        IsDeleted = true;
+        DeletedAt = now;
+        UpdatedAt = now;
+        return true;
+    }
+
+    /// <summary>Shows or hides the category on the site; returns whether it changed.</summary>
+    public bool SetShownOnSite(bool isShown, DateTimeOffset now)
+    {
+        if (IsShownOnSite == isShown) return false;
+        IsShownOnSite = isShown;
+        UpdatedAt = now;
+        return true;
+    }
+
+    public bool Restore(DateTimeOffset now)
+    {
+        if (!IsDeleted) return false;
+        IsDeleted = false;
+        DeletedAt = null;
+        UpdatedAt = now;
+        return true;
+    }
+    #endregion
+
+    #region Setters/Validation
+    private void SetProductTypeIdOneC(string productTypeIdOneC)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(productTypeIdOneC);
+        ProductTypeIdOneC = productTypeIdOneC;
+    }
+
+    private void SetName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new DomainException(CategoryErrors.NameIsRequired());
+        if (name.Length is < 1 or > 100) throw new DomainException(CategoryErrors.NameLengthInvalid(name.Length));
+        Name = name.Trim();
+    }
+
+    private void SetSlug(string slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(CategoryErrors.SlugIsRequired());
+        Slug = slug.Trim();
+    }
+    private void SetPath(CategoryPath path)
+    {
+        if(path.Value.Length == 0) throw new DomainException(CategoryErrors.PathIsRequired());
+        Path = path;
+    }
+    private void SetParentId(ProductCategoryId? parentId)
+    {
+        ParentId = parentId;
+    }
+
+    private static string ValidateShortName(
+        string shortName,
+        Func<CatalogDomainError> requiredError,
+        Func<int, CatalogDomainError> invalidLengthError)
+    {
+        if (string.IsNullOrWhiteSpace(shortName))
+            throw new DomainException(requiredError());
+
+        var trimmed = shortName.Trim();
+        if (trimmed.Length > ShortNameMaxLength)
+            throw new DomainException(invalidLengthError(trimmed.Length));
+
+        return trimmed;
+    }
+
+    private static void GuardSortOrder(int sortOrder)
+    {
+        if (sortOrder < 0)
+            throw new DomainException(CategoryErrors.SortOrderNegative(sortOrder));
+    }
+
+    private void GuardLevel(int level)
+    {
+        if (level < 0)
+            throw new DomainException(CategoryErrors.LevelNegative(level));
+
+        var pathLevel = GetLevelFromPath(Path);
+        if (level != pathLevel)
+            throw new DomainException(CategoryErrors.LevelDoesNotMatchPath(level, pathLevel));
+    }
+    #endregion
+
+    #region ProductCategory API
+    public void Rename(string name) => SetName(name);
+    public void Repath(CategoryPath newPath)
+    {
+        SetPath(newPath);
+        Level = GetLevelFromPath(Path);
+    }
+
+    /// <summary>Sets presentation metadata and returns whether anything changed.</summary>
+    public bool UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder, int level)
+    {
+        var validatedShortNameUk = ValidateShortName(
+            shortNameUk,
+            CategoryErrors.ShortNameUkIsRequired,
+            CategoryErrors.ShortNameUkLengthInvalid);
+        var validatedShortNameRu = ValidateShortName(
+            shortNameRu,
+            CategoryErrors.ShortNameRuIsRequired,
+            CategoryErrors.ShortNameRuLengthInvalid);
+
+        GuardSortOrder(sortOrder);
+        GuardLevel(level);
+
+        var changed = !string.Equals(ShortNameUk, validatedShortNameUk, StringComparison.Ordinal) ||
+                      !string.Equals(ShortNameRu, validatedShortNameRu, StringComparison.Ordinal) ||
+                      SortOrder != sortOrder ||
+                      Level != level;
+
+        ShortNameUk = validatedShortNameUk;
+        ShortNameRu = validatedShortNameRu;
+        SortOrder = sortOrder;
+        Level = level;
+        return changed;
+    }
+
+    public void Reparent(ProductCategoryId? newParentId, CategoryPath newParentPath)
+    {
+        GuardReparentInvariant(newParentPath);
+        SetParentId(newParentId);
+        SetPath(Concat(newParentPath, GetSelfSegment()));
+        Level = GetLevelFromPath(Path);
+    }
+    #endregion
+
+    #region Internal rules
+    protected void GuardReparentInvariant(CategoryPath newParentPath)
+    {
+        if (newParentPath.Value == Path.Value)
+            throw new DomainException(CategoryErrors.CannotSetSelfAsParent(Path.Value));
+
+        if (IsDescendantOf(newParentPath, Path))
+            throw new DomainException(CategoryErrors.CannotMoveUnderDescendant(
+                Path.Value, newParentPath.Value)
+            );
+    }
+    protected bool IsSameParent(CategoryPath newParentPath)
+        => TryGetParentPath(out var currentParent) && currentParent.Value == newParentPath.Value;
+
+    protected static CategoryPath Concat(CategoryPath parent, string segment) =>
+        CategoryPath.From($"{parent.Value}.{segment}");
+
+    protected string GetSelfSegment()
+    {
+        var s = Path.Value;
+        var idx = s.LastIndexOf('.');
+        return idx < 0 ? s : s[(idx + 1)..];
+    }
+
+    private bool TryGetParentPath(out CategoryPath parentPath)
+    {
+        if (IsRoot)
+        {
+            parentPath = CategoryPath.None;
+            return false;
+        }
+
+        var s = Path.Value;
+        var idx = s.LastIndexOf('.');
+        parentPath = CategoryPath.From(s[..idx]);
+        return true;
+    }
+
+    public bool IsRoot => SegmentCount(Path) <= 1;
+
+    private static bool IsDescendantOf(CategoryPath candidateChild, CategoryPath candidateAncestor)
+    {
+        var anc = candidateAncestor.Value;
+        var child = candidateChild.Value;
+        return child.Length > anc.Length &&
+               child.StartsWith(anc, StringComparison.Ordinal) &&
+               child[anc.Length] == '.';
+    }
+
+    private static int SegmentCount(CategoryPath path)
+        => 1 + path.Value.Count(ch => ch == '.');
+
+    private static int GetLevelFromPath(CategoryPath path)
+        => SegmentCount(path) - 1;
+    #endregion
+}

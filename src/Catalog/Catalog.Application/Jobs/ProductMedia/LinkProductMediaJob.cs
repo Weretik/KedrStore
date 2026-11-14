@@ -2,7 +2,13 @@ using System.Text.RegularExpressions;
 using Catalog.Application.Contracts.Media;
 using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Jobs.ProductMedia;
 

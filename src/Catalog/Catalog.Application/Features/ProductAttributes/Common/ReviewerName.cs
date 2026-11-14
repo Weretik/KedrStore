@@ -1,5 +1,5 @@
 using BuildingBlocks.Application.Contracts;
-using Catalog.Domain.Entities.Attributes;
+using Catalog.Domain.Attributes;
 
 namespace Catalog.Application.Features.ProductAttributes.Common;
 

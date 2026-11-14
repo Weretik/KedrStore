@@ -3,8 +3,14 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Features.ProductAttributes.Common;
 using Catalog.Application.Features.SiteModels.Common;
 using Catalog.Contracts.SiteModels;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.SiteModels.Accept;
 

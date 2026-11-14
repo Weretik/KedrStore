@@ -1,4 +1,4 @@
-using Catalog.Domain.Entities.Groups;
+using Catalog.Domain.Groups;
 
 namespace Catalog.Infrastructure.Configurations.Groups;
 
