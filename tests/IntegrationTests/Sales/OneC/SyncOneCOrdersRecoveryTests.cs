@@ -1,7 +1,7 @@
 using IntegrationTests.TestSupport.Sales;
-using Sales.Application.Integrations.OneC.DTOs;
-using Sales.Domain.Orders.Enums;
-using Sales.Infrastructure.Integrations.OneC.Options;
+using Sales.Application.Abstractions.Integrations.OneC;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Integrations.OneC;
 
 namespace IntegrationTests.Sales.OneC;
 

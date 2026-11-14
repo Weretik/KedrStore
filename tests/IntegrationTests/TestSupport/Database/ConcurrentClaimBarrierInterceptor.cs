@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Sales.Domain.Orders.Entities;
-using Sales.Domain.Orders.Enums;
+using Sales.Domain.Orders;
 
 namespace IntegrationTests.TestSupport.Database;
 

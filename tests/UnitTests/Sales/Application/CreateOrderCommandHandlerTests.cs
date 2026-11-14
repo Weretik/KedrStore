@@ -1,14 +1,10 @@
 using System.Reflection;
 using Ardalis.Result;
-using Sales.Application.Contracts.Catalog;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Contracts.Persistence;
-using Sales.Application.Features.Orders.Create;
-using Sales.Application.Features.Orders.Create.DTOs;
-using Sales.Application.Features.Orders.Create.Validators;
-using Sales.Domain.Orders.Entities;
-using Sales.Domain.Orders.Enums;
-using Sales.Domain.Orders.ValueObjects;
+using Sales.Application.Abstractions.Catalog;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Application.Features.Orders.Commands.CreateOrder;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Application;
 
@@ -21,7 +17,7 @@ public sealed class CreateOrderCommandHandlerTests
     [Fact]
     public void Validator_RejectsInvalidPayload()
     {
-        var result = new CreateOrderCommandValidator().Validate(new CreateOrderCommand(
+        var result = new CreateOrderValidator().Validate(new CreateOrderCommand(
             new CreateOrderRequest("", null, []), Guid.Empty));
 
         Assert.False(result.IsValid);
@@ -89,7 +85,7 @@ public sealed class CreateOrderCommandHandlerTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => CreateHandler(store).Handle(Command, CancellationToken.None).AsTask());
     }
 
-    private static CreateOrderCommandHandler CreateHandler(Store store) => new(store, new ProductReader(), new NumberGenerator());
+    private static CreateOrderHandler CreateHandler(Store store) => new(store, new ProductReader(), new NumberGenerator());
 
     private sealed class NumberGenerator : IOrderNumberGenerator
     {

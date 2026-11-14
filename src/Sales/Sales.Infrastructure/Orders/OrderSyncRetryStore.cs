@@ -1,7 +1,8 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Domain.Orders.Enums;
-using Sales.Domain.Orders.ValueObjects;
-using Sales.Infrastructure.DataBase.Entities;
+using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence.Customers;
+using Sales.Infrastructure.Persistence.OrderDrafts;
+using Sales.Infrastructure.Persistence.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

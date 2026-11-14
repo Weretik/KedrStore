@@ -1,7 +1,6 @@
 using System.Globalization;
 using BuildingBlocks.Integrations.OneC.Factory;
-using Sales.Application.Integrations.OneC.Contracts;
-using Sales.Application.Integrations.OneC.DTOs;
+using Sales.Application.Abstractions.Integrations.OneC;
 
 namespace Sales.Infrastructure.Integrations.OneC;
 

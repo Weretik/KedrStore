@@ -2,11 +2,11 @@
 
 **Module:** Sales. **Consumer:** React Admin (kedr-web `libs/admin/orders/data-access`).
 
-[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs) exposes separate `/api/admin/order-workspace` routes (policy `CanManageOrders`) and dispatches each operation to its own Application handler. Existing `/api/admin/orders` remains a separate contract. The [order reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) performs search, sorting, and paging; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) uses current stock and the customer price from the [price resolver](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/CustomerPriceResolver.cs): the price type of the nearest customer rule on the product's category or any parent category, otherwise the customer's default type. Each line may carry a per-unit `priceAdjustment` in UAH (negative is a discount, positive a markup); the unit price is the customer price plus the adjustment and a discount may not take it below 1 UAH per unit (400 `price_below_minimum`; a product cheaper than 1 UAH cannot be discounted). `POST customer-prices` returns customer prices for up to 100 products without checking stock, so the checkout table shows them even when the quote fails. Orders and drafts store the adjustment per line; the order list returns `adjustmentAmount`, and 1C receives only the final line amounts. Insufficient stock returns the expected 400 `unavailable_product` with product name and quantities.
+[AdminOrderWorkspaceController](../../../../src/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs) exposes separate `/api/admin/order-workspace` routes (policy `CanManageOrders`) and dispatches each operation to its own Application handler. Existing `/api/admin/orders` remains a separate contract. The [order reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs) performs search, sorting, and paging; [pricing](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/AdminWorkspacePricing.cs) uses current stock and the customer price from the [price resolver](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Pricing/CustomerPriceResolver.cs): the price type of the nearest customer rule on the product's category or any parent category, otherwise the customer's default type. Each line may carry a per-unit `priceAdjustment` in UAH (negative is a discount, positive a markup); the unit price is the customer price plus the adjustment and a discount may not take it below 1 UAH per unit (400 `price_below_minimum`; a product cheaper than 1 UAH cannot be discounted). `POST customer-prices` returns customer prices for up to 100 products without checking stock, so the checkout table shows them even when the quote fails. Orders and drafts store the adjustment per line; the order list returns `adjustmentAmount`, and 1C receives only the final line amounts. Insufficient stock returns the expected 400 `unavailable_product` with product name and quantities.
 
-The line price rules (stock, customer price, the 1 UAH floor, an amount that fits) live in the domain [OrderLinePricing](../../../../src/Sales/Sales.Domain/Orders/Pricing/OrderLinePricing.cs). Request input is checked by a validator per use case through the shared [input rules](../../../../src/Sales/Sales.Application/Features/Orders/AdminWorkspace/WorkspaceInputRules.cs); the services return `DomainResult` with the [workspace errors](../../../../src/Sales/Sales.Application/Features/Orders/AdminWorkspace/WorkspaceErrors.cs) and throw nothing for a business case. [WorkspaceErrorAnswers](../../../../src/Sales/Sales.Api/Controllers/WorkspaceErrorAnswers.cs) answers every failure as `{code, message}` in Ukrainian: a 400 keeps the code of the rule that failed (`invalid_lines`, `invalid_price_adjustment`, `unavailable_product`, `invalid_date_range`, `invalid_sort` and the others), a 404 says `not_found` and a 409 `conflict`. During checkout, [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) recalculates the total, compares the fingerprint, and atomically writes Order and Pending 1C sync through the existing OrderCreationStore.
+The line price rules (stock, customer price, the 1 UAH floor, an amount that fits) live in the domain [OrderLinePricing](../../../../src/Sales/Sales.Domain/Orders/Pricing/OrderLinePricing.cs). Request input is checked by a validator per use case through the shared [input rules](../../../../src/Sales/Sales.Application/Features/OrderWorkspace/Shared/WorkspaceInputRules.cs); the services return `DomainResult` with the [workspace errors](../../../../src/Sales/Sales.Application/Features/OrderWorkspace/Shared/WorkspaceErrors.cs) and throw nothing for a business case. [WorkspaceErrorAnswers](../../../../src/Sales/Sales.Api/Features/OrderWorkspace/WorkspaceErrorAnswers.cs) answers every failure as `{code, message}` in Ukrainian: a 400 keeps the code of the rule that failed (`invalid_lines`, `invalid_price_adjustment`, `unavailable_product`, `invalid_date_range`, `invalid_sort` and the others), a 404 says `not_found` and a 409 `conflict`. During checkout, [creator](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Checkout/WorkspaceOrderCreator.cs) recalculates the total, compares the fingerprint, and atomically writes Order and Pending 1C sync through the existing OrderCreationStore.
 
-Drafts use a separate [model](../../../../src/Sales/Sales.Domain/Orders/Entities/OrderDraft.cs), [reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs), and [write adapter](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Drafts/WorkspaceDraftWriter.cs). They do not receive an Order number or go to 1C. The details response contains a current server-side quote or `pricingStatus=Unavailable` with saved lines and `null` for unavailable prices; PUT/DELETE use `If-Match`. Checkout from a draft does not change the draft.
+Drafts use a separate [model](../../../../src/Sales/Sales.Domain/Orders/OrderDraft.cs), [reader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs), and [write adapter](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Drafts/WorkspaceDraftWriter.cs). They do not receive an Order number or go to 1C. The details response contains a current server-side quote or `pricingStatus=Unavailable` with saved lines and `null` for unavailable prices; PUT/DELETE use `If-Match`. Checkout from a draft does not change the draft.
 
 ## Structure diagram
 
@@ -33,10 +33,11 @@ flowchart LR
 
 ```text
 src/Sales/
-├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs           # HTTP entry (CanManageOrders)
-├── Sales.Api/Controllers/WorkspaceErrorAnswers.cs                   # failure result → status + {code, message}
+├── Sales.Api/Features/OrderWorkspace/
+│   ├── AdminOrderWorkspaceController.cs                       # HTTP entry (CanManageOrders)
+│   └── WorkspaceErrorAnswers.cs                               # failure result → status + {code, message}
 ├── Sales.Application/
-│   ├── Contracts/Orders/
+│   ├── Abstractions/Orders/
 │   │   ├── WorkspaceOrderContracts.cs                         # order DTOs
 │   │   ├── WorkspaceDraftContracts.cs                         # draft DTOs
 │   │   ├── WorkspaceQuoteContracts.cs                         # quote DTOs
@@ -44,20 +45,18 @@ src/Sales/
 │   │   ├── WorkspaceInputLine.cs                              # request line
 │   │   ├── IWorkspaceOrderReader.cs                           # order read port
 │   │   └── IWorkspaceDraftWriter.cs                           # draft write port
-│   └── Features/Orders/AdminWorkspace/
-│       ├── WorkspaceInputRules.cs                             # shared validator rules with public error codes
-│       ├── WorkspaceErrors.cs                                 # not found, version and idempotency conflicts
-│       ├── WorkspaceDateRange.cs                              # Kyiv calendar-day filter
-│       ├── WorkspaceSorts.cs                                  # allowed list sorts
-│       ├── */*/Validators/*Validator.cs                       # one validator per query and command
-│       ├── Orders/GetList/GetWorkspaceOrdersQueryHandler.cs  # order list
-│       ├── Orders/Quote/QuoteWorkspaceOrderQueryHandler.cs   # server-side quote
-│       ├── Orders/CustomerPrices/GetWorkspaceCustomerPricesQueryHandler.cs # customer prices without stock
-│       ├── Orders/Create/CreateWorkspaceOrderCommandHandler.cs # checkout
-│       ├── Drafts/GetList/GetWorkspaceDraftsQueryHandler.cs  # draft list
-│       ├── Drafts/Create/CreateWorkspaceDraftCommandHandler.cs # create draft
-│       ├── Drafts/Update/UpdateWorkspaceDraftCommandHandler.cs # edit draft
-│       └── Drafts/Delete/DeleteWorkspaceDraftCommandHandler.cs # delete draft
+│   └── Features/OrderWorkspace/
+│       ├── Shared/
+│       │   ├── WorkspaceInputRules.cs                         # shared validator rules with public error codes
+│       │   ├── WorkspaceDraftInputValidator.cs                # draft input shared by create and update
+│       │   ├── WorkspaceErrors.cs                             # not found, version and idempotency conflicts
+│       │   ├── WorkspaceDateRange.cs                          # Kyiv calendar-day filter
+│       │   └── WorkspaceSorts.cs                              # allowed list sorts
+│       ├── Queries/<UseCase>/<UseCase>{Query,Handler,Validator}.cs
+│       │   # GetWorkspaceOrders, GetWorkspaceOrder, QuoteWorkspaceOrder, GetWorkspaceCustomerPrices,
+│       │   # GetWorkspaceDrafts, GetWorkspaceDraft, GetWorkspaceOverview
+│       └── Commands/<UseCase>/<UseCase>{Command,Handler,Validator}.cs
+│           # CreateWorkspaceOrder (checkout), CreateWorkspaceDraft, UpdateWorkspaceDraft, DeleteWorkspaceDraft
 ├── Sales.Domain/Orders/Entities/OrderDraft.cs                       # persisted draft model
 ├── Sales.Domain/Orders/Pricing/OrderLinePricing.cs                  # line price rules → DomainResult
 └── Sales.Infrastructure/
@@ -68,6 +67,7 @@ src/Sales/
     ├── Orders/Admin/Pricing/AdminWorkspacePricing.cs           # quote: stock, adjustments, totals, fingerprint
     ├── Orders/Admin/Pricing/CustomerPriceResolver.cs           # customer price with category inheritance
     ├── Orders/Admin/Idempotency/WorkspaceIdempotency.cs        # hash and DB conflict handling for retries
+    ├── Persistence/OrderDrafts/                                # draft table mappings
     ├── Migrations/20261021135819_AddAdminOrderDrafts.cs             # additive table migration
     └── Migrations/20261029130909_AddOrderLinePriceAdjustment.cs     # PriceAdjustment on order and draft lines
 ```

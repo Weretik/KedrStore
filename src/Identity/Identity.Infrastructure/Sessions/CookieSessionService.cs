@@ -2,7 +2,9 @@ using Identity.Infrastructure.Avatars;
 using Identity.Application.Features.Auth.Queries.SessionMe;
 using Identity.Application.Abstractions.Accounts;
 using Identity.Application.Abstractions.Sessions;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 
 namespace Identity.Infrastructure.Sessions;
 

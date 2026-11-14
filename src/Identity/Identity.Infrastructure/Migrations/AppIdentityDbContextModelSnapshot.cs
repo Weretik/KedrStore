@@ -22,7 +22,7 @@ namespace Identity.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppRefreshSession", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Sessions.AppRefreshSession", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,7 +86,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AppRefreshSessions", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppRole", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Roles.AppRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,7 +133,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppUser", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Users.AppUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -207,7 +207,7 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppUserRole", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Users.AppUserRole", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -350,9 +350,9 @@ namespace Identity.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppRefreshSession", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Sessions.AppRefreshSession", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppUser", "User")
+                    b.HasOne("Identity.Infrastructure.Persistence.Users.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -361,15 +361,15 @@ namespace Identity.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppUserRole", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Users.AppUserRole", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppRole", "Role")
+                    b.HasOne("Identity.Infrastructure.Persistence.Roles.AppRole", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Identity.Infrastructure.Entities.AppUser", "User")
+                    b.HasOne("Identity.Infrastructure.Persistence.Users.AppUser", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -382,7 +382,7 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppRole", null)
+                    b.HasOne("Identity.Infrastructure.Persistence.Roles.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -391,7 +391,7 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppUser", null)
+                    b.HasOne("Identity.Infrastructure.Persistence.Users.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -400,7 +400,7 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppUser", null)
+                    b.HasOne("Identity.Infrastructure.Persistence.Users.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -409,19 +409,19 @@ namespace Identity.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Identity.Infrastructure.Entities.AppUser", null)
+                    b.HasOne("Identity.Infrastructure.Persistence.Users.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppRole", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Roles.AppRole", b =>
                 {
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("Identity.Infrastructure.Entities.AppUser", b =>
+            modelBuilder.Entity("Identity.Infrastructure.Persistence.Users.AppUser", b =>
                 {
                     b.Navigation("UserRoles");
                 });

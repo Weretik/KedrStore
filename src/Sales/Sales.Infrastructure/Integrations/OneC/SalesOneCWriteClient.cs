@@ -1,6 +1,5 @@
 using System.Globalization;
-using Sales.Application.Integrations.OneC.Contracts;
-using Sales.Application.Integrations.OneC.DTOs;
+using Sales.Application.Abstractions.Integrations.OneC;
 using OneCItem = BuildingBlocks.Integrations.OneC.Generated.Item;
 using OneCRequestData = BuildingBlocks.Integrations.OneC.Generated.RequestData;
 

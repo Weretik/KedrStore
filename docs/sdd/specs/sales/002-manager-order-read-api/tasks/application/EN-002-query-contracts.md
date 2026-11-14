@@ -3,7 +3,7 @@
 - **ID задачі:** EN-002
 - **Підтримує:** SC-001, SC-002, SC-003, SC-004
 - **Залежить від:** EN-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Contracts/Orders/IOrderReadService.cs`, `src/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
+- **Точні шляхи:** `src/Sales/Sales.Application/Abstractions/Orders/IOrderReadService.cs`, `src/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
 - **Рівень тесту:** перевірка компіляції Application і контракту
 
 ## Чому це підготовча задача

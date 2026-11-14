@@ -1,4 +1,4 @@
-using Sales.Application.Features.Orders.AdminWorkspace;
+using Sales.Application.Features.OrderWorkspace.Shared;
 
 namespace UnitTests.Sales.Application;
 

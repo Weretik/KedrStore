@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Orders;
+using Sales.Application.Abstractions.Orders;
 
 namespace IntegrationTests.Platform.Api;
 

@@ -1,10 +1,8 @@
 using Ardalis.Result;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetById.DTOs;
-using Sales.Application.Features.Orders.GetList;
-using Sales.Application.Features.Orders.GetList.DTOs;
-using Sales.Application.Features.Orders.GetList.Validators;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderById;
+using Sales.Application.Features.Orders.Queries.GetOrderList;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Application;
 
@@ -21,7 +19,7 @@ public sealed class GetOrderListQueryHandlerTests
         using var source = new CancellationTokenSource();
         var request = new OrderListRequest { CounterpartyId = "cp-1", Page = 2, PageSize = 5 };
 
-        var result = await new GetOrderListQueryHandler(reader)
+        var result = await new GetOrderListHandler(reader)
             .Handle(new GetOrderListQuery(request), source.Token);
 
         Assert.True(result.IsSuccess);
@@ -35,7 +33,7 @@ public sealed class GetOrderListQueryHandlerTests
     {
         var reader = new Reader { ListResult = Result.Error("read failed") };
 
-        var result = await new GetOrderListQueryHandler(reader)
+        var result = await new GetOrderListHandler(reader)
             .Handle(new GetOrderListQuery(new OrderListRequest()), CancellationToken.None);
 
         Assert.Equal(ResultStatus.Error, result.Status);
@@ -48,7 +46,7 @@ public sealed class GetOrderListQueryHandlerTests
     [InlineData(null, 1, 101)]
     public void Validator_RejectsInvalidListInput(string? counterpartyId, int page, int pageSize)
     {
-        var result = new GetOrderListQueryValidator().Validate(new GetOrderListQuery(
+        var result = new GetOrderListValidator().Validate(new GetOrderListQuery(
             new OrderListRequest { CounterpartyId = counterpartyId, Page = page, PageSize = pageSize }));
 
         Assert.False(result.IsValid);

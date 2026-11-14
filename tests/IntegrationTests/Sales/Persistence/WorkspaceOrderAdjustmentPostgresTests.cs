@@ -2,9 +2,9 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Orders;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
+using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -24,7 +24,7 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         await using var provider = services.BuildServiceProvider();
         await using var scope = provider.CreateAsyncScope();
         var reader = scope.ServiceProvider.GetRequiredService<IWorkspaceOrderReader>();

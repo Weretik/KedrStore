@@ -1,7 +1,9 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Contracts.Authorization;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 
 namespace Identity.Infrastructure.Users;
 

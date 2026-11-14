@@ -41,14 +41,14 @@ Every **successful full** customer import from 1C must bring local Sales data in
 
 | Path | State | Responsibility |
 | --- | --- | --- |
-| `src/Sales/Sales.Infrastructure/Integrations/OneC/Services/OneCCounterpartiesSyncService.cs` | Implemented | Source ID set, upsert/restore, fail-closed for empty/incomplete IDs, and deletion call |
+| `src/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs` | Implemented | Source ID set, upsert/restore, fail-closed for empty/incomplete IDs, and deletion call |
 | `src/Sales/Sales.Infrastructure/Integrations/OneC/SalesOneCReadClient.cs` | Existing | Maps the complete SOAP array to Sales DTOs; does not return a snapshot marker |
-| `src/Sales/Sales.Infrastructure/Integrations/OneC/Services/StaleCounterpartyRemoval.cs` | Implemented | Transactional Sales dependency deletion, outbox record, and Identity deletion retry |
-| `src/Sales/Sales.Infrastructure/DataBase/Entities/PendingCounterpartyIdentityDeletion.cs` | Implemented | Persisted IDs and Identity deletion retry state |
-| `src/Sales/Sales.Infrastructure/Configurations/PendingCounterpartyIdentityDeletionConfiguration.cs` | Implemented | Outbox table mapping and index by Identity user ID |
+| `src/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs` | Implemented | Transactional Sales dependency deletion, outbox record, and Identity deletion retry |
+| `src/Sales/Sales.Infrastructure/Persistence/Customers/PendingCounterpartyIdentityDeletion.cs` | Implemented | Persisted IDs and Identity deletion retry state |
+| `src/Sales/Sales.Infrastructure/Persistence/Customers/PendingCounterpartyIdentityDeletionConfiguration.cs` | Implemented | Outbox table mapping and index by Identity user ID |
 | `src/Sales/Sales.Infrastructure/Migrations/20261022104036_AddPendingCounterpartyIdentityDeletions.cs` | Implemented | Creates durable outbox table with Guid PK and unique CounterpartyId/IdentityUserId pair |
-| `src/Sales/Sales.Infrastructure/Configurations/OrderConfiguration.cs`, `OrderDraftConfiguration.cs`, `OrderSyncRetryAuditConfiguration.cs`, `OrderIdempotencyRecordConfiguration.cs` | Checked | Restrict/cascade FKs that determine deletion order |
-| `src/Sales/Sales.Infrastructure/Integrations/OneC/Services/SyncOneCOrdersService.cs` | Existing | Loads, optimistically claims through `xmin`, and sends; no dedicated customer-deletion concurrency test |
+| `src/Sales/Sales.Infrastructure/Persistence/Orders/OrderConfiguration.cs`, `OrderDraftConfiguration.cs`, `OrderSyncRetryAuditConfiguration.cs`, `OrderIdempotencyRecordConfiguration.cs` | Checked | Restrict/cascade FKs that determine deletion order |
+| `src/Sales/Sales.Infrastructure/Integrations/OneC/SyncOneCOrdersService.cs` | Existing | Loads, optimistically claims through `xmin`, and sends; no dedicated customer-deletion concurrency test |
 | `src/Identity/Identity.Infrastructure/Services/ImportedCounterpartyIdentityProvisioningService.cs` | Existing | Idempotent deletion of a user who is already absent |
 | `tests/IntegrationTests/Sales/Persistence/CounterpartyReconciliationPostgresTests.cs` | Added; skipped without Docker | Order/Draft deletion and Identity retry scenario; PostgreSQL result not yet obtained |
 | `docs/sdd/features/sales/customers.md` | Updated | Current sync and deletion feature map |

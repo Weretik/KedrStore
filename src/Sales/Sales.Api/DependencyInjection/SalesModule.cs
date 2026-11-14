@@ -9,7 +9,7 @@ public static class SalesModule
 {
     public static IServiceCollection AddSalesModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSalesInfrastructureServices(configuration);
+        services.AddSalesInfrastructure(configuration);
         services.AddValidatorsFromAssembly(typeof(Sales.Application.SalesApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
         services.AddControllers().AddApplicationPart(typeof(SalesApiAssemblyMarker).Assembly);
 

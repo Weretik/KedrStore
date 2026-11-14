@@ -22,7 +22,7 @@ Canonical operation: `GET /api/admin/order-workspace/drafts`, `operationId: getA
 | Path | State | Responsibility |
 | --- | --- | --- |
 | `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml` | existing | provider parameters |
-| `src/Sales/Sales.Api/Controllers/AdminOrderWorkspaceController.cs` | existing | binding |
+| `src/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs` | existing | binding |
 | `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Drafts/GetList/` | existing | validation/passing conditions |
 | `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs` | existing | filter, count, pagination |
 | `tests/IntegrationTests/Sales/Api/` | existing directory | focused API/SQL tests |

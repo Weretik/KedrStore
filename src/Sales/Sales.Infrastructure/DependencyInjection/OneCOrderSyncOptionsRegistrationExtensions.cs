@@ -1,4 +1,4 @@
-using Sales.Infrastructure.Integrations.OneC.Options;
+using Sales.Infrastructure.Integrations.OneC;
 
 namespace Sales.Infrastructure.DependencyInjection;
 

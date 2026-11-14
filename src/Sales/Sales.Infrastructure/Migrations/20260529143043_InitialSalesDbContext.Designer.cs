@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Sales.Infrastructure.DataBase;
+using Sales.Infrastructure.Persistence;
 
 #nullable disable
 
@@ -25,7 +25,7 @@ namespace Sales.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Sales.Domain.Customers.Entities.Counterparty", b =>
+            modelBuilder.Entity("Sales.Domain.Customers.Counterparty", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(64)
@@ -72,7 +72,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("Counterparties", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Customers.Entities.CounterpartyCategoryPriceType", b =>
+            modelBuilder.Entity("Sales.Domain.Customers.CounterpartyCategoryPriceType", b =>
                 {
                     b.Property<string>("CounterpartyId")
                         .HasMaxLength(64)

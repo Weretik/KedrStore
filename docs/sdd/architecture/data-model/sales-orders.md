@@ -1,6 +1,6 @@
 # Sales — orders and 1C: data
 
-**Source:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Sales/Sales.Infrastructure/Configurations/), checked 2026-10-21. [Back to database map](README.md) · [orders feature](../../features/sales/admin-orders.md).
+**Source:** [Sales snapshot](../../../../src/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Sales/Sales.Infrastructure/Persistence/), checked 2026-10-21. [Back to database map](README.md) · [orders feature](../../features/sales/admin-orders.md).
 
 | Table | PK | Purpose and important fields |
 | --- | --- | --- |

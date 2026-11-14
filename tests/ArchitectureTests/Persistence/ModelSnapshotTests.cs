@@ -3,7 +3,7 @@ using Content.Infrastructure.Persistence;
 using Identity.Infrastructure.Persistence;
 using Media.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Sales.Infrastructure.DataBase;
+using Sales.Infrastructure.Persistence;
 using Work.Infrastructure.Persistence;
 
 namespace ArchitectureTests.Persistence;

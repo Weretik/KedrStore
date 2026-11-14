@@ -1,6 +1,6 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetSyncStatus.DTOs;
-using Sales.Domain.Orders.ValueObjects;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
+using Sales.Domain.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

@@ -1,7 +1,9 @@
 using System.Net.Http.Json;
 using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Avatars;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;

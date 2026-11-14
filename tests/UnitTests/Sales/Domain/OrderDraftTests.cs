@@ -1,4 +1,4 @@
-using Sales.Domain.Orders.Entities;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Domain;
 

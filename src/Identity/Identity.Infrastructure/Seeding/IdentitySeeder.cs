@@ -1,8 +1,9 @@
 using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Seeding;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 using Identity.Infrastructure.Avatars;
-using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 

@@ -1,6 +1,8 @@
 using Ardalis.Result;
 using Identity.Application.Features.Avatars;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 
 namespace Identity.Infrastructure.Avatars;
 

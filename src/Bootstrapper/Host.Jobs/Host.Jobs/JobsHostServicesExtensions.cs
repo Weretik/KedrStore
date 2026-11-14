@@ -21,7 +21,7 @@ public static class JobsHostServicesExtensions
         services.AddCatalogDbContextServices(configuration);
         services.AddCatalogContracts();
         services.AddProductMediaServices();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         services.AddIdentityInfrastructure(configuration);
         services.AddContentInfrastructure(configuration);
         services.AddMediaInfrastructure(configuration);

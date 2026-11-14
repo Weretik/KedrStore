@@ -1,12 +1,8 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Create;
-using Sales.Application.Features.Orders.AdminWorkspace.Drafts.Create.Validators;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.CustomerPrices;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.CustomerPrices.Validators;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList.Validators;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.Quote;
-using Sales.Application.Features.Orders.AdminWorkspace.Orders.Quote.Validators;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.OrderWorkspace.Commands.CreateWorkspaceDraft;
+using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceCustomerPrices;
+using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOrders;
+using Sales.Application.Features.OrderWorkspace.Queries.QuoteWorkspaceOrder;
 
 namespace UnitTests.Sales.Application;
 
@@ -21,7 +17,7 @@ public sealed class WorkspaceValidatorsTests
 
     [Fact]
     public void Quote_AcceptsWholeQuantitiesAndKopeckAdjustments()
-        => Assert.Null(FirstCode(new QuoteWorkspaceOrderQueryValidator(),
+        => Assert.Null(FirstCode(new QuoteWorkspaceOrderValidator(),
             Quote(new WorkspaceInputLine("101", 2, -10.5m), new WorkspaceInputLine("102", 1))));
 
     [Theory]
@@ -30,17 +26,17 @@ public sealed class WorkspaceValidatorsTests
     [InlineData("-5", 1)]
     [InlineData("101", 0)]
     public void Quote_RejectsBadLines(string productId, int quantity)
-        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderQueryValidator(),
+        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderValidator(),
             Quote(new WorkspaceInputLine(productId, quantity))));
 
     [Fact]
     public void Quote_RejectsTheSameProductTwice()
-        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderQueryValidator(),
+        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderValidator(),
             Quote(new WorkspaceInputLine("101", 1), new WorkspaceInputLine("101", 2))));
 
     [Fact]
     public void Quote_RejectsAnEmptyCustomer()
-        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderQueryValidator(),
+        => Assert.Equal("invalid_lines", FirstCode(new QuoteWorkspaceOrderValidator(),
             new QuoteWorkspaceOrderQuery(new WorkspaceQuoteRequest(" ", [new WorkspaceInputLine("101", 1)]))));
 
     [Theory]
@@ -48,21 +44,21 @@ public sealed class WorkspaceValidatorsTests
     [InlineData(1_000_000.01)]
     [InlineData(-1_000_000.01)]
     public void Quote_RejectsAdjustmentsOutsideWholeKopecksOrTheLimit(double adjustment)
-        => Assert.Equal("invalid_price_adjustment", FirstCode(new QuoteWorkspaceOrderQueryValidator(),
+        => Assert.Equal("invalid_price_adjustment", FirstCode(new QuoteWorkspaceOrderValidator(),
             Quote(new WorkspaceInputLine("101", 1, (decimal)adjustment))));
 
     [Theory]
     [InlineData(" ", "101")]
     [InlineData("customer", "abc")]
     public void CustomerPrices_RejectAMissingCustomerOrBadProduct(string customer, string productId)
-        => Assert.Equal("invalid_products", FirstCode(new GetWorkspaceCustomerPricesQueryValidator(),
+        => Assert.Equal("invalid_products", FirstCode(new GetWorkspaceCustomerPricesValidator(),
             new GetWorkspaceCustomerPricesQuery(new WorkspaceCustomerPricesRequest(customer, [productId]))));
 
     [Fact]
     public void CreateDraft_NeedsAnIdempotencyKeyAndTitle()
     {
         var draft = new WorkspaceDraftInput(" ", null, "customer", [new WorkspaceInputLine("101", 1)]);
-        var validator = new CreateWorkspaceDraftCommandValidator();
+        var validator = new CreateWorkspaceDraftValidator();
 
         Assert.Equal("invalid_idempotency_key", FirstCode(validator, new CreateWorkspaceDraftCommand(draft, Guid.Empty)));
         Assert.Equal("invalid_draft", FirstCode(validator, new CreateWorkspaceDraftCommand(draft, Guid.NewGuid())));
@@ -74,6 +70,6 @@ public sealed class WorkspaceValidatorsTests
     [InlineData(null, null, "-createdAt", 0, "invalid_query")]
     [InlineData("2026-03-09", "2026-03-10", "totalAmount", 1, null)]
     public void OrderList_ChecksDatesSortAndPage(string? from, string? to, string sort, int page, string? code)
-        => Assert.Equal(code, FirstCode(new GetWorkspaceOrdersQueryValidator(),
+        => Assert.Equal(code, FirstCode(new GetWorkspaceOrdersValidator(),
             new GetWorkspaceOrdersQuery(null, null, from, to, sort, page, 20)));
 }

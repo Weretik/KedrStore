@@ -1,6 +1,6 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetById.DTOs;
-using Sales.Application.Features.Orders.GetList.DTOs;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderById;
+using Sales.Application.Features.Orders.Queries.GetOrderList;
 
 namespace Sales.Infrastructure.Orders;
 

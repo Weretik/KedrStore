@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Sales.Application.Contracts.Persistence;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Domain.Orders;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
-using Sales.Application.Contracts.Orders;
+using Sales.Application.Abstractions.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

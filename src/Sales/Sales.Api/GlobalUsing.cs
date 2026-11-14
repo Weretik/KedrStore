@@ -7,6 +7,5 @@ global using Mediator;
 global using Ardalis.Result;
 global using Ardalis.Result.AspNetCore;
 
-global using Sales.Api.Contracts.Catalog;
-global using Sales.Application.Features.Catalog.GetList;
-global using Sales.Application.Features.Catalog.GetList.DTOs;
+global using Sales.Api.Features.Catalog;
+global using Sales.Application.Features.Catalog.Queries.GetCatalogList;

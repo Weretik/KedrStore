@@ -6,15 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sales.Application.Contracts.Catalog;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Contracts.Persistence;
-using Sales.Application.Features.Orders.GetSyncStatus.DTOs;
-using Sales.Application.Integrations.OneC.Contracts;
-using Sales.Application.Integrations.OneC.DTOs;
-using Sales.Domain.Orders.Entities;
-using Sales.Domain.Orders.Enums;
-using Sales.Domain.Orders.ValueObjects;
+using Sales.Application.Abstractions.Catalog;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
+using Sales.Application.Abstractions.Integrations.OneC;
+using Sales.Domain.Orders;
 
 using IntegrationTests.TestSupport.Api;
 

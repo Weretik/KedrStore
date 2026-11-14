@@ -1,4 +1,4 @@
-using Sales.Application.Contracts.Orders;
+using Sales.Application.Abstractions.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

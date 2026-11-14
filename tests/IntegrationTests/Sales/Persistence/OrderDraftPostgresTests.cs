@@ -1,9 +1,9 @@
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence;
 
 namespace IntegrationTests.Sales.Persistence;
 
@@ -132,7 +132,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await db.SaveChangesAsync();
     }
 
-    private async Task<global::Sales.Domain.Orders.ValueObjects.OrderDraftId> SeedDraftAsync(
+    private async Task<global::Sales.Domain.Orders.OrderDraftId> SeedDraftAsync(
         IEnumerable<OrderDraftLine> lines)
     {
         await using var db = postgres.CreateContext();
