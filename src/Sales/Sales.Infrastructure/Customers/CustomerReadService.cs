@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Persistence;
+using Catalog.Contracts.Reference;
 using Sales.Application.Contracts.Customers;
 using Sales.Application.Features.Customers.GetById.DTOs;
 using Sales.Application.Features.Customers.GetList.DTOs;

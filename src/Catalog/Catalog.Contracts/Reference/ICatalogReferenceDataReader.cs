@@ -1,4 +1,4 @@
-namespace Catalog.Application.Contracts.Persistence;
+namespace Catalog.Contracts.Reference;
 
 public interface ICatalogReferenceDataReader
 {

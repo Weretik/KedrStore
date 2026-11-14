@@ -6,13 +6,15 @@ Every module has Api, Application, Contracts, Domain, and Infrastructure project
 
 Layers: Catalog.Api, Catalog.Application, Catalog.Contracts, Catalog.Domain, Catalog.Infrastructure.
 
+`Catalog.Contracts` offers `ICatalogProductListReader`, `ICatalogSalesReader`, `ICatalogReferenceDataReader`, pricing options, and API DTOs; Catalog.Infrastructure implements them (`AddCatalogContracts()`).
+
 Owns catalog products, categories, price types, translations, the product-list projection, order-creation integration, 1C synchronization, and public/admin catalog reads.
 
 ## Sales
 
 Layers: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
 
-Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog only through `Catalog.Contracts` and Identity through `Identity.Contracts` (counterparty account provisioning). Until the Catalog read contracts stage lands, `Sales.Infrastructure` still reads Catalog tables directly (see [known deviations](../../standards/module-rules.md#known-deviations)).
+Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog only through `Catalog.Contracts` and Identity through `Identity.Contracts` (counterparty account provisioning).: products, stock, category parents, and prices through `ICatalogSalesReader`, category and price type names through `ICatalogReferenceDataReader`.
 
 ## Content
 

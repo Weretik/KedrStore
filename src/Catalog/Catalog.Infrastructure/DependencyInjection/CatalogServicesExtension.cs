@@ -1,3 +1,6 @@
+using Catalog.Contracts.Reference;
+using Catalog.Contracts.Sales;
+using Catalog.Infrastructure.Contracts.Sales;
 using Catalog.Application.Contracts.ClosedXML;
 using Catalog.Application.Contracts.Content;
 using Catalog.Infrastructure.Content;
@@ -25,7 +28,7 @@ public static class CatalogServicesExtension
         services.AddScoped<IOrderExcelExporter, OrderExcelExporter>();
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
         services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
-        services.AddCatalogReferenceDataServices();
+        services.AddCatalogContracts();
         services.AddProductMediaServices();
 
         return services;
@@ -48,9 +51,11 @@ public static class CatalogServicesExtension
         return services;
     }
 
-    public static IServiceCollection AddCatalogReferenceDataServices(this IServiceCollection services)
+    /// <summary>Implementations of Catalog.Contracts that other modules use.</summary>
+    public static IServiceCollection AddCatalogContracts(this IServiceCollection services)
     {
         services.AddScoped<ICatalogReferenceDataReader, CatalogReferenceDataReader>();
+        services.AddScoped<ICatalogSalesReader, CatalogSalesReader>();
 
         return services;
     }

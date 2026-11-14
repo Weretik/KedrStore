@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Persistence;
+using Catalog.Contracts.Reference;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

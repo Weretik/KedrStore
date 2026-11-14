@@ -1,13 +1,12 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Domain.ValueObjects;
+using Catalog.Contracts.Sales;
 using Sales.Application.Contracts.Orders;
 
 namespace Sales.Infrastructure.Orders;
 
-internal sealed class AdminWorkspacePricing(IReadCatalogDbContext catalogDb, CustomerPriceResolver prices) : IWorkspacePricing
+internal sealed class AdminWorkspacePricing(ICatalogSalesReader catalog, CustomerPriceResolver prices) : IWorkspacePricing
 {
     /// <summary>Largest per-unit discount or markup, in UAH, a manager may enter.</summary>
     internal const decimal MaxPriceAdjustment = 1_000_000m;
@@ -43,11 +42,8 @@ internal sealed class AdminWorkspacePricing(IReadCatalogDbContext catalogDb, Cus
         IReadOnlyCollection<OrderDraftLine> lines, CancellationToken ct)
     {
         var ids = lines.Select(x => int.TryParse(x.ProductId, out var id) ? id : -1)
-            .Where(x => x is > 0 and <= 1_000_000_000).Distinct().Select(ProductId.From).ToArray();
-        var products = await catalogDb.Products.AsNoTracking()
-            .Where(x => ids.Contains(x.Id))
-            .Select(x => new { x.Id, x.Name })
-            .ToDictionaryAsync(x => x.Id.Value, x => x.Name, ct);
+            .Where(x => x is > 0 and <= 1_000_000_000).Distinct().ToArray();
+        var products = (await catalog.GetProductsAsync(ids, ct)).ToDictionary(x => x.Id, x => x.Name);
         return lines.Select(x =>
         {
             string? name = null;

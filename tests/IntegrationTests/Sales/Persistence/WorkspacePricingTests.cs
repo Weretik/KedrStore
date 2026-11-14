@@ -2,6 +2,7 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Domain.Entities;
 using Catalog.Domain.ValueObjects;
 using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,7 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
         services.AddDbContext<SalesDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         services.AddDbContext<CatalogDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+        services.AddCatalogContracts();
         _provider = services.BuildServiceProvider();
         _scope = _provider.CreateAsyncScope();
 

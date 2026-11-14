@@ -1,5 +1,4 @@
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Domain.ValueObjects;
+using Catalog.Contracts.Sales;
 using Sales.Application.Contracts.Orders;
 
 namespace Sales.Infrastructure.Orders;
@@ -8,7 +7,7 @@ namespace Sales.Infrastructure.Orders;
 /// Picks a customer's UAH price for products: the price type of the nearest category rule on the
 /// product's category or any of its ancestors, otherwise the customer's default price type.
 /// </summary>
-internal sealed class CustomerPriceResolver(SalesDbContext salesDb, IReadCatalogDbContext catalogDb)
+internal sealed class CustomerPriceResolver(SalesDbContext salesDb, ICatalogSalesReader catalog)
 {
     internal sealed record PricedProduct(int ProductId, string Name, decimal Stock, decimal? UnitPrice);
 
@@ -28,29 +27,18 @@ internal sealed class CustomerPriceResolver(SalesDbContext salesDb, IReadCatalog
                 .ToListAsync(ct))
             .GroupBy(x => x.CategoryId)
             .ToDictionary(x => x.Key, x => x.First().PriceTypeId);
-        var productIds = ids.Select(ProductId.From).ToArray();
-        var products = await catalogDb.Products.AsNoTracking()
-            .Where(x => productIds.Contains(x.Id))
-            .Select(x => new { x.Id, x.Name, x.CategoryId, x.Stock })
-            .ToListAsync(ct);
+        var products = await catalog.GetProductsAsync(ids, ct);
         var parents = rules.Count == 0
             ? new Dictionary<int, int?>()
-            : (await catalogDb.Categories.AsNoTracking()
-                    .Select(x => new { x.Id, x.ParentId })
-                    .ToListAsync(ct))
-                .ToDictionary(x => x.Id.Value, x => x.ParentId?.Value);
-        var prices = (await catalogDb.ProductPrices.AsNoTracking()
-                .Where(x => productIds.Contains(x.ProductId))
-                .Select(x => new { x.ProductId, x.PriceTypeId, x.Amount, x.CurrencyIso })
-                .ToListAsync(ct))
-            .Where(x => x.CurrencyIso == "UAH")
-            .ToLookup(x => (ProductId: x.ProductId.Value, PriceTypeId: x.PriceTypeId.Value), x => x.Amount);
+            : await catalog.GetCategoryParentsAsync(ct);
+        var prices = (await catalog.GetPricesAsync(ids, "UAH", ct))
+            .ToLookup(x => (x.ProductId, x.PriceTypeId), x => x.Amount);
 
-        return products.ToDictionary(x => x.Id.Value, product =>
+        return products.ToDictionary(x => x.Id, product =>
         {
-            var typeId = RulePriceType(product.CategoryId.Value, rules, parents) ?? customer.DefaultPriceTypeId;
-            var price = prices[(product.Id.Value, typeId)].Cast<decimal?>().FirstOrDefault();
-            return new PricedProduct(product.Id.Value, product.Name, product.Stock, price);
+            var typeId = RulePriceType(product.CategoryId, rules, parents) ?? customer.DefaultPriceTypeId;
+            var price = prices[(product.Id, typeId)].Cast<decimal?>().FirstOrDefault();
+            return new PricedProduct(product.Id, product.Name, product.Stock, price);
         });
     }
 

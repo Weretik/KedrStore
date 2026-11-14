@@ -149,7 +149,6 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 
 | Where | Deviation | Plan |
 | --- | --- | --- |
-| `Sales.Infrastructure` | Reads Catalog tables through `IReadCatalogDbContext` and uses `Catalog.Application` / `Catalog.Domain` types | Stage: Catalog read contracts for Sales in `Catalog.Contracts` |
 | `Content`, `Sales`, `Work` | No `<Module>.Contracts` project yet | Created empty with the folder restructuring |
 | Host.Api | Registers each module's Infrastructure itself; no `Add<Module>Module()` in Api | Stage: module registration from Api |
 | All modules | Type folders (`Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Configurations/`, `Common/`), Application features without `Commands/` / `Queries/`, controllers in `Controllers/` | Stage: folder restructuring, one module per change |
