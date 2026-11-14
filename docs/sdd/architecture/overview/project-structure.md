@@ -7,56 +7,49 @@ KedrStore.sln
 │
 ├── src/
 │   ├── Bootstrapper/
-│   │   ├── Host.Api/                 composition root and HTTP host
-│   │   └── Host.Jobs/                CLI host for jobs
+│   │   ├── Host.Api/                 composition root and HTTP host: registers modules only
+│   │   └── Host.Jobs/                CLI host for jobs: picks the job, runs the owning module's code
 │   ├── BuildingBlocks/
 │   │   ├── BuildingBlocks.Domain/
 │   │   ├── BuildingBlocks.Application/
 │   │   ├── BuildingBlocks.Infrastructure/
+│   │   ├── BuildingBlocks.Integrations.OneC/
 │   │   └── BuildingBlocks.Api/
-│   ├── Catalog/
-│   │   ├── Catalog.Api/
-│   │   ├── Catalog.Application/
-│   │   ├── Catalog.Contracts/
-│   │   ├── Catalog.Domain/
-│   │   └── Catalog.Infrastructure/
-│   ├── Sales/
-│   │   ├── Sales.Api/
-│   │   ├── Sales.Application/
-│   │   ├── Sales.Domain/
-│   │   └── Sales.Infrastructure/
-│   └── Identity/
-│       ├── Identity.Api/
-│       ├── Identity.Application/
-│       ├── Identity.Domain/
-│       └── Identity.Infrastructure/
+│   └── <Module>/                     Catalog, Sales, Identity, Content, Media, Work
+│       ├── <Module>.Api/             Features/<Feature>/ controllers, DependencyInjection/Add<Module>Module()
+│       ├── <Module>.Application/     Abstractions/, Features/<Feature>/Commands|Queries/<UseCase>/
+│       ├── <Module>.Contracts/       what other modules may use: interfaces, DTOs, events
+│       ├── <Module>.Domain/          <Aggregate>/
+│       └── <Module>.Infrastructure/  Persistence/<Aggregate>/, Integrations/<System>/, Contracts/<Feature>/
 │
 ├── tests/
-│   ├── UnitTests/
-│   ├── IntegrationTests/
-│   └── ArchitectureTests/
+│   ├── UnitTests/                    <Module>/Domain|Application/...
+│   ├── IntegrationTests/             <Module>/Api|Persistence|Integrations/..., Platform/
+│   └── ArchitectureTests/            <Rule>/
 └── docs/
     ├── sdd/                         current documentation
     └── legacy/                      archive only
 ~~~
 
+Folder rules for every layer and for tests: [module rules](../../standards/module-rules.md#folder-structure-inside-a-module). Current gaps are listed in its [known deviations](../../standards/module-rules.md#known-deviations).
+
 ## Dependency diagram
 
 ~~~text
                          Host.Api / Host.Jobs
-                          │        │
-             ┌────────────┘        └─────────────┐
-             ▼                                   ▼
-        <Module>.Api                     <Module>.Infrastructure
+                                 │ Add<Module>Module()
+                                 ▼
+        <Module>.Api ──(registration only)──► <Module>.Infrastructure
              │                                   │
              └──────────────┐     ┌──────────────┘
                             ▼     ▼
-                      <Module>.Application
+                      <Module>.Application ──► <Other>.Contracts
                             │
                             ▼
                        <Module>.Domain
 
-<Module>.Contracts — stable DTO boundary for relevant consumers.
+<Module>.Contracts — the only part of a module another module may reference.
+It is implemented inside the module (Infrastructure/Contracts/<Feature>/).
 ~~~
 
-Not every module needs every project, but preserve the dependency direction. `BuildingBlocks.Integrations.OneC` is a separate shared transport project described in the [BuildingBlocks guide](../platform/building-blocks/README.md).
+Every business module has all five projects; keep the dependency direction. `BuildingBlocks.Integrations.OneC` is a separate shared transport project described in the [BuildingBlocks guide](../platform/building-blocks/README.md).

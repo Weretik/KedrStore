@@ -6,25 +6,31 @@ Application executes one use case at a time. It coordinates Domain and abstracti
 
 ## Target feature structure
 
+Folders follow features and CQRS ([module rules](../../standards/module-rules.md#folder-structure-inside-a-module)).
+
 ~~~text
 <Module>.Application/
+├── Abstractions/                       ports: repositories, read stores, unit of work, external services
 ├── Features/
-│   └── <Area>/
-│       └── <UseCase>/
-│           ├── <UseCase>Command.cs | <UseCase>Query.cs
-│           ├── <UseCase>CommandHandler.cs | <UseCase>QueryHandler.cs
-│           ├── DTOs/               private use-case DTOs, only when needed
-│           ├── Validators/
-│           │   └── <UseCase>Validator.cs
-│           └── Extensions/         only related LINQ/mapping helpers
-├── Contracts/
-│   ├── Persistence/                DbContext/read/repository abstractions
-│   ├── Integrations/               external service abstractions
-│   └── Services/
-├── Integrations/                   external flow coordination
-├── Jobs/                           use-case job logic, not scheduler wiring
+│   └── <Feature>/                      for example Redirects, Products, Orders
+│       ├── Commands/
+│       │   └── <UseCase>/              SaveRedirect/
+│       │       ├── <UseCase>Command.cs
+│       │       ├── <UseCase>CommandHandler.cs
+│       │       └── <UseCase>CommandValidator.cs
+│       ├── Queries/
+│       │   ├── <UseCase>/              GetRedirects/ (admin)
+│       │   └── <PublicUseCase>/        GetPublicRedirects/ (site) in the same feature
+│       │       ├── <UseCase>Query.cs
+│       │       ├── <UseCase>QueryHandler.cs
+│       │       ├── <UseCase>QueryValidator.cs
+│       │       └── <UseCase>Response.cs
+│       ├── EventHandlers/              domain or integration event handlers of the feature
+│       └── Shared/                     DTOs, mapping, policies used by several use cases of the feature
 └── <Module>ApplicationAssemblyMarker.cs
 ~~~
+
+Do not create `Common/`, `DTOs/`, `Validators/`, `Extensions/`, or `Public…` feature folders. The name `Contracts` is reserved for the `<Module>.Contracts` project.
 
 ## Use-case diagram
 
