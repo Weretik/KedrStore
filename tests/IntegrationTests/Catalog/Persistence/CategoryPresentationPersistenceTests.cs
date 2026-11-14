@@ -5,7 +5,7 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 

@@ -10,10 +10,10 @@ using Catalog.Application.Contracts.Persistence;
 using Catalog.Application.Contracts.Projections;
 using Catalog.Application.Features.Category;
 using Catalog.Application.Slugs;
-using Catalog.Infrastructure.DataBase;
-using Catalog.Infrastructure.Projections;
-using Catalog.Infrastructure.Repositories;
-using Catalog.Infrastructure.Products;
+using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Persistence.Products;
+using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Contracts.Products;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

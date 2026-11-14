@@ -13,7 +13,7 @@ using Catalog.Domain.PriceTypes;
 using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

@@ -1,6 +1,6 @@
 using Catalog.Application.Integrations.OneC.Contracts;
 using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Infrastructure.Integrations.OneC.Client;
+using Catalog.Infrastructure.Integrations.OneC;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

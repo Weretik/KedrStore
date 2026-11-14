@@ -6,7 +6,7 @@ A product has 0–20 photos in order and 0–1 scheme, linked by ID to files of 
 
 ## Structure and relationships
 
-The links are owned by the [Product](../../../../src/Catalog/Catalog.Domain/Entities/Product.Media.cs) aggregate as [ProductMediaLink](../../../../src/Catalog/Catalog.Domain/Entities/ProductMediaLink.cs) rows (table `ProductMedia`: product, media file ID, kind, position, URL copy). `Product.Photo` and `Product.Sсheme` stay as a cache of the first photo and the scheme, so lists, sales, and projections remain one-table reads; they are an empty string without media.
+The links are owned by the [Product](../../../../src/Catalog/Catalog.Domain/Products/Product.Media.cs) aggregate as [ProductMediaLink](../../../../src/Catalog/Catalog.Domain/Products/Media/ProductMediaLink.cs) rows (table `ProductMedia`: product, media file ID, kind, position, URL copy). `Product.Photo` and `Product.Sсheme` stay as a cache of the first photo and the scheme, so lists, sales, and projections remain one-table reads; they are an empty string without media.
 
 Catalog reads files only through its port [IProductMediaLibrary](../../../../src/Catalog/Catalog.Application/Contracts/Media/IProductMediaLibrary.cs). Catalog.Infrastructure serves it with the Media contract [IMediaFileDirectory](../../../../src/Media/Media.Contracts/Files/IMediaFileDirectory.cs). Media calls every [IMediaFileChangeListener](../../../../src/Media/Media.Contracts/Files/IMediaFileChangeListener.cs) after a replace or delete; the Catalog listener updates the links through [ProductMediaFileChanges](../../../../src/Catalog/Catalog.Application/Features/ProductMedia/FileChanges/ProductMediaFileChanges.cs). A failed listener is logged and does not fail the Media request.
 

@@ -16,7 +16,7 @@ using Catalog.Domain.PriceTypes;
 using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Persistence;
 using IntegrationTests.TestSupport.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

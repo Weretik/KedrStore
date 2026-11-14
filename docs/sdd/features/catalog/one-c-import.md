@@ -6,7 +6,7 @@ Background import of categories, product details, prices, price types, and stock
 
 ## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Contracts/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Catalog/Catalog.Infrastructure/Integrations/OneC/Client/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Catalog/Catalog.Infrastructure/Repositories/CatalogEfRepository.cs) persists data.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Contracts/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Catalog/Catalog.Infrastructure/Integrations/OneC/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Catalog/Catalog.Infrastructure/Persistence/CatalogEfRepository.cs) persists data.
 
 The [category job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs) and [product details job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs) load every row of the root once (deleted ones included), compare in memory, and save once:
 

@@ -1,6 +1,8 @@
 using Catalog.Contracts.Pricing;
 using Catalog.Application.Contracts.Json;
-using Catalog.Infrastructure.Converters;
+using Catalog.Infrastructure.Integrations.OneC;
+using Catalog.Infrastructure.Persistence;
+using Catalog.Infrastructure.Persistence.Categories;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 
@@ -14,7 +16,7 @@ public static class CatalogInfrastructureExtensions
 
         services.AddCatalogDbContextServices(configuration);
         services.AddCatalogServices(configuration);
-        services.AddScoped<IXmlToJsonConvector, XmlToJsonConvector>();
+        services.AddScoped<IXmlToJsonConverter, XmlToJsonConverter>();
 
         return services;
     }

@@ -15,7 +15,7 @@ using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Integrations.OneC.Options;
 using Catalog.Application.Integrations.OneC.Sync;
 using Catalog.Application.Slugs;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
