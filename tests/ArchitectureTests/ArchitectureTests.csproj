@@ -31,6 +31,12 @@
       <ProjectReference Include="..\..\src\Identity\Identity.Domain\Identity.Domain.csproj" />
       <ProjectReference Include="..\..\src\Sales\Sales.Application\Sales.Application.csproj" />
       <ProjectReference Include="..\..\src\Sales\Sales.Domain\Sales.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

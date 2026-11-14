@@ -177,6 +177,7 @@ The rules above are only real when a test fails on a violation. The architecture
 - Api endpoints do not use Infrastructure types;
 - folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands.<UseCase>` / `.Queries.<UseCase>` with no deeper folder, each use-case namespace holds one request and one handler, ports sit in `Abstractions`;
 - hosts contain no class that implements a module port;
+- each module's EF model maps only its own entities, with no navigation or foreign key to another module's entity or schema;
 - test sources sit in a responsibility folder and their namespace follows the path.
 
 A new module, layer, or rule is added to these tests in the same change, test first: the new architecture test must fail on the old code (Red) before the code is moved (Green), as the project's testing rules require for any behavior.
@@ -202,6 +203,7 @@ Host.Api/
 - Each module owns its tables in its own PostgreSQL schema, named after the module in lower case (`content`, `crm`). Its `DbContext` calls `modelBuilder.HasDefaultSchema("<module>")`.
 - Keep the module's migration history in its schema: `UseNpgsql(connection, x => x.MigrationsHistoryTable("__EFMigrationsHistory", "<module>"))`, in both runtime registration and the design-time factory.
 - One module's `DbContext` maps only its own tables. Do not add foreign keys, joins, or EF navigation to another module's tables; store the other module's identifier as a value and read its data through that module's `Contracts`.
+- **No entity of another module inside an entity.** An entity never holds a navigation property, a collection, or a field typed with another module's entity (for example, `OrderLine.Product` from the Catalog domain). It keeps the other module's id as a plain value (`ProductId`, no foreign key) and a snapshot of what the owning aggregate needs at that moment (`ProductName`, `UnitPrice`), so an order still reads correctly after the product changes or disappears.
 - The first migration of a new module creates its schema; check it against an empty database as the [database rules](database-rules.md) require.
 
 ## Extensibility without over-engineering
