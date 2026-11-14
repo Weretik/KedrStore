@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using BuildingBlocks.Integrations.OneC.Generated;
 using Microsoft.Extensions.Logging;
-using Sales.Application.Integrations.OneC.DTOs;
+using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Infrastructure.Integrations.OneC;
 
 namespace IntegrationTests.Sales.OneC;

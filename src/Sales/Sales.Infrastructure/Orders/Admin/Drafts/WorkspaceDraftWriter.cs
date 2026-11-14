@@ -1,7 +1,7 @@
 using System.Text.Json;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.AdminWorkspace;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.OrderWorkspace.Shared;
 
 namespace Sales.Infrastructure.Orders;
 

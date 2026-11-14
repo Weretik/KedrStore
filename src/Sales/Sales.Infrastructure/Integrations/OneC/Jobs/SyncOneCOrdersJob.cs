@@ -1,4 +1,4 @@
-using Sales.Infrastructure.Integrations.OneC.Services;
+using Sales.Infrastructure.Integrations.OneC;
 
 namespace Sales.Infrastructure.Integrations.OneC.Jobs;
 

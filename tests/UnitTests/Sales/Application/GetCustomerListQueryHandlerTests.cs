@@ -1,9 +1,7 @@
 using Ardalis.Result;
-using Sales.Application.Contracts.Customers;
-using Sales.Application.Features.Customers.GetById.DTOs;
-using Sales.Application.Features.Customers.GetList;
-using Sales.Application.Features.Customers.GetList.DTOs;
-using Sales.Application.Features.Customers.GetList.Validators;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.Customers.Queries.GetCustomerById;
+using Sales.Application.Features.Customers.Queries.GetCustomerList;
 
 namespace UnitTests.Sales.Application;
 
@@ -19,7 +17,7 @@ public sealed class GetCustomerListQueryHandlerTests
         using var source = new CancellationTokenSource();
         var request = new CustomerListRequest { Page = 2, PageSize = 5 };
 
-        var result = await new GetCustomerListQueryHandler(reader)
+        var result = await new GetCustomerListHandler(reader)
             .Handle(new GetCustomerListQuery(request), source.Token);
 
         Assert.True(result.IsSuccess);
@@ -33,7 +31,7 @@ public sealed class GetCustomerListQueryHandlerTests
     {
         var reader = new Reader { ListResult = Result.Error("read failed") };
 
-        var result = await new GetCustomerListQueryHandler(reader)
+        var result = await new GetCustomerListHandler(reader)
             .Handle(new GetCustomerListQuery(new CustomerListRequest()), CancellationToken.None);
 
         Assert.Equal(ResultStatus.Error, result.Status);
@@ -46,7 +44,7 @@ public sealed class GetCustomerListQueryHandlerTests
     [InlineData(1, 101)]
     public void Validator_RejectsInvalidPaging(int page, int pageSize)
     {
-        var result = new GetCustomerListQueryValidator().Validate(new GetCustomerListQuery(
+        var result = new GetCustomerListValidator().Validate(new GetCustomerListQuery(
             new CustomerListRequest { Page = page, PageSize = pageSize }));
 
         Assert.False(result.IsValid);

@@ -5,7 +5,9 @@ global using Host.Api.DependencyInjection.ServiceRegistration;
 global using Host.Api.DependencyInjection.ServiceRegistration.Observability;
 
 global using Identity.Infrastructure.DependencyInjection;
-global using Identity.Infrastructure.Entities;
+global using Identity.Infrastructure.Persistence.Roles;
+global using Identity.Infrastructure.Persistence.Sessions;
+global using Identity.Infrastructure.Persistence.Users;
 global using Identity.Infrastructure.Avatars;
 global using Identity.Infrastructure.Seeding;
 global using Identity.Infrastructure.Sessions;

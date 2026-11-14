@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Sales.Infrastructure.DataBase;
+using Sales.Infrastructure.Persistence;
 
 #nullable disable
 
@@ -25,7 +25,7 @@ namespace Sales.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Sales.Domain.Customers.Entities.Counterparty", b =>
+            modelBuilder.Entity("Sales.Domain.Customers.Counterparty", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(64)
@@ -72,7 +72,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("Counterparties", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Customers.Entities.CounterpartyCategoryPriceType", b =>
+            modelBuilder.Entity("Sales.Domain.Customers.CounterpartyCategoryPriceType", b =>
                 {
                     b.Property<string>("CounterpartyId")
                         .HasMaxLength(64)
@@ -93,7 +93,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("CounterpartyCategoryPriceTypes", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.OneCOrderSync", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.OneCOrderSync", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -171,7 +171,7 @@ namespace Sales.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.Order", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -212,7 +212,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("Orders", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderLine", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.OrderLine", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -247,7 +247,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderLines", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderIdempotencyRecord", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,43 +290,43 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderIdempotencyRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.OneCOrderSync", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.OneCOrderSync", b =>
                 {
-                    b.HasOne("Sales.Domain.Orders.Entities.Order", null)
+                    b.HasOne("Sales.Domain.Orders.Order", null)
                         .WithOne()
-                        .HasForeignKey("Sales.Domain.Orders.Entities.OneCOrderSync", "OrderId")
+                        .HasForeignKey("Sales.Domain.Orders.OneCOrderSync", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.Order", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
                 {
-                    b.HasOne("Sales.Domain.Customers.Entities.Counterparty", null)
+                    b.HasOne("Sales.Domain.Customers.Counterparty", null)
                         .WithMany()
                         .HasForeignKey("CounterpartyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.OrderLine", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.OrderLine", b =>
                 {
-                    b.HasOne("Sales.Domain.Orders.Entities.Order", null)
+                    b.HasOne("Sales.Domain.Orders.Order", null)
                         .WithMany("Lines")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.DataBase.Entities.OrderIdempotencyRecord", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", b =>
                 {
-                    b.HasOne("Sales.Domain.Orders.Entities.Order", null)
+                    b.HasOne("Sales.Domain.Orders.Order", null)
                         .WithOne()
-                        .HasForeignKey("Sales.Infrastructure.DataBase.Entities.OrderIdempotencyRecord", "OrderId")
+                        .HasForeignKey("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", "OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.Entities.Order", b =>
+            modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
                 {
                     b.Navigation("Lines");
                 });

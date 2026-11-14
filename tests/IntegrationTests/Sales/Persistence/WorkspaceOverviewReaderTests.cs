@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sales.Application.Contracts.Orders;
-using Sales.Domain.Orders.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -21,7 +21,7 @@ public sealed class WorkspaceOverviewReaderTests
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(new ConfigurationBuilder()
+        services.AddSalesInfrastructure(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = "Host=localhost;Database=unused" })
             .Build(), includeCatalogReadServices: false);
         services.RemoveAll<SalesDbContext>();

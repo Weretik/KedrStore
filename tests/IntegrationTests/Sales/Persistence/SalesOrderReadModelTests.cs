@@ -2,11 +2,11 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetById.DTOs;
-using Sales.Application.Features.Orders.GetList.DTOs;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderById;
+using Sales.Application.Features.Orders.Queries.GetOrderList;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -43,7 +43,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         Assert.Equal(150, olderRow.LineCount);
         Assert.Equal(150m, olderRow.TotalAmount);
         Assert.Equal("Older customer", olderRow.CounterpartyName);
-        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.DataBase.SalesDbContext>()
+        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.Persistence.SalesDbContext>()
             .ChangeTracker.Entries());
     }
 
@@ -139,7 +139,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         return services.BuildServiceProvider();
     }
 

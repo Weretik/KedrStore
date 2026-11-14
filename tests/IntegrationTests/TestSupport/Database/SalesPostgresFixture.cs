@@ -1,7 +1,7 @@
 using DotNet.Testcontainers.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Sales.Infrastructure.DataBase;
+using Sales.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
 namespace IntegrationTests.TestSupport.Database;

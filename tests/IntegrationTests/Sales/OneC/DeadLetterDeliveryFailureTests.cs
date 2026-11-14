@@ -1,7 +1,7 @@
 using ClosedXML.Excel;
-using Sales.Application.Features.Orders.DeliveryFailure;
-using Sales.Infrastructure.Exports;
-using Sales.Infrastructure.Notifications;
+using Sales.Application.Abstractions.DeliveryFailure;
+using Sales.Infrastructure.Integrations.Excel;
+using Sales.Infrastructure.Integrations.Telegram;
 
 namespace IntegrationTests.Sales.OneC;
 

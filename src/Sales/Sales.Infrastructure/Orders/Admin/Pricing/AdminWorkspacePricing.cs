@@ -2,8 +2,8 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Catalog.Contracts.Sales;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.AdminWorkspace;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.OrderWorkspace.Shared;
 using Sales.Domain.Orders.Pricing;
 
 namespace Sales.Infrastructure.Orders;

@@ -1,6 +1,6 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.RetrySync;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Commands.RetryOrderSync;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Application;
 
@@ -14,7 +14,7 @@ public sealed class RetryOrderSyncCommandHandlerTests
             42,
             "SO-42",
             OneCOrderSyncStatus.BusinessError));
-        var handler = new RetryOrderSyncCommandHandler(store);
+        var handler = new RetryOrderSyncHandler(store);
 
         var result = await handler.Handle(
             new RetryOrderSyncCommand(42, "  Reference data corrected  ", "manager-1"),
@@ -33,7 +33,7 @@ public sealed class RetryOrderSyncCommandHandlerTests
     [InlineData(OneCOrderSyncStatus.RetryScheduled)]
     public async Task Handle_ReturnsConflictWhenCurrentStatusCannotBeRetried(OneCOrderSyncStatus status)
     {
-        var handler = new RetryOrderSyncCommandHandler(new RecordingRetryStore(
+        var handler = new RetryOrderSyncHandler(new RecordingRetryStore(
             new OrderSyncRetryStoreResult(OrderSyncRetryStoreOutcome.InvalidStatus, 42, "SO-42", status)));
 
         var result = await handler.Handle(
@@ -46,7 +46,7 @@ public sealed class RetryOrderSyncCommandHandlerTests
     [Fact]
     public async Task Handle_ReturnsNotFoundForUnknownOrder()
     {
-        var handler = new RetryOrderSyncCommandHandler(new RecordingRetryStore(
+        var handler = new RetryOrderSyncHandler(new RecordingRetryStore(
             new OrderSyncRetryStoreResult(OrderSyncRetryStoreOutcome.NotFound, 404, null, null)));
 
         var result = await handler.Handle(

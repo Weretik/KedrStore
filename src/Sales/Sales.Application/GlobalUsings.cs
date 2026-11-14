@@ -6,10 +6,10 @@ global using Microsoft.EntityFrameworkCore;
 
 global using BuildingBlocks.Domain.Abstractions;
 
-global using Sales.Application.Contracts.Catalog;
-global using Sales.Application.Contracts.Persistence;
-global using Sales.Application.Contracts.Pricing;
-global using Sales.Application.Features.Catalog.GetList.DTOs;
-global using Sales.Domain.Customers.Entities;
+global using Sales.Application.Abstractions.Catalog;
+global using Sales.Application.Abstractions.Persistence;
+global using Sales.Application.Abstractions.Pricing;
+global using Sales.Application.Features.Catalog.Queries.GetCatalogList;
+global using Sales.Domain.Customers;
 global using BuildingBlocks.Domain.Results;
 global using BuildingBlocks.Application.Results;

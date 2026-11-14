@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What other modules may use from Sales: interfaces, DTOs and events. Empty until another module needs Sales. -->
+
+</Project>

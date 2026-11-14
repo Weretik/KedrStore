@@ -1,10 +1,8 @@
 using Ardalis.Result;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetById;
-using Sales.Application.Features.Orders.GetById.DTOs;
-using Sales.Application.Features.Orders.GetById.Validators;
-using Sales.Application.Features.Orders.GetList.DTOs;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderById;
+using Sales.Application.Features.Orders.Queries.GetOrderList;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Application;
 
@@ -25,7 +23,7 @@ public sealed class GetOrderByIdQueryHandlerTests
         var reader = new Reader { DetailResult = Result.Success(detail) };
         using var source = new CancellationTokenSource();
 
-        var result = await new GetOrderByIdQueryHandler(reader)
+        var result = await new GetOrderByIdHandler(reader)
             .Handle(new GetOrderByIdQuery(42), source.Token);
 
         Assert.True(result.IsSuccess);
@@ -37,9 +35,9 @@ public sealed class GetOrderByIdQueryHandlerTests
     [Fact]
     public async Task Handle_PreservesNotFoundAndReadFailure()
     {
-        var missing = await new GetOrderByIdQueryHandler(new Reader { DetailResult = Result.NotFound() })
+        var missing = await new GetOrderByIdHandler(new Reader { DetailResult = Result.NotFound() })
             .Handle(new GetOrderByIdQuery(404), CancellationToken.None);
-        var failed = await new GetOrderByIdQueryHandler(new Reader { DetailResult = Result.Error("read failed") })
+        var failed = await new GetOrderByIdHandler(new Reader { DetailResult = Result.Error("read failed") })
             .Handle(new GetOrderByIdQuery(42), CancellationToken.None);
 
         Assert.Equal(ResultStatus.NotFound, missing.Status);
@@ -51,7 +49,7 @@ public sealed class GetOrderByIdQueryHandlerTests
     [InlineData(-1)]
     public void Validator_RejectsNonPositiveOrderId(long orderId)
     {
-        var result = new GetOrderByIdQueryValidator().Validate(new GetOrderByIdQuery(orderId));
+        var result = new GetOrderByIdValidator().Validate(new GetOrderByIdQuery(orderId));
 
         Assert.False(result.IsValid);
     }

@@ -1,5 +1,5 @@
 using IntegrationTests.TestSupport.Sales;
-using Sales.Application.Integrations.OneC.DTOs;
+using Sales.Application.Abstractions.Integrations.OneC;
 
 namespace IntegrationTests.Sales.OneC;
 

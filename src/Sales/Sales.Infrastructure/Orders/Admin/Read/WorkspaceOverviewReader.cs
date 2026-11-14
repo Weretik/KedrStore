@@ -1,5 +1,5 @@
-using Sales.Application.Contracts.Orders;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

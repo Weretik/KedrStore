@@ -1,6 +1,8 @@
-using Sales.Application.Contracts.Persistence;
-using Sales.Infrastructure.DataBase;
-using Sales.Infrastructure.DataBase.Entities;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Infrastructure.Persistence;
+using Sales.Infrastructure.Persistence.Customers;
+using Sales.Infrastructure.Persistence.OrderDrafts;
+using Sales.Infrastructure.Persistence.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

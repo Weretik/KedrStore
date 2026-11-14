@@ -3,9 +3,9 @@ using IntegrationTests.TestSupport.Sales;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Orders;
-using Sales.Domain.Orders.Enums;
-using Sales.Infrastructure.DataBase;
+using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -45,7 +45,7 @@ public sealed class OrderSyncManualRetryPostgresTests(SalesPostgresFixture postg
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration);
+        services.AddSalesInfrastructure(configuration);
         await using var provider = services.BuildServiceProvider();
         await using var scope = provider.CreateAsyncScope();
         var store = scope.ServiceProvider.GetRequiredService<IOrderSyncRetryStore>();

@@ -1,6 +1,4 @@
-using Sales.Domain.Orders.Entities;
-using Sales.Domain.Orders.Enums;
-using Sales.Domain.Orders.ValueObjects;
+using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Domain;
 

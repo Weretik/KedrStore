@@ -1,4 +1,4 @@
-using Sales.Domain.Orders.Errors;
+using Sales.Domain.Orders;
 
 namespace Sales.Domain.Orders.Pricing;
 

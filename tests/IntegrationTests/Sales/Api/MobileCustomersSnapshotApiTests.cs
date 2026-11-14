@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sales.Application.Contracts.Persistence;
-using Sales.Domain.Customers.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Domain.Customers;
+using Sales.Infrastructure.Persistence;
 
 namespace IntegrationTests.Sales.Api;
 

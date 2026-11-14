@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Features.Orders.GetById.DTOs;
-using Sales.Application.Features.Orders.GetList.DTOs;
-using Sales.Domain.Orders.Enums;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Features.Orders.Queries.GetOrderById;
+using Sales.Application.Features.Orders.Queries.GetOrderList;
+using Sales.Domain.Orders;
 
 using IntegrationTests.TestSupport.Api;
 

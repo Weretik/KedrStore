@@ -3,7 +3,7 @@
 - **ID завдання:** EN-002
 - **Забезпечує:** SC-001, SC-002, SC-003
 - **Залежить від:** EN-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Contracts/Customers/ICustomerReadService.cs`, `src/Sales/Sales.Application/Features/Customers/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Customers/GetById/DTOs/`
+- **Точні шляхи:** `src/Sales/Sales.Application/Abstractions/Customers/ICustomerReadService.cs`, `src/Sales/Sales.Application/Features/Customers/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Customers/GetById/DTOs/`
 - **Рівень тестування:** перевірка компіляції Application і контрактів
 
 ## Чому це спільна передумова

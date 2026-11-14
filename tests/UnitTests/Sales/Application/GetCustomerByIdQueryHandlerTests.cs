@@ -1,9 +1,7 @@
 using Ardalis.Result;
-using Sales.Application.Contracts.Customers;
-using Sales.Application.Features.Customers.GetById;
-using Sales.Application.Features.Customers.GetById.DTOs;
-using Sales.Application.Features.Customers.GetById.Validators;
-using Sales.Application.Features.Customers.GetList.DTOs;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.Customers.Queries.GetCustomerById;
+using Sales.Application.Features.Customers.Queries.GetCustomerList;
 
 namespace UnitTests.Sales.Application;
 
@@ -22,7 +20,7 @@ public sealed class GetCustomerByIdQueryHandlerTests
         var reader = new Reader { DetailResult = Result.Success(detail) };
         using var source = new CancellationTokenSource();
 
-        var result = await new GetCustomerByIdQueryHandler(reader)
+        var result = await new GetCustomerByIdHandler(reader)
             .Handle(new GetCustomerByIdQuery("customer-1"), source.Token);
 
         Assert.True(result.IsSuccess);
@@ -34,9 +32,9 @@ public sealed class GetCustomerByIdQueryHandlerTests
     [Fact]
     public async Task Handle_PreservesNotFoundAndReadFailure()
     {
-        var missing = await new GetCustomerByIdQueryHandler(new Reader { DetailResult = Result.NotFound() })
+        var missing = await new GetCustomerByIdHandler(new Reader { DetailResult = Result.NotFound() })
             .Handle(new GetCustomerByIdQuery("missing"), CancellationToken.None);
-        var failed = await new GetCustomerByIdQueryHandler(new Reader { DetailResult = Result.Error("read failed") })
+        var failed = await new GetCustomerByIdHandler(new Reader { DetailResult = Result.Error("read failed") })
             .Handle(new GetCustomerByIdQuery("customer-1"), CancellationToken.None);
 
         Assert.Equal(ResultStatus.NotFound, missing.Status);
@@ -48,7 +46,7 @@ public sealed class GetCustomerByIdQueryHandlerTests
     [InlineData(" ")]
     public void Validator_RejectsBlankIdentifier(string counterpartyId)
     {
-        var result = new GetCustomerByIdQueryValidator().Validate(new GetCustomerByIdQuery(counterpartyId));
+        var result = new GetCustomerByIdValidator().Validate(new GetCustomerByIdQuery(counterpartyId));
 
         Assert.False(result.IsValid);
     }
@@ -56,7 +54,7 @@ public sealed class GetCustomerByIdQueryHandlerTests
     [Fact]
     public void Validator_RejectsIdentifierLongerThan64Characters()
     {
-        var result = new GetCustomerByIdQueryValidator().Validate(new GetCustomerByIdQuery(new string('x', 65)));
+        var result = new GetCustomerByIdValidator().Validate(new GetCustomerByIdQuery(new string('x', 65)));
 
         Assert.False(result.IsValid);
     }

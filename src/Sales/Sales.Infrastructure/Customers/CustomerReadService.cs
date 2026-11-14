@@ -1,7 +1,7 @@
 using Catalog.Contracts.Reference;
-using Sales.Application.Contracts.Customers;
-using Sales.Application.Features.Customers.GetById.DTOs;
-using Sales.Application.Features.Customers.GetList.DTOs;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.Customers.Queries.GetCustomerById;
+using Sales.Application.Features.Customers.Queries.GetCustomerList;
 
 namespace Sales.Infrastructure.Customers;
 

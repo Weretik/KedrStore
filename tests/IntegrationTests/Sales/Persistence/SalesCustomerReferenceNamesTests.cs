@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Sales.Application.Contracts.Customers;
-using Sales.Domain.Customers.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Application.Abstractions.Customers;
+using Sales.Domain.Customers;
+using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -24,7 +24,7 @@ public sealed class SalesCustomerReferenceNamesTests
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         services.RemoveAll<SalesDbContext>();
         services.RemoveAll<DbContextOptions<SalesDbContext>>();
         services.RemoveAll<IDbContextOptionsConfiguration<SalesDbContext>>();

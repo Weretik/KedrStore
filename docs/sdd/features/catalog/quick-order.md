@@ -6,7 +6,7 @@ Public `POST /api/orders` with Excel generation and Telegram notification.
 
 ## Structure and relationships
 
-[OrderController](../../../../src/Catalog/Catalog.Api/Features/Orders/OrderController.cs) invokes [CreateOrderHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Commands/CreateOrder/CreateOrderHandler.cs). The handler creates a GUID, generates an Excel file through an exporter, and sends it with a notifier. This flow does not persist a [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs); do not confuse it with Sales admin orders.
+[OrderController](../../../../src/Catalog/Catalog.Api/Features/Orders/OrderController.cs) invokes [CreateOrderHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Commands/CreateOrder/CreateOrderHandler.cs). The handler creates a GUID, generates an Excel file through an exporter, and sends it with a notifier. This flow does not persist a [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Order.cs); do not confuse it with Sales admin orders.
 
 ## Code structure
 

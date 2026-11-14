@@ -1,5 +1,5 @@
 using static Sales.Infrastructure.Orders.WorkspaceQueryTools;
-using Sales.Application.Contracts.Orders;
+using Sales.Application.Abstractions.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

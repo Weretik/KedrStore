@@ -95,7 +95,7 @@ All writes are idempotent for the same input except avatar upload, which creates
 
 | Path | State | Responsibility |
 | --- | --- | --- |
-| `src/Identity/Identity.Infrastructure/Entities/AppUser.cs`, `Configuration/AppUserConfiguration.cs` | Done | `AvatarPath` column |
+| `src/Identity/Identity.Infrastructure/Persistence/Users/AppUser.cs`, `Configuration/AppUserConfiguration.cs` | Done | `AvatarPath` column |
 | `src/Identity/Identity.Infrastructure/Migrations/*_AddUserAvatarPath.cs` | Done | Additive column |
 | `src/Identity/Identity.Application/Features/Profile/{GetProfile,ChangeOwnName,UploadOwnAvatar,RemoveOwnAvatar,ChangeOwnEmail,ChangeOwnPassword}/` | Done | Own-profile use cases and validators |
 | `src/Identity/Identity.Application/Features/Users/{ChangeStaffName,ChangeStaffEmail,UploadStaffAvatar,RemoveStaffAvatar}/` | Done | Manager edits by an Admin |

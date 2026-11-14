@@ -3,7 +3,9 @@ using Identity.Application.Features.Avatars;
 using Identity.Application.Abstractions.Accounts;
 using Identity.Application.Abstractions.Sessions;
 using Identity.Infrastructure.Avatars;
-using Identity.Infrastructure.Entities;
+using Identity.Infrastructure.Persistence.Roles;
+using Identity.Infrastructure.Persistence.Sessions;
+using Identity.Infrastructure.Persistence.Users;
 using Identity.Infrastructure.Sessions;
 
 namespace Identity.Infrastructure.Users;

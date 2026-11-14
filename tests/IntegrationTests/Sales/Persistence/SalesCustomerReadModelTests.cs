@@ -3,10 +3,10 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Customers;
-using Sales.Application.Features.Customers.GetById.DTOs;
-using Sales.Application.Features.Customers.GetList.DTOs;
-using Sales.Domain.Customers.Entities;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.Customers.Queries.GetCustomerById;
+using Sales.Application.Features.Customers.Queries.GetCustomerList;
+using Sales.Domain.Customers;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -40,7 +40,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
             result.Value.Value.Select(customer => customer.CounterpartyId));
         Assert.DoesNotContain(typeof(CustomerListItemDto).GetProperties(), property =>
             property.Name is "Email" or "IdentityUserId" or "IsDeleted");
-        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.DataBase.SalesDbContext>()
+        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.Persistence.SalesDbContext>()
             .ChangeTracker.Entries());
     }
 
@@ -130,7 +130,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         Assert.Equal(["Тип 101", "Тип 202"], result.Value.CategoryPriceTypes.Select(rule => rule.PriceTypeName));
         Assert.DoesNotContain(typeof(CustomerDetailDto).GetProperties(), property =>
             property.Name is "IdentityUserId" or "IsDeleted" or "CreatedAt" or "UpdatedAt" or "Orders");
-        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.DataBase.SalesDbContext>()
+        Assert.Empty(scope.ServiceProvider.GetRequiredService<global::Sales.Infrastructure.Persistence.SalesDbContext>()
             .ChangeTracker.Entries());
     }
 
@@ -163,7 +163,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         services.AddSingleton<ICatalogReferenceDataReader, TestCatalogReferenceDataReader>();
         return services.BuildServiceProvider();
     }

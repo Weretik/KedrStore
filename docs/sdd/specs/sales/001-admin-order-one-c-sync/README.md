@@ -47,7 +47,7 @@
 
 - [Межа інтеграції з 1C](../../../architecture/integrations/one-c/README.md)
 - [Стандарти backend](../../../standards/README.md)
-- [Інструкція з передавання Sales → 1C](../../../../../SALES_1C_SYNC_INSTRUCTION.txt)
+- [Інструкція з передавання Sales → 1C](../../../../legacy/sales-one-c-sync-instruction.txt)
 
 ## Історія змін
 

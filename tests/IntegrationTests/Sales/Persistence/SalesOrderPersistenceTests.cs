@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence;
 
 namespace IntegrationTests.Sales.Persistence;
 

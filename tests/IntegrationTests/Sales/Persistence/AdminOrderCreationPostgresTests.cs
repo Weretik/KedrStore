@@ -3,13 +3,12 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Application.Contracts.Catalog;
-using Sales.Application.Contracts.Orders;
-using Sales.Application.Contracts.Persistence;
-using Sales.Application.Features.Orders.Create;
-using Sales.Application.Features.Orders.Create.DTOs;
-using Sales.Domain.Customers.Entities;
-using Sales.Infrastructure.DataBase;
+using Sales.Application.Abstractions.Catalog;
+using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Persistence;
+using Sales.Application.Features.Orders.Commands.CreateOrder;
+using Sales.Domain.Customers;
+using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace IntegrationTests.Sales.Persistence;
@@ -27,7 +26,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
 
         await using var provider = BuildProvider();
         await using var scope = provider.CreateAsyncScope();
-        var handler = new CreateOrderCommandHandler(
+        var handler = new CreateOrderHandler(
             scope.ServiceProvider.GetRequiredService<IOrderCreationStore>(),
             new ProductReader(),
             scope.ServiceProvider.GetRequiredService<IOrderNumberGenerator>());
@@ -65,7 +64,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
             .Build();
         var services = new ServiceCollection();
         services.AddLogging();
-        services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
+        services.AddSalesInfrastructure(configuration, includeCatalogReadServices: false);
         return services.BuildServiceProvider();
     }
 

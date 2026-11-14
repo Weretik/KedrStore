@@ -3,11 +3,10 @@ using Identity.Contracts.Users;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using Sales.Application.Integrations.OneC.Contracts;
-using Sales.Application.Integrations.OneC.DTOs;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
-using Sales.Infrastructure.Integrations.OneC.Services;
+using Sales.Application.Abstractions.Integrations.OneC;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Integrations.OneC;
 
 namespace IntegrationTests.Sales.Persistence;
 
@@ -63,7 +62,7 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         Assert.Equal(2, identity.DeleteCalls);
     }
 
-    private static Task<int> PendingCountAsync(global::Sales.Infrastructure.DataBase.SalesDbContext db)
+    private static Task<int> PendingCountAsync(global::Sales.Infrastructure.Persistence.SalesDbContext db)
         => db.Database.SqlQueryRaw<int>(
             "SELECT COUNT(*)::integer AS \"Value\" FROM \"PendingCounterpartyIdentityDeletions\"")
             .SingleAsync();

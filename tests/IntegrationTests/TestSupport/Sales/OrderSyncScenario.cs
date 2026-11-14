@@ -1,14 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Sales.Application.Features.Orders.DeliveryFailure;
-using Sales.Application.Integrations.OneC.Contracts;
-using Sales.Application.Integrations.OneC.DTOs;
-using Sales.Domain.Customers.Entities;
-using Sales.Domain.Orders.Entities;
-using Sales.Infrastructure.DataBase;
-using Sales.Infrastructure.Integrations.OneC.Options;
-using Sales.Infrastructure.Integrations.OneC.Services;
+using Sales.Application.Abstractions.DeliveryFailure;
+using Sales.Application.Abstractions.Integrations.OneC;
+using Sales.Domain.Customers;
+using Sales.Domain.Orders;
+using Sales.Infrastructure.Persistence;
+using Sales.Infrastructure.Integrations.OneC;
 
 namespace IntegrationTests.TestSupport.Sales;
 

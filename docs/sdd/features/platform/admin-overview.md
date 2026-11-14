@@ -6,7 +6,7 @@ Three read-only endpoints feed the admin home page «Огляд». Each module c
 
 ## Structure and relationships
 
-- Sales: [WorkspaceOverviewReader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs) counts today's orders (Kyiv day from [WorkspaceDateRange](../../../../src/Sales/Sales.Application/Features/Orders/AdminWorkspace/WorkspaceDateRange.cs)), drafts and retryable 1C problems, and lists the newest orders.
+- Sales: [WorkspaceOverviewReader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs) counts today's orders (Kyiv day from [WorkspaceDateRange](../../../../src/Sales/Sales.Application/Features/OrderWorkspace/Shared/WorkspaceDateRange.cs)), drafts and retryable 1C problems, and lists the newest orders.
 - Catalog: [GetAdminCatalogOverviewHandler](../../../../src/Catalog/Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/GetAdminCatalogOverviewHandler.cs) reads the product list projection and category texts with the same «filled» rule as the category list.
 - Content: [GetAdminContentOverviewHandler](../../../../src/Content/Content.Application/Features/Overview/Queries/GetAdminContentOverview/GetAdminContentOverviewHandler.cs) counts article drafts, legacy covers and document drafts.
 
@@ -14,16 +14,16 @@ Three read-only endpoints feed the admin home page «Огляд». Each module c
 
 ```text
 src/Sales/
-├── Sales.Api/Controllers/AdminOrderWorkspaceController.cs     # GET overview
-├── Sales.Application/Contracts/Orders/{IWorkspaceOverviewReader,WorkspaceOverviewContracts}.cs
-├── Sales.Application/Features/Orders/AdminWorkspace/Overview/
+├── Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs  # GET overview
+├── Sales.Application/Abstractions/Orders/{IWorkspaceOverviewReader,WorkspaceOverviewContracts}.cs
+├── Sales.Application/Features/OrderWorkspace/Queries/GetWorkspaceOverview/
 └── Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs
 src/Catalog/
-├── Catalog.Api/Controllers/AdminCatalogOverviewController.cs
-├── Catalog.Application/Features/Overview/
+├── Catalog.Api/Features/Overview/AdminCatalogOverviewController.cs
+├── Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/
 └── Catalog.Contracts/Overview/AdminCatalogOverviewResponse.cs
 src/Content/
-├── Content.Api/Controllers/AdminContentOverviewController.cs
+├── Content.Api/Features/Overview/AdminContentOverviewController.cs
 └── Content.Application/Features/Overview/
 ```
 

@@ -14,7 +14,7 @@ Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete l
 
 ## Structure and relationships
 
-[AdminCustomersController](../../../../src/Sales/Sales.Api/Controllers/AdminCustomersController.cs) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/GetList/GetCustomerListQueryHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/GetById/GetCustomerByIdQueryHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Entities/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
+[AdminCustomersController](../../../../src/Sales/Sales.Api/Features/Customers/AdminCustomersController.cs) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
 
 ## Code structure
 
@@ -23,29 +23,29 @@ The tree lists verified entry points and key components; it does not include eve
 ```text
 src/
 ├── Sales/
-│   ├── Sales.Api/Controllers/AdminCustomersController.cs  # HTTP entry point and query parameters
-│   ├── Sales.Application/Features/Customers/
-│   │   ├── GetById/GetCustomerByIdQueryHandler.cs  # use-case handler
-│   │   └── GetList/GetCustomerListQueryHandler.cs  # use-case handler
+│   ├── Sales.Api/Features/Customers/AdminCustomersController.cs  # HTTP entry point and query parameters
+│   ├── Sales.Application/Features/Customers/Queries/
+│   │   ├── GetCustomerById/GetCustomerByIdHandler.cs  # use-case handler
+│   │   └── GetCustomerList/GetCustomerListHandler.cs  # use-case handler
 │   ├── Sales.Domain/Customers/Entities/Counterparty.cs  # domain model
 │   └── Sales.Infrastructure/
 │       ├── Customers/CustomerReadService.cs  # search, filters, ordering, count, and paging
 │       ├── Integrations/OneC/SalesOneCReadClient.cs  # full 1C array → Sales DTO
-│       ├── Integrations/OneC/Services/OneCCounterpartiesSyncService.cs  # source ID set and upsert
-│       ├── Integrations/OneC/Services/StaleCounterpartyRemoval.cs  # transactional deletion and outbox drain
-│       ├── DataBase/Entities/PendingCounterpartyIdentityDeletion.cs  # persisted Identity retry state
-│       ├── Configurations/PendingCounterpartyIdentityDeletionConfiguration.cs  # outbox mapping
+│       ├── Integrations/OneC/OneCCounterpartiesSyncService.cs  # source ID set and upsert
+│       ├── Integrations/OneC/StaleCounterpartyRemoval.cs  # transactional deletion and outbox drain
+│       ├── Persistence/Entities/PendingCounterpartyIdentityDeletion.cs  # persisted Identity retry state
+│       ├── Persistence/Customers/PendingCounterpartyIdentityDeletionConfiguration.cs  # outbox mapping
 │       └── Migrations/20261022103423_AddPendingCounterpartyIdentityDeletions.cs  # outbox table
 └── Identity/
-    └── Identity.Infrastructure/Services/ImportedCounterpartyIdentityProvisioningService.cs  # Identity lifecycle
+    └── Identity.Infrastructure/Users/ImportedCounterpartyIdentityProvisioningService.cs  # Identity lifecycle
 ```
 
 ## Structure diagram
 
 ```mermaid
 flowchart LR
-    A["AdminCustomersController"] --> B["GetCustomerListQueryHandler"]
-    A --> C["GetCustomerByIdQueryHandler"]
+    A["AdminCustomersController"] --> B["GetCustomerListHandler"]
+    A --> C["GetCustomerByIdHandler"]
     B --> G["CustomerReadService"]
     G --> D["Counterparty"]
     C --> D
