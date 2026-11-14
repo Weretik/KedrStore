@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
 using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModel;
 using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
 using Catalog.Application.Features.SiteModels.Queries.GetPublicProductModelAddress;
@@ -5,7 +13,7 @@ using Catalog.Contracts.Category;
 using Catalog.Contracts.SiteModels.Public;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.SiteModels;
 
 /// <summary>
 /// The public site's models (spec catalog/007 stage 5): category lists with filters, the search, the model page, and

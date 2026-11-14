@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Products.Queries.GetProductBySlug;
 using Catalog.Application.Features.Products.Queries.GetProductBySlug;
 using Catalog.Application.Features.Products.Queries.GetPublicProductList;
@@ -5,7 +13,7 @@ using Catalog.Contracts.Category;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.Products;
 
 [ApiController]
 [Route("api/catalog/{lang}")]

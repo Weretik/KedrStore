@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
+using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Attributes.Commands.CreateCatalogAttribute;
 using Catalog.Application.Features.Attributes.Commands.CreateAttributeValue;
 using Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
@@ -15,7 +23,7 @@ using Catalog.Contracts.Attributes;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.Attributes;
 
 /// <summary>
 /// The «Властивості» page (spec catalog/006, phase 3): attributes, values, codes, and category filters. Manager, Seo, and

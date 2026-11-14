@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
+using Catalog.Api.Features.SiteModels;
 using System.Security.Claims;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategoryById;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
@@ -7,17 +15,10 @@ using Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility
 using Catalog.Application.Features.Slugs.Commands.ChangeSlug;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.Slugs;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.Categories;
 
 [ApiController]
 [Route("api/categories")]
@@ -59,7 +60,7 @@ public sealed class AdminCategoriesController(ISender sender) : ControllerBase
         [FromBody] ChangeSlugRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new ChangeSlugCommand(CatalogEntityType.Category, id, request), cancellationToken);
+        var result = await sender.Send(ChangeSlugCommand.ForCategory(id, request), cancellationToken);
         return this.ToActionResult(result);
     }
 

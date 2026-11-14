@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Groups.Queries.GetProductGroupForProduct;
 using Catalog.Application.Features.Groups.Commands.SetProductGroup;
 using Catalog.Application.Features.Products.Queries.GetAdminProductList;
@@ -12,17 +20,10 @@ using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetAdminDetail;
 using Catalog.Contracts.Products.Media;
 using Catalog.Contracts.Slugs;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.Products;
 
 [ApiController]
 [Route("api/admin/products")]
@@ -76,7 +77,7 @@ public sealed class AdminProductsController(ISender sender) : ControllerBase
         [FromBody] ChangeSlugRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new ChangeSlugCommand(CatalogEntityType.Product, id, request), cancellationToken);
+        var result = await sender.Send(ChangeSlugCommand.ForProduct(id, request), cancellationToken);
         return this.ToActionResult(result);
     }
 

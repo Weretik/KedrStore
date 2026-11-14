@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.Products;
+using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.ProductAttributes.Commands.AcceptProductReview;
 using Catalog.Application.Features.ProductAttributes.Queries.GetProductAttributes;
 using Catalog.Application.Features.ProductAttributes.Commands.ReopenProductReview;
@@ -7,7 +15,7 @@ using Catalog.Contracts.Attributes;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.ProductAttributes;
 
 /// <summary>
 /// The «Властивості» panel of a product (spec catalog/006, phase 3): its attribute values and review. Manager and

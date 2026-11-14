@@ -1,10 +1,18 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
+using Catalog.Api.Features.SiteModels;
 using BuildingBlocks.Api.Snapshots;
 using Catalog.Application.Features.MobileSync.Queries.GetCatalogSnapshot;
 using Catalog.Contracts.MobileSync;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.MobileSync;
 
 /// <summary>The catalog snapshot the offline manager app keeps on the device (spec platform/004).</summary>
 [ApiController]

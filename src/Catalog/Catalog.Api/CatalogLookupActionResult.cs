@@ -1,6 +1,6 @@
 using Catalog.Contracts.Category;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api;
 
 internal static class CatalogLookupActionResult
 {

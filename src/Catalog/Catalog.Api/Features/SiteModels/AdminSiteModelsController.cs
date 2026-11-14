@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.Groups;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
 using Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 using Catalog.Application.Features.SiteModels.Commands.AddSiteModelProducts;
 using Catalog.Application.Features.SiteModels.Commands.CreateSiteModel;
@@ -15,7 +23,7 @@ using Catalog.Contracts.SiteModels;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.SiteModels;
 
 /// <summary>
 /// Site models (spec catalog/007): the models the public site is built from, their axes, products, and texts.

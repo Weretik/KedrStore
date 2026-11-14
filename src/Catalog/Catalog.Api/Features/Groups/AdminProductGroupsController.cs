@@ -1,3 +1,11 @@
+using Catalog.Api.Features.Attributes;
+using Catalog.Api.Features.Categories;
+using Catalog.Api.Features.MobileSync;
+using Catalog.Api.Features.Orders;
+using Catalog.Api.Features.Overview;
+using Catalog.Api.Features.ProductAttributes;
+using Catalog.Api.Features.Products;
+using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Groups.Commands.CreateProductGroup;
 using Catalog.Application.Features.Groups.Queries.GetProductGroup;
 using Catalog.Application.Features.Groups.Queries.GetProductGroups;
@@ -6,17 +14,10 @@ using Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
 using Catalog.Application.Features.Slugs.Commands.ChangeSlug;
 using Catalog.Contracts.Groups;
 using Catalog.Contracts.Slugs;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Catalog.Api.Controllers;
+namespace Catalog.Api.Features.Groups;
 
 /// <summary>Variant groups (spec catalog/006): Manager and Admin edit them; only Admin and Seo change a group slug.</summary>
 [ApiController]
@@ -82,5 +83,5 @@ public sealed class AdminProductGroupsController(ISender sender) : ControllerBas
         [FromBody] ChangeSlugRequest request,
         CancellationToken cancellationToken)
         => this.ToActionResult(await sender.Send(
-            new ChangeSlugCommand(CatalogEntityType.ProductGroup, id, request), cancellationToken));
+            ChangeSlugCommand.ForProductGroup(id, request), cancellationToken));
 }
