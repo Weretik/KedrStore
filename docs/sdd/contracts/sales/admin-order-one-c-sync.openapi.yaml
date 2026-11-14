@@ -147,11 +147,7 @@ components:
         orderId: { type: integer, format: int64, example: 12345 }
         orderNumber: { type: string, example: SO-20260817-0001 }
         syncStatus: { type: string, enum: [RetryScheduled], example: RetryScheduled }
-    Error:
-      type: object
-      properties:
-        errors: { type: object, additionalProperties: { type: array, items: { type: string } } }
   responses:
-    ValidationError: { description: Invalid request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
-    NotFoundError: { description: Counterparty not found, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
-    ConflictError: { description: Idempotency key reused with different data, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    ValidationError: { description: Invalid request, content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' } } } }
+    NotFoundError: { description: Counterparty not found, content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/Problem' } } } }
+    ConflictError: { description: Idempotency key reused with different data, content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/Problem' } } } }

@@ -1,0 +1,34 @@
+openapi: 3.1.0
+info:
+  title: KedrStore error answers
+  version: 1.0.0
+  description: >-
+    Every error answer is RFC 9457 ProblemDetails (`application/problem+json`), built by the one BuildingBlocks.Api
+    mapper (platform spec 005). Module contracts reference these schemas.
+paths: {}
+components:
+  schemas:
+    Problem:
+      type: object
+      required: [status, title, code, traceId]
+      properties:
+        type: { type: string }
+        title: { type: string, description: Ukrainian title of the status. }
+        status: { type: integer }
+        detail: { type: [string, 'null'], description: The first error message, Ukrainian. }
+        code:
+          type: string
+          description: >-
+            The rule's own code (for example `invalid_lines`) or one of `validation`, `invalid_request`,
+            `unauthorized`, `forbidden`, `not_found`, `conflict`, `unavailable`, `unexpected`.
+        traceId: { type: string }
+      additionalProperties: true
+    ValidationProblem:
+      allOf:
+        - { $ref: '#/components/schemas/Problem' }
+        - type: object
+          properties:
+            errors:
+              type: object
+              description: Messages by field (the validator's property path).
+              additionalProperties: { type: array, items: { type: string } }

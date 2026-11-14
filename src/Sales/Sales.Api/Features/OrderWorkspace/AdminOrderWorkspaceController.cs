@@ -28,7 +28,7 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
     {
         var todayFrom = WorkspaceDateRange.TodayStartUtc(clock.GetUtcNow());
         var result = await sender.Send(new GetWorkspaceOverviewQuery(todayFrom), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpGet("orders", Name = "getAdminWorkspaceOrders")]
@@ -40,28 +40,28 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
     {
         var result = await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId,
             createdFrom, createdTo, sort, page, pageSize), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpGet("orders/{orderId:long}", Name = "getAdminWorkspaceOrderById")]
     public async Task<ActionResult> GetOrder(long orderId, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkspaceOrderQuery(orderId), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpPost("quote", Name = "quoteAdminWorkspaceOrder")]
     public async Task<ActionResult> Quote([FromBody] WorkspaceQuoteRequest request, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new QuoteWorkspaceOrderQuery(request), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpPost("customer-prices", Name = "getAdminWorkspaceCustomerPrices")]
     public async Task<ActionResult> CustomerPrices([FromBody] WorkspaceCustomerPricesRequest request, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkspaceCustomerPricesQuery(request), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpPost("orders", Name = "createAdminWorkspaceOrder")]
@@ -71,9 +71,9 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new CreateWorkspaceOrderCommand(request, idempotencyKey), cancellationToken);
-        if (!result.IsSuccess) return this.Error(result);
+        if (!result.IsSuccess) return this.ToProblem(result);
         var created = result.Value;
-        if (created.Conflict is not null) return Conflict(created.Conflict);
+        if (created.Conflict is not null) return this.ToProblem(created.Conflict);
         return created.Replay ? Ok(created.Order) : StatusCode(StatusCodes.Status201Created, created.Order);
     }
 
@@ -86,14 +86,14 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
     {
         var result = await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId,
             createdFrom, createdTo, sort, page, pageSize), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpGet("drafts/{draftId:long}", Name = "getAdminOrderDraftById")]
     public async Task<ActionResult> GetDraft(long draftId, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkspaceDraftQuery(draftId), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpPost("drafts", Name = "createAdminOrderDraft")]
@@ -103,7 +103,7 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new CreateWorkspaceDraftCommand(request, idempotencyKey), cancellationToken);
-        if (!result.IsSuccess) return this.Error(result);
+        if (!result.IsSuccess) return this.ToProblem(result);
         return result.Value.Replay ? Ok(result.Value.Draft) : StatusCode(StatusCodes.Status201Created, result.Value.Draft);
     }
 
@@ -113,7 +113,7 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromBody] WorkspaceDraftInput request, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new UpdateWorkspaceDraftCommand(draftId, version, request), cancellationToken);
-        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
+        return result.IsSuccess ? Ok(result.Value) : this.ToProblem(result);
     }
 
     [HttpDelete("drafts/{draftId:long}", Name = "deleteAdminOrderDraft")]
@@ -121,6 +121,6 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         long draftId, [FromHeader(Name = "If-Match")] string version, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new DeleteWorkspaceDraftCommand(draftId, version), cancellationToken);
-        return result.IsSuccess ? NoContent() : this.Error(result);
+        return result.IsSuccess ? NoContent() : this.ToProblem(result);
     }
 }

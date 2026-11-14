@@ -60,7 +60,7 @@ paths:
         '409':
           description: Quote changed or idempotency key reused with different request.
           content:
-            application/json:
+            application/problem+json:
               schema: { $ref: '#/components/schemas/OrderConflict' }
         '401': { description: Not signed in. }
         '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
@@ -253,14 +253,16 @@ components:
         totalAmount: { $ref: '#/components/schemas/Money' }
         syncStatus: { type: string, enum: [Pending] }
     OrderConflict:
-      type: object
-      required: [code]
-      properties:
-        code: { type: string, enum: [quote_changed, idempotency_conflict] }
-        quote:
-          oneOf:
-            - { $ref: '#/components/schemas/Quote' }
-            - { type: 'null' }
+      allOf:
+        - { $ref: '../problem.openapi.yaml#/components/schemas/Problem' }
+        - type: object
+          required: [code]
+          properties:
+            code: { type: string, enum: [quote_changed, idempotency_conflict] }
+            quote:
+              oneOf:
+                - { $ref: '#/components/schemas/Quote' }
+                - { type: 'null' }
     CustomerPricesRequest:
       type: object
       required: [counterpartyId, productIds]

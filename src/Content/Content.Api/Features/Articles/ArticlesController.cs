@@ -42,7 +42,7 @@ public sealed class ArticlesController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new GetArticleCoverQuery(id), cancellationToken);
         if (!result.IsSuccess)
-            return this.ToActionResult(result).Result!;
+            return this.ToProblem(result);
 
         Response.Headers[HeaderNames.CacheControl] = v == result.Value.Version
             ? "public, max-age=31536000, immutable"

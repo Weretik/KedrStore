@@ -38,7 +38,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
         {
             ResultStatus.Ok => Ok(ToResponse(result.Value)),
             ResultStatus.Created => StatusCode(StatusCodes.Status201Created, ToResponse(result.Value)),
-            _ => this.ToActionResult(result).Result!
+            _ => this.ToProblem(result)
         };
     }
 
@@ -52,7 +52,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
         var result = await sender.Send(new GetOrderSyncStatusQuery(orderId), cancellationToken);
         return result.Status == ResultStatus.Ok
             ? Ok(ToResponse(result.Value))
-            : this.ToActionResult(result).Result!;
+            : this.ToProblem(result);
     }
 
     [HttpPost("{orderId:long}/sync/retry", Name = "retryAdminOrderSync")]
@@ -76,7 +76,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
 
         return result.Status == ResultStatus.Ok
             ? StatusCode(StatusCodes.Status202Accepted, ToResponse(result.Value))
-            : this.ToActionResult(result).Result!;
+            : this.ToProblem(result);
     }
 
     [HttpGet(Name = "getAdminOrders")]
@@ -96,7 +96,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
             cancellationToken);
 
         if (result.Status != ResultStatus.Ok)
-            return this.ToActionResult(result).Result!;
+            return this.ToProblem(result);
 
         var rows = result.Value.Value.Select(ToResponse).ToList();
         return Ok(new PagedResult<List<GetAdminOrderListItemResponse>>(result.Value.PagedInfo, rows));
@@ -111,7 +111,7 @@ public sealed class AdminOrdersController(ISender sender) : ControllerBase
         var result = await sender.Send(new GetOrderByIdQuery(orderId), cancellationToken);
         return result.Status == ResultStatus.Ok
             ? Ok(ToResponse(result.Value))
-            : this.ToActionResult(result).Result!;
+            : this.ToProblem(result);
     }
 
     private static CreateAdminOrderResponse ToResponse(CreateOrderResult result)

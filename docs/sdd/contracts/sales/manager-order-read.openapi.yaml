@@ -134,12 +134,9 @@ components:
     OrderSyncStatus:
       type: string
       enum: [Pending, Sent, Accepted, BusinessError, TransportError, RetryScheduled, DeadLetter]
-    ValidationErrors:
-      type: object
-      additionalProperties: true
   responses:
     ValidationError:
       description: Input validation failed.
       content:
-        application/json:
-          schema: { $ref: '#/components/schemas/ValidationErrors' }
+        application/problem+json:
+          schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' }

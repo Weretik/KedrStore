@@ -9,7 +9,7 @@ internal static class CatalogLookupActionResult
         where T : class
     {
         if (!result.IsSuccess)
-            return controller.ToActionResult(result).Result ?? controller.NotFound();
+            return controller.ToProblem(result);
 
         return result.Value.Item is { } item
             ? controller.Ok(item)

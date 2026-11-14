@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using BuildingBlocks.Api.Result;
+using BuildingBlocks.Api.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -16,7 +16,7 @@ public static class SnapshotResult
         Func<T, string> version)
     {
         if (result.Status != ResultStatus.Ok)
-            return controller.ToActionResult(result);
+            return controller.ToProblem(result);
 
         var etag = new EntityTagHeaderValue($"\"{version(result.Value)}\"");
         controller.Response.Headers.ETag = etag.ToString();

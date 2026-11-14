@@ -2,13 +2,10 @@ using Identity.Application.Abstractions.Accounts;
 using Identity.Application.Abstractions.Sessions;
 using Identity.Contracts.Users;
 using Identity.Infrastructure.Avatars;
-using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 using Identity.Infrastructure.Profile;
-using Identity.Infrastructure.Sessions;
-using Identity.Infrastructure.Users;
 
 namespace Identity.Infrastructure.DependencyInjection;
 
