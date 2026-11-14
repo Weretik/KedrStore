@@ -2,6 +2,7 @@ using Sales.Infrastructure.Persistence.Customers;
 using Sales.Infrastructure.Persistence.OrderDrafts;
 using Sales.Infrastructure.Persistence.Orders;
 using Sales.Domain.Orders;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Persistence.OrderDrafts;
 

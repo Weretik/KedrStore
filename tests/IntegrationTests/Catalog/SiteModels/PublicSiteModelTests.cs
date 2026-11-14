@@ -62,6 +62,8 @@ using global::Infrastructure;
 using IntegrationTests.Catalog.ProductMedia;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Domain.Groups.Members;
 
 namespace IntegrationTests.Catalog.SiteModels;
 

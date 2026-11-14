@@ -1,4 +1,6 @@
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Pricing;
+using Sales.Application.Abstractions.Workspace.Orders;
 
 namespace Sales.Application.Features.OrderWorkspace.Commands.CreateWorkspaceOrder;
 

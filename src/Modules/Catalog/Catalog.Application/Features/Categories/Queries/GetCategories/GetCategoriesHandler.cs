@@ -1,6 +1,8 @@
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.OneCSync.Mapping;
+using Catalog.Application.Features.Categories.Shared.Tree;
+using Catalog.Application.Features.Categories.Shared.Stats;
 
 namespace Catalog.Application.Features.Categories.Queries.GetCategories;
 

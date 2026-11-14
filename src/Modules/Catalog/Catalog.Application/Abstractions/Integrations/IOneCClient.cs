@@ -1,4 +1,5 @@
 ﻿using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Source.Prices;
 
 namespace Catalog.Application.Abstractions.Integrations;
 

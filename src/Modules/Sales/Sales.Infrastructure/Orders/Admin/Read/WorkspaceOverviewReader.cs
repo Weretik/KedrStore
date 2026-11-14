@@ -1,5 +1,7 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Domain.Orders;
+using Sales.Application.Abstractions.Workspace.Overview;
+using Sales.Application.Abstractions.Workspace.Orders;
 
 namespace Sales.Infrastructure.Orders;
 

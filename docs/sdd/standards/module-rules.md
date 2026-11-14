@@ -94,22 +94,36 @@ A module never reads another module's database, entities, `DbContext`, repositor
 
 ## Folder structure inside a module
 
-Folders follow the business, not the kind of class. The same applies to the whole repository: no dump folders such as `Common/`, `Misc/`, `Helpers/`, `Utils/`, `Temp/`, or `Old/`, and no stray scripts or files at a project root. Do not create layer-wide or per-aggregate type folders such as `Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Interfaces/`, `DTOs/`, `Models/`, `Services/`, or `Configurations/` that collect unrelated features. Namespaces follow folders.
+Folders follow the business, not the kind of class. The same applies to the whole repository: no dump folders such as `Common/`, `Misc/`, `Helpers/`, `Utils/`, `Temp/`, or `Old/`, and no stray scripts or files at a project root. Do not create layer-wide type folders such as `Entities/`, `Interfaces/`, `DTOs/`, `Models/`, `Services/`, or `Configurations/` that collect unrelated features; the only type folders are `ValueObjects/`, `Enums/`, and `Errors/` inside one large Domain aggregate (see below). Namespaces follow folders.
+
+### The folder axiom: at most six files
+
+**A folder holds at most 6 code files. When it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders (a folder with no files and a single subfolder), and no new one-file folders. Only generated code (EF `Migrations/`, `Generated/`) is exempt.**
+
+- It applies to every backend project: modules, `BuildingBlocks`, hosts, and every test project.
+- Split by sub-concept (`Orders/Sync/`, `Attributes/Aliases/`, `Outbox/Dispatch/`), never by type, except the Domain aggregate split below.
+- A file that only one use case uses moves into that use case's folder instead of staying in `Shared/`; two tiny records of one use case go into the file of the type that holds them (`OrderDetailDto.cs` holds its line and counterparty records).
+- The levels of the layout are not wrappers even with one child: `Commands/`, `Queries/`, `Jobs/`, `Adapters/<Provider>/`, and `Integrations/<System>/`.
+- Existing one-file folders named by an aggregate or feature (`Persistence/Slugs/`) may stay; a split never creates a new one.
+- The architecture test `CodeFolders_HoldAtMostSixFiles_AndAreNeitherEmptyNorWrappers` fails on a folder with more than six `.cs` files, an empty folder, or a wrapper, in `src/` and `tests/`. Every feature audit and every general audit runs it and lists each violation.
 
 ```text
 <Module>.Domain/
   <Aggregate>/                     Order.cs, OrderLine.cs, OrderStatus.cs, OrderId.cs, OrderErrors.cs, OrderPlaced.cs
-  <Aggregate>/<Part>/              only when the aggregate grows: a sub-concept such as Lines/, not a type
+  <Aggregate>/<Part>/              when the aggregate grows: a sub-concept such as Aliases/ or Members/
+  <Aggregate>/ValueObjects|Enums|Errors/  when the aggregate still has more than six files: the entity stays on top
 <Module>.Application/
   Abstractions/                    ports: what Application asks from the outside world (IOrderRepository, IUnitOfWork, IClock, ICatalogDbContext)
   Features/<Feature>/
     Commands/<UseCase>/            PlaceOrderCommand.cs, PlaceOrderHandler.cs, PlaceOrderValidator.cs, PlaceOrderResponse.cs
     Queries/<UseCase>/             GetOrderDetailsQuery.cs, GetOrderDetailsHandler.cs, GetOrderDetailsValidator.cs, OrderDetailsDto.cs
     EventHandlers/                 handlers of domain or other modules' integration events for this feature
-    Shared/                        DTOs, mapping, and policies used by several use cases of this feature
+    Shared/                        DTOs, mapping, and policies used by several use cases of this feature;
+                                   past six files, named groups such as Shared/Reading/, Shared/Writing/
 <Module>.Infrastructure/
   Persistence/                     <Module>DbContext.cs, design-time factory, Migrations/
   Persistence/<Aggregate>/         entity configurations, repository, read queries of that aggregate
+  Persistence/Seed/                the module's seed data and its embedded files, in one folder
   Integrations/<System>/           external clients such as 1C, Telegram, storage
   Adapters/<Provider>/             adapters from another module's Contracts to this module's own ports
   Contracts/<Feature>/             implementations of the module's own Contracts interfaces
@@ -123,11 +137,11 @@ Folders follow the business, not the kind of class. The same applies to the whol
   <Feature>/                       interfaces, DTOs, integration events, constants other modules use
 ```
 
-- **Domain.** One folder per aggregate holds its root, child entities, value objects, enums, errors, and events. A value object used by several aggregates gets a folder named after the concept (`Money/`, `Slugs/`).
+- **Domain.** One folder per aggregate holds its root, child entities, value objects, enums, errors, and events. A value object used by several aggregates gets a folder named after the concept (`Money/`, `Slugs/`). A small aggregate stays flat. When an aggregate has more than six files, first split out a sub-concept with its own entity (`Aliases/`); if it still has more than six, move its value objects to `ValueObjects/`, enums to `Enums/`, and errors to `Errors/`, keeping the root entity and child entities on top.
 - **Application, one use case = one folder.** Every use case is one folder under `Commands/` (changes state) or `Queries/` (reads only), named after the action (`PlaceOrder`, `GetOrderDetails`). The folder holds, flat and together, everything of that use case: the request (`<UseCase>Command` or `<UseCase>Query`), its handler (`<UseCase>Handler`), its validator (`<UseCase>Validator`), and its result (`<UseCase>Response` for a command, `<Name>Dto` for a query). One request per folder: a second query or command is a second folder. No subfolders inside a use case (`DTOs/`, `Validators/`, `Models/`); a type that two use cases share goes to the feature's `Shared/`. Ports that Application needs from the outside world (repositories, unit of work, clock, read `DbContext` interfaces, external services) live in `Abstractions/` and are implemented in Infrastructure. A command handler never returns a read model bigger than the new identifier or status; a query handler never changes state. Admin, public, and mobile variants of the same feature live in the same feature folder as separate use cases (`GetRedirects`, `GetPublicRedirects`), not in separate `Public…` feature folders. A use case's request and response types live in its folder; the name `Contracts` is reserved for the module's Contracts project.
-- **Infrastructure.** Persistence is grouped by aggregate, the same names as in Domain; integrations by external system.
+- **Infrastructure.** Persistence is grouped by aggregate, the same names as in Domain, with the `DbContext` at the `Persistence/` root and seed data in one `Persistence/Seed/`; integrations by external system (`Integrations/OneC/Orders/`, `Integrations/OneC/Counterparties/`).
 - **Api (Minimal API).** Endpoints are grouped by the same features as Application, never in one flat `Endpoints/` folder. `Endpoints/<Feature>/<Feature>Endpoints.cs` maps the feature's groups (admin, public, mobile) with their route prefix, authorization policy, and tags; each use case has its own folder `Endpoints/<Feature>/<UseCase>/` with `<UseCase>Endpoint.cs` and its HTTP `Request` and response types; what two or more endpoints of the feature use goes to `Endpoints/<Feature>/Shared/`. The feature folder itself holds only the route group file, so it reads as a table of contents, never as a pile of files. The endpoint maps the `Request` to the Application command or query; the HTTP request is never bound straight to a command or query, so the API contract and the use case can change separately. Moving from controllers keeps the OpenAPI contract identical (compare the snapshot before and after).
-- A folder with eight or more production files is a signal to look for a sub-concept to split out, not a reason to create type folders.
+- The folder axiom above applies to every layer: more than six files means a split by meaning.
 
 ## Layer responsibilities and the handler
 
@@ -168,6 +182,7 @@ tests/<Kind>/TestSupport/                                   factories, fakes, bu
 ```
 
 - A test file sits in exactly one module and one layer folder; a namespace follows its path. No loose files at a test project root and no folders such as `Misc/`, `Helpers/`, `Common/`, or `Temp/`.
+- The folder axiom holds in tests too: a module folder with more than six test files splits by feature (`IntegrationTests/Content/Articles/`, `IntegrationTests/Sales/OneC/OrderSync/`).
 - Every module has at least: unit tests of its Domain aggregates, unit tests of its command and query handlers and validators, integration tests of its endpoints and persistence, and its place in the architecture tests.
 
 ## Architecture tests
@@ -176,7 +191,7 @@ The rules above are only real when a test fails on a violation. The architecture
 
 - `Layers/`: Domain references only `BuildingBlocks.Domain` and throws only programming-error exceptions; Domain properties have no public setter; Application references no Api, Infrastructure or host; Api references only its own Infrastructure and no Domain; compiled type dependencies follow the same direction;
 - `Modules/`: each module has Api, Application, Contracts, Domain and Infrastructure projects; a module reaches another one only through its `Contracts`, and `Contracts` references no project; building blocks reference no module; each EF model maps only its own entities with no link to another module;
-- `Folders/`: no type or dump folders in `src/` (`Entities`, `Enums`, `ValueObjects`, `Configurations`, `DTOs`, `Validators`, `Controllers`, `Repositories`, `Models`, `Interfaces`, `Common`, `Helpers`, `Utils`, `Extensions`, `Services`, …; `Contracts/` only as a module project or `Infrastructure/Contracts/`); each handler sits alone in `Features.<Feature>.Commands|Queries.<UseCase>` and is named `<UseCase>Handler`; a use case does not use another use case's folder (shared code goes to the feature's `Shared/`); controllers sit in `Features/<Feature>/`; `*Endpoints` route groups sit in `<Module>.Api.Endpoints.<Feature>`, each `<UseCase>Endpoint` in `<Module>.Api.Endpoints.<Feature>.<UseCase>`, and an endpoint feature folder holds no other file directly; a module with endpoints has no controller left; Api uses Infrastructure only for registration;
+- `Folders/`: the folder axiom in `src/` and `tests/` (at most six code files per folder, no empty or wrapper folder); no type or dump folders in `src/` (`Entities`, `Enums` and `ValueObjects` outside a Domain aggregate, `Configurations`, `DTOs`, `Validators`, `Controllers`, `Repositories`, `Models`, `Interfaces`, `Common`, `Helpers`, `Utils`, `Extensions`, `Services`, …; `Contracts/` only as a module project or `Infrastructure/Contracts/`); each handler sits alone in `Features.<Feature>.Commands|Queries.<UseCase>` and is named `<UseCase>Handler`; a use case does not use another use case's folder (shared code goes to the feature's `Shared/`); controllers sit in `Features/<Feature>/`; `*Endpoints` route groups sit in `<Module>.Api.Endpoints.<Feature>`, each `<UseCase>Endpoint` in `<Module>.Api.Endpoints.<Feature>.<UseCase>`, and an endpoint feature folder holds no other file directly; a module with endpoints has no controller left; Api uses Infrastructure only for registration;
 - `Hosts/`: a host declares no module port implementation, controller or `DbContext`;
 - `Application/`: every command and query answers a `Result`, and every one with client input has a validator;
 - `Persistence/`: each module's EF model matches its latest migration snapshot (`ModelSnapshotTests`, no database needed);
@@ -192,10 +207,16 @@ A host is the composition root, nothing more.
 
 ```text
 Host.Api/
-  Program.cs                       pipeline and startup
+  Program.cs, HostServicesExtensions.cs, ModulesRegistrationExtensions.cs, SerilogExtensions.cs
   appsettings*.json, Dockerfile
-  DependencyInjection/             one file per technical concern: modules list, security, web, observability, options
+  Application/                     Mediator and the Application pipeline
+  Http/                            Minimal API, OpenAPI, response compression
+  Network/                         forwarded headers, rate limits; TrustedProxy/ for the proxy client IP
+  Security/                        authentication, authorization policies, CORS; Csrf/ for the cookie CSRF check
+Host.Jobs/                         Program.cs and the job host's registration, no nested project folder
 ```
+
+Registration is grouped by technical topic directly under the host; there is no `DependencyInjection/ServiceRegistration/` wrapper.
 
 - The host calls `Add<Module>Module()` for each module and configures cross-cutting concerns (authentication, CORS, logging, health checks, OpenAPI). It does not contain readers, adapters, notifiers, or any class that knows two modules' data; such a class belongs to a module's Infrastructure behind a `Contracts` interface.
 - Access policies are declared once in the host from the names in `Identity.Contracts` (or the project's access module).
@@ -249,7 +270,7 @@ Business outcomes travel as results; exceptions are only for the unexpected.
 ## KedrStore specifics
 
 - Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`), `Media` (CDN picture library; schema `media`), `Work` (staff tasks and activity log; schema `work`). Projects live in `src/Modules/<Module>/<Module>.<Layer>/`; `src/` holds only `Bootstrapper/`, `BuildingBlocks/` and `Modules/` (architecture test `FolderStructureTests`), and the solution view mirrors these folders.
-- `Host.Api` calls `Add<Module>Module()` for each module in `src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/ModulesRegistrationExtensions.cs`; each module defines it in `<Module>.Api/DependencyInjection/<Module>Module.cs`. `Host.Jobs` registers module Infrastructure and jobs (`AddCatalogJobs()`) in `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`.
+- `Host.Api` calls `Add<Module>Module()` for each module in `src/Bootstrapper/Host.Api/ModulesRegistrationExtensions.cs`; each module defines it in `<Module>.Api/DependencyInjection/<Module>Module.cs`. `Host.Jobs` registers module Infrastructure and jobs (`AddCatalogJobs()`) in `src/Bootstrapper/Host.Jobs/JobsHostServicesExtensions.cs`.
 - Access policy and role names are in `Identity.Contracts/Authorization` (`PolicyNames`, `RoleNames`); every module's Api uses them from there.
 - Architecture tests list business modules in `BusinessModules` in `tests/ArchitectureTests/Modules/ProjectModuleIsolationTests.cs`; add the new module there.
 - All modules share one database and run migrations through `Host.Jobs --job=migrate` ([operations](../operations/data/migrations-and-seeding.md)).

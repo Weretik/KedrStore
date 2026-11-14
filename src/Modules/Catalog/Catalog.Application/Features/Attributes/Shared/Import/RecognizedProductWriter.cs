@@ -2,6 +2,9 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Attributes.Jobs;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Attributes.Enums;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.Attributes.Shared.Import;
 

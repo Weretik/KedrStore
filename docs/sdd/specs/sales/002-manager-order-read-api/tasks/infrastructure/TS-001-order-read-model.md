@@ -3,7 +3,7 @@
 - **ID задачі:** TS-001
 - **Покриває:** SC-001, SC-002, SC-003, SC-004
 - **Залежить від:** EN-002
-- **Точні шляхи:** `src/Modules/Sales/Sales.Infrastructure/Orders/OrderReadService.cs`, `src/Modules/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructure.cs`, `tests/IntegrationTests/Sales/Persistence/SalesOrderReadModelTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Infrastructure/Orders/OrderReadService.cs`, `src/Modules/Sales/Sales.Infrastructure/DependencyInjection/SalesInfrastructure.cs`, `tests/IntegrationTests/Sales/Persistence/Orders/SalesOrderReadModelTests.cs`
 - **Рівень тесту:** інтеграція Infrastructure
 
 ## Докази

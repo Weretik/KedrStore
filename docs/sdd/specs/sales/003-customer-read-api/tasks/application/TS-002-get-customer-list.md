@@ -3,7 +3,7 @@
 - **ID завдання:** TS-002
 - **Охоплює:** SC-001
 - **Залежить від:** TS-001
-- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Customers/GetList/`, `tests/UnitTests/Sales/Application/GetCustomerListQueryHandlerTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Customers/GetList/`, `tests/UnitTests/Sales/Application/Customers/GetCustomerListQueryHandlerTests.cs`
 - **Рівень тестування:** Application
 
 ## Свідчення

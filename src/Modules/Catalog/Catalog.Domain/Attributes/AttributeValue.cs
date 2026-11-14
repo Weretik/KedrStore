@@ -1,3 +1,5 @@
+using Catalog.Domain.Attributes.ValueObjects;
+
 namespace Catalog.Domain.Attributes;
 
 /// <summary>One value of an attribute, for example «Антична бронза» (code AB) of color.</summary>

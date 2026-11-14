@@ -5,6 +5,8 @@ using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Infrastructure.Persistence;
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
+using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 
 namespace IntegrationTests.Platform.Outbox;
 

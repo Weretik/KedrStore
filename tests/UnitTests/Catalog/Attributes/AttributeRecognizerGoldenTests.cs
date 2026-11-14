@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Application.Features.Attributes.Shared.Recognition;
+using Catalog.Application.Features.Attributes.Shared.Import.Files;
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
 
 namespace UnitTests.Catalog.Attributes;
 

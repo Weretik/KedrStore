@@ -1,4 +1,5 @@
 using Content.Application.Features.Articles.Shared;
+using Content.Application.Features.Articles.Shared.Writing;
 
 namespace Content.Application.Features.Articles.Queries.GetPublicArticles;
 

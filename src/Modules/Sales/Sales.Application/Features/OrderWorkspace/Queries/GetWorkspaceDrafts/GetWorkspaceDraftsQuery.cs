@@ -1,4 +1,6 @@
+using Sales.Application.Abstractions.Workspace;
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Drafts;
 
 namespace Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceDrafts;
 

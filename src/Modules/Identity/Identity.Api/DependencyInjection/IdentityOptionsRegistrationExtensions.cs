@@ -7,6 +7,7 @@ using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 
 using Identity.Api.Endpoints.Auth.Shared;
+using Identity.Infrastructure.Sessions.Options;
 namespace Identity.Api.DependencyInjection;
 
 internal static class IdentityOptionsRegistrationExtensions

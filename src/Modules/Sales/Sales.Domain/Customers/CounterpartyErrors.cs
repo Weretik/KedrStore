@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Sales.Domain.Customers;
 
 public static class CounterpartyErrors

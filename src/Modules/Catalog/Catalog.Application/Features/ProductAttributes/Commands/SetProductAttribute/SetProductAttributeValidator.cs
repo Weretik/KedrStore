@@ -1,4 +1,5 @@
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.SetProductAttribute;
 

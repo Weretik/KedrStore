@@ -14,6 +14,8 @@ using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Domain.Orders;
 
 using IntegrationTests.TestSupport.Api;
+using Sales.Application.Abstractions.Orders.Sync;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace IntegrationTests.Sales.Api;
 

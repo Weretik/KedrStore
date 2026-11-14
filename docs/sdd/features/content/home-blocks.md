@@ -38,8 +38,8 @@ Tables `content."HomeFaqItems"` and `content."HomeBrands"`; see the [database ma
 
 ## Tests
 
-- Unit: [HomeBlocksTests](../../../../tests/UnitTests/Content/HomeBlocksTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
-- Integration: [HTTP, access, FAQ and brand editing](../../../../tests/IntegrationTests/Content/HomeBlocksApiTests.cs), [PostgreSQL seed](../../../../tests/IntegrationTests/Content/HomeBlocksPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
+- Unit: [HomeBlocksTests](../../../../tests/UnitTests/Content/Pages/HomeBlocksTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
+- Integration: [HTTP, access, FAQ and brand editing](../../../../tests/IntegrationTests/Content/Pages/HomeBlocksApiTests.cs), [PostgreSQL seed](../../../../tests/IntegrationTests/Content/Pages/HomeBlocksPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
 
 ## Related sources
 

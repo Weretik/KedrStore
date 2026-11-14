@@ -1,6 +1,8 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
 using Sales.Domain.Orders;
+using Sales.Application.Abstractions.Orders.Sync;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

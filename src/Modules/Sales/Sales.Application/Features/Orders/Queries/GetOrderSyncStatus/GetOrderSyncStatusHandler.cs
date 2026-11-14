@@ -1,5 +1,6 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
+using Sales.Application.Abstractions.Orders.Sync;
 
 namespace Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
 

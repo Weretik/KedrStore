@@ -18,6 +18,8 @@ using Catalog.Domain.PriceTypes;
 using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
+using Catalog.Application.Features.Categories.Shared.Stats;
+using Catalog.Application.Features.OneCSync.Sync.Categories;
 
 namespace UnitTests.Catalog.Sync;
 

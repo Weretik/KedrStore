@@ -87,7 +87,7 @@ GET /api/admin/products/missing-photos?searchTerm=8190&inStock=false&isSale=fals
 ## CLI-контракт Host.Jobs
 
 ```text
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=check-product-photos
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=check-product-photos
 ```
 
 Команда не приймає `rootId`, виконує один повний цикл для активних товарів,

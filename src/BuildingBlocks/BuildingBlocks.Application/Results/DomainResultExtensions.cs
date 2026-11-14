@@ -1,5 +1,6 @@
 using BuildingBlocks.Domain.Results;
-using ErrorType = BuildingBlocks.Domain.Abstractions.ErrorType;
+using BuildingBlocks.Domain.Abstractions.Errors;
+using ErrorType = BuildingBlocks.Domain.Abstractions.Errors.ErrorType;
 
 namespace BuildingBlocks.Application.Results;
 

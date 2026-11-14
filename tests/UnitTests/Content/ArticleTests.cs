@@ -3,6 +3,8 @@ using Content.Application.Features.Articles.Commands.CreateArticle;
 using Content.Application.Features.Articles.Commands.UpdateArticle;
 using Content.Application.Features.Articles.Shared;
 using Content.Domain.Articles;
+using Content.Application.Features.Articles.Shared.Reading;
+using Content.Application.Features.Articles.Shared.Writing;
 
 namespace UnitTests.Content;
 

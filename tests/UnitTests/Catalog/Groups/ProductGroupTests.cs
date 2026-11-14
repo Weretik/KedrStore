@@ -11,6 +11,10 @@ using Catalog.Domain.PriceTypes;
 using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Attributes.Enums;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace UnitTests.Catalog.Groups;
 

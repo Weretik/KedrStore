@@ -1,6 +1,7 @@
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
 using Catalog.Infrastructure.Persistence.Attributes;
+using Catalog.Domain.Groups.Members;
 
 namespace Catalog.Infrastructure.Persistence.Groups;
 

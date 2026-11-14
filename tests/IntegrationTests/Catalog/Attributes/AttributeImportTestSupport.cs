@@ -21,6 +21,9 @@ using Catalog.Domain.Slugs;
 using Catalog.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging.Abstractions;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Domain.Attributes.Aliases;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace IntegrationTests.Catalog.Attributes;
 

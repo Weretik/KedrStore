@@ -13,6 +13,7 @@ using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Application.Features.Categories.Shared.Stats;
 
 namespace UnitTests.Catalog.Application;
 

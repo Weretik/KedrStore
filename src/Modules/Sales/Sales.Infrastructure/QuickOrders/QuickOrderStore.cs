@@ -1,5 +1,6 @@
 using Sales.Application.Abstractions.QuickOrders;
 using Sales.Application.Features.QuickOrders.Messages;
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
 
 namespace Sales.Infrastructure.QuickOrders;
 

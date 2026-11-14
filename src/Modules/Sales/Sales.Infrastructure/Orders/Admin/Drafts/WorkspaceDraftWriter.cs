@@ -2,6 +2,9 @@ using System.Text.Json;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Shared;
+using Sales.Application.Abstractions.Workspace.Drafts;
+using Sales.Application.Abstractions.Workspace.Pricing;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

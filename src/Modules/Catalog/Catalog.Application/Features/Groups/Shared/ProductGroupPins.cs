@@ -1,5 +1,6 @@
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Groups.Members;
 
 namespace Catalog.Application.Features.Groups.Shared;
 

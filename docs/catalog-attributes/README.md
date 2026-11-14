@@ -12,6 +12,6 @@ Recognizer output for the [catalog attributes SDD](../sdd/specs/catalog/006-attr
 Load into a database (dry run first; production only after the owner's «да»):
 
 ```bash
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=import-catalog-attributes \
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=import-catalog-attributes \
   --dictionary=docs/catalog-attributes/dictionaries.json --csv=docs/catalog-attributes/products_attributes.csv [--apply]
 ```

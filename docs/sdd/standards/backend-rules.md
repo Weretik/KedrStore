@@ -19,7 +19,7 @@ Apply the [identifier strategy](identifier-strategy.md) before creating or chang
 
 Group application code by feature. Keep a use case's command or query, handler, validator, and private DTOs together. Each Mediator handler owns one use case; commands change state, queries do not.
 
-Each file and directory should have a coherent responsibility. Before creating files for a feature, compare the planned SDD map with current module boundaries; review the actual files before completion. Separate independent use cases, read/write contracts, and adapters by ownership without creating unnecessary abstractions or folders for a single small file. Line count is a reason to review a file, not an automatic split rule.
+Each file and directory should have a coherent responsibility. Before creating files for a feature, compare the planned SDD map with current module boundaries; review the actual files before completion. Separate independent use cases, read/write contracts, and adapters by ownership without creating unnecessary abstractions or folders for a single small file. A folder holds at most six code files; past that, split it by meaning (the [folder axiom](module-rules.md#the-folder-axiom-at-most-six-files)). Line count is a reason to review a file, not an automatic split rule.
 
 Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in Mediator pipeline behaviors, but do not move business rules there.
 

@@ -3,6 +3,9 @@ using Sales.Domain.Orders;
 using Sales.Infrastructure.Persistence.Customers;
 using Sales.Infrastructure.Persistence.OrderDrafts;
 using Sales.Infrastructure.Persistence.Orders;
+using Sales.Application.Abstractions.Orders.Sync;
+using Sales.Infrastructure.Persistence.Orders.SyncRetries;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

@@ -3,6 +3,8 @@ using Catalog.Application.Features.SiteModels.Shared;
 using Catalog.Contracts.SiteModels;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace Catalog.Application.Features.SiteModels.Commands.FillSiteModelFromNames;
 

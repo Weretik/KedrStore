@@ -3,6 +3,8 @@ using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.Persistence.Customers;
 using Sales.Infrastructure.Persistence.OrderDrafts;
 using Sales.Infrastructure.Persistence.Orders;
+using Sales.Domain.Orders.ValueObjects;
+using Sales.Infrastructure.Persistence.Orders.Idempotency;
 
 namespace Sales.Infrastructure.Orders;
 

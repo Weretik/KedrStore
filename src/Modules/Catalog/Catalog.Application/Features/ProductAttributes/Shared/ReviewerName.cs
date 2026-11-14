@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Users;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace Catalog.Application.Features.ProductAttributes.Shared;
 

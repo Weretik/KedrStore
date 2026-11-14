@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Catalog.Domain.Groups;
 
 public static class ProductGroupErrors

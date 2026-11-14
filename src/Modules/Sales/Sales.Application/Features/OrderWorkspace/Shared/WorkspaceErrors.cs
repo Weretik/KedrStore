@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Sales.Application.Features.OrderWorkspace.Shared;
 
 /// <summary>The order workspace's answers that depend on stored data rather than on the request alone.</summary>

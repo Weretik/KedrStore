@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Catalog.Domain.Products.Prices;
 
 public static class ProductPriceErrors

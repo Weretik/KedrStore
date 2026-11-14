@@ -1,5 +1,6 @@
 using Catalog.Application.Features.Attributes.Shared;
 using Catalog.Contracts.Attributes;
+using Catalog.Application.Features.Attributes.Shared.Readers;
 
 namespace Catalog.Application.Features.Attributes.Queries.GetCategoryAttributeFilters;
 

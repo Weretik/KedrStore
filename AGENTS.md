@@ -51,6 +51,8 @@ A small fix that restores documented behavior needs no SDD, file-role map, or au
 | Verify changes / hand off for review | `$backend-change-verification` / `$backend-pr-handoff` | [Testing rules](docs/sdd/standards/testing-rules.md) |
 | Differences between code and documentation | `$backend-docs-sync` | [Standards index](docs/sdd/standards/README.md) and [feature map](docs/sdd/features/README.md) |
 
+**Folder axiom:** a folder holds at most 6 code files; when it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders, no new one-file folders; only generated code (EF `Migrations/`, `Generated/`) is exempt. It applies to `src/` and `tests/`, the architecture tests enforce it, and every audit checks it ([module rules](docs/sdd/standards/module-rules.md#the-folder-axiom-at-most-six-files)).
+
 For a new feature, apply the [delivery rules](docs/sdd/standards/delivery-rules.md) and [backend code organization rules](docs/sdd/standards/backend-rules.md): plan the file-role map in the SDD first and compare it with actual code before handoff.
 
 ## Process priority

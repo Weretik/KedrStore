@@ -3,6 +3,8 @@ using Catalog.Application.Features.Attributes.Shared;
 using Catalog.Application.Features.ProductAttributes.Shared;
 using Catalog.Contracts.Attributes;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Attributes.Enums;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.ReopenProductReview;
 

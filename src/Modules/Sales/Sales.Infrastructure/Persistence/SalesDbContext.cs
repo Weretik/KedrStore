@@ -1,3 +1,7 @@
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
+using Sales.Infrastructure.Persistence.Orders.SyncRetries;
+using Sales.Infrastructure.Persistence.Orders.Idempotency;
+
 namespace Sales.Infrastructure.Persistence;
 
 public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)

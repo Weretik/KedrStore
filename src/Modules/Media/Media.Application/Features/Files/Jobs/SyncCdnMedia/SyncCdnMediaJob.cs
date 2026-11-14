@@ -1,6 +1,7 @@
 using Media.Application.Abstractions.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using BuildingBlocks.Domain.Abstractions.Errors;
 
 namespace Media.Application.Features.Files.Jobs.SyncCdnMedia;
 

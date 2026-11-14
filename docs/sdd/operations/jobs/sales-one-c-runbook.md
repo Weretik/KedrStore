@@ -19,7 +19,7 @@ Before synchronizing customers, read the [counterparty and Identity flow](../../
 
 ```powershell
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=sales-customers-full
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=sales-customers-full
 ```
 
 Before accepting the refresh, check the imported, updated, restored, deleted, and skipped counters in the final logs.
@@ -57,7 +57,7 @@ Use a non-production database and an approved test 1C endpoint. Execution may cr
 
 ```powershell
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=sync-one-c-orders
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=sync-one-c-orders
 ```
 
 Exit code `0` and `[SUCCESS] Job finished OK` mean the pass completed without an unhandled exception. They do not mean every order was accepted. Check the structured final counters `Processed`, `Accepted`, `BusinessError`, `TransportError`, `Deferred`, and `DeadLetter`.

@@ -1,6 +1,8 @@
 using Catalog.Contracts.SiteModels;
 using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.SiteModels.Shared;
 

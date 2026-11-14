@@ -1,5 +1,7 @@
+using Sales.Application.Abstractions.Workspace;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Shared;
+using Sales.Application.Abstractions.Workspace.Orders;
 
 namespace Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOrders;
 

@@ -25,7 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Bootstrapper\Host.Api\Host.Api.csproj" />
-      <ProjectReference Include="..\..\src\Bootstrapper\Host.Jobs\Host.Jobs\Host.Jobs.csproj" Aliases="JobsHost" />
+      <ProjectReference Include="..\..\src\Bootstrapper\Host.Jobs\Host.Jobs.csproj" Aliases="JobsHost" />
       <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Modules\Sales\Sales.Application\Sales.Application.csproj" />

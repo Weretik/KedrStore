@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Domain.Abstractions;
 using Mediator;
+using BuildingBlocks.Domain.Abstractions.Events;
 
 namespace BuildingBlocks.Infrastructure.DomainEvents;
 

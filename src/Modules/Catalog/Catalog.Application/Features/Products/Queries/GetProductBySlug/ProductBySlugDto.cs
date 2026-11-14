@@ -25,3 +25,5 @@ public record  ProductBySlugDto
 
     public IReadOnlyList<CategoryBreadcrumbDto> Breadcrumbs { get; init; } = [];
 }
+
+public sealed record CategoryBreadcrumbDto(int Id, string Name, string Slug);

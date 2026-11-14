@@ -4,6 +4,7 @@ using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Products.GetList;
+using Catalog.Application.Features.Categories.Shared.Tree;
 
 namespace Catalog.Application.Features.Products.Queries.GetPublicProductList;
 

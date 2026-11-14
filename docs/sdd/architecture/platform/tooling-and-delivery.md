@@ -7,8 +7,8 @@
 | SDK | `global.json` | .NET SDK `10.0.101`, `rollForward: latestFeature`; projects target `net10.0`. |
 | Solution | `KedrStore.sln` | Single entry point for `dotnet restore`, `dotnet build`, and `dotnet test`. |
 | Local API profiles | `src/Bootstrapper/Host.Api/Properties/launchSettings.json` | Profiles `http` and `https`; addresses and launch instructions are in the [operations guide](../../operations/local-development/run-api.md). |
-| Configuration | `src/Bootstrapper/Host.Api/appsettings*.json`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, ASP.NET Core User Secrets, environment variables | See [configuration and secrets](../../operations/configuration/configuration-and-secrets.md). `Host.Jobs` uses its own User Secrets in Development. |
-| Containers | `src/Bootstrapper/Host.Api/Dockerfile`, `src/Bootstrapper/Host.Jobs/Host.Jobs/Dockerfile` | Separate images for the HTTP host and CLI jobs. |
+| Configuration | `src/Bootstrapper/Host.Api/appsettings*.json`, `src/Bootstrapper/Host.Jobs/appsettings.json`, ASP.NET Core User Secrets, environment variables | See [configuration and secrets](../../operations/configuration/configuration-and-secrets.md). `Host.Jobs` uses its own User Secrets in Development. |
+| Containers | `src/Bootstrapper/Host.Api/Dockerfile`, `src/Bootstrapper/Host.Jobs/Dockerfile` | Separate images for the HTTP host and CLI jobs. |
 | CI | `.github/workflows/deploy-cloudrun.yml`, `verify` job | Checks out the code, installs .NET from `global.json`, restores dependencies, builds Release, UnitTests, ArchitectureTests, IntegrationTests and uploads coverage in Cobertura format. IntegrationTests may require Docker for PostgreSQL Testcontainers. |
 | Deployment | `.github/workflows/deploy-cloudrun.yml`, job `deploy` | After verification succeeds, builds images, runs Cloud Run `database-migrate` job with `--job=migrate` and waits for completion, then deploys `Host.Api` and updates job images. The workflow runs on pushes to `master`. |
 

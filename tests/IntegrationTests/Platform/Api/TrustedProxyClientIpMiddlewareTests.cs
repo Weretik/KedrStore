@@ -1,7 +1,7 @@
 using System.Net;
-using Host.Api.Security.TrustedProxy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Host.Api.Network.TrustedProxy;
 
 namespace IntegrationTests.Platform.Api;
 

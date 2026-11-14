@@ -3,6 +3,7 @@ using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Identity.Infrastructure.Sessions.Options;
 
 namespace Identity.Infrastructure.DependencyInjection;
 

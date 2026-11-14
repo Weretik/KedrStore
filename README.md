@@ -109,14 +109,14 @@ Requirements: .NET SDK 10 (see `global.json`), PostgreSQL (tests use 18).
    ```powershell
    cd KedrStore
    dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=kedr;Username=kedr;Password=<local-password>" --project src/Bootstrapper/Host.Api/Host.Api.csproj
-   dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=kedr;Username=kedr;Password=<local-password>" --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj
-   dotnet user-secrets set "ADMIN_DEFAULT_PASSWORD" "<first-admin-password>" --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj
+   dotnet user-secrets set "ConnectionStrings:Default" "Host=localhost;Port=5432;Database=kedr;Username=kedr;Password=<local-password>" --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj
+   dotnet user-secrets set "ADMIN_DEFAULT_PASSWORD" "<first-admin-password>" --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj
    ```
 
 3. Create the schema and the first administrator. The API never migrates at startup:
 
    ```powershell
-   dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=migrate
+   dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=migrate
    ```
 
 4. Start the API on `https://localhost:7230` (Swagger and `/health` are available):

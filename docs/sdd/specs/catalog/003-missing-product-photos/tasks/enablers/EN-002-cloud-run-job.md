@@ -3,7 +3,7 @@
 - **ID задачі:** EN-002
 - **Уможливлює:** SC-010
 - **Залежить від:** TS-004
-- **Точні шляхи:** `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`, `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`, `.github/workflows/deploy-cloudrun.yml`, `docs/sdd/operations/jobs/host-jobs-cli.md`, `docs/sdd/operations/jobs/catalog-photo-check-runbook.md`
+- **Точні шляхи:** `src/Bootstrapper/Host.Jobs/Program.cs`, `src/Bootstrapper/Host.Jobs/JobsHostServicesExtensions.cs`, `src/Bootstrapper/Host.Jobs/appsettings.json`, `.github/workflows/deploy-cloudrun.yml`, `docs/sdd/operations/jobs/host-jobs-cli.md`, `docs/sdd/operations/jobs/catalog-photo-check-runbook.md`
 - **Рівень тесту:** інтеграційний CLI + статична перевірка workflow
 
 ## Чому це передумова

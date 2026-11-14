@@ -5,7 +5,7 @@ For a routine refresh, run the single `full` job: it uses a safe import order an
 ```powershell
 # Run from the repository root
 $env:DOTNET_ENVIRONMENT = 'Development'
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=full
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=full
 ```
 
 | Situation | Job | Next action |

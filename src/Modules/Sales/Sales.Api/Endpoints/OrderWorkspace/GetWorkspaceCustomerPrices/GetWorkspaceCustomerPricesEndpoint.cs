@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceCustomerPrices;
+using Sales.Application.Abstractions.Workspace.Pricing;
 namespace Sales.Api.Endpoints.OrderWorkspace.GetWorkspaceCustomerPrices;
 
 internal static class GetWorkspaceCustomerPricesEndpoint

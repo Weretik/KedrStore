@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
+using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 
 namespace BuildingBlocks.Infrastructure.DependencyInjection;
 

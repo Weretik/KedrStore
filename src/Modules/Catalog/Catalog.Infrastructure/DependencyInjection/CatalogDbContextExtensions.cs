@@ -9,6 +9,9 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.Persistence.Products;
+using Catalog.Application.Features.Attributes.Shared.Readers;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Application.Features.Categories.Shared.Stats;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

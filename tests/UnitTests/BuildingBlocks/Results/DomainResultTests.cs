@@ -2,6 +2,7 @@ using Ardalis.Result;
 using BuildingBlocks.Application.Results;
 using BuildingBlocks.Domain.Abstractions;
 using BuildingBlocks.Domain.Results;
+using BuildingBlocks.Domain.Abstractions.Errors;
 
 namespace UnitTests.BuildingBlocks.Results;
 

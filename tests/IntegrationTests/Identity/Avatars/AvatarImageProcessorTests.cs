@@ -1,6 +1,7 @@
 using Identity.Application.Features.Avatars;
 using Identity.Infrastructure.Avatars;
 using SkiaSharp;
+using Identity.Infrastructure.Avatars.Images;
 
 namespace IntegrationTests.Identity.Avatars;
 

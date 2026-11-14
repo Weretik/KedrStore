@@ -26,6 +26,9 @@ using IntegrationTests.Catalog.ProductMedia;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.Enums;
 
 namespace IntegrationTests.Catalog.SiteModels;
 

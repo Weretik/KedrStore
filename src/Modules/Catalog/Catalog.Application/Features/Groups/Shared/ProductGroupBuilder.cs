@@ -3,6 +3,8 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.Groups.Shared;
 

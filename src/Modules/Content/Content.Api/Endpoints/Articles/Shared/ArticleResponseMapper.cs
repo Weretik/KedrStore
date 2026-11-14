@@ -1,4 +1,5 @@
 using Content.Application.Features.Articles.Shared;
+using Content.Application.Features.Articles.Shared.Reading;
 namespace Content.Api.Endpoints.Articles.Shared;
 
 internal static class ArticleResponseMapper

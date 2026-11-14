@@ -15,7 +15,7 @@
 3. Real run: **Execute** the job with its default arguments (`--job=media-cdn-sync`).
 4. Optional daily run: a Cloud Scheduler trigger for the job keeps files uploaded straight over FTP visible in the library.
 
-Locally: `dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs -- --job=media-cdn-sync --dry-run` with `MediaStorage:Ftp:Password` in user secrets and a local database.
+Locally: `dotnet run --project src/Bootstrapper/Host.Jobs -- --job=media-cdn-sync --dry-run` with `MediaStorage:Ftp:Password` in user secrets and a local database.
 
 ## Product links
 

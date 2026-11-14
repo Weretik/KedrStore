@@ -3,6 +3,9 @@ using Sales.Application.Abstractions.Persistence;
 using Sales.Domain.Orders;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Application.Abstractions.Workspace.Pricing;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

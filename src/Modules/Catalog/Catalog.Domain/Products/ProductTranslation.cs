@@ -1,3 +1,5 @@
+using Catalog.Domain.Products.Errors;
+
 namespace Catalog.Domain.Products;
 
 public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot

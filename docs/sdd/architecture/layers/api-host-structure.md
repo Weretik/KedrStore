@@ -7,8 +7,8 @@
 ├── Endpoints/
 │   └── <Feature>/
 │       ├── <Feature>Endpoints.cs           Map<Feature>Endpoints(): one MapGroup per audience (admin, public, mobile) with tag and policy
-│       ├── <UseCase>Endpoint.cs            Map(group) + Handle: one operation
-│       └── <UseCase>Request.cs             HTTP request record of the feature (≠ the Application command)
+│       ├── <UseCase>/                      <UseCase>Endpoint.cs (Map + Handle) with its HTTP request and response records (≠ the Application command)
+│       └── Shared/                         records or mapping used by two or more endpoints of the feature
 ├── DependencyInjection/
 │   └── <Module>Module.cs                   Add<Module>Module(): Application, Infrastructure; Map<Module>Endpoints()
 └── <Module>.Api.csproj
@@ -21,13 +21,13 @@ Endpoints bind HTTP input into a request record, call `ISender.Send` with `Cance
 ~~~text
 Bootstrapper/Host.Api/
 ├── Program.cs
-├── DependencyInjection/
-│   ├── ServiceRegistration/
-│   │   ├── ModulesRegistrationExtensions.cs   calls Add<Module>Module() for every module
-│   │   ├── Pipeline/
-│   │   ├── SecurityRegistrationExtensions.cs
-│   │   └── Web/
-│   └── WebApplication/
+├── HostServicesExtensions.cs                  AddHostServices(): the topics below in order
+├── ModulesRegistrationExtensions.cs           calls Add<Module>Module() for every module
+├── SerilogExtensions.cs
+├── Application/                               Mediator and the Application pipeline
+├── Http/                                      Minimal API, OpenAPI, mobile sync compression
+├── Network/                                   forwarded headers, rate limits; TrustedProxy/
+├── Security/                                  authentication, authorization policies, CORS; Csrf/
 └── appsettings*.json
 
 Bootstrapper/Host.Jobs/

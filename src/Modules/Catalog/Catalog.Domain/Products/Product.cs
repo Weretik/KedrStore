@@ -1,4 +1,5 @@
 using Catalog.Domain.Categories;
+using Catalog.Domain.Products.Errors;
 
 namespace Catalog.Domain.Products;
 

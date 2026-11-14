@@ -1,3 +1,6 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+using Catalog.Domain.Attributes.ProductValues;
+
 namespace Catalog.Domain.Attributes;
 
 public static class AttributeErrors

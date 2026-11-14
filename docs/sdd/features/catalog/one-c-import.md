@@ -6,7 +6,7 @@ Background import of categories, product details, prices, price types, and stock
 
 ## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Modules/Catalog/Catalog.Application/Abstractions/Integrations/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Modules/Catalog/Catalog.Infrastructure/Integrations/OneC/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/CatalogEfRepository.cs) persists data.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Program.cs) runs the [full job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Modules/Catalog/Catalog.Application/Abstractions/Integrations/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Modules/Catalog/Catalog.Infrastructure/Integrations/OneC/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/CatalogEfRepository.cs) persists data.
 
 The [category job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCCategoryJob.cs) and [product details job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCProductDetailsJob.cs) load every row of the root once (deleted ones included), compare in memory, and save once:
 
@@ -15,7 +15,7 @@ The [category job](../../../../src/Modules/Catalog/Catalog.Application/Features/
 - a returning row is restored with its old slug;
 - a slug is created once, for new rows only, through [SlugService](../../../../src/Modules/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs), and is never rewritten by the import.
 
-Products find their category by name through [CategoryNameMap](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/CategoryNameMap.cs): a missing or ambiguous name keeps the current category (or skips a new product) and is reported in one warning. Each phase logs its duration and counters through [ImportCounters](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/ImportCounters.cs). The projection rebuild leaves out products of deleted categories.
+Products find their category by name through [CategoryNameMap](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/Categories/CategoryNameMap.cs): a missing or ambiguous name keeps the current category (or skips a new product) and is reported in one warning. Each phase logs its duration and counters through [ImportCounters](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/ImportCounters.cs). The projection rebuild leaves out products of deleted categories.
 
 ## Code structure
 
@@ -23,7 +23,7 @@ The tree lists verified entry points and key components, not every supporting fi
 
 ```text
 src/
-├── Bootstrapper/Host.Jobs/Host.Jobs/Program.cs  # runs the job (incl. migrate-slugs)
+├── Bootstrapper/Host.Jobs/Program.cs  # runs the job (incl. migrate-slugs)
 └── Catalog/
     ├── Catalog.Application/
     │   ├── Integrations/OneC/

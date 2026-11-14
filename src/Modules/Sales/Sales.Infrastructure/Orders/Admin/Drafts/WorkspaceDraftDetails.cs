@@ -1,4 +1,7 @@
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Drafts;
+using Sales.Application.Abstractions.Workspace;
+using Sales.Application.Abstractions.Workspace.Pricing;
 
 namespace Sales.Infrastructure.Orders;
 

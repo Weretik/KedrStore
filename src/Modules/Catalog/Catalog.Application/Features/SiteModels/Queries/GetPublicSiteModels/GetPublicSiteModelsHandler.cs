@@ -4,6 +4,7 @@ using Catalog.Application.Shared;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.SiteModels.Public;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
 

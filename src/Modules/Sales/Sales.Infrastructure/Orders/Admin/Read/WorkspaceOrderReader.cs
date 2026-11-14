@@ -1,5 +1,8 @@
+using Sales.Application.Abstractions.Workspace;
 using static Sales.Infrastructure.Orders.WorkspaceQueryTools;
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

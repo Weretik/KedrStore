@@ -75,7 +75,7 @@ src/Modules/Sales/
 
 ## Tests
 
-[OrderDraftTests.cs](../../../../tests/UnitTests/Sales/Domain/OrderDraftTests.cs) · [OrderLinePricingTests.cs](../../../../tests/UnitTests/Sales/Domain/OrderLinePricingTests.cs) · [WorkspaceValidatorsTests.cs](../../../../tests/UnitTests/Sales/Application/WorkspaceValidatorsTests.cs) · [WorkspaceDateRangeTests.cs](../../../../tests/UnitTests/Sales/Application/WorkspaceDateRangeTests.cs) · [OrderDraftPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/OrderDraftPostgresTests.cs) · [WorkspacePricingTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/WorkspacePricingTests.cs) · [WorkspaceOrderAdjustmentPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/WorkspaceOrderAdjustmentPostgresTests.cs)
+[OrderDraftTests.cs](../../../../tests/UnitTests/Sales/Domain/OrderDraftTests.cs) · [OrderLinePricingTests.cs](../../../../tests/UnitTests/Sales/Domain/OrderLinePricingTests.cs) · [WorkspaceValidatorsTests.cs](../../../../tests/UnitTests/Sales/Application/Workspace/WorkspaceValidatorsTests.cs) · [WorkspaceDateRangeTests.cs](../../../../tests/UnitTests/Sales/Application/Workspace/WorkspaceDateRangeTests.cs) · [OrderDraftPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/Orders/OrderDraftPostgresTests.cs) · [WorkspacePricingTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/Workspace/WorkspacePricingTests.cs) · [WorkspaceOrderAdjustmentPostgresTests.cs](../../../../tests/IntegrationTests/Sales/Persistence/Workspace/WorkspaceOrderAdjustmentPostgresTests.cs)
 
 The checkout handler has no dedicated test.
 

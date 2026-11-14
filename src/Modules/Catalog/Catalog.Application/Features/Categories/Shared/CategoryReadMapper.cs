@@ -1,5 +1,6 @@
 using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Contracts.Category;
+using Catalog.Application.Features.Categories.Shared.Tree;
 
 namespace Catalog.Application.Features.Categories.Shared;
 

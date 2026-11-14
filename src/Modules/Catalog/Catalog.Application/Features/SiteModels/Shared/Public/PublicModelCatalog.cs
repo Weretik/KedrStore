@@ -2,6 +2,7 @@ using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Contracts.SiteModels.Public;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.SiteModels.Shared.Public;
 

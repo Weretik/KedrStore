@@ -86,6 +86,9 @@ using global::Catalog.Infrastructure.Persistence.Slugs;
 using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace IntegrationTests.Catalog.SiteModels;
 
