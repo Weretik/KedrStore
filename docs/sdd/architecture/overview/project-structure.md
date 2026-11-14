@@ -20,7 +20,7 @@ KedrStore.sln
 │       ├── <Module>.Application/     Abstractions/, Features/<Feature>/Commands|Queries/<UseCase>/
 │       ├── <Module>.Contracts/       what other modules may use: interfaces, DTOs, events
 │       ├── <Module>.Domain/          <Aggregate>/
-│       └── <Module>.Infrastructure/  Persistence/<Aggregate>/, Integrations/<System>/, Contracts/<Feature>/
+│       └── <Module>.Infrastructure/  Persistence/<Aggregate>/, Integrations/<System>/, Adapters/<Provider>/, Contracts/<Feature>/
 │
 ├── tests/
 │   ├── UnitTests/                    <Module>/Domain|Application/...

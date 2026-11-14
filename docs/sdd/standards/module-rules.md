@@ -38,7 +38,7 @@ A module never reads another module's database, entities, `DbContext`, repositor
 - **Reads** go through a contract interface. **"After X happens"** reactions go through an integration event declared in the provider's `Contracts` and handled in the consumer's Application, so the provider does not know the consumer.
 - **Commands** to another module, such as "create a production order", are also a contract interface or an event; never call another module's handler or Mediator request type directly.
 - Keep each contract small and named in the provider's words. Change it compatibly: add members or new interfaces instead of changing a shape a consumer already uses.
-- The host does not implement cross-module adapters. An adapter that maps a provider's contract into the consumer's own port lives in the consumer's Infrastructure.
+- The host does not implement cross-module adapters. An adapter that maps a provider's contract into the consumer's own port lives in the consumer's Infrastructure under `Adapters/<Provider>/`.
 
 ## Folder structure inside a module
 
@@ -59,6 +59,7 @@ Folders follow the business, not the kind of class. The same applies to the whol
   Persistence/                     <Module>DbContext.cs, design-time factory, Migrations/
   Persistence/<Aggregate>/         entity configurations, repository, read queries of that aggregate
   Integrations/<System>/           external clients such as 1C, Telegram, storage
+  Adapters/<Provider>/             adapters from another module's Contracts to this module's own ports
   Contracts/<Feature>/             implementations of the module's own Contracts interfaces
   DependencyInjection/             registration of the layer
 <Module>.Api/

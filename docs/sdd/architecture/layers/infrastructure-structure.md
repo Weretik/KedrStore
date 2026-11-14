@@ -17,6 +17,8 @@ Folders follow aggregates and external systems ([module rules](../../standards/m
 │   └── <Aggregate>/                  entity configurations, repository, read queries of that aggregate
 ├── Integrations/
 │   └── <System>/                     1C, CDN, Telegram: client, mapping, sync services
+├── Adapters/
+│   └── <Provider>/                   adapters from another module's Contracts to this module's ports
 ├── Contracts/
 │   └── <Feature>/                    implementations of the module's own Contracts interfaces
 ├── DependencyInjection/              Add<Module>Infrastructure(), called by Add<Module>Module()
