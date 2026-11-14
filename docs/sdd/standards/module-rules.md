@@ -204,10 +204,22 @@ Host.Api/
 - One module's `DbContext` maps only its own tables. Do not add foreign keys, joins, or EF navigation to another module's tables; store the other module's identifier as a value and read its data through that module's `Contracts`.
 - The first migration of a new module creates its schema; check it against an empty database as the [database rules](database-rules.md) require.
 
+## Errors
+
+Business outcomes travel as results; exceptions are only for the unexpected.
+
+- **One error type.** The shared kernel defines `Error(Code, Message, Type)` with `ErrorType` = `Validation`, `NotFound`, `Conflict`, `Forbidden` (and `Unexpected`). Each module's Domain keeps its errors in static `<Aggregate>Errors` classes with stable codes such as `Orders.AlreadyShipped`. Domain and Application never mention HTTP: no status codes, `IResult`/`IActionResult`, `HttpContext`, or `BadHttpRequestException`.
+- **Results, not exceptions, for business cases.** An aggregate method that can be refused returns a result (`order.Cancel()` returns `Result`); the handler returns that error. Throw only for programming errors (`ArgumentException` guards, an impossible state) and real failures (database down, missing configuration). Do not throw a business exception and catch it in a controller or pipeline behavior to turn it into a status code.
+- **One mapper.** Exactly one place in the shared Api layer maps `ErrorType` to HTTP: `Validation` 400, `NotFound` 404, `Conflict` 409, `Forbidden` 403, anything else 500. Controllers and endpoints call it; they never pick status codes from a result themselves and never wrap handlers in `try`/`catch`.
+- **One global exception handler.** The host registers `AddProblemDetails()`, `AddExceptionHandler<GlobalExceptionHandler>()`, and `UseExceptionHandler()`. The handler logs the exception and answers 500 as `ProblemDetails` with the `traceId`; the client never gets the exception text or a stack trace (the developer page is for local development only). A job host logs a failed run and exits non-zero.
+- **Language.** Messages a user can see (validation and business errors) are written in the users' language; codes and logs stay in English.
+
 ## Validation
 
-- Every command and every query that accepts client input has a FluentValidation validator (`<UseCase>Validator`) in the use-case folder. `ValidationBehavior` runs it before the handler and turns failures into `Result.Invalid`.
+- Server validation is mandatory. Frontend validation is only for user experience and is never a reason to skip a server check.
+- Every command and every query that accepts client input has a FluentValidation validator (`<UseCase>Validator`) in the use-case folder. `ValidationBehavior` runs it before the handler and turns failures into a `Validation` error with the field name.
 - Validators check the shape of the input: required fields, lengths, ranges, formats, and paging limits. Business invariants and state checks stay in Domain or the handler; do not query the database from a validator unless the project documents an exception.
+- Validation messages are in the users' language: set FluentValidation's `LanguageManager` culture for the built-in messages, and write custom `WithMessage` texts in that language.
 - Do not repeat validator rules in controllers or request models.
 
 ## KedrStore specifics
@@ -236,6 +248,6 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | `Catalog.Application`, `Content.Application`, `Media.Application`, `Sales.Application`, `Work.Application` | Reference EF Core directly: handlers query the module's read `DbContext` interface (`DbSet`, `EF.Functions.ILike`); `Catalog.Application` also references import packages (ClosedXML, Newtonsoft.Json, Slugify, NodaMoney, Npgsql) | Folder restructuring moves import and job code to Infrastructure; the read-`DbContext` pattern stays until a separate decision |
 | `BuildingBlocks.*` | Type and dump folders (`Application/Contracts/`, `Application/Helpers/`, `Infrastructure/Extensions/`, `Infrastructure/Services/`); no outbox | Folder restructuring renames them by concern; an outbox is added only with a feature that needs reliable cross-module events |
 | Identity, Media, Sales, Work Application and Infrastructure | Ports in `Application/Contracts/` instead of `Abstractions/`; Infrastructure registered through several public `Add*Services` methods instead of one `Add<Module>Infrastructure()` (Catalog and Content done) | Folder restructuring, one module per change |
-| Errors | Domain errors (`DomainError(Code, Message)`) have no type, so every `DomainException` becomes 400; about 15 controller actions choose status codes themselves instead of the one `ToActionResult` mapper; error bodies are not `ProblemDetails` | Error type and one mapper: stage with the next modules; `ProblemDetails` body: switched together with the Minimal API stage and the client updates (owner decision 2026-11-14) |
+| Errors | Domain rules throw `DomainException` (138 places) and `ExceptionBehavior` turns it into 400, so business cases use exceptions and have no error type; `Sales` throws `WorkspaceException(statusCode, ...)` from Application and `AdminOrderWorkspaceController` catches it in 11 actions; about 15 controller actions choose status codes themselves instead of the one `ToActionResult` mapper; error bodies are not `ProblemDetails` | Stage «errors and validation»: `ErrorType`, results from aggregates, one mapper; `ProblemDetails` bodies switch with the Minimal API stage and the client updates (owner decision 2026-11-14) |
 | `Catalog`, `Sales`, `Identity` | Tables and migration history in the `public` schema | Keep: moving existing tables needs a separate migration and rollout plan. New modules use their own schema. |
-| 58 of 173 commands and queries | No FluentValidation validator | Final audit decides which accept client input and need one |
+| Validation | 30 commands and queries with client input have no validator (Catalog 7, Content 3, Identity 8, Sales 12; count of 2026-11-14); validation, domain, and handler messages are in English, and the admin shows them to users as they are | Stage «errors and validation»: add the validators, set FluentValidation `LanguageManager` to `uk`, write user-facing messages in Ukrainian |
