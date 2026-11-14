@@ -27,7 +27,7 @@ public sealed class CategorySiteVisibilityTests
 {
     private const string Doors = "000007226";
 
-    private static SetCategorySiteVisibilityCommandHandler Handler(CatalogDbContext db)
+    private static SetCategorySiteVisibilityHandler Handler(CatalogDbContext db)
         => new(new TestRepository<ProductCategory>(db), Options.Create(new RootCategoryId
         {
             DoorsRootCategoryId = Doors,

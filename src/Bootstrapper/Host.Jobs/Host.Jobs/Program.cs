@@ -27,6 +27,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddJobsHostServices(builder.Configuration);
+builder.ConfigureContainer(new DefaultServiceProviderFactory(JobsServiceProviderOptions.Value));
 
 var app = builder.Build();
 

@@ -23,7 +23,7 @@ Each file and directory should have a coherent responsibility. Before creating f
 
 Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in Mediator pipeline behaviors, but do not move business rules there.
 
-Use specific names such as `CreateOrderCommand`, `GetPublicProductListQuery`, and `GetAdminProductListQueryHandler`. Avoid vague folders or names such as `Common`, `Misc`, `Helper`, `Utils`, and `Manager`. Do not add abstractions without a concrete need.
+Use specific names such as `CreateOrderCommand`, `GetPublicProductListQuery`, and `GetAdminProductListHandler`. Avoid vague folders or names such as `Common`, `Misc`, `Helper`, `Utils`, and `Manager`. Do not add abstractions without a concrete need.
 
 ## Domain events and transactions
 

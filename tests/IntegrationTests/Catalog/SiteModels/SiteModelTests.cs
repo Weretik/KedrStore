@@ -136,40 +136,40 @@ public sealed class SiteModelTests
         public SiteModelChanges Changes => new(db, new TestRepository<ProductGroupAxis>(db),
             new ProductGroupPins(db, new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), State);
 
-        public AcceptSiteModelsCommandHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
+        public AcceptSiteModelsHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
             Changes, State, TimeProvider.System);
 
-        public CreateSiteModelCommandHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
+        public CreateSiteModelHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
             Changes, Reader, TimeProvider.System);
 
-        public SetSiteModelAxesCommandHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
+        public SetSiteModelAxesHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
 
-        public SetSiteModelTextCommandHandler SetText => new(db, new TestRepository<ProductGroupText>(db), Reader,
+        public SetSiteModelTextHandler SetText => new(db, new TestRepository<ProductGroupText>(db), Reader,
             TimeProvider.System);
 
-        public FillSiteModelFromNamesCommandHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
+        public FillSiteModelFromNamesHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
             State, Changes, Reader, TimeProvider.System);
 
-        public RemoveSiteModelProductCommandHandler Remove => new(db, Changes, Reader, TimeProvider.System);
+        public RemoveSiteModelProductHandler Remove => new(db, Changes, Reader, TimeProvider.System);
 
         public async Task<SiteModelDto> GetAsync(int id)
-            => (await new GetSiteModelQueryHandler(Reader).Handle(new GetSiteModelQuery(id), CancellationToken.None))
+            => (await new GetSiteModelHandler(Reader).Handle(new GetSiteModelQuery(id), CancellationToken.None))
                 .Value;
 
         public async Task<SiteModelHealthDto> HealthAsync()
-            => (await new GetSiteModelHealthQueryHandler(State).Handle(new GetSiteModelHealthQuery(),
+            => (await new GetSiteModelHealthHandler(State).Handle(new GetSiteModelHealthQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteShowcaseListDto> ShowcaseAsync(GetSiteShowcaseRequest request)
-            => (await new GetSiteShowcaseQueryHandler(State).Handle(new GetSiteShowcaseQuery(request),
+            => (await new GetSiteShowcaseHandler(State).Handle(new GetSiteShowcaseQuery(request),
                 CancellationToken.None)).Value;
 
         public async Task<List<SiteModelCategoryDto>> CategoriesAsync()
-            => (await new GetSiteModelCategoriesQueryHandler(State).Handle(new GetSiteModelCategoriesQuery(),
+            => (await new GetSiteModelCategoriesHandler(State).Handle(new GetSiteModelCategoriesQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteModelListDto> ListAsync(GetSiteModelsRequest request)
-            => (await new GetSiteModelsQueryHandler(State).Handle(new GetSiteModelsQuery(request),
+            => (await new GetSiteModelsHandler(State).Handle(new GetSiteModelsQuery(request),
                 CancellationToken.None)).Value;
     }
 

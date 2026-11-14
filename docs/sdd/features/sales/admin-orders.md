@@ -6,7 +6,7 @@ Order creation and reads, synchronization status, and retry.
 
 ## Structure and relationships
 
-[AdminOrdersController](../../../../src/Sales/Sales.Api/Controllers/AdminOrdersController.cs) invokes the [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Create/CreateOrderCommandHandler.cs), which validates the counterparty/products and idempotency, then persists [Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs) and [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/Entities/OneCOrderSync.cs) through [IOrderCreationStore](../../../../src/Sales/Sales.Application/Contracts/Persistence/IOrderCreationStore.cs) and [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/SyncOneCOrdersService.cs) sends orders to 1C.
+[AdminOrdersController](../../../../src/Sales/Sales.Api/Controllers/AdminOrdersController.cs) invokes the [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Create/CreateOrderHandler.cs), which validates the counterparty/products and idempotency, then persists [Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs) and [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/Entities/OneCOrderSync.cs) through [IOrderCreationStore](../../../../src/Sales/Sales.Application/Contracts/Persistence/IOrderCreationStore.cs) and [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/Services/SyncOneCOrdersService.cs) sends orders to 1C.
 
 ## Code structure
 
@@ -19,7 +19,7 @@ src/
     ├── Sales.Application/
     │   ├── Contracts/Persistence/IOrderCreationStore.cs  # port and contract
     │   └── Features/Orders/
-    │       ├── Create/CreateOrderCommandHandler.cs  # use-case handler
+    │       ├── Create/CreateOrderHandler.cs  # use-case handler
     │       ├── GetById/GetOrderByIdQueryHandler.cs  # use-case handler
     │       ├── GetList/GetOrderListQueryHandler.cs  # use-case handler
     │       ├── GetSyncStatus/GetOrderSyncStatusQueryHandler.cs  # use-case handler
@@ -36,7 +36,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["AdminOrdersController"] --> B["CreateOrderCommandHandler"]
+    A["AdminOrdersController"] --> B["CreateOrderHandler"]
     B --> C["Validate counterparty, products, and idempotency"]
     C --> D["Order and OneCOrderSync"]
     B --> E["IOrderCreationStore"]

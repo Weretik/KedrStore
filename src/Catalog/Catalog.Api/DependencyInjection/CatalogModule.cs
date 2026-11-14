@@ -9,9 +9,7 @@ public static class CatalogModule
 {
     public static IServiceCollection AddCatalogModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddCatalogInfrastructureServices(configuration);
-        services.AddCatalogIntegrationOneCServices(configuration);
-        services.AddCatalogJobs();
+        services.AddCatalogInfrastructure(configuration);
         services.AddValidatorsFromAssembly(typeof(Catalog.Application.CatalogApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
         services.AddControllers().AddApplicationPart(typeof(CatalogApiAssemblyMarker).Assembly);
 

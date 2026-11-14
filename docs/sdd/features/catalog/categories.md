@@ -8,7 +8,7 @@ Public tree and category page by slug, Admin reads, Admin slug edit, Admin-writt
 
 The [public controller](../../../../src/Catalog/Catalog.Api/Controllers/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Categories/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Slugs/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryStatsReader](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsReader.cs) and [CategoryStatsRollup](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsRollup.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Categories/Content/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Integrations/Html/HtmlSanitizerService.cs) on save. The public tree and category page show only categories marked `IsShownOnSite` and never the Cosmos import root ([PublicCatalogScope](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/PublicCatalogScope.cs)): the tree omits the others and their slugs answer `404`; admin reads still list them.
 
-**Show on site** ([spec 007 R-18](../../specs/catalog/007-site-models/README.md#stage-4b-categories-on-the-site-and-the-showcase-by-model)): an Admin sets the mark with `PUT api/categories/{id}/site-visibility` ([handler](../../../../src/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySiteVisibility/SetCategorySiteVisibilityCommandHandler.cs)). Hiding takes every subcategory with it; showing also shows every parent; Cosmos is never shown. The 1C category sync never changes the mark and gives a new category its parent's (a new top category is shown only in the hardware root). The migration `CategorySiteVisibility` shows the whole «Фурнітура» root (1C `000005513`) once. Hidden categories and their products also leave «Вітрина сайту», «Моделі», and the «Огляд» counts.
+**Show on site** ([spec 007 R-18](../../specs/catalog/007-site-models/README.md#stage-4b-categories-on-the-site-and-the-showcase-by-model)): an Admin sets the mark with `PUT api/categories/{id}/site-visibility` ([handler](../../../../src/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySiteVisibility/SetCategorySiteVisibilityHandler.cs)). Hiding takes every subcategory with it; showing also shows every parent; Cosmos is never shown. The 1C category sync never changes the mark and gives a new category its parent's (a new top category is shown only in the hardware root). The migration `CategorySiteVisibility` shows the whole «Фурнітура» root (1C `000005513`) once. Hidden categories and their products also leave «Вітрина сайту», «Моделі», and the «Огляд» counts.
 
 The active admin list also carries `productCount` (all active products of the category and its descendants, on the site or not) and `filledContentLanguages` (languages with any text or FAQ) from [AdminCategoryInsightsReader](../../../../src/Catalog/Catalog.Application/Features/Categories/Queries/GetAdminCategories/AdminCategoryInsightsReader.cs); the Admin tree uses them to show counts and mark categories without texts. Deleted rows and the by-id read leave both `null`.
 
@@ -30,8 +30,8 @@ src/
     │   │   ├── AdminGetById/, AdminGetList/  # Admin reads (+ deleted filter, counts and filled languages)
     │   │   ├── Content/Get/, Content/Save/  # Admin content query and command
     │   │   ├── SiteVisibility/  # Admin «show on site» mark with subcategories and parents
-    │   │   ├── GetBySlug/GetCategoryBySlugQueryHandler.cs  # history, redirect, counts, prices, content
-    │   │   ├── GetList/GetCategoriesQuryHandler.cs  # tree with counts, hides empty
+    │   │   ├── GetBySlug/GetCategoryBySlugHandler.cs  # history, redirect, counts, prices, content
+    │   │   ├── GetList/GetCategoriesHandler.cs  # tree with counts, hides empty
     │   │   ├── Stats/                   # counts and price range, rolled up the tree
     │   │   └── CategoryTreeIds.cs  # category + descendants
     │   ├── Features/Slugs/Change/  # Admin slug edit (products and categories)
@@ -49,7 +49,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["CategoriesController"] --> C["GetCategoriesQuryHandler / GetCategoryBySlugQueryHandler"]
+    A["CategoriesController"] --> C["GetCategoriesHandler / GetCategoryBySlugHandler"]
     B["AdminCategoriesController"] --> D["Admin reads, ChangeSlug, Content"]
     C --> S["SlugService"]
     C --> T["CategoryStatsReader"]

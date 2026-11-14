@@ -26,7 +26,7 @@ namespace Catalog.Api.Controllers;
 [Authorize(Policy = PolicyNames.CanManageProducts)]
 public sealed class AdminCatalogAttributesController(ISender sender) : ControllerBase
 {
-    private const long SwatchRequestLimit = UploadAttributeSwatchCommandValidator.MaxUploadBytes + 64 * 1024;
+    private const long SwatchRequestLimit = UploadAttributeSwatchValidator.MaxUploadBytes + 64 * 1024;
 
     [HttpGet(Name = "getAdminCatalogAttributes")]
     [ProducesResponseType(typeof(List<AdminCatalogAttributeListItemDto>), StatusCodes.Status200OK)]

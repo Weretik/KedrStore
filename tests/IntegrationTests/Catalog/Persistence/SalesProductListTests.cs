@@ -70,7 +70,7 @@ public sealed class SalesProductListTests
         Assert.All(result.Value.Value, row => Assert.NotNull(row.Price));
     }
 
-    private static GetProductListQueryHandler Handler(CatalogDbContext db) => new(
+    private static GetProductListHandler Handler(CatalogDbContext db) => new(
         db,
         new Snapshot<RootCategoryId>(new RootCategoryId
         {

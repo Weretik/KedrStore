@@ -13,7 +13,7 @@ public sealed class UploadAttributeSwatchTests
         var storage = new FakeStorage(Result.Success(new StoredSwatchImage(42, "https://cdn/swatches/a.png")));
         var bytes = new byte[] { 1, 2, 3 };
 
-        var result = await new UploadAttributeSwatchCommandHandler(storage).Handle(
+        var result = await new UploadAttributeSwatchHandler(storage).Handle(
             new UploadAttributeSwatchCommand(new SwatchUpload("C:\\photos\\satin.png", bytes.Length,
                 () => new MemoryStream(bytes))), CancellationToken.None);
 
@@ -28,9 +28,9 @@ public sealed class UploadAttributeSwatchTests
     public async Task Handle_RejectsAStreamLargerThanTheLimit_WithoutStoring()
     {
         var storage = new FakeStorage(Result.Success(new StoredSwatchImage(1, "u")));
-        var big = new byte[UploadAttributeSwatchCommandValidator.MaxUploadBytes + 1];
+        var big = new byte[UploadAttributeSwatchValidator.MaxUploadBytes + 1];
 
-        var result = await new UploadAttributeSwatchCommandHandler(storage).Handle(
+        var result = await new UploadAttributeSwatchHandler(storage).Handle(
             new UploadAttributeSwatchCommand(new SwatchUpload("big.jpg", 10, () => new MemoryStream(big))),
             CancellationToken.None);
 
@@ -43,7 +43,7 @@ public sealed class UploadAttributeSwatchTests
     {
         var storage = new FakeStorage(Result<StoredSwatchImage>.Unavailable("Media storage is not configured."));
 
-        var result = await new UploadAttributeSwatchCommandHandler(storage).Handle(
+        var result = await new UploadAttributeSwatchHandler(storage).Handle(
             new UploadAttributeSwatchCommand(new SwatchUpload("a.webp", 1, () => new MemoryStream([7]))),
             CancellationToken.None);
 
@@ -53,12 +53,12 @@ public sealed class UploadAttributeSwatchTests
     [Fact]
     public void Validator_RejectsEmptyAndOversizedFiles()
     {
-        var validator = new UploadAttributeSwatchCommandValidator();
+        var validator = new UploadAttributeSwatchValidator();
 
         Assert.False(validator.Validate(new UploadAttributeSwatchCommand(
             new SwatchUpload("a.png", 0, () => Stream.Null))).IsValid);
         Assert.False(validator.Validate(new UploadAttributeSwatchCommand(new SwatchUpload("a.png",
-            UploadAttributeSwatchCommandValidator.MaxUploadBytes + 1, () => Stream.Null))).IsValid);
+            UploadAttributeSwatchValidator.MaxUploadBytes + 1, () => Stream.Null))).IsValid);
         Assert.True(validator.Validate(new UploadAttributeSwatchCommand(
             new SwatchUpload("a.png", 1024, () => Stream.Null))).IsValid);
     }

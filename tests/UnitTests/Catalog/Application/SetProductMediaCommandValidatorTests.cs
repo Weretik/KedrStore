@@ -6,7 +6,7 @@ namespace UnitTests.Catalog.Application;
 /// <summary>R-30, R-31 input rules for <c>PUT /api/admin/products/{id}/media</c>.</summary>
 public sealed class SetProductMediaCommandValidatorTests
 {
-    private readonly SetProductMediaCommandValidator _validator = new();
+    private readonly SetProductMediaValidator _validator = new();
 
     [Fact]
     public void AcceptsOrderedPhotosAndScheme_OrAnEmptySet()

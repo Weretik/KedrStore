@@ -176,7 +176,7 @@ public sealed class ProductGroupBuilderTests
         var group = await db.ProductGroups.AsNoTracking().SingleAsync();
         Assert.Equal(3, group.MainProductId?.Value);
 
-        var setMain = new SetProductGroupMainCommandHandler(db, new TestRepository<ProductGroup>(db),
+        var setMain = new SetProductGroupMainHandler(db, new TestRepository<ProductGroup>(db),
             new ProductGroupReader(db), TimeProvider.System);
         var notOnSite = await setMain.Handle(
             new SetProductGroupMainCommand(group.Id.Value, new SetProductGroupMainRequest { ProductId = 1 }),
@@ -242,7 +242,7 @@ public sealed class ProductGroupBuilderTests
         await RunAsync(db, Dictionary, csv, apply: true);
         var handle = (await db.ProductGroups.AsNoTracking().SingleAsync(group => group.Name == "Ручка")).Id;
 
-        var create = new CreateProductGroupCommandHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
+        var create = new CreateProductGroupHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
             Pins(db), GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
         var created = await create.Handle(new CreateProductGroupCommand(new CreateProductGroupRequest
         {
@@ -258,7 +258,7 @@ public sealed class ProductGroupBuilderTests
         }), CancellationToken.None);
         Assert.False(wrongCategory.IsSuccess);
 
-        var move = new SetProductGroupCommandHandler(db, new TestRepository<ProductGroupMember>(db), Pins(db),
+        var move = new SetProductGroupHandler(db, new TestRepository<ProductGroupMember>(db), Pins(db),
             GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
         var outOfGroups = await move.Handle(new SetProductGroupCommand(2, new SetProductGroupRequest()),
             CancellationToken.None);

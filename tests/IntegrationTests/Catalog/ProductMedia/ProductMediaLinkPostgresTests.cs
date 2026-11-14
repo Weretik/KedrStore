@@ -168,7 +168,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         SetProductMediaCommand command)
     {
         await using var scope = provider.CreateAsyncScope();
-        var handler = ActivatorUtilities.CreateInstance<SetProductMediaCommandHandler>(scope.ServiceProvider);
+        var handler = ActivatorUtilities.CreateInstance<SetProductMediaHandler>(scope.ServiceProvider);
         return await handler.Handle(command, default);
     }
 

@@ -185,7 +185,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var color = await db.Attributes.AsNoTracking().SingleAsync(attribute => attribute.Code == "color");
         var otherColor = await db.AttributeValues.AsNoTracking()
             .SingleAsync(value => value.AttributeId == color.Id && value.Code == "AB");
-        var set = new SetProductAttributeCommandHandler(db, new TestRepository<ProductAttributeValue>(db),
+        var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
             GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
         Assert.True((await set.Handle(new SetProductAttributeCommand(60, color.Id.Value,
                 new SetProductAttributeRequest([new SetProductAttributeValueRequest(otherColor.Id.Value, null)])),
@@ -216,9 +216,9 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var before = await ReviewTextAsync(db, 60);
         Assert.Contains("AL", before);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId, new DecideAttributeCodeRequest(null)),
             CancellationToken.None);
         db.ChangeTracker.Clear();
@@ -241,15 +241,15 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.Contains("«AL»", await ReviewTextAsync(db, 60));
         Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
 
-        var listed = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
+        var listed = await new GetCodeProductsHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
             CancellationToken.None);
         var handles = Assert.Single(listed.Value.Categories, category => category.CategoryId == 5915);
         Assert.Contains(handles.Products, product => product.ProductId == 60);
         Assert.False(handles.HasOwnValue);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId,
                 new DecideAttributeCodeRequest(null, ApplyToAll: false,
                     [new DecideAttributeCodeCategoryRequest(5915, null)])),
@@ -263,7 +263,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.False(alias.IsEditedManually);
         Assert.DoesNotContain("«AL»", await ReviewTextAsync(db, 60));
         Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
-        var after = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
+        var after = await new GetCodeProductsHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
             CancellationToken.None);
         Assert.True(Assert.Single(after.Value.Categories, category => category.CategoryId == 5915).HasOwnValue);
 
@@ -296,9 +296,9 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         output.WriteLine(await ReviewTextAsync(db, cylinder));
         Assert.Contains("ZCG", await ReviewTextAsync(db, cylinder));
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(zcg.AliasId,
                 new DecideAttributeCodeRequest(null, Meanings: [new CodeMeaningRequest(color.Id.Value, gold.Id.Value)])),
             CancellationToken.None);
@@ -319,7 +319,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
             CancellationToken.None)).IsSuccess);
         db.ChangeTracker.Clear();
         Assert.False(await HasGoldAsync(cylinder));
-        var listed = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db))
+        var listed = await new GetCodeProductsHandler(db, new CodeMeaningReader(db))
             .Handle(new GetCodeProductsQuery(zcg.AliasId), CancellationToken.None);
         var own = Assert.Single(listed.Value.Categories, category => category.CategoryId == cylinders);
         Assert.True(own.HasOwnValue);

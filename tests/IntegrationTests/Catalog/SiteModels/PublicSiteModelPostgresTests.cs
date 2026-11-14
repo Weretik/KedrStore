@@ -84,7 +84,7 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
             DoorsRootCategoryId = "000007226", HardwareRootCategoryId = Root, CosmosRootCategoryId = "Космос",
             CosmosCategoryId = 920000
         }));
-        var result = await new GetPublicSiteModelsQueryHandler(reader, new SlugService(context))
+        var result = await new GetPublicSiteModelsHandler(reader, new SlugService(context))
             .Handle(new GetPublicSiteModelsQuery("uk", "zavisy", new GetPublicSiteModelsRequest
             {
                 Filter = ["storona:prava"]

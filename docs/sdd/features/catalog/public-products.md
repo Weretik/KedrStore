@@ -6,7 +6,7 @@ Anonymous product lists by language/category and details by slug.
 
 ## Structure and relationships
 
-[ProductsController](../../../../src/Catalog/Catalog.Api/Controllers/ProductsController.cs) calls the [list handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetPublicProductList/GetPublicProductListQueryHandler.cs) and [details handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetProductBySlug/GetProductBySlugQueryHandler.cs). The list uses the [read projection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs); the source product is [Product](../../../../src/Catalog/Catalog.Domain/Products/Product.cs), the hierarchy is [ProductCategory](../../../../src/Catalog/Catalog.Domain/Categories/ProductCategory.cs), and database access uses [IReadCatalogDbContext](../../../../src/Catalog/Catalog.Application/Abstractions/Persistence/ICatalogDbContext.cs).
+[ProductsController](../../../../src/Catalog/Catalog.Api/Controllers/ProductsController.cs) calls the [list handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetPublicProductList/GetPublicProductListHandler.cs) and [details handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetProductBySlug/GetProductBySlugHandler.cs). The list uses the [read projection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs); the source product is [Product](../../../../src/Catalog/Catalog.Domain/Products/Product.cs), the hierarchy is [ProductCategory](../../../../src/Catalog/Catalog.Domain/Categories/ProductCategory.cs), and database access uses [IReadCatalogDbContext](../../../../src/Catalog/Catalog.Application/Abstractions/Persistence/ICatalogDbContext.cs).
 
 When `categoryId` or `categorySlug` is supplied, the handler reads existing categories, chooses a root by ID (which takes precedence) or slug, then traverses all descendants by `ParentId` with no fixed depth. Public projections are filtered by the subtree ID set before counting, sorting, and paging. A former category slug resolves through [SlugService](../../../../src/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs); an unknown or deleted category slug returns `404`, an unknown `categoryId` an empty page; without a category parameter, the general list is retained. `availability` (`InStock` or `All`) overrides `inStock` when supplied, and the `AvailabilityThenName` sort lists in-stock products first.
 
@@ -23,8 +23,8 @@ src/
     ├── Catalog.Application/
     │   ├── Contracts/Persistence/ICatalogDbContext.cs  # port and contract
     │   └── Features/Products/
-    │       ├── GetBySlug/GetProductBySlugQueryHandler.cs  # use-case handler
-    │       └── GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
+    │       ├── GetBySlug/GetProductBySlugHandler.cs  # use-case handler
+    │       └── GetPublicList/GetPublicProductListHandler.cs  # use-case handler
     └── Catalog.Domain/Entities/
         ├── Product.cs  # domain model
         ├── ProductCategory.cs  # category hierarchy
@@ -35,8 +35,8 @@ src/
 
 ```mermaid
 flowchart LR
-    A["ProductsController"] --> B["GetPublicProductListQueryHandler"]
-    A --> C["GetProductBySlugQueryHandler"]
+    A["ProductsController"] --> B["GetPublicProductListHandler"]
+    A --> C["GetProductBySlugHandler"]
     B --> D["IReadCatalogDbContext"]
     C --> D
     D --> E["ProductListProjection"]

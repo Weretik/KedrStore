@@ -107,7 +107,7 @@ public sealed class AttributeAdminTests
     public async Task YesNoAttribute_IsCreatedWithTheValuesTakAndNi()
     {
         await using var db = await ImportedAsync();
-        var create = new CreateCatalogAttributeCommandHandler(db, new TestRepository<CatalogAttribute>(db),
+        var create = new CreateCatalogAttributeHandler(db, new TestRepository<CatalogAttribute>(db),
             new TestRepository<AttributeValue>(db),
             new CatalogAttributeReader(db, new global::IntegrationTests.Catalog.ProductMedia.FakeProductMediaLibrary()),
             TimeProvider.System);
@@ -126,7 +126,7 @@ public sealed class AttributeAdminTests
     {
         await using var db = await ImportedAsync();
         var color = await AttributeIdAsync(db, "color");
-        var set = new SetProductAttributeCommandHandler(db, new TestRepository<ProductAttributeValue>(db),
+        var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
             GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
 
         // Product 1 becomes chrome like product 2: same color and side → «Однакові варіанти».
@@ -144,7 +144,7 @@ public sealed class AttributeAdminTests
         var kept = Assert.Single(await ColorsAsync(db, 1));
         Assert.Equal((AttributeValueSource.Manual, await ValueIdAsync(db, "CR")), (kept.Source, kept.ValueId!.Value.Value));
 
-        var restore = new RestoreProductAttributeCommandHandler(db, new TestRepository<ProductAttributeValue>(db),
+        var restore = new RestoreProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
             GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
         var restored = await restore.Handle(new RestoreProductAttributeCommand(1, color), CancellationToken.None);
         Assert.True(restored.IsSuccess);
@@ -159,7 +159,7 @@ public sealed class AttributeAdminTests
     public async Task SetValue_RejectsAValueOfAnotherAttribute_AndAnEmptyList()
     {
         await using var db = await ImportedAsync();
-        var set = new SetProductAttributeCommandHandler(db, new TestRepository<ProductAttributeValue>(db),
+        var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
             GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
 
         var wrong = await set.Handle(new SetProductAttributeCommand(1, await AttributeIdAsync(db, "color"),
@@ -167,7 +167,7 @@ public sealed class AttributeAdminTests
             CancellationToken.None);
         Assert.False(wrong.IsSuccess);
 
-        var validator = new SetProductAttributeCommandValidator();
+        var validator = new SetProductAttributeValidator();
         Assert.False(validator.Validate(new SetProductAttributeCommand(1, 1, new SetProductAttributeRequest([]))).IsValid);
         Assert.False(validator.Validate(new SetProductAttributeCommand(1, 1,
             new SetProductAttributeRequest([new SetProductAttributeValueRequest(1, 2m)]))).IsValid);
@@ -177,7 +177,7 @@ public sealed class AttributeAdminTests
     public async Task AcceptedProduct_StaysAcceptedAfterImport_UntilReopened()
     {
         await using var db = await ImportedAsync();
-        var accept = new AcceptProductReviewCommandHandler(db,
+        var accept = new AcceptProductReviewHandler(db,
             new TestRepository<ProductAttributeReview>(db), new ProductAttributesReader(db), new TestContentEditor(),
             TimeProvider.System);
 
@@ -189,7 +189,7 @@ public sealed class AttributeAdminTests
         var review = await db.ProductAttributeReviews.AsNoTracking().SingleAsync(item => item.ProductId == ProductId.From(3));
         Assert.Equal(AttributeReviewState.Accepted, review.State);
 
-        var reopen = new ReopenProductReviewCommandHandler(db, new TestRepository<ProductAttributeReview>(db),
+        var reopen = new ReopenProductReviewHandler(db, new TestRepository<ProductAttributeReview>(db),
             new ProductAttributesReader(db), TimeProvider.System);
         var reopened = await reopen.Handle(new ReopenProductReviewCommand(3), CancellationToken.None);
         Assert.Equal("needs_review", reopened.Value.Review.State);
@@ -206,9 +206,9 @@ public sealed class AttributeAdminTests
         Assert.Contains(before, code => code.RawValue == "AL" && code.ValueId is null);
         Assert.False(Assert.Single(await ColorsAsync(db, 2)).IsConfirmed);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(cp.AliasId,
             new DecideAttributeCodeRequest(await ValueIdAsync(db, "CR"))), CancellationToken.None);
 
@@ -256,7 +256,7 @@ public sealed class AttributeAdminTests
         Assert.True(color.IsFilterable);
         Assert.Equal(3, color.ProductCount);
 
-        var set = new SetCategoryAttributeFiltersCommandHandler(db, new TestRepository<CategoryAttribute>(db), reader,
+        var set = new SetCategoryAttributeFiltersHandler(db, new TestRepository<CategoryAttribute>(db), reader,
             TimeProvider.System);
         var result = await set.Handle(new SetCategoryAttributeFiltersCommand(10, new SetCategoryAttributeFiltersRequest(
             [new SetCategoryAttributeFilterRequest(color.AttributeId, false, 5)])), CancellationToken.None);

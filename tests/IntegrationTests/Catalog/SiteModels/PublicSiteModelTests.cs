@@ -111,7 +111,7 @@ public sealed class PublicSiteModelTests
         var hinges = await db.ProductGroupMembers.AsNoTracking()
             .Where(member => member.ProductId == ProductId.From(1)).Select(member => member.GroupId!.Value).SingleAsync();
         var state = new SiteModelStateReader(db);
-        var accepted = await new AcceptSiteModelsCommandHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
+        var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroupAxis>(db),
                     new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
@@ -119,7 +119,7 @@ public sealed class PublicSiteModelTests
             .Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [hinges.Value] }),
                 CancellationToken.None);
         Assert.True(accepted.IsSuccess);
-        await new SetSiteModelTextCommandHandler(db, new TestRepository<ProductGroupText>(db), new SiteModelReader(state),
+        await new SetSiteModelTextHandler(db, new TestRepository<ProductGroupText>(db), new SiteModelReader(state),
                 TimeProvider.System)
             .Handle(new SetSiteModelTextCommand(hinges.Value, "uk", new SetSiteModelTextRequest
             {
@@ -138,7 +138,7 @@ public sealed class PublicSiteModelTests
 
     private static async Task<Ardalis.Result.Result<PublicSiteModelListDto>> ListAsync(CatalogDbContext db,
         string? category, GetPublicSiteModelsRequest request, string lang = "uk")
-        => await new GetPublicSiteModelsQueryHandler(Reader(db), new SlugService(db))
+        => await new GetPublicSiteModelsHandler(Reader(db), new SlugService(db))
             .Handle(new GetPublicSiteModelsQuery(lang, category, request), CancellationToken.None);
 
     private static async Task<(string Attribute, string Left, string Right)> SideSlugsAsync(CatalogDbContext db)
@@ -231,7 +231,7 @@ public sealed class PublicSiteModelTests
     {
         await using var db = await CatalogAsync();
         var side = await SideSlugsAsync(db);
-        var handler = new GetPublicSiteModelQueryHandler(Reader(db), new SlugService(db));
+        var handler = new GetPublicSiteModelHandler(Reader(db), new SlugService(db));
         var slug = (await ListAsync(db, "katehoriia-11", new GetPublicSiteModelsRequest())).Value.Items[0].Slug;
 
         var page = (await handler.Handle(new GetPublicSiteModelQuery("ru", slug), CancellationToken.None)).Value.Model!;
@@ -264,7 +264,7 @@ public sealed class PublicSiteModelTests
     {
         await using var db = await CatalogAsync();
         var side = await SideSlugsAsync(db);
-        var handler = new GetPublicProductModelAddressQueryHandler(Reader(db), new SlugService(db), db);
+        var handler = new GetPublicProductModelAddressHandler(Reader(db), new SlugService(db), db);
 
         var hinge = (await handler.Handle(new GetPublicProductModelAddressQuery("product-1"), CancellationToken.None)).Value;
         Assert.Equal(side.Left, hinge.Item!.Selection[side.Attribute]);
