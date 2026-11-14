@@ -88,18 +88,18 @@ The existing `/api/auth/session/*` token flow (access token in JSON, refresh tok
 
 | Path | Phase | State | Responsibility |
 | --- | --- | --- | --- |
-| `src/Identity/Identity.Infrastructure/DataBase/AppIdentityDbContext.cs` | A | Change | Adds `DataProtectionKeys` set |
+| `src/Identity/Identity.Infrastructure/Persistence/AppIdentityDbContext.cs` | A | Change | Adds `DataProtectionKeys` set |
 | `src/Identity/Identity.Infrastructure/DependencyInjection/IdentityDbContextExtensions.cs` | A, B | Change | Data Protection, lockout options; schemes move to Host.Api in B |
 | `src/Identity/Identity.Infrastructure/Migrations/20261028140559_PersistDataProtectionKeysAndRefreshConcurrency.cs` | A | Done | Keys table; `xmin` is a system column, so no DDL |
-| `src/Identity/Identity.Infrastructure/Configuration/AppRefreshSessionConfiguration.cs` | A | Change | `xmin` concurrency token |
-| `src/Identity/Identity.Infrastructure/Options/IdentitySessionSecurityOptions.cs` | A | Change | `RefreshReuseGraceSeconds` |
+| `src/Identity/Identity.Infrastructure/Persistence/Sessions/AppRefreshSessionConfiguration.cs` | A | Change | `xmin` concurrency token |
+| `src/Identity/Identity.Infrastructure/Sessions/IdentitySessionSecurityOptions.cs` | A | Change | `RefreshReuseGraceSeconds` |
 | `src/Identity/Identity.Infrastructure/Services/IdentitySessionService.cs` | A, B | Split in A | Use cases. A extracted `RefreshSessionStore.cs` (create, rotate with `xmin`, revoke) and `IdentityBearerTokenIssuer.cs` (token issue). B replaces the response capture with the bearer protector |
-| `src/Identity/Identity.Infrastructure/Options/ImportedCounterpartyIdentityOptions.cs`, `AdminUserOptions.cs`, `Seeders/IdentitySeeder.cs` | A | Change | Lockout defaults and alignment |
-| `src/Identity/Identity.Api/Identity.Api/Controllers/AuthSessionController.cs` | A, B | Change → split | A: logout of current session. B: `CookieAuthController`, `MobileAuthController`; cookie helpers to `SessionCookieWriter` |
+| `src/Identity/Identity.Infrastructure/Users/ImportedCounterpartyIdentityOptions.cs`, `AdminUserOptions.cs`, `Seeders/IdentitySeeder.cs` | A | Change | Lockout defaults and alignment |
+| `src/Identity/Identity.Api/Features/Auth/AuthSessionController.cs` | A, B | Change → split | A: logout of current session. B: `CookieAuthController`, `MobileAuthController`; cookie helpers to `SessionCookieWriter` |
 | `src/Identity/Identity.Infrastructure/DependencyInjection/IdentityAuthenticationExtensions.cs` | B | Done | Policy scheme `Kedr`, Identity cookies, bearer; kept in Identity next to the Identity registration instead of Host.Api |
-| `src/Identity/Identity.Infrastructure/Services/Sessions/CookieSessionService.cs` | B | Done | Browser sign-in |
-| `src/Identity/Identity.Api/Identity.Api/Cookies/SessionCookieWriter.cs` | B | Done | CSRF and refresh cookies, shared by controllers and middleware |
-| `src/Identity/Identity.Api/Identity.Api/Controllers/CookieAuthController.cs`, `MobileAuthController.cs`, `AdminUsersController.cs` | B | Done | Browser, mobile, staff accounts |
+| `src/Identity/Identity.Infrastructure/Sessions/CookieSessionService.cs` | B | Done | Browser sign-in |
+| `src/Identity/Identity.Api/Features/Auth/SessionCookieWriter.cs` | B | Done | CSRF and refresh cookies, shared by controllers and middleware |
+| `src/Identity/Identity.Api/Features/Auth/CookieAuthController.cs`, `MobileAuthController.cs`, `AdminUsersController.cs` | B | Done | Browser, mobile, staff accounts |
 | `src/Identity/Identity.Application/Features/Users/*`, `Services/IStaffAccountService.cs`, `Infrastructure/Services/Users/StaffAccountService.cs` | B | Done | Staff accounts |
 | `src/Bootstrapper/Host.Api/Security/Csrf/CookieCsrfMiddleware.cs` | B | Done | R-007 |
 | `src/Sales/Sales.Api/Controllers/Admin*.cs`, `src/Catalog/Catalog.Api/Controllers/Admin*.cs` | C | Done | Policies instead of `[AllowAnonymous]`; Catalog.Api now references Identity.Application for `PolicyNames`, as Sales.Api does |

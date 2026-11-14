@@ -1,7 +1,7 @@
 using BuildingBlocks.Application.Validation;
-using Identity.Application.Features.Auth.CookieLogin;
+using Identity.Application.Features.Auth.Commands.CookieLogin;
 using Identity.Application.Features.Avatars;
-using Identity.Application.Features.Users.UploadStaffAvatar;
+using Identity.Application.Features.Users.Commands.UploadStaffAvatar;
 
 namespace UnitTests.Identity.Application;
 
@@ -13,7 +13,7 @@ public sealed class IdentityInputValidatorsTests
     [Fact]
     public void CookieLogin_RequiresEmailAndPassword_InUkrainian()
     {
-        var result = new CookieLoginCommandValidator().Validate(new CookieLoginCommand("", ""));
+        var result = new CookieLoginValidator().Validate(new CookieLoginCommand("", ""));
 
         Assert.Equal(["Email", "Password"], result.Errors.Select(e => e.PropertyName));
         Assert.All(result.Errors, error => Assert.Equal("Заповніть це поле.", error.ErrorMessage));
@@ -21,14 +21,14 @@ public sealed class IdentityInputValidatorsTests
 
     [Fact]
     public void CookieLogin_AcceptsAnyWellSizedPair()
-        => Assert.True(new CookieLoginCommandValidator().Validate(new CookieLoginCommand("not-an-email", "x")).IsValid);
+        => Assert.True(new CookieLoginValidator().Validate(new CookieLoginCommand("not-an-email", "x")).IsValid);
 
     [Theory]
     [InlineData(0, AvatarRules.MissingMessage)]
     [InlineData(AvatarRules.MaxBytes + 1, AvatarRules.TooLargeMessage)]
     public void StaffAvatar_ReportsTheFileProblemOnTheFileField(long length, string message)
     {
-        var result = new UploadStaffAvatarCommandValidator().Validate(
+        var result = new UploadStaffAvatarValidator().Validate(
             new UploadStaffAvatarCommand(Guid.NewGuid(), new AvatarUpload(Stream.Null, length)));
 
         var error = Assert.Single(result.Errors);

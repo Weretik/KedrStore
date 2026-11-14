@@ -100,14 +100,14 @@ All writes are idempotent for the same input except avatar upload, which creates
 | `src/Identity/Identity.Application/Features/Profile/{GetProfile,ChangeOwnName,UploadOwnAvatar,RemoveOwnAvatar,ChangeOwnEmail,ChangeOwnPassword}/` | Done | Own-profile use cases and validators |
 | `src/Identity/Identity.Application/Features/Users/{ChangeStaffName,ChangeStaffEmail,UploadStaffAvatar,RemoveStaffAvatar}/` | Done | Manager edits by an Admin |
 | `src/Identity/Identity.Application/Features/Avatars/` | Done | `AvatarUpload` input, `AvatarResult`, `AvatarRules` (limits) |
-| `src/Identity/Identity.Application/Services/IProfileService.cs`, `IStaffProfileEditService.cs` | Done | Ports for the use cases |
-| `src/Identity/Identity.Infrastructure/Services/Profile/ProfileService.cs` | Done | Own profile with `UserManager`, `SignInManager` |
+| `src/Identity/Identity.Application/Abstractions/Accounts/IProfileService.cs`, `IStaffProfileEditService.cs` | Done | Ports for the use cases |
+| `src/Identity/Identity.Infrastructure/Profile/ProfileService.cs` | Done | Own profile with `UserManager`, `SignInManager` |
 | `src/Identity/Identity.Infrastructure/Services/Users/{StaffProfileEditService,ManagedStaffResolver,AccountEmailWriter}.cs` | Done | Manager-only edits, Admin-target refusal, email change shared with the own profile |
-| `src/Identity/Identity.Infrastructure/Services/Users/StaffAccountService.cs` | Done | `avatarUrl` in list; manager-only password rule |
+| `src/Identity/Identity.Infrastructure/Users/StaffAccountService.cs` | Done | `avatarUrl` in list; manager-only password rule |
 | `src/Identity/Identity.Infrastructure/Avatars/{AvatarImageProcessor,AvatarOrientation,AvatarService,IAvatarStorage,FtpAvatarStorage,UnconfiguredAvatarStorage,AvatarUrlBuilder}.cs`, `Options/AvatarStorageOptions.cs` | Done | Image checks and conversion, EXIF orientation, upload pipeline, storage port and FTP, URL |
-| `src/Identity/Identity.Api/Identity.Api/Controllers/ProfileController.cs` | Done | `/api/profile` |
-| `src/Identity/Identity.Api/Identity.Api/Controllers/AdminUsersController.cs` | Done | New staff edit routes |
-| `src/Identity/Identity.Api/Identity.Api/Contracts/{Profile,Users,Auth}/*` | Done | Requests and responses, `avatarUrl` |
+| `src/Identity/Identity.Api/Features/Profile/ProfileController.cs` | Done | `/api/profile` |
+| `src/Identity/Identity.Api/Features/Users/AdminUsersController.cs` | Done | New staff edit routes |
+| `src/Identity/Identity.Api/Contracts/{Profile,Users,Auth}/*` | Done | Requests and responses, `avatarUrl` |
 | `docs/sdd/contracts/identity/profile.openapi.yaml`, `users.openapi.yaml`, `session.openapi.yaml`, `openapi.yaml` | Done | Contract |
 | `.github/workflows/deploy-cloudrun.yml`, `src/Bootstrapper/Host.Api/appsettings.json` | Done | Secret `AvatarStorage__Ftp__Password`; host, user and URLs in `appsettings.json` |
 | `tests/IntegrationTests/Identity/Api/ProfileApiTests.cs`, `AdminUsersProfileApiTests.cs` | Done | SC-001…SC-011 through the API with an in-memory storage |

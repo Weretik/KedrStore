@@ -1,5 +1,8 @@
 using FluentFTP;
-using Identity.Infrastructure.Options;
+using Identity.Infrastructure.Avatars;
+using Identity.Infrastructure.Seeding;
+using Identity.Infrastructure.Sessions;
+using Identity.Infrastructure.Users;
 
 namespace Identity.Infrastructure.Avatars;
 

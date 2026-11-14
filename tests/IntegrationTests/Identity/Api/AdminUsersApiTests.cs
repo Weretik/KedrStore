@@ -1,7 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Identity.Application.Services;
+using Identity.Application.Abstractions.Accounts;
+using Identity.Application.Abstractions.Sessions;
 using Identity.Contracts.Users;
 using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Entities;

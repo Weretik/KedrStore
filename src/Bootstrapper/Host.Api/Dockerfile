@@ -31,7 +31,7 @@ COPY ["src/Content/Content.Domain/Content.Domain.csproj", "src/Content/Content.D
 COPY ["src/Content/Content.Infrastructure/Content.Infrastructure.csproj", "src/Content/Content.Infrastructure/"]
 
 # Identity
-COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/Identity.Api/"]
+COPY ["src/Identity/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/"]
 COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]
 COPY ["src/Identity/Identity.Domain/Identity.Domain.csproj", "src/Identity/Identity.Domain/"]
 COPY ["src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Identity/Identity.Infrastructure/"]

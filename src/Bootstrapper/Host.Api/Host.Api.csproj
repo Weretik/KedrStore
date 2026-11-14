@@ -27,7 +27,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\..\Catalog\Catalog.Api\Catalog.Api.csproj" />
-      <ProjectReference Include="..\..\Identity\Identity.Api\Identity.Api\Identity.Api.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Api\Identity.Api.csproj" />
       <ProjectReference Include="..\..\Sales\Sales.Api\Sales.Api.csproj" />
       <ProjectReference Include="..\..\Content\Content.Api\Content.Api.csproj" />
       <ProjectReference Include="..\..\Media\Media.Api\Media.Api.csproj" />
