@@ -2,6 +2,11 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Wholesale.GetAdminWholesalePage;
+
+using Content.Api.Endpoints.Wholesale.GetPublicWholesalePage;
+using Content.Api.Endpoints.Wholesale.UpdateAdminWholesalePage;
+
 namespace Content.Api.Endpoints.Wholesale;
 
 /// <summary>

@@ -138,9 +138,13 @@ public sealed class FolderStructureTests
                                                     || type.Name.EndsWith("Endpoints", StringComparison.Ordinal))
                     .ToArray();
                 var misplaced = endpoints
-                    .Where(type => !EndpointFeatureNamespace.IsMatch(type.Namespace!) ||
-                                   !type.Namespace!.StartsWith($"{name}.Endpoints.", StringComparison.Ordinal))
-                    .Select(type => $"{type.FullName} is outside {name}.Endpoints.<Feature>");
+                    .Where(type => !type.Namespace!.StartsWith($"{name}.Endpoints.", StringComparison.Ordinal) ||
+                                   (type.Name.EndsWith("Endpoints", StringComparison.Ordinal)
+                                       ? !EndpointFeatureNamespace.IsMatch(type.Namespace!)
+                                       : type.Namespace != EndpointUseCaseNamespace(type)))
+                    .Select(type => type.Name.EndsWith("Endpoints", StringComparison.Ordinal)
+                        ? $"{type.FullName} is outside {name}.Endpoints.<Feature>"
+                        : $"{type.FullName} is outside {name}.Endpoints.<Feature>.<UseCase> named by it");
                 var leftovers = types.Where(type => typeof(ControllerBase).IsAssignableFrom(type))
                     .Select(type => $"{type.FullName} is a controller; modules expose Minimal API endpoints");
                 return misplaced.Concat(leftovers);
@@ -153,6 +157,36 @@ public sealed class FolderStructureTests
 
     private static readonly Regex EndpointFeatureNamespace =
         new(@"^\w+\.Api\.Endpoints\.\w+$", RegexOptions.CultureInvariant);
+
+    private static string EndpointUseCaseNamespace(Type endpoint)
+    {
+        var feature = string.Join('.', endpoint.Namespace!.Split('.').Take(4));
+        return $"{feature}.{endpoint.Name[..^"Endpoint".Length]}";
+    }
+
+    /// <summary>
+    /// An HTTP feature folder is a table of contents, not a pile: <c>Endpoints/&lt;Feature&gt;/</c> holds only the
+    /// route group <c>&lt;Feature&gt;Endpoints.cs</c>; each endpoint sits with its own request and response in
+    /// <c>&lt;UseCase&gt;/</c>, and what several endpoints of the feature share sits in <c>Shared/</c>.
+    /// </summary>
+    [Fact]
+    public void EndpointFeatureFolders_HoldOnlyTheRouteGroup_AndOneFolderPerEndpoint()
+    {
+        var modules = Path.Combine(FindRepositoryRoot(), "src", "Modules");
+        var violations = Directory.EnumerateDirectories(modules, "Endpoints", SearchOption.AllDirectories)
+            .Where(path => !path.Split(Path.DirectorySeparatorChar).Any(segment => segment is "bin" or "obj"))
+            .SelectMany(Directory.EnumerateDirectories)
+            .SelectMany(feature => Directory.EnumerateFiles(feature, "*.cs")
+                .Where(file => Path.GetFileName(file) != $"{Path.GetFileName(feature)}Endpoints.cs" &&
+                               Directory.EnumerateFiles(feature, "*Endpoint.cs", SearchOption.AllDirectories).Any()))
+            .Select(file => Path.GetRelativePath(modules, file).Replace('\\', '/'))
+            .Order()
+            .ToArray();
+
+        Assert.True(violations.Length == 0,
+            "Move each file into the endpoint's <UseCase>/ folder or the feature's Shared/: " +
+            string.Join(", ", violations));
+    }
 
     [Fact]
     public void ApiCode_UsesInfrastructureOnlyForRegistration()

@@ -2,6 +2,15 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Work.Api.Endpoints.Tasks.GetMyWorkTasks;
+
+using Work.Api.Endpoints.Tasks.DeleteMyWorkTask;
+using Work.Api.Endpoints.Tasks.ChangeMyWorkTaskStatus;
+using Work.Api.Endpoints.Tasks.CreateWorkTaskForUser;
+using Work.Api.Endpoints.Tasks.SetMyWorkTaskStep;
+using Work.Api.Endpoints.Tasks.CreateMyWorkTask;
+using Work.Api.Endpoints.Tasks.UpdateMyWorkTask;
+
 namespace Work.Api.Endpoints.Tasks;
 
 /// <summary>

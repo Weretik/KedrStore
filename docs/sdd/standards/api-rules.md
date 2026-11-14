@@ -12,7 +12,7 @@ Use task-specific DTOs. Do not expose entities, persistence types, secrets, or i
 
 Modules expose Minimal API endpoints, never controllers ([module rules](module-rules.md), Api layer). An endpoint must:
 
-- live in `<Module>.Api/Endpoints/<Feature>/` as one `<UseCase>Endpoint` class (`Map` + `Handle`) mapped by the feature's `<Feature>Endpoints` group, which sets the tag and access policy;
+- live in `<Module>.Api/Endpoints/<Feature>/<UseCase>/` as one `<UseCase>Endpoint` class (`Map` + `Handle`) with its own request and response records, mapped by the feature's `<Feature>Endpoints` group in `Endpoints/<Feature>/`, which sets the tag and access policy; records shared by several endpoints of the feature go to `Endpoints/<Feature>/Shared/`;
 - bind an explicit request record (body, or query through `[AsParameters]` with nullable values), never an Application command or query, and map it in `Handle`;
 - pass `CancellationToken` to Mediator;
 - answer through the one result mapper (`ToHttpResult` / `ToProblem`);

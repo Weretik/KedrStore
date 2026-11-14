@@ -2,6 +2,21 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.Attributes.GetAdminUnresolvedAttributeCodes;
+
+using Catalog.Api.Endpoints.Attributes.SetAdminCategoryAttributeFilters;
+using Catalog.Api.Endpoints.Attributes.GetAdminAttributeProblemReasons;
+using Catalog.Api.Endpoints.Attributes.UpdateAdminAttributeValue;
+using Catalog.Api.Endpoints.Attributes.CreateAdminAttributeValue;
+using Catalog.Api.Endpoints.Attributes.GetAdminCatalogAttributes;
+using Catalog.Api.Endpoints.Attributes.GetAdminCatalogAttribute;
+using Catalog.Api.Endpoints.Attributes.GetAdminCategoryAttributeFilters;
+using Catalog.Api.Endpoints.Attributes.CreateAdminCatalogAttribute;
+using Catalog.Api.Endpoints.Attributes.GetAdminAttributeCodeProducts;
+using Catalog.Api.Endpoints.Attributes.DecideAdminAttributeCode;
+using Catalog.Api.Endpoints.Attributes.UpdateAdminCatalogAttribute;
+using Catalog.Api.Endpoints.Attributes.UploadAdminAttributeSwatch;
+
 namespace Catalog.Api.Endpoints.Attributes;
 
 /// <summary>

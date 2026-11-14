@@ -2,6 +2,7 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Site.RefreshSite;
 namespace Content.Api.Endpoints.Site;
 
 /// <summary>«Оновити сайт зараз»: asks the public site to drop its cached content and catalog.</summary>

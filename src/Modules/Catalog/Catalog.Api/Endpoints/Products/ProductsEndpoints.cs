@@ -2,6 +2,18 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.Products.GetAdminProducts;
+
+using Catalog.Api.Endpoints.Products.GetProducts;
+using Catalog.Api.Endpoints.Products.GetProductBySlug;
+using Catalog.Api.Endpoints.Products.GetAdminProductBySlug;
+using Catalog.Api.Endpoints.Products.GetAdminProductGroupOfProduct;
+using Catalog.Api.Endpoints.Products.ChangeAdminProductSlug;
+using Catalog.Api.Endpoints.Products.SetAdminProductGroupOfProduct;
+using Catalog.Api.Endpoints.Products.SetAdminProductMedia;
+using Catalog.Api.Endpoints.Products.GetAllAdminProducts;
+using Catalog.Api.Endpoints.Products.GetAdminProductMedia;
+
 namespace Catalog.Api.Endpoints.Products;
 
 /// <summary>Products: the admin list, slug, media and group, and the public list and product page by slug.</summary>

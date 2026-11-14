@@ -2,6 +2,18 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Articles.DeleteAdminArticle;
+
+using Content.Api.Endpoints.Articles.GetArticleCover;
+using Content.Api.Endpoints.Articles.GetAdminArticles;
+using Content.Api.Endpoints.Articles.GetAdminArticle;
+using Content.Api.Endpoints.Articles.UploadAdminArticleCover;
+using Content.Api.Endpoints.Articles.GetArticles;
+using Content.Api.Endpoints.Articles.GetArticle;
+using Content.Api.Endpoints.Articles.MoveLegacyAdminArticleCovers;
+using Content.Api.Endpoints.Articles.UpdateAdminArticle;
+using Content.Api.Endpoints.Articles.CreateAdminArticle;
+
 namespace Content.Api.Endpoints.Articles;
 
 /// <summary>

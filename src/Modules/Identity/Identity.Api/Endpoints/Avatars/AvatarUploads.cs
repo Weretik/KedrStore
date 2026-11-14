@@ -2,6 +2,7 @@ using Identity.Api.Endpoints.Profile;
 using Identity.Application.Features.Avatars;
 using Microsoft.AspNetCore.Builder;
 
+using Identity.Api.Endpoints.Profile.Shared;
 namespace Identity.Api.Endpoints.Avatars;
 
 /// <summary>HTTP shape shared by the own-profile and Users-page avatar uploads.</summary>

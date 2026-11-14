@@ -2,6 +2,25 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.SiteModels.AcceptAdminSiteModels;
+
+using Catalog.Api.Endpoints.SiteModels.RenameAdminSiteModel;
+using Catalog.Api.Endpoints.SiteModels.GetAdminSiteModel;
+using Catalog.Api.Endpoints.SiteModels.RemoveAdminSiteModelProduct;
+using Catalog.Api.Endpoints.SiteModels.FillAdminSiteModelFromNames;
+using Catalog.Api.Endpoints.SiteModels.GetAdminSiteModelCategories;
+using Catalog.Api.Endpoints.SiteModels.CreateAdminSiteModel;
+using Catalog.Api.Endpoints.SiteModels.GetAdminSiteModelHealth;
+using Catalog.Api.Endpoints.SiteModels.GetPublicProductModelAddress;
+using Catalog.Api.Endpoints.SiteModels.SetAdminSiteModelText;
+using Catalog.Api.Endpoints.SiteModels.AddAdminSiteModelProducts;
+using Catalog.Api.Endpoints.SiteModels.SetAdminSiteModelAxes;
+using Catalog.Api.Endpoints.SiteModels.GetPublicSiteModel;
+using Catalog.Api.Endpoints.SiteModels.GetAdminSiteShowcase;
+using Catalog.Api.Endpoints.SiteModels.GetAdminSiteModels;
+using Catalog.Api.Endpoints.SiteModels.GetPublicSiteModels;
+using Catalog.Api.Endpoints.SiteModels.GetPublicCategorySiteModels;
+
 namespace Catalog.Api.Endpoints.SiteModels;
 
 /// <summary>

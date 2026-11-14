@@ -2,6 +2,11 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.SiteSeo.ListAdminPageSeo;
+
+using Content.Api.Endpoints.SiteSeo.ListPublicPageSeo;
+using Content.Api.Endpoints.SiteSeo.UpdateAdminPageSeo;
+
 namespace Content.Api.Endpoints.SiteSeo;
 
 /// <summary>

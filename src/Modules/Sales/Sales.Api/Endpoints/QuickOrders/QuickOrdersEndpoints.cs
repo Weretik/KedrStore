@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Sales.Api.Endpoints.QuickOrders.PlaceQuickOrder;
 namespace Sales.Api.Endpoints.QuickOrders;
 
 /// <summary>The site quick order: an anonymous, rate-limited order without an account (platform spec 006, R-007).</summary>

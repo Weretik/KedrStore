@@ -1,6 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Identity.Api.Endpoints.Auth.GetSessionMe;
+
+using Identity.Api.Endpoints.Auth.MobileLogout;
+using Identity.Api.Endpoints.Auth.MobileRefresh;
+using Identity.Api.Endpoints.Auth.CookieLogout;
+using Identity.Api.Endpoints.Auth.MobileLogin;
+using Identity.Api.Endpoints.Auth.CookieLogin;
+
 namespace Identity.Api.Endpoints.Auth;
 
 /// <summary>
