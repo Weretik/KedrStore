@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,9 +11,8 @@ using Work.Application.Features.Activity.Commands.RecordWorkActivity;
 namespace Work.Api.Endpoints.Activity;
 
 /// <summary>
-/// Spec work/001, R-5: after a staff member's successful change through an <c>Admin*</c> endpoint group (or, until
-/// the last module moves to Minimal API, an <c>Admin*</c> controller) of any module, writes one activity entry. No
-/// other module knows about it, and a failure to write is logged and never changes the response.
+/// Spec work/001, R-5: after a staff member's successful change through an <c>Admin*</c> endpoint group of any module,
+/// writes one activity entry. No other module knows about it, and a failure to write is logged and never changes the response.
 /// </summary>
 public sealed class WorkActivityMiddleware(RequestDelegate next, ILogger<WorkActivityMiddleware> logger)
 {
@@ -57,14 +55,11 @@ public sealed class WorkActivityMiddleware(RequestDelegate next, ILogger<WorkAct
         }
     }
 
-    /// <summary>The group (tag or controller name), the operation (endpoint or action name) and its assembly.</summary>
+    /// <summary>The group (tag), the operation (endpoint name or class) and its assembly.</summary>
     internal sealed record Source(string Group, string Operation, Assembly Assembly);
 
     internal static Source? Describe(Endpoint endpoint)
     {
-        if (endpoint.Metadata.GetMetadata<ControllerActionDescriptor>() is { } action)
-            return new Source(action.ControllerName, action.ActionName, action.ControllerTypeInfo.Assembly);
-
         var tag = endpoint.Metadata.GetMetadata<ITagsMetadata>()?.Tags.FirstOrDefault();
         var handler = endpoint.Metadata.GetMetadata<MethodInfo>();
         if (tag is null || handler?.DeclaringType is null)

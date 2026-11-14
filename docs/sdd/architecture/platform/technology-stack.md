@@ -3,7 +3,7 @@
 | Area | Current choice | Rule for new work |
 | --- | --- | --- |
 | Runtime | .NET 10 / C#; `global.json` sets SDK `10.0.101` with `latestFeature` roll-forward | Follow nullable annotations and configured analyzers. |
-| HTTP | ASP.NET Core controllers | Keep controllers thin and use Mediator. |
+| HTTP | ASP.NET Core Minimal API | Keep endpoints thin and use Mediator. |
 | Mediator | Mediator 3.x | Use request/handler pairs and the existing pipeline. |
 | Mediator pipeline | RequestLogging, Exception, Performance, Validation, DomainEventDispatcher behaviors | Preserve registration order; do not put business rules in behaviors. |
 | Validation | FluentValidation | Keep input validators beside the corresponding use case. |

@@ -12,7 +12,7 @@ Each client signs in its own way; see the [session contract](identity/session.op
 
 The earlier `/api/auth/session/login|refresh|logout` endpoints were removed on 2026-10-28; only `/api/auth/session/me` remains under that path.
 
-The host has a fallback policy that requires authentication. Public endpoints are those explicitly marked anonymous in a controller. `401` means not signed in: show the login page. `403` means signed in without the needed role: show a "no access" message.
+The host has a fallback policy that requires authentication. Public endpoints are those explicitly marked anonymous on their endpoint group. `401` means not signed in: show the login page. `403` means signed in without the needed role: show a "no access" message.
 
 ## HTTP rules
 

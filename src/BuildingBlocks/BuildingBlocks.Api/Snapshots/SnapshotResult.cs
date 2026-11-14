@@ -1,7 +1,6 @@
 using Ardalis.Result;
 using BuildingBlocks.Api.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
@@ -13,17 +12,6 @@ namespace BuildingBlocks.Api.Snapshots;
 /// </summary>
 public static class SnapshotResult
 {
-    public static ActionResult ToSnapshotResult<T>(this ControllerBase controller, Result<T> result,
-        Func<T, string> version)
-    {
-        if (result.Status != ResultStatus.Ok)
-            return controller.ToProblem(result);
-
-        return IsHeld(controller.HttpContext, version(result.Value))
-            ? new StatusCodeResult(StatusCodes.Status304NotModified)
-            : controller.Ok(result.Value);
-    }
-
     public static IResult ToSnapshotHttpResult<T>(this Result<T> result, HttpContext httpContext,
         Func<T, string> version)
     {

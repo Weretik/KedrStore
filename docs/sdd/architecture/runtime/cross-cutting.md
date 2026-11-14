@@ -18,7 +18,7 @@ Validators live alongside their use case in `Validators` and check input shape: 
 
 Domain code checks business invariants and state transitions. Do not duplicate a rule across layers without a deliberate reason for a defensive check.
 
-`ValidationBehavior` converts validation failures to `Ardalis.Result.Invalid` when the response is `Result` or `Result<T>`. Controllers retain the current HTTP result mapping.
+`ValidationBehavior` converts validation failures to `Ardalis.Result.Invalid` when the response is `Result` or `Result<T>`. Endpoints answer it through `ToHttpResult` as a 400 `ProblemDetails` with `errors`.
 
 ## Domain events
 

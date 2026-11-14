@@ -16,7 +16,7 @@ KedrStore.sln
 │   │   ├── BuildingBlocks.Integrations.OneC/
 │   │   └── BuildingBlocks.Api/
 │   └── <Module>/                     Catalog, Sales, Identity, Content, Media, Work
-│       ├── <Module>.Api/             Features/<Feature>/ controllers, DependencyInjection/Add<Module>Module()
+│       ├── <Module>.Api/             Endpoints/<Feature>/ Minimal API endpoints, DependencyInjection/Add<Module>Module(), Map<Module>Endpoints()
 │       ├── <Module>.Application/     Abstractions/, Features/<Feature>/Commands|Queries/<UseCase>/
 │       ├── <Module>.Contracts/       what other modules may use: interfaces, DTOs, events
 │       ├── <Module>.Domain/          <Aggregate>/

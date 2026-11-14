@@ -61,7 +61,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseWorkActivity();
 
-app.MapControllers();
 app.MapCatalogEndpoints();
 app.MapContentEndpoints();
 app.MapIdentityEndpoints();
