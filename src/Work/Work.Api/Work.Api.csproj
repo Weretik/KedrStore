@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Work.Application\Work.Application.csproj" />
-    <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -7,7 +7,7 @@ using Content.Application.Features.Gallery.Admin.PreviewYoutube;
 using Content.Application.Features.Gallery.Admin.Reorder;
 using Content.Application.Features.Gallery.Admin.Update;
 using Content.Application.Features.Gallery.Common;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

@@ -1,7 +1,7 @@
 using Content.Api.Contacts;
 using Content.Application.Features.Contacts.Get;
 using Content.Application.Features.Contacts.Update;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

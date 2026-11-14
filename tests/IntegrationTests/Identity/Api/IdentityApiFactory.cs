@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Entities;
 using IntegrationTests.TestSupport.Database;

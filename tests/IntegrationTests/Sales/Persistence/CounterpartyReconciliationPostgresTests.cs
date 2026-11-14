@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using Identity.Application.Services;
+using Identity.Contracts.Users;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;

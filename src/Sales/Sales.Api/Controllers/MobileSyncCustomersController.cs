@@ -1,5 +1,5 @@
 using BuildingBlocks.Api.Snapshots;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Sales.Application.Features.MobileSync;
 using Sales.Application.Features.MobileSync.DTOs;
 

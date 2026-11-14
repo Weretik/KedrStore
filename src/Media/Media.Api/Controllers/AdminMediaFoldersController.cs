@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Media.Api.Requests;
 using Media.Application.Features.Folders.Common;
 using Media.Application.Features.Folders.Create;

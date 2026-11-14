@@ -1,7 +1,7 @@
 using Content.Api.Site;
 using Content.Application.Contracts.Site;
 using Content.Application.Features.Site.Refresh;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

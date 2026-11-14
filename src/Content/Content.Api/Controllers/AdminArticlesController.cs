@@ -8,7 +8,7 @@ using Content.Application.Features.Articles.Admin.MoveLegacyCovers;
 using Content.Application.Features.Articles.Admin.Update;
 using Content.Application.Features.Articles.Admin.UploadCover;
 using Content.Application.Features.Articles.Common;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

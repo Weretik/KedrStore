@@ -1,7 +1,7 @@
 using BuildingBlocks.Api.Snapshots;
 using Catalog.Application.Features.MobileSync;
 using Catalog.Contracts.MobileSync;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

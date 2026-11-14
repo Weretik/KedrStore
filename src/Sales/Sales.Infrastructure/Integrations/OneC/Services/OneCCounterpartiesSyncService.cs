@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using Identity.Application.Services;
+using Identity.Contracts.Users;
 using Microsoft.EntityFrameworkCore;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;

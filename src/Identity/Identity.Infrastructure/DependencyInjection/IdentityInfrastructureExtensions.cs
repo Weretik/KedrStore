@@ -1,4 +1,5 @@
 using Identity.Application.Services;
+using Identity.Contracts.Users;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Options;
 using Identity.Infrastructure.Services.Profile;

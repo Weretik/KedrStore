@@ -1,4 +1,4 @@
-namespace Identity.Application.Security.Policies;
+namespace Identity.Contracts.Authorization;
 
 public static class PolicyNames
 {

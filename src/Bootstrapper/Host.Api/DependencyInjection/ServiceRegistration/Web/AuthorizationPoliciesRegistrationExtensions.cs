@@ -1,5 +1,4 @@
-using Identity.Application.Security.Policies;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Host.Api.DependencyInjection.ServiceRegistration.Web;

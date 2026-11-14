@@ -8,8 +8,7 @@ using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.ValueObjects;
-using Identity.Application.Security.Policies;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

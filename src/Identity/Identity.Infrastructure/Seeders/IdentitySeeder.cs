@@ -1,4 +1,4 @@
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Contracts;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Options;

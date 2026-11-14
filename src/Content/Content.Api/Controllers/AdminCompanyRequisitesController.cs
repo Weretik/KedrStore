@@ -2,7 +2,7 @@ using Content.Api.Requisites;
 using Content.Application.Features.Requisites.Get;
 using Content.Application.Features.Requisites.History;
 using Content.Application.Features.Requisites.Update;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;
