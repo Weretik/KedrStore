@@ -279,7 +279,7 @@ public sealed class PublicSiteModelTests
             (await handler.Handle(new GetPublicProductModelAddressQuery("nemaie"), CancellationToken.None)).Status);
     }
 
-    private sealed class Manager : BuildingBlocks.Application.Contracts.ICurrentUserService
+    private sealed class Manager : BuildingBlocks.Application.Users.ICurrentUserService
     {
         public string UserId => "2";
         public bool IsAuthenticated => true;

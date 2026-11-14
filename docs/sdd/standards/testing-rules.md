@@ -16,7 +16,7 @@ Do not repeat an entire scenario at every level without a separate risk. Several
 
 - `UnitTests` contains deterministic Domain and Application tests and does not reference Infrastructure, Bootstrapper, HTTP hosts, or EF Core InMemory.
 - `IntegrationTests` contains persistence, migration, provider, external adapter, background job, HTTP, and OpenAPI tests.
-- `ArchitectureTests` checks project reference direction, compiled type dependencies, business-module isolation, and test organization.
+- `ArchitectureTests` checks project reference direction, compiled type dependencies, business-module isolation, Contracts-only access, folder and use-case layout, hosts, results and validators, EF model snapshots, and test organization ([full list](module-rules.md#architecture-tests)).
 
 In each project, organize tests by `<Module>/<Responsibility>` with a matching namespace. Put shared fixtures, scenario builders, and fakes in `TestSupport`; do not create empty module directories.
 

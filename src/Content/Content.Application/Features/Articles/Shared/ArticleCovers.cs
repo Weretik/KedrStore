@@ -5,6 +5,10 @@ namespace Content.Application.Features.Articles.Shared;
 /// <summary>Reads cover URLs from the media library and applies the cover part of the admin input.</summary>
 internal static class ArticleCovers
 {
+    /// <summary>CDN directory and media-library folder of article covers.</summary>
+    public const string StorageDirectory = "articles";
+    public const string LibraryFolder = "Статті";
+
     public static async Task<IReadOnlyDictionary<long, MediaImage>> ImagesAsync(IMediaImageReader images,
         IEnumerable<long?> mediaFileIds, CancellationToken cancellationToken)
     {

@@ -170,17 +170,17 @@ tests/<Kind>/TestSupport/                                   factories, fakes, bu
 
 ## Architecture tests
 
-The rules above are only real when a test fails on a violation. The architecture test project checks, for every business module:
+The rules above are only real when a test fails on a violation. The architecture test project (`tests/ArchitectureTests/`) checks, for every business module:
 
-- project references: Domain only `BuildingBlocks.Domain`; Application, Infrastructure, and Api reference another module only through its `Contracts`; `Contracts` references no module project;
-- code dependencies (namespaces), the same rules, so a transitive reference cannot bypass them;
-- Api endpoints do not use Infrastructure types;
-- folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands.<UseCase>` / `.Queries.<UseCase>` with no deeper folder, each use-case namespace holds one request and one handler, ports sit in `Abstractions`;
-- hosts contain no class that implements a module port;
-- each module's EF model maps only its own entities, with no navigation or foreign key to another module's entity or schema;
-- every command and query with client input has a validator;
-- Domain throws only programming-error exceptions (`Argument*Exception`, `InvalidOperationException`); business rules return results;
+- `Layers/`: Domain references only `BuildingBlocks.Domain` and throws only programming-error exceptions; Domain properties have no public setter; Application references no Api, Infrastructure or host; Api references only its own Infrastructure and no Domain; compiled type dependencies follow the same direction;
+- `Modules/`: each module has Api, Application, Contracts, Domain and Infrastructure projects; a module reaches another one only through its `Contracts`, and `Contracts` references no project; building blocks reference no module; each EF model maps only its own entities with no link to another module;
+- `Folders/`: no type or dump folders in `src/` (`Entities`, `Enums`, `ValueObjects`, `Configurations`, `DTOs`, `Validators`, `Controllers`, `Repositories`, `Models`, `Interfaces`, `Common`, `Helpers`, `Utils`, `Extensions`, `Services`, …; `Contracts/` only as a module project or `Infrastructure/Contracts/`); each handler sits alone in `Features.<Feature>.Commands|Queries.<UseCase>` and is named `<UseCase>Handler`; a use case does not use another use case's folder (shared code goes to the feature's `Shared/`); controllers sit in `Features/<Feature>/` and use Infrastructure only for registration;
+- `Hosts/`: a host declares no module port implementation, controller or `DbContext`;
+- `Application/`: every command and query answers a `Result`, and every one with client input has a validator;
+- `Persistence/`: each module's EF model matches its latest migration snapshot (`ModelSnapshotTests`, no database needed);
 - test sources sit in a responsibility folder and their namespace follows the path.
+
+Not checked automatically: that ports sit in `Abstractions/` (review it).
 
 A new module, layer, or rule is added to these tests in the same change, test first: the new architecture test must fail on the old code (Red) before the code is moved (Green), as the project's testing rules require for any behavior.
 
@@ -261,9 +261,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | Host.Api | One Mediator registration lists every module's Application assembly | Keep: the Mediator source generator needs one `AddMediator` call with literal assemblies |
 | `Sales.Infrastructure` | 1C sync jobs live in `Integrations/OneC/Jobs/` instead of `Application/Features/<X>/Jobs/` (Catalog and Media already moved theirs) | Jobs audit stage: report first, then move the job entry points to Application behind ports |
 | Side effects | No shared outbox: Sales uses its own `OneCOrderSync` table and job; the quick order sends Telegram directly | Stage: transactional outbox (Cloud Scheduler calls one internal endpoint every minute) |
-| Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | `Catalog.Application`, `Content.Application`, `Media.Application`, `Sales.Application`, `Work.Application` | Reference EF Core directly: handlers query the module's read `DbContext` interface (`DbSet`, `EF.Functions.ILike`); `Catalog.Application` also references import packages (ClosedXML, Newtonsoft.Json, Slugify, NodaMoney, Npgsql) | Folder restructuring moves import and job code to Infrastructure; the read-`DbContext` pattern stays until a separate decision |
-| `BuildingBlocks.*` | Type and dump folders (`Application/Contracts/`, `Application/Helpers/`, `Infrastructure/Extensions/`, `Infrastructure/Services/`); no outbox | Folder restructuring renames them by concern; an outbox is added only with a feature that needs reliable cross-module events |
 | All Api projects | Controllers (in `Features/<Feature>/`) instead of Minimal API endpoints in `Endpoints/<Feature>/` | Last stage, after the audit and all fixes (owner decision 2026-11-14): move every module to Minimal API with separate `Request` types and `ProblemDetails` errors, keeping the OpenAPI snapshot identical |
 | Errors | Every module returns results for business cases; no business exception remains (`DomainException`, `WorkspaceException` and the `IExpectedApplicationException` escape hatch are removed). Still open: Identity controllers use the `BuildingBlocks.Api` `ToActionResult`, the other modules use the one from `Ardalis.Result.AspNetCore`, and the Sales order workspace answers `{code, message}` through its own `WorkspaceErrorAnswers`, so error bodies differ; they are not `ProblemDetails` | One mapper and `ProblemDetails` bodies with a `code` extension switch with the Minimal API stage and the client updates (owner decision 2026-11-14) |
 | `Catalog`, `Sales`, `Identity` | Tables and migration history in the `public` schema | Keep: moving existing tables needs a separate migration and rollout plan. New modules use their own schema. |

@@ -1,4 +1,4 @@
-namespace Identity.Application.Features.Auth.Queries.SessionMe;
+namespace Identity.Application.Features.Auth.Shared;
 
 public sealed record SessionMeResult(
     string UserId,

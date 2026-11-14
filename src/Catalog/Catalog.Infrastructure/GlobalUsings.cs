@@ -14,7 +14,7 @@ global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 // Infrastructure namespaces
 global using BuildingBlocks.Infrastructure.Migrations;
-global using BuildingBlocks.Infrastructure.Services;
+global using BuildingBlocks.Infrastructure.Notifications;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;

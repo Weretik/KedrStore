@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 
 namespace Work.Application.Abstractions.Users;
 

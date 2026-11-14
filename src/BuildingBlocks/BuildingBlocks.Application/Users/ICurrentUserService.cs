@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Application.Contracts
+﻿namespace BuildingBlocks.Application.Users
 {
     public interface ICurrentUserService
     {

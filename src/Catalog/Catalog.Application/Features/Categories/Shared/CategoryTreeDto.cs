@@ -1,4 +1,4 @@
-namespace Catalog.Application.Features.Categories.Queries.GetCategories;
+namespace Catalog.Application.Features.Categories.Shared;
 
 public sealed record CategoryTreeDto(
     int Id,

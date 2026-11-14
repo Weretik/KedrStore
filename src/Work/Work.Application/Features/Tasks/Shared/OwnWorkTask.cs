@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Work.Application.Abstractions.Users;
 
 namespace Work.Application.Features.Tasks.Shared;

@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Infrastructure.Services;
+﻿namespace BuildingBlocks.Infrastructure.Notifications;
 
 public sealed class TelegramOptions
 {

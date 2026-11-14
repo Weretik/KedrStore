@@ -1,6 +1,5 @@
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Category;
@@ -42,7 +41,7 @@ public sealed class GetCategoryBySlugHandler(
             return Result.NotFound();
 
         var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
-        var tree = GetCategoriesQuryHandler.BuildTree(categories, query.Lang, stats, hideEmpty: false);
+        var tree = CategoryTree.Build(categories, query.Lang, stats, hideEmpty: false);
         var node = Find(tree, selected.Id.Value);
         if (node is null)
             return Result.NotFound();

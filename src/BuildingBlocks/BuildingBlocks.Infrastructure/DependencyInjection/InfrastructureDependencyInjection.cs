@@ -1,7 +1,8 @@
-﻿using BuildingBlocks.Application.Contracts;
+﻿using BuildingBlocks.Application.Users;
 using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Infrastructure.DomainEvents;
-using BuildingBlocks.Infrastructure.Services;
+using BuildingBlocks.Infrastructure.Notifications;
+using BuildingBlocks.Infrastructure.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,7 +22,6 @@ public static class InfrastructureDependencyInjection
 
         // Identity context services
         services.AddHttpContextAccessor();
-        services.AddScoped<IPermissionService, ClaimPermissionService>();
         services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
 
         return services;

@@ -1,4 +1,4 @@
-using BuildingBlocks.Infrastructure.Services;
+using BuildingBlocks.Infrastructure.Notifications;
 using Microsoft.Extensions.Options;
 using Sales.Application.Abstractions.DeliveryFailure;
 using Telegram.Bot;
