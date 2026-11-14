@@ -13,7 +13,6 @@ public static class ApplicationRegistrationsExtensions
             configuration.GetSection(PerformanceBehaviorOptions.SectionName));
 
         services.AddMediatorPipeline();
-        services.AddFluentValidation();
 
         return services;
     }

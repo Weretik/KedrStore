@@ -30,17 +30,12 @@
     <ItemGroup>
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\..\Catalog\Catalog.Api\Catalog.Api.csproj" />
-      <ProjectReference Include="..\..\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Identity\Identity.Api\Identity.Api\Identity.Api.csproj" />
-      <ProjectReference Include="..\..\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Sales\Sales.Api\Sales.Api.csproj" />
-      <ProjectReference Include="..\..\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Content\Content.Api\Content.Api.csproj" />
-      <ProjectReference Include="..\..\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Media\Media.Api\Media.Api.csproj" />
-      <ProjectReference Include="..\..\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Work\Work.Api\Work.Api.csproj" />
-      <ProjectReference Include="..\..\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

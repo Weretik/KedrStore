@@ -139,7 +139,7 @@ Host.Api/
 ## KedrStore specifics
 
 - Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`), `Media` (CDN picture library; schema `media`), `Work` (staff tasks and activity log; schema `work`). Projects live in `src/<Module>/<Module>.<Layer>/`.
-- Hosts register modules in `src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/ModulesRegistrationExtensions.cs` and, for jobs, `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`.
+- `Host.Api` calls `Add<Module>Module()` for each module in `src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/ModulesRegistrationExtensions.cs`; each module defines it in `<Module>.Api/DependencyInjection/<Module>Module.cs`. `Host.Jobs` registers module Infrastructure and jobs (`AddCatalogJobs()`) in `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`.
 - Access policy and role names are in `Identity.Contracts/Authorization` (`PolicyNames`, `RoleNames`); every module's Api uses them from there.
 - Architecture tests list business modules in `BusinessModules` in `tests/ArchitectureTests/Modules/ProjectModuleIsolationTests.cs`; add the new module there.
 - All modules share one database and run migrations through `Host.Jobs --job=migrate` ([operations](../operations/data/migrations-and-seeding.md)).
@@ -151,7 +151,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | Where | Deviation | Plan |
 | --- | --- | --- |
 | `Content`, `Sales`, `Work` | No `<Module>.Contracts` project yet | Created empty with the folder restructuring |
-| Host.Api | Registers each module's Infrastructure itself; no `Add<Module>Module()` in Api | Stage: module registration from Api |
+| Host.Api | One Mediator registration lists every module's Application assembly | Keep: the Mediator source generator needs one `AddMediator` call with literal assemblies |
 | All modules | Type folders (`Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Configurations/`, `Common/`), Application features without `Commands/` / `Queries/`, controllers in `Controllers/` | Stage: folder restructuring, one module per change |
 | Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | Tests | No unit tests for Identity; few handler tests for Content, Media, Work | Stage: missing unit tests |

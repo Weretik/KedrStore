@@ -1,12 +1,14 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Identity.Api.Cookies;
 using Identity.Api.Options;
 using Identity.Infrastructure.Options;
 
-namespace Host.Api.DependencyInjection.ServiceRegistration.Options;
+namespace Identity.Api.DependencyInjection;
 
-public static class IdentityOptionsRegistrationExtensions
+internal static class IdentityOptionsRegistrationExtensions
 {
-    public static IServiceCollection AddIdentityConfiguration(
+    public static IServiceCollection AddIdentityOptions(
         this IServiceCollection services,
         IConfiguration configuration)
     {

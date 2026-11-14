@@ -10,6 +10,7 @@
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
       <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
+      <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
