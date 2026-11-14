@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Identity.Infrastructure.Avatars;
+using Identity.Infrastructure.Avatars.Storage;
 
 namespace IntegrationTests.Identity.Avatars;
 

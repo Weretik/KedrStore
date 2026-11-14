@@ -63,6 +63,50 @@ public sealed class FolderStructureTests
         Assert.Empty(violations);
     }
 
+    /// <summary>
+    /// The folder axiom: a code folder holds at most six code files; past that it is split by meaning into named
+    /// subfolders. No folder is empty, and none is a wrapper (no files and a single subfolder) unless it is a level
+    /// of the layer layout. Generated code (EF <c>Migrations</c>, <c>Generated</c>) is exempt.
+    /// </summary>
+    [Theory]
+    [InlineData("src")]
+    [InlineData("tests")]
+    public void CodeFolders_HoldAtMostSixFiles_AndAreNeitherEmptyNorWrappers(string top)
+    {
+        var root = Path.Combine(FindRepositoryRoot(), top);
+        var violations = new List<string>();
+        foreach (var folder in CodeFolders(root))
+        {
+            var relative = Path.GetRelativePath(root, folder).Replace('\\', '/');
+            var files = Directory.GetFiles(folder);
+            var subfolders = CodeFolders(folder, recursive: false).ToArray();
+            var codeFiles = files.Count(file => file.EndsWith(".cs", StringComparison.Ordinal));
+
+            if (codeFiles > MaxCodeFilesPerFolder)
+                violations.Add($"{top}/{relative}: {codeFiles} code files, split it into named subfolders");
+            if (files.Length == 0 && subfolders.Length == 0)
+                violations.Add($"{top}/{relative}: empty folder, delete it");
+            if (files.Length == 0 && subfolders.Length == 1 && !IsLayoutLevel(folder, subfolders[0]) &&
+                Directory.EnumerateFiles(folder, "*.cs", SearchOption.AllDirectories).Any())
+                violations.Add($"{top}/{relative}: wrapper around {Path.GetFileName(subfolders[0])}/, flatten it");
+        }
+
+        Assert.True(violations.Count == 0, string.Join(Environment.NewLine, violations.Order()));
+    }
+
+    private const int MaxCodeFilesPerFolder = 6;
+
+    private static readonly string[] LayoutLevels = ["Commands", "Queries", "Jobs", "Adapters", "Integrations"];
+
+    private static bool IsLayoutLevel(string folder, string onlySubfolder)
+        => LayoutLevels.Contains(Path.GetFileName(folder)) || LayoutLevels.Contains(Path.GetFileName(onlySubfolder));
+
+    private static IEnumerable<string> CodeFolders(string root, bool recursive = true)
+        => Directory.EnumerateDirectories(root, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+            .Where(path => !Path.GetRelativePath(root, path).Split(Path.DirectorySeparatorChar)
+                .Any(segment => segment is "bin" or "obj" or "Migrations" or "Generated" or "TestResults" ||
+                                segment.StartsWith('.')));
+
     [Fact]
     public void UseCaseHandlers_SitOnePerUseCaseFolderAndAreNamedByIt()
     {
@@ -213,6 +257,13 @@ public sealed class FolderStructureTests
         {
             // A module's own Contracts project, or Infrastructure/Contracts/ that implements it, is allowed.
             return !(segments.Length >= 2 && segments[^2].EndsWith(".Infrastructure", StringComparison.Ordinal));
+        }
+
+        // A large aggregate splits its own value objects, enums and errors out of the entity's folder.
+        if (name is "ValueObjects" or "Enums" && segments.Length >= 3 &&
+            segments[^3].EndsWith(".Domain", StringComparison.Ordinal))
+        {
+            return false;
         }
 
         return TypeOrDumpFolders.Contains(name, StringComparer.Ordinal);

@@ -1,4 +1,5 @@
 using System.Globalization;
+using BuildingBlocks.Domain.Abstractions.Errors;
 
 namespace Sales.Application.Features.OrderWorkspace.Shared;
 

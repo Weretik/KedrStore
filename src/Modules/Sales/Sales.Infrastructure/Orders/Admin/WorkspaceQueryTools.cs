@@ -1,4 +1,5 @@
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace;
 
 namespace Sales.Infrastructure.Orders;
 

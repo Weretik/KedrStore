@@ -3,7 +3,7 @@
 - **ID задачі:** TS-002
 - **Покриває:** SC-001, SC-003
 - **Залежить від:** TS-001
-- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Orders/GetList/`, `tests/UnitTests/Sales/Application/GetOrderListQueryHandlerTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Orders/GetList/`, `tests/UnitTests/Sales/Application/Orders/GetOrderListQueryHandlerTests.cs`
 - **Рівень тесту:** Application
 
 ## Докази

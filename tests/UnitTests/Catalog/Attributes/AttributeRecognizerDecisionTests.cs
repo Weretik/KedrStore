@@ -1,4 +1,5 @@
 using Catalog.Application.Features.Attributes.Shared.Recognition;
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
 
 namespace UnitTests.Catalog.Attributes;
 

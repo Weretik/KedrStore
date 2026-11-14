@@ -64,6 +64,9 @@ using global::Catalog.Infrastructure.Persistence.Slugs;
 using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ValueObjects;
+using Catalog.Domain.Attributes.Enums;
 
 namespace IntegrationTests.Catalog.Groups;
 

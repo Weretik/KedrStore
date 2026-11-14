@@ -11,6 +11,7 @@ using Identity.Infrastructure.Persistence.Users;
 using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
+using Identity.Infrastructure.Sessions.Options;
 
 namespace Identity.Infrastructure.Sessions;
 

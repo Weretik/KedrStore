@@ -6,6 +6,8 @@ using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 using Identity.Infrastructure.Profile;
+using Identity.Infrastructure.Avatars.Images;
+using Identity.Infrastructure.Avatars.Storage;
 
 namespace Identity.Infrastructure.DependencyInjection;
 

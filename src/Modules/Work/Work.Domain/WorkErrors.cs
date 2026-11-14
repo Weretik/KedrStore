@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Work.Domain;
 
 public static class WorkErrors

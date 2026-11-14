@@ -2,6 +2,7 @@ using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
+using Identity.Infrastructure.Avatars.Storage;
 
 namespace Identity.Infrastructure.Avatars;
 

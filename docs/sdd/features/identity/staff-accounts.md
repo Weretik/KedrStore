@@ -42,7 +42,7 @@ flowchart LR
 
 ## Tests
 
-Unit: [StaffAccountValidatorsTests](../../../../tests/UnitTests/Identity/Application/StaffAccountValidatorsTests.cs) check staff roles, password length, email and candidate search — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Identity"`.
+Unit: [StaffAccountValidatorsTests](../../../../tests/UnitTests/Identity/StaffAccountValidatorsTests.cs) check staff roles, password length, email and candidate search — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Identity"`.
 
 [AdminUsersApiTests](../../../../tests/IntegrationTests/Identity/Api/AdminUsersApiTests.cs) run through the real API against PostgreSQL: 401/403, create and duplicate, validation, block and self-block, role and password change, customer search and staff access, 1C sync keeping a staff account.
 

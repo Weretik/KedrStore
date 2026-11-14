@@ -1,4 +1,5 @@
 using Catalog.Domain.Categories;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Domain.Attributes;
 

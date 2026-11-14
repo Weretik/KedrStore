@@ -1,5 +1,6 @@
 using Catalog.Domain.Products;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Groups.Members;
 
 namespace Catalog.Infrastructure.Persistence.Groups;
 

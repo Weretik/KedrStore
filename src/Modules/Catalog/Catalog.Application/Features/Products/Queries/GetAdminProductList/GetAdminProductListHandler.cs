@@ -4,6 +4,7 @@ using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetList;
+using Catalog.Application.Features.Categories.Shared.Tree;
 
 namespace Catalog.Application.Features.Products.Queries.GetAdminProductList;
 

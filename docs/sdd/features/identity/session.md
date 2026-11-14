@@ -52,7 +52,7 @@ flowchart LR
 
 ## Tests
 
-Unit: [IdentityInputValidatorsTests](../../../../tests/UnitTests/Identity/Application/IdentityInputValidatorsTests.cs) and [ProfileAndSessionValidatorsTests](../../../../tests/UnitTests/Identity/Application/ProfileAndSessionValidatorsTests.cs) check sign-in and refresh input — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Identity"`.
+Unit: [IdentityInputValidatorsTests](../../../../tests/UnitTests/Identity/IdentityInputValidatorsTests.cs) and [ProfileAndSessionValidatorsTests](../../../../tests/UnitTests/Identity/ProfileAndSessionValidatorsTests.cs) check sign-in and refresh input — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Identity"`.
 
 PostgreSQL integration tests in [Identity/Sessions](../../../../tests/IntegrationTests/Identity/Sessions/) cover lockout, Data Protection keys, the refresh grace window, parallel refresh and logout scope; [Identity/Api](../../../../tests/IntegrationTests/Identity/Api/) covers cookie login, CSRF, and the mobile flow through the real API. They need Docker or `KEDR_IDENTITY_TEST_POSTGRES_CONNECTION`.
 

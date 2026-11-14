@@ -7,10 +7,10 @@ As of 2026-10-15, `Host.Api` does **not** run migrations or seeders at startup: 
 A separate `Host.Jobs` command runs migrations and seed data:
 
 ```powershell
-dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj -- --job=migrate
+dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=migrate
 ```
 
-`src/Bootstrapper/Host.Jobs/Host.Jobs/DatabaseMigrationJob.cs` calls registered `IDatabaseMigrator` implementations in order, then each unique `ISeeder` type. On failure, `Host.Jobs/Program.cs` returns a non-zero exit code. Normal API startup no longer prepares the database automatically. `--job=migrate` changes schema and data; verify configuration and target database before running it.
+`src/Bootstrapper/Host.Jobs/DatabaseMigrationJob.cs` calls registered `IDatabaseMigrator` implementations in order, then each unique `ISeeder` type. On failure, `Host.Jobs/Program.cs` returns a non-zero exit code. Normal API startup no longer prepares the database automatically. `--job=migrate` changes schema and data; verify configuration and target database before running it.
 
 The current `.github/workflows/deploy-cloudrun.yml` creates or updates the Cloud Run Job `database-migrate`, runs it, and waits for success before deploying a new API revision. This describes the deployment workflow code; it does not confirm the state of any deployed environment. First-deployment order and Identity risks are described in the [migration job specification](../../specs/platform/001-database-migration-job/README.md).
 

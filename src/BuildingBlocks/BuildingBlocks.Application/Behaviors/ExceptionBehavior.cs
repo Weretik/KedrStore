@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Application.Logging;
+using BuildingBlocks.Application.Logging.Failures;
 
 namespace BuildingBlocks.Application.Behaviors;
 

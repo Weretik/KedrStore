@@ -4,6 +4,7 @@ using Catalog.Application.Features.ProductAttributes.Shared;
 using Catalog.Application.Features.SiteModels.Shared;
 using Catalog.Contracts.SiteModels;
 using Catalog.Domain.Groups;
+using Catalog.Application.Features.SiteModels.Shared.State;
 
 namespace Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 

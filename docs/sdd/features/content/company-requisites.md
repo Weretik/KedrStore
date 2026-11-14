@@ -38,8 +38,8 @@ Tables `content."CompanyRequisites"` and `content."CompanyRequisitesChanges"`; s
 
 ## Tests
 
-- Unit: [CompanyRequisitesTests](../../../../tests/UnitTests/Content/CompanyRequisitesTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
-- Integration: [HTTP, access and history](../../../../tests/IntegrationTests/Content/CompanyRequisitesApiTests.cs), [PostgreSQL seed, single row and jsonb log](../../../../tests/IntegrationTests/Content/CompanyRequisitesPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
+- Unit: [CompanyRequisitesTests](../../../../tests/UnitTests/Content/Company/CompanyRequisitesTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
+- Integration: [HTTP, access and history](../../../../tests/IntegrationTests/Content/Company/CompanyRequisitesApiTests.cs), [PostgreSQL seed, single row and jsonb log](../../../../tests/IntegrationTests/Content/Company/CompanyRequisitesPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
 
 ## Related sources
 

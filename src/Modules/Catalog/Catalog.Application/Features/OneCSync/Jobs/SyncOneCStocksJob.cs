@@ -1,6 +1,7 @@
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Application.Features.OneCSync.Sync;
+using Catalog.Application.Features.OneCSync.Sync.Products;
 
 namespace Catalog.Application.Features.OneCSync.Jobs;
 

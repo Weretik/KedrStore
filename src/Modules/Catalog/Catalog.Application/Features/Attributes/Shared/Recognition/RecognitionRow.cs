@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
 
 namespace Catalog.Application.Features.Attributes.Shared.Recognition;
 

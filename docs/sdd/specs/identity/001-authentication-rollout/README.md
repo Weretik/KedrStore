@@ -92,7 +92,7 @@ The existing `/api/auth/session/*` token flow (access token in JSON, refresh tok
 | `src/Modules/Identity/Identity.Infrastructure/DependencyInjection/IdentityDbContextExtensions.cs` | A, B | Change | Data Protection, lockout options; schemes move to Host.Api in B |
 | `src/Modules/Identity/Identity.Infrastructure/Migrations/20261028140559_PersistDataProtectionKeysAndRefreshConcurrency.cs` | A | Done | Keys table; `xmin` is a system column, so no DDL |
 | `src/Modules/Identity/Identity.Infrastructure/Persistence/Sessions/AppRefreshSessionConfiguration.cs` | A | Change | `xmin` concurrency token |
-| `src/Modules/Identity/Identity.Infrastructure/Sessions/IdentitySessionSecurityOptions.cs` | A | Change | `RefreshReuseGraceSeconds` |
+| `src/Modules/Identity/Identity.Infrastructure/Sessions/Options/IdentitySessionSecurityOptions.cs` | A | Change | `RefreshReuseGraceSeconds` |
 | `src/Modules/Identity/Identity.Infrastructure/Services/IdentitySessionService.cs` | A, B | Split in A | Use cases. A extracted `RefreshSessionStore.cs` (create, rotate with `xmin`, revoke) and `IdentityBearerTokenIssuer.cs` (token issue). B replaces the response capture with the bearer protector |
 | `src/Modules/Identity/Identity.Infrastructure/Users/ImportedCounterpartyIdentityOptions.cs`, `AdminUserOptions.cs`, `Seeders/IdentitySeeder.cs` | A | Change | Lockout defaults and alignment |
 | `src/Modules/Identity/Identity.Api/Features/Auth/AuthSessionController.cs` | A, B | Change → split | A: logout of current session. B: `CookieAuthController`, `MobileAuthController`; cookie helpers to `SessionCookieWriter` |

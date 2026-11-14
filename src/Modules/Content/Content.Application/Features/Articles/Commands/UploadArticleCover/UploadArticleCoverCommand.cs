@@ -1,5 +1,6 @@
 using Content.Application.Abstractions.Media;
 using Content.Application.Features.Articles.Shared;
+using Content.Application.Features.Articles.Shared.Reading;
 
 namespace Content.Application.Features.Articles.Commands.UploadArticleCover;
 

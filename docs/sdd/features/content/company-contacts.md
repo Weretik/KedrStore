@@ -36,8 +36,8 @@ Table `content."CompanyContacts"`; see the [database map](../../architecture/dat
 
 ## Tests
 
-- Unit: [CompanyContactsTests](../../../../tests/UnitTests/Content/CompanyContactsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
-- Integration: [HTTP and access](../../../../tests/IntegrationTests/Content/CompanyContactsApiTests.cs), [PostgreSQL seed and single row](../../../../tests/IntegrationTests/Content/CompanyContactsPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
+- Unit: [CompanyContactsTests](../../../../tests/UnitTests/Content/Company/CompanyContactsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
+- Integration: [HTTP and access](../../../../tests/IntegrationTests/Content/Company/CompanyContactsApiTests.cs), [PostgreSQL seed and single row](../../../../tests/IntegrationTests/Content/Company/CompanyContactsPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
 
 ## Related sources
 

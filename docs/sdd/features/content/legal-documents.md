@@ -42,8 +42,8 @@ Tables `content."LegalDocumentVersions"` and `content."LegalDocumentTexts"`; see
 
 ## Tests
 
-- Unit: [LegalDocumentVersionTests](../../../../tests/UnitTests/Content/LegalDocumentVersionTests.cs) and [GalleryAndDocumentValidatorsTests](../../../../tests/UnitTests/Content/GalleryAndDocumentValidatorsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
-- Integration: [HTTP, access, draft → publish → history](../../../../tests/IntegrationTests/Content/LegalDocumentsApiTests.cs), [PostgreSQL seed and unique indexes](../../../../tests/IntegrationTests/Content/LegalDocumentsPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
+- Unit: [LegalDocumentVersionTests](../../../../tests/UnitTests/Content/Documents/LegalDocumentVersionTests.cs) and [GalleryAndDocumentValidatorsTests](../../../../tests/UnitTests/Content/Documents/GalleryAndDocumentValidatorsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
+- Integration: [HTTP, access, draft → publish → history](../../../../tests/IntegrationTests/Content/Documents/LegalDocumentsApiTests.cs), [PostgreSQL seed and unique indexes](../../../../tests/IntegrationTests/Content/Documents/LegalDocumentsPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content"`.
 
 ## Related sources
 

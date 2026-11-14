@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sales.Application.Features.QuickOrders.Messages;
 using Sales.Infrastructure.Persistence;
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
 
 namespace IntegrationTests.Sales.QuickOrders;
 

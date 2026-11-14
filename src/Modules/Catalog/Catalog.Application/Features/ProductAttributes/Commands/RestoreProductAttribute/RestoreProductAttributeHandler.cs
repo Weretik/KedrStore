@@ -4,6 +4,8 @@ using Catalog.Application.Features.ProductAttributes.Shared;
 using Catalog.Application.Features.Groups.Shared;
 using Catalog.Contracts.Attributes;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.RestoreProductAttribute;
 

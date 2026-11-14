@@ -19,6 +19,8 @@ using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Catalog.Application.Features.OneCSync.Source.Prices;
+using Catalog.Application.Features.OneCSync.Sync.Translations;
 
 namespace IntegrationTests.Catalog.Import;
 

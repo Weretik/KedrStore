@@ -2,6 +2,7 @@ using Catalog.Application.Features.OneCSync.Jobs;
 using Catalog.Application.Features.OneCSync.Sync;
 using Catalog.Application.Features.Attributes.Jobs;
 using Catalog.Application.Features.Slugs.Jobs;
+using Catalog.Application.Features.OneCSync.Sync.Translations;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

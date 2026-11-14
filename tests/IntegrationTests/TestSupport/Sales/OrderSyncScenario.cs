@@ -7,6 +7,7 @@ using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.Integrations.OneC;
+using Sales.Infrastructure.Integrations.OneC.Orders;
 
 namespace IntegrationTests.TestSupport.Sales;
 

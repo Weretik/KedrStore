@@ -2,6 +2,8 @@ using BuildingBlocks.Application.Users;
 using Content.Application.Abstractions.Media;
 using Content.Application.Features.Articles.Shared;
 using Content.Application.Shared;
+using Content.Application.Features.Articles.Shared.Reading;
+using Content.Application.Features.Articles.Shared.Writing;
 
 namespace Content.Application.Features.Articles.Commands.MoveLegacyArticleCovers;
 

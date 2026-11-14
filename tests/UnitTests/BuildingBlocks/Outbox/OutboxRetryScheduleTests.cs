@@ -1,5 +1,6 @@
 using BuildingBlocks.Application.Outbox;
 using BuildingBlocks.Infrastructure.Outbox;
+using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 
 namespace UnitTests.BuildingBlocks.Outbox;
 

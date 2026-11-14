@@ -10,6 +10,13 @@ using Sales.Infrastructure.Orders;
 using Sales.Infrastructure.QuickOrders;
 using Sales.Application.Abstractions.QuickOrders;
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Application.Abstractions.Workspace.Drafts;
+using Sales.Infrastructure.Integrations.OneC.Counterparties;
+using Sales.Infrastructure.Integrations.OneC.Orders;
+using Sales.Application.Abstractions.Orders.Sync;
+using Sales.Application.Abstractions.Workspace.Overview;
+using Sales.Application.Abstractions.Workspace.Pricing;
 
 namespace Sales.Infrastructure.DependencyInjection;
 

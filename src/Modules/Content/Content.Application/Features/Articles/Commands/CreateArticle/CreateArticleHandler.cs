@@ -3,6 +3,8 @@ using Content.Application.Shared;
 using Content.Application.Abstractions.Integrations;
 using Content.Application.Abstractions.Media;
 using Content.Application.Features.Articles.Shared;
+using Content.Application.Features.Articles.Shared.Reading;
+using Content.Application.Features.Articles.Shared.Writing;
 
 namespace Content.Application.Features.Articles.Commands.CreateArticle;
 

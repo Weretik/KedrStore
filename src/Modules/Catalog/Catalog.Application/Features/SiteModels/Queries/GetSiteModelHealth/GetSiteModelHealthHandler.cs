@@ -1,5 +1,6 @@
 using Catalog.Application.Features.SiteModels.Shared;
 using Catalog.Contracts.SiteModels;
+using Catalog.Application.Features.SiteModels.Shared.State;
 
 namespace Catalog.Application.Features.SiteModels.Queries.GetSiteModelHealth;
 

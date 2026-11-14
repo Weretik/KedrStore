@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Commands.CreateWorkspaceOrder;
 using Sales.Api.Endpoints.OrderWorkspace.Shared;
+using Sales.Application.Abstractions.Workspace.Orders;
 namespace Sales.Api.Endpoints.OrderWorkspace.CreateWorkspaceOrder;
 
 internal static class CreateWorkspaceOrderEndpoint

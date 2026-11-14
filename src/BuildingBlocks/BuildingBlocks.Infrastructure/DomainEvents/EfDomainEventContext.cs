@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Application.Notifications;
 using BuildingBlocks.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using BuildingBlocks.Domain.Abstractions.Events;
 
 namespace BuildingBlocks.Infrastructure.DomainEvents;
 

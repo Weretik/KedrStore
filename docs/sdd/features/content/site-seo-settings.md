@@ -34,8 +34,8 @@ Table `content."SiteSeoSettings"`; see the [database map](../../architecture/dat
 
 ## Tests
 
-- Unit: [SiteSeoSettingsTests](../../../../tests/UnitTests/Content/SiteSeoSettingsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~SiteSeoSettingsTests"`.
-- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/SiteSeoSettingsApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~SiteSeoSettings"` (in-memory, no Docker).
+- Unit: [SiteSeoSettingsTests](../../../../tests/UnitTests/Content/Pages/SiteSeoSettingsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~SiteSeoSettingsTests"`.
+- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/Seo/SiteSeoSettingsApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~SiteSeoSettings"` (in-memory, no Docker).
 
 ## Related sources
 

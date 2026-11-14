@@ -1,4 +1,5 @@
 using Catalog.Application.Features.Categories.Shared;
+using Catalog.Application.Features.Categories.Shared.Tree;
 namespace Catalog.Application.Features.Categories.Queries.GetCategories;
 
 public sealed record GetCategoriesQuery(CategoryFilter Filter, string Lang = "uk")

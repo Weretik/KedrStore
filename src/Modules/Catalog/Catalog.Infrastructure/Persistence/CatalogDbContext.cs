@@ -7,6 +7,9 @@ using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.Aliases;
 
 namespace Catalog.Infrastructure.Persistence;
 

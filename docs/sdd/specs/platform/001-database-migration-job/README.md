@@ -11,7 +11,7 @@ Move EF Core migration execution from Cloud Run API startup to the root `Host.Jo
 ## Scope
 
 - After a fresh backup, reset only the agreed noncritical Identity tables and their historical migration rows.
-- Add an explicit one-shot `--job=migrate` mode to `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` and its executable code.
+- Add an explicit one-shot `--job=migrate` mode to `src/Bootstrapper/Host.Jobs/Host.Jobs.csproj` and its executable code.
 - Apply migrations sequentially for all registered contexts, with structured logs and a nonzero exit code on failure.
 - Remove automatic migration execution from `Host.Api` startup.
 - Update Cloud Run deployment so the migration job succeeds before the new API revision is deployed.

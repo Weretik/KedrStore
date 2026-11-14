@@ -32,8 +32,8 @@ Table `content."PageSeo"`; see the [database map](../../architecture/data-model/
 
 ## Tests
 
-- Unit: [PageSeoTests](../../../../tests/UnitTests/Content/PageSeoTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~PageSeoTests"`.
-- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/PageSeoApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~PageSeo"`.
+- Unit: [PageSeoTests](../../../../tests/UnitTests/Content/Pages/PageSeoTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~PageSeoTests"`.
+- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/Seo/PageSeoApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~PageSeo"`.
 
 ## Related sources
 

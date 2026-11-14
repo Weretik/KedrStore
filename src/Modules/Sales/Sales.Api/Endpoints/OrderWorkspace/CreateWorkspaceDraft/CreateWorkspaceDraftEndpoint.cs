@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Commands.CreateWorkspaceDraft;
+using Sales.Application.Abstractions.Workspace.Drafts;
 namespace Sales.Api.Endpoints.OrderWorkspace.CreateWorkspaceDraft;
 
 internal static class CreateWorkspaceDraftEndpoint

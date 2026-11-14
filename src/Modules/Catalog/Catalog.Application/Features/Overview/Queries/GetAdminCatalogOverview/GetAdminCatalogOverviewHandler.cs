@@ -2,6 +2,9 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.SiteModels.Shared;
 using Catalog.Contracts.Overview;
 using Catalog.Domain.Attributes;
+using Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Domain.Attributes.ValueObjects;
+using Catalog.Domain.Attributes.Enums;
 
 namespace Catalog.Application.Features.Overview.Queries.GetAdminCatalogOverview;
 

@@ -2,6 +2,10 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Application.Features.OneCSync.Source;
 using Catalog.Application.Features.OneCSync.Sync;
+using BuildingBlocks.Domain.Abstractions.Errors;
+using Catalog.Application.Features.OneCSync.Source.Prices;
+using Catalog.Application.Features.OneCSync.Sync.Prices;
+using Catalog.Application.Features.OneCSync.Sync.Products;
 
 namespace Catalog.Application.Features.OneCSync.Jobs;
 

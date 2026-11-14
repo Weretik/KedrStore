@@ -1,4 +1,5 @@
 using Sales.Infrastructure.Integrations.OneC;
+using Sales.Infrastructure.Integrations.OneC.Orders;
 
 namespace Sales.Infrastructure.DependencyInjection;
 

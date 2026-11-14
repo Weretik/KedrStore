@@ -1,4 +1,6 @@
 using Sales.Domain.Orders;
+using Sales.Domain.Orders.ValueObjects;
+using Sales.Domain.Orders.Errors;
 
 namespace Sales.Domain.Orders;
 

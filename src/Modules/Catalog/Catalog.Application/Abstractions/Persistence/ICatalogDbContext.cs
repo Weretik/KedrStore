@@ -1,5 +1,8 @@
 ﻿using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes.Aliases;
+using Catalog.Domain.Groups.Members;
+using Catalog.Domain.Attributes.ProductValues;
 
 namespace Catalog.Application.Abstractions.Persistence;
 

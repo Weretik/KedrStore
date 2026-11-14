@@ -3,6 +3,7 @@ using Identity.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.Sessions;
 using Microsoft.Extensions.Options;
 using Identity.Api.Endpoints.Auth.Shared;
+using Identity.Infrastructure.Sessions.Options;
 
 namespace Host.Api.Security.Csrf;
 

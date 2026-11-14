@@ -1,6 +1,7 @@
 using Media.Application.Abstractions.Images;
 using Media.Application.Abstractions.Storage;
 using Media.Contracts.Files;
+using BuildingBlocks.Domain.Abstractions.Errors;
 
 namespace Media.Infrastructure.Contracts.Files;
 

@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Content.Domain.Seo;
 
 public static class PageSeoErrors

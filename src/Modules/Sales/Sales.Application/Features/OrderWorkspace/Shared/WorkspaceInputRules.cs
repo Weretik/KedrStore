@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Sales.Application.Abstractions.Orders;
 using Sales.Domain.Orders.Pricing;
+using Sales.Application.Abstractions.Workspace;
 
 namespace Sales.Application.Features.OrderWorkspace.Shared;
 

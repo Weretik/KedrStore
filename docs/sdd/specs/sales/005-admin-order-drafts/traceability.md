@@ -34,7 +34,7 @@
 
 ## PostgreSQL інтеграційні тести (2026-10-25)
 
-`tests/IntegrationTests/Sales/Persistence/OrderDraftPostgresTests.cs` (колекція `Sales PostgreSQL`, Testcontainers або `KEDR_SALES_TEST_POSTGRES_CONNECTION`):
+`tests/IntegrationTests/Sales/Persistence/Orders/OrderDraftPostgresTests.cs` (колекція `Sales PostgreSQL`, Testcontainers або `KEDR_SALES_TEST_POSTGRES_CONNECTION`):
 
 | Тест | Сценарій |
 | --- | --- |

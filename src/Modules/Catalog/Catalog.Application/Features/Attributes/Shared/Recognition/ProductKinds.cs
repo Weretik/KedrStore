@@ -1,3 +1,6 @@
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
+using Catalog.Application.Features.Attributes.Shared.Recognition.Observations;
+
 namespace Catalog.Application.Features.Attributes.Shared.Recognition;
 
 /// <summary>The kind of product a name describes (Python <c>product_kind</c>); it decides how sizes are read.</summary>

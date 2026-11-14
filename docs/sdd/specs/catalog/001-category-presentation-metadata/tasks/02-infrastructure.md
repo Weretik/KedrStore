@@ -3,7 +3,7 @@
 **Статус:** завершено й перевірено
 
 - [x] T009 Додати погоджену типізовану модель options представлення в `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Options/` і прив'язати її в `src/Modules/Catalog/Catalog.Infrastructure/DependencyInjection/CatalogIntegrationOneCExtension.cs` або наявній точці компонування. **Залежності:** T002, T008.
-- [x] T010 Додати затверджені однакові записи конфігурації до `src/Bootstrapper/Host.Api/appsettings.json` і `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`. **Залежності:** T009.
+- [x] T010 Додати затверджені однакові записи конфігурації до `src/Bootstrapper/Host.Api/appsettings.json` і `src/Bootstrapper/Host.Jobs/appsettings.json`. **Залежності:** T009.
 - [x] T011 Налаштувати поля й погоджений індекс упорядкування, якщо він потрібний, у `src/Modules/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs`; створити нову міграцію в `src/Modules/Catalog/Catalog.Infrastructure/Migrations/`. **Залежності:** T005, T006, T002.
 - [x] T012 [P] Додати перевірки збереження/міграції в `tests/IntegrationTests/` за проєктною домовленістю тестування. **Залежності:** T011.
 

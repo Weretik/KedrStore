@@ -1,6 +1,7 @@
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Category;
+using Catalog.Application.Features.Categories.Shared.Tree;
 
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategoryById;
 

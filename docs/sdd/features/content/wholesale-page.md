@@ -6,7 +6,7 @@ The editable copy of the site page «Співпраця» (wholesale offer) in U
 
 ## Structure and relationships
 
-[WholesalePage](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Modules/Content/Content.Application/Features/Wholesale/Shared/WholesaleTextValidator.cs)).
+[WholesalePage](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Modules/Content/Content.Application/Features/Wholesale/Commands/UpdateWholesalePage/WholesaleTextValidator.cs)).
 
 ## Code structure
 
@@ -33,8 +33,8 @@ Table `content."WholesalePages"`; see the [database map](../../architecture/data
 
 ## Tests
 
-- Unit: [WholesalePageTests](../../../../tests/UnitTests/Content/WholesalePageTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WholesalePageTests"`.
-- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/WholesalePageApiTests.cs), [PostgreSQL seed and jsonb](../../../../tests/IntegrationTests/Content/WholesalePagePostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Wholesale"`.
+- Unit: [WholesalePageTests](../../../../tests/UnitTests/Content/Pages/WholesalePageTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WholesalePageTests"`.
+- Integration: [HTTP, access, validation](../../../../tests/IntegrationTests/Content/Pages/WholesalePageApiTests.cs), [PostgreSQL seed and jsonb](../../../../tests/IntegrationTests/Content/Pages/WholesalePagePostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Wholesale"`.
 
 ## Related sources
 

@@ -7,7 +7,7 @@
 Типізована модель options поруч із `RootCategoryId` у `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Options/` зберігає затверджені записи представлення. Обидва конфігураційні файли хостів прив'язують однакові затверджені метадані:
 
 - `src/Bootstrapper/Host.Api/appsettings.json`
-- `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`
+- `src/Bootstrapper/Host.Jobs/appsettings.json`
 
 `SyncOneCCategoryJob` визначає метадані після побудови ручної ієрархії, створює або оновлює категорії та зберігає наявний захист від видалення за порожньої відповіді. Його наявна гілка Cosmos і надалі створює/оновлює локальну віртуальну категорію без виклику SOAP-методу категорій. `SyncOneCProductDetailsJob` і надалі безпосередньо призначає налаштований ID категорії Cosmos.
 

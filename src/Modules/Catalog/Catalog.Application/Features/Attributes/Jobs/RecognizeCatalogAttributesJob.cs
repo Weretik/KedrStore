@@ -3,6 +3,9 @@ using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Attributes.Shared.Recognition;
 using Catalog.Application.Features.Groups.Shared;
 using Catalog.Domain.Attributes;
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
+using Catalog.Application.Features.Attributes.Shared.Import.Files;
+using Catalog.Domain.Attributes.Enums;
 
 namespace Catalog.Application.Features.Attributes.Jobs;
 

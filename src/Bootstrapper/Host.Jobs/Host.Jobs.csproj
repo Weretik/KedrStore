@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>d92e55a6-aac1-4ec7-b6c8-5e3589d220b5</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="appsettings.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
+      <Content Include="..\..\Modules\Catalog\Catalog.Application\Integrations\OneC\Translation\Imports\product-translations.ru.csv">
+          <Link>Translation\Imports\product-translations.ru.csv</Link>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
+      <ProjectReference Include="..\..\Modules\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -121,7 +121,7 @@ jobs:
       - name: Build & Push Host.Jobs image
         run: |
           JOBS_IMAGE="${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/api/host-jobs:${{ github.sha }}"
-          docker build -f src/Bootstrapper/Host.Jobs/Host.Jobs/Dockerfile -t "$JOBS_IMAGE" .
+          docker build -f src/Bootstrapper/Host.Jobs/Dockerfile -t "$JOBS_IMAGE" .
           docker push "$JOBS_IMAGE"
           echo "JOBS_IMAGE=$JOBS_IMAGE" >> $GITHUB_ENV
 

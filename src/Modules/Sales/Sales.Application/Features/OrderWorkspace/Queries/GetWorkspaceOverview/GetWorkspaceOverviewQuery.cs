@@ -1,4 +1,5 @@
 using Sales.Application.Abstractions.Orders;
+using Sales.Application.Abstractions.Workspace.Overview;
 
 namespace Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOverview;
 

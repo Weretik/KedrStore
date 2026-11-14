@@ -71,7 +71,7 @@ Contract: [media.openapi.yaml](../../../contracts/media/media.openapi.yaml). Fea
 | `src/Modules/Media/Media.Infrastructure/Storage/{MediaUrlBuilder,UnconfiguredMediaStorage,MediaStorageOptions}.cs` | public URL, 503 fallback, options | implemented |
 | `src/Modules/Media/Media.Api/Features/Folders/AdminMediaFoldersController.cs` | `/api/admin/media/folders` | implemented |
 | `src/Modules/Media/Media.Api/Features/Files/AdminMediaFilesController.cs` | `/api/admin/media/files` | implemented |
-| `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs` | `--job=media-cdn-sync [--dry-run]` | changed |
+| `src/Bootstrapper/Host.Jobs/Program.cs` | `--job=media-cdn-sync [--dry-run]` | changed |
 | `.github/workflows/deploy-cloudrun.yml` | FTP secret for the API, Cloud Run job `media-cdn-sync` | changed |
 
 ## Rollout and rollback

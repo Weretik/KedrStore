@@ -1,6 +1,7 @@
 using Catalog.Application.Features.SiteModels.Shared.Public;
 using Catalog.Contracts.SiteModels.Public;
 using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
 

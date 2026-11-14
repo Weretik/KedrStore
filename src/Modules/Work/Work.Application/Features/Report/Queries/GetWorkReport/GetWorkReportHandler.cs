@@ -1,6 +1,5 @@
 using BuildingBlocks.Application.Users;
 using Work.Application.Abstractions.Users;
-using Work.Application.Features.Activity.Shared;
 using Work.Application.Features.Tasks.Shared;
 
 namespace Work.Application.Features.Report.Queries.GetWorkReport;

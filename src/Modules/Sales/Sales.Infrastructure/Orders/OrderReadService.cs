@@ -1,6 +1,7 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Queries.GetOrderById;
 using Sales.Application.Features.Orders.Queries.GetOrderList;
+using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Infrastructure.Orders;
 

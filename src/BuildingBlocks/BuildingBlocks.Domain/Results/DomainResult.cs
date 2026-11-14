@@ -1,4 +1,5 @@
 using BuildingBlocks.Domain.Abstractions;
+using BuildingBlocks.Domain.Abstractions.Errors;
 
 namespace BuildingBlocks.Domain.Results;
 

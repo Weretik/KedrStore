@@ -1,3 +1,6 @@
+using Catalog.Application.Features.Attributes.Shared.Recognition.Dictionary;
+using Catalog.Application.Features.Attributes.Shared.Recognition.ProductNames;
+
 namespace Catalog.Application.Features.Attributes.Shared.Recognition;
 
 /// <summary>

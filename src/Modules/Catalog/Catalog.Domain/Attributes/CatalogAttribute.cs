@@ -1,3 +1,6 @@
+using Catalog.Domain.Attributes.Enums;
+using Catalog.Domain.Attributes.ValueObjects;
+
 namespace Catalog.Domain.Attributes;
 
 /// <summary>

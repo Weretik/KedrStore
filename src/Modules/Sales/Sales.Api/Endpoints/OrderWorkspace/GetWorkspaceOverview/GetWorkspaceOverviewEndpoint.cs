@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOverview;
 using Sales.Application.Features.OrderWorkspace.Shared;
+using Sales.Application.Abstractions.Workspace.Overview;
 namespace Sales.Api.Endpoints.OrderWorkspace.GetWorkspaceOverview;
 
 internal static class GetWorkspaceOverviewEndpoint

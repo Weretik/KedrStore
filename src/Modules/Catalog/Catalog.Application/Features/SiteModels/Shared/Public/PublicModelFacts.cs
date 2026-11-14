@@ -1,5 +1,7 @@
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes.ValueObjects;
+using Catalog.Domain.Attributes.Enums;
 
 namespace Catalog.Application.Features.SiteModels.Shared.Public;
 

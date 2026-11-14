@@ -29,8 +29,8 @@ src/Modules/Content/
 
 ## Tests
 
-- Integration: [orders](../../../../tests/IntegrationTests/Sales/Persistence/WorkspaceOverviewReaderTests.cs), [catalog](../../../../tests/IntegrationTests/Catalog/Api/AdminCatalogOverviewApiTests.cs), [content](../../../../tests/IntegrationTests/Content/ContentOverviewApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Overview"`.
-- Unit: [Kyiv day](../../../../tests/UnitTests/Sales/Application/WorkspaceDateRangeTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WorkspaceDateRangeTests"`.
+- Integration: [orders](../../../../tests/IntegrationTests/Sales/Persistence/Workspace/WorkspaceOverviewReaderTests.cs), [catalog](../../../../tests/IntegrationTests/Catalog/Api/AdminCatalogOverviewApiTests.cs), [content](../../../../tests/IntegrationTests/Content/ContentOverviewApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Overview"`.
+- Unit: [Kyiv day](../../../../tests/UnitTests/Sales/Application/Workspace/WorkspaceDateRangeTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WorkspaceDateRangeTests"`.
 
 ## Related sources
 

@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Catalog.Domain.Categories.Content;
 
 public static class CategoryContentErrors

@@ -1,4 +1,3 @@
-using Host.Api.DependencyInjection.ServiceRegistration.Web;
 using Catalog.Api.DependencyInjection;
 using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;

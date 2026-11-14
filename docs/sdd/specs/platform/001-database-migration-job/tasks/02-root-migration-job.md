@@ -1,8 +1,8 @@
 # Фаза 02 — Кореневе завдання міграції
 
-- [x] T008 Додати окремий сервіс координації міграцій у `src/Bootstrapper/Host.Jobs/Host.Jobs/`, який викликає зареєстровані `IDatabaseMigrator` у погодженому визначеному порядку. **Залежності:** T004.
-- [x] T009 Додати dispatch `--job=migrate` у `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs`; він не потребує root IDs, передає cancellation, логує безпечний контекст і повертає ненульовий код за помилки. **Залежності:** T008.
-- [x] T010 Підтвердити, що `src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj` містить потрібні project references і publish content для нового job; додати лише відсутні залежності кореневого job. **Залежності:** T008.
+- [x] T008 Додати окремий сервіс координації міграцій у `src/Bootstrapper/Host.Jobs/`, який викликає зареєстровані `IDatabaseMigrator` у погодженому визначеному порядку. **Залежності:** T004.
+- [x] T009 Додати dispatch `--job=migrate` у `src/Bootstrapper/Host.Jobs/Program.cs`; він не потребує root IDs, передає cancellation, логує безпечний контекст і повертає ненульовий код за помилки. **Залежності:** T008.
+- [x] T010 Підтвердити, що `src/Bootstrapper/Host.Jobs/Host.Jobs.csproj` містить потрібні project references і publish content для нового job; додати лише відсутні залежності кореневого job. **Залежності:** T008.
 - [x] T011 Додати покриття модульними й інтеграційними тестами для диспетчеризації команди, порядку, зупинки за помилки й ідемпотентного повтору. **Залежності:** T009, T010.
 
 ## Запис завершення (2026-07-29)

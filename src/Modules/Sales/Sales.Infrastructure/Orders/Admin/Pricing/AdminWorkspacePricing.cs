@@ -5,6 +5,8 @@ using Catalog.Contracts.Sales;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Shared;
 using Sales.Domain.Orders.Pricing;
+using Sales.Application.Abstractions.Workspace.Pricing;
+using Sales.Application.Abstractions.Workspace.Drafts;
 
 namespace Sales.Infrastructure.Orders;
 

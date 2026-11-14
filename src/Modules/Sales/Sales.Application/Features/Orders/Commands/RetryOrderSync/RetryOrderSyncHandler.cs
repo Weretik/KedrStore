@@ -1,6 +1,7 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Commands.RetryOrderSync;
 using Sales.Domain.Orders;
+using Sales.Application.Abstractions.Orders.Sync;
 
 namespace Sales.Application.Features.Orders.Commands.RetryOrderSync;
 

@@ -60,6 +60,11 @@ using global::Infrastructure;
 using IntegrationTests.TestSupport.Content;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Domain.Attributes.ValueObjects;
+using Catalog.Domain.Attributes.Aliases;
+using Catalog.Application.Features.Attributes.Shared.Readers;
+using Catalog.Domain.Attributes.Enums;
 
 namespace IntegrationTests.Catalog.Attributes;
 

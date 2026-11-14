@@ -4,6 +4,9 @@ using Catalog.Application.Features.OneCSync.Source;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Application.Features.OneCSync.Sync;
 using Catalog.Application.Features.Slugs.Shared;
+using Catalog.Application.Features.OneCSync.Sync.Translations;
+using Catalog.Application.Features.OneCSync.Sync.Products;
+using Catalog.Application.Features.OneCSync.Sync.Categories;
 
 namespace Catalog.Application.Features.OneCSync.Jobs;
 

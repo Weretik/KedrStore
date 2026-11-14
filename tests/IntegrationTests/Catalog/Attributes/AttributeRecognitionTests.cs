@@ -68,6 +68,12 @@ using global::Catalog.Infrastructure.Persistence.Slugs;
 using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
+using Catalog.Application.Features.Attributes.Shared.Readers;
+using Catalog.Domain.Attributes.Aliases;
+using Catalog.Domain.Attributes.Enums;
+using Catalog.Domain.Attributes.ProductValues;
+using Catalog.Application.Features.Attributes.Shared.Import.Files;
+using Catalog.Domain.Attributes.ValueObjects;
 
 namespace IntegrationTests.Catalog.Attributes;
 

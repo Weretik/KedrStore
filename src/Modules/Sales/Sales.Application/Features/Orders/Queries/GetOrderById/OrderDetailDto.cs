@@ -1,3 +1,5 @@
+using Sales.Domain.Orders;
+
 namespace Sales.Application.Features.Orders.Queries.GetOrderById;
 
 public sealed record OrderDetailDto(
@@ -9,3 +11,19 @@ public sealed record OrderDetailDto(
     IReadOnlyList<OrderLineDto> Lines,
     decimal TotalAmount,
     OrderSyncDto Sync);
+
+public sealed record OrderCounterpartyDto(
+    string CounterpartyId,
+    string Name,
+    string? Phone);
+
+public sealed record OrderLineDto(
+    string ProductId,
+    string ProductName,
+    int Quantity,
+    decimal Amount);
+
+public sealed record OrderSyncDto(
+    OneCOrderSyncStatus Status,
+    string? OneCDocumentNumber,
+    DateTimeOffset? AcceptedAtUtc);

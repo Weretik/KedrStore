@@ -1,6 +1,7 @@
 using BuildingBlocks.Integrations.OneC.Factory;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Source.Prices;
 
 namespace Catalog.Infrastructure.Integrations.OneC;
 

@@ -1,3 +1,5 @@
+using BuildingBlocks.Domain.Abstractions.Errors;
+
 namespace Media.Domain;
 
 public static class MediaErrors
