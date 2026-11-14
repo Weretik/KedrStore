@@ -58,19 +58,19 @@ Contract: [media.openapi.yaml](../../../contracts/media/media.openapi.yaml). Fea
 | `src/Media/Media.Domain/Folders/MediaFolder.cs` | folder aggregate (R-1) | implemented |
 | `src/Media/Media.Domain/Files/MediaFile.cs` | file aggregate (R-3, R-5) | implemented |
 | `src/Media/Media.Domain/MediaErrors.cs` | domain errors | implemented |
-| `src/Media/Media.Application/Contracts/Storage/IMediaStorage.cs` | CDN port: upload, delete, list | implemented |
-| `src/Media/Media.Application/Contracts/Images/IImageInspector.cs` | image type and size port | implemented |
+| `src/Media/Media.Application/Abstractions/Storage/IMediaStorage.cs` | CDN port: upload, delete, list | implemented |
+| `src/Media/Media.Application/Abstractions/Images/IImageInspector.cs` | image type and size port | implemented |
 | `src/Media/Media.Application/Contracts/Persistence/*` | repository and read context | implemented |
 | `src/Media/Media.Application/Features/Folders/{GetTree,Create,Update,Delete}/` | folder use cases + validators (Update = rename + move) | implemented |
 | `src/Media/Media.Application/Features/Files/{GetList,GetById,Upload,Replace,Update,Move,Delete}/` | file use cases + validators (Update = rename + move one) | implemented |
 | `src/Media/Media.Application/Features/{Files,Folders}/Common/` | DTOs, specs, folder rules, upload store | implemented |
-| `src/Media/Media.Application/Jobs/CdnSync/SyncCdnMediaJob.cs` | CDN sync job (R-8) | implemented |
-| `src/Media/Media.Infrastructure/DataBase/MediaDbContext.cs` | schema `media`, own history | implemented |
-| `src/Media/Media.Infrastructure/Storage/FtpMediaStorage.cs` | FTP adapter | implemented |
-| `src/Media/Media.Infrastructure/Images/SkiaImageInspector.cs` | image header reader | implemented |
+| `src/Media/Media.Application/Features/Files/Jobs/SyncCdnMedia/SyncCdnMediaJob.cs` | CDN sync job (R-8) | implemented |
+| `src/Media/Media.Infrastructure/Persistence/MediaDbContext.cs` | schema `media`, own history | implemented |
+| `src/Media/Media.Infrastructure/Integrations/Storage/FtpMediaStorage.cs` | FTP adapter | implemented |
+| `src/Media/Media.Infrastructure/Integrations/Images/SkiaImageInspector.cs` | image header reader | implemented |
 | `src/Media/Media.Infrastructure/Storage/{MediaUrlBuilder,UnconfiguredMediaStorage,MediaStorageOptions}.cs` | public URL, 503 fallback, options | implemented |
-| `src/Media/Media.Api/Controllers/AdminMediaFoldersController.cs` | `/api/admin/media/folders` | implemented |
-| `src/Media/Media.Api/Controllers/AdminMediaFilesController.cs` | `/api/admin/media/files` | implemented |
+| `src/Media/Media.Api/Features/Folders/AdminMediaFoldersController.cs` | `/api/admin/media/folders` | implemented |
+| `src/Media/Media.Api/Features/Files/AdminMediaFilesController.cs` | `/api/admin/media/files` | implemented |
 | `src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs` | `--job=media-cdn-sync [--dry-run]` | changed |
 | `.github/workflows/deploy-cloudrun.yml` | FTP secret for the API, Cloud Run job `media-cdn-sync` | changed |
 

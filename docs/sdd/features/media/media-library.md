@@ -6,11 +6,11 @@ The library of pictures on the CDN (`images-kedr.cdn.express`): virtual folders,
 
 ## Structure and relationships
 
-[AdminMediaFoldersController](../../../../src/Media/Media.Api/Controllers/AdminMediaFoldersController.cs) and [AdminMediaFilesController](../../../../src/Media/Media.Api/Controllers/AdminMediaFilesController.cs) dispatch to one handler per use case. [MediaFolder](../../../../src/Media/Media.Domain/Folders/MediaFolder.cs) is a named node with an optional parent; [MediaFile](../../../../src/Media/Media.Domain/Files/MediaFile.cs) holds the CDN key, display name, type, size, and optional dimensions. Folder checks that need other folders (name clash among siblings, parent exists, no cycle) live in [MediaFolderRules](../../../../src/Media/Media.Application/Features/Folders/Common/MediaFolderRules.cs).
+[AdminMediaFoldersController](../../../../src/Media/Media.Api/Features/Folders/AdminMediaFoldersController.cs) and [AdminMediaFilesController](../../../../src/Media/Media.Api/Features/Files/AdminMediaFilesController.cs) dispatch to one handler per use case. [MediaFolder](../../../../src/Media/Media.Domain/Folders/MediaFolder.cs) is a named node with an optional parent; [MediaFile](../../../../src/Media/Media.Domain/Files/MediaFile.cs) holds the CDN key, display name, type, size, and optional dimensions. Folder checks that need other folders (name clash among siblings, parent exists, no cycle) live in [MediaFolderRules](../../../../src/Media/Media.Application/Features/Folders/Shared/MediaFolderRules.cs).
 
-Uploads go through [MediaUploadStore](../../../../src/Media/Media.Application/Features/Files/Common/MediaUploadStore.cs): the [image inspector](../../../../src/Media/Media.Infrastructure/Images/SkiaImageInspector.cs) reads the real type and size from the picture header, the file is stored unchanged at `library/<yyyy>/<MM>/<guid>.<ext>` through [FtpMediaStorage](../../../../src/Media/Media.Infrastructure/Storage/FtpMediaStorage.cs), then the row is saved. Replace keeps the file ID, points it at a new key, and deletes the old CDN file. Without CDN credentials `UnconfiguredMediaStorage` is registered and writes answer `503`.
+Uploads go through [MediaUploadStore](../../../../src/Media/Media.Application/Features/Files/Shared/MediaUploadStore.cs): the [image inspector](../../../../src/Media/Media.Infrastructure/Integrations/Images/SkiaImageInspector.cs) reads the real type and size from the picture header, the file is stored unchanged at `library/<yyyy>/<MM>/<guid>.<ext>` through [FtpMediaStorage](../../../../src/Media/Media.Infrastructure/Integrations/Storage/FtpMediaStorage.cs), then the row is saved. Replace keeps the file ID, points it at a new key, and deletes the old CDN file. Without CDN credentials `UnconfiguredMediaStorage` is registered and writes answer `503`.
 
-[SyncCdnMediaJob](../../../../src/Media/Media.Application/Jobs/CdnSync/SyncCdnMediaJob.cs) (`--job=media-cdn-sync [--dry-run]`) lists the CDN without `avatars/` and dot service directories such as `.thumbs/`, skips known keys, reports unknown files in `library/` as orphans, and registers other pictures: `products` → folder «Товари», `product-scheme` → «Схеми», deeper directories → subfolders. Other modules upload into a CDN directory and a root folder of their own through [IMediaFileUploader](../../../../src/Media/Media.Contracts/Files/IMediaFileUploader.cs) (Content: article covers → `articles/`, «Статті») and arrange files into their own virtual folder tree through [IMediaFolderArranger](../../../../src/Media/Media.Contracts/Folders/IMediaFolderArranger.cs) (Catalog: product photos by category).
+[SyncCdnMediaJob](../../../../src/Media/Media.Application/Features/Files/Jobs/SyncCdnMedia/SyncCdnMediaJob.cs) (`--job=media-cdn-sync [--dry-run]`) lists the CDN without `avatars/` and dot service directories such as `.thumbs/`, skips known keys, reports unknown files in `library/` as orphans, and registers other pictures: `products` → folder «Товари», `product-scheme` → «Схеми», deeper directories → subfolders. Other modules upload into a CDN directory and a root folder of their own through [IMediaFileUploader](../../../../src/Media/Media.Contracts/Files/IMediaFileUploader.cs) (Content: article covers → `articles/`, «Статті») and arrange files into their own virtual folder tree through [IMediaFolderArranger](../../../../src/Media/Media.Contracts/Folders/IMediaFolderArranger.cs) (Catalog: product photos by category).
 
 Access: everything needs `CanManageMedia` (Manager, Seo, Admin); file and folder delete also need `RequireAdminRole`.
 
@@ -19,19 +19,22 @@ Access: everything needs `CanManageMedia` (Manager, Seo, Admin); file and folder
 ```text
 src/Media/
 ├── Media.Api/
-│   ├── Controllers/AdminMediaFoldersController.cs  # /api/admin/media/folders
-│   ├── Controllers/AdminMediaFilesController.cs    # /api/admin/media/files
-│   └── Requests/MediaRequests.cs                   # request bodies
+│   ├── Features/Folders/AdminMediaFoldersController.cs  # /api/admin/media/folders, MediaFolderRequests
+│   ├── Features/Files/AdminMediaFilesController.cs      # /api/admin/media/files, MediaFileRequests
+│   └── DependencyInjection/MediaModule.cs
 ├── Media.Application/
-│   ├── Contracts/                                  # persistence, storage (CDN, URLs), image inspector ports
-│   ├── Features/Folders/                           # GetTree, Create, Update (rename + move), Delete
-│   ├── Features/Files/                             # GetList, GetById, Upload, Replace, Update, Move, Delete
-│   └── Jobs/CdnSync/                               # SyncCdnMediaJob, options, report
+│   ├── Abstractions/                               # persistence, storage (CDN, URLs), image inspector ports
+│   ├── Features/Folders/{Commands,Queries,Shared}/ # GetMediaFolderTree, CreateMediaFolder, UpdateMediaFolder (rename + move), DeleteMediaFolder
+│   ├── Features/Files/{Commands,Queries,Shared}/   # GetMediaFiles, GetMediaFile, UploadMediaFile, ReplaceMediaFile, UpdateMediaFile, MoveMediaFiles, DeleteMediaFile
+│   └── Features/Files/Jobs/SyncCdnMedia/           # SyncCdnMediaJob, options, report
+├── Media.Contracts/                                # what other modules use: lookup, directory, uploader, folder arranger
 ├── Media.Domain/                                   # MediaFolder, MediaFile, errors
 └── Media.Infrastructure/
-    ├── DataBase/MediaDbContext.cs                  # schema media, own migration history
-    ├── Storage/                                    # FTP storage, URL builder, options
-    ├── Images/SkiaImageInspector.cs
+    ├── Persistence/MediaDbContext.cs               # schema media, own migration history; {Files,Folders}/ configurations
+    ├── Contracts/                                  # Media.Contracts implementations
+    ├── Integrations/Storage/                       # FTP storage, URL builder, options
+    ├── Integrations/Images/SkiaImageInspector.cs
+    ├── DependencyInjection/MediaInfrastructure.cs  # AddMediaInfrastructure
     └── Migrations/*_InitialMedia.cs
 ```
 

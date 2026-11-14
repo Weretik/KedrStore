@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Media.Application.Contracts.Storage;
+using Media.Application.Abstractions.Storage;
 
 namespace IntegrationTests.Media;
 

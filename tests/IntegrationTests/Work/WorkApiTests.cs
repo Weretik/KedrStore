@@ -2,15 +2,15 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IntegrationTests.TestSupport.Api;
-using Media.Application.Contracts.Persistence;
-using Media.Infrastructure.DataBase;
+using Media.Application.Abstractions.Persistence;
+using Media.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Work.Application.Contracts.Persistence;
-using Work.Infrastructure.DataBase;
+using Work.Application.Abstractions.Persistence;
+using Work.Infrastructure.Persistence;
 
 namespace IntegrationTests.Work;
 

@@ -1,9 +1,9 @@
 using IntegrationTests.TestSupport.Database;
-using Media.Application.Contracts.Storage;
-using Media.Application.Features.Files.GetList;
-using Media.Application.Features.Folders.GetTree;
-using Media.Application.Jobs.CdnSync;
-using Media.Application.Contracts.Persistence;
+using Media.Application.Abstractions.Storage;
+using Media.Application.Features.Files.Queries.GetMediaFiles;
+using Media.Application.Features.Folders.Queries.GetMediaFolderTree;
+using Media.Application.Features.Files.Jobs.SyncCdnMedia;
+using Media.Application.Abstractions.Persistence;
 using Media.Contracts.Files;
 using Media.Contracts.Folders;
 using Media.Infrastructure.DependencyInjection;
@@ -63,7 +63,7 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
 
         await using var scope = provider.CreateAsyncScope();
         var read = scope.ServiceProvider.GetRequiredService<IReadMediaDbContext>();
-        var tree = (await new GetMediaFolderTreeQueryHandler(read).Handle(new GetMediaFolderTreeQuery(), default)).Value;
+        var tree = (await new GetMediaFolderTreeHandler(read).Handle(new GetMediaFolderTreeQuery(), default)).Value;
         Assert.Equal(["banners", "old", "Схеми", "Товари"], tree.Folders.Select(folder => folder.Name).Order(StringComparer.Ordinal));
         var products = tree.Folders.Single(folder => folder.Name == "Товари");
         Assert.Equal(2, products.FileCount);
@@ -71,13 +71,13 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(5, tree.TotalFileCount);
 
         var urls = scope.ServiceProvider.GetRequiredService<IMediaUrlBuilder>();
-        var page = (await new GetMediaFilesQueryHandler(read, urls)
+        var page = (await new GetMediaFilesHandler(read, urls)
             .Handle(new GetMediaFilesQuery(null, false, "73", 1, 2), default)).Value;
         Assert.Equal(4, page.TotalCount);
         Assert.Equal(["731.jpg", "732.JPG"], page.Items.Select(item => item.FileName));
         Assert.Equal("https://images-kedr.cdn.express/products/731.jpg", page.Items[0].Url);
 
-        var handler = new GetMediaFilesQueryHandler(read, urls);
+        var handler = new GetMediaFilesHandler(read, urls);
         var direct = (await handler.Handle(new GetMediaFilesQuery(products.Id, false, null), default)).Value;
         var withSubfolders = (await handler.Handle(
             new GetMediaFilesQuery(products.Id, false, null, IncludeSubfolders: true), default)).Value;
@@ -233,7 +233,7 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
                 ["MediaStorage:PublicBaseUrl"] = "https://images-kedr.cdn.express"
             })
             .Build();
-        var services = new ServiceCollection().AddMediaInfrastructureServices(configuration);
+        var services = new ServiceCollection().AddMediaInfrastructure(configuration);
         services.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.RemoveAll<IMediaStorage>();
