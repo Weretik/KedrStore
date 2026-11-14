@@ -87,10 +87,10 @@ Folders follow the business, not the kind of class. The same applies to the whol
   <Aggregate>/                     Order.cs, OrderLine.cs, OrderStatus.cs, OrderId.cs, OrderErrors.cs, OrderPlaced.cs
   <Aggregate>/<Part>/              only when the aggregate grows: a sub-concept such as Lines/, not a type
 <Module>.Application/
-  Abstractions/                    ports of the module: repositories, unit of work, external services
+  Abstractions/                    ports: what Application asks from the outside world (IOrderRepository, IUnitOfWork, IClock, ICatalogDbContext)
   Features/<Feature>/
-    Commands/<UseCase>/            <UseCase>Command.cs, <UseCase>CommandHandler.cs, <UseCase>CommandValidator.cs
-    Queries/<UseCase>/             <UseCase>Query.cs, <UseCase>QueryHandler.cs, <UseCase>QueryValidator.cs, response DTOs
+    Commands/<UseCase>/            PlaceOrderCommand.cs, PlaceOrderHandler.cs, PlaceOrderValidator.cs, PlaceOrderResponse.cs
+    Queries/<UseCase>/             GetOrderDetailsQuery.cs, GetOrderDetailsHandler.cs, GetOrderDetailsValidator.cs, OrderDetailsDto.cs
     EventHandlers/                 handlers of domain or other modules' integration events for this feature
     Shared/                        DTOs, mapping, and policies used by several use cases of this feature
 <Module>.Infrastructure/
@@ -108,7 +108,7 @@ Folders follow the business, not the kind of class. The same applies to the whol
 ```
 
 - **Domain.** One folder per aggregate holds its root, child entities, value objects, enums, errors, and events. A value object used by several aggregates gets a folder named after the concept (`Money/`, `Slugs/`).
-- **Application, CQRS.** Every use case is one folder under `Commands/` (changes state) or `Queries/` (reads only). A command handler never returns a read model bigger than the new identifier or status; a query handler never changes state. Admin, public, and mobile variants of the same feature live in the same feature folder as separate use cases (`GetRedirects`, `GetPublicRedirects`), not in separate `Public…` feature folders. A use case's request and response types live in its folder; the name `Contracts` is reserved for the module's Contracts project.
+- **Application, one use case = one folder.** Every use case is one folder under `Commands/` (changes state) or `Queries/` (reads only), named after the action (`PlaceOrder`, `GetOrderDetails`). The folder holds, flat and together, everything of that use case: the request (`<UseCase>Command` or `<UseCase>Query`), its handler (`<UseCase>Handler`), its validator (`<UseCase>Validator`), and its result (`<UseCase>Response` for a command, `<Name>Dto` for a query). One request per folder: a second query or command is a second folder. No subfolders inside a use case (`DTOs/`, `Validators/`, `Models/`); a type that two use cases share goes to the feature's `Shared/`. Ports that Application needs from the outside world (repositories, unit of work, clock, read `DbContext` interfaces, external services) live in `Abstractions/` and are implemented in Infrastructure. A command handler never returns a read model bigger than the new identifier or status; a query handler never changes state. Admin, public, and mobile variants of the same feature live in the same feature folder as separate use cases (`GetRedirects`, `GetPublicRedirects`), not in separate `Public…` feature folders. A use case's request and response types live in its folder; the name `Contracts` is reserved for the module's Contracts project.
 - **Infrastructure.** Persistence is grouped by aggregate, the same names as in Domain; integrations by external system.
 - **Api.** Controllers are grouped by the same features as Application. One controller serves one audience (admin, public, mobile) of one feature.
 - A folder with eight or more production files is a signal to look for a sub-concept to split out, not a reason to create type folders.
@@ -139,7 +139,7 @@ The rules above are only real when a test fails on a violation. The architecture
 - project references: Domain only `BuildingBlocks.Domain`; Application, Infrastructure, and Api reference another module only through its `Contracts`; `Contracts` references no module project;
 - code dependencies (namespaces), the same rules, so a transitive reference cannot bypass them;
 - Api controllers do not use Infrastructure types;
-- folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands` / `.Queries`;
+- folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands.<UseCase>` / `.Queries.<UseCase>` with no deeper folder, each use-case namespace holds one request and one handler, ports sit in `Abstractions`;
 - hosts contain no class that implements a module port;
 - test sources sit in a responsibility folder and their namespace follows the path.
 
@@ -191,6 +191,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | `Content`, `Sales`, `Work` | No `<Module>.Contracts` project yet | Created empty with the folder restructuring |
 | Host.Api | One Mediator registration lists every module's Application assembly | Keep: the Mediator source generator needs one `AddMediator` call with literal assemblies |
 | All modules | Type folders (`Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Configurations/`, `Common/`), Application features without `Commands/` / `Queries/`, controllers in `Controllers/` | Stage: folder restructuring, one module per change |
+| All Application projects | Use cases named `<UseCase>CommandHandler` / `<UseCase>QueryHandler`; `DTOs/` and `Validators/` subfolders inside use cases; several queries in one use-case folder (`Products/GetAdminList`); ports in `Application/Contracts/` instead of `Abstractions/` | Folder restructuring, one module per change |
 | Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | Tests | No unit tests for Identity; few handler tests for Content, Media, Work | Stage: missing unit tests |
 | Repository root | `dotnet-install.ps1`, `SALES_1C_SYNC_INSTRUCTION.txt` | Move to `tools/` and `docs/sdd/operations/` with the folder restructuring |
