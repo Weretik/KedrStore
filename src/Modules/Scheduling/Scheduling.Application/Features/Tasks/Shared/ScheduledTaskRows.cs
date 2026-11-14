@@ -13,7 +13,7 @@ public static class ScheduledTaskRows
     {
         var saved = await db.Tasks.ToDictionaryAsync(x => x.Key, StringComparer.Ordinal, cancellationToken);
         return ScheduledTaskCatalog.Tasks.Select(definition => new ScheduledTaskRow(definition,
-            saved.GetValueOrDefault(definition.Key) ?? Create(db, definition, now))).ToArray();
+            Synced(definition, saved.GetValueOrDefault(definition.Key), now) ?? Create(db, definition, now))).ToArray();
     }
 
     /// <summary>One catalogue task, or null when the key is unknown.</summary>
@@ -22,11 +22,21 @@ public static class ScheduledTaskRows
     {
         var definition = ScheduledTaskCatalog.Find(key);
         if (definition is null) return null;
-        var task = db.Tasks.Local.FirstOrDefault(x => x.Key == key)
-                   ?? await db.Tasks.FirstOrDefaultAsync(x => x.Key == key, cancellationToken)
+        var task = Synced(definition, db.Tasks.Local.FirstOrDefault(x => x.Key == key)
+                   ?? await db.Tasks.FirstOrDefaultAsync(x => x.Key == key, cancellationToken), now)
                    ?? Create(db, definition, now);
         return new ScheduledTaskRow(definition, task);
     }
+
+    /// <summary>A task the Admin cannot edit always follows the catalogue schedule, also after the catalogue changes.</summary>
+    private static ScheduledTask? Synced(ScheduledTaskDefinition definition, ScheduledTask? task, DateTimeOffset now)
+    {
+        if (task is not null && !definition.Editable && !task.Schedule.Equals(definition.DefaultSchedule))
+            _ = task.ChangeSchedule(task.Enabled, definition.DefaultSchedule, null, SystemActor, now);
+        return task;
+    }
+
+    private const string SystemActor = "system";
 
     private static ScheduledTask Create(ISchedulingDbContext db, ScheduledTaskDefinition definition, DateTimeOffset now)
     {
