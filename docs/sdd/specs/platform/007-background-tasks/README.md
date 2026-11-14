@@ -83,7 +83,7 @@ Schema `scheduling`: `ScheduledTasks` (key, on/off, schedule jsonb, next run, st
 | Application | `Features/Runs/` | `ScheduledTaskRunJournal` (R-06, R-07) |
 | Application | `Features/Tasks/{Commands,Queries,Shared}/` | admin use cases, schedule input and validator |
 | Contracts | `Scheduling.Contracts/Runs/IScheduledTaskRunJournal.cs` | what the job host records |
-| Infrastructure | `Persistence/`, `Migrations/`, `Integrations/CloudRun/`, `Integrations/Outbox/` | schema, Cloud Run `jobs:run`, outbox in the tick |
+| Infrastructure | `Persistence/` (`Tasks/` configurations), `Migrations/`, `Integrations/CloudRun/`, `Integrations/Outbox/` | schema, Cloud Run `jobs:run`, outbox in the tick |
 | Api | `Endpoints/Tasks/`, `Endpoints/Tick/RunSchedulerTick/` | HTTP, OIDC caller check |
 | Host.Jobs | `Tasks/` (`ScheduledTasksJobRunner`, `ScheduledTaskRunners`, runners in `Catalog/`, `Sales/`, `Site/`) | R-06 |
 | Deploy | `deploy-cloudrun.yml`: job `kedr-tasks` (4 h, no retries), API env `Scheduler__Job__*` | |
@@ -100,3 +100,4 @@ Runbook: [background tasks](../../../operations/jobs/background-tasks.md).
 
 - **TS-01** Domain tests (schedules, DST, claim, expiry). **TS-02** Tick tests (SC-01, SC-02, SC-05, SC-06, outbox). **TS-03** Journal and `--tasks` parsing, a runner for every job task. **TS-04** Admin use cases and validators (SC-07, SC-08); HTTP access and tick (SC-09, SC-10). **TS-05** Migration `InitialScheduling`. **TS-06** Deploy job, docs.
 - **Evidence 2026-11-14:** `dotnet test tests/UnitTests --filter UnitTests.Scheduling` 55 passed; `tests/IntegrationTests --filter IntegrationTests.Scheduling` 7 passed (SQLite, no Docker); `tests/ArchitectureTests` 48 passed; OpenAPI snapshot updated. Not written: a PostgreSQL test of the concurrent claim.
+- **Final audit 2026-11-14:** handler and job-runner tests moved from `UnitTests` (which may not reference a host or Infrastructure) to `IntegrationTests/Scheduling/{Api,Tasks}` and `IntegrationTests/Platform/Jobs`; persistence configurations moved to `Persistence/Tasks/`. Unit filter `Scheduling` 38 passed; integration filter `Scheduling|ScheduledTasksJobRunner|OpenApiSnapshot` 30 passed; `tests/ArchitectureTests` 48 passed.

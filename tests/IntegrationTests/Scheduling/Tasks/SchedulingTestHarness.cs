@@ -10,7 +10,7 @@ using Scheduling.Application.Features.Tick.Commands.RunSchedulerTick;
 using Scheduling.Domain.Schedules;
 using Scheduling.Infrastructure.Persistence;
 
-namespace UnitTests.Scheduling.Application;
+namespace IntegrationTests.Scheduling.Tasks;
 
 internal sealed class FakeLauncher : ITaskJobLauncher
 {

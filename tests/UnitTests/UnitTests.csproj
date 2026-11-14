@@ -18,8 +18,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Slugify.Core" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     </ItemGroup>
 
     <ItemGroup>
@@ -33,8 +31,7 @@
       <ProjectReference Include="..\..\src\Modules\Media\Media.Application\Media.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Application\Work.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Api\Work.Api.csproj" />
-      <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Api\Scheduling.Api.csproj" />
-      <ProjectReference Include="..\..\src\Bootstrapper\Host.Jobs\Host.Jobs.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Application\Scheduling.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>

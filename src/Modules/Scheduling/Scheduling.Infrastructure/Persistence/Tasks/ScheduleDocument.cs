@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Scheduling.Domain.Schedules;
 
-namespace Scheduling.Infrastructure.Persistence;
+namespace Scheduling.Infrastructure.Persistence.Tasks;
 
 /// <summary>The jsonb form of a <see cref="TaskSchedule"/> in <c>scheduling."ScheduledTasks"."Schedule"</c>.</summary>
 internal sealed record ScheduleDocument(ScheduleKind Kind, int? EveryMinutes, int? FromHour, int? ToHour,

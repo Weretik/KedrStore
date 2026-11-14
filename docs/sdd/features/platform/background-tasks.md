@@ -30,8 +30,8 @@ src/Bootstrapper/Host.Jobs/Tasks/                 # --job=tasks; runners in Cata
 
 ## Tests
 
-- `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Scheduling"` — schedules and Kyiv time, task states, tick, admin use cases, validators, `--tasks` parsing.
-- `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Scheduling"` — Admin-only access, schedule change, run now, the protected tick (SQLite, no Docker).
+- `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Scheduling"` — schedules and Kyiv time, task states, schedule validator.
+- `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Scheduling|FullyQualifiedName~ScheduledTasksJobRunner"` — tick, admin use cases, Admin-only access, the protected tick, `--tasks` parsing and a runner for every job task (SQLite, no Docker).
 
 ## Operations
 

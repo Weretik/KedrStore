@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Scheduling.Domain.Runs;
 using Scheduling.Domain.Tasks;
 
-namespace Scheduling.Infrastructure.Persistence;
+namespace Scheduling.Infrastructure.Persistence.Tasks;
 
 public sealed class ScheduledTaskRunConfiguration : IEntityTypeConfiguration<ScheduledTaskRun>
 {

@@ -1,7 +1,10 @@
-using Host.Jobs.Tasks;
+extern alias JobsHost;
+
+using ScheduledTaskRunners = JobsHost::Host.Jobs.Tasks.ScheduledTaskRunners;
+using ScheduledTasksJobRunner = JobsHost::Host.Jobs.Tasks.ScheduledTasksJobRunner;
 using Scheduling.Application.Features.Catalog;
 
-namespace UnitTests.Scheduling.Application;
+namespace IntegrationTests.Platform.Jobs;
 
 /// <summary>platform/007 R-06: the job's argument and a runner for every task the job runs.</summary>
 public sealed class ScheduledTasksJobRunnerTests

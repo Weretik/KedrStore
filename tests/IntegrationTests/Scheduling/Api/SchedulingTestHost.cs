@@ -11,7 +11,7 @@ using Scheduling.Api.Endpoints.Tick.RunSchedulerTick;
 using Scheduling.Application.Abstractions;
 using Scheduling.Infrastructure.Persistence;
 
-namespace IntegrationTests.Scheduling;
+namespace IntegrationTests.Scheduling.Api;
 
 /// <summary>
 /// The API with the Scheduling module on SQLite in memory, a fake job launcher and a caller check that accepts the

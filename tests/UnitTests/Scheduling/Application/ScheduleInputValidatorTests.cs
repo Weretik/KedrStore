@@ -2,7 +2,7 @@ using Scheduling.Application.Features.Tasks.Shared;
 
 namespace UnitTests.Scheduling.Application;
 
-/// <summary>Admin limits of a schedule (SCH-001 R-02): Ukrainian messages, at least every 5 minutes.</summary>
+/// <summary>Admin limits of a schedule (platform/007 R-02): Ukrainian messages, at least every 5 minutes.</summary>
 public sealed class ScheduleInputValidatorTests
 {
     private static readonly ScheduleInputValidator Validator = new();

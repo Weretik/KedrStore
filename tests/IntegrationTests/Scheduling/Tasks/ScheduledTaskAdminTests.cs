@@ -8,7 +8,7 @@ using Scheduling.Application.Features.Tasks.Queries.GetScheduledTasks;
 using Scheduling.Application.Features.Tasks.Shared;
 using Scheduling.Domain.Schedules;
 
-namespace UnitTests.Scheduling.Application;
+namespace IntegrationTests.Scheduling.Tasks;
 
 /// <summary>platform/007 SC-07 (schedule), SC-08 (run now) and the page list.</summary>
 public sealed class ScheduledTaskAdminTests

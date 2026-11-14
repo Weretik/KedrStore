@@ -5,7 +5,7 @@ using Scheduling.Domain.Runs;
 using Scheduling.Domain.Schedules;
 using Scheduling.Domain.Tasks;
 
-namespace UnitTests.Scheduling.Application;
+namespace IntegrationTests.Scheduling.Tasks;
 
 /// <summary>platform/007 SC-01, SC-02, SC-05, SC-06 and the outbox inside the tick.</summary>
 public sealed class SchedulerTickTests

@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using IntegrationTests.TestSupport.Api;
 
-namespace IntegrationTests.Scheduling;
+namespace IntegrationTests.Scheduling.Api;
 
 /// <summary>Spec platform/007 over HTTP: SC-07, SC-08, SC-09 (Admin only) and SC-10 (the protected tick).</summary>
 public sealed class SchedulingApiTests
