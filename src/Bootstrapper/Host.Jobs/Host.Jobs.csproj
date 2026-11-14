@@ -28,6 +28,7 @@
       <ProjectReference Include="..\..\Modules\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Scheduling\Scheduling.Infrastructure\Scheduling.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

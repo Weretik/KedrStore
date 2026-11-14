@@ -6,7 +6,7 @@ namespace ArchitectureTests.Hosts;
 /// </summary>
 public sealed class HostCompositionTests
 {
-    private static readonly string[] BusinessModules = ["Catalog", "Content", "Identity", "Media", "Sales", "Work"];
+    private static readonly string[] BusinessModules = ["Catalog", "Content", "Identity", "Media", "Sales", "Scheduling", "Work"];
 
     [Fact]
     public void HostSources_DeclareNoPortImplementationControllerOrDbContext()

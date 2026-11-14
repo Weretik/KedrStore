@@ -28,6 +28,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | Identity endpoints, tag `AdminUsers` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
 | Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
 | Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
+| Scheduling endpoints, tag `AdminScheduledTasks` | `/api/admin/scheduling/tasks` | `RequireAdminRole` on the group |
+| Scheduler tick | `POST /internal/scheduler/tick` | anonymous for the auth middleware; only Cloud Scheduler's Google OIDC token (`Scheduler:Audience`, `Scheduler:SchedulerServiceAccount`) passes, otherwise `401`; `404` until configured |
 | Identity endpoints, tag `Profile` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
 | Catalog endpoints, tags `Categories`, `Products` | `/api/catalog/{lang}` | public |

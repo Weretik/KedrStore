@@ -7,6 +7,7 @@ using Media.Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Infrastructure.DependencyInjection;
+using Scheduling.Infrastructure.DependencyInjection;
 using Work.Infrastructure.DependencyInjection;
 
 namespace Host.Jobs;
@@ -26,6 +27,7 @@ public static class JobsHostServicesExtensions
         services.AddContentInfrastructure(configuration);
         services.AddMediaInfrastructure(configuration);
         services.AddWorkInfrastructure(configuration);
+        services.AddSchedulingInfrastructure(configuration);
 
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);

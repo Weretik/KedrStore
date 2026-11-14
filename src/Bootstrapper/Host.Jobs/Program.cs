@@ -4,6 +4,7 @@ using Catalog.Application.Features.ProductMedia.Jobs;
 using Catalog.Application.Features.Attributes.Jobs;
 using Catalog.Application.Features.Slugs.Jobs;
 using Host.Jobs;
+using Host.Jobs.Tasks;
 using Media.Application.Features.Files.Jobs.SyncCdnMedia;
 using Sales.Application.Abstractions.Integrations.OneC;
 using Microsoft.Extensions.Configuration;
@@ -66,6 +67,11 @@ try
 
     switch (jobKey)
     {
+        case "tasks":
+            // Tasks the scheduler tick claimed (spec platform/007 R-06): one exit code for the whole execution.
+            return await ScheduledTasksJobRunner.RunAsync(
+                app.Services, GetArg(args, ScheduledTasksJobRunner.Argument), logger, cancellationToken);
+
         case "migrate":
             await scopeServiceProvider.GetRequiredService<DatabaseMigrationJob>().RunAsync(cancellationToken);
             break;

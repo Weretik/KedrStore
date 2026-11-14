@@ -12,7 +12,7 @@ This is an index of design decisions and delivery records; the [implemented feat
 | Media | [media library for CDN photos](media/001-media-library/README.md) |
 | Work | [staff tasks and the activity log](work/001-staff-tasks-and-activity/README.md) |
 | Identity | [authentication and authorization rollout](identity/001-authentication-rollout/README.md) |
-| Platform | [separate migration job](platform/001-database-migration-job/README.md), [test architecture](platform/002-test-architecture/README.md), [admin «Огляд» data](platform/003-admin-overview/README.md), [data snapshots for the offline mobile app](platform/004-mobile-offline-sync/README.md), [Minimal API endpoints and ProblemDetails errors](platform/005-minimal-api-problem-details/README.md), [transactional outbox](platform/006-transactional-outbox/README.md) |
+| Platform | [separate migration job](platform/001-database-migration-job/README.md), [test architecture](platform/002-test-architecture/README.md), [admin «Огляд» data](platform/003-admin-overview/README.md), [data snapshots for the offline mobile app](platform/004-mobile-offline-sync/README.md), [Minimal API endpoints and ProblemDetails errors](platform/005-minimal-api-problem-details/README.md), [transactional outbox](platform/006-transactional-outbox/README.md), [«Фонові задачі»: one scheduler, schedules in the database](platform/007-background-tasks/README.md) |
 
 This directory contains requirements, design decisions, contracts, task records, and verification evidence for individual changes. Update the specification for a nontrivial behavior change before implementation. A status or plan in a specification alone does not prove that the behavior exists in code.
 

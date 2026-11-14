@@ -78,11 +78,11 @@ Invalid values stop the host at startup: batch size and attempt limit must be po
 
 ### Cloud Run execution
 
-The deployment process creates or updates `onec-orders-sync` with the Host.Jobs image, argument `--job=sync-one-c-orders`, one task, parallelism `1`, zero platform retries, and a 10-minute timeout. The process does not run the delivery job or create a Cloud Scheduler schedule.
+Order delivery runs as the task «Замовлення в 1С» of [background tasks](background-tasks.md) inside the Cloud Run job `kedr-tasks`; its schedule is set on the admin page «Фонові задачі». A one-off run is «Запустити зараз» there, or `kedr-tasks` executed with the argument `--job=sync-one-c-orders`.
 
 Before enabling the schedule, check the job revision, arguments, secret bindings, task count, parallelism, retries, timeout, and service account. Configure Cloud Scheduler and its calling service account separately in the deployment environment. Keep schedule names and frequency in the environment's operational registry; this repository does not define them.
 
-To stop outbound delivery, pause or disable the scheduler that runs `onec-orders-sync`. Let an execution already in progress finish, or cancel it through the Cloud Run operator interface if an immediate stop is needed. Do not delete the Cloud Run Job or synchronization records: incomplete state is needed for recovery.
+To stop outbound delivery, switch «Замовлення в 1С» off on «Фонові задачі». Let an execution already in progress finish, or cancel it through the Cloud Run operator interface if an immediate stop is needed. Do not delete the Cloud Run Job or synchronization records: incomplete state is needed for recovery.
 
 After deployment or a configuration change, perform one controlled run on approved data and confirm the final counters and persisted synchronization state before enabling recurring execution.
 

@@ -15,7 +15,7 @@ components:
         type: { type: string }
         title: { type: string, description: Ukrainian title of the status. }
         status: { type: integer }
-        detail: { type: [string, 'null'], description: The first error message, Ukrainian. }
+        detail: { type: [string, 'null'], description: 'The first error message, Ukrainian.' }
         code:
           type: string
           description: >-

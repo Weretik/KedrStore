@@ -82,7 +82,7 @@ paths:
         - { name: modelSlug, in: path, required: true, schema: { type: string } }
       responses:
         '200': { description: The model, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModel' } } } }
-        '400': { description: Language is not uk or ru, or the slug is empty or longer than 200 characters }
+        '400': { description: 'Language is not uk or ru, or the slug is empty or longer than 200 characters' }
         '404':
           description: >-
             Not a model. For a former model slug, or the slug of a product inside an accepted model, the body is the

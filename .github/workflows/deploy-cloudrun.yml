@@ -18,6 +18,7 @@ env:
   GCP_WORKLOAD_IDENTITY_PROVIDER: projects/449981321140/locations/global/workloadIdentityPools/github/providers/github-oidc
   GCP_DEPLOY_SERVICE_ACCOUNT: gha-deployer@classkedrproject.iam.gserviceaccount.com
   CLOUD_RUN_SERVICE: api
+  TASKS_JOB: kedr-tasks
 
 jobs:
   verify:
@@ -175,69 +176,57 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --set-secrets "$API_SECRETS" \
+            --update-env-vars "Scheduler__Job__Project=${{ env.GCP_PROJECT_ID }},Scheduler__Job__Region=${{ env.GCP_REGION }},Scheduler__Job__Name=${{ env.TASKS_JOB }}" \
             --quiet
 
       - name: Update Cloud Run Jobs to new image
         run: |
-          for JOB in onec-prices onec-category onec-pricetypes onec-productdetails onec-stocks onec-full; do
-            gcloud run jobs update "$JOB" \
-              --image "${{ env.JOBS_IMAGE }}" \
-              --region "${{ env.GCP_REGION }}" \
-              --quiet
-          done
-
           JOB_SECRETS="ConnectionStrings__Default=db-connection:latest,OneCSoap__Endpoint=onec-endpoint:latest,OneCSoap__Username=onec-username:latest,OneCSoap__Password=onec-password:latest"
 
-          ORDER_SYNC_JOB="onec-orders-sync"
-          ORDER_SYNC_ARGS="--job=sync-one-c-orders"
-          ORDER_SYNC_SECRETS="${JOB_SECRETS},Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest"
+          # Background tasks of «Фонові задачі» (spec platform/007): the scheduler tick starts one execution with the
+          # claimed tasks in --tasks=key:runId,... per execution; the arguments below are only the default. This job
+          # replaced the old onec-*, onec-orders-sync, onec-sales-customers-full and media-cdn-sync jobs; a one-off run
+          # of any Host.Jobs command is `gcloud run jobs execute kedr-tasks --args=--job=<command>,...`.
+          TASKS_SECRETS="${JOB_SECRETS},Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest"
 
-          if gcloud run jobs describe "$ORDER_SYNC_JOB" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
-            gcloud run jobs update "$ORDER_SYNC_JOB" \
+          if gcloud run jobs describe "${{ env.TASKS_JOB }}" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+            gcloud run jobs update "${{ env.TASKS_JOB }}" \
               --image "${{ env.JOBS_IMAGE }}" \
               --region "${{ env.GCP_REGION }}" \
               --tasks 1 \
               --parallelism 1 \
               --max-retries 0 \
-              --task-timeout 10m \
-              --args="$ORDER_SYNC_ARGS" \
-              --set-secrets "$ORDER_SYNC_SECRETS" \
+              --task-timeout 4h \
+              --args="--job=tasks,--tasks=" \
+              --set-secrets "$TASKS_SECRETS" \
               --quiet
           else
-            gcloud run jobs create "$ORDER_SYNC_JOB" \
+            gcloud run jobs create "${{ env.TASKS_JOB }}" \
               --image "${{ env.JOBS_IMAGE }}" \
               --region "${{ env.GCP_REGION }}" \
               --tasks 1 \
               --parallelism 1 \
               --max-retries 0 \
-              --task-timeout 10m \
-              --args="$ORDER_SYNC_ARGS" \
-              --set-secrets "$ORDER_SYNC_SECRETS" \
+              --task-timeout 4h \
+              --args="--job=tasks,--tasks=" \
+              --set-secrets "$TASKS_SECRETS" \
               --quiet
           fi
 
-          # Registers CDN files in the media library; run it once with --dry-run, then without (see the media runbook).
-          MEDIA_SYNC_JOB="media-cdn-sync"
-          MEDIA_SYNC_SECRETS="ConnectionStrings__Default=db-connection:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest"
-
-          if gcloud run jobs describe "$MEDIA_SYNC_JOB" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
-            gcloud run jobs update "$MEDIA_SYNC_JOB" \
-              --image "${{ env.JOBS_IMAGE }}" \
-              --region "${{ env.GCP_REGION }}" \
-              --set-secrets "$MEDIA_SYNC_SECRETS" \
-              --quiet
-          else
-            gcloud run jobs create "$MEDIA_SYNC_JOB" \
-              --image "${{ env.JOBS_IMAGE }}" \
-              --region "${{ env.GCP_REGION }}" \
-              --tasks 1 \
-              --parallelism 1 \
-              --max-retries 0 \
-              --task-timeout 60m \
-              --args=--job=media-cdn-sync \
-              --set-secrets "$MEDIA_SYNC_SECRETS" \
-              --quiet
+          # EN-01 of «Фонові задачі»: the API's runtime account may start only this job, with overrides. The binding is
+          # idempotent; this deploy account (Cloud Run Admin) grants it, so nobody needs the project owner for it.
+          API_RUNTIME_SA=$(gcloud run services describe "${{ env.CLOUD_RUN_SERVICE }}" --region "${{ env.GCP_REGION }}" \
+            --format='value(spec.template.spec.serviceAccountName)')
+          if [ -z "$API_RUNTIME_SA" ]; then
+            PROJECT_NUMBER=$(gcloud run services describe "${{ env.CLOUD_RUN_SERVICE }}" --region "${{ env.GCP_REGION }}" \
+              --format='value(metadata.namespace)')
+            API_RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
           fi
+          gcloud run jobs add-iam-policy-binding "${{ env.TASKS_JOB }}" \
+            --region "${{ env.GCP_REGION }}" \
+            --member "serviceAccount:${API_RUNTIME_SA}" \
+            --role roles/run.jobsExecutorWithOverrides \
+            --quiet >/dev/null
 
           # Catalog attributes (spec catalog/006): the CSV import and the .NET recognizer over current 1C names.
           # Each dry-run job only reports changes; each apply job writes them. All are idempotent and run only by hand.
@@ -267,32 +256,6 @@ jobs:
                 --task-timeout 30m \
                 --args="$JOB_ARG" \
                 --set-secrets "$ATTRIBUTE_SECRETS" \
-                --quiet
-            fi
-          done
-
-          # Primary customer-sync job. This is the only customer job that should be used for routine execution.
-          for JOB_DEF in \
-            "onec-sales-customers-full|--job=sales-customers-full"
-          do
-            IFS='|' read -r JOB_NAME JOB_ARG <<< "$JOB_DEF"
-
-            if gcloud run jobs describe "$JOB_NAME" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
-              gcloud run jobs update "$JOB_NAME" \
-                --image "${{ env.JOBS_IMAGE }}" \
-                --region "${{ env.GCP_REGION }}" \
-                --args="$JOB_ARG" \
-                --set-secrets "$JOB_SECRETS" \
-                --quiet
-            else
-              gcloud run jobs create "$JOB_NAME" \
-                --image "${{ env.JOBS_IMAGE }}" \
-                --region "${{ env.GCP_REGION }}" \
-                --tasks 1 \
-                --parallelism 1 \
-                --max-retries 1 \
-                --args="$JOB_ARG" \
-                --set-secrets "$JOB_SECRETS" \
                 --quiet
             fi
           done

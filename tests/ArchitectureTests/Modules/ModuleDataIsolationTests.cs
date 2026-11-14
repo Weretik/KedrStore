@@ -5,6 +5,7 @@ using Media.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Sales.Infrastructure.Persistence;
+using Scheduling.Infrastructure.Persistence;
 using Work.Infrastructure.Persistence;
 
 namespace ArchitectureTests.Modules;
@@ -18,7 +19,7 @@ public sealed class ModuleDataIsolationTests
 {
     private static readonly string[] SharedNamespaces = ["BuildingBlocks", "Microsoft", "System"];
 
-    public static TheoryData<string> Contexts => new() { "Catalog", "Content", "Identity", "Media", "Sales", "Work" };
+    public static TheoryData<string> Contexts => new() { "Catalog", "Content", "Identity", "Media", "Sales", "Scheduling", "Work" };
 
     [Theory]
     [MemberData(nameof(Contexts))]
@@ -60,6 +61,7 @@ public sealed class ModuleDataIsolationTests
         "Media" => new MediaDbContext(Options<MediaDbContext>()),
         "Sales" => new SalesDbContext(Options<SalesDbContext>()),
         "Work" => new WorkDbContext(Options<WorkDbContext>()),
+        "Scheduling" => new SchedulingDbContext(Options<SchedulingDbContext>()),
         _ => throw new ArgumentOutOfRangeException(nameof(module), module, null),
     };
 
