@@ -1,4 +1,6 @@
-using Work.Api.Features.Activity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Work.Api.Endpoints.Activity;
 using Work.Domain.Activity;
 
 namespace UnitTests.Work;
@@ -38,15 +40,36 @@ public sealed class WorkActivityTests
     [Fact]
     public void Filter_Names_The_Area_And_Target()
     {
-        Assert.Equal("Categories", WorkActivityFilter.AreaOf("AdminCategories"));
-        Assert.Equal("id=12, lang=uk", WorkActivityFilter.TargetOf(new Dictionary<string, object?>
+        Assert.Equal("Categories", WorkActivityMiddleware.AreaOf("AdminCategories"));
+        Assert.Equal("id=12, lang=uk", WorkActivityMiddleware.TargetOf(new Dictionary<string, object?>
         {
             ["controller"] = "AdminCategories",
             ["action"] = "UpdateContent",
             ["lang"] = "uk",
             ["id"] = "12"
         }));
-        Assert.True(WorkActivityFilter.IsChange("PUT"));
-        Assert.False(WorkActivityFilter.IsChange("GET"));
+        Assert.True(WorkActivityMiddleware.IsChange("PUT"));
+        Assert.False(WorkActivityMiddleware.IsChange("GET"));
     }
+
+    [Fact]
+    public void Middleware_Names_A_Minimal_Api_Admin_Endpoint_By_Its_Tag_And_Name()
+    {
+        var endpoint = new Endpoint(_ => Task.CompletedTask, new EndpointMetadataCollection(
+            new TagsAttribute("AdminCategories"),
+            new EndpointNameMetadata("updateAdminCategoryContent"),
+            typeof(string).GetMethod(nameof(string.Trim), Type.EmptyTypes)!), "test");
+
+        var source = WorkActivityMiddleware.Describe(endpoint);
+
+        Assert.NotNull(source);
+        Assert.Equal("AdminCategories", source.Group);
+        Assert.Equal("updateAdminCategoryContent", source.Operation);
+        Assert.True(WorkActivityMiddleware.IsLogged(source));
+    }
+
+    [Fact]
+    public void Middleware_Skips_An_Endpoint_Without_A_Tag() =>
+        Assert.Null(WorkActivityMiddleware.Describe(new Endpoint(_ => Task.CompletedTask,
+            new EndpointMetadataCollection(new EndpointNameMetadata("x")), "test")));
 }

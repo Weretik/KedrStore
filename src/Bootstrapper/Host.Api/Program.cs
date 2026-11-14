@@ -1,4 +1,5 @@
 using Host.Api.DependencyInjection.ServiceRegistration.Web;
+using Work.Api.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +54,10 @@ app.UseRateLimiter();
 app.UseCookieCsrfProtection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseWorkActivity();
 
 app.MapControllers();
+app.MapWorkEndpoints();
 app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

@@ -32,7 +32,7 @@ Owns the picture library on the CDN: virtual folders, file records with CDN keys
 
 Layers: Work.Api, Work.Application, Work.Domain, Work.Infrastructure.
 
-Owns the staff members' own tasks and the automatic log of their admin changes (spec work/001). Its tables live in the PostgreSQL schema `work` with their own migration history; users are Identity user IDs as values. The log is written by `WorkActivityFilter`, a global MVC filter in Work.Api, so other modules neither reference nor call Work.
+Owns the staff members' own tasks and the automatic log of their admin changes (spec work/001). Its tables live in the PostgreSQL schema `work` with their own migration history; users are Identity user IDs as values. The log is written by `WorkActivityMiddleware` in Work.Api after every successful admin change, so other modules neither reference nor call Work.
 
 ## Identity
 

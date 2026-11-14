@@ -45,7 +45,7 @@ public sealed class ResultToActionResultTests
             new ValidationError("Name", "Вкажіть назву.", "name_required", ValidationSeverity.Error),
             new ValidationError("Name", "Назва задовга.", "MaximumLengthValidator", ValidationSeverity.Error));
 
-        var problem = Problem<ValidationProblemDetails>(Controller().ToActionResult(result), 400);
+        var problem = Problem<HttpValidationProblemDetails>(Controller().ToActionResult(result), 400);
 
         Assert.Equal("name_required", problem.Extensions["code"]);
         Assert.Equal("Вкажіть назву.", problem.Detail);
@@ -58,7 +58,7 @@ public sealed class ResultToActionResultTests
         var result = Result.Invalid(new ValidationError("Request.Password", "Пароль задовгий.", "MaximumLengthValidator",
             ValidationSeverity.Error));
 
-        var problem = Problem<ValidationProblemDetails>(Controller().ToActionResult(result), 400);
+        var problem = Problem<HttpValidationProblemDetails>(Controller().ToActionResult(result), 400);
 
         Assert.Equal(ProblemCodes.Validation, problem.Extensions["code"]);
         Assert.Equal(["Пароль задовгий."], problem.Errors["Request.Password"]);

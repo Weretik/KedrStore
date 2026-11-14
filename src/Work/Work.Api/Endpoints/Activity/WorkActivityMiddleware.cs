@@ -1,31 +1,32 @@
+using System.Reflection;
 using System.Security.Claims;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Work.Application.Features.Activity.Commands.RecordWorkActivity;
 
-namespace Work.Api.Features.Activity;
+namespace Work.Api.Endpoints.Activity;
 
 /// <summary>
-/// Global result filter for spec work/001, R-5: after a staff member's successful change through an <c>Admin*</c>
-/// controller of any module, writes one activity entry. No other module knows about it, and a failure to write
-/// is logged and never changes the response.
+/// Spec work/001, R-5: after a staff member's successful change through an <c>Admin*</c> endpoint group (or, until
+/// the last module moves to Minimal API, an <c>Admin*</c> controller) of any module, writes one activity entry. No
+/// other module knows about it, and a failure to write is logged and never changes the response.
 /// </summary>
-public sealed class WorkActivityFilter(ILogger<WorkActivityFilter> logger) : IAsyncResultFilter
+public sealed class WorkActivityMiddleware(RequestDelegate next, ILogger<WorkActivityMiddleware> logger)
 {
     private static readonly HashSet<string> SkippedRouteValues = ["controller", "action"];
 
-    public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+    public async Task InvokeAsync(HttpContext http)
     {
-        await next();
+        await next(http);
 
-        var http = context.HttpContext;
         if (!IsChange(http.Request.Method) || http.Response.StatusCode is < 200 or > 299)
             return;
-        if (context.ActionDescriptor is not ControllerActionDescriptor action || !IsLoggedController(action))
+        if (http.GetEndpoint() is not { } endpoint || Describe(endpoint) is not { } source || !IsLogged(source))
             return;
         if (!Guid.TryParse(http.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
             return;
@@ -37,10 +38,10 @@ public sealed class WorkActivityFilter(ILogger<WorkActivityFilter> logger) : IAs
         var command = new RecordWorkActivityCommand(
             userId,
             http.User.FindFirstValue(ClaimTypes.Email) ?? http.User.Identity?.Name,
-            AreaOf(action.ControllerName),
-            action.ActionName,
+            AreaOf(source.Group),
+            source.Operation,
             http.Request.Method,
-            TargetOf(context.RouteData.Values));
+            TargetOf(http.Request.RouteValues));
         try
         {
             var sender = http.RequestServices.GetRequiredService<ISender>();
@@ -56,16 +57,32 @@ public sealed class WorkActivityFilter(ILogger<WorkActivityFilter> logger) : IAs
         }
     }
 
+    /// <summary>The group (tag or controller name), the operation (endpoint or action name) and its assembly.</summary>
+    internal sealed record Source(string Group, string Operation, Assembly Assembly);
+
+    internal static Source? Describe(Endpoint endpoint)
+    {
+        if (endpoint.Metadata.GetMetadata<ControllerActionDescriptor>() is { } action)
+            return new Source(action.ControllerName, action.ActionName, action.ControllerTypeInfo.Assembly);
+
+        var tag = endpoint.Metadata.GetMetadata<ITagsMetadata>()?.Tags.FirstOrDefault();
+        var name = endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName;
+        var handler = endpoint.Metadata.GetMetadata<MethodInfo>();
+        return tag is null || name is null || handler?.DeclaringType is null
+            ? null
+            : new Source(tag, name, handler.DeclaringType.Assembly);
+    }
+
+    internal static bool IsLogged(Source source) =>
+        source.Group.StartsWith("Admin", StringComparison.Ordinal)
+        && source.Assembly != typeof(WorkActivityMiddleware).Assembly;
+
     internal static bool IsChange(string method) =>
         HttpMethods.IsPost(method) || HttpMethods.IsPut(method) || HttpMethods.IsPatch(method) || HttpMethods.IsDelete(method);
 
-    internal static bool IsLoggedController(ControllerActionDescriptor action) =>
-        action.ControllerName.StartsWith("Admin", StringComparison.Ordinal)
-        && action.ControllerTypeInfo.Assembly != typeof(WorkActivityFilter).Assembly;
-
     /// <summary><c>AdminCategories</c> → <c>Categories</c>.</summary>
-    internal static string AreaOf(string controllerName) =>
-        controllerName.Length > "Admin".Length ? controllerName["Admin".Length..] : controllerName;
+    internal static string AreaOf(string group) =>
+        group.Length > "Admin".Length ? group["Admin".Length..] : group;
 
     /// <summary>Route values such as <c>id=12, lang=uk</c>, in name order.</summary>
     internal static string TargetOf(IEnumerable<KeyValuePair<string, object?>> routeValues) =>

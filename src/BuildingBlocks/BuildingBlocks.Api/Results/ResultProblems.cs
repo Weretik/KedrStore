@@ -55,7 +55,7 @@ public static class ResultProblems
     private static ProblemDetails Invalid(HttpContext httpContext, IReadOnlyList<ValidationError> errors)
     {
         var first = errors.FirstOrDefault();
-        var problem = new ValidationProblemDetails(errors
+        var problem = new HttpValidationProblemDetails(errors
             .GroupBy(error => error.Identifier ?? string.Empty, StringComparer.Ordinal)
             .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray(),
                 StringComparer.Ordinal))
