@@ -8,6 +8,7 @@ WORKDIR /src
 
 COPY ["KedrStore.sln", "./"]
 COPY ["global.json", "./"]
+COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 
 # BuildingBlocks
 COPY ["src/BuildingBlocks/BuildingBlocks.Api/BuildingBlocks.Api.csproj", "src/BuildingBlocks/BuildingBlocks.Api/"]
@@ -55,6 +56,12 @@ COPY ["src/Bootstrapper/Host.Api/Host.Api.csproj", "src/Bootstrapper/Host.Api/"]
 COPY ["tests/ArchitectureTests/ArchitectureTests.csproj", "tests/ArchitectureTests/"]
 COPY ["tests/IntegrationTests/IntegrationTests.csproj", "tests/IntegrationTests/"]
 COPY ["tests/UnitTests/UnitTests.csproj", "tests/UnitTests/"]
+
+COPY ["src/Identity/Identity.Contracts/Identity.Contracts.csproj", "src/Identity/Identity.Contracts/"]
+COPY ["src/Work/Work.Api/Work.Api.csproj", "src/Work/Work.Api/"]
+COPY ["src/Work/Work.Application/Work.Application.csproj", "src/Work/Work.Application/"]
+COPY ["src/Work/Work.Domain/Work.Domain.csproj", "src/Work/Work.Domain/"]
+COPY ["src/Work/Work.Infrastructure/Work.Infrastructure.csproj", "src/Work/Work.Infrastructure/"]
 
 RUN dotnet restore "src/Bootstrapper/Host.Api/Host.Api.csproj"
 

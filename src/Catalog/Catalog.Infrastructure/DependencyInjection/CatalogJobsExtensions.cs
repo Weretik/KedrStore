@@ -1,11 +1,14 @@
 using Catalog.Application.Integrations.OneC.Jobs;
 using Catalog.Application.Integrations.OneC.Sync;
+using Catalog.Application.Jobs.Attributes;
+using Catalog.Application.Jobs.Slugs;
 
-namespace Host.Api.DependencyInjection.ServiceRegistration;
+namespace Catalog.Infrastructure.DependencyInjection;
 
-public static class BackgroundJobRegistrationsExtensions
+public static class CatalogJobsExtensions
 {
-    public static IServiceCollection AddBackgroundJobRegistrations(this IServiceCollection services)
+    /// <summary>Catalog jobs that Host.Jobs runs by name and the API can start on demand.</summary>
+    public static IServiceCollection AddCatalogJobs(this IServiceCollection services)
     {
         services.AddScoped<SyncOneCFullJob>();
         services.AddScoped<SyncOneCPriceTypesJob>();
@@ -14,6 +17,8 @@ public static class BackgroundJobRegistrationsExtensions
         services.AddScoped<ProductTranslationImporter>();
         services.AddScoped<SyncOneCStocksJob>();
         services.AddScoped<SyncOneCPricesJob>();
+        services.AddScoped<MigrateLegacySlugsJob>();
+        services.AddScoped<ImportCatalogAttributesJob>();
 
         return services;
     }

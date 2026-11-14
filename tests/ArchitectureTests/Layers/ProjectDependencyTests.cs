@@ -33,14 +33,16 @@ public sealed class ProjectDependencyTests
     }
 
     [Fact]
-    public void ApiProjects_DoNotReferenceDomainOrInfrastructure()
+    public void ApiProjects_ReferenceOnlyTheirOwnInfrastructureAndNoDomain()
     {
+        // Api references its own Infrastructure only to register the module in Add<Module>Module().
         var violations = Graph.Projects
             .Where(project => project.Name.EndsWith(".Api", StringComparison.Ordinal) &&
                               !project.Name.StartsWith("Host.", StringComparison.Ordinal))
             .SelectMany(project => project.References
                 .Where(reference => reference.EndsWith(".Domain", StringComparison.Ordinal) ||
-                                    reference.EndsWith(".Infrastructure", StringComparison.Ordinal))
+                                    (reference.EndsWith(".Infrastructure", StringComparison.Ordinal) &&
+                                     reference != $"{ModuleOf(project.Name)}.Infrastructure"))
                 .Select(reference => $"{project.Name} -> {reference}"))
             .ToArray();
 
@@ -77,6 +79,8 @@ public sealed class ProjectDependencyTests
 
         Assert.Empty(referenceViolations.Concat(packageViolations));
     }
+
+    private static string ModuleOf(string projectName) => projectName[..projectName.IndexOf('.', StringComparison.Ordinal)];
 
     private static bool IsOuterLayerOrHost(string projectName)
         => projectName.EndsWith(".Api", StringComparison.Ordinal) ||

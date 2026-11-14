@@ -6,7 +6,7 @@ public static class ApiRegistrationsExtensions
 {
     public static IServiceCollection AddApiRegistrations(this IServiceCollection services)
     {
-        services.AddModuleControllers();
+        services.AddControllers();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerDocumentation();

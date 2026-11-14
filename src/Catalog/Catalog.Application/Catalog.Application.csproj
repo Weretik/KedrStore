@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\Catalog.Contracts\Catalog.Contracts.csproj" />
@@ -21,5 +15,16 @@
       <EmbeddedResource Include="..\..\..\docs\catalog-attributes\dictionaries.json"
                         LogicalName="Catalog.Application.Attributes.Recognition.dictionaries.json" />
     </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Hangfire" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Slugify.Core" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="NodaMoney" />
+    <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
 
 </Project>
