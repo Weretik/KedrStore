@@ -49,6 +49,61 @@ public sealed class FolderStructureTests
         Assert.Empty(misplaced);
     }
 
+    /// <summary>
+    /// The solution view matches the disk: every project in <c>KedrStore.sln</c> sits in the solution folders named
+    /// like the folders that hold it (<c>src/Modules/Scheduling/</c>), and every module layer project on disk sits in
+    /// <c>src/Modules/&lt;Module&gt;/</c>, so no module shows up as a separate top-level folder in the IDE.
+    /// </summary>
+    [Fact]
+    public void Solution_MirrorsTheDisk_AndEveryModuleLayerSitsInModules()
+    {
+        var root = FindRepositoryRoot();
+        var solution = File.ReadAllText(Path.Combine(root, "KedrStore.sln"));
+        var folders = SolutionFolder.Matches(solution).ToDictionary(m => m.Groups["id"].Value, m => m.Groups["name"].Value);
+        var nesting = NestedProject.Matches(solution).ToDictionary(m => m.Groups["child"].Value, m => m.Groups["parent"].Value);
+
+        var misplacedInSolution = SolutionProject.Matches(solution)
+            .Select(project =>
+            {
+                var chain = new List<string>();
+                for (var id = project.Groups["id"].Value; nesting.TryGetValue(id, out var parent); id = parent)
+                    chain.Insert(0, folders.GetValueOrDefault(parent, "?"));
+                var expected = Path.GetDirectoryName(Path.GetDirectoryName(project.Groups["path"].Value.Replace('\\', '/')))!
+                    .Replace('\\', '/');
+                var actual = string.Join('/', chain);
+                return actual == expected ? null : $"{project.Groups["name"].Value}: solution folder '{actual}', disk '{expected}'";
+            })
+            .OfType<string>();
+
+        var misplacedOnDisk = Directory.EnumerateFiles(Path.Combine(root, "src"), "*.csproj", SearchOption.AllDirectories)
+            .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+            .Where(path => ModuleLayerProject.IsMatch(Path.GetFileName(path)) &&
+                           !path.StartsWith("src/BuildingBlocks/", StringComparison.Ordinal) &&
+                           !path.StartsWith("src/Bootstrapper/", StringComparison.Ordinal) &&
+                           !ModuleProjectPath.IsMatch(path))
+            .Select(path => $"{path} is a module layer outside src/Modules/<Module>/");
+
+        var violations = misplacedInSolution.Concat(misplacedOnDisk).Order().ToArray();
+        Assert.True(violations.Length == 0, string.Join(Environment.NewLine, violations));
+    }
+
+    private static readonly Regex SolutionFolder = new(
+        @"Project\(""\{2150E333-8FDC-42A3-9474-1A3956D46DE8\}""\) = ""(?<name>[^""]+)"", ""[^""]+"", ""\{(?<id>[^}]+)\}""",
+        RegexOptions.CultureInvariant);
+
+    private static readonly Regex SolutionProject = new(
+        @"Project\(""\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC\}""\) = ""(?<name>[^""]+)"", ""(?<path>[^""]+\.csproj)"", ""\{(?<id>[^}]+)\}""",
+        RegexOptions.CultureInvariant);
+
+    private static readonly Regex NestedProject =
+        new(@"\{(?<child>[0-9A-Fa-f-]+)\} = \{(?<parent>[0-9A-Fa-f-]+)\}", RegexOptions.CultureInvariant);
+
+    private static readonly Regex ModuleLayerProject =
+        new(@"^\w+\.(Api|Application|Contracts|Domain|Infrastructure)\.csproj$", RegexOptions.CultureInvariant);
+
+    private static readonly Regex ModuleProjectPath =
+        new(@"^src/Modules/(?<module>\w+)/\k<module>\.\w+/\k<module>\.\w+\.csproj$", RegexOptions.CultureInvariant);
+
     [Fact]
     public void SourceFolders_AreNotNamedByTypeOrAsADump()
     {
