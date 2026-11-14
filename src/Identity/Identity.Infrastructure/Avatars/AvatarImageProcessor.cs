@@ -10,12 +10,12 @@ namespace Identity.Infrastructure.Avatars;
 /// </summary>
 public sealed class AvatarImageProcessor
 {
-    public const string TooLargeMessage = "The photo is larger than 2 MB.";
-    public const string UnsupportedFormatMessage = "Only JPEG, PNG and WebP photos are supported.";
-    public const string TooSmallMessage = "The photo must be at least 128×128 pixels.";
-    public const string TooManyPixelsMessage = "The photo resolution is too high (more than 24 megapixels).";
+    public const string TooLargeMessage = AvatarRules.TooLargeMessage;
+    public const string UnsupportedFormatMessage = AvatarRules.UnsupportedFormatMessage;
+    public const string TooSmallMessage = AvatarRules.TooSmallMessage;
+    public const string TooManyPixelsMessage = AvatarRules.TooManyPixelsMessage;
 
-    public const string FileField = "file";
+    public const string FileField = AvatarRules.FileField;
 
     private const int WebpQuality = 85;
 

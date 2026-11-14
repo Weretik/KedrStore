@@ -177,6 +177,7 @@ The rules above are only real when a test fails on a violation. The architecture
 - Api endpoints do not use Infrastructure types;
 - folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands.<UseCase>` / `.Queries.<UseCase>` with no deeper folder, each use-case namespace holds one request and one handler, ports sit in `Abstractions`;
 - hosts contain no class that implements a module port;
+- each module's EF model maps only its own entities, with no navigation or foreign key to another module's entity or schema;
 - test sources sit in a responsibility folder and their namespace follows the path.
 
 A new module, layer, or rule is added to these tests in the same change, test first: the new architecture test must fail on the old code (Red) before the code is moved (Green), as the project's testing rules require for any behavior.
@@ -202,7 +203,24 @@ Host.Api/
 - Each module owns its tables in its own PostgreSQL schema, named after the module in lower case (`content`, `crm`). Its `DbContext` calls `modelBuilder.HasDefaultSchema("<module>")`.
 - Keep the module's migration history in its schema: `UseNpgsql(connection, x => x.MigrationsHistoryTable("__EFMigrationsHistory", "<module>"))`, in both runtime registration and the design-time factory.
 - One module's `DbContext` maps only its own tables. Do not add foreign keys, joins, or EF navigation to another module's tables; store the other module's identifier as a value and read its data through that module's `Contracts`.
+- **No entity of another module inside an entity.** An entity never holds a navigation property, a collection, or a field typed with another module's entity (for example, `OrderLine.Product` from the Catalog domain). It keeps the other module's id as a plain value (`ProductId`, no foreign key) and a snapshot of what the owning aggregate needs at that moment (`ProductName`, `UnitPrice`), so an order still reads correctly after the product changes or disappears.
 - The first migration of a new module creates its schema; check it against an empty database as the [database rules](database-rules.md) require.
+
+## Extensibility without over-engineering
+
+Add new behavior by adding a class, not by editing a growing chain of conditions, but only when the need is real.
+
+| What is added | Tool | Example |
+| --- | --- | --- |
+| Another variant of the same action | Strategy: one port in `Application/Abstractions/`, one implementation per variant in Infrastructure, chosen through keyed DI or a registry, never a growing `switch` | Delivery providers, payment methods |
+| The same behavior around every use case | A Mediator pipeline behavior in `BuildingBlocks.Application/Behaviors/` | Logging, validation, performance, transactions |
+| Another reaction to something that happened | A new domain or integration event handler; across modules or to an outside system through the outbox | «Order placed» → notification, export to the accounting system |
+| Switching a capability on or off without a deploy | A feature flag, only by a recorded product decision, with an owner and a removal date | Gradual rollout of a new checkout |
+
+- **Rule of three.** Introduce the abstraction at the third variant, reaction, or copy, not before. Two cases stay a plain `if` or a short `switch`; mapping an enum to a name or a status is not a growing chain and stays a `switch` expression.
+- No speculative interfaces, factories, base classes, generic repositories, or plug-in points "for the future". An interface exists only for a port (an outside dependency that Application must not know) or for a variant that already has at least two implementations.
+- A pipeline behavior holds only cross-cutting plumbing; business rules stay in Domain and handlers.
+- An audit reports both directions: a `switch` or `if` chain on a type or code that has reached three branches in more than one place, and an abstraction with a single implementation and no port role.
 
 ## Errors
 
@@ -221,6 +239,8 @@ Business outcomes travel as results; exceptions are only for the unexpected.
 - Validators check the shape of the input: required fields, lengths, ranges, formats, and paging limits. Business invariants and state checks stay in Domain or the handler; do not query the database from a validator unless the project documents an exception.
 - Validation messages are in the users' language: set FluentValidation's `LanguageManager` culture for the built-in messages, and write custom `WithMessage` texts in that language.
 - Do not repeat validator rules in endpoints or request models.
+- A message whose only input is a flag (`bool`) or nothing needs no validator. The architecture test `ValidatorCoverageTests` fails when any other command or query has none; its pending list mirrors the known deviation below.
+- Rules shared by several use cases live in one place: a validator of the shared request type in `Features/<Feature>/Shared/` used through `SetValidator`, or rule-builder extensions in `Application/Shared/` (for example the content language and the looked-up slug).
 
 ## KedrStore specifics
 
@@ -251,4 +271,4 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | All Api projects | Controllers (in `Features/<Feature>/` for Catalog and Content, `Controllers/` elsewhere) instead of Minimal API endpoints in `Endpoints/<Feature>/` | Last stage, after the audit and all fixes (owner decision 2026-11-14): move every module to Minimal API with separate `Request` types and `ProblemDetails` errors, keeping the OpenAPI snapshot identical |
 | Errors | Domain rules throw `DomainException` (138 places) and `ExceptionBehavior` turns it into 400, so business cases use exceptions and have no error type; `Sales` throws `WorkspaceException(statusCode, ...)` from Application and `AdminOrderWorkspaceController` catches it in 11 actions; about 15 controller actions choose status codes themselves instead of the one `ToActionResult` mapper; error bodies are not `ProblemDetails` | Stage «errors and validation»: `ErrorType`, results from aggregates, one mapper; `ProblemDetails` bodies switch with the Minimal API stage and the client updates (owner decision 2026-11-14) |
 | `Catalog`, `Sales`, `Identity` | Tables and migration history in the `public` schema | Keep: moving existing tables needs a separate migration and rollout plan. New modules use their own schema. |
-| Validation | 30 commands and queries with client input have no validator (Catalog 7, Content 3, Identity 8, Sales 12; count of 2026-11-14); validation, domain, and handler messages are in English, and the admin shows them to users as they are | Stage «errors and validation»: add the validators, set FluentValidation `LanguageManager` to `uk`, write user-facing messages in Ukrainian |
+| Validation | The 11 Sales order workspace messages (`Sales.Application.Features.Orders.AdminWorkspace`) still have no validator: their checks sit in Sales Infrastructure and throw `WorkspaceException`; `ValidatorCoverageTests` lists them as pending. Handler, domain, and infrastructure messages are still partly English | Sales stage: move the checks into validators and `Result`; stage «errors and validation»: translate the remaining user-facing messages |

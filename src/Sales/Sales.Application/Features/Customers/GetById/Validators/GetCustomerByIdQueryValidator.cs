@@ -6,7 +6,7 @@ public sealed class GetCustomerByIdQueryValidator : AbstractValidator<GetCustome
     {
         RuleFor(query => query.CounterpartyId)
             .Must(value => !string.IsNullOrWhiteSpace(value))
-            .WithMessage("Counterparty ID must not be blank.")
+            .WithMessage("Вкажіть контрагента.")
             .MaximumLength(64);
     }
 }

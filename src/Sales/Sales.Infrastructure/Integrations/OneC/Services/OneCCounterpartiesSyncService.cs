@@ -104,7 +104,7 @@ public sealed class OneCCounterpartiesSyncService(
 
             if (existingCounterparty is null)
             {
-                var counterparty = Counterparty.Create(
+                var created = Counterparty.Create(
                     id: normalized.CounterpartyId,
                     identityUserId: identityResult.Value,
                     name: normalized.CounterpartyName,
@@ -112,6 +112,15 @@ public sealed class OneCCounterpartiesSyncService(
                     phone: normalized.Phone,
                     defaultPriceTypeId: normalized.DefaultPriceTypeId,
                     createdAt: now);
+                if (created.IsFailure)
+                {
+                    skipped++;
+                    logger.LogWarning("Counterparty {CounterpartyId} skipped during sync: {Reason}",
+                        normalized.CounterpartyId, created.Error!.Code);
+                    continue;
+                }
+
+                var counterparty = created.Value;
 
                 await salesDbContext.Counterparties.AddAsync(counterparty, cancellationToken);
                 existingCounterparties[normalized.CounterpartyId] = counterparty;
@@ -138,13 +147,20 @@ public sealed class OneCCounterpartiesSyncService(
                 continue;
             }
 
-            existingCounterparty.Update(
+            var changed = existingCounterparty.Update(
                 identityUserId: identityResult.Value,
                 name: normalized.CounterpartyName,
                 email: normalized.Email,
                 phone: normalized.Phone,
                 defaultPriceTypeId: normalized.DefaultPriceTypeId,
                 updatedAt: now);
+            if (changed.IsFailure)
+            {
+                skipped++;
+                logger.LogWarning("Counterparty {CounterpartyId} skipped during sync: {Reason}",
+                    normalized.CounterpartyId, changed.Error!.Code);
+                continue;
+            }
 
             assignedIdentityUsers[identityResult.Value] = normalized.CounterpartyId;
             updated++;

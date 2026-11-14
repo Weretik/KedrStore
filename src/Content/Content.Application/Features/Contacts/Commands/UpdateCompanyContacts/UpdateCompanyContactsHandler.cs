@@ -18,7 +18,10 @@ public sealed class UpdateCompanyContactsHandler(
         if (contacts is null)
             return Result.NotFound();
 
-        contacts.Update(CompanyContactsMapper.ToValues(command.Input), clock.GetUtcNow(), ContentEditor.Name(currentUser));
+        var updated = contacts.Update(CompanyContactsMapper.ToValues(command.Input), clock.GetUtcNow(),
+            ContentEditor.Name(currentUser));
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<CompanyContactsDetails>();
         await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(CompanyContactsMapper.ToDetails(contacts));
     }

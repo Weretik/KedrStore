@@ -16,8 +16,11 @@ public sealed class CreateHomeBrandHandler(
             return Result.Invalid(invalid);
 
         var position = await HomeAdminBlocks.NextBrandPositionAsync(db, cancellationToken);
-        await repository.AddAsync(HomeBrand.Create(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId,
-            position, clock.GetUtcNow()), cancellationToken);
+        var brand = HomeBrand.Create(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId, position,
+            clock.GetUtcNow());
+        if (brand.IsFailure)
+            return brand.Error!.ToResult<AdminHomeBlocks>();
+        await repository.AddAsync(brand.Value, cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

@@ -89,7 +89,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
             "create-order@example.com",
             "+380000000000",
             1,
-            DateTimeOffset.UtcNow));
+            DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }
 

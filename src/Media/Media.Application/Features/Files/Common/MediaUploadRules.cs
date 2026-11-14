@@ -9,7 +9,7 @@ public static class MediaUploadRules
     public const long MaxUploadBytes = 15 * 1024 * 1024;
 
     internal static IRuleBuilderOptions<T, MediaUpload> FileRules<T>(IRuleBuilder<T, MediaUpload> rule)
-        => rule.NotNull().WithMessage("A file is required.")
+        => rule.NotNull().WithMessage("Додайте файл.")
             .Must(file => file is null || file.Length is > 0 and <= MaxUploadBytes)
-            .WithMessage("The picture must be between 1 byte and 15 MB.");
+            .WithMessage("Зображення має бути не більше 15 МБ.");
 }

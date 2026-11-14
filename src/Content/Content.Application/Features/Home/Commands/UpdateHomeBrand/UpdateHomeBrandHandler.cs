@@ -19,7 +19,9 @@ public sealed class UpdateHomeBrandHandler(
             await HomeAdminBlocks.CheckLogoAsync(images, command.Brand.LogoMediaFileId, cancellationToken) is { } invalid)
             return Result.Invalid(invalid);
 
-        brand.Update(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId, clock.GetUtcNow());
+        var updated = brand.Update(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId, clock.GetUtcNow());
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<AdminHomeBlocks>();
         await repository.UpdateAsync(brand, cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }

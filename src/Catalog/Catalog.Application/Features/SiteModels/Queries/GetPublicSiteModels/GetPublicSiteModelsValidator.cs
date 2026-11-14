@@ -13,12 +13,12 @@ public sealed class GetPublicSiteModelsValidator : AbstractValidator<GetPublicSi
             RuleFor(query => query.Request.Search).MaximumLength(200).OverridePropertyName("search");
             RuleFor(query => query.Request.Sort)
                 .Must(sort => sort is null || GetPublicSiteModelsQuery.Sorts.Contains(sort))
-                .WithMessage("Sort is default, price_asc, price_desc, name_asc, or new.").OverridePropertyName("sort");
+                .WithMessage("Сортування: default, price_asc, price_desc, name_asc або new.").OverridePropertyName("sort");
             RuleFor(query => query.Request.PriceFrom).GreaterThanOrEqualTo(0).OverridePropertyName("priceFrom");
             RuleFor(query => query.Request.PriceTo).GreaterThanOrEqualTo(0).OverridePropertyName("priceTo");
             RuleFor(query => query.Request.Filter)
                 .Must(filter => PublicModelFilter.Parse(filter) is not null)
-                .WithMessage($"Use attribute-slug:value-slug[,value-slug], at most {PublicModelFilter.MaxValues} values.")
+                .WithMessage($"Формат: характеристика:значення[,значення], не більше {PublicModelFilter.MaxValues} значень.")
                 .OverridePropertyName("filter");
         });
     }

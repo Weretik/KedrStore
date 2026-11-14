@@ -122,7 +122,7 @@ public sealed class WholesalePageApiTests
     private static WholesalePageText Create(string language) => WholesalePageText.Create(new(
         $"{language} hero", "Lead", "Card", "Note", "Assortment", "Intro", "company", "Company text", "Selection",
         "selection", "Warehouse", "warehouse", "Steps", [("1", "a"), ("2", "b"), ("3", "c")], "Faq",
-        [("Q?", "A.")], "Closing"));
+        [("Q?", "A.")], "Closing")).Value;
 
     private static WebApplicationFactory<Program> CreateFactory(ContentDbContext db)
         => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>

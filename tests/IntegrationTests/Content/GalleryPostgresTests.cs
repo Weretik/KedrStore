@@ -41,7 +41,7 @@ public sealed class GalleryPostgresTests(ContentPostgresFixture postgres)
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<ContentDbContext>();
 
-        db.GalleryItems.Add(GalleryItem.CreateVideo("0FDRbSaQ9Ec", 100, GalleryItemTexts.Empty, DateTimeOffset.UtcNow));
+        db.GalleryItems.Add(GalleryItem.CreateVideo("0FDRbSaQ9Ec", 100, GalleryItemTexts.Empty, DateTimeOffset.UtcNow).Value);
 
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
     }

@@ -23,7 +23,10 @@ public sealed class UpdateCompanyRequisitesHandler(
             return Result.NotFound();
 
         var now = clock.GetUtcNow();
-        var changes = requisites.Update(CompanyRequisitesMapper.ToValues(command.Input), now);
+        var updated = requisites.Update(CompanyRequisitesMapper.ToValues(command.Input), now);
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<CompanyRequisitesDetails>();
+        var changes = updated.Value;
         if (changes.Count == 0)
             return Result.Success(CompanyRequisitesMapper.ToDetails(requisites));
 

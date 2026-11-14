@@ -25,25 +25,33 @@ public sealed class MediaFile : IAggregateRoot
 
     private MediaFile() { }
 
-    public static MediaFile Create(MediaFolderId? folderId, string fileName, MediaFileContent content, DateTimeOffset now)
+    public static DomainResult<MediaFile> Create(MediaFolderId? folderId, string fileName, MediaFileContent content,
+        DateTimeOffset now)
     {
-        var file = new MediaFile { FolderId = folderId, FileName = NormalizeFileName(fileName), CreatedAt = now };
-        file.SetContent(content, now);
-        return file;
+        var name = NormalizeFileName(fileName);
+        if (name.IsFailure)
+            return name.Error!;
+        var file = new MediaFile { FolderId = folderId, FileName = name.Value, CreatedAt = now };
+        var set = file.SetContent(content, now);
+        return set.IsSuccess ? file : set.Error!;
     }
 
     /// <summary>Points the file at a new picture and returns the old CDN key, which the caller deletes.</summary>
-    public string Replace(MediaFileContent content, DateTimeOffset now)
+    public DomainResult<string> Replace(MediaFileContent content, DateTimeOffset now)
     {
         var previousKey = StorageKey;
-        SetContent(content, now);
-        return previousKey;
+        var set = SetContent(content, now);
+        return set.IsSuccess ? previousKey : set.Error!;
     }
 
-    public void Rename(string fileName, DateTimeOffset now)
+    public DomainResult Rename(string fileName, DateTimeOffset now)
     {
-        FileName = NormalizeFileName(fileName);
+        var name = NormalizeFileName(fileName);
+        if (name.IsFailure)
+            return name.Error!;
+        FileName = name.Value;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
     public void MoveTo(MediaFolderId? folderId, DateTimeOffset now)
@@ -52,28 +60,28 @@ public sealed class MediaFile : IAggregateRoot
         UpdatedAt = now;
     }
 
-    public static string NormalizeFileName(string? fileName)
+    public static DomainResult<string> NormalizeFileName(string? fileName)
     {
         var normalized = fileName?.Trim() ?? string.Empty;
         if (normalized.Length == 0)
-            throw new DomainException(MediaErrors.Required("FileName"));
+            return MediaErrors.Required("FileName");
         if (normalized.Length > FileNameMaxLength)
-            throw new DomainException(MediaErrors.TooLong("FileName", FileNameMaxLength, normalized.Length));
+            return MediaErrors.TooLong("FileName", FileNameMaxLength, normalized.Length);
         return normalized;
     }
 
-    private void SetContent(MediaFileContent content, DateTimeOffset now)
+    private DomainResult SetContent(MediaFileContent content, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(content);
         var key = content.StorageKey?.Trim().TrimStart('/') ?? string.Empty;
         if (key.Length == 0)
-            throw new DomainException(MediaErrors.Required("StorageKey"));
+            return MediaErrors.Required("StorageKey");
         if (key.Length > StorageKeyMaxLength)
-            throw new DomainException(MediaErrors.TooLong("StorageKey", StorageKeyMaxLength, key.Length));
+            return MediaErrors.TooLong("StorageKey", StorageKeyMaxLength, key.Length);
         if (string.IsNullOrWhiteSpace(content.ContentType))
-            throw new DomainException(MediaErrors.Required("ContentType"));
+            return MediaErrors.Required("ContentType");
         if (content.SizeBytes < 0 || content.Width <= 0 || content.Height <= 0)
-            throw new DomainException(MediaErrors.ContentInvalid());
+            return MediaErrors.ContentInvalid();
 
         StorageKey = key;
         ContentType = content.ContentType.Trim();
@@ -81,5 +89,6 @@ public sealed class MediaFile : IAggregateRoot
         Width = content.Width;
         Height = content.Height;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 }

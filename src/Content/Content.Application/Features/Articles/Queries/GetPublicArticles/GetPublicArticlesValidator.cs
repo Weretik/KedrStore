@@ -6,6 +6,6 @@ public sealed class GetPublicArticlesValidator : AbstractValidator<GetPublicArti
 {
     public GetPublicArticlesValidator()
     {
-        RuleFor(x => x.Language).Must(ArticleLanguage.IsSupported).WithMessage("Language must be 'uk' or 'ru'.");
+        RuleFor(x => x.Language).Must(ArticleLanguage.IsSupported).WithMessage("Мова може бути лише uk або ru.");
     }
 }

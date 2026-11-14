@@ -113,7 +113,7 @@ public sealed class CompanyRequisitesApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         db.CompanyRequisites.Add(CompanyRequisites.Create(new CompanyRequisitesValues(
             "ФОП Овчинников Максим Володимирович", "2689400771", "24800170000032534", Iban, "ПриватБанк",
-            "305299"), Now));
+            "305299"), Now).Value);
         db.SaveChanges();
         return db;
     }

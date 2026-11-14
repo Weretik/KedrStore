@@ -28,12 +28,14 @@ public sealed class UpdateSiteSeoSettingsHandler(
             && !(await images.GetImagesAsync([imageId], cancellationToken)).ContainsKey(imageId))
         {
             return Result.Invalid(new ValidationError("shareImageMediaFileId",
-                $"The file {imageId} is not in the media library.", "Content.SiteSeoSettings.Image.NotFound",
+                "Цього зображення немає в медіатеці.", "Content.SiteSeoSettings.Image.NotFound",
                 ValidationSeverity.Error));
         }
 
-        settings.Update(SiteSeoSettingsMapper.ToValues(command.Input), clock.GetUtcNow(),
+        var updated = settings.Update(SiteSeoSettingsMapper.ToValues(command.Input), clock.GetUtcNow(),
             ContentEditor.Name(currentUser));
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<SiteSeoSettingsDetails>();
         await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await SiteSeoSettingsMapper.ToDetailsAsync(settings, images, cancellationToken));
     }

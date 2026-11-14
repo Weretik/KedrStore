@@ -8,9 +8,9 @@ public static class ProfileRules
     public const int EmailMaxLength = 256;
 
     public static IRuleBuilderOptions<T, string> FullName<T>(this IRuleBuilder<T, string> rule) =>
-        rule.Must(value => !string.IsNullOrWhiteSpace(value)).WithMessage("Name is required.")
+        rule.Must(value => !string.IsNullOrWhiteSpace(value)).WithMessage("Вкажіть назву.")
             .Must(value => value is null || value.Trim().Length <= FullNameMaxLength)
-            .WithMessage($"Name must be at most {FullNameMaxLength} characters.");
+            .WithMessage($"Ім’я — не більше {FullNameMaxLength} символів.");
 
     public static IRuleBuilderOptions<T, string> StaffEmail<T>(this IRuleBuilder<T, string> rule) =>
         rule.NotEmpty().EmailAddress().MaximumLength(EmailMaxLength);

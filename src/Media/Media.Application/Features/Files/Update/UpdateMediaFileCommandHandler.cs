@@ -24,7 +24,9 @@ public sealed class UpdateMediaFileCommandHandler(
             return MediaResults.Fail<MediaFileItem>(missing);
 
         var now = clock.GetUtcNow();
-        file.Rename(command.FileName, now);
+        var renamed = file.Rename(command.FileName, now);
+        if (renamed.IsFailure)
+            return renamed.Error!.ToResult<MediaFileItem>();
         file.MoveTo(command.FolderId is { } id ? MediaFolderId.Create(id) : null, now);
         await files.SaveChangesAsync(cancellationToken);
         return Result.Success(MediaFileMapper.ToItem(file, urls));

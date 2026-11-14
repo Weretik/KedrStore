@@ -7,7 +7,7 @@ public sealed class AddGalleryPhotosValidator : AbstractValidator<AddGalleryPhot
     public AddGalleryPhotosValidator()
     {
         RuleFor(x => x.MediaFileIds).NotEmpty().Must(ids => ids.Count <= MaxFiles)
-            .WithMessage($"Add at most {MaxFiles} photos at once.");
+            .WithMessage($"За раз можна додати не більше {MaxFiles} фото.");
         RuleForEach(x => x.MediaFileIds).GreaterThan(0);
     }
 }

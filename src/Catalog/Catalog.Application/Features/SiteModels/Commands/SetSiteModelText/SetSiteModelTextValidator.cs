@@ -8,7 +8,7 @@ public sealed class SetSiteModelTextValidator : AbstractValidator<SetSiteModelTe
     {
         RuleFor(command => command.ModelId).GreaterThan(0);
         RuleFor(command => command.Language).Must(language => ProductGroupText.Languages.Contains(language))
-            .WithMessage("Language is uk or ru.");
+            .WithMessage("Мова може бути лише uk або ru.");
         RuleFor(command => command.Request).NotNull();
         When(command => command.Request is not null, () =>
         {

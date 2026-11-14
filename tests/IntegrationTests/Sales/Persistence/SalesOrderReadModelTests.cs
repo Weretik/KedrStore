@@ -166,10 +166,10 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
             $"{counterpartyId}@example.com",
             "+380000000000",
             1,
-            createdAt);
+            createdAt).Value;
         var lines = amounts.Select((amount, index) =>
-            OrderLine.Create($"product-{index}", $"Product {index}", index + 1, amount));
-        var order = Order.Create(orderNumber, counterpartyId, "Manager note", lines, createdAt);
+            OrderLine.Create($"product-{index}", $"Product {index}", index + 1, amount).Value);
+        var order = Order.Create(orderNumber, counterpartyId, "Manager note", lines, createdAt).Value;
         db.Counterparties.Add(counterparty);
         db.Orders.Add(order);
         await db.SaveChangesAsync();

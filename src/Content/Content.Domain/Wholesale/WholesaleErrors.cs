@@ -3,17 +3,14 @@ namespace Content.Domain.Wholesale;
 public static class WholesaleErrors
 {
     public static DomainError Required(string field) =>
-        new($"Content.Wholesale.{field}.Required", $"{field} is required");
+        new($"Content.Wholesale.{field}.Required", "Заповніть це поле.", Field: field);
 
     public static DomainError TooLong(string field, int maxLength, int length) =>
-        new($"Content.Wholesale.{field}.TooLong", $"{field} must be at most {maxLength} characters. Actual: {length}");
+        new($"Content.Wholesale.{field}.TooLong", $"Не більше {maxLength} символів (зараз {length}).", Field: field);
 
     public static DomainError StepCount(int expected, int actual) =>
-        new("Content.Wholesale.Steps.Count", $"Exactly {expected} steps are required. Actual: {actual}");
+        new("Content.Wholesale.Steps.Count", $"Потрібно рівно {expected} кроки (зараз {actual}).", Field: "Steps");
 
     public static DomainError FaqCount(int max, int actual) =>
-        new("Content.Wholesale.Faq.Count", $"From 1 to {max} questions are required. Actual: {actual}");
-
-    public static DomainError UnknownLanguage(string language) =>
-        new("Content.Wholesale.Language.Unknown", $"Unknown language: {language}");
+        new("Content.Wholesale.Faq.Count", $"Потрібно від 1 до {max} питань (зараз {actual}).", Field: "Faq");
 }

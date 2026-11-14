@@ -141,7 +141,7 @@ public sealed class LegalDocumentsApiTests
             [
                 new LegalDocumentTextInput("uk", "Публічна оферта", "<h2>Загальні</h2><p>Старий текст</p>"),
                 new LegalDocumentTextInput("ru", "Публичная оферта", "<h2>Общие</h2><p>Старый текст</p>"),
-            ], Now, "seed");
+            ], Now, "seed").Value;
             version.Publish(1, new DateOnly(2026, 11, 3), Now, "seed");
             db.LegalDocumentVersions.Add(version);
         }

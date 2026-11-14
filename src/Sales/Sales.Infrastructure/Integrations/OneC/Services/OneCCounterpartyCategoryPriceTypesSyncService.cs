@@ -90,8 +90,9 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
                 continue;
             }
 
+            // validRules hold only rows that pass the rule's checks, so creation always succeeds here.
             await salesDbContext.CounterpartyCategoryPriceTypes.AddAsync(
-                CounterpartyCategoryPriceType.Create(item.CounterpartyId, item.CategoryId, item.PriceTypeId),
+                CounterpartyCategoryPriceType.Create(item.CounterpartyId, item.CategoryId, item.PriceTypeId).Value,
                 cancellationToken);
         }
 

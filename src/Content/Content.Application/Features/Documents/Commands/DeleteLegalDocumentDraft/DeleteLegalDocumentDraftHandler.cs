@@ -10,7 +10,7 @@ public sealed class DeleteLegalDocumentDraftHandler(IContentRepository<LegalDocu
         if (version is null)
             return Result.NotFound();
         if (!version.IsDraft)
-            return Result.Conflict("Published versions are kept; only a draft can be deleted.");
+            return Result.Conflict("Опубліковані редакції зберігаються, видалити можна лише чернетку.");
 
         await versions.DeleteAsync(version, cancellationToken);
         return Result.NoContent();

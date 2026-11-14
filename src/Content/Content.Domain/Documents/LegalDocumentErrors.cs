@@ -3,27 +3,25 @@ namespace Content.Domain.Documents;
 public static class LegalDocumentErrors
 {
     public static DomainError LanguageMissing(string language) =>
-        new("Content.Document.Text.Missing", $"The '{language}' text of the document is required");
+        new("Content.Document.Text.Missing",
+            language == "ru" ? "Додайте текст російською." : "Додайте текст українською.", Field: "Texts");
 
-    public static DomainError LanguageInvalid(string? language) =>
-        new("Content.Document.Text.Language", $"Document language must be 'uk' or 'ru'. Actual: {language}");
+    public static DomainError LanguageInvalid() =>
+        new("Content.Document.Text.Language", "Мова документа: лише українська або російська.", Field: "Texts");
 
     public static DomainError Required(string field) =>
-        new($"Content.Document.{field}.Required", $"{field} is required");
+        new($"Content.Document.{field}.Required", "Заповніть це поле.", Field: field);
 
     public static DomainError TooLong(string field, int maxLength, int length) =>
-        new($"Content.Document.{field}.TooLong", $"{field} must be at most {maxLength} characters. Actual: {length}");
+        new($"Content.Document.{field}.TooLong", $"Не більше {maxLength} символів (зараз {length}).", Field: field);
 
-    public static DomainError NotDraft(long id) =>
-        new("Content.Document.NotDraft", $"Version {id} is already published; only a draft can be changed");
+    public static DomainError NotDraft() =>
+        DomainError.Conflict("Content.Document.NotDraft", "Цю редакцію вже опубліковано, змінити можна лише чернетку.");
 
-    public static DomainError NotPublished(long id) =>
-        new("Content.Document.NotPublished", $"Version {id} is not the published one");
+    public static DomainError NotPublished() =>
+        DomainError.Conflict("Content.Document.NotPublished", "Ця редакція зараз не на сайті.");
 
     public static DomainError EffectiveFromTooEarly(DateOnly current) =>
         new("Content.Document.EffectiveFrom.TooEarly",
-            $"The date may not be earlier than the current edition ({current:yyyy-MM-dd}).");
-
-    public static DomainError NumberInvalid(int number) =>
-        new("Content.Document.Number.Invalid", $"A version number must be positive. Actual: {number}");
+            $"Дата не може бути раніше за чинну редакцію ({current:dd.MM.yyyy}).", Field: "effectiveFrom");
 }

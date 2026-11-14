@@ -35,27 +35,35 @@ public sealed partial class Article : IAggregateRoot
 
     private Article() { }
 
-    public static Article Create(string slug, DateOnly publishedOn, bool isPublished,
+    public static DomainResult<Article> Create(string slug, DateOnly publishedOn, bool isPublished,
         IReadOnlyCollection<ArticleText> texts, DateTimeOffset now, string editor)
     {
         var article = new Article { CreatedAt = now };
-        article.Update(slug, publishedOn, isPublished, texts, now, editor);
-        return article;
+        var updated = article.Update(slug, publishedOn, isPublished, texts, now, editor);
+        return updated.IsFailure ? updated.Error! : article;
     }
 
-    public void Update(string slug, DateOnly publishedOn, bool isPublished,
+    public DomainResult Update(string slug, DateOnly publishedOn, bool isPublished,
         IReadOnlyCollection<ArticleText> texts, DateTimeOffset now, string editor)
     {
         ArgumentNullException.ThrowIfNull(texts);
         var normalizedSlug = slug?.Trim() ?? string.Empty;
         if (!IsValidSlug(normalizedSlug))
-            throw new DomainException(ArticleErrors.SlugInvalid(slug));
+            return ArticleErrors.SlugInvalid();
 
-        var translations = texts.Select(ArticleTranslation.Create).ToList();
+        var translations = new List<ArticleTranslation>();
+        foreach (var text in texts)
+        {
+            var translation = ArticleTranslation.Create(text);
+            if (translation.IsFailure)
+                return translation.Error!;
+            translations.Add(translation.Value);
+        }
+
         foreach (var language in Languages)
         {
             if (translations.Count(t => t.Language == language) != 1)
-                throw new DomainException(ArticleErrors.LanguageMissing(language));
+                return ArticleErrors.LanguageMissing(language);
         }
 
         Slug = normalizedSlug;
@@ -64,21 +72,23 @@ public sealed partial class Article : IAggregateRoot
         _translations.Clear();
         _translations.AddRange(translations.OrderBy(t => t.Language, StringComparer.Ordinal));
         Touch(now, editor);
+        return DomainResult.Success();
     }
 
     public ArticleTranslation Text(string language) => _translations.Single(t => t.Language == language);
 
     /// <summary>Uses a media-library picture as the cover; a legacy cover stops being used.</summary>
-    public void SetCover(long mediaFileId, DateTimeOffset now, string editor)
+    public DomainResult SetCover(long mediaFileId, DateTimeOffset now, string editor)
     {
         if (mediaFileId <= 0)
-            throw new DomainException(ArticleErrors.CoverInvalid(mediaFileId));
+            return ArticleErrors.CoverInvalid();
         if (CoverMediaFileId == mediaFileId && CoverVersion is null)
-            return;
+            return DomainResult.Success();
 
         CoverMediaFileId = mediaFileId;
         CoverVersion = null;
         Touch(now, editor);
+        return DomainResult.Success();
     }
 
     public void RemoveCover(DateTimeOffset now, string editor)

@@ -22,28 +22,28 @@ internal sealed class WholesaleTextValidator : AbstractValidator<WholesaleTextDt
         Required(x => x.ClosingTitle, WholesalePageText.TitleMaxLength);
 
         RuleFor(x => x.Steps).NotNull().Must(steps => steps.Count == WholesalePageText.StepCount)
-            .WithMessage($"Exactly {WholesalePageText.StepCount} steps are required.");
+            .WithMessage($"Потрібно рівно {WholesalePageText.StepCount} кроків.");
         RuleForEach(x => x.Steps).ChildRules(step =>
         {
             step.RuleFor(x => x.Title).Must(value => !string.IsNullOrWhiteSpace(value))
-                .WithMessage("Required.").MaximumLength(WholesalePageText.ShortTitleMaxLength);
+                .WithMessage("Заповніть це поле.").MaximumLength(WholesalePageText.ShortTitleMaxLength);
             step.RuleFor(x => x.Text).Must(value => !string.IsNullOrWhiteSpace(value))
-                .WithMessage("Required.").MaximumLength(WholesalePageText.ShortTextMaxLength);
+                .WithMessage("Заповніть це поле.").MaximumLength(WholesalePageText.ShortTextMaxLength);
         }).When(x => x.Steps is not null);
 
         RuleFor(x => x.Faq).NotNull()
             .Must(faq => faq.Count is > 0 and <= WholesalePageText.MaxFaqItems)
-            .WithMessage($"From 1 to {WholesalePageText.MaxFaqItems} questions are required.");
+            .WithMessage($"Потрібно від 1 до {WholesalePageText.MaxFaqItems} запитань.");
         RuleForEach(x => x.Faq).ChildRules(item =>
         {
             item.RuleFor(x => x.Question).Must(value => !string.IsNullOrWhiteSpace(value))
-                .WithMessage("Required.").MaximumLength(WholesalePageText.QuestionMaxLength);
+                .WithMessage("Заповніть це поле.").MaximumLength(WholesalePageText.QuestionMaxLength);
             item.RuleFor(x => x.Answer).Must(value => !string.IsNullOrWhiteSpace(value))
-                .WithMessage("Required.").MaximumLength(WholesalePageText.AnswerMaxLength);
+                .WithMessage("Заповніть це поле.").MaximumLength(WholesalePageText.AnswerMaxLength);
         }).When(x => x.Faq is not null);
     }
 
     private void Required(System.Linq.Expressions.Expression<Func<WholesaleTextDto, string>> field, int maxLength)
-        => RuleFor(field).Must(value => !string.IsNullOrWhiteSpace(value)).WithMessage("Required.")
+        => RuleFor(field).Must(value => !string.IsNullOrWhiteSpace(value)).WithMessage("Заповніть це поле.")
             .MaximumLength(maxLength);
 }

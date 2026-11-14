@@ -23,7 +23,7 @@ public sealed class AddGalleryPhotosHandler(
         if (missing.Count > 0)
         {
             return Result.Invalid(new ValidationError("mediaFileIds",
-                $"These files are not in the media library: {string.Join(", ", missing)}.",
+                $"Цих файлів немає в медіатеці: {string.Join(", ", missing)}.",
                 "Content.Gallery.MediaFile.NotFound", ValidationSeverity.Error));
         }
 
@@ -33,9 +33,14 @@ public sealed class AddGalleryPhotosHandler(
             .ToListAsync(cancellationToken);
         var now = clock.GetUtcNow();
         var position = await GalleryAdminList.NextPositionAsync(db, cancellationToken);
-        var added = ids.Where(id => !present.Contains(id))
-            .Select(id => GalleryItem.CreatePhoto(id, position++, GalleryItemTexts.Empty, now))
-            .ToList();
+        var added = new List<GalleryItem>();
+        foreach (var id in ids.Where(id => !present.Contains(id)))
+        {
+            var photo = GalleryItem.CreatePhoto(id, position++, GalleryItemTexts.Empty, now);
+            if (photo.IsFailure)
+                return photo.Error!.ToResult<IReadOnlyList<AdminGalleryItem>>();
+            added.Add(photo.Value);
+        }
         if (added.Count > 0)
             await repository.AddRangeAsync(added, cancellationToken);
 

@@ -10,7 +10,7 @@ public sealed class SearchStaffCandidatesQueryValidator : AbstractValidator<Sear
     {
         RuleFor(x => x.Search)
             .Must(search => search is not null && search.Trim().Length >= MinimumLength)
-            .WithMessage($"Search must have at least {MinimumLength} characters.")
+            .WithMessage($"Для пошуку введіть щонайменше {MinimumLength} символи.")
             .MaximumLength(256);
     }
 }

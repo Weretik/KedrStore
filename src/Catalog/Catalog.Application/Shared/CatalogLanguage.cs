@@ -8,4 +8,8 @@ public static class CatalogLanguage
 
     public static string Normalize(string? language)
         => string.Equals(language, Russian, StringComparison.OrdinalIgnoreCase) ? Russian : Ukrainian;
+
+    public static bool IsSupported(string? language)
+        => string.Equals(language, Ukrainian, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(language, Russian, StringComparison.OrdinalIgnoreCase);
 }

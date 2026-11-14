@@ -35,79 +35,88 @@ public sealed class LegalDocumentVersion : IAggregateRoot
     public static bool AllowsEffectiveFrom(DateOnly effectiveFrom, LegalDocumentVersion? current)
         => current?.EffectiveFrom is not { } currentDate || currentDate <= effectiveFrom;
 
-    public static LegalDocumentVersion CreateDraft(LegalDocumentKind kind,
+    public static DomainResult<LegalDocumentVersion> CreateDraft(LegalDocumentKind kind,
         IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now, string userName)
     {
         var version = new LegalDocumentVersion { Kind = kind, Status = LegalDocumentStatus.Draft };
-        version.ReplaceTexts(texts, now, userName);
-        return version;
+        var replaced = version.ReplaceTexts(texts, now, userName);
+        return replaced.IsFailure ? replaced.Error! : version;
     }
 
-    public void UpdateDraft(IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now, string userName)
-    {
-        EnsureDraft();
-        ReplaceTexts(texts, now, userName);
-    }
+    public DomainResult UpdateDraft(IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now,
+        string userName)
+        => IsDraft ? ReplaceTexts(texts, now, userName) : LegalDocumentErrors.NotDraft();
 
     /// <summary>Publishes this draft as <paramref name="number"/>; the caller archives the previous one.</summary>
-    public void Publish(int number, DateOnly effectiveFrom, DateTimeOffset now, string userName)
+    public DomainResult Publish(int number, DateOnly effectiveFrom, DateTimeOffset now, string userName)
     {
-        EnsureDraft();
-        if (number < 1)
-            throw new DomainException(LegalDocumentErrors.NumberInvalid(number));
+        // The number is the next one the repository counted, never user input.
+        ArgumentOutOfRangeException.ThrowIfLessThan(number, 1);
+        if (!IsDraft)
+            return LegalDocumentErrors.NotDraft();
 
         Status = LegalDocumentStatus.Published;
         Number = number;
         EffectiveFrom = effectiveFrom;
         PublishedAt = now;
         PublishedBy = Trim(userName);
+        return DomainResult.Success();
     }
 
     /// <summary>
     /// Publishes this draft as the next edition after <paramref name="lastNumber"/> and archives
     /// <paramref name="current"/>, the edition of the same kind the site shows now.
     /// </summary>
-    public void PublishReplacing(LegalDocumentVersion? current, int lastNumber, DateOnly effectiveFrom,
+    public DomainResult PublishReplacing(LegalDocumentVersion? current, int lastNumber, DateOnly effectiveFrom,
         DateTimeOffset now, string userName)
     {
         if (current is not null && current.Kind != Kind)
             throw new ArgumentException("The current edition must be of the same document kind.", nameof(current));
         if (!AllowsEffectiveFrom(effectiveFrom, current))
-            throw new DomainException(LegalDocumentErrors.EffectiveFromTooEarly(current!.EffectiveFrom!.Value));
+            return LegalDocumentErrors.EffectiveFromTooEarly(current!.EffectiveFrom!.Value);
+        if (current is not null && current.Status != LegalDocumentStatus.Published)
+            return LegalDocumentErrors.NotPublished();
 
-        Publish(lastNumber + 1, effectiveFrom, now, userName);
-        current?.Archive();
+        var published = Publish(lastNumber + 1, effectiveFrom, now, userName);
+        if (published.IsFailure)
+            return published;
+        return current?.Archive() ?? DomainResult.Success();
     }
 
-    public void Archive()
+    public DomainResult Archive()
     {
         if (Status != LegalDocumentStatus.Published)
-            throw new DomainException(LegalDocumentErrors.NotPublished(Id));
+            return LegalDocumentErrors.NotPublished();
         Status = LegalDocumentStatus.Archived;
+        return DomainResult.Success();
     }
 
     public LegalDocumentText Text(string language) => _texts.Single(text => text.Language == language);
 
-    private void EnsureDraft()
-    {
-        if (Status != LegalDocumentStatus.Draft)
-            throw new DomainException(LegalDocumentErrors.NotDraft(Id));
-    }
-
-    private void ReplaceTexts(IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now, string userName)
+    private DomainResult ReplaceTexts(IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now,
+        string userName)
     {
         ArgumentNullException.ThrowIfNull(texts);
-        var created = texts.Select(LegalDocumentText.Create).ToList();
+        var created = new List<LegalDocumentText>();
+        foreach (var input in texts)
+        {
+            var text = LegalDocumentText.Create(input);
+            if (text.IsFailure)
+                return text.Error!;
+            created.Add(text.Value);
+        }
+
         foreach (var language in Languages)
         {
             if (created.Count(text => text.Language == language) != 1)
-                throw new DomainException(LegalDocumentErrors.LanguageMissing(language));
+                return LegalDocumentErrors.LanguageMissing(language);
         }
 
         _texts.Clear();
         _texts.AddRange(created.OrderBy(text => text.Language, StringComparer.Ordinal));
         UpdatedAt = now;
         UpdatedBy = Trim(userName);
+        return DomainResult.Success();
     }
 
     private static string Trim(string userName)

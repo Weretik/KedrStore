@@ -76,14 +76,30 @@ public sealed class SyncCdnMediaJob(
             foreach (var item in batch)
             {
                 var folderId = await EnsureFolderAsync(FolderPathOf(item.Key), folderIds, now, cancellationToken);
+                if (folderId.IsFailure)
+                {
+                    Skip(item.Key, folderId.Error!);
+                    continue;
+                }
+
                 var content = new MediaFileContent(item.Key, MediaContentTypes.FromKey(item.Key)!, item.SizeBytes, null, null);
-                created.Add(MediaFile.Create(folderId, Path.GetFileName(item.Key), content, now));
+                var file = MediaFile.Create(folderId.Value, Path.GetFileName(item.Key), content, now);
+                if (file.IsFailure)
+                {
+                    Skip(item.Key, file.Error!);
+                    continue;
+                }
+
+                created.Add(file.Value);
             }
             await files.AddRangeAsync(created, cancellationToken);
         }
     }
 
-    private async Task<MediaFolderId?> EnsureFolderAsync(IReadOnlyList<string> path,
+    private void Skip(string key, DomainError error)
+        => logger.LogWarning("Media CDN sync skipped {Key}: {Code}", key, error.Code);
+
+    private async Task<DomainResult<MediaFolderId?>> EnsureFolderAsync(IReadOnlyList<string> path,
         Dictionary<string, MediaFolderId> folderIds, DateTimeOffset now, CancellationToken cancellationToken)
     {
         MediaFolderId? parent = null;
@@ -92,13 +108,17 @@ public sealed class SyncCdnMediaJob(
             var key = FolderKey(parent, name);
             if (!folderIds.TryGetValue(key, out var id))
             {
-                var folder = await folders.AddAsync(MediaFolder.Create(name, parent, now), cancellationToken);
+                var created = MediaFolder.Create(name, parent, now);
+                if (created.IsFailure)
+                    return created.Error!;
+
+                var folder = await folders.AddAsync(created.Value, cancellationToken);
                 id = folder.Id;
                 folderIds[key] = id;
             }
             parent = id;
         }
-        return parent;
+        return DomainResult<MediaFolderId?>.Success(parent);
     }
 
     /// <summary>Folder names for the directories of a key; the first level is renamed by <see cref="MediaCdnSyncOptions.FolderNames"/>.</summary>

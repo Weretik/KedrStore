@@ -19,9 +19,11 @@ internal sealed class AttributeSwatchStorage(IMediaFileUploader uploader) : IAtt
             { Status: MediaFileUploadStatus.Uploaded, File: { } file } =>
                 Result.Success(new StoredSwatchImage(file.Id, file.Url)),
             { Status: MediaFileUploadStatus.StorageUnavailable } =>
-                Result<StoredSwatchImage>.Unavailable("Media storage is not configured."),
+                Result<StoredSwatchImage>.Unavailable("Сховище медіа не налаштоване."),
+            { Status: MediaFileUploadStatus.Invalid, Message: { } message } =>
+                Result<StoredSwatchImage>.Invalid(new ValidationError("file", message, null, ValidationSeverity.Error)),
             _ => Result<StoredSwatchImage>.Invalid(
-                new ValidationError("file", "The file must be a JPEG, PNG, or WebP picture.", null,
+                new ValidationError("file", "Файл має бути зображенням JPEG, PNG або WebP.", null,
                     ValidationSeverity.Error)),
         };
     }

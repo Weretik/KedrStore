@@ -19,7 +19,7 @@ public sealed class ReorderGalleryHandler(
     {
         var items = await repository.ListAsync(cancellationToken);
         if (items.Count != command.Ids.Count || items.Any(item => !command.Ids.Contains(item.Id)))
-            return Result.Conflict("The gallery has changed; reload the page and try again.");
+            return Result.Conflict("Галерея змінилася, оновіть сторінку й спробуйте ще раз.");
 
         var now = clock.GetUtcNow();
         var byId = items.ToDictionary(item => item.Id);

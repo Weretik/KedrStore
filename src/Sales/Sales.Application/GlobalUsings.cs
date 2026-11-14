@@ -11,3 +11,5 @@ global using Sales.Application.Contracts.Persistence;
 global using Sales.Application.Contracts.Pricing;
 global using Sales.Application.Features.Catalog.GetList.DTOs;
 global using Sales.Domain.Customers.Entities;
+global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Application.Results;

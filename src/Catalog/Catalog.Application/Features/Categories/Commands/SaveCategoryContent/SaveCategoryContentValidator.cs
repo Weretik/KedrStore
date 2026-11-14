@@ -7,7 +7,7 @@ public sealed class SaveCategoryContentValidator : AbstractValidator<SaveCategor
         RuleFor(x => x.CategoryId).GreaterThan(0);
         RuleFor(x => x.Language)
             .Must(language => CategoryContent.Languages.Contains(language))
-            .WithMessage("Language must be 'uk' or 'ru'.");
+            .WithMessage("Мова може бути лише uk або ru.");
         RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.Request).NotNull();
 

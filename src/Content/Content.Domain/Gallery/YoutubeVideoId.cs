@@ -50,9 +50,9 @@ public static partial class YoutubeVideoId
         return true;
     }
 
-    public static string Parse(string? value) => TryParse(value, out var id)
+    public static DomainResult<string> Parse(string? value) => TryParse(value, out var id)
         ? id
-        : throw new DomainException(GalleryErrors.YoutubeLinkInvalid(value));
+        : GalleryErrors.YoutubeLinkInvalid(value);
 
     private static string? QueryValue(string query, string name)
     {

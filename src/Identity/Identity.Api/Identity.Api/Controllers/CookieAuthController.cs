@@ -16,6 +16,7 @@ public sealed class CookieAuthController(ISender sender, SessionCookieWriter coo
     [AllowAnonymous]
     [EnableRateLimiting("AuthLogin")]
     [ProducesResponseType(typeof(SessionMeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<SessionMeResponse>> Login([FromBody] SessionLoginRequest request, CancellationToken cancellationToken)

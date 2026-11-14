@@ -22,8 +22,9 @@ public sealed class ArticleCover : IAggregateRoot
     {
         ArgumentNullException.ThrowIfNull(data);
         ArgumentException.ThrowIfNullOrWhiteSpace(contentType);
+        // Legacy covers are no longer uploaded; only stored rows and test data reach this.
         if (data.Length is 0 or > MaxBytes)
-            throw new DomainException(ArticleErrors.TooLong("Cover", MaxBytes, data.Length));
+            throw new ArgumentOutOfRangeException(nameof(data), data.Length, $"A cover holds 1-{MaxBytes} bytes.");
 
         Data = data;
         ContentType = contentType;

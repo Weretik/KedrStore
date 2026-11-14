@@ -65,17 +65,17 @@ public sealed class ContentOverviewApiTests
     private static ContentDbContext Seed()
     {
         var db = CreateDb();
-        var published = Article.Create("petli", new DateOnly(2026, 11, 4), true, Texts("Петлі"), Now, "seed");
+        var published = Article.Create("petli", new DateOnly(2026, 11, 4), true, Texts("Петлі"), Now, "seed").Value;
         db.Articles.Add(published);
-        db.Articles.Add(Article.Create("nova", new DateOnly(2026, 11, 5), false, Texts("Нова чернетка"), Now, "seed"));
-        db.Articles.Add(Article.Create("stara", new DateOnly(2026, 10, 1), false, Texts("Стара чернетка"), Now.AddDays(-12), "seed"));
+        db.Articles.Add(Article.Create("nova", new DateOnly(2026, 11, 5), false, Texts("Нова чернетка"), Now, "seed").Value);
+        db.Articles.Add(Article.Create("stara", new DateOnly(2026, 10, 1), false, Texts("Стара чернетка"), Now.AddDays(-12), "seed").Value);
         db.SaveChanges();
         db.Entry(published).Property(article => article.CoverVersion).CurrentValue = 1;
 
-        var offer = LegalDocumentVersion.CreateDraft(LegalDocumentKind.PublicOffer, DocumentTexts(), Now, "seed");
+        var offer = LegalDocumentVersion.CreateDraft(LegalDocumentKind.PublicOffer, DocumentTexts(), Now, "seed").Value;
         offer.Publish(1, new DateOnly(2026, 11, 3), Now, "seed");
         db.LegalDocumentVersions.Add(offer);
-        db.LegalDocumentVersions.Add(LegalDocumentVersion.CreateDraft(LegalDocumentKind.PublicOffer, DocumentTexts(), Now, "seed"));
+        db.LegalDocumentVersions.Add(LegalDocumentVersion.CreateDraft(LegalDocumentKind.PublicOffer, DocumentTexts(), Now, "seed").Value);
         db.SaveChanges();
         return db;
     }

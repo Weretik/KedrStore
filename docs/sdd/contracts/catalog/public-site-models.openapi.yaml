@@ -82,6 +82,7 @@ paths:
         - { name: modelSlug, in: path, required: true, schema: { type: string } }
       responses:
         '200': { description: The model, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModel' } } } }
+        '400': { description: Language is not uk or ru, or the slug is empty or longer than 200 characters }
         '404':
           description: >-
             Not a model. For a former model slug, or the slug of a product inside an accepted model, the body is the
@@ -101,6 +102,7 @@ paths:
         - { name: productSlug, in: path, required: true, schema: { type: string } }
       responses:
         '200': { description: Model address, content: { application/json: { schema: { $ref: '#/components/schemas/PublicSiteModelAddress' } } } }
+        '400': { description: The slug is empty or longer than 200 characters }
         '404':
           description: >-
             The product is unknown, or not on the site. For a product off the site or deleted whose category is public

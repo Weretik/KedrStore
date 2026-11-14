@@ -59,9 +59,9 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
 
         var now = DateTimeOffset.UtcNow;
         var sales = _scope.ServiceProvider.GetRequiredService<SalesDbContext>();
-        sales.Counterparties.Add(Counterparty.Create(CustomerId, Guid.NewGuid(), "Клієнт", "c@example.com", null, DefaultType, now));
+        sales.Counterparties.Add(Counterparty.Create(CustomerId, Guid.NewGuid(), "Клієнт", "c@example.com", null, DefaultType, now).Value);
         // The rule sits on the parent "Locks" category; products live in its child and grandchild.
-        sales.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create(CustomerId, 10, LocksType));
+        sales.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create(CustomerId, 10, LocksType).Value);
         await sales.SaveChangesAsync();
 
         var catalog = _scope.ServiceProvider.GetRequiredService<CatalogDbContext>();

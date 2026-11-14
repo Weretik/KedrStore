@@ -20,29 +20,47 @@ public sealed class HomeFaqItem : IAggregateRoot
 
     private HomeFaqItem() { }
 
-    public static HomeFaqItem Create(HomeFaqTexts texts, int position, DateTimeOffset now)
+    public static DomainResult<HomeFaqItem> Create(HomeFaqTexts texts, int position, DateTimeOffset now)
     {
-        var item = new HomeFaqItem { Position = HomeGuard.Position(position), CreatedAt = now };
-        item.Update(texts, now);
-        return item;
+        var checkedPosition = HomeGuard.Position(position);
+        if (checkedPosition.IsFailure)
+            return checkedPosition.Error!;
+
+        var item = new HomeFaqItem { Position = checkedPosition.Value, CreatedAt = now };
+        var updated = item.Update(texts, now);
+        return updated.IsSuccess ? item : updated.Error!;
     }
 
-    public void Update(HomeFaqTexts texts, DateTimeOffset now)
+    public DomainResult Update(HomeFaqTexts texts, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(texts);
-        QuestionUk = HomeGuard.Text(texts.QuestionUk, nameof(QuestionUk), QuestionMaxLength);
-        QuestionRu = HomeGuard.Text(texts.QuestionRu, nameof(QuestionRu), QuestionMaxLength);
-        AnswerUk = HomeGuard.Text(texts.AnswerUk, nameof(AnswerUk), AnswerMaxLength);
-        AnswerRu = HomeGuard.Text(texts.AnswerRu, nameof(AnswerRu), AnswerMaxLength);
+        var questionUk = HomeGuard.Text(texts.QuestionUk, nameof(QuestionUk), QuestionMaxLength);
+        var questionRu = HomeGuard.Text(texts.QuestionRu, nameof(QuestionRu), QuestionMaxLength);
+        var answerUk = HomeGuard.Text(texts.AnswerUk, nameof(AnswerUk), AnswerMaxLength);
+        var answerRu = HomeGuard.Text(texts.AnswerRu, nameof(AnswerRu), AnswerMaxLength);
+        var valid = DomainResult.Combine(questionUk, questionRu, answerUk, answerRu);
+        if (valid.IsFailure)
+            return valid;
+
+        QuestionUk = questionUk.Value;
+        QuestionRu = questionRu.Value;
+        AnswerUk = answerUk.Value;
+        AnswerRu = answerRu.Value;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
-    public void MoveTo(int position, DateTimeOffset now)
+    public DomainResult MoveTo(int position, DateTimeOffset now)
     {
-        if (HomeGuard.Position(position) == Position)
-            return;
+        var checkedPosition = HomeGuard.Position(position);
+        if (checkedPosition.IsFailure)
+            return checkedPosition;
+        if (checkedPosition.Value == Position)
+            return DomainResult.Success();
+
         Position = position;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 }
 

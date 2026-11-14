@@ -11,9 +11,9 @@ public sealed class SetProductMediaValidator : AbstractValidator<SetProductMedia
         RuleFor(command => command.Request.PhotoIds)
             .NotNull()
             .Must(ids => ids.Count <= Product.MaximumPhotos)
-            .WithMessage($"A product can have at most {Product.MaximumPhotos} photos.")
+            .WithMessage($"У товару може бути не більше {Product.MaximumPhotos} фото.")
             .Must(ids => ids.Distinct().Count() == ids.Count)
-            .WithMessage("A file can be added to the photos only once.")
+            .WithMessage("Файл можна додати до фото лише один раз.")
             .When(command => command.Request is not null)
             .OverridePropertyName("photoIds");
 
@@ -25,7 +25,7 @@ public sealed class SetProductMediaValidator : AbstractValidator<SetProductMedia
         RuleFor(command => command.Request.SchemeId)
             .GreaterThan(0)
             .Must((command, schemeId) => command.Request.PhotoIds?.Contains(schemeId!.Value) != true)
-            .WithMessage("The scheme cannot also be a photo.")
+            .WithMessage("Схема не може бути водночас фото.")
             .When(command => command.Request?.SchemeId is not null)
             .OverridePropertyName("schemeId");
     }

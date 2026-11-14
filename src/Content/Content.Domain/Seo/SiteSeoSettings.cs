@@ -52,21 +52,31 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     /// <summary>The empty row the migration inserts.</summary>
     public static SiteSeoSettings CreateEmpty(DateTimeOffset now) => new() { Id = SingletonId, UpdatedAt = now };
 
-    public void Update(SiteSeoSettingsValues values, DateTimeOffset now, string editor)
+    public DomainResult Update(SiteSeoSettingsValues values, DateTimeOffset now, string editor)
     {
         ArgumentNullException.ThrowIfNull(values);
-        GoogleAnalyticsId = Checked(NormalizeId(values.GoogleAnalyticsId), nameof(GoogleAnalyticsId), IsAnalyticsId);
-        GoogleTagManagerId = Checked(NormalizeId(values.GoogleTagManagerId), nameof(GoogleTagManagerId), IsTagManagerId);
-        GoogleSiteVerification = Checked(NormalizeVerification(values.GoogleSiteVerification),
-            nameof(GoogleSiteVerification), IsVerification);
-        BingSiteVerification = Checked(NormalizeVerification(values.BingSiteVerification),
-            nameof(BingSiteVerification), IsVerification);
+        var checks = new DomainChecks();
+        var analyticsId = checks.Take(Checked(NormalizeId(values.GoogleAnalyticsId), nameof(GoogleAnalyticsId), IsAnalyticsId));
+        var tagManagerId = checks.Take(Checked(NormalizeId(values.GoogleTagManagerId), nameof(GoogleTagManagerId),
+            IsTagManagerId));
+        var googleVerification = checks.Take(Checked(NormalizeVerification(values.GoogleSiteVerification),
+            nameof(GoogleSiteVerification), IsVerification));
+        var bingVerification = checks.Take(Checked(NormalizeVerification(values.BingSiteVerification),
+            nameof(BingSiteVerification), IsVerification));
         if (values.ShareImageMediaFileId is <= 0)
-            throw new DomainException(SiteSeoSettingsErrors.Invalid(nameof(ShareImageMediaFileId),
+            checks.Check(SiteSeoSettingsErrors.Invalid(nameof(ShareImageMediaFileId),
                 values.ShareImageMediaFileId.ToString()));
+        if (checks.Error is { } error)
+            return error;
+
+        GoogleAnalyticsId = analyticsId;
+        GoogleTagManagerId = tagManagerId;
+        GoogleSiteVerification = googleVerification;
+        BingSiteVerification = bingVerification;
         ShareImageMediaFileId = values.ShareImageMediaFileId;
         UpdatedAt = now;
         UpdatedBy = EditorName.Normalize(editor);
+        return DomainResult.Success();
     }
 
     /// <summary>Trimmed and upper-cased; blank is null.</summary>
@@ -93,10 +103,10 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     /// <summary>Letters, digits, <c>-</c> and <c>_</c>, as Google and Bing give them.</summary>
     public static bool IsVerification(string value) => VerificationPattern().IsMatch(value);
 
-    private static string? Checked(string? value, string field, Func<string, bool> isValid) =>
+    private static DomainResult<string?> Checked(string? value, string field, Func<string, bool> isValid) =>
         value is null || isValid(value)
-            ? value
-            : throw new DomainException(SiteSeoSettingsErrors.Invalid(field, value));
+            ? DomainResult<string?>.Success(value)
+            : SiteSeoSettingsErrors.Invalid(field, value);
 
     [GeneratedRegex("^G-[A-Z0-9]{4,15}$", RegexOptions.CultureInvariant)]
     private static partial Regex AnalyticsIdPattern();

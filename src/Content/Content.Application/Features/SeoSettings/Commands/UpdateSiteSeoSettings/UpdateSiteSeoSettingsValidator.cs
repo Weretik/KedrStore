@@ -3,7 +3,7 @@ namespace Content.Application.Features.SeoSettings.Commands.UpdateSiteSeoSetting
 /// <summary>Same rules as the domain, reported per field by its JSON name so the admin form can show them.</summary>
 public sealed class UpdateSiteSeoSettingsValidator : AbstractValidator<UpdateSiteSeoSettingsCommand>
 {
-    private const string VerificationMessage = "Paste the code from the console or its whole meta tag.";
+    private const string VerificationMessage = "Вставте код із консолі або весь його мета-тег.";
 
     public UpdateSiteSeoSettingsValidator()
     {
@@ -12,10 +12,10 @@ public sealed class UpdateSiteSeoSettingsValidator : AbstractValidator<UpdateSit
         {
             RuleFor(x => x.Input.GoogleAnalyticsId)
                 .Must(value => SiteSeoSettings.NormalizeId(value) is not { } id || SiteSeoSettings.IsAnalyticsId(id))
-                .WithMessage("Use a measurement id like G-AB12CD34EF.").OverridePropertyName("googleAnalyticsId");
+                .WithMessage("Введіть ID вимірювання, наприклад G-AB12CD34EF.").OverridePropertyName("googleAnalyticsId");
             RuleFor(x => x.Input.GoogleTagManagerId)
                 .Must(value => SiteSeoSettings.NormalizeId(value) is not { } id || SiteSeoSettings.IsTagManagerId(id))
-                .WithMessage("Use a container id like GTM-AB12CD3.").OverridePropertyName("googleTagManagerId");
+                .WithMessage("Введіть ID контейнера, наприклад GTM-AB12CD3.").OverridePropertyName("googleTagManagerId");
             RuleFor(x => x.Input.GoogleSiteVerification).Must(IsVerificationOrBlank)
                 .WithMessage(VerificationMessage).OverridePropertyName("googleSiteVerification");
             RuleFor(x => x.Input.BingSiteVerification).Must(IsVerificationOrBlank)

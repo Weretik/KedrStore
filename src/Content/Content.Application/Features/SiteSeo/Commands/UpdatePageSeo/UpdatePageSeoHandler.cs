@@ -21,12 +21,17 @@ public sealed class UpdatePageSeoHandler(
         var seo = await repository.GetByIdAsync(command.Page, cancellationToken);
         if (seo is null)
         {
-            seo = PageSeo.Create(command.Page, values, now, editor);
+            var created = PageSeo.Create(command.Page, values, now, editor);
+            if (created.IsFailure)
+                return created.Error!.ToResult<AdminPageSeo>();
+            seo = created.Value;
             await repository.AddAsync(seo, cancellationToken);
         }
         else
         {
-            seo.Update(values, now, editor);
+            var updated = seo.Update(values, now, editor);
+            if (updated.IsFailure)
+                return updated.Error!.ToResult<AdminPageSeo>();
             await repository.SaveChangesAsync(cancellationToken);
         }
 

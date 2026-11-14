@@ -9,7 +9,7 @@ public sealed class LegalDocumentTextsValidator : AbstractValidator<IReadOnlyLis
             .Must(texts => texts is not null && texts.Count == LegalDocumentVersion.Languages.Count &&
                            LegalDocumentVersion.Languages.All(language =>
                                texts.Count(text => text?.Language == language) == 1))
-            .WithMessage("Both 'uk' and 'ru' texts are required, once each.")
+            .WithMessage("Потрібні тексти українською та російською, по одному.")
             .OverridePropertyName("texts");
         RuleForEach(texts => texts).ChildRules(text =>
         {

@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.Requisites.Shared;
 using Content.Application.Features.Requisites.Commands.UpdateCompanyRequisites;
 using Content.Domain.Requisites;
@@ -17,7 +17,7 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Create_TrimsAndRecordsNoChanges()
     {
-        var requisites = CompanyRequisites.Create(Values(), Now);
+        var requisites = CompanyRequisites.Create(Values(), Now).Value;
 
         Assert.Equal(CompanyRequisites.SingletonId, requisites.Id);
         Assert.Equal("ФОП Овчинников Максим Володимирович", requisites.LegalName);
@@ -27,9 +27,9 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Update_ReportsOnlyTheChangedFields_WithOldAndNewValues()
     {
-        var requisites = CompanyRequisites.Create(Values(), Now);
+        var requisites = CompanyRequisites.Create(Values(), Now).Value;
 
-        var changes = requisites.Update(Values(legalName: "ФОП Інший Власник"), Now.AddHours(1));
+        var changes = requisites.Update(Values(legalName: "ФОП Інший Власник"), Now.AddHours(1)).Value;
 
         var change = Assert.Single(changes);
         Assert.Equal("LegalName", change.Field);
@@ -41,9 +41,9 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Update_WithTheSameValues_ChangesNothing()
     {
-        var requisites = CompanyRequisites.Create(Values(), Now);
+        var requisites = CompanyRequisites.Create(Values(), Now).Value;
 
-        var changes = requisites.Update(Values(iban: "UA30 3052 9900 0002 6007 0259 0521 6"), Now.AddHours(1));
+        var changes = requisites.Update(Values(iban: "UA30 3052 9900 0002 6007 0259 0521 6"), Now.AddHours(1)).Value;
 
         Assert.Empty(changes);
         Assert.Equal(Now, requisites.UpdatedAt);
@@ -60,10 +60,11 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Update_RejectsABankCodeThatDoesNotMatchTheIban()
     {
-        var requisites = CompanyRequisites.Create(Values(), Now);
+        var requisites = CompanyRequisites.Create(Values(), Now).Value;
 
-        var error = Assert.Throws<DomainException>(() => requisites.Update(Values(bankCode: "300711"), Now));
-        Assert.Contains("BankCode", error.Message);
+        var error = DomainAssert.Fails(requisites.Update(Values(bankCode: "300711"), Now));
+        Assert.Equal("Content.Requisites.BankCode.Mismatch", error.Code);
+        Assert.Equal("BankCode", error.Field);
     }
 
     [Theory]
@@ -73,7 +74,7 @@ public sealed class CompanyRequisitesTests
 
     [Fact]
     public void Record_NeedsAtLeastOneChange()
-        => Assert.Throws<DomainException>(() => CompanyRequisitesChange.Record([], Now, "1", "admin@kedr"));
+        => Assert.Throws<ArgumentException>(() => CompanyRequisitesChange.Record([], Now, "1", "admin@kedr"));
 
     [Fact]
     public void Validator_NamesEachInvalidField()

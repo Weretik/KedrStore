@@ -3,14 +3,14 @@ namespace Work.Domain;
 public static class WorkErrors
 {
     public static DomainError Required(string field) =>
-        new($"Work.{field}.Required", $"{field} is required");
+        new($"Work.{field}.Required", "Заповніть це поле.", Field: field);
 
     public static DomainError TooLong(string field, int maxLength, int length) =>
-        new($"Work.{field}.TooLong", $"{field} must be at most {maxLength} characters. Actual: {length}");
+        new($"Work.{field}.TooLong", $"Не більше {maxLength} символів (зараз {length}).", Field: field);
 
     public static DomainError TooManySteps(int maxCount, int count) =>
-        new("Work.Steps.TooMany", $"A task may have at most {maxCount} steps. Actual: {count}");
+        new("Work.Steps.TooMany", $"Не більше {maxCount} кроків (зараз {count}).", Field: "Steps");
 
     public static DomainError UserRequired() =>
-        new("Work.User.Required", "A task and an activity entry need a user");
+        new("Work.User.Required", "Задача й запис журналу потребують користувача.");
 }

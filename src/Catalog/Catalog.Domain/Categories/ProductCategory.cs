@@ -134,8 +134,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 
     private static string ValidateShortName(
         string shortName,
-        Func<CatalogDomainError> requiredError,
-        Func<int, CatalogDomainError> invalidLengthError)
+        Func<DomainError> requiredError,
+        Func<int, DomainError> invalidLengthError)
     {
         if (string.IsNullOrWhiteSpace(shortName))
             throw new DomainException(requiredError());

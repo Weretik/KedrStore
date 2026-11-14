@@ -25,15 +25,22 @@ public sealed class GalleryItem : IAggregateRoot
 
     private GalleryItem() { }
 
-    public static GalleryItem CreatePhoto(long mediaFileId, int position, GalleryItemTexts texts, DateTimeOffset now)
+    public static DomainResult<GalleryItem> CreatePhoto(long mediaFileId, int position, GalleryItemTexts texts,
+        DateTimeOffset now)
     {
         if (mediaFileId <= 0)
-            throw new DomainException(GalleryErrors.MediaFileInvalid(mediaFileId));
+            return GalleryErrors.MediaFileInvalid(mediaFileId);
         return Create(GalleryItemKind.Photo, mediaFileId, null, position, texts, now);
     }
 
-    public static GalleryItem CreateVideo(string youtubeLinkOrId, int position, GalleryItemTexts texts, DateTimeOffset now)
-        => Create(GalleryItemKind.Video, null, YoutubeVideoId.Parse(youtubeLinkOrId), position, texts, now);
+    public static DomainResult<GalleryItem> CreateVideo(string youtubeLinkOrId, int position, GalleryItemTexts texts,
+        DateTimeOffset now)
+    {
+        var youtubeId = YoutubeVideoId.Parse(youtubeLinkOrId);
+        if (youtubeId.IsFailure)
+            return youtubeId.Error!;
+        return Create(GalleryItemKind.Video, null, youtubeId.Value, position, texts, now);
+    }
 
     public void UpdateTexts(GalleryItemTexts texts, DateTimeOffset now)
     {
@@ -45,21 +52,22 @@ public sealed class GalleryItem : IAggregateRoot
         UpdatedAt = now;
     }
 
-    public void MoveTo(int position, DateTimeOffset now)
+    public DomainResult MoveTo(int position, DateTimeOffset now)
     {
         if (position < 0)
-            throw new DomainException(GalleryErrors.PositionInvalid(position));
+            return GalleryErrors.PositionInvalid(position);
         if (position == Position)
-            return;
+            return DomainResult.Success();
         Position = position;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
-    private static GalleryItem Create(GalleryItemKind kind, long? mediaFileId, string? youtubeId, int position,
-        GalleryItemTexts texts, DateTimeOffset now)
+    private static DomainResult<GalleryItem> Create(GalleryItemKind kind, long? mediaFileId, string? youtubeId,
+        int position, GalleryItemTexts texts, DateTimeOffset now)
     {
         if (position < 0)
-            throw new DomainException(GalleryErrors.PositionInvalid(position));
+            return GalleryErrors.PositionInvalid(position);
         var item = new GalleryItem
         {
             Kind = kind,

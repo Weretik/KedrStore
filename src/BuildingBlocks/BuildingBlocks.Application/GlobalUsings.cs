@@ -14,6 +14,7 @@ global using Microsoft.Extensions.Options;
 
 // Domain namespaces
 global using BuildingBlocks.Domain.Abstractions;
+global using BuildingBlocks.Domain.Results;
 
 // External libraries
 global using Mediator;

@@ -21,17 +21,17 @@ public abstract class ArticleInputValidator<TCommand> : AbstractValidator<TComma
             RuleFor(x => x.Input.Slug)
                 .Must(slug => Article.IsValidSlug(slug?.Trim()))
                 .When(x => slugRequired || !string.IsNullOrWhiteSpace(x.Input.Slug))
-                .WithMessage($"Slug must use a-z, 0-9 and single hyphens, 1-{Article.SlugMaxLength} characters.")
+                .WithMessage($"Slug: латинські літери a-z, цифри та одинарні дефіси, від 1 до {Article.SlugMaxLength} символів.")
                 .OverridePropertyName("slug");
             RuleFor(x => x.Input.PublishedOn).NotEmpty().OverridePropertyName("publishedOn");
             RuleFor(x => x.Input.CoverMediaFileId).GreaterThan(0).When(x => x.Input.CoverMediaFileId is not null)
                 .OverridePropertyName("coverMediaFileId");
             RuleFor(x => x.Input.RemoveCover).Equal(false).When(x => x.Input.CoverMediaFileId is not null)
-                .WithMessage("Send either a cover or removeCover, not both.").OverridePropertyName("removeCover");
+                .WithMessage("Або завантажте обкладинку, або приберіть її, не обидва одразу.").OverridePropertyName("removeCover");
             RuleFor(x => x.Input.Texts)
                 .Must(texts => texts is not null && texts.Count == Article.Languages.Count &&
                                Article.Languages.All(language => texts.Count(t => t?.Language == language) == 1))
-                .WithMessage("Both 'uk' and 'ru' texts are required, once each.")
+                .WithMessage("Потрібні тексти українською та російською, по одному.")
                 .OverridePropertyName("texts");
             RuleForEach(x => x.Input.Texts).ChildRules(text =>
             {

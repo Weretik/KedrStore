@@ -2,27 +2,27 @@ namespace Sales.Domain.Customers.Errors;
 
 public static class CounterpartyErrors
 {
-    public static IDomainError IdRequired() =>
-        new DomainError("sales.counterparty.id_required", "Counterparty id is required.");
+    public static DomainError IdRequired() =>
+        new("sales.counterparty.id_required", "Потрібен код контрагента.", Field: "CounterpartyId");
 
-    public static IDomainError IdentityUserIdInvalid(Guid identityUserId) =>
-        new DomainError("sales.counterparty.identity_user_id_invalid", $"Identity user id is invalid: {identityUserId}.");
+    public static DomainError IdentityUserIdInvalid(Guid identityUserId) =>
+        new("sales.counterparty.identity_user_id_invalid", $"Некоректний користувач контрагента: {identityUserId}.");
 
-    public static IDomainError NameRequired() =>
-        new DomainError("sales.counterparty.name_required", "Counterparty name is required.");
+    public static DomainError NameRequired() =>
+        new("sales.counterparty.name_required", "Потрібна назва контрагента.", Field: "Name");
 
-    public static IDomainError NameTooLong(int length) =>
-        new DomainError("sales.counterparty.name_too_long", $"Counterparty name is too long: {length}.");
+    public static DomainError NameTooLong(int length) =>
+        new("sales.counterparty.name_too_long", $"Назва контрагента задовга ({length} символів).", Field: "Name");
 
-    public static IDomainError EmailRequired() =>
-        new DomainError("sales.counterparty.email_required", "Counterparty email is required.");
+    public static DomainError EmailRequired() =>
+        new("sales.counterparty.email_required", "Потрібна електронна пошта контрагента.", Field: "Email");
 
-    public static IDomainError EmailTooLong(int length) =>
-        new DomainError("sales.counterparty.email_too_long", $"Counterparty email is too long: {length}.");
+    public static DomainError EmailTooLong(int length) =>
+        new("sales.counterparty.email_too_long", $"Електронна пошта контрагента задовга ({length} символів).", Field: "Email");
 
-    public static IDomainError PriceTypeInvalid(int priceTypeId) =>
-        new DomainError("sales.counterparty.price_type_invalid", $"Price type id is invalid: {priceTypeId}.");
+    public static DomainError PriceTypeInvalid(int priceTypeId) =>
+        new("sales.counterparty.price_type_invalid", $"Некоректний тип ціни: {priceTypeId}.", Field: "PriceTypeId");
 
-    public static IDomainError CategoryInvalid(int categoryId) =>
-        new DomainError("sales.counterparty.category_invalid", $"Category id is invalid: {categoryId}.");
+    public static DomainError CategoryInvalid(int categoryId) =>
+        new("sales.counterparty.category_invalid", $"Некоректна категорія: {categoryId}.", Field: "CategoryId");
 }

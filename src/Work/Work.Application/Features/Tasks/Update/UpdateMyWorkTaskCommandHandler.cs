@@ -15,7 +15,9 @@ public sealed class UpdateMyWorkTaskCommandHandler(
             return found.Map(task => WorkTaskDto.From(task, WorkCalendar.Today(clock)));
 
         var task = found.Value;
-        task.Edit(command.Title, command.Details, command.DueDate, command.Steps, clock.GetUtcNow());
+        var edited = task.Edit(command.Title, command.Details, command.DueDate, command.Steps, clock.GetUtcNow());
+        if (edited.IsFailure)
+            return edited.Error!.ToResult<WorkTaskDto>();
         await tasks.UpdateAsync(task, cancellationToken);
         return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }

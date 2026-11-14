@@ -18,7 +18,10 @@ public sealed class UpdateGalleryItemHandler(
         if (item is null)
             return Result.NotFound();
 
-        item.UpdateTexts(GalleryTexts.ToDomain(command.Texts), clock.GetUtcNow());
+        var texts = GalleryTexts.ToDomain(command.Texts);
+        if (texts.IsFailure)
+            return texts.Error!.ToResult<IReadOnlyList<AdminGalleryItem>>();
+        item.UpdateTexts(texts.Value, clock.GetUtcNow());
         await repository.UpdateAsync(item, cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }

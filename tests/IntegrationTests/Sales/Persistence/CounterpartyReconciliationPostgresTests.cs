@@ -32,10 +32,10 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         var retainedUserId = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
         db.Counterparties.AddRange(
-            Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now),
-            Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now));
+            Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now).Value,
+            Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now).Value);
         db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
-            [OrderLine.Create("101", "Door", 1, 25m)], now));
+            [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
         db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
             [OrderDraftLine.Create("101", 1)], now));
         await db.SaveChangesAsync();

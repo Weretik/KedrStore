@@ -21,7 +21,13 @@ public enum MediaFileUploadStatus
 
     /// <summary>The bytes are not a JPEG, PNG, or WebP picture.</summary>
     NotAPicture,
+
+    /// <summary>The file or folder name breaks a library rule; <see cref="MediaFileUploadResult.Message"/> says which.</summary>
+    Invalid,
 }
 
-/// <summary><see cref="File"/> is set only when <see cref="Status"/> is <see cref="MediaFileUploadStatus.Uploaded"/>.</summary>
-public sealed record MediaFileUploadResult(MediaFileUploadStatus Status, MediaFileReference? File);
+/// <summary>
+/// <see cref="File"/> is set only when <see cref="Status"/> is <see cref="MediaFileUploadStatus.Uploaded"/>;
+/// <see cref="Message"/> is the user-facing reason of an <see cref="MediaFileUploadStatus.Invalid"/> upload.
+/// </summary>
+public sealed record MediaFileUploadResult(MediaFileUploadStatus Status, MediaFileReference? File, string? Message = null);

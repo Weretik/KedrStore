@@ -18,6 +18,7 @@ public sealed class MobileAuthController(ISender sender) : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("AuthLogin")]
     [ProducesResponseType(typeof(MobileTokenResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<MobileTokenResponse>> Login([FromBody] SessionLoginRequest request, CancellationToken cancellationToken)
@@ -37,6 +38,7 @@ public sealed class MobileAuthController(ISender sender) : ControllerBase
     [AllowAnonymous]
     [EnableRateLimiting("AuthRefresh")]
     [ProducesResponseType(typeof(MobileTokenResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<MobileTokenResponse>> Refresh([FromBody] MobileRefreshRequest request, CancellationToken cancellationToken)
@@ -54,6 +56,7 @@ public sealed class MobileAuthController(ISender sender) : ControllerBase
     [HttpPost("logout", Name = "logoutMobile")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout([FromBody] MobileLogoutRequest request, CancellationToken cancellationToken)
     {

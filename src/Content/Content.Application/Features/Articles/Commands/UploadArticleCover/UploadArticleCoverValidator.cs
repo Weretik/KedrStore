@@ -11,7 +11,7 @@ public sealed class UploadArticleCoverValidator : AbstractValidator<UploadArticl
         RuleFor(x => x.File.Length)
             .GreaterThan(0).LessThanOrEqualTo(MaxUploadBytes)
             .When(x => x.File is not null)
-            .WithMessage("The picture must be between 1 byte and 10 MB.")
+            .WithMessage("Зображення має бути не більше 10 МБ.")
             .OverridePropertyName("file");
     }
 }

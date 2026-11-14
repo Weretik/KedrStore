@@ -5,6 +5,9 @@ namespace Sales.Domain.Orders.Entities;
 
 public sealed class Order : BaseAuditableEntity<OrderId>, IAggregateRoot, IAuditableEntity
 {
+    public const int OrderNumberMaxLength = 32;
+    public const int CommentMaxLength = 1_000;
+
     private readonly List<OrderLine> _lines = [];
 
     public string OrderNumber { get; private set; } = null!;
@@ -14,44 +17,41 @@ public sealed class Order : BaseAuditableEntity<OrderId>, IAggregateRoot, IAudit
 
     private Order() { }
 
-    private Order(string orderNumber, string counterpartyId, string? comment, IEnumerable<OrderLine> lines, DateTimeOffset createdAt)
+    public static DomainResult<Order> Create(string orderNumber, string counterpartyId, string? comment,
+        IEnumerable<OrderLine> lines, DateTimeOffset createdAt)
     {
-        OrderNumber = Required(orderNumber, OrderErrors.OrderNumberRequired());
-        if (OrderNumber.Length > 32)
-            throw new DomainException(OrderErrors.OrderNumberTooLong());
-        CounterpartyId = Required(counterpartyId, OrderErrors.CounterpartyIdRequired());
-        Comment = NormalizeComment(comment);
-        _lines.AddRange(lines);
+        if (string.IsNullOrWhiteSpace(orderNumber))
+            return OrderErrors.OrderNumberRequired();
+        if (orderNumber.Trim().Length > OrderNumberMaxLength)
+            return OrderErrors.OrderNumberTooLong();
+        if (string.IsNullOrWhiteSpace(counterpartyId))
+            return OrderErrors.CounterpartyIdRequired();
+        var normalizedComment = comment?.Trim();
+        if (normalizedComment?.Length > CommentMaxLength)
+            return OrderErrors.CommentTooLong();
+        var orderLines = lines.ToList();
+        if (orderLines.Count == 0)
+            return OrderErrors.LinesRequired();
 
-        if (_lines.Count == 0)
-            throw new DomainException(OrderErrors.LinesRequired());
-
-        MarkAsCreated(createdAt);
+        var order = new Order
+        {
+            OrderNumber = orderNumber.Trim(),
+            CounterpartyId = counterpartyId.Trim(),
+            Comment = string.IsNullOrEmpty(normalizedComment) ? null : normalizedComment,
+        };
+        order._lines.AddRange(orderLines);
+        order.MarkAsCreated(createdAt);
+        return order;
     }
 
-    public static Order Create(string orderNumber, string counterpartyId, string? comment, IEnumerable<OrderLine> lines, DateTimeOffset createdAt)
-        => new(orderNumber, counterpartyId, comment, lines, createdAt);
-
-    public void AssignOrderNumber(string orderNumber)
+    public DomainResult AssignOrderNumber(string orderNumber)
     {
         if (!OrderNumber.StartsWith("P", StringComparison.Ordinal))
             throw new InvalidOperationException("Order number is already assigned.");
+        if (string.IsNullOrWhiteSpace(orderNumber))
+            return OrderErrors.OrderNumberRequired();
 
-        OrderNumber = Required(orderNumber, OrderErrors.OrderNumberRequired());
-    }
-
-    private static string Required(string value, IDomainError error)
-        => string.IsNullOrWhiteSpace(value) ? throw new DomainException(error) : value.Trim();
-
-    private static string? NormalizeComment(string? value)
-    {
-        var trimmed = value?.Trim();
-        if (string.IsNullOrEmpty(trimmed))
-            return null;
-
-        if (trimmed.Length > 1_000)
-            throw new DomainException(OrderErrors.CommentTooLong());
-
-        return trimmed;
+        OrderNumber = orderNumber.Trim();
+        return DomainResult.Success();
     }
 }

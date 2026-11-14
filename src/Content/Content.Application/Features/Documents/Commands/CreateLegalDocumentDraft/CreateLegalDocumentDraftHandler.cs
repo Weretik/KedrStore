@@ -27,17 +27,20 @@ public sealed class CreateLegalDocumentDraftHandler(
             .Where(v => v.Kind == kind && v.Status != LegalDocumentStatus.Archived)
             .ToListAsync(cancellationToken);
         if (current.Any(v => v.Status == LegalDocumentStatus.Draft))
-            return Result.Conflict("A draft of this document already exists.");
+            return Result.Conflict("Чернетка цього документа вже є.");
 
         var texts = command.Texts ?? current.FirstOrDefault(v => v.Status == LegalDocumentStatus.Published)?.Texts
             .Select(text => new LegalDocumentTextData(text.Language, text.Title, text.BodyHtml)).ToList();
         if (texts is null)
             return Result.Invalid(new ValidationError("texts",
-                "Nothing is published yet, so the first draft needs both texts.", "Content.Document.Text.Missing",
+                "Документ ще не опубліковано, тож перша чернетка потребує обох текстів.", "Content.Document.Text.Missing",
                 ValidationSeverity.Error));
 
-        var draft = LegalDocumentVersion.CreateDraft(kind, LegalDocumentEditor.Sanitized(texts, sanitizer),
+        var created = LegalDocumentVersion.CreateDraft(kind, LegalDocumentEditor.Sanitized(texts, sanitizer),
             clock.GetUtcNow(), ContentEditor.Name(currentUser));
+        if (created.IsFailure)
+            return created.Error!.ToResult<LegalDocumentVersionDetails>();
+        var draft = created.Value;
         await versions.AddAsync(draft, cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(draft));
     }

@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Sales.Domain.Orders.Entities;
 
 namespace UnitTests.Sales.Domain;
@@ -8,8 +8,8 @@ public sealed class SalesOrderTests
     [Fact]
     public void Create_CreatesImmutableOrderWithHistoricalLineSnapshot()
     {
-        var line = OrderLine.Create("000123", "Door handle", 10, 1_250m);
-        var order = Order.Create("SO-20260817-0001", "customer-1", "Urgent", [line], DateTimeOffset.UtcNow);
+        var line = OrderLine.Create("000123", "Door handle", 10, 1_250m).Value;
+        var order = Order.Create("SO-20260817-0001", "customer-1", "Urgent", [line], DateTimeOffset.UtcNow).Value;
 
         Assert.Equal("SO-20260817-0001", order.OrderNumber);
         Assert.Equal("customer-1", order.CounterpartyId);
@@ -22,10 +22,9 @@ public sealed class SalesOrderTests
     [Fact]
     public void Create_RejectsEmptyLines()
     {
-        var exception = Assert.Throws<DomainException>(() =>
-            Order.Create("SO-20260817-0001", "customer-1", null, [], DateTimeOffset.UtcNow));
+        var exception = DomainAssert.Fails(Order.Create("SO-20260817-0001", "customer-1", null, [], DateTimeOffset.UtcNow));
 
-        Assert.Equal("sales.order.lines_required", exception.Error.Code);
+        Assert.Equal("sales.order.lines_required", exception.Code);
     }
 
     [Theory]
@@ -35,15 +34,14 @@ public sealed class SalesOrderTests
     [InlineData("product", "Name", 1, -0.01)]
     public void CreateLine_RejectsInvalidValues(string productId, string name, int quantity, decimal amount)
     {
-        Assert.Throws<DomainException>(() => OrderLine.Create(productId, name, quantity, amount));
+        DomainAssert.Fails(OrderLine.Create(productId, name, quantity, amount));
     }
 
     [Fact]
     public void Create_RejectsOrderNumberLongerThan32Characters()
     {
-        var exception = Assert.Throws<DomainException>(() =>
-            Order.Create(new string('A', 33), "customer-1", null, [OrderLine.Create("p", "Name", 1, 1m)], DateTimeOffset.UtcNow));
+        var exception = DomainAssert.Fails(Order.Create(new string('A', 33), "customer-1", null, [OrderLine.Create("p", "Name", 1, 1m).Value], DateTimeOffset.UtcNow));
 
-        Assert.Equal("sales.order.order_number_too_long", exception.Error.Code);
+        Assert.Equal("sales.order.order_number_too_long", exception.Code);
     }
 }

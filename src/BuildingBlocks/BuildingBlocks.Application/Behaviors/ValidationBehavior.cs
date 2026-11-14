@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Application.Logging;
+﻿using BuildingBlocks.Application.Validation;
+using BuildingBlocks.Application.Logging;
 
 namespace BuildingBlocks.Application.Behaviors;
 
@@ -8,6 +9,8 @@ public class ValidationBehavior<TMessage, TResponse>(
     : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
 {
+    static ValidationBehavior() => UkrainianValidationMessages.Use();
+
     public async ValueTask<TResponse> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage,TResponse> next,

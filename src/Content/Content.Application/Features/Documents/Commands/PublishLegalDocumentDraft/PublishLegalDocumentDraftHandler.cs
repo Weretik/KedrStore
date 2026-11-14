@@ -20,22 +20,15 @@ public sealed class PublishLegalDocumentDraftHandler(
         var draft = await versions.GetByIdAsync(command.Id, cancellationToken);
         if (draft is null)
             return Result.NotFound();
-        if (!draft.IsDraft)
-            return Result.Conflict("This version is already published.");
 
         var kind = draft.Kind;
         var published = await versions.FirstOrDefaultAsync(
             new LegalDocumentVersionByStatusSpec(kind, LegalDocumentStatus.Published), cancellationToken);
-        if (!LegalDocumentVersion.AllowsEffectiveFrom(command.EffectiveFrom, published))
-        {
-            var error = LegalDocumentErrors.EffectiveFromTooEarly(published!.EffectiveFrom!.Value);
-            return Result.Invalid(new ValidationError("effectiveFrom", error.Message, error.Code,
-                ValidationSeverity.Error));
-        }
-
         var lastNumber = await versions.ListAsync(new LegalDocumentNumbersSpec(kind), cancellationToken);
-        draft.PublishReplacing(published, lastNumber.Count == 0 ? 0 : lastNumber.Max(), command.EffectiveFrom,
-            clock.GetUtcNow(), ContentEditor.Name(currentUser));
+        var publishing = draft.PublishReplacing(published, lastNumber.Count == 0 ? 0 : lastNumber.Max(),
+            command.EffectiveFrom, clock.GetUtcNow(), ContentEditor.Name(currentUser));
+        if (publishing.IsFailure)
+            return publishing.Error!.ToResult<LegalDocumentVersionDetails>();
         await versions.SaveChangesAsync(cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(draft));
     }

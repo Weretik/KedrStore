@@ -33,11 +33,14 @@ public sealed class CreateArticleHandler(
 
         var now = clock.GetUtcNow();
         var editor = ContentEditor.Name(currentUser);
-        var article = Article.Create(slug, input.PublishedOn, input.IsPublished,
+        var created = Article.Create(slug, input.PublishedOn, input.IsPublished,
             ArticleTexts.Sanitized(input.Texts, sanitizer), now, editor);
+        if (created.IsFailure)
+            return created.Error!.ToResult<AdminArticleDetails>();
+        var article = created.Value;
         var coverError = await ArticleCovers.ApplyAsync(article, input, images, covers, now, editor, cancellationToken);
         if (coverError is not null)
-            return Result.Invalid(coverError);
+            return coverError.ToResult<AdminArticleDetails>();
 
         await articles.AddAsync(article, cancellationToken);
         return Result.Success(ArticleMapper.ToAdmin(article,
