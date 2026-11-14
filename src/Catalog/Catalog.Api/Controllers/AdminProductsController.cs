@@ -11,8 +11,7 @@ using Catalog.Contracts.Products.GetAdminDetail;
 using Catalog.Contracts.Products.Media;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.ValueObjects;
-using Identity.Application.Security.Policies;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

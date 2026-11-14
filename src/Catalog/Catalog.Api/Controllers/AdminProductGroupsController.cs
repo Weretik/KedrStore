@@ -7,7 +7,7 @@ using Catalog.Application.Features.Slugs.Change;
 using Catalog.Contracts.Groups;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.ValueObjects;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

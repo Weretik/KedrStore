@@ -1,7 +1,7 @@
 using Content.Api.Wholesale;
 using Content.Application.Features.Wholesale.Admin.Get;
 using Content.Application.Features.Wholesale.Admin.Update;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

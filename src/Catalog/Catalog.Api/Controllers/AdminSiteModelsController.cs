@@ -12,7 +12,7 @@ using Catalog.Application.Features.SiteModels.Rename;
 using Catalog.Application.Features.SiteModels.SetAxes;
 using Catalog.Application.Features.SiteModels.SetTexts;
 using Catalog.Contracts.SiteModels;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

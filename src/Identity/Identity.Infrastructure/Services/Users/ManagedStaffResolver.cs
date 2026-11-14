@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Entities;
 
 namespace Identity.Infrastructure.Services.Users;

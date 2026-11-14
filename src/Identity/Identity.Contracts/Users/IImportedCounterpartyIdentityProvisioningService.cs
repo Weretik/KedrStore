@@ -1,4 +1,6 @@
-namespace Identity.Application.Services;
+using Ardalis.Result;
+
+namespace Identity.Contracts.Users;
 
 public interface IImportedCounterpartyIdentityProvisioningService
 {

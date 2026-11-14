@@ -3,7 +3,7 @@ using Identity.Application.Features.Avatars;
 using Identity.Application.Features.Profile.Shared;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Services.Sessions;

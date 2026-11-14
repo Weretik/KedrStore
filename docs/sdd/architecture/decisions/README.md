@@ -13,5 +13,6 @@ For a new ADR, create a separate file with a unique number and short name. Inclu
 | [0001](0001-modular-monolith.md) | Modular monolith with one PostgreSQL schema per module |
 | [0002](0002-one-shot-jobs-on-cloud-run.md) | 1C sync and migrations as one-shot jobs on Cloud Run Jobs |
 | [0003](0003-cloudflare-worker-api-front-door.md) | Cloudflare Worker as the API front door |
+| [0004](0004-contracts-and-business-folders.md) | Modules talk only through Contracts; folders follow the business |
 
 Frontend decisions live in kedr-web: [Next.js public site](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/site/adr/0001-nextjs-public-site.md) and [offline-first mobile app](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/mobile/adr/0005-offline-first-local-database.md).

@@ -7,7 +7,7 @@ using Content.Application.Features.Documents.Admin.GetVersions;
 using Content.Application.Features.Documents.Admin.Publish;
 using Content.Application.Features.Documents.Admin.UpdateDraft;
 using Content.Application.Features.Documents.Common;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

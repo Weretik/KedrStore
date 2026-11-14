@@ -8,8 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
-      <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

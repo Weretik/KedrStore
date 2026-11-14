@@ -1,4 +1,4 @@
-namespace Identity.Domain.Authorization;
+namespace Identity.Contracts.Authorization;
 
 public static class RoleNames
 {

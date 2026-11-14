@@ -26,6 +26,10 @@ Use PostgreSQL integration tests for migrations, SQL, transactions, constraints,
 
 PostgreSQL integration tests use Testcontainers and separate `DbContext` instances for concurrent actors. If a local Docker endpoint is unavailable, a test may explicitly skip. In CI, Docker is a prerequisite, so a failure to start the container or apply migrations fails verification.
 
+## Test folders
+
+Tests mirror the module and feature they check: see [test structure](module-rules.md#test-structure). Architecture tests check module references, Contracts-only access, folder names, and host content for every business module.
+
 ## Red → Green → Refactor
 
 For new behavior:

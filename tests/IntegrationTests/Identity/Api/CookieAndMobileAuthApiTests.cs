@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using IntegrationTests.TestSupport.Database;
 
 namespace IntegrationTests.Identity.Api;

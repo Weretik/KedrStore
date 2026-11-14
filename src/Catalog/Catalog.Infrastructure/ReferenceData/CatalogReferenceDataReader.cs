@@ -1,4 +1,5 @@
 using Catalog.Application.Contracts.Persistence;
+using Catalog.Contracts.Reference;
 using Catalog.Domain.ValueObjects;
 
 namespace Catalog.Infrastructure.ReferenceData;

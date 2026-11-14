@@ -9,7 +9,7 @@ using Content.Application.Features.Home.Admin.Faq.Reorder;
 using Content.Application.Features.Home.Admin.Faq.Update;
 using Content.Application.Features.Home.Admin.GetBlocks;
 using Content.Application.Features.Home.Common;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

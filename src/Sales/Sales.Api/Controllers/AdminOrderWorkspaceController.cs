@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Sales.Application.Contracts.Orders;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;

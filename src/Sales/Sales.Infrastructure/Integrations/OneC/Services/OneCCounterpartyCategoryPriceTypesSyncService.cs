@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Persistence;
+using Catalog.Contracts.Reference;
 using Microsoft.EntityFrameworkCore;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;

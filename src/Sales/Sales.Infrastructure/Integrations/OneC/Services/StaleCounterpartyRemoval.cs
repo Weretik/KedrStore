@@ -1,4 +1,4 @@
-using Identity.Application.Services;
+using Identity.Contracts.Users;
 using Sales.Domain.Customers.Entities;
 using Sales.Infrastructure.DataBase.Entities;
 

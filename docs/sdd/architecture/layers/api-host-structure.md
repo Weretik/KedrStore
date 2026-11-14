@@ -4,13 +4,17 @@
 
 ~~~text
 <Module>.Api/
-├── Controllers/
-│   └── <Area>Controller.cs
-├── GlobalUsing.cs
+├── Features/
+│   └── <Feature>/
+│       ├── Admin<Feature>Controller.cs     one controller per audience (admin, public, mobile)
+│       ├── Public<Feature>Controller.cs
+│       └── <Action>Request.cs              HTTP request models of the feature
+├── DependencyInjection/
+│   └── <Module>Module.cs                   Add<Module>Module(): Application, Infrastructure, controllers
 └── <Module>.Api.csproj
 ~~~
 
-Controllers bind HTTP input, call `ISender.Send` with `CancellationToken`, and return the result through the existing Result mapping. They do not run EF queries, create repositories, or contain domain rules.
+Controllers bind HTTP input, call `ISender.Send` with `CancellationToken`, and return the result through the existing Result mapping. They do not run EF queries, create repositories, use Infrastructure types, or contain domain rules. Access attributes take policy names from `Identity.Contracts`.
 
 ## Host structure
 
@@ -19,12 +23,16 @@ Bootstrapper/Host.Api/
 ├── Program.cs
 ├── DependencyInjection/
 │   ├── ServiceRegistration/
-│   │   ├── ApplicationRegistrationExtensions.cs
+│   │   ├── ModulesRegistrationExtensions.cs   calls Add<Module>Module() for every module
 │   │   ├── Pipeline/
 │   │   ├── SecurityRegistrationExtensions.cs
 │   │   └── Web/
 │   └── WebApplication/
 └── appsettings*.json
+
+Bootstrapper/Host.Jobs/
+├── Program.cs                                 parses --job and runs it
+└── JobsHostServicesExtensions.cs              registers modules; job logic lives in the owning module
 ~~~
 
 ## Request pipeline

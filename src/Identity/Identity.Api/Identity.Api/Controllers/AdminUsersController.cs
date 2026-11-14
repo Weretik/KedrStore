@@ -12,7 +12,7 @@ using Identity.Application.Features.Users.SearchStaffCandidates;
 using Identity.Application.Features.Users.SetStaffBlocked;
 using Identity.Application.Features.Users.SetStaffPassword;
 using Identity.Application.Features.Users.UploadStaffAvatar;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 
 namespace Identity.Api.Controllers;
 

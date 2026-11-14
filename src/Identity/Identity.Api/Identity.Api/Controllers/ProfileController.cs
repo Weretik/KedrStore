@@ -6,7 +6,7 @@ using Identity.Application.Features.Profile.ChangeOwnPassword;
 using Identity.Application.Features.Profile.GetProfile;
 using Identity.Application.Features.Profile.RemoveOwnAvatar;
 using Identity.Application.Features.Profile.UploadOwnAvatar;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 
 namespace Identity.Api.Controllers;
 

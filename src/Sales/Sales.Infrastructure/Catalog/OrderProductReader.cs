@@ -1,11 +1,10 @@
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Domain.ValueObjects;
+using Catalog.Contracts.Sales;
 using Sales.Application.Contracts.Catalog;
 using System.Globalization;
 
 namespace Sales.Infrastructure.Catalog;
 
-internal sealed class OrderProductReader(IReadCatalogDbContext catalogDbContext) : IOrderProductReader
+internal sealed class OrderProductReader(ICatalogSalesReader catalog) : IOrderProductReader
 {
     public async Task<IReadOnlyDictionary<string, OrderProductSnapshot>> GetByIdsAsync(
         IReadOnlyCollection<string> productIds,
@@ -17,12 +16,8 @@ internal sealed class OrderProductReader(IReadCatalogDbContext catalogDbContext)
         if (parsedIds.Any(id => id is null))
             return new Dictionary<string, OrderProductSnapshot>();
 
-        var ids = parsedIds.Select(id => ProductId.From(id!.Value.Value)).ToArray();
-        var products = await catalogDbContext.Products
-            .AsNoTracking()
-            .Where(product => ids.Contains(product.Id))
-            .Select(product => new { Id = product.Id.Value, product.Name })
-            .ToListAsync(cancellationToken);
+        var products = await catalog.GetProductsAsync(
+            parsedIds.Select(id => id!.Value.Value).ToArray(), cancellationToken);
 
         return products.ToDictionary(
             product => product.Id.ToString(CultureInfo.InvariantCulture),

@@ -1,8 +1,12 @@
 # Module map
 
+Every module has Api, Application, Contracts, Domain, and Infrastructure projects. Another module may use only its `Contracts` ([communication rules](../../standards/module-rules.md#communication-between-modules)). Rows below list what each `Contracts` project offers today.
+
 ## Catalog
 
 Layers: Catalog.Api, Catalog.Application, Catalog.Contracts, Catalog.Domain, Catalog.Infrastructure.
+
+`Catalog.Contracts` offers `ICatalogProductListReader`, `ICatalogSalesReader`, `ICatalogReferenceDataReader`, pricing options, and API DTOs; Catalog.Infrastructure implements them (`AddCatalogContracts()`).
 
 Owns catalog products, categories, price types, translations, the product-list projection, order-creation integration, 1C synchronization, and public/admin catalog reads.
 
@@ -10,7 +14,7 @@ Owns catalog products, categories, price types, translations, the product-list p
 
 Layers: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
 
-Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog through contracts and read abstractions, not Catalog.Infrastructure types.
+Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog only through `Catalog.Contracts` and Identity through `Identity.Contracts` (counterparty account provisioning).: products, stock, category parents, and prices through `ICatalogSalesReader`, category and price type names through `ICatalogReferenceDataReader`.
 
 ## Content
 
@@ -32,9 +36,9 @@ Owns the staff members' own tasks and the automatic log of their admin changes (
 
 ## Identity
 
-Layers: Identity.Api, Identity.Application, Identity.Domain, Identity.Infrastructure.
+Layers: Identity.Api, Identity.Application, Identity.Contracts, Identity.Domain, Identity.Infrastructure.
 
-Owns identity persistence, roles, authorization policies, session/current-user services, and seed data. Business modules use permission/current-user abstractions rather than Identity EF types.
+Owns identity persistence, roles, authorization policies, session/current-user services, and seed data. `Identity.Contracts` holds `PolicyNames`, `RoleNames`, and `IImportedCounterpartyIdentityProvisioningService`; other modules reference only it. Business modules use permission/current-user abstractions rather than Identity EF types.
 
 ## BuildingBlocks
 

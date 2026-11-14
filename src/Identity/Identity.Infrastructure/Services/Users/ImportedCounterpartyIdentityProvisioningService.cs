@@ -1,7 +1,8 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Users;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Entities;
 using Identity.Infrastructure.Options;
 using Microsoft.AspNetCore.Identity;

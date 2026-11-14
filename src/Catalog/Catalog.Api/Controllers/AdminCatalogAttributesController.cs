@@ -12,7 +12,7 @@ using Catalog.Application.Features.Attributes.Update;
 using Catalog.Application.Features.Attributes.UpdateValue;
 using Catalog.Application.Features.Attributes.UploadSwatch;
 using Catalog.Contracts.Attributes;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

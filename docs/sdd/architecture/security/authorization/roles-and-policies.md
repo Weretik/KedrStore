@@ -41,7 +41,7 @@ A new endpoint in an admin controller inherits the controller's policy. A public
 
 ## Roles
 
-Role constants are defined in `Identity.Domain/Authorization/RoleNames.cs`.
+Role constants are defined in `Identity.Contracts/Authorization/RoleNames.cs` (other modules reference only `Identity.Contracts`).
 
 | Role | Current meaning | Created by `Host.Jobs --job=migrate` |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ Role constants are defined in `Identity.Domain/Authorization/RoleNames.cs`.
 
 ## Access policies
 
-Policy names are defined in `Identity.Application/Security/Policies/PolicyNames.cs`; role requirements are configured by `Host.Api` in `AuthorizationPoliciesRegistrationExtensions`.
+Policy names are defined in `Identity.Contracts/Authorization/PolicyNames.cs`; role requirements are configured by `Host.Api` in `AuthorizationPoliciesRegistrationExtensions`.
 
 | Policy | Allowed roles |
 | --- | --- |

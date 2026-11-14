@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Sales.Api.Contracts.Orders;
 using Sales.Application.Features.Orders.Create;
 using Sales.Application.Features.Orders.Create.DTOs;

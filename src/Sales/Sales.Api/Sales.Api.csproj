@@ -7,9 +7,9 @@
 </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
       <ProjectReference Include="..\Sales.Application\Sales.Application.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
+      <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>

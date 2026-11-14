@@ -4,7 +4,7 @@ using Catalog.Application.Features.ProductAttributes.ReopenReview;
 using Catalog.Application.Features.ProductAttributes.Restore;
 using Catalog.Application.Features.ProductAttributes.Set;
 using Catalog.Contracts.Attributes;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Catalog.Api.Controllers;

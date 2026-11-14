@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Sales.Api.Contracts.Customers;
 using Sales.Application.Features.Customers.GetById;
 using Sales.Application.Features.Customers.GetById.DTOs;

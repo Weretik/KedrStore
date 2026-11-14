@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Work.Api.Requests;
 using Work.Application.Features.Report.GetReport;

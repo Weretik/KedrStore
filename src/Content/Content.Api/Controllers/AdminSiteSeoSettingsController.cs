@@ -1,7 +1,7 @@
 using Content.Api.SeoSettings;
 using Content.Application.Features.SeoSettings.Get;
 using Content.Application.Features.SeoSettings.Update;
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Content.Api.Controllers;

@@ -1,4 +1,4 @@
-using Identity.Application.Security.Policies;
+using Identity.Contracts.Authorization;
 using Media.Api.Requests;
 using Media.Application.Contracts.Images;
 using Media.Application.Features.Files.Common;

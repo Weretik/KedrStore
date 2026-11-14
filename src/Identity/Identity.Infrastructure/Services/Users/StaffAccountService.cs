@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Services;
-using Identity.Domain.Authorization;
+using Identity.Contracts.Authorization;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.DataBase;
 using Identity.Infrastructure.Entities;

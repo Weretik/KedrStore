@@ -45,7 +45,7 @@ It also prevents linking one `IdentityUserId` to two different counterparties in
 
 ## Identity user creation and update
 
-Implementation: `ImportedCounterpartyIdentityProvisioningService`, registered in Identity Infrastructure for Application interface `IImportedCounterpartyIdentityProvisioningService`.
+Implementation: `ImportedCounterpartyIdentityProvisioningService`, registered in Identity Infrastructure for the `Identity.Contracts` interface `IImportedCounterpartyIdentityProvisioningService`; Sales references only `Identity.Contracts`.
 
 ```text
 existing Counterparty.IdentityUserId → find AppUser by ID
