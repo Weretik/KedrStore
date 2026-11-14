@@ -40,4 +40,3 @@ global using PhoneNumbers;
 global using NodaMoney;
 global using Newtonsoft.Json;
 global using Slugify;
-global using Hangfire;

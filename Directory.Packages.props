@@ -15,7 +15,6 @@
     <PackageVersion Include="FluentFTP" Version="55.1.0" />
     <PackageVersion Include="FluentValidation" Version="12.2.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
-    <PackageVersion Include="Hangfire" Version="1.8.25" />
     <PackageVersion Include="HtmlSanitizer" Version="9.2.1039" />
     <PackageVersion Include="libphonenumber-csharp" Version="9.0.42" />
     <PackageVersion Include="Mediator.Abstractions" Version="3.0.2" />
