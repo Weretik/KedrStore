@@ -113,6 +113,28 @@ Folders follow the business, not the kind of class. The same applies to the whol
 - **Api.** Controllers are grouped by the same features as Application. One controller serves one audience (admin, public, mobile) of one feature.
 - A folder with eight or more production files is a signal to look for a sub-concept to split out, not a reason to create type folders.
 
+## Layer responsibilities and the handler
+
+| Where | Does | Example |
+| --- | --- | --- |
+| Handler (Application) | the order of steps | load, call the domain, save |
+| Aggregate (Domain) | the rules | no zero quantity, minimum order sum 500, a shipped order cannot be cancelled |
+| Infrastructure | how exactly data is stored and fetched | EF Core, the 1C HTTP client |
+| Api | HTTP | route, request model, status codes |
+
+A command handler follows five steps:
+
+1. Load the data it needs (aggregates through the module's ports, read models through `Contracts` of other modules).
+2. Check what needs outside data: the referenced product exists, a slug is free, a configured root category is excluded. Return `NotFound` / `Invalid` / `Conflict` here.
+3. Call the aggregate's method; the business rules are checked there and raise a domain error. The handler does not repeat or replace them (no `if (order.Status == Shipped) return Conflict` next to `order.Cancel()`); the pipeline maps a domain error to the response.
+4. Save everything with one `SaveChanges`, that is one transaction. A batch command that processes items independently (an import, a migration of old files) may save once per item and says so in its summary.
+5. Return a simple result: the new id, a status, or a DTO from the use-case folder, never a domain entity or value object.
+
+- **Rich domain.** Entities have private setters and change state only through methods that check their invariants; a rule that involves only one aggregate's own data lives in that aggregate, not in the handler. A rule that needs several aggregates of the same module goes to a domain service in `Domain/<Aggregate>/`, called by the handler.
+- **Queries** read through projections straight to DTOs (`Select`), never load aggregates to map them, and never call `SaveChanges`.
+- **Api** controllers send one Mediator request and map the `Result` to HTTP; they hold no rule, no query, and no domain type.
+- The architecture tests check that request result types and Api code use no Domain types and that Domain entities have no public setters.
+
 ## Test structure
 
 Tests mirror the code they check, so a test is found the same way as its code.
@@ -192,6 +214,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | Host.Api | One Mediator registration lists every module's Application assembly | Keep: the Mediator source generator needs one `AddMediator` call with literal assemblies |
 | All modules | Type folders (`Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Configurations/`, `Common/`), Application features without `Commands/` / `Queries/`, controllers in `Controllers/` | Stage: folder restructuring, one module per change |
 | All Application projects | Use cases named `<UseCase>CommandHandler` / `<UseCase>QueryHandler`; `DTOs/` and `Validators/` subfolders inside use cases; several queries in one use-case folder (`Products/GetAdminList`); ports in `Application/Contracts/` instead of `Abstractions/` | Folder restructuring, one module per change |
+| Handlers (audit 2026-11-14 of 96 commands) | Domain is rich (no public setters, rules raise `DomainException`), and no command returns an entity. Remaining: legal-document handlers (`Content` Documents Create/Update/Delete/Publish) repeat the draft-status checks the aggregate already makes, and the «Редакція від» date rule sits in the handler; category site visibility spreads the change over the category tree in the handler instead of a domain service; Api controllers in `Catalog` use `Catalog.Domain` value objects | Fixed with the folder restructuring of each module |
 | Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | Tests | No unit tests for Identity; few handler tests for Content, Media, Work | Stage: missing unit tests |
 | Repository root | `dotnet-install.ps1`, `SALES_1C_SYNC_INSTRUCTION.txt` | Move to `tools/` and `docs/sdd/operations/` with the folder restructuring |
