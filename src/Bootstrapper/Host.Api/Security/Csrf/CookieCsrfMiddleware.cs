@@ -1,4 +1,4 @@
-using Identity.Api.Features.Auth;
+using Identity.Api.Endpoints.Auth;
 using Identity.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.Sessions;
 using Microsoft.Extensions.Options;

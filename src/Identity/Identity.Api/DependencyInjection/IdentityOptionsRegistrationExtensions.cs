@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Identity.Api.Features.Auth;
-using Identity.Api.Features.Auth;
+using Identity.Api.Endpoints.Auth;
 using Identity.Infrastructure.Avatars;
 using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
