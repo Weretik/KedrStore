@@ -1,5 +1,6 @@
 using Identity.Contracts.Authorization;
 using Sales.Application.Contracts.Orders;
+using Sales.Application.Features.Orders.AdminWorkspace;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetList;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.GetById;
 using Sales.Application.Features.Orders.AdminWorkspace.Orders.Quote;
@@ -26,7 +27,8 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromServices] TimeProvider clock, CancellationToken cancellationToken)
     {
         var todayFrom = WorkspaceDateRange.TodayStartUtc(clock.GetUtcNow());
-        return Ok((await sender.Send(new GetWorkspaceOverviewQuery(todayFrom), cancellationToken)).Value);
+        var result = await sender.Send(new GetWorkspaceOverviewQuery(todayFrom), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpGet("orders", Name = "getAdminWorkspaceOrders")]
@@ -36,34 +38,30 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromQuery] string sort = "-createdAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var dates = WorkspaceDateRange.Parse(createdFrom, createdTo);
-            return Ok((await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId,
-                dates.FromUtc, dates.ToUtcExclusive, sort, page, pageSize), cancellationToken)).Value);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new GetWorkspaceOrdersQuery(searchTerm, counterpartyId,
+            createdFrom, createdTo, sort, page, pageSize), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpGet("orders/{orderId:long}", Name = "getAdminWorkspaceOrderById")]
     public async Task<ActionResult> GetOrder(long orderId, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkspaceOrderQuery(orderId), cancellationToken);
-        return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpPost("quote", Name = "quoteAdminWorkspaceOrder")]
     public async Task<ActionResult> Quote([FromBody] WorkspaceQuoteRequest request, CancellationToken cancellationToken)
     {
-        try { return Ok((await sender.Send(new QuoteWorkspaceOrderQuery(request), cancellationToken)).Value); }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new QuoteWorkspaceOrderQuery(request), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpPost("customer-prices", Name = "getAdminWorkspaceCustomerPrices")]
     public async Task<ActionResult> CustomerPrices([FromBody] WorkspaceCustomerPricesRequest request, CancellationToken cancellationToken)
     {
-        try { return Ok((await sender.Send(new GetWorkspaceCustomerPricesQuery(request), cancellationToken)).Value); }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new GetWorkspaceCustomerPricesQuery(request), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpPost("orders", Name = "createAdminWorkspaceOrder")]
@@ -72,13 +70,11 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = (await sender.Send(new CreateWorkspaceOrderCommand(request, idempotencyKey), cancellationToken)).Value;
-            if (result.Conflict is not null) return Conflict(result.Conflict);
-            return result.Replay ? Ok(result.Order) : StatusCode(201, result.Order);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new CreateWorkspaceOrderCommand(request, idempotencyKey), cancellationToken);
+        if (!result.IsSuccess) return this.Error(result);
+        var created = result.Value;
+        if (created.Conflict is not null) return Conflict(created.Conflict);
+        return created.Replay ? Ok(created.Order) : StatusCode(StatusCodes.Status201Created, created.Order);
     }
 
     [HttpGet("drafts", Name = "getAdminOrderDrafts")]
@@ -88,24 +84,16 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromQuery] string sort = "-updatedAt", [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var dates = WorkspaceDateRange.Parse(createdFrom, createdTo);
-            return Ok((await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId,
-                dates.FromUtc, dates.ToUtcExclusive, sort, page, pageSize), cancellationToken)).Value);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new GetWorkspaceDraftsQuery(searchTerm, counterpartyId,
+            createdFrom, createdTo, sort, page, pageSize), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpGet("drafts/{draftId:long}", Name = "getAdminOrderDraftById")]
     public async Task<ActionResult> GetDraft(long draftId, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await sender.Send(new GetWorkspaceDraftQuery(draftId), cancellationToken);
-            return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new GetWorkspaceDraftQuery(draftId), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpPost("drafts", Name = "createAdminOrderDraft")]
@@ -114,12 +102,9 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = (await sender.Send(new CreateWorkspaceDraftCommand(request, idempotencyKey), cancellationToken)).Value;
-            return result.Replay ? Ok(result.Draft) : StatusCode(201, result.Draft);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new CreateWorkspaceDraftCommand(request, idempotencyKey), cancellationToken);
+        if (!result.IsSuccess) return this.Error(result);
+        return result.Value.Replay ? Ok(result.Value.Draft) : StatusCode(StatusCodes.Status201Created, result.Value.Draft);
     }
 
     [HttpPut("drafts/{draftId:long}", Name = "updateAdminOrderDraft")]
@@ -127,22 +112,15 @@ public sealed class AdminOrderWorkspaceController(ISender sender) : ControllerBa
         long draftId, [FromHeader(Name = "If-Match")] string version,
         [FromBody] WorkspaceDraftInput request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await sender.Send(new UpdateWorkspaceDraftCommand(draftId, version, request), cancellationToken);
-            return result.Status == ResultStatus.NotFound ? NotFound() : Ok(result.Value);
-        }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new UpdateWorkspaceDraftCommand(draftId, version, request), cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : this.Error(result);
     }
 
     [HttpDelete("drafts/{draftId:long}", Name = "deleteAdminOrderDraft")]
     public async Task<ActionResult> DeleteDraft(
         long draftId, [FromHeader(Name = "If-Match")] string version, CancellationToken cancellationToken)
     {
-        try { return (await sender.Send(new DeleteWorkspaceDraftCommand(draftId, version), cancellationToken)).Value ? NoContent() : NotFound(); }
-        catch (WorkspaceException error) { return Error(error); }
+        var result = await sender.Send(new DeleteWorkspaceDraftCommand(draftId, version), cancellationToken);
+        return result.IsSuccess ? NoContent() : this.Error(result);
     }
-
-    private ObjectResult Error(WorkspaceException error)
-        => StatusCode(error.StatusCode, new { code = error.Code, message = error.Message });
 }

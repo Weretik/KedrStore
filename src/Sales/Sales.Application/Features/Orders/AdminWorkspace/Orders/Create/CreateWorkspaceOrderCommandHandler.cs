@@ -6,7 +6,5 @@ public sealed class CreateWorkspaceOrderCommandHandler(IWorkspaceOrderCreator po
     : ICommandHandler<CreateWorkspaceOrderCommand, Result<(WorkspaceCreatedOrder Order, bool Replay, WorkspaceOrderConflict? Conflict)>>
 {
     public async ValueTask<Result<(WorkspaceCreatedOrder Order, bool Replay, WorkspaceOrderConflict? Conflict)>> Handle(CreateWorkspaceOrderCommand request, CancellationToken cancellationToken)
-    {
-        return Result.Success(await port.CreateOrderAsync(request.Order, request.IdempotencyKey, cancellationToken));
-    }
+        => (await port.CreateOrderAsync(request.Order, request.IdempotencyKey, cancellationToken)).AsResult();
 }

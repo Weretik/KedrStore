@@ -10,7 +10,6 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         DateTimeOffset? createdFromUtc, DateTimeOffset? createdToUtcExclusive,
         string sort, int page, int pageSize, CancellationToken ct)
     {
-        ValidatePage(searchTerm, counterpartyId, page, pageSize);
         var query =
             from order in db.Orders.AsNoTracking()
             join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on order.CounterpartyId equals customer.Id
@@ -40,7 +39,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             "-customerName" => query.OrderByDescending(x => x.customer.Name).ThenByDescending(x => x.order.Id),
             "totalAmount" => query.OrderBy(x => x.order.Lines.Sum(y => y.Amount)).ThenBy(x => x.order.Id),
             "-totalAmount" => query.OrderByDescending(x => x.order.Lines.Sum(y => y.Amount)).ThenByDescending(x => x.order.Id),
-            _ => throw new WorkspaceException(400, "invalid_sort", "Unsupported order sort.")
+            _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, "The validator allows only known sorts.")
         };
         var rows = await query.Skip((page - 1) * pageSize).Take(pageSize)
             .Select(x => new WorkspaceOrderListItem(x.order.Id.Value, x.order.OrderNumber,

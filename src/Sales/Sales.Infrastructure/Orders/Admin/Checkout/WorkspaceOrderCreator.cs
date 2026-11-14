@@ -6,17 +6,15 @@ using Sales.Application.Contracts.Orders;
 
 namespace Sales.Infrastructure.Orders;
 
+/// <summary>Turns a confirmed quote into an order; the input passed the workspace validator.</summary>
 internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePricing pricing, IOrderCreationStore orderStore, IOrderNumberGenerator numberGenerator) : IWorkspaceOrderCreator
 {
     private const string OrderOperation = "create-admin-workspace-order";
 
-    public async Task<(WorkspaceCreatedOrder Order, bool Replay, WorkspaceOrderConflict? Conflict)> CreateOrderAsync(
+    public async Task<DomainResult<(WorkspaceCreatedOrder Order, bool Replay, WorkspaceOrderConflict? Conflict)>> CreateOrderAsync(
         WorkspaceCreateOrderRequest request, Guid idempotencyKey, CancellationToken ct)
     {
-        if (request is null || idempotencyKey == Guid.Empty || string.IsNullOrWhiteSpace(request.QuoteFingerprint) ||
-            request.Comment?.Length > 1000)
-            throw new WorkspaceException(400, "invalid_request", "Idempotency key, quote fingerprint or comment is invalid.");
-        AdminWorkspacePricing.ValidateRequest(new WorkspaceQuoteRequest(request.CounterpartyId, request.Lines));
+        ArgumentNullException.ThrowIfNull(request);
         var hash = Hash(JsonSerializer.Serialize(new
         {
             customer = request.CounterpartyId?.Trim(),
@@ -37,15 +35,26 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
                 existing.SyncStatus.ToString()), true, null);
         }
 
-        var quote = await pricing.QuoteAsync(new WorkspaceQuoteRequest(request.CounterpartyId!, request.Lines!), ct);
+        var quoted = await pricing.QuoteAsync(new WorkspaceQuoteRequest(request.CounterpartyId, request.Lines), ct);
+        if (quoted.IsFailure)
+            return quoted.Error!;
+        var quote = quoted.Value;
         if (!string.Equals(quote.QuoteFingerprint, request.QuoteFingerprint, StringComparison.Ordinal))
             return (null!, false, new WorkspaceOrderConflict("quote_changed", quote));
         var now = DateTimeOffset.UtcNow;
         var lines = new List<OrderLine>(quote.Lines.Count);
         foreach (var line in quote.Lines)
-            lines.Add(Valid(OrderLine.Create(line.ProductId, line.ProductName, line.Quantity, line.LineAmount, line.PriceAdjustment)));
-        var order = Valid(Order.Create(await numberGenerator.GenerateAsync(now, ct), quote.CounterpartyId,
-            request.Comment, lines, now));
+        {
+            var orderLine = OrderLine.Create(line.ProductId, line.ProductName, line.Quantity, line.LineAmount, line.PriceAdjustment);
+            if (orderLine.IsFailure)
+                return orderLine.Error!;
+            lines.Add(orderLine.Value);
+        }
+        var created = Order.Create(await numberGenerator.GenerateAsync(now, ct), quote.CounterpartyId,
+            request.Comment, lines, now);
+        if (created.IsFailure)
+            return created.Error!;
+        var order = created.Value;
         try
         {
             await orderStore.PersistAsync(order,
@@ -67,8 +76,4 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         }
         return (new WorkspaceCreatedOrder(order.Id.Value, order.OrderNumber, quote.TotalAmount, "Pending"), false, null);
     }
-
-    // The workspace still reports problems through WorkspaceException until the Sales stage moves it to results.
-    private static T Valid<T>(DomainResult<T> result)
-        => result.IsSuccess ? result.Value : throw new WorkspaceException(400, result.Error!.Code, result.Error.Message);
 }

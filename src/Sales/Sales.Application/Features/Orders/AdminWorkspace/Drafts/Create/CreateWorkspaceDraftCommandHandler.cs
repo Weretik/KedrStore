@@ -6,7 +6,5 @@ public sealed class CreateWorkspaceDraftCommandHandler(IWorkspaceDraftWriter por
     : ICommandHandler<CreateWorkspaceDraftCommand, Result<(WorkspaceDraftDetail Draft, bool Replay)>>
 {
     public async ValueTask<Result<(WorkspaceDraftDetail Draft, bool Replay)>> Handle(CreateWorkspaceDraftCommand request, CancellationToken cancellationToken)
-    {
-        return Result.Success(await port.CreateDraftAsync(request.Draft, request.IdempotencyKey, cancellationToken));
-    }
+        => (await port.CreateDraftAsync(request.Draft, request.IdempotencyKey, cancellationToken)).AsResult();
 }
