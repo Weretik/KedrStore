@@ -5,7 +5,13 @@
 ~~~text
 BuildingBlocks.Infrastructure/
 ├── DependencyInjection/
-│   └── AddInfrastructureServices
+│   ├── AddInfrastructureServices
+│   └── OutboxRegistration (AddOutbox<TContext>(schema), AddOutboxHandler<TMessage, THandler>(name))
+├── Outbox/
+│   ├── OutboxMessage, ApplyOutbox(schema)   # <schema>."OutboxMessages"
+│   ├── OutboxWriter                         # adds a message in the module's SaveChanges
+│   ├── ModuleOutbox<TContext>, OutboxDispatcher  # IOutboxDispatcher: send after commit, due dispatch, retention
+│   └── OutboxRetrySchedule                  # 1, 5, 15, 30, 60 minutes, then hourly; 10 attempts
 ├── DomainEvents/
 │   ├── EfDomainEventContext
 │   └── MediatorDomainEventDispatcher
@@ -23,6 +29,8 @@ BuildingBlocks.Infrastructure/
     ├── XmlToJsonConvector
     └── TelegramOptions
 ~~~
+
+The transactional outbox is described in [platform spec 006](../../../specs/platform/006-transactional-outbox/README.md) and the [module rules](../../../standards/module-rules.md#transactional-outbox).
 
 ## Registered shared services
 

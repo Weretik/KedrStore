@@ -17,10 +17,53 @@ namespace Sales.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("BuildingBlocks.Infrastructure.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("FailedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("NextAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("ProcessedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NextAttemptAtUtc")
+                        .HasDatabaseName("IX_OutboxMessages_Due")
+                        .HasFilter("\"ProcessedAtUtc\" IS NULL AND \"FailedAtUtc\" IS NULL");
+
+                    b.ToTable("OutboxMessages", "sales");
+                });
 
             modelBuilder.Entity("Sales.Domain.Customers.Counterparty", b =>
                 {
@@ -345,6 +388,40 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderLines", (string)null);
                 });
 
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Customers.PendingCounterpartyIdentityDeletion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CounterpartyId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("IdentityUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityUserId");
+
+                    b.HasIndex("CounterpartyId", "IdentityUserId")
+                        .IsUnique();
+
+                    b.ToTable("PendingCounterpartyIdentityDeletions", (string)null);
+                });
+
             modelBuilder.Entity("Sales.Infrastructure.Persistence.OrderDrafts.OrderDraftIdempotencyRecord", b =>
                 {
                     b.Property<long>("Id")
@@ -479,40 +556,6 @@ namespace Sales.Infrastructure.Migrations
                     b.HasIndex("RequestedAtUtc");
 
                     b.ToTable("OrderSyncRetryAudits", (string)null);
-                });
-
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Customers.PendingCounterpartyIdentityDeletion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CounterpartyId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("IdentityUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdentityUserId");
-
-                    b.HasIndex("CounterpartyId", "IdentityUserId")
-                        .IsUnique();
-
-                    b.ToTable("PendingCounterpartyIdentityDeletions", (string)null);
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.OneCOrderSync", b =>
