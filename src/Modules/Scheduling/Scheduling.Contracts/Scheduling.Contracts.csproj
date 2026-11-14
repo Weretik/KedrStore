@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What the hosts and other modules may use from Scheduling: the run journal the tasks job writes to. -->
+
+</Project>

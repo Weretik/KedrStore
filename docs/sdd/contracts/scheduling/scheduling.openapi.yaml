@@ -1,0 +1,290 @@
+openapi: 3.1.0
+info:
+  title: 'Scheduling: «Фонові задачі»'
+  version: 1.0.0
+  description: 'Background tasks of Kedr (spec platform/007). The task list is code; the admin changes only the schedule,
+    the on/off switch and the next run, and asks for «Запустити зараз». Every operation needs RequireAdminRole. Times are
+    UTC instants; schedule times are Kyiv HH:mm. The scheduler tick (POST /internal/scheduler/tick) is hidden from this
+    contract: Cloud Scheduler calls it with a Google OIDC token.'
+paths:
+  /api/admin/scheduling/tasks:
+    get:
+      tags:
+      - AdminScheduledTasks
+      operationId: getAdminScheduledTasks
+      description: Every task in page order with its schedule, next run and last success and failure.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduledTaskResponse'
+        '401':
+          description: Not signed in
+        '403':
+          description: No view right on background-tasks
+  /api/admin/scheduling/tasks/{key}/runs:
+    get:
+      tags:
+      - AdminScheduledTasks
+      operationId: getAdminScheduledTaskRuns
+      description: The last 50 runs of a task, newest first. Runs are kept 90 days.
+      parameters:
+      - $ref: '#/components/parameters/TaskKey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduledTaskRunResponse'
+        '401':
+          description: Not signed in
+        '403':
+          description: No view right on background-tasks
+        '404':
+          description: Unknown task
+  /api/admin/scheduling/tasks/{key}/schedule:
+    put:
+      tags:
+      - AdminScheduledTasks
+      operationId: updateAdminScheduledTaskSchedule
+      description: Changes the schedule and the on/off switch. nextRunAt moves the next run once; without it the next run
+        follows the schedule.
+      parameters:
+      - $ref: '#/components/parameters/TaskKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledTaskScheduleInput'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledTaskResponse'
+        '400':
+          description: Invalid schedule, or nextRunAt in the past
+        '401':
+          description: Not signed in
+        '403':
+          description: No edit right on background-tasks
+        '404':
+          description: Unknown task
+        '409':
+          description: The task runs every minute and its schedule does not change
+  /api/admin/scheduling/tasks/{key}/run:
+    post:
+      tags:
+      - AdminScheduledTasks
+      operationId: runAdminScheduledTaskNow
+      description: «Запустити зараз», also for a disabled task. The next tick, within a minute, starts it.
+      parameters:
+      - $ref: '#/components/parameters/TaskKey'
+      responses:
+        '200':
+          description: Requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledTaskResponse'
+        '401':
+          description: Not signed in
+        '403':
+          description: No create right on background-tasks
+        '404':
+          description: Unknown task
+        '409':
+          description: «Задача вже виконується», «Запуск уже заплановано» or the task runs every minute
+components:
+  parameters:
+    TaskKey:
+      name: key
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 64
+  schemas:
+    ScheduleInput:
+      type: object
+      required:
+      - kind
+      properties:
+        kind:
+          type: string
+          enum:
+          - interval
+          - daily
+          - manual
+        everyMinutes:
+          type:
+          - integer
+          - 'null'
+          minimum: 5
+          maximum: 1440
+          description: interval only
+        fromHour:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 23
+          description: interval only; with toHour, the Kyiv hours the task runs in
+        toHour:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          maximum: 23
+        times:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            pattern: ^\d{2}:\d{2}$
+          maxItems: 6
+          description: daily only; Kyiv HH:mm
+        days:
+          type:
+          - array
+          - 'null'
+          items:
+            type: integer
+            minimum: 1
+            maximum: 7
+          description: daily only; ISO weekdays, 1 = Monday
+    ScheduledTaskScheduleInput:
+      type: object
+      required:
+      - enabled
+      - schedule
+      properties:
+        enabled:
+          type: boolean
+        schedule:
+          $ref: '#/components/schemas/ScheduleInput'
+        nextRunAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    ScheduledTaskResponse:
+      type: object
+      required:
+      - key
+      - name
+      - description
+      - editable
+      - enabled
+      - schedule
+      - isRunning
+      - lastRunFailed
+      - overdue
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        editable:
+          type: boolean
+          description: false for the outbox, which runs every minute
+        enabled:
+          type: boolean
+        schedule:
+          $ref: '#/components/schemas/ScheduleInput'
+        nextRunAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        isRunning:
+          type: boolean
+        runningSince:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        runRequestedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        lastSuccessAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        lastSuccessSummary:
+          type:
+          - string
+          - 'null'
+        lastFailureAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        lastFailureReason:
+          type:
+          - string
+          - 'null'
+        lastRunFailed:
+          type: boolean
+          description: the last result was a failure
+        overdue:
+          type: boolean
+          description: an enabled task missed its time by more than 15 minutes
+    ScheduledTaskRunResponse:
+      type: object
+      required:
+      - id
+      - trigger
+      - claimedAt
+      - outcome
+      properties:
+        id:
+          type: string
+          format: uuid
+        trigger:
+          type: string
+          enum:
+          - schedule
+          - manual
+        requestedBy:
+          type:
+          - string
+          - 'null'
+        claimedAt:
+          type: string
+          format: date-time
+        startedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        finishedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        outcome:
+          type: string
+          enum:
+          - running
+          - succeeded
+          - failed
+        message:
+          type:
+          - string
+          - 'null'

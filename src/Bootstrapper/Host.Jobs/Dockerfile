@@ -41,6 +41,11 @@ COPY ["src/Modules/Work/Work.Api/Work.Api.csproj", "src/Modules/Work/Work.Api/"]
 COPY ["src/Modules/Work/Work.Application/Work.Application.csproj", "src/Modules/Work/Work.Application/"]
 COPY ["src/Modules/Work/Work.Domain/Work.Domain.csproj", "src/Modules/Work/Work.Domain/"]
 COPY ["src/Modules/Work/Work.Infrastructure/Work.Infrastructure.csproj", "src/Modules/Work/Work.Infrastructure/"]
+COPY ["src/Modules/Scheduling/Scheduling.Api/Scheduling.Api.csproj", "src/Modules/Scheduling/Scheduling.Api/"]
+COPY ["src/Modules/Scheduling/Scheduling.Application/Scheduling.Application.csproj", "src/Modules/Scheduling/Scheduling.Application/"]
+COPY ["src/Modules/Scheduling/Scheduling.Contracts/Scheduling.Contracts.csproj", "src/Modules/Scheduling/Scheduling.Contracts/"]
+COPY ["src/Modules/Scheduling/Scheduling.Domain/Scheduling.Domain.csproj", "src/Modules/Scheduling/Scheduling.Domain/"]
+COPY ["src/Modules/Scheduling/Scheduling.Infrastructure/Scheduling.Infrastructure.csproj", "src/Modules/Scheduling/Scheduling.Infrastructure/"]
 
 RUN dotnet restore "src/Bootstrapper/Host.Jobs/Host.Jobs.csproj"
 COPY . .

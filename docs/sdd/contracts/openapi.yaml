@@ -298,6 +298,14 @@ paths:
     $ref: ./work/work.openapi.yaml#/paths/~1api~1admin~1work~1tasks
   /api/admin/work/report:
     $ref: ./work/work.openapi.yaml#/paths/~1api~1admin~1work~1report
+  /api/admin/scheduling/tasks:
+    $ref: ./scheduling/scheduling.openapi.yaml#/paths/~1api~1admin~1scheduling~1tasks
+  /api/admin/scheduling/tasks/{key}/runs:
+    $ref: ./scheduling/scheduling.openapi.yaml#/paths/~1api~1admin~1scheduling~1tasks~1{key}~1runs
+  /api/admin/scheduling/tasks/{key}/schedule:
+    $ref: ./scheduling/scheduling.openapi.yaml#/paths/~1api~1admin~1scheduling~1tasks~1{key}~1schedule
+  /api/admin/scheduling/tasks/{key}/run:
+    $ref: ./scheduling/scheduling.openapi.yaml#/paths/~1api~1admin~1scheduling~1tasks~1{key}~1run
 components:
   securitySchemes:
     bearerAuth:

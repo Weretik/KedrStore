@@ -4,6 +4,7 @@ using Identity.Infrastructure.Persistence;
 using Media.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Sales.Infrastructure.Persistence;
+using Scheduling.Infrastructure.Persistence;
 using Work.Infrastructure.Persistence;
 
 namespace ArchitectureTests.Persistence;
@@ -24,6 +25,7 @@ public sealed class ModelSnapshotTests
         nameof(MediaDbContext),
         nameof(SalesDbContext),
         nameof(WorkDbContext),
+        nameof(SchedulingDbContext),
     };
 
     [Theory]
@@ -45,6 +47,7 @@ public sealed class ModelSnapshotTests
         nameof(ContentDbContext) => new ContentDbContext(Configured<ContentDbContext>(ContentDbContext.Configure)),
         nameof(MediaDbContext) => new MediaDbContext(Configured<MediaDbContext>(MediaDbContext.Configure)),
         nameof(WorkDbContext) => new WorkDbContext(Configured<WorkDbContext>(WorkDbContext.Configure)),
+        nameof(SchedulingDbContext) => new SchedulingDbContext(Configured<SchedulingDbContext>(SchedulingDbContext.Configure)),
         _ => throw new ArgumentOutOfRangeException(nameof(contextName), contextName, null),
     };
 

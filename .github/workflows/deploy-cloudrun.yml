@@ -18,6 +18,7 @@ env:
   GCP_WORKLOAD_IDENTITY_PROVIDER: projects/449981321140/locations/global/workloadIdentityPools/github/providers/github-oidc
   GCP_DEPLOY_SERVICE_ACCOUNT: gha-deployer@classkedrproject.iam.gserviceaccount.com
   CLOUD_RUN_SERVICE: api
+  TASKS_JOB: kedr-tasks
 
 jobs:
   verify:
@@ -175,6 +176,7 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --set-secrets "$API_SECRETS" \
+            --update-env-vars "Scheduler__Job__Project=${{ env.GCP_PROJECT_ID }},Scheduler__Job__Region=${{ env.GCP_REGION }},Scheduler__Job__Name=${{ env.TASKS_JOB }}" \
             --quiet
 
       - name: Update Cloud Run Jobs to new image
@@ -213,6 +215,34 @@ jobs:
               --task-timeout 10m \
               --args="$ORDER_SYNC_ARGS" \
               --set-secrets "$ORDER_SYNC_SECRETS" \
+              --quiet
+          fi
+
+          # Background tasks of «Фонові задачі» (spec platform/007): the scheduler tick starts one execution with the
+          # claimed tasks in --tasks=key:runId,... per execution; the arguments below are only the default.
+          TASKS_SECRETS="${JOB_SECRETS},Telegram__BotToken=telegram-bot-token:latest,Telegram__ChatId=telegram-chat-id:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest"
+
+          if gcloud run jobs describe "${{ env.TASKS_JOB }}" --region "${{ env.GCP_REGION }}" >/dev/null 2>&1; then
+            gcloud run jobs update "${{ env.TASKS_JOB }}" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 4h \
+              --args="--job=tasks,--tasks=" \
+              --set-secrets "$TASKS_SECRETS" \
+              --quiet
+          else
+            gcloud run jobs create "${{ env.TASKS_JOB }}" \
+              --image "${{ env.JOBS_IMAGE }}" \
+              --region "${{ env.GCP_REGION }}" \
+              --tasks 1 \
+              --parallelism 1 \
+              --max-retries 0 \
+              --task-timeout 4h \
+              --args="--job=tasks,--tasks=" \
+              --set-secrets "$TASKS_SECRETS" \
               --quiet
           fi
 

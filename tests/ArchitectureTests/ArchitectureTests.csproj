@@ -43,6 +43,7 @@
       <ProjectReference Include="..\..\src\Modules\Media\Media.Api\Media.Api.csproj" />
       <ProjectReference Include="..\..\src\Modules\Sales\Sales.Api\Sales.Api.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Api\Scheduling.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

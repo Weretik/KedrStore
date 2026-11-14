@@ -6,6 +6,7 @@ using Content.Application;
 using Identity.Application;
 using Media.Application;
 using Sales.Application;
+using Scheduling.Application;
 using Work.Application;
 namespace Host.Api.Application;
 
@@ -27,6 +28,7 @@ public static class MediatorRegistrationExtensions
                 typeof(ContentApplicationAssemblyMarker).Assembly,
                 typeof(MediaApplicationAssemblyMarker).Assembly,
                 typeof(WorkApplicationAssemblyMarker).Assembly,
+                typeof(SchedulingApplicationAssemblyMarker).Assembly,
                 typeof(ApplicationAssemblyMarker).Assembly
             ];
 

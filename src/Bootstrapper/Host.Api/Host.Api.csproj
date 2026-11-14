@@ -32,6 +32,7 @@
       <ProjectReference Include="..\..\Modules\Content\Content.Api\Content.Api.csproj" />
       <ProjectReference Include="..\..\Modules\Media\Media.Api\Media.Api.csproj" />
       <ProjectReference Include="..\..\Modules\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\Modules\Scheduling\Scheduling.Api\Scheduling.Api.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     </ItemGroup>
 

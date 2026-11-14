@@ -5,6 +5,7 @@ using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;
 using Media.Api.DependencyInjection;
 using Sales.Api.DependencyInjection;
+using Scheduling.Api.DependencyInjection;
 using Work.Api.DependencyInjection;
 namespace Host.Api;
 
@@ -24,6 +25,7 @@ public static class ModuleRegistrationsExtensions
         services.AddContentModule(configuration);
         services.AddMediaModule(configuration);
         services.AddWorkModule(configuration);
+        services.AddSchedulingModule(configuration);
 
         return services;
     }

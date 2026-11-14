@@ -23,11 +23,11 @@ public sealed class FolderStructureTests
     private static readonly string[] ApplicationAssemblies =
     [
         "Catalog.Application", "Content.Application", "Identity.Application", "Media.Application",
-        "Sales.Application", "Work.Application",
+        "Sales.Application", "Scheduling.Application", "Work.Application",
     ];
 
     private static readonly string[] ApiAssemblies =
-        ["Catalog.Api", "Content.Api", "Identity.Api", "Media.Api", "Sales.Api", "Work.Api"];
+        ["Catalog.Api", "Content.Api", "Identity.Api", "Media.Api", "Sales.Api", "Scheduling.Api", "Work.Api"];
 
     /// <summary>
     /// <c>src/</c> holds the hosts, the shared code and the business modules, each module in
