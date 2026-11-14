@@ -5,7 +5,6 @@ namespace BuildingBlocks.Domain.Abstractions;
 /// input field it belongs to, when there is one. Only the shared Api mapper turns <see cref="Type"/> into HTTP.
 /// </summary>
 public sealed record DomainError(string Code, string Message, ErrorType Type = ErrorType.Validation, string? Field = null)
-    : IDomainError
 {
     public static DomainError NotFound(string code, string message) => new(code, message, ErrorType.NotFound);
     public static DomainError Conflict(string code, string message) => new(code, message, ErrorType.Conflict);

@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Expected use-case error | Ardalis.Result and the existing Result mapping | Throwing ordinary validation or missing-data exceptions |
 | Input validation | FluentValidation and ValidationBehavior | Validating only in the controller |
-| Business invariant | DomainError and DomainException, or aggregate behavior | Moving a domain rule into a behavior |
+| Business invariant | Aggregate behavior that returns `DomainResult` with a `DomainError` | Moving a domain rule into a behavior |
 | Current user/permissions | ICurrentUserService or IPermissionService | Injecting IHttpContextAccessor into Application |
 | Domain event | BaseEntity collection and dispatcher behavior | Publishing directly from the controller |
 | Database migration/seed | IDatabaseMigrator/ISeeder through the separate `Host.Jobs --job=migrate` | Running migrations/seeders inside a handler |

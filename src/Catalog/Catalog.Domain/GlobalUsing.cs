@@ -1,6 +1,5 @@
 ﻿global using System;
 global using System.Text.RegularExpressions;
-global using BuildingBlocks.Domain.Exceptions;
 global using BuildingBlocks.Domain.Entity;
 
 // Domain namespaces
