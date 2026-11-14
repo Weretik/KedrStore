@@ -23,8 +23,9 @@ public sealed class CompanyRequisitesChange : IAggregateRoot
     public static CompanyRequisitesChange Record(IReadOnlyList<RequisitesFieldChange> changes,
         DateTimeOffset changedAt, string userId, string userName)
     {
+        // The handler records only a save that changed something, so an empty list is a caller bug.
         if (changes.Count == 0)
-            throw new DomainException(CompanyRequisitesErrors.NothingChanged());
+            throw new ArgumentException("A change log entry needs at least one changed field.", nameof(changes));
         var entry = new CompanyRequisitesChange
         {
             ChangedAt = changedAt,

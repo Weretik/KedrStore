@@ -43,30 +43,45 @@ public sealed partial class CompanyContacts : IAggregateRoot
 
     private CompanyContacts() { }
 
-    public static CompanyContacts Create(CompanyContactsValues values, DateTimeOffset now)
+    public static DomainResult<CompanyContacts> Create(CompanyContactsValues values, DateTimeOffset now)
     {
         var contacts = new CompanyContacts { Id = SingletonId };
-        contacts.Apply(values, now);
-        return contacts;
+        var applied = contacts.Apply(values, now);
+        return applied.IsFailure ? applied.Error! : contacts;
     }
 
-    public void Update(CompanyContactsValues values, DateTimeOffset now, string editor)
+    public DomainResult Update(CompanyContactsValues values, DateTimeOffset now, string editor)
     {
-        Apply(values, now);
+        var applied = Apply(values, now);
+        if (applied.IsFailure)
+            return applied;
         UpdatedBy = EditorName.Normalize(editor);
+        return DomainResult.Success();
     }
 
-    private void Apply(CompanyContactsValues values, DateTimeOffset now)
+    private DomainResult Apply(CompanyContactsValues values, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(values);
-        SalesPhone = Phone(values.SalesPhone, nameof(SalesPhone));
-        Email = Checked(values.Email, nameof(Email), EmailMaxLength, IsValidEmail);
-        TelegramUrl = Checked(values.TelegramUrl, nameof(TelegramUrl), UrlMaxLength, IsValidTelegramUrl);
-        ViberPhone = Phone(values.ViberPhone, nameof(ViberPhone));
-        MapUrl = Checked(values.MapUrl, nameof(MapUrl), UrlMaxLength, IsValidHttpsUrl);
-        CityUk = Checked(values.CityUk, nameof(CityUk), CityMaxLength, _ => true);
-        CityRu = Checked(values.CityRu, nameof(CityRu), CityMaxLength, _ => true);
+        var checks = new DomainChecks();
+        var salesPhone = checks.Take(Phone(values.SalesPhone, nameof(SalesPhone)));
+        var email = checks.Take(Checked(values.Email, nameof(Email), EmailMaxLength, IsValidEmail));
+        var telegramUrl = checks.Take(Checked(values.TelegramUrl, nameof(TelegramUrl), UrlMaxLength, IsValidTelegramUrl));
+        var viberPhone = checks.Take(Phone(values.ViberPhone, nameof(ViberPhone)));
+        var mapUrl = checks.Take(Checked(values.MapUrl, nameof(MapUrl), UrlMaxLength, IsValidHttpsUrl));
+        var cityUk = checks.Take(Checked(values.CityUk, nameof(CityUk), CityMaxLength, _ => true));
+        var cityRu = checks.Take(Checked(values.CityRu, nameof(CityRu), CityMaxLength, _ => true));
+        if (checks.Error is { } error)
+            return error;
+
+        SalesPhone = salesPhone;
+        Email = email;
+        TelegramUrl = telegramUrl;
+        ViberPhone = viberPhone;
+        MapUrl = mapUrl;
+        CityUk = cityUk;
+        CityRu = cityRu;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
     public static bool IsValidPhone(string? value) => value is not null && PhonePattern().IsMatch(value);
@@ -80,22 +95,22 @@ public sealed partial class CompanyContacts : IAggregateRoot
     public static bool IsValidTelegramUrl(string? value)
         => IsValidHttpsUrl(value) && new Uri(value!).Host is "t.me" or "telegram.me";
 
-    private static string Phone(string? value, string field)
-    {
-        var trimmed = value?.Trim() ?? string.Empty;
-        return IsValidPhone(trimmed)
-            ? trimmed
-            : throw new DomainException(CompanyContactsErrors.Invalid(field, value));
-    }
-
-    private static string Checked(string? value, string field, int maxLength, Func<string, bool> isValid)
+    private static DomainResult<string> Phone(string? value, string field)
     {
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length == 0)
-            throw new DomainException(CompanyContactsErrors.Required(field));
+            return CompanyContactsErrors.Required(field);
+        return IsValidPhone(trimmed) ? trimmed : CompanyContactsErrors.Invalid(field);
+    }
+
+    private static DomainResult<string> Checked(string? value, string field, int maxLength, Func<string, bool> isValid)
+    {
+        var trimmed = value?.Trim() ?? string.Empty;
+        if (trimmed.Length == 0)
+            return CompanyContactsErrors.Required(field);
         if (trimmed.Length > maxLength)
-            throw new DomainException(CompanyContactsErrors.TooLong(field, maxLength, trimmed.Length));
-        return isValid(trimmed) ? trimmed : throw new DomainException(CompanyContactsErrors.Invalid(field, value));
+            return CompanyContactsErrors.TooLong(field, maxLength, trimmed.Length);
+        return isValid(trimmed) ? trimmed : CompanyContactsErrors.Invalid(field);
     }
 
     [GeneratedRegex(@"^\+380\d{9}$", RegexOptions.CultureInvariant)]

@@ -60,47 +60,49 @@ public sealed class WholesalePageText
 
     private WholesalePageText() { }
 
-    public static WholesalePageText Create(WholesalePageTextValues values)
+    public static DomainResult<WholesalePageText> Create(WholesalePageTextValues values)
     {
         ArgumentNullException.ThrowIfNull(values);
         if (values.Steps is null || values.Steps.Count != StepCount)
-            throw new DomainException(WholesaleErrors.StepCount(StepCount, values.Steps?.Count ?? 0));
+            return WholesaleErrors.StepCount(StepCount, values.Steps?.Count ?? 0);
         if (values.Faq is null || values.Faq.Count is 0 or > MaxFaqItems)
-            throw new DomainException(WholesaleErrors.FaqCount(MaxFaqItems, values.Faq?.Count ?? 0));
+            return WholesaleErrors.FaqCount(MaxFaqItems, values.Faq?.Count ?? 0);
 
-        return new WholesalePageText
+        var checks = new DomainChecks();
+        var text = new WholesalePageText
         {
-            HeroTitle = Text(values.HeroTitle, nameof(HeroTitle), TitleMaxLength),
-            HeroLead = Text(values.HeroLead, nameof(HeroLead), TextMaxLength),
-            ContactCardTitle = Text(values.ContactCardTitle, nameof(ContactCardTitle), ShortTitleMaxLength),
-            ContactCardNote = Text(values.ContactCardNote, nameof(ContactCardNote), ShortTextMaxLength),
-            AssortmentTitle = Text(values.AssortmentTitle, nameof(AssortmentTitle), TitleMaxLength),
-            AssortmentIntro = Text(values.AssortmentIntro, nameof(AssortmentIntro), ShortTextMaxLength),
-            CompanyTitle = Text(values.CompanyTitle, nameof(CompanyTitle), TitleMaxLength),
-            CompanyText = Text(values.CompanyText, nameof(CompanyText), TextMaxLength),
-            SelectionTitle = Text(values.SelectionTitle, nameof(SelectionTitle), ShortTitleMaxLength),
-            SelectionText = Text(values.SelectionText, nameof(SelectionText), ShortTextMaxLength),
-            WarehouseTitle = Text(values.WarehouseTitle, nameof(WarehouseTitle), ShortTitleMaxLength),
-            WarehouseText = Text(values.WarehouseText, nameof(WarehouseText), ShortTextMaxLength),
-            StepsTitle = Text(values.StepsTitle, nameof(StepsTitle), TitleMaxLength),
+            HeroTitle = checks.Take(Text(values.HeroTitle, nameof(HeroTitle), TitleMaxLength)),
+            HeroLead = checks.Take(Text(values.HeroLead, nameof(HeroLead), TextMaxLength)),
+            ContactCardTitle = checks.Take(Text(values.ContactCardTitle, nameof(ContactCardTitle), ShortTitleMaxLength)),
+            ContactCardNote = checks.Take(Text(values.ContactCardNote, nameof(ContactCardNote), ShortTextMaxLength)),
+            AssortmentTitle = checks.Take(Text(values.AssortmentTitle, nameof(AssortmentTitle), TitleMaxLength)),
+            AssortmentIntro = checks.Take(Text(values.AssortmentIntro, nameof(AssortmentIntro), ShortTextMaxLength)),
+            CompanyTitle = checks.Take(Text(values.CompanyTitle, nameof(CompanyTitle), TitleMaxLength)),
+            CompanyText = checks.Take(Text(values.CompanyText, nameof(CompanyText), TextMaxLength)),
+            SelectionTitle = checks.Take(Text(values.SelectionTitle, nameof(SelectionTitle), ShortTitleMaxLength)),
+            SelectionText = checks.Take(Text(values.SelectionText, nameof(SelectionText), ShortTextMaxLength)),
+            WarehouseTitle = checks.Take(Text(values.WarehouseTitle, nameof(WarehouseTitle), ShortTitleMaxLength)),
+            WarehouseText = checks.Take(Text(values.WarehouseText, nameof(WarehouseText), ShortTextMaxLength)),
+            StepsTitle = checks.Take(Text(values.StepsTitle, nameof(StepsTitle), TitleMaxLength)),
             _steps = values.Steps.Select(step => new WholesaleStep(
-                Text(step.Title, "StepTitle", ShortTitleMaxLength),
-                Text(step.Text, "StepText", ShortTextMaxLength))).ToList(),
-            FaqTitle = Text(values.FaqTitle, nameof(FaqTitle), TitleMaxLength),
+                checks.Take(Text(step.Title, "StepTitle", ShortTitleMaxLength)),
+                checks.Take(Text(step.Text, "StepText", ShortTextMaxLength)))).ToList(),
+            FaqTitle = checks.Take(Text(values.FaqTitle, nameof(FaqTitle), TitleMaxLength)),
             _faq = values.Faq.Select(item => new WholesaleFaqItem(
-                Text(item.Question, "Question", QuestionMaxLength),
-                Text(item.Answer, "Answer", AnswerMaxLength))).ToList(),
-            ClosingTitle = Text(values.ClosingTitle, nameof(ClosingTitle), TitleMaxLength),
+                checks.Take(Text(item.Question, "Question", QuestionMaxLength)),
+                checks.Take(Text(item.Answer, "Answer", AnswerMaxLength)))).ToList(),
+            ClosingTitle = checks.Take(Text(values.ClosingTitle, nameof(ClosingTitle), TitleMaxLength)),
         };
+        return checks.Error is { } error ? error : text;
     }
 
-    private static string Text(string? value, string field, int maxLength)
+    private static DomainResult<string> Text(string? value, string field, int maxLength)
     {
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length == 0)
-            throw new DomainException(WholesaleErrors.Required(field));
+            return WholesaleErrors.Required(field);
         return trimmed.Length <= maxLength
             ? trimmed
-            : throw new DomainException(WholesaleErrors.TooLong(field, maxLength, trimmed.Length));
+            : WholesaleErrors.TooLong(field, maxLength, trimmed.Length);
     }
 }

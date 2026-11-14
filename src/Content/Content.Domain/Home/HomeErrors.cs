@@ -3,14 +3,14 @@ namespace Content.Domain.Home;
 public static class HomeErrors
 {
     public static DomainError Required(string field) =>
-        new($"Content.Home.{field}.Required", $"{field} is required.");
+        new($"Content.Home.{field}.Required", "Заповніть це поле.", Field: field);
 
     public static DomainError TooLong(string field, int maxLength, int length) =>
-        new($"Content.Home.{field}.TooLong", $"{field} must be at most {maxLength} characters. Actual: {length}");
+        new($"Content.Home.{field}.TooLong", $"Не більше {maxLength} символів (зараз {length}).", Field: field);
 
     public static DomainError MediaFileInvalid(long id) =>
-        new("Content.Home.Logo.Invalid", $"A media file ID must be positive. Actual: {id}");
+        new("Content.Home.Logo.Invalid", "Виберіть логотип з медіатеки.", Field: "LogoMediaFileId");
 
     public static DomainError PositionInvalid(int position) =>
-        new("Content.Home.Position.Invalid", $"A position must not be negative. Actual: {position}");
+        new("Content.Home.Position.Invalid", $"Позиція не може бути від'ємною (зараз {position}).", Field: "Position");
 }

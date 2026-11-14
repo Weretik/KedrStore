@@ -14,31 +14,29 @@ public sealed class ArticleTranslation
 
     private ArticleTranslation() { }
 
-    internal static ArticleTranslation Create(ArticleText text)
+    internal static DomainResult<ArticleTranslation> Create(ArticleText text)
     {
         var language = text.Language?.Trim().ToLowerInvariant() ?? string.Empty;
         if (!Article.Languages.Contains(language))
-            throw new DomainException(ArticleErrors.LanguageInvalid(text.Language));
+            return ArticleErrors.LanguageInvalid();
 
-        return new ArticleTranslation
-        {
-            Language = language,
-            Title = Required(text.Title, TitleMaxLength, nameof(Title)),
-            Excerpt = Required(text.Excerpt, ExcerptMaxLength, nameof(Excerpt)),
-            BodyHtml = Required(text.BodyHtml, BodyHtmlMaxLength, nameof(BodyHtml)),
-        };
+        var checks = new DomainChecks();
+        var title = checks.Take(Required(text.Title, TitleMaxLength, nameof(Title)));
+        var excerpt = checks.Take(Required(text.Excerpt, ExcerptMaxLength, nameof(Excerpt)));
+        var bodyHtml = checks.Take(Required(text.BodyHtml, BodyHtmlMaxLength, nameof(BodyHtml)));
+        if (checks.Error is { } error)
+            return error;
+
+        return new ArticleTranslation { Language = language, Title = title, Excerpt = excerpt, BodyHtml = bodyHtml };
     }
 
-    private static string Required(string? value, int maxLength, string field)
+    private static DomainResult<string> Required(string? value, int maxLength, string field)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException(ArticleErrors.Required(field));
+            return ArticleErrors.Required(field);
 
         var trimmed = value.Trim();
-        if (trimmed.Length > maxLength)
-            throw new DomainException(ArticleErrors.TooLong(field, maxLength, trimmed.Length));
-
-        return trimmed;
+        return trimmed.Length > maxLength ? ArticleErrors.TooLong(field, maxLength, trimmed.Length) : trimmed;
     }
 }
 

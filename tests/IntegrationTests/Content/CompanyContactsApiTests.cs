@@ -106,7 +106,7 @@ public sealed class CompanyContactsApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         db.CompanyContacts.Add(CompanyContacts.Create(new CompanyContactsValues("+380687135049",
             "kedr.class19@gmail.com", "https://t.me/+380687135049", "+380687135049",
-            "https://maps.app.goo.gl/D2rH3HcaxLfxik5H6", "Харків", "Харьков"), Now));
+            "https://maps.app.goo.gl/D2rH3HcaxLfxik5H6", "Харків", "Харьков"), Now).Value);
         db.SaveChanges();
         return db;
     }

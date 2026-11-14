@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.Articles.Commands.CreateArticle;
 using Content.Application.Features.Articles.Commands.UpdateArticle;
 using Content.Application.Features.Articles.Shared;
@@ -21,7 +21,7 @@ public sealed class ArticleTests
     [Fact]
     public void Create_KeepsBothLanguagesSortedAndTrimmed()
     {
-        var article = Article.Create("prykhovani-petli", Day, true, Texts("  Петлі  "), Now, " manager@classkedr.com.ua ");
+        var article = Article.Create("prykhovani-petli", Day, true, Texts("  Петлі  "), Now, " manager@classkedr.com.ua ").Value;
 
         Assert.Equal(["ru", "uk"], article.Translations.Select(t => t.Language));
         Assert.Equal("Петлі", article.Text("uk").Title);
@@ -36,27 +36,27 @@ public sealed class ArticleTests
     [InlineData("-start")]
     [InlineData("пробіл")]
     public void Create_RejectsInvalidSlug(string slug)
-        => Assert.Throws<DomainException>(() => Article.Create(slug, Day, true, Texts(), Now, Editor));
+        => DomainAssert.Fails(Article.Create(slug, Day, true, Texts(), Now, Editor));
 
     [Fact]
     public void Update_RequiresEachLanguageOnce()
     {
-        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;
         ArticleText[] onlyUk = [new("uk", "Т", "К", "<p>Т</p>"), new("uk", "Т2", "К", "<p>Т</p>")];
 
-        Assert.Throws<DomainException>(() => article.Update("a", Day, true, onlyUk, Now, Editor));
+        DomainAssert.Fails(article.Update("a", Day, true, onlyUk, Now, Editor));
     }
 
     [Fact]
     public void Cover_IsALibraryFileAndRemovable()
     {
-        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;
         Assert.Null(article.CoverMediaFileId);
 
         article.SetCover(42, Now, Editor);
         Assert.Equal(42, article.CoverMediaFileId);
         Assert.Null(article.CoverVersion);
-        Assert.Throws<DomainException>(() => article.SetCover(0, Now, Editor));
+        DomainAssert.Fails(article.SetCover(0, Now, Editor));
 
         article.RemoveCover(Now, "");
         Assert.Null(article.CoverMediaFileId);
@@ -66,7 +66,7 @@ public sealed class ArticleTests
     [Fact]
     public void Cover_SameFileAgainChangesNothing()
     {
-        var article = Article.Create("a", Day, true, Texts(), Now, Editor);
+        var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;
         article.SetCover(42, Now, Editor);
 
         article.SetCover(42, Now.AddDays(1), "other@classkedr.com.ua");

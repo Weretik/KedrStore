@@ -31,10 +31,13 @@ public sealed class UpdateArticleHandler(
 
         var now = clock.GetUtcNow();
         var editor = ContentEditor.Name(currentUser);
-        article.Update(slug, input.PublishedOn, input.IsPublished, ArticleTexts.Sanitized(input.Texts, sanitizer), now, editor);
+        var updated = article.Update(slug, input.PublishedOn, input.IsPublished,
+            ArticleTexts.Sanitized(input.Texts, sanitizer), now, editor);
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<AdminArticleDetails>();
         var coverError = await ArticleCovers.ApplyAsync(article, input, images, covers, now, editor, cancellationToken);
         if (coverError is not null)
-            return Result.Invalid(coverError);
+            return coverError.ToResult<AdminArticleDetails>();
 
         await articles.SaveChangesAsync(cancellationToken);
         return Result.Success(ArticleMapper.ToAdmin(article,

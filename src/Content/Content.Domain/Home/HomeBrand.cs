@@ -17,27 +17,41 @@ public sealed class HomeBrand : IAggregateRoot
 
     private HomeBrand() { }
 
-    public static HomeBrand Create(string name, long logoMediaFileId, int position, DateTimeOffset now)
+    public static DomainResult<HomeBrand> Create(string name, long logoMediaFileId, int position, DateTimeOffset now)
     {
-        var brand = new HomeBrand { Position = HomeGuard.Position(position), CreatedAt = now };
-        brand.Update(name, logoMediaFileId, now);
-        return brand;
+        var checkedPosition = HomeGuard.Position(position);
+        if (checkedPosition.IsFailure)
+            return checkedPosition.Error!;
+
+        var brand = new HomeBrand { Position = checkedPosition.Value, CreatedAt = now };
+        var updated = brand.Update(name, logoMediaFileId, now);
+        return updated.IsSuccess ? brand : updated.Error!;
     }
 
-    public void Update(string name, long logoMediaFileId, DateTimeOffset now)
+    public DomainResult Update(string name, long logoMediaFileId, DateTimeOffset now)
     {
         if (logoMediaFileId <= 0)
-            throw new DomainException(HomeErrors.MediaFileInvalid(logoMediaFileId));
-        Name = HomeGuard.Text(name, nameof(Name), NameMaxLength);
+            return HomeErrors.MediaFileInvalid(logoMediaFileId);
+        var checkedName = HomeGuard.Text(name, nameof(Name), NameMaxLength);
+        if (checkedName.IsFailure)
+            return checkedName;
+
+        Name = checkedName.Value;
         LogoMediaFileId = logoMediaFileId;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
-    public void MoveTo(int position, DateTimeOffset now)
+    public DomainResult MoveTo(int position, DateTimeOffset now)
     {
-        if (HomeGuard.Position(position) == Position)
-            return;
+        var checkedPosition = HomeGuard.Position(position);
+        if (checkedPosition.IsFailure)
+            return checkedPosition;
+        if (checkedPosition.Value == Position)
+            return DomainResult.Success();
+
         Position = position;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 }

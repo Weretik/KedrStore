@@ -24,7 +24,7 @@ internal static class ArticleSlugs
             : db.Articles.AnyAsync(article => article.Slug == slug, cancellationToken);
 
     public static Result<AdminArticleDetails> TakenResult(string slug) => Result.Invalid(new ValidationError(
-        "slug", $"Slug '{slug}' is used by another article.", "Content.Article.SlugTaken", ValidationSeverity.Error));
+        "slug", $"Адреса «{slug}» вже зайнята іншою статтею.", "Content.Article.SlugTaken", ValidationSeverity.Error));
 
     public static string FromTitle(string title)
     {

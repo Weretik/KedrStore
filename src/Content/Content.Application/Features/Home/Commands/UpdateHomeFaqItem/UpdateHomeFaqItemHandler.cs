@@ -16,7 +16,9 @@ public sealed class UpdateHomeFaqItemHandler(
         if (item is null)
             return Result.NotFound();
 
-        item.Update(HomeInputs.ToDomain(command.Texts), clock.GetUtcNow());
+        var updated = item.Update(HomeInputs.ToDomain(command.Texts), clock.GetUtcNow());
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<AdminHomeBlocks>();
         await repository.UpdateAsync(item, cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }

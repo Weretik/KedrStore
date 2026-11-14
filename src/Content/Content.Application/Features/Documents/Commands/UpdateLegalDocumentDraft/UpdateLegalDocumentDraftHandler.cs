@@ -19,11 +19,11 @@ public sealed class UpdateLegalDocumentDraftHandler(
         var version = await versions.GetByIdAsync(command.Id, cancellationToken);
         if (version is null)
             return Result.NotFound();
-        if (!version.IsDraft)
-            return Result.Conflict("Only a draft can be changed; start a new draft to edit a published version.");
 
-        version.UpdateDraft(LegalDocumentEditor.Sanitized(command.Texts, sanitizer), clock.GetUtcNow(),
+        var updated = version.UpdateDraft(LegalDocumentEditor.Sanitized(command.Texts, sanitizer), clock.GetUtcNow(),
             ContentEditor.Name(currentUser));
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<LegalDocumentVersionDetails>();
         await versions.UpdateAsync(version, cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(version));
     }

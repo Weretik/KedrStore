@@ -16,7 +16,7 @@ public sealed class ReorderHomeBrandsHandler(
         var items = await repository.ListAsync(cancellationToken);
         var now = clock.GetUtcNow();
         if (!HomeAdminBlocks.TryReorder(items, command.Ids, item => item.Id, (item, position) => item.MoveTo(position, now)))
-            return Result.Conflict("The list has changed; reload the page and try again.");
+            return Result.Conflict("Список змінився, оновіть сторінку й спробуйте ще раз.");
 
         await repository.UpdateRangeAsync(items, cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));

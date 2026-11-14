@@ -43,7 +43,7 @@ internal static class WholesaleMapper
         WholesalePage.Languages.Select(language => ToDto(language, page.Text(language))).ToList(),
         page.UpdatedAt, page.UpdatedBy);
 
-    public static WholesalePageText ToText(WholesaleTextDto input) => WholesalePageText.Create(new(
+    public static DomainResult<WholesalePageText> ToText(WholesaleTextDto input) => WholesalePageText.Create(new(
         input.HeroTitle, input.HeroLead, input.ContactCardTitle, input.ContactCardNote, input.AssortmentTitle,
         input.AssortmentIntro, input.CompanyTitle, input.CompanyText, input.SelectionTitle, input.SelectionText,
         input.WarehouseTitle, input.WarehouseText, input.StepsTitle,

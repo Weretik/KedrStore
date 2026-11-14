@@ -11,19 +11,26 @@ public sealed record GalleryItemTexts(string? TitleUk, string? TitleRu, string? 
 
     public static GalleryItemTexts Empty { get; } = new(null, null, null, null);
 
-    public static GalleryItemTexts Create(string? titleUk, string? titleRu, string? captionUk, string? captionRu) =>
-        new(Normalize(titleUk, nameof(TitleUk), TitleMaxLength),
-            Normalize(titleRu, nameof(TitleRu), TitleMaxLength),
-            Normalize(captionUk, nameof(CaptionUk), CaptionMaxLength),
-            Normalize(captionRu, nameof(CaptionRu), CaptionMaxLength));
+    public static DomainResult<GalleryItemTexts> Create(string? titleUk, string? titleRu, string? captionUk,
+        string? captionRu)
+    {
+        var tUk = Normalize(titleUk, nameof(TitleUk), TitleMaxLength);
+        var tRu = Normalize(titleRu, nameof(TitleRu), TitleMaxLength);
+        var cUk = Normalize(captionUk, nameof(CaptionUk), CaptionMaxLength);
+        var cRu = Normalize(captionRu, nameof(CaptionRu), CaptionMaxLength);
+        var valid = DomainResult.Combine(tUk, tRu, cUk, cRu);
+        return valid.IsSuccess
+            ? new GalleryItemTexts(tUk.Value, tRu.Value, cUk.Value, cRu.Value)
+            : valid.Error!;
+    }
 
-    private static string? Normalize(string? value, string field, int maxLength)
+    private static DomainResult<string?> Normalize(string? value, string field, int maxLength)
     {
         var trimmed = value?.Trim();
         if (string.IsNullOrEmpty(trimmed))
-            return null;
+            return DomainResult<string?>.Success(null);
         if (trimmed.Length > maxLength)
-            throw new DomainException(GalleryErrors.TooLong(field, maxLength, trimmed.Length));
+            return GalleryErrors.TooLong(field, maxLength, trimmed.Length);
         return trimmed;
     }
 }

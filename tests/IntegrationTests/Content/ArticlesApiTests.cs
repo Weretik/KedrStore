@@ -104,8 +104,8 @@ public sealed class ArticlesApiTests
     {
         var db = new ContentDbContext(new DbContextOptionsBuilder<ContentDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-        var published = Article.Create("petli", new DateOnly(2026, 11, 4), true, Texts("Петлі"), Now, "seed");
-        var draft = Article.Create("chernetka", new DateOnly(2026, 11, 4), false, Texts("Чернетка"), Now, "seed");
+        var published = Article.Create("petli", new DateOnly(2026, 11, 4), true, Texts("Петлі"), Now, "seed").Value;
+        var draft = Article.Create("chernetka", new DateOnly(2026, 11, 4), false, Texts("Чернетка"), Now, "seed").Value;
         db.Articles.Add(published);
         db.SaveChanges();
         db.Articles.Add(draft);

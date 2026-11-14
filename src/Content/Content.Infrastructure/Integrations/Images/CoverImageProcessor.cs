@@ -23,29 +23,29 @@ internal sealed class CoverImageProcessor : ICoverImageProcessor
     public async Task<Result<ProcessedCover>> ProcessAsync(CoverUpload upload, CancellationToken cancellationToken = default)
     {
         if (upload.Length > MaxUploadBytes)
-            return Invalid("The picture is larger than 10 MB.");
+            return Invalid("Зображення більше за 10 МБ.");
 
         var bytes = await ReadLimitedAsync(upload.OpenReadStream, cancellationToken);
         if (bytes is null)
-            return Invalid("The picture is larger than 10 MB.");
+            return Invalid("Зображення більше за 10 МБ.");
 
         using var data = SKData.CreateCopy(bytes);
         using var codec = SKCodec.Create(data);
         if (codec is null || !SupportedFormats.Contains(codec.EncodedFormat))
-            return Invalid("Only JPEG, PNG and WebP pictures are supported.");
+            return Invalid("Підтримуються лише зображення JPEG, PNG та WebP.");
 
         var rotated = IsQuarterTurn(codec.EncodedOrigin);
         var (width, height) = rotated
             ? (codec.Info.Height, codec.Info.Width)
             : (codec.Info.Width, codec.Info.Height);
         if (width < MinWidth)
-            return Invalid($"The picture must be at least {MinWidth} pixels wide.");
+            return Invalid($"Ширина зображення має бути щонайменше {MinWidth} пікселів.");
         if ((long)width * height > MaxPixels)
-            return Invalid("The picture resolution is too high (more than 40 megapixels).");
+            return Invalid("Роздільність зображення завелика (понад 40 мегапікселів).");
 
         using var decoded = SKBitmap.Decode(codec);
         if (decoded is null)
-            return Invalid("Only JPEG, PNG and WebP pictures are supported.");
+            return Invalid("Підтримуються лише зображення JPEG, PNG та WebP.");
 
         var scale = Math.Min(1f, (float)MaxWidth / width);
         var outWidth = Math.Max(1, (int)Math.Round(width * scale));
@@ -67,7 +67,7 @@ internal sealed class CoverImageProcessor : ICoverImageProcessor
         using var encoded = snapshot.Encode(SKEncodedImageFormat.Webp, WebpQuality);
         var webp = encoded.ToArray();
         return webp.Length > ArticleCover.MaxBytes
-            ? Invalid("The picture is too detailed to store; try a smaller one.")
+            ? Invalid("Зображення надто деталізоване, спробуйте менше.")
             : Result.Success(new ProcessedCover(webp, "image/webp"));
     }
 

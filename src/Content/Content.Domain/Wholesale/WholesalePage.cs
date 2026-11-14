@@ -29,11 +29,12 @@ public sealed class WholesalePage : IAggregateRoot
         return page;
     }
 
+    /// <summary>The text in a site language; callers pass a validated <c>uk</c> or <c>ru</c>.</summary>
     public WholesalePageText Text(string language) => language switch
     {
         "uk" => Uk,
         "ru" => Ru,
-        _ => throw new DomainException(WholesaleErrors.UnknownLanguage(language)),
+        _ => throw new ArgumentOutOfRangeException(nameof(language), language, "Only uk and ru are site languages."),
     };
 
     public void Update(WholesalePageText uk, WholesalePageText ru, DateTimeOffset now, string editor)

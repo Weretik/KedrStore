@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.Contacts.Shared;
 using Content.Application.Features.Contacts.Commands.UpdateCompanyContacts;
 using Content.Domain.Contacts;
@@ -15,7 +15,7 @@ public sealed class CompanyContactsTests
     [Fact]
     public void Create_TrimsAndKeepsTheSingletonId()
     {
-        var contacts = CompanyContacts.Create(Values(), Now);
+        var contacts = CompanyContacts.Create(Values(), Now).Value;
 
         Assert.Equal(CompanyContacts.SingletonId, contacts.Id);
         Assert.Equal("sales@classkedr.com.ua", contacts.Email);
@@ -29,10 +29,10 @@ public sealed class CompanyContactsTests
     [InlineData("+48687135049")]
     public void Update_RejectsANonUkrainianOrShortPhone(string phone)
     {
-        var contacts = CompanyContacts.Create(Values(), Now);
+        var contacts = CompanyContacts.Create(Values(), Now).Value;
 
-        var error = Assert.Throws<DomainException>(() => contacts.Update(Values(phone), Now, "manager"));
-        Assert.Contains("SalesPhone", error.Message);
+        var error = DomainAssert.Fails(contacts.Update(Values(phone), Now, "manager"));
+        Assert.Equal("SalesPhone", error.Field);
     }
 
     [Theory]

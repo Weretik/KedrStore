@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Content.Domain.Gallery;
 
 namespace UnitTests.Content;
@@ -35,14 +35,14 @@ public sealed class GalleryItemTests
     public void YoutubeVideoId_RejectsEverythingElse(string? value)
     {
         Assert.False(YoutubeVideoId.TryParse(value, out _));
-        Assert.Throws<DomainException>(() => YoutubeVideoId.Parse(value));
+        DomainAssert.Fails(YoutubeVideoId.Parse(value));
     }
 
     [Fact]
     public void CreateVideo_StoresTheIdOnly_AndTrimsTexts()
     {
         var item = GalleryItem.CreateVideo("https://youtu.be/0FDRbSaQ9Ec",
-            3, GalleryItemTexts.Create(" Петля ", "  ", null, "Подпись"), Now);
+            3, GalleryItemTexts.Create(" Петля ", "  ", null, "Подпись").Value, Now).Value;
 
         Assert.Equal(GalleryItemKind.Video, item.Kind);
         Assert.Equal("0FDRbSaQ9Ec", item.YoutubeId);
@@ -56,14 +56,13 @@ public sealed class GalleryItemTests
     [Fact]
     public void CreatePhoto_NeedsAPositiveFileId_AndTextsHaveLimits()
     {
-        var photo = GalleryItem.CreatePhoto(42, 0, GalleryItemTexts.Empty, Now);
+        var photo = GalleryItem.CreatePhoto(42, 0, GalleryItemTexts.Empty, Now).Value;
 
         Assert.Equal(GalleryItemKind.Photo, photo.Kind);
         Assert.Equal(42, photo.MediaFileId);
         Assert.Null(photo.YoutubeId);
-        Assert.Throws<DomainException>(() => GalleryItem.CreatePhoto(0, 0, GalleryItemTexts.Empty, Now));
-        Assert.Throws<DomainException>(() =>
-            GalleryItemTexts.Create(new string('а', GalleryItemTexts.TitleMaxLength + 1), null, null, null));
-        Assert.Throws<DomainException>(() => photo.MoveTo(-1, Now));
+        DomainAssert.Fails(GalleryItem.CreatePhoto(0, 0, GalleryItemTexts.Empty, Now));
+        DomainAssert.Fails(GalleryItemTexts.Create(new string('а', GalleryItemTexts.TitleMaxLength + 1), null, null, null));
+        DomainAssert.Fails(photo.MoveTo(-1, Now));
     }
 }

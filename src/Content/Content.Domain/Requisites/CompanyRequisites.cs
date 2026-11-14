@@ -40,18 +40,21 @@ public sealed partial class CompanyRequisites : IAggregateRoot
 
     private CompanyRequisites() { }
 
-    public static CompanyRequisites Create(CompanyRequisitesValues values, DateTimeOffset now)
+    public static DomainResult<CompanyRequisites> Create(CompanyRequisitesValues values, DateTimeOffset now)
     {
         var requisites = new CompanyRequisites { Id = SingletonId };
-        requisites.Update(values, now);
-        return requisites;
+        var updated = requisites.Update(values, now);
+        return updated.IsFailure ? updated.Error! : requisites;
     }
 
     /// <summary>Replaces all fields; returns the fields whose value changed (empty when nothing did).</summary>
-    public IReadOnlyList<RequisitesFieldChange> Update(CompanyRequisitesValues values, DateTimeOffset now)
+    public DomainResult<IReadOnlyList<RequisitesFieldChange>> Update(CompanyRequisitesValues values, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(values);
-        var next = Normalize(values);
+        var normalized = Normalize(values);
+        if (normalized.IsFailure)
+            return normalized.Error!;
+        var next = normalized.Value;
         var changes = new List<RequisitesFieldChange>();
 
         LegalName = Apply(nameof(LegalName), LegalName, next.LegalName, changes);
@@ -98,19 +101,24 @@ public sealed partial class CompanyRequisites : IAggregateRoot
     public static bool BankCodeMatchesIban(string? iban, string? bankCode)
         => iban is { Length: 29 } && bankCode is { Length: 6 } && iban.Substring(4, 6) == bankCode;
 
-    private static CompanyRequisitesValues Normalize(CompanyRequisitesValues values)
+    private static DomainResult<CompanyRequisitesValues> Normalize(CompanyRequisitesValues values)
     {
-        var legalName = Text(values.LegalName, nameof(LegalName), LegalNameMaxLength);
-        var code = Checked(values.Code, nameof(Code), IsValidCode);
-        var extract = Checked(values.RegistrationExtractNumber, nameof(RegistrationExtractNumber),
-            IsValidExtractNumber);
+        var checks = new DomainChecks();
+        var legalName = checks.Take(Text(values.LegalName, nameof(LegalName), LegalNameMaxLength));
+        var code = checks.Take(Checked(values.Code, nameof(Code), IsValidCode));
+        var extract = checks.Take(Checked(values.RegistrationExtractNumber, nameof(RegistrationExtractNumber),
+            IsValidExtractNumber));
         var iban = NormalizeIban(values.Iban);
         if (!IsValidIban(iban))
-            throw new DomainException(CompanyRequisitesErrors.Invalid(nameof(Iban), values.Iban));
-        var bankName = Text(values.BankName, nameof(BankName), BankNameMaxLength);
-        var bankCode = Checked(values.BankCode, nameof(BankCode), IsValidBankCode);
+            checks.Check(iban.Length == 0
+                ? CompanyRequisitesErrors.Required(nameof(Iban))
+                : CompanyRequisitesErrors.Invalid(nameof(Iban)));
+        var bankName = checks.Take(Text(values.BankName, nameof(BankName), BankNameMaxLength));
+        var bankCode = checks.Take(Checked(values.BankCode, nameof(BankCode), IsValidBankCode));
+        if (checks.Error is { } error)
+            return error;
         if (!BankCodeMatchesIban(iban, bankCode))
-            throw new DomainException(CompanyRequisitesErrors.BankCodeMismatch());
+            return CompanyRequisitesErrors.BankCodeMismatch();
         return new CompanyRequisitesValues(legalName, code, extract, iban, bankName, bankCode);
     }
 
@@ -121,22 +129,22 @@ public sealed partial class CompanyRequisites : IAggregateRoot
         return next;
     }
 
-    private static string Text(string? value, string field, int maxLength)
+    private static DomainResult<string> Text(string? value, string field, int maxLength)
     {
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length == 0)
-            throw new DomainException(CompanyRequisitesErrors.Required(field));
+            return CompanyRequisitesErrors.Required(field);
         return trimmed.Length <= maxLength
             ? trimmed
-            : throw new DomainException(CompanyRequisitesErrors.TooLong(field, maxLength, trimmed.Length));
+            : CompanyRequisitesErrors.TooLong(field, maxLength, trimmed.Length);
     }
 
-    private static string Checked(string? value, string field, Func<string, bool> isValid)
+    private static DomainResult<string> Checked(string? value, string field, Func<string, bool> isValid)
     {
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length == 0)
-            throw new DomainException(CompanyRequisitesErrors.Required(field));
-        return isValid(trimmed) ? trimmed : throw new DomainException(CompanyRequisitesErrors.Invalid(field, value));
+            return CompanyRequisitesErrors.Required(field);
+        return isValid(trimmed) ? trimmed : CompanyRequisitesErrors.Invalid(field);
     }
 
     [GeneratedRegex(@"^(\d{8}|\d{10})$", RegexOptions.CultureInvariant)]

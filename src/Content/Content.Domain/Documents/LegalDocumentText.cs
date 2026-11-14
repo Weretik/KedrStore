@@ -12,30 +12,28 @@ public sealed class LegalDocumentText
 
     private LegalDocumentText() { }
 
-    internal static LegalDocumentText Create(LegalDocumentTextInput input)
+    internal static DomainResult<LegalDocumentText> Create(LegalDocumentTextInput input)
     {
         var language = input.Language?.Trim().ToLowerInvariant() ?? string.Empty;
         if (!LegalDocumentVersion.Languages.Contains(language))
-            throw new DomainException(LegalDocumentErrors.LanguageInvalid(input.Language));
+            return LegalDocumentErrors.LanguageInvalid();
 
-        return new LegalDocumentText
-        {
-            Language = language,
-            Title = Required(input.Title, TitleMaxLength, nameof(Title)),
-            BodyHtml = Required(input.BodyHtml, BodyHtmlMaxLength, nameof(BodyHtml)),
-        };
+        var checks = new DomainChecks();
+        var title = checks.Take(Required(input.Title, TitleMaxLength, nameof(Title)));
+        var bodyHtml = checks.Take(Required(input.BodyHtml, BodyHtmlMaxLength, nameof(BodyHtml)));
+        if (checks.Error is { } error)
+            return error;
+
+        return new LegalDocumentText { Language = language, Title = title, BodyHtml = bodyHtml };
     }
 
-    private static string Required(string? value, int maxLength, string field)
+    private static DomainResult<string> Required(string? value, int maxLength, string field)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new DomainException(LegalDocumentErrors.Required(field));
+            return LegalDocumentErrors.Required(field);
 
         var trimmed = value.Trim();
-        if (trimmed.Length > maxLength)
-            throw new DomainException(LegalDocumentErrors.TooLong(field, maxLength, trimmed.Length));
-
-        return trimmed;
+        return trimmed.Length > maxLength ? LegalDocumentErrors.TooLong(field, maxLength, trimmed.Length) : trimmed;
     }
 }
 

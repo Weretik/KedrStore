@@ -57,6 +57,7 @@ public sealed class DomainResult<T>
 
     public static implicit operator DomainResult<T>(T value) => Success(value);
     public static implicit operator DomainResult<T>(DomainError error) => Failure(error);
+    public static implicit operator DomainResult(DomainResult<T> result) => result.WithoutValue();
 
     /// <summary>The plain outcome without the value.</summary>
     public DomainResult WithoutValue() => Error is null ? DomainResult.Success() : DomainResult.Failure(Error);

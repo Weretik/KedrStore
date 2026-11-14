@@ -24,48 +24,59 @@ public sealed class PageSeo : IAggregateRoot
 
     private PageSeo() { }
 
-    public static PageSeo Create(string page, PageSeoValues values, DateTimeOffset now, string editor)
+    public static DomainResult<PageSeo> Create(string page, PageSeoValues values, DateTimeOffset now, string editor)
     {
         if (!SitePages.IsKnown(page))
-            throw new DomainException(PageSeoErrors.UnknownPage(page));
+            return PageSeoErrors.UnknownPage(page);
 
         var seo = new PageSeo { Page = page };
-        seo.Update(values, now, editor);
-        return seo;
+        var updated = seo.Update(values, now, editor);
+        return updated.IsSuccess ? seo : updated.Error!;
     }
 
-    public void Update(PageSeoValues values, DateTimeOffset now, string editor)
+    public DomainResult Update(PageSeoValues values, DateTimeOffset now, string editor)
     {
         ArgumentNullException.ThrowIfNull(values);
-        TitleUk = Clean(values.TitleUk, nameof(TitleUk), TitleMaxLength);
-        TitleRu = Clean(values.TitleRu, nameof(TitleRu), TitleMaxLength);
-        DescriptionUk = Clean(values.DescriptionUk, nameof(DescriptionUk), DescriptionMaxLength);
-        DescriptionRu = Clean(values.DescriptionRu, nameof(DescriptionRu), DescriptionMaxLength);
+        var checks = new DomainChecks();
+        var titleUk = checks.Take(Clean(values.TitleUk, nameof(TitleUk), TitleMaxLength));
+        var titleRu = checks.Take(Clean(values.TitleRu, nameof(TitleRu), TitleMaxLength));
+        var descriptionUk = checks.Take(Clean(values.DescriptionUk, nameof(DescriptionUk), DescriptionMaxLength));
+        var descriptionRu = checks.Take(Clean(values.DescriptionRu, nameof(DescriptionRu), DescriptionMaxLength));
+        if (checks.Error is { } error)
+            return error;
+
+        TitleUk = titleUk;
+        TitleRu = titleRu;
+        DescriptionUk = descriptionUk;
+        DescriptionRu = descriptionRu;
         UpdatedAt = now;
         UpdatedBy = EditorName.Normalize(editor);
+        return DomainResult.Success();
     }
 
+    /// <summary>The title in a site language; callers pass a validated <c>uk</c> or <c>ru</c>.</summary>
     public string? Title(string language) => language switch
     {
         "uk" => TitleUk,
         "ru" => TitleRu,
-        _ => throw new DomainException(PageSeoErrors.UnknownLanguage(language)),
+        _ => throw new ArgumentOutOfRangeException(nameof(language), language, "Only uk and ru are site languages."),
     };
 
+    /// <summary>The description in a site language; callers pass a validated <c>uk</c> or <c>ru</c>.</summary>
     public string? Description(string language) => language switch
     {
         "uk" => DescriptionUk,
         "ru" => DescriptionRu,
-        _ => throw new DomainException(PageSeoErrors.UnknownLanguage(language)),
+        _ => throw new ArgumentOutOfRangeException(nameof(language), language, "Only uk and ru are site languages."),
     };
 
-    private static string? Clean(string? value, string field, int maxLength)
+    private static DomainResult<string?> Clean(string? value, string field, int maxLength)
     {
         var text = value?.Trim();
         if (string.IsNullOrEmpty(text))
-            return null;
+            return DomainResult<string?>.Success(null);
         if (text.Length > maxLength)
-            throw new DomainException(PageSeoErrors.TooLong(field, maxLength, text.Length));
+            return PageSeoErrors.TooLong(field, maxLength, text.Length);
         return text;
     }
 }

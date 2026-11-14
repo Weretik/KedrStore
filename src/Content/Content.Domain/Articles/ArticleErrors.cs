@@ -2,22 +2,23 @@ namespace Content.Domain.Articles;
 
 public static class ArticleErrors
 {
-    public static DomainError SlugInvalid(string? slug) =>
+    public static DomainError SlugInvalid() =>
         new("Content.Article.Slug.Invalid",
-            $"Slug must use a-z, 0-9 and single hyphens, 1-{Article.SlugMaxLength} characters. Actual: {slug}");
+            $"Лише a-z, 0-9 та одинарні дефіси, до {Article.SlugMaxLength} символів.", Field: "Slug");
 
     public static DomainError LanguageMissing(string language) =>
-        new("Content.Article.Translation.Missing", $"The '{language}' text of the article is required");
+        new("Content.Article.Translation.Missing",
+            language == "ru" ? "Додайте текст російською." : "Додайте текст українською.", Field: "Texts");
 
-    public static DomainError LanguageInvalid(string? language) =>
-        new("Content.Article.Translation.Language", $"Article language must be 'uk' or 'ru'. Actual: {language}");
+    public static DomainError LanguageInvalid() =>
+        new("Content.Article.Translation.Language", "Мова статті: лише українська або російська.", Field: "Texts");
 
-    public static DomainError CoverInvalid(long mediaFileId) =>
-        new("Content.Article.Cover.Invalid", $"Cover must be a media library file ID. Actual: {mediaFileId}");
+    public static DomainError CoverInvalid() =>
+        new("Content.Article.Cover.Invalid", "Оберіть зображення з медіатеки.", Field: "CoverMediaFileId");
 
     public static DomainError Required(string field) =>
-        new($"Content.Article.{field}.Required", $"{field} is required");
+        new($"Content.Article.{field}.Required", "Заповніть це поле.", Field: field);
 
     public static DomainError TooLong(string field, int maxLength, int length) =>
-        new($"Content.Article.{field}.TooLong", $"{field} must be at most {maxLength} characters. Actual: {length}");
+        new($"Content.Article.{field}.TooLong", $"Не більше {maxLength} символів (зараз {length}).", Field: field);
 }

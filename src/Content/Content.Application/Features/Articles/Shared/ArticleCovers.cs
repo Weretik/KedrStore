@@ -32,7 +32,7 @@ internal static class ArticleCovers
     /// Sets or removes the cover by the input; a legacy cover row is deleted once it is no longer used.
     /// 400 when the chosen picture is not in the media library.
     /// </summary>
-    public static async Task<ValidationError?> ApplyAsync(Article article, ArticleInput input, IMediaImageReader images,
+    public static async Task<DomainError?> ApplyAsync(Article article, ArticleInput input, IMediaImageReader images,
         IContentRepository<ArticleCover> covers, DateTimeOffset now, string editor, CancellationToken cancellationToken)
     {
         if (input.CoverMediaFileId is { } mediaFileId)
@@ -41,10 +41,12 @@ internal static class ArticleCovers
             {
                 var found = await images.GetImagesAsync([mediaFileId], cancellationToken);
                 if (!found.ContainsKey(mediaFileId))
-                    return new ValidationError("coverMediaFileId", $"The file {mediaFileId} is not in the media library.",
-                        "Content.Article.Cover.NotFound", ValidationSeverity.Error);
+                    return new DomainError("Content.Article.Cover.NotFound", "Цього зображення вже немає в медіатеці.",
+                        Field: "coverMediaFileId");
             }
-            article.SetCover(mediaFileId, now, editor);
+            var cover = article.SetCover(mediaFileId, now, editor);
+            if (cover.IsFailure)
+                return cover.Error;
         }
         else if (input.RemoveCover)
         {

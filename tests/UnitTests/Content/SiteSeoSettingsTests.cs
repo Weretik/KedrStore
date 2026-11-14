@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.SeoSettings.Shared;
 using Content.Application.Features.SeoSettings.Commands.UpdateSiteSeoSettings;
 using Content.Domain.Seo;
@@ -51,9 +51,9 @@ public sealed class SiteSeoSettingsTests
     {
         var settings = SiteSeoSettings.CreateEmpty(Now);
 
-        var error = Assert.Throws<DomainException>(() =>
+        var error = DomainAssert.Fails(
             settings.Update(new SiteSeoSettingsValues(id, null, null, null, null), Now, "seo"));
-        Assert.Contains("GoogleAnalyticsId", error.Message);
+        Assert.Equal("GoogleAnalyticsId", error.Field);
     }
 
     [Fact]

@@ -43,7 +43,7 @@ public static class HomeAdminBlocks
         var files = await images.GetImagesAsync([mediaFileId], cancellationToken);
         return files.ContainsKey(mediaFileId)
             ? null
-            : new ValidationError("logoMediaFileId", $"The file {mediaFileId} is not in the media library.",
+            : new ValidationError("logoMediaFileId", "Цього зображення немає в медіатеці.",
                 "Content.Home.Logo.NotFound", ValidationSeverity.Error);
     }
 
