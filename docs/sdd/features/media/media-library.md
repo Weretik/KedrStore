@@ -1,12 +1,12 @@
 # Media library
 
-**Static code check:** 2026-11-04. **Module:** Media.
+**Static code check:** 2026-11-14. **Module:** Media.
 
 The library of pictures on the CDN (`images-kedr.cdn.express`): virtual folders, upload, replace, rename, move, and delete, plus a job that registers the files that already sit on the CDN. Folders live only in the database, so moving anything never changes a CDN URL. Catalog will link product photos and schemes to library files by ID (stage 3 of the [specification](../../specs/media/001-media-library/README.md)).
 
 ## Structure and relationships
 
-[AdminMediaFoldersController](../../../../src/Media/Media.Api/Features/Folders/AdminMediaFoldersController.cs) and [AdminMediaFilesController](../../../../src/Media/Media.Api/Features/Files/AdminMediaFilesController.cs) dispatch to one handler per use case. [MediaFolder](../../../../src/Media/Media.Domain/Folders/MediaFolder.cs) is a named node with an optional parent; [MediaFile](../../../../src/Media/Media.Domain/Files/MediaFile.cs) holds the CDN key, display name, type, size, and optional dimensions. Folder checks that need other folders (name clash among siblings, parent exists, no cycle) live in [MediaFolderRules](../../../../src/Media/Media.Application/Features/Folders/Shared/MediaFolderRules.cs).
+The Minimal API groups in [FoldersEndpoints](../../../../src/Media/Media.Api/Endpoints/Folders/FoldersEndpoints.cs) and [FilesEndpoints](../../../../src/Media/Media.Api/Endpoints/Files/FilesEndpoints.cs) (`CanManageMedia`, delete also `RequireAdminRole`) have one `<UseCase>Endpoint` per use case that dispatches to its handler; the upload and replace endpoints keep the multipart body limit and rely on the host's cookie CSRF check ([MediaUploads](../../../../src/Media/Media.Api/Endpoints/Files/MediaUploads.cs)). [MediaFolder](../../../../src/Media/Media.Domain/Folders/MediaFolder.cs) is a named node with an optional parent; [MediaFile](../../../../src/Media/Media.Domain/Files/MediaFile.cs) holds the CDN key, display name, type, size, and optional dimensions. Folder checks that need other folders (name clash among siblings, parent exists, no cycle) live in [MediaFolderRules](../../../../src/Media/Media.Application/Features/Folders/Shared/MediaFolderRules.cs).
 
 Uploads go through [MediaUploadStore](../../../../src/Media/Media.Application/Features/Files/Shared/MediaUploadStore.cs): the [image inspector](../../../../src/Media/Media.Infrastructure/Integrations/Images/SkiaImageInspector.cs) reads the real type and size from the picture header, the file is stored unchanged at `library/<yyyy>/<MM>/<guid>.<ext>` through [FtpMediaStorage](../../../../src/Media/Media.Infrastructure/Integrations/Storage/FtpMediaStorage.cs), then the row is saved. Replace keeps the file ID, points it at a new key, and deletes the old CDN file. Without CDN credentials `UnconfiguredMediaStorage` is registered and writes answer `503`.
 
@@ -19,8 +19,8 @@ Access: everything needs `CanManageMedia` (Manager, Seo, Admin); file and folder
 ```text
 src/Media/
 ├── Media.Api/
-│   ├── Features/Folders/AdminMediaFoldersController.cs  # /api/admin/media/folders, MediaFolderRequests
-│   ├── Features/Files/AdminMediaFilesController.cs      # /api/admin/media/files, MediaFileRequests
+│   ├── Endpoints/Folders/                         # /api/admin/media/folders: FoldersEndpoints, <UseCase>Endpoint, SaveMediaFolderRequest
+│   ├── Endpoints/Files/                           # /api/admin/media/files: FilesEndpoints, <UseCase>Endpoint, requests, MediaUploads
 │   └── DependencyInjection/MediaModule.cs
 ├── Media.Application/
 │   ├── Abstractions/                               # persistence, storage (CDN, URLs), image inspector ports

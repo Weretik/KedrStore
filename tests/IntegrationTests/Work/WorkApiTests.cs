@@ -89,7 +89,7 @@ public sealed class WorkApiTests
         Assert.Equal(1, report.GetProperty("openTasks").GetArrayLength());
         var activity = report.GetProperty("activity").EnumerateArray().ToList();
         Assert.Equal(2, activity.Count);
-        var update = activity.Single(entry => entry.GetProperty("operation").GetString() == "Update");
+        var update = activity.Single(entry => entry.GetProperty("operation").GetString() == "updateAdminMediaFolder");
         Assert.Equal("MediaFolders", update.GetProperty("area").GetString());
         Assert.Equal($"id={folderId}", update.GetProperty("target").GetString());
         Assert.Equal(2, update.GetProperty("count").GetInt32());

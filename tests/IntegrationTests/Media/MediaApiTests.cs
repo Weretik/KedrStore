@@ -88,6 +88,40 @@ public sealed class MediaApiTests
     }
 
     [Fact]
+    public async Task Upload_WithoutFile_AnswersValidationProblem()
+    {
+        using var factory = CreateFactory(new FakeMediaStorage());
+        using var manager = factory.CreateClientWithRole("Manager");
+        using var form = new MultipartFormDataContent { { new StringContent("1"), "folderId" } };
+
+        using var response = await manager.PostAsync("/api/admin/media/files", form);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("validation", problem.RootElement.GetProperty("code").GetString());
+    }
+
+    /// <summary>Platform spec 005, SC-008: the host's cookie CSRF check still guards the moved form endpoints.</summary>
+    [Fact]
+    public async Task Upload_WithSessionCookieButWithoutCsrfHeader_IsRefused()
+    {
+        var cdn = new FakeMediaStorage();
+        using var factory = CreateFactory(cdn);
+        using var manager = factory.CreateClientWithRole("Manager");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/media/files")
+        {
+            Content = Form(TestImages.Create(10, 10), "a.jpg", null),
+        };
+        request.Headers.Add("Cookie", "__Host-kedr.session=stolen");
+
+        using var response = await manager.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("Сесія застаріла, оновіть сторінку.", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
     public async Task Folders_RejectCyclesAndClashes_AndAdminDeletesOnlyEmptyOnes()
     {
         var cdn = new FakeMediaStorage();
