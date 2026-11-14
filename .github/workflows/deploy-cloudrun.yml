@@ -246,6 +246,21 @@ jobs:
               --quiet
           fi
 
+          # EN-01 of «Фонові задачі»: the API's runtime account may start only this job, with overrides. The binding is
+          # idempotent; this deploy account (Cloud Run Admin) grants it, so nobody needs the project owner for it.
+          API_RUNTIME_SA=$(gcloud run services describe "${{ env.CLOUD_RUN_SERVICE }}" --region "${{ env.GCP_REGION }}" \
+            --format='value(spec.template.spec.serviceAccountName)')
+          if [ -z "$API_RUNTIME_SA" ]; then
+            PROJECT_NUMBER=$(gcloud run services describe "${{ env.CLOUD_RUN_SERVICE }}" --region "${{ env.GCP_REGION }}" \
+              --format='value(metadata.namespace)')
+            API_RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          fi
+          gcloud run jobs add-iam-policy-binding "${{ env.TASKS_JOB }}" \
+            --region "${{ env.GCP_REGION }}" \
+            --member "serviceAccount:${API_RUNTIME_SA}" \
+            --role roles/run.jobsExecutorWithOverrides \
+            --quiet >/dev/null
+
           # Registers CDN files in the media library; run it once with --dry-run, then without (see the media runbook).
           MEDIA_SYNC_JOB="media-cdn-sync"
           MEDIA_SYNC_SECRETS="ConnectionStrings__Default=db-connection:latest,MediaStorage__Ftp__Password=cdn-media-ftp-password:latest"

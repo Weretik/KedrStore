@@ -8,13 +8,13 @@ Spec [platform/007](../../specs/platform/007-background-tasks/README.md); featur
 2. The API sends the outbox, fails stuck runs, claims due tasks and starts one execution of the Cloud Run Job `kedr-tasks` with `--job=tasks --tasks=key:runId,...`.
 3. The job runs the tasks one after another and writes each result; the admin page «Адміністрування → Фонові задачі» shows them.
 
-The deploy workflow creates or updates `kedr-tasks` (4 h limit, no retries, secrets for 1C, Telegram and the media FTP) and sets `Scheduler__Job__Project`, `Scheduler__Job__Region`, `Scheduler__Job__Name` on the API.
+The deploy workflow creates or updates `kedr-tasks` (4 h limit, no retries, secrets for 1C, Telegram and the media FTP), lets the API's runtime account start it, and sets `Scheduler__Job__Project`, `Scheduler__Job__Region`, `Scheduler__Job__Name` on the API.
 
 ## Switch-over (once, owner through the coordinator)
 
 Until these steps are done the tick answers `404` and nothing changes: the old Cloud Run jobs keep their own Cloud Scheduler entries.
 
-1. **EN-01.** Give the API's runtime service account the role `roles/run.jobsExecutorWithOverrides` on the job `kedr-tasks` only.
+1. **EN-01.** The deploy workflow gives the API's runtime service account the role `roles/run.jobsExecutorWithOverrides` on the job `kedr-tasks` only, so this step needs no one by hand. The deploy account has Cloud Run Admin; the owner's day-to-day account cannot grant it.
 2. **EN-02.** Create a service account for the scheduler (for example `kedr-scheduler`) and set on the API `Scheduler__Audience=https://<api run.app URL>/internal/scheduler/tick` and `Scheduler__SchedulerServiceAccount=<that account's e-mail>` (`gcloud run services update api --update-env-vars …`).
 3. **EN-03.** Create one Cloud Scheduler job `kedr-tick`: every minute (`* * * * *`, time zone Europe/Kyiv), `POST` to that URL, OIDC token of that account with that audience. Check on the page that «Досилання повідомлень» shows a recent success.
 4. The same day: on the page enable «Залишки з 1С», «Ціни з 1С», «Каталог з 1С», «Клієнти з 1С», «Замовлення в 1С», «Фото з CDN» (adjust the times if needed) and **pause** the old Cloud Scheduler entries of `onec-*` and `media-cdn-sync`.
