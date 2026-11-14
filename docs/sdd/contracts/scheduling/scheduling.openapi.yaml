@@ -25,7 +25,7 @@ paths:
         '401':
           description: Not signed in
         '403':
-          description: No view right on background-tasks
+          description: Not an administrator
   /api/admin/scheduling/tasks/{key}/runs:
     get:
       tags:
@@ -46,7 +46,7 @@ paths:
         '401':
           description: Not signed in
         '403':
-          description: No view right on background-tasks
+          description: Not an administrator
         '404':
           description: Unknown task
   /api/admin/scheduling/tasks/{key}/schedule:
@@ -76,7 +76,7 @@ paths:
         '401':
           description: Not signed in
         '403':
-          description: No edit right on background-tasks
+          description: Not an administrator
         '404':
           description: Unknown task
         '409':
@@ -99,7 +99,7 @@ paths:
         '401':
           description: Not signed in
         '403':
-          description: No create right on background-tasks
+          description: Not an administrator
         '404':
           description: Unknown task
         '409':
