@@ -6,16 +6,16 @@ Background import of categories, product details, prices, price types, and stock
 
 ## Structure and relationships
 
-[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Catalog/Catalog.Application/Abstractions/Integrations/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Catalog/Catalog.Infrastructure/Integrations/OneC/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Catalog/Catalog.Infrastructure/Persistence/CatalogEfRepository.cs) persists data.
+[Host.Jobs](../../../../src/Bootstrapper/Host.Jobs/Host.Jobs/Program.cs) runs the [full job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCFullJob.cs) and individual jobs. The [client contract](../../../../src/Modules/Catalog/Catalog.Application/Abstractions/Integrations/IOneCClient.cs) isolates 1C; [OneCClient](../../../../src/Modules/Catalog/Catalog.Infrastructure/Integrations/OneC/OneCClient.cs) implements access; [CatalogEfRepository](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/CatalogEfRepository.cs) persists data.
 
-The [category job](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCCategoryJob.cs) and [product details job](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCProductDetailsJob.cs) load every row of the root once (deleted ones included), compare in memory, and save once:
+The [category job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCCategoryJob.cs) and [product details job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCProductDetailsJob.cs) load every row of the root once (deleted ones included), compare in memory, and save once:
 
 - a row changes only when a 1C field changed;
-- a row missing from a non-empty 1C response is soft-deleted, unless that would delete more than 30% of the root's active rows ([MassDeletionGuard](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Sync/MassDeletionGuard.cs));
+- a row missing from a non-empty 1C response is soft-deleted, unless that would delete more than 30% of the root's active rows ([MassDeletionGuard](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/MassDeletionGuard.cs));
 - a returning row is restored with its old slug;
-- a slug is created once, for new rows only, through [SlugService](../../../../src/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs), and is never rewritten by the import.
+- a slug is created once, for new rows only, through [SlugService](../../../../src/Modules/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs), and is never rewritten by the import.
 
-Products find their category by name through [CategoryNameMap](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Sync/CategoryNameMap.cs): a missing or ambiguous name keeps the current category (or skips a new product) and is reported in one warning. Each phase logs its duration and counters through [ImportCounters](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Sync/ImportCounters.cs). The projection rebuild leaves out products of deleted categories.
+Products find their category by name through [CategoryNameMap](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/CategoryNameMap.cs): a missing or ambiguous name keeps the current category (or skips a new product) and is reported in one warning. Each phase logs its duration and counters through [ImportCounters](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/ImportCounters.cs). The projection rebuild leaves out products of deleted categories.
 
 ## Code structure
 

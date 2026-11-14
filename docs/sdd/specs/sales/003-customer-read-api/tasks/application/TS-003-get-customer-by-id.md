@@ -3,7 +3,7 @@
 - **ID завдання:** TS-003
 - **Охоплює:** SC-002, SC-003
 - **Залежить від:** TS-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Features/Customers/GetById/`, `tests/UnitTests/Sales/Application/GetCustomerByIdQueryHandlerTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Customers/GetById/`, `tests/UnitTests/Sales/Application/GetCustomerByIdQueryHandlerTests.cs`
 - **Рівень тестування:** Application
 
 ## Свідчення

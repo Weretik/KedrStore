@@ -97,7 +97,7 @@ Products get structured attributes (color, size, side, type, material, and so on
 ## Code (phase 1)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Domain/
 │   ├── Entities/Attributes/  # CatalogAttribute, AttributeValue, AttributeAlias, CategoryAttribute,
 │   │                         # ProductAttributeValue, ProductAttributeReview (+ reason)
@@ -114,7 +114,7 @@ src/Catalog/
 ## Code (phase 2)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Domain/Entities/Groups/   # ProductGroup, ProductGroupMember; CatalogEntityType.ProductGroup = 3
 ├── Catalog.Application/
 │   ├── Groups/                       # ProductGroupBuilder (R-07–R-11), ProductGroupKey, report
@@ -130,7 +130,7 @@ Contract: [product-groups.openapi.yaml](../../../contracts/catalog/product-group
 ## Code (phase 3, backend)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Domain/Entities/Attributes/  # manual edits: kept automatic value, Decide, EditManually, swatch
 ├── Catalog.Contracts/Attributes/        # panel, dictionary, codes, filters DTOs
 ├── Catalog.Application/Features/
@@ -148,7 +148,7 @@ Contract: [attributes.openapi.yaml](../../../contracts/catalog/attributes.openap
 ## Code (phase 4)
 
 ```text
-src/Catalog/Catalog.Application/
+src/Modules/Catalog/Catalog.Application/
 ├── Attributes/Recognition/   # port of extract_attributes.py v2.0: dictionary (+ owner decisions), category paths,
 │                             # name observations, product kinds, measurements, base name, CSV-shaped row
 ├── Attributes/Import/RecognizedProductWriter.cs  # shared by the import and the recognizer (values, reviews, filters)

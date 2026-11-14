@@ -22,27 +22,27 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Application\Catalog.Application.csproj" />
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Domain\Catalog.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Application\Content.Application.csproj" />
-      <ProjectReference Include="..\..\src\Media\Media.Application\Media.Application.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Application\Work.Application.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Application\Identity.Application.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Domain\Identity.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Application\Sales.Application.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Domain\Sales.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Api\Catalog.Api.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Api\Content.Api.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Api\Identity.Api.csproj" />
-      <ProjectReference Include="..\..\src\Media\Media.Api\Media.Api.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Api\Sales.Api.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Domain\Catalog.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Application\Content.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Application\Media.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Application\Work.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Application\Identity.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Domain\Identity.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Application\Sales.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Domain\Sales.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Api\Catalog.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Api\Content.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Api\Identity.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Api\Media.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Api\Sales.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Api\Work.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

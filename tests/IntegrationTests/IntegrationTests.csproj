@@ -26,13 +26,13 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\Bootstrapper\Host.Api\Host.Api.csproj" />
       <ProjectReference Include="..\..\src\Bootstrapper\Host.Jobs\Host.Jobs\Host.Jobs.csproj" Aliases="JobsHost" />
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Application\Sales.Application.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Application\Sales.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Infrastructure\Sales.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Infrastructure\Content.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Infrastructure\Work.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
 # Identity — access and sessions: data
 
-**Source:** [Identity snapshot](../../../../src/Identity/Identity.Infrastructure/Migrations/AppIdentityDbContextModelSnapshot.cs) and [configurations](../../../../src/Identity/Identity.Infrastructure/Persistence/), checked 2026-10-21. [Back to database map](README.md) · [session feature](../../features/identity/session.md).
+**Source:** [Identity snapshot](../../../../src/Modules/Identity/Identity.Infrastructure/Migrations/AppIdentityDbContextModelSnapshot.cs) and [configurations](../../../../src/Modules/Identity/Identity.Infrastructure/Persistence/), checked 2026-10-21. [Back to database map](README.md) · [session feature](../../features/identity/session.md).
 
 | Table | PK | Purpose |
 | --- | --- | --- |

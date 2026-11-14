@@ -82,36 +82,36 @@ flowchart LR
 
 | Path | Role | State |
 | --- | --- | --- |
-| `src/Catalog/Catalog.Domain/Entities/ProductCategory.cs` | soft delete, slug change, change-detecting import update | C |
-| `src/Catalog/Catalog.Domain/Entities/Product.cs` | `DeletedAt`, restore, slug change, change-detecting import update | C |
-| `src/Catalog/Catalog.Domain/Entities/CategoryContent.cs`, `CategoryFaqItem.cs` | content aggregate and limits | N |
-| `src/Catalog/Catalog.Domain/Entities/SlugHistoryEntry.cs`, `ValueObjects/CatalogEntityType.cs` | slug history | N |
-| `src/Catalog/Catalog.Application/Slugs/UkrainianTransliterator.cs` | KMU 2010 transliteration | N |
-| `src/Catalog/Catalog.Application/Slugs/SlugText.cs`, `SlugAllocator.cs` | normalize, cut, suffix; unique allocation in a run | N |
-| `src/Catalog/Catalog.Application/Slugs/SlugService.cs` (+ `ISlugService`) | allocator load, resolve, taken check, history write | N |
-| `src/Catalog/Catalog.Application/Jobs/Slugs/MigrateLegacySlugsJob.cs` | one-off `migrate-slugs` | N |
-| `src/Catalog/Catalog.Application/Integrations/OneC/Sync/MassDeletionGuard.cs`, `ImportCounters.cs` | 30% guard; per-phase counters and timing (the diff itself stays in each job, one loop per entity type) | N |
-| `src/Catalog/Catalog.Application/Integrations/OneC/Sync/CategoryNameMap.cs` | safe name → category mapping | N |
-| `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs` | uses diff/slug service; manual-group hierarchy moves to `Sync/ManualCategoryHierarchy.cs` (split: the job currently holds both the import flow and the grouping algorithm) | C + N |
-| `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs` | uses diff/name map; translation upsert moves to `Sync/ProductTranslationImporter.cs` (split: same reason) | C + N |
-| `src/Catalog/Catalog.Application/Integrations/OneC/Mappers/CatalogMapper.cs` | drops slug generation and name lookup | C |
-| `src/Catalog/Catalog.Application/Features/Category/Content/{Get,Save}/` | Admin content query and command (+ validator) | N |
-| `src/Catalog/Catalog.Application/Features/Slugs/Change/` | one Admin slug command for both entity types (+ validator); updates projection rows after save | N |
-| `src/Catalog/Catalog.Application/Features/Category/Stats/` (after the [code audit](code-audit/audit.md)) | counts and price range from the projection, rolled up by path | N |
-| `src/Catalog/Catalog.Application/Features/Products/GetAdminList/DeletedAdminProducts.cs` | Admin-only deleted list | N |
-| `src/Catalog/Catalog.Contracts/Category/CatalogRedirect.cs`, `Catalog.Contracts/Slugs/SlugDtos.cs` | redirect body and lookup result; slug DTOs | N |
-| `src/Catalog/Catalog.Application/Features/Category/GetList/GetCategoriesQuryHandler.cs` | counts and hiding | C |
-| `src/Catalog/Catalog.Application/Features/Category/GetBySlug/GetCategoryBySlugQueryHandler.cs` | history, redirect, counts, prices, content | C |
-| `src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs` | `availability`, new sort, `404`; category-tree resolution moves to `Features/Category/CategoryTreeIds.cs` (shared with the tree counts) | C + N |
-| `src/Catalog/Catalog.Application/Features/Products/GetBySlug/GetProductBySlugQueryHandler.cs` | history, redirect, `updatedAt` | C |
-| `src/Catalog/Catalog.Application/Contracts/Content/IHtmlSanitizerService.cs` | port for HTML allow-list | N |
-| `src/Catalog/Catalog.Infrastructure/Content/HtmlSanitizerService.cs` | `HtmlSanitizer` (Ganss.Xss) adapter | N |
-| `src/Catalog/Catalog.Infrastructure/Configurations/{CategoryContent,CategoryFaqItem,SlugHistoryEntry}Configuration.cs` | EF mapping | N |
-| `src/Catalog/Catalog.Infrastructure/Configurations/{Product,ProductCategory}Configuration.cs` | new columns, filters, unique indexes | C |
-| `src/Catalog/Catalog.Infrastructure/Migrations/20261030181626_StableSlugsSoftDeleteCategoryContent.cs` | schema, including unique slug indexes | N |
-| `src/Catalog/Catalog.Infrastructure/Projections/ProductListProjectionRebuilder.cs` | skip products of deleted categories | C |
-| `src/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs`, `AdminProductsController.cs` | slug, content, deleted filter endpoints | C |
-| `src/Catalog/Catalog.Contracts/Category/*`, `Products/*` | DTO additions | C |
+| `src/Modules/Catalog/Catalog.Domain/Entities/ProductCategory.cs` | soft delete, slug change, change-detecting import update | C |
+| `src/Modules/Catalog/Catalog.Domain/Entities/Product.cs` | `DeletedAt`, restore, slug change, change-detecting import update | C |
+| `src/Modules/Catalog/Catalog.Domain/Entities/CategoryContent.cs`, `CategoryFaqItem.cs` | content aggregate and limits | N |
+| `src/Modules/Catalog/Catalog.Domain/Entities/SlugHistoryEntry.cs`, `ValueObjects/CatalogEntityType.cs` | slug history | N |
+| `src/Modules/Catalog/Catalog.Application/Slugs/UkrainianTransliterator.cs` | KMU 2010 transliteration | N |
+| `src/Modules/Catalog/Catalog.Application/Slugs/SlugText.cs`, `SlugAllocator.cs` | normalize, cut, suffix; unique allocation in a run | N |
+| `src/Modules/Catalog/Catalog.Application/Slugs/SlugService.cs` (+ `ISlugService`) | allocator load, resolve, taken check, history write | N |
+| `src/Modules/Catalog/Catalog.Application/Jobs/Slugs/MigrateLegacySlugsJob.cs` | one-off `migrate-slugs` | N |
+| `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Sync/MassDeletionGuard.cs`, `ImportCounters.cs` | 30% guard; per-phase counters and timing (the diff itself stays in each job, one loop per entity type) | N |
+| `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Sync/CategoryNameMap.cs` | safe name → category mapping | N |
+| `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs` | uses diff/slug service; manual-group hierarchy moves to `Sync/ManualCategoryHierarchy.cs` (split: the job currently holds both the import flow and the grouping algorithm) | C + N |
+| `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs` | uses diff/name map; translation upsert moves to `Sync/ProductTranslationImporter.cs` (split: same reason) | C + N |
+| `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Mappers/CatalogMapper.cs` | drops slug generation and name lookup | C |
+| `src/Modules/Catalog/Catalog.Application/Features/Category/Content/{Get,Save}/` | Admin content query and command (+ validator) | N |
+| `src/Modules/Catalog/Catalog.Application/Features/Slugs/Change/` | one Admin slug command for both entity types (+ validator); updates projection rows after save | N |
+| `src/Modules/Catalog/Catalog.Application/Features/Category/Stats/` (after the [code audit](code-audit/audit.md)) | counts and price range from the projection, rolled up by path | N |
+| `src/Modules/Catalog/Catalog.Application/Features/Products/GetAdminList/DeletedAdminProducts.cs` | Admin-only deleted list | N |
+| `src/Modules/Catalog/Catalog.Contracts/Category/CatalogRedirect.cs`, `Catalog.Contracts/Slugs/SlugDtos.cs` | redirect body and lookup result; slug DTOs | N |
+| `src/Modules/Catalog/Catalog.Application/Features/Category/GetList/GetCategoriesQuryHandler.cs` | counts and hiding | C |
+| `src/Modules/Catalog/Catalog.Application/Features/Category/GetBySlug/GetCategoryBySlugQueryHandler.cs` | history, redirect, counts, prices, content | C |
+| `src/Modules/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs` | `availability`, new sort, `404`; category-tree resolution moves to `Features/Category/CategoryTreeIds.cs` (shared with the tree counts) | C + N |
+| `src/Modules/Catalog/Catalog.Application/Features/Products/GetBySlug/GetProductBySlugQueryHandler.cs` | history, redirect, `updatedAt` | C |
+| `src/Modules/Catalog/Catalog.Application/Contracts/Content/IHtmlSanitizerService.cs` | port for HTML allow-list | N |
+| `src/Modules/Catalog/Catalog.Infrastructure/Content/HtmlSanitizerService.cs` | `HtmlSanitizer` (Ganss.Xss) adapter | N |
+| `src/Modules/Catalog/Catalog.Infrastructure/Configurations/{CategoryContent,CategoryFaqItem,SlugHistoryEntry}Configuration.cs` | EF mapping | N |
+| `src/Modules/Catalog/Catalog.Infrastructure/Configurations/{Product,ProductCategory}Configuration.cs` | new columns, filters, unique indexes | C |
+| `src/Modules/Catalog/Catalog.Infrastructure/Migrations/20261030181626_StableSlugsSoftDeleteCategoryContent.cs` | schema, including unique slug indexes | N |
+| `src/Modules/Catalog/Catalog.Infrastructure/Projections/ProductListProjectionRebuilder.cs` | skip products of deleted categories | C |
+| `src/Modules/Catalog/Catalog.Api/Controllers/AdminCategoriesController.cs`, `AdminProductsController.cs` | slug, content, deleted filter endpoints | C |
+| `src/Modules/Catalog/Catalog.Contracts/Category/*`, `Products/*` | DTO additions | C |
 | `docs/sdd/contracts/catalog/*.openapi.yaml`, `openapi.yaml` | contract | C |
 | `docs/sdd/features/catalog/{categories,public-products,one-c-import,admin-products}.md` | feature cards | C |
 | `tests/UnitTests/Catalog/Slugs/*`, `…/Sync/*`, `…/Domain/CatalogSoftDeleteAndContentTests.cs` | unit tests | N |

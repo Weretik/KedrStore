@@ -16,9 +16,9 @@
 
 ## Змінені ділянки реалізації
 
-- Domain: `src/Sales/Sales.Domain/Orders/Order.cs` і `OneCOrderSync.cs`, зокрема переходи стану передавання, незмінні ідентифікатори, планування повторів і незмінні номери документів 1C.
-- Application: `src/Sales/Sales.Application/Features/Orders/` і `Contracts/`, зокрема команди створення, отримання статусу й повтору, а також межі зберігання даних та інтеграції з 1C.
-- API: `src/Sales/Sales.Api/Features/Orders/AdminOrdersController.cs` і `Contracts/Orders/`.
+- Domain: `src/Modules/Sales/Sales.Domain/Orders/Order.cs` і `OneCOrderSync.cs`, зокрема переходи стану передавання, незмінні ідентифікатори, планування повторів і незмінні номери документів 1C.
+- Application: `src/Modules/Sales/Sales.Application/Features/Orders/` і `Contracts/`, зокрема команди створення, отримання статусу й повтору, а також межі зберігання даних та інтеграції з 1C.
+- API: `src/Modules/Sales/Sales.Api/Features/Orders/AdminOrdersController.cs` і `Contracts/Orders/`.
 - Infrastructure: конфігурації EF для Sales, `SalesDbContext`, міграції до `20260909154836_AddOrderSyncRetryAudit` включно, сховища замовлень, адаптер SOAP, сервіси завдань, сервіс сповіщень і перевірені параметри `Sales:OneCOrderSync`.
 - Хости й розгортання: реєстрація/конфігурація `Host.Jobs` і `.github/workflows/deploy-cloudrun.yml`.
 - Тести: набори Sales у `tests/UnitTests/Sales/` і `tests/IntegrationTests/Sales/`, перевірки чинного OpenAPI та архітектурні тести.

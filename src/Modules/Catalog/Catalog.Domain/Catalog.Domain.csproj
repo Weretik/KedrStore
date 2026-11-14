@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ardalis.SmartEnum" />
+      <PackageReference Include="NodaMoney" />
+      <PackageReference Include="Vogen" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="..\..\..\..\..\.nuget\packages\vogen\8.0.4\contentFiles\any\netstandard2.0\Vogen.targets" />
+    </ItemGroup>
+
+</Project>

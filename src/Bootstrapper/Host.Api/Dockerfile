@@ -18,36 +18,36 @@ COPY ["src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastru
 COPY ["src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integrations.OneC.csproj", "src/BuildingBlocks/BuildingBlocks.Integrations.OneC/"]
 
 # Catalog
-COPY ["src/Catalog/Catalog.Api/Catalog.Api.csproj", "src/Catalog/Catalog.Api/"]
-COPY ["src/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Catalog/Catalog.Application/"]
-COPY ["src/Catalog/Catalog.Contracts/Catalog.Contracts.csproj", "src/Catalog/Catalog.Contracts/"]
-COPY ["src/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Catalog/Catalog.Domain/"]
-COPY ["src/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Catalog/Catalog.Infrastructure/"]
+COPY ["src/Modules/Catalog/Catalog.Api/Catalog.Api.csproj", "src/Modules/Catalog/Catalog.Api/"]
+COPY ["src/Modules/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Modules/Catalog/Catalog.Application/"]
+COPY ["src/Modules/Catalog/Catalog.Contracts/Catalog.Contracts.csproj", "src/Modules/Catalog/Catalog.Contracts/"]
+COPY ["src/Modules/Catalog/Catalog.Domain/Catalog.Domain.csproj", "src/Modules/Catalog/Catalog.Domain/"]
+COPY ["src/Modules/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj", "src/Modules/Catalog/Catalog.Infrastructure/"]
 
 # Content
-COPY ["src/Content/Content.Api/Content.Api.csproj", "src/Content/Content.Api/"]
-COPY ["src/Content/Content.Application/Content.Application.csproj", "src/Content/Content.Application/"]
-COPY ["src/Content/Content.Domain/Content.Domain.csproj", "src/Content/Content.Domain/"]
-COPY ["src/Content/Content.Infrastructure/Content.Infrastructure.csproj", "src/Content/Content.Infrastructure/"]
+COPY ["src/Modules/Content/Content.Api/Content.Api.csproj", "src/Modules/Content/Content.Api/"]
+COPY ["src/Modules/Content/Content.Application/Content.Application.csproj", "src/Modules/Content/Content.Application/"]
+COPY ["src/Modules/Content/Content.Domain/Content.Domain.csproj", "src/Modules/Content/Content.Domain/"]
+COPY ["src/Modules/Content/Content.Infrastructure/Content.Infrastructure.csproj", "src/Modules/Content/Content.Infrastructure/"]
 
 # Identity
-COPY ["src/Identity/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/"]
-COPY ["src/Identity/Identity.Application/Identity.Application.csproj", "src/Identity/Identity.Application/"]
-COPY ["src/Identity/Identity.Domain/Identity.Domain.csproj", "src/Identity/Identity.Domain/"]
-COPY ["src/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Identity/Identity.Infrastructure/"]
+COPY ["src/Modules/Identity/Identity.Api/Identity.Api.csproj", "src/Modules/Identity/Identity.Api/"]
+COPY ["src/Modules/Identity/Identity.Application/Identity.Application.csproj", "src/Modules/Identity/Identity.Application/"]
+COPY ["src/Modules/Identity/Identity.Domain/Identity.Domain.csproj", "src/Modules/Identity/Identity.Domain/"]
+COPY ["src/Modules/Identity/Identity.Infrastructure/Identity.Infrastructure.csproj", "src/Modules/Identity/Identity.Infrastructure/"]
 
 # Sales
-COPY ["src/Sales/Sales.Api/Sales.Api.csproj", "src/Sales/Sales.Api/"]
-COPY ["src/Sales/Sales.Application/Sales.Application.csproj", "src/Sales/Sales.Application/"]
-COPY ["src/Sales/Sales.Domain/Sales.Domain.csproj", "src/Sales/Sales.Domain/"]
-COPY ["src/Sales/Sales.Infrastructure/Sales.Infrastructure.csproj", "src/Sales/Sales.Infrastructure/"]
+COPY ["src/Modules/Sales/Sales.Api/Sales.Api.csproj", "src/Modules/Sales/Sales.Api/"]
+COPY ["src/Modules/Sales/Sales.Application/Sales.Application.csproj", "src/Modules/Sales/Sales.Application/"]
+COPY ["src/Modules/Sales/Sales.Domain/Sales.Domain.csproj", "src/Modules/Sales/Sales.Domain/"]
+COPY ["src/Modules/Sales/Sales.Infrastructure/Sales.Infrastructure.csproj", "src/Modules/Sales/Sales.Infrastructure/"]
 
 # Media
-COPY ["src/Media/Media.Api/Media.Api.csproj", "src/Media/Media.Api/"]
-COPY ["src/Media/Media.Application/Media.Application.csproj", "src/Media/Media.Application/"]
-COPY ["src/Media/Media.Contracts/Media.Contracts.csproj", "src/Media/Media.Contracts/"]
-COPY ["src/Media/Media.Domain/Media.Domain.csproj", "src/Media/Media.Domain/"]
-COPY ["src/Media/Media.Infrastructure/Media.Infrastructure.csproj", "src/Media/Media.Infrastructure/"]
+COPY ["src/Modules/Media/Media.Api/Media.Api.csproj", "src/Modules/Media/Media.Api/"]
+COPY ["src/Modules/Media/Media.Application/Media.Application.csproj", "src/Modules/Media/Media.Application/"]
+COPY ["src/Modules/Media/Media.Contracts/Media.Contracts.csproj", "src/Modules/Media/Media.Contracts/"]
+COPY ["src/Modules/Media/Media.Domain/Media.Domain.csproj", "src/Modules/Media/Media.Domain/"]
+COPY ["src/Modules/Media/Media.Infrastructure/Media.Infrastructure.csproj", "src/Modules/Media/Media.Infrastructure/"]
 
 # Bootstrapper
 COPY ["src/Bootstrapper/Host.Api/Host.Api.csproj", "src/Bootstrapper/Host.Api/"]
@@ -57,11 +57,11 @@ COPY ["tests/ArchitectureTests/ArchitectureTests.csproj", "tests/ArchitectureTes
 COPY ["tests/IntegrationTests/IntegrationTests.csproj", "tests/IntegrationTests/"]
 COPY ["tests/UnitTests/UnitTests.csproj", "tests/UnitTests/"]
 
-COPY ["src/Identity/Identity.Contracts/Identity.Contracts.csproj", "src/Identity/Identity.Contracts/"]
-COPY ["src/Work/Work.Api/Work.Api.csproj", "src/Work/Work.Api/"]
-COPY ["src/Work/Work.Application/Work.Application.csproj", "src/Work/Work.Application/"]
-COPY ["src/Work/Work.Domain/Work.Domain.csproj", "src/Work/Work.Domain/"]
-COPY ["src/Work/Work.Infrastructure/Work.Infrastructure.csproj", "src/Work/Work.Infrastructure/"]
+COPY ["src/Modules/Identity/Identity.Contracts/Identity.Contracts.csproj", "src/Modules/Identity/Identity.Contracts/"]
+COPY ["src/Modules/Work/Work.Api/Work.Api.csproj", "src/Modules/Work/Work.Api/"]
+COPY ["src/Modules/Work/Work.Application/Work.Application.csproj", "src/Modules/Work/Work.Application/"]
+COPY ["src/Modules/Work/Work.Domain/Work.Domain.csproj", "src/Modules/Work/Work.Domain/"]
+COPY ["src/Modules/Work/Work.Infrastructure/Work.Infrastructure.csproj", "src/Modules/Work/Work.Infrastructure/"]
 
 RUN dotnet restore "src/Bootstrapper/Host.Api/Host.Api.csproj"
 

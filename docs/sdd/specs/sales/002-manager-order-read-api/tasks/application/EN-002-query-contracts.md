@@ -3,7 +3,7 @@
 - **ID задачі:** EN-002
 - **Підтримує:** SC-001, SC-002, SC-003, SC-004
 - **Залежить від:** EN-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Abstractions/Orders/IOrderReadService.cs`, `src/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Abstractions/Orders/IOrderReadService.cs`, `src/Modules/Sales/Sales.Application/Features/Orders/GetList/DTOs/`, `src/Modules/Sales/Sales.Application/Features/Orders/GetById/DTOs/`
 - **Рівень тесту:** перевірка компіляції Application і контракту
 
 ## Чому це підготовча задача
@@ -21,8 +21,8 @@
 ## Виняток із test-first та замінна перевірка
 
 - **Причина:** контракти часу компіляції передують поведінковим тестам обробника й інфраструктури.
-- **Замінна перевірка:** зібрати `src/Sales/Sales.Application/Sales.Application.csproj` і скомпілювати цільові тестові фікстури.
-- **Результат:** завершено 2026-09-10; `dotnet build src/Sales/Sales.Application/Sales.Application.csproj` пройшла з 0 попереджень і 0 помилок.
+- **Замінна перевірка:** зібрати `src/Modules/Sales/Sales.Application/Sales.Application.csproj` і скомпілювати цільові тестові фікстури.
+- **Результат:** завершено 2026-09-10; `dotnet build src/Modules/Sales/Sales.Application/Sales.Application.csproj` пройшла з 0 попереджень і 0 помилок.
 
 ## Контрольна точка
 

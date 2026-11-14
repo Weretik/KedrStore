@@ -6,14 +6,14 @@ An administrator lists administrators and managers (with avatar URLs), creates t
 
 ## Structure and relationships
 
-The Minimal API group [UsersEndpoints](../../../../src/Identity/Identity.Api/Endpoints/Users/UsersEndpoints.cs) at `/api/admin/users` (tag `AdminUsers`) requires policy `CanManageUsers` (role Admin); one `<UseCase>Endpoint` per operation dispatches its Application use case. [StaffAccountService](../../../../src/Identity/Identity.Infrastructure/Users/StaffAccountService.cs) implements them with `UserManager`. It refuses to block or re-role the acting administrator, so the system always keeps one. Blocking sets an endless lockout, changes the security stamp (browser sessions end within 5 minutes) and revokes refresh sessions (mobile ends at once). Setting a password does the same through a password reset.
+The Minimal API group [UsersEndpoints](../../../../src/Modules/Identity/Identity.Api/Endpoints/Users/UsersEndpoints.cs) at `/api/admin/users` (tag `AdminUsers`) requires policy `CanManageUsers` (role Admin); one `<UseCase>Endpoint` per operation dispatches its Application use case. [StaffAccountService](../../../../src/Modules/Identity/Identity.Infrastructure/Users/StaffAccountService.cs) implements them with `UserManager`. It refuses to block or re-role the acting administrator, so the system always keeps one. Blocking sets an endless lockout, changes the security stamp (browser sessions end within 5 minutes) and revokes refresh sessions (mobile ends at once). Setting a password does the same through a password reset.
 
-Giving staff access to an existing account (`GET candidates?search=`, `POST {userId}/staff-access`) keeps its email and customer role, sets the name and a new password, clears a lockout and revokes refresh sessions. From then on [ImportedCounterpartyIdentityProvisioningService](../../../../src/Identity/Identity.Infrastructure/Users/ImportedCounterpartyIdentityProvisioningService.cs) leaves a staff account's email, name, password and lockout alone during 1C customer sync, and for a customer removed from 1C it removes only the `User` role instead of deleting the account.
+Giving staff access to an existing account (`GET candidates?search=`, `POST {userId}/staff-access`) keeps its email and customer role, sets the name and a new password, clears a lockout and revokes refresh sessions. From then on [ImportedCounterpartyIdentityProvisioningService](../../../../src/Modules/Identity/Identity.Infrastructure/Users/ImportedCounterpartyIdentityProvisioningService.cs) leaves a staff account's email, name, password and lockout alone during 1C customer sync, and for a customer removed from 1C it removes only the `User` role instead of deleting the account.
 
 ## Code structure
 
 ```text
-src/Identity/
+src/Modules/Identity/
 ├── Identity.Api/Endpoints/Users/
 │   ├── UsersEndpoints.cs  # HTTP group, CanManageUsers
 │   ├── <UseCase>Endpoint.cs  # one per operation

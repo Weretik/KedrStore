@@ -9,7 +9,7 @@ KedrStore uses ASP.NET Core Identity. Each client signs in the way that fits it:
 | Admin (React) and storefront (Angular) in a browser | Identity session cookie `__Host-kedr.session` (HttpOnly, Secure, SameSite=Lax, sliding 7 days) plus a CSRF header | No token is readable by JavaScript, so an XSS bug cannot steal a session. The API is on the same site (`api.classkedr.com.ua`, see the [Cloudflare API proxy](../../../operations/deployment/cloudflare-api-proxy.md)), so the cookie is first-party. |
 | Mobile (Expo) | Bearer access token (15 minutes) plus a rotating refresh token in the request body | Native apps have no browser cookie jar; the app keeps both tokens in the device secure store. |
 
-The default scheme `Kedr` is a policy scheme ([registration](../../../../../src/Identity/Identity.Infrastructure/DependencyInjection/IdentityAuthenticationExtensions.cs)): a request with `Authorization: Bearer …` is authenticated by the bearer scheme, any other request by the Identity cookie. Unauthenticated calls to a protected endpoint get `401` and calls without the required role get `403`; the API never redirects.
+The default scheme `Kedr` is a policy scheme ([registration](../../../../../src/Modules/Identity/Identity.Infrastructure/DependencyInjection/IdentityAuthenticationExtensions.cs)): a request with `Authorization: Bearer …` is authenticated by the bearer scheme, any other request by the Identity cookie. Unauthenticated calls to a protected endpoint get `401` and calls without the required role get `403`; the API never redirects.
 
 ```text
 Browser                               Mobile
@@ -47,8 +47,8 @@ Set-Cookie: kedr.csrf
 
 ## Mobile token rules
 
-- The access token is protected by the bearer scheme's Data Protection protector; the refresh token is 32 random bytes (Base64Url). [IdentityBearerTokenIssuer](../../../../../src/Identity/Identity.Infrastructure/Sessions/IdentityBearerTokenIssuer.cs) creates both.
-- [RefreshSessionStore](../../../../../src/Identity/Identity.Infrastructure/Sessions/RefreshSessionStore.cs) keeps each refresh token in `AppRefreshSessions` only as a SHA-256 hash, with timestamps and limited client context.
+- The access token is protected by the bearer scheme's Data Protection protector; the refresh token is 32 random bytes (Base64Url). [IdentityBearerTokenIssuer](../../../../../src/Modules/Identity/Identity.Infrastructure/Sessions/IdentityBearerTokenIssuer.cs) creates both.
+- [RefreshSessionStore](../../../../../src/Modules/Identity/Identity.Infrastructure/Sessions/RefreshSessionStore.cs) keeps each refresh token in `AppRefreshSessions` only as a SHA-256 hash, with timestamps and limited client context.
 - Refresh sessions have an absolute lifetime (`RefreshAbsoluteLifetimeDays`, 30) and an inactivity limit (`RefreshIdleTimeoutDays`, 14).
 - A successful refresh rotates the session: it revokes the old one and links it to the new one. Rotation is guarded by the PostgreSQL `xmin` concurrency token, so parallel refresh requests rotate a session once; the others fail.
 - A rotated token presented again within `RefreshReuseGraceSeconds` (default 60) fails quietly. This covers parallel requests and retries.

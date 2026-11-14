@@ -22,9 +22,9 @@ Canonical operation: `GET /api/admin/order-workspace/drafts`, `operationId: getA
 | Path | State | Responsibility |
 | --- | --- | --- |
 | `docs/sdd/contracts/sales/admin-order-drafts.openapi.yaml` | existing | provider parameters |
-| `src/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs` | existing | binding |
-| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Drafts/GetList/` | existing | validation/passing conditions |
-| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs` | existing | filter, count, pagination |
+| `src/Modules/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs` | existing | binding |
+| `src/Modules/Sales/Sales.Application/Features/Orders/AdminWorkspace/Drafts/GetList/` | existing | validation/passing conditions |
+| `src/Modules/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceDraftReader.cs` | existing | filter, count, pagination |
 | `tests/IntegrationTests/Sales/Api/` | existing directory | focused API/SQL tests |
 | `docs/sdd/features/sales/admin-order-workspace.md` | existing | reconcile after implementation |
 

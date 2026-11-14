@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+      <ProjectReference Include="..\Catalog.Contracts\Catalog.Contracts.csproj" />
+      <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Catalog.Application.csproj.DotSettings" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- The recognizer dictionary (rules, spellings, settings); the .NET recognizer reads it at run time. -->
+      <EmbeddedResource Include="..\..\..\..\docs\catalog-attributes\dictionaries.json"
+                        LogicalName="Catalog.Application.Attributes.Recognition.dictionaries.json" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Slugify.Core" />
+    <PackageReference Include="NodaMoney" />
+    <PackageReference Include="Ardalis.Specification" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>

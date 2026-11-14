@@ -21,16 +21,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Catalog\Catalog.Application\Catalog.Application.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Domain\Sales.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Application\Sales.Application.csproj" />
-      <ProjectReference Include="..\..\src\Sales\Sales.Api\Sales.Api.csproj" />
-      <ProjectReference Include="..\..\src\Identity\Identity.Application\Identity.Application.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Application\Content.Application.csproj" />
-      <ProjectReference Include="..\..\src\Content\Content.Domain\Content.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Media\Media.Application\Media.Application.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Application\Work.Application.csproj" />
-      <ProjectReference Include="..\..\src\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Domain\Sales.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Application\Sales.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Sales\Sales.Api\Sales.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Identity\Identity.Application\Identity.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Application\Content.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Domain\Content.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Application\Media.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Application\Work.Application.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Api\Work.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

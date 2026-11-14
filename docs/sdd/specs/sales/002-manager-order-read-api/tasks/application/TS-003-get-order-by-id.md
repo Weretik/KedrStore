@@ -3,7 +3,7 @@
 - **ID задачі:** TS-003
 - **Покриває:** SC-002, SC-004
 - **Залежить від:** TS-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Features/Orders/GetById/`, `tests/UnitTests/Sales/Application/GetOrderByIdQueryHandlerTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Features/Orders/GetById/`, `tests/UnitTests/Sales/Application/GetOrderByIdQueryHandlerTests.cs`
 - **Рівень тесту:** Application
 
 ## Докази

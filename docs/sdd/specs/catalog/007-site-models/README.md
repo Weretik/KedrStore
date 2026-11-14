@@ -98,7 +98,7 @@ Contract: [site-models.openapi.yaml](../../../contracts/catalog/site-models.open
 ### Files (stage 2)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Domain/
 │   ├── Entities/Groups/ProductGroup.cs        # + Status, Accept
 │   ├── Entities/Groups/ProductGroupAxis.cs, ProductGroupText.cs   # new: axis and texts rows
@@ -151,7 +151,7 @@ Contract: [public-site-models.openapi.yaml](../../../contracts/catalog/public-si
 ### Files (stage 5)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Contracts/SiteModels/Public/          # new: request, list (card, filter, address), page DTOs
 ├── Catalog.Application/Features/SiteModels/Public/
 │   ├── Common/                                   # new: PublicModelCatalog + reader + facts, page mapper
@@ -184,7 +184,7 @@ Owner requests 2026-11-05 18:22–18:27 after using stage 4: a «show on site» 
 ### Files (stage 4b)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Domain/Entities/ProductCategory.cs                 # + IsShownOnSite, SetShownOnSite
 ├── Catalog.Infrastructure/Migrations/*_CategorySiteVisibility.cs  # column + one-time «Фурнітура» start
 ├── Catalog.Application/
@@ -214,7 +214,7 @@ Owner requests 2026-11-05 23:03 after the UX audit, and the choice of canvas var
 ### Files (stage 4c)
 
 ```text
-src/Catalog/
+src/Modules/Catalog/
 ├── Catalog.Contracts/SiteModels/SiteModelRequests.cs, SiteShowcaseDtos.cs  # status filter; tree counts
 └── Catalog.Application/Features/SiteModels/
     ├── Common/SiteModelState*.cs           # no_model only outside every model; filter counts

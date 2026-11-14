@@ -6,16 +6,16 @@ The payment requisites the site shows on its requisites page: the ФОП name, �
 
 ## Structure and relationships
 
-The [public and admin endpoint groups](../../../../src/Content/Content.Api/Endpoints/Requisites/RequisitesEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to two queries and one command. [CompanyRequisites](../../../../src/Content/Content.Domain/Requisites/CompanyRequisites.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint) that is only replaced as a whole. Its `Update` normalizes the input (trim; IBAN without spaces, upper case), checks the invariants, and returns the list of changed fields. The [handler](../../../../src/Content/Content.Application/Features/Requisites/Commands/UpdateCompanyRequisites/UpdateCompanyRequisitesHandler.cs) turns a non-empty list into a [CompanyRequisitesChange](../../../../src/Content/Content.Domain/Requisites/CompanyRequisitesChange.cs) with the editor's email, saved in the same transaction; saving the same values writes no entry.
+The [public and admin endpoint groups](../../../../src/Modules/Content/Content.Api/Endpoints/Requisites/RequisitesEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to two queries and one command. [CompanyRequisites](../../../../src/Modules/Content/Content.Domain/Requisites/CompanyRequisites.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint) that is only replaced as a whole. Its `Update` normalizes the input (trim; IBAN without spaces, upper case), checks the invariants, and returns the list of changed fields. The [handler](../../../../src/Modules/Content/Content.Application/Features/Requisites/Commands/UpdateCompanyRequisites/UpdateCompanyRequisitesHandler.cs) turns a non-empty list into a [CompanyRequisitesChange](../../../../src/Modules/Content/Content.Domain/Requisites/CompanyRequisitesChange.cs) with the editor's email, saved in the same transaction; saving the same values writes no entry.
 
-Rules: the code is 8 (ЄДРПОУ) or 10 (РНОКПП) digits, the IBAN is `UA` + 27 digits with a valid mod-97 checksum, the МФО is 6 digits and must equal digits 5–10 of the IBAN. The [validator](../../../../src/Content/Content.Application/Features/Requisites/Commands/UpdateCompanyRequisites/UpdateCompanyRequisitesValidator.cs) reports each field by its JSON name; the МФО mismatch goes to `bankCode`.
+Rules: the code is 8 (ЄДРПОУ) or 10 (РНОКПП) digits, the IBAN is `UA` + 27 digits with a valid mod-97 checksum, the МФО is 6 digits and must equal digits 5–10 of the IBAN. The [validator](../../../../src/Modules/Content/Content.Application/Features/Requisites/Commands/UpdateCompanyRequisites/UpdateCompanyRequisitesValidator.cs) reports each field by its JSON name; the МФО mismatch goes to `bankCode`.
 
 Access: `GET /api/content/requisites` is anonymous; `/api/admin/content/requisites` and its `/history` need `RequireAdminRole`.
 
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/Requisites/ public group       # public GET
 │   ├── Endpoints/Requisites/ admin group  # admin GET, PUT, GET history

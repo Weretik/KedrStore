@@ -88,7 +88,7 @@ More: [architecture](docs/sdd/architecture/README.md), [feature map](docs/sdd/fe
 KedrStore/                     backend (.NET), this repository
   src/Bootstrapper/Host.Api    HTTP API host
   src/Bootstrapper/Host.Jobs   one-shot job runner: --job=migrate, --job=full, --job=sync-one-c-orders, ...
-  src/<Module>/<Module>.{Api,Application,Domain,Infrastructure}
+  src/Modules/<Module>/<Module>.{Api,Application,Contracts,Domain,Infrastructure}
   src/BuildingBlocks/*         shared primitives, Mediator pipeline, 1C SOAP transport
   tests/{UnitTests,IntegrationTests,ArchitectureTests}
   deploy/cloudflare/api-proxy  API proxy Worker

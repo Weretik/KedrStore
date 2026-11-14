@@ -15,8 +15,8 @@ public sealed class HostCompositionTests
         var ports = BusinessModules
             .SelectMany(module => new[]
             {
-                Path.Combine(FindRepositoryRoot(), "src", module, $"{module}.Application", "Abstractions"),
-                Path.Combine(FindRepositoryRoot(), "src", module, $"{module}.Contracts"),
+                Path.Combine(FindRepositoryRoot(), "src", "Modules", module, $"{module}.Application", "Abstractions"),
+                Path.Combine(FindRepositoryRoot(), "src", "Modules", module, $"{module}.Contracts"),
             })
             .Where(Directory.Exists)
             .SelectMany(path => Directory.EnumerateFiles(path, "*.cs", SearchOption.AllDirectories))

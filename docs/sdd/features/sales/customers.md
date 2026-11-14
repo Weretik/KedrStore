@@ -14,7 +14,7 @@ Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete l
 
 ## Structure and relationships
 
-The Minimal API group [CustomersEndpoints](../../../../src/Sales/Sales.Api/Endpoints/Customers/CustomersEndpoints.cs) (tag `AdminCustomers`, `CanManageOrders`) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
+The Minimal API group [CustomersEndpoints](../../../../src/Modules/Sales/Sales.Api/Endpoints/Customers/CustomersEndpoints.cs) (tag `AdminCustomers`, `CanManageOrders`) reads through the [list handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Modules/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Modules/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Modules/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
 
 ## Code structure
 
@@ -22,7 +22,7 @@ The tree lists verified entry points and key components; it does not include eve
 
 ```text
 src/
-├── Sales/
+├── Modules/Sales/
 │   ├── Sales.Api/Endpoints/Customers/                       # HTTP group, one endpoint per use case, query parameters
 │   ├── Sales.Application/Features/Customers/Queries/
 │   │   ├── GetCustomerById/GetCustomerByIdHandler.cs  # use-case handler
@@ -36,7 +36,7 @@ src/
 │       ├── Persistence/Entities/PendingCounterpartyIdentityDeletion.cs  # persisted Identity retry state
 │       ├── Persistence/Customers/PendingCounterpartyIdentityDeletionConfiguration.cs  # outbox mapping
 │       └── Migrations/20261022103423_AddPendingCounterpartyIdentityDeletions.cs  # outbox table
-└── Identity/
+└── Modules/Identity/
     └── Identity.Infrastructure/Users/ImportedCounterpartyIdentityProvisioningService.cs  # Identity lifecycle
 ```
 

@@ -6,14 +6,14 @@ A product has 0–20 photos in order and 0–1 scheme, linked by ID to files of 
 
 ## Structure and relationships
 
-The links are owned by the [Product](../../../../src/Catalog/Catalog.Domain/Products/Product.Media.cs) aggregate as [ProductMediaLink](../../../../src/Catalog/Catalog.Domain/Products/Media/ProductMediaLink.cs) rows (table `ProductMedia`: product, media file ID, kind, position, URL copy). `Product.Photo` and `Product.Sсheme` stay as a cache of the first photo and the scheme, so lists, sales, and projections remain one-table reads; they are an empty string without media.
+The links are owned by the [Product](../../../../src/Modules/Catalog/Catalog.Domain/Products/Product.Media.cs) aggregate as [ProductMediaLink](../../../../src/Modules/Catalog/Catalog.Domain/Products/Media/ProductMediaLink.cs) rows (table `ProductMedia`: product, media file ID, kind, position, URL copy). `Product.Photo` and `Product.Sсheme` stay as a cache of the first photo and the scheme, so lists, sales, and projections remain one-table reads; they are an empty string without media.
 
-Catalog reads files only through its port [IProductMediaLibrary](../../../../src/Catalog/Catalog.Application/Abstractions/Media/IProductMediaLibrary.cs). Catalog.Infrastructure serves it with the Media contract [IMediaFileDirectory](../../../../src/Media/Media.Contracts/Files/IMediaFileDirectory.cs). Media calls every [IMediaFileChangeListener](../../../../src/Media/Media.Contracts/Files/IMediaFileChangeListener.cs) after a replace or delete; the Catalog listener updates the links through [ProductMediaFileChanges](../../../../src/Catalog/Catalog.Application/Features/ProductMedia/Shared/ProductMediaFileChanges.cs). A failed listener is logged and does not fail the Media request.
+Catalog reads files only through its port [IProductMediaLibrary](../../../../src/Modules/Catalog/Catalog.Application/Abstractions/Media/IProductMediaLibrary.cs). Catalog.Infrastructure serves it with the Media contract [IMediaFileDirectory](../../../../src/Modules/Media/Media.Contracts/Files/IMediaFileDirectory.cs). Media calls every [IMediaFileChangeListener](../../../../src/Modules/Media/Media.Contracts/Files/IMediaFileChangeListener.cs) after a replace or delete; the Catalog listener updates the links through [ProductMediaFileChanges](../../../../src/Modules/Catalog/Catalog.Application/Features/ProductMedia/Shared/ProductMediaFileChanges.cs). A failed listener is logged and does not fail the Media request.
 
 - `GET/PUT /api/admin/products/{id}/media` (CanManageProducts + CanManageMedia): read or replace the whole set. Unknown file IDs are `400`.
 - `GET /api/admin/products?withoutPhoto=true`: products whose cached photo is empty.
 - Public product details return `photo`, `scheme`, and `photos` (gallery order).
-- The [link job](../../../../src/Catalog/Catalog.Application/Features/ProductMedia/Jobs/LinkProductMediaJob.cs) runs inside `--job=media-cdn-sync` after the sync, with the same `--dry-run`. It rereads link URLs, drops links to deleted files, rewrites the cache, and links `products/<id>.<jpg|jpeg|png|webp>` and `product-scheme/s<id>.<ext>` to active products without links of that kind. Then the [folder job](../../../../src/Catalog/Catalog.Application/Features/ProductMedia/Jobs/ArrangeProductMediaFoldersJob.cs) lays out linked photos in «Товари» and schemes in «Схеми» as the category tree, through `IProductMediaLibrary.ArrangeFoldersAsync` and Media's `IMediaFolderArranger` (R-37). See the [runbook](../../operations/jobs/media-cdn-sync-runbook.md).
+- The [link job](../../../../src/Modules/Catalog/Catalog.Application/Features/ProductMedia/Jobs/LinkProductMediaJob.cs) runs inside `--job=media-cdn-sync` after the sync, with the same `--dry-run`. It rereads link URLs, drops links to deleted files, rewrites the cache, and links `products/<id>.<jpg|jpeg|png|webp>` and `product-scheme/s<id>.<ext>` to active products without links of that kind. Then the [folder job](../../../../src/Modules/Catalog/Catalog.Application/Features/ProductMedia/Jobs/ArrangeProductMediaFoldersJob.cs) lays out linked photos in «Товари» and schemes in «Схеми» as the category tree, through `IProductMediaLibrary.ArrangeFoldersAsync` and Media's `IMediaFolderArranger` (R-37). See the [runbook](../../operations/jobs/media-cdn-sync-runbook.md).
 
 Every change copies the cached photo into `ProductListProjections` with one SQL update (`RefreshPhotosAsync`).
 
@@ -21,13 +21,13 @@ Every change copies the cached photo into `ProductListProjections` with one SQL 
 
 ```text
 src/
-├── Media/Media.Contracts/Files/                 # contract for other modules
+├── Modules/Media/Media.Contracts/Files/                 # contract for other modules
 │   ├── IMediaFileDirectory.cs                   # files by ID and by CDN directory
 │   ├── IMediaFileChangeListener.cs              # replace and delete callbacks
 │   └── MediaFileReference.cs
-├── Media/Media.Infrastructure/Files/MediaFileDirectory.cs
-├── Media/Media.Application/Features/Files/Common/MediaFileChangeNotifier.cs
-└── Catalog/
+├── Modules/Media/Media.Infrastructure/Files/MediaFileDirectory.cs
+├── Modules/Media/Media.Application/Features/Files/Common/MediaFileChangeNotifier.cs
+└── Modules/Catalog/
     ├── Catalog.Domain/Entities/{Product.Media,ProductMediaLink}.cs  # links, rules R-30, cache
     ├── Catalog.Application/
     │   ├── Contracts/Media/IProductMediaLibrary.cs             # Catalog port
