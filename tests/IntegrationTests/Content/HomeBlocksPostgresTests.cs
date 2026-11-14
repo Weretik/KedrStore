@@ -1,6 +1,6 @@
-using Content.Application.Contracts.MediaLibrary;
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Home.Public.GetBlocks;
+using Content.Application.Abstractions.Media;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Home.Queries.GetPublicHomeBlocks;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.Extensions.Configuration;
@@ -19,11 +19,11 @@ public sealed class HomeBlocksPostgresTests(ContentPostgresFixture postgres)
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        await using var provider = new ServiceCollection().AddContentInfrastructureServices(configuration)
+        await using var provider = new ServiceCollection().AddContentInfrastructure(configuration)
             .BuildServiceProvider();
         await using var scope = provider.CreateAsyncScope();
 
-        var result = await new GetPublicHomeBlocksQueryHandler(
+        var result = await new GetPublicHomeBlocksHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(), new NoLogos())
             .Handle(new GetPublicHomeBlocksQuery("ru"), default);
 

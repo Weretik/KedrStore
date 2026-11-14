@@ -27,7 +27,13 @@ public sealed class LegalDocumentVersion : IAggregateRoot
     public string? PublishedBy { get; private set; }
     public IReadOnlyList<LegalDocumentText> Texts => _texts;
 
+    public bool IsDraft => Status == LegalDocumentStatus.Draft;
+
     private LegalDocumentVersion() { }
+
+    /// <summary>«Редакція від» may not be earlier than the edition the site shows now.</summary>
+    public static bool AllowsEffectiveFrom(DateOnly effectiveFrom, LegalDocumentVersion? current)
+        => current?.EffectiveFrom is not { } currentDate || currentDate <= effectiveFrom;
 
     public static LegalDocumentVersion CreateDraft(LegalDocumentKind kind,
         IReadOnlyCollection<LegalDocumentTextInput> texts, DateTimeOffset now, string userName)
@@ -55,6 +61,22 @@ public sealed class LegalDocumentVersion : IAggregateRoot
         EffectiveFrom = effectiveFrom;
         PublishedAt = now;
         PublishedBy = Trim(userName);
+    }
+
+    /// <summary>
+    /// Publishes this draft as the next edition after <paramref name="lastNumber"/> and archives
+    /// <paramref name="current"/>, the edition of the same kind the site shows now.
+    /// </summary>
+    public void PublishReplacing(LegalDocumentVersion? current, int lastNumber, DateOnly effectiveFrom,
+        DateTimeOffset now, string userName)
+    {
+        if (current is not null && current.Kind != Kind)
+            throw new ArgumentException("The current edition must be of the same document kind.", nameof(current));
+        if (!AllowsEffectiveFrom(effectiveFrom, current))
+            throw new DomainException(LegalDocumentErrors.EffectiveFromTooEarly(current!.EffectiveFrom!.Value));
+
+        Publish(lastNumber + 1, effectiveFrom, now, userName);
+        current?.Archive();
     }
 
     public void Archive()

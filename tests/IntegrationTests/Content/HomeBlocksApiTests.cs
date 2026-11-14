@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Content.Application.Contracts.MediaLibrary;
-using Content.Application.Contracts.Persistence;
+using Content.Application.Abstractions.Media;
+using Content.Application.Abstractions.Persistence;
 using Content.Domain.Home;
-using Content.Infrastructure.DataBase;
+using Content.Infrastructure.Persistence;
 using IntegrationTests.TestSupport.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain.Exceptions;
-using Content.Application.Features.Requisites.Common;
-using Content.Application.Features.Requisites.Update;
+using Content.Application.Features.Requisites.Shared;
+using Content.Application.Features.Requisites.Commands.UpdateCompanyRequisites;
 using Content.Domain.Requisites;
 
 namespace UnitTests.Content;
@@ -78,7 +78,7 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Validator_NamesEachInvalidField()
     {
-        var result = new UpdateCompanyRequisitesCommandValidator().Validate(new UpdateCompanyRequisitesCommand(
+        var result = new UpdateCompanyRequisitesValidator().Validate(new UpdateCompanyRequisitesCommand(
             new CompanyRequisitesInput("", "123", "12a", "UA00", "", "12")));
 
         var fields = result.Errors.Select(error => error.PropertyName).Distinct().ToList();
@@ -88,7 +88,7 @@ public sealed class CompanyRequisitesTests
     [Fact]
     public void Validator_ReportsABankCodeMismatchOnTheBankCodeField()
     {
-        var result = new UpdateCompanyRequisitesCommandValidator().Validate(new UpdateCompanyRequisitesCommand(
+        var result = new UpdateCompanyRequisitesValidator().Validate(new UpdateCompanyRequisitesCommand(
             new CompanyRequisitesInput("ФОП", "2689400771", "1", Iban, "Банк", "300711")));
 
         var error = Assert.Single(result.Errors);

@@ -6,9 +6,9 @@ The two editable lists of the site home page: the FAQ (question and answer in Uk
 
 ## Structure and relationships
 
-[HomeFaqItem](../../../../src/Content/Content.Domain/Home/HomeFaqItem.cs) and [HomeBrand](../../../../src/Content/Content.Domain/Home/HomeBrand.cs) are separate aggregates with a position. A brand stores `LogoMediaFileId` (a value, not a foreign key); its URL comes through the shared port [IMediaImageReader](../../../../src/Content/Content.Application/Contracts/MediaLibrary/IMediaImageReader.cs), the same one the gallery uses. A brand whose logo file was deleted is hidden on the site and marked `logoMissing` in the admin.
+[HomeFaqItem](../../../../src/Content/Content.Domain/Home/HomeFaqItem.cs) and [HomeBrand](../../../../src/Content/Content.Domain/Home/HomeBrand.cs) are separate aggregates with a position. A brand stores `LogoMediaFileId` (a value, not a foreign key); its URL comes through the shared port [IMediaImageReader](../../../../src/Content/Content.Application/Abstractions/Media/IMediaImageReader.cs), the same one the gallery uses. A brand whose logo file was deleted is hidden on the site and marked `logoMissing` in the admin.
 
-Handlers live in `Features/Home/{Public,Admin}`; every admin change answers with both lists ([HomeAdminBlocks](../../../../src/Content/Content.Application/Features/Home/Common/HomeAdminBlocks.cs)):
+Handlers live in `Features/Home/{Public,Admin}`; every admin change answers with both lists ([HomeAdminBlocks](../../../../src/Content/Content.Application/Features/Home/Shared/HomeAdminBlocks.cs)):
 
 - FAQ: create (to the end), update, delete, reorder (a stale list answers 409);
 - brands: the same, and a logo that is not in the library answers 400.

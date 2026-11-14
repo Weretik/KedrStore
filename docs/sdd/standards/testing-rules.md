@@ -51,7 +51,7 @@ A Red-first test can be omitted for documentation-only work, generated migration
 | --- | --- |
 | Local change | Run `dotnet test tests/<Project>/<Project>.csproj --filter <name>` for the affected behavior; for documentation, run `python3 tools/docs/check_doc_links.py` and `git diff --check`. |
 | Boundary, API, or database change | Add the relevant `ArchitectureTests` or `IntegrationTests` project/filter and the needed contract or operational evidence. |
-| Full CI | The `verify` job in the [workflow](../../../.github/workflows/deploy-cloudrun.yml) checks PRs and pushes; rerun the full suite locally only on explicit request. |
+| CI | The `verify` job in the [workflow](../../../.github/workflows/deploy-cloudrun.yml) checks PRs and pushes; rerun the full suite locally only on explicit request. A pull request runs only the affected tests, chosen by [`tools/ci/affected_tests.py`](../../../tools/ci/affected_tests.py): a change in `src/<Module>/` or `tests/*/<Module>/` runs that module's unit and integration tests plus those of every module whose projects reference it; `BuildingBlocks`, `Bootstrapper`, build files, test support, and CI files run everything; documentation runs no module tests. Architecture tests and `IntegrationTests.Platform` always run. A push to `master` runs everything before the deploy. Keep each test in `tests/<Project>/<Module>/` with the namespace `<Project>.<Module>`, or the selection misses it. |
 
 Check project names and available filters under `tests/` before running them.
 

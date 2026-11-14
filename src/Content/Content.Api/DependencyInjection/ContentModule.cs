@@ -9,7 +9,7 @@ public static class ContentModule
 {
     public static IServiceCollection AddContentModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddContentInfrastructureServices(configuration);
+        services.AddContentInfrastructure(configuration);
         services.AddValidatorsFromAssembly(typeof(Content.Application.ContentApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
         services.AddControllers().AddApplicationPart(typeof(ContentApiAssemblyMarker).Assembly);
 

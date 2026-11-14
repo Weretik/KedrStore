@@ -6,7 +6,7 @@ The editable copy of the site page «Співпраця» (wholesale offer) in U
 
 ## Structure and relationships
 
-[WholesalePage](../../../../src/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Content/Content.Application/Features/Wholesale/Common/WholesaleTextValidator.cs)).
+[WholesalePage](../../../../src/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Content/Content.Application/Features/Wholesale/Shared/WholesaleTextValidator.cs)).
 
 ## Code structure
 

@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using Content.Application.Contracts.MediaLibrary;
+using Content.Application.Abstractions.Media;
 
 namespace IntegrationTests.TestSupport.Content;
 

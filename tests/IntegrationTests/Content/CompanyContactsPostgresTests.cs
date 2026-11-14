@@ -1,7 +1,7 @@
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Contacts.Common;
-using Content.Application.Features.Contacts.Get;
-using Content.Application.Features.Contacts.Update;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Contacts.Shared;
+using Content.Application.Features.Contacts.Queries.GetCompanyContacts;
+using Content.Application.Features.Contacts.Commands.UpdateCompanyContacts;
 using Content.Domain.Contacts;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Content;
@@ -26,7 +26,7 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
         await using var provider = BuildProvider();
         await using var scope = provider.CreateAsyncScope();
 
-        var result = await new GetCompanyContactsQueryHandler(
+        var result = await new GetCompanyContactsHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>())
             .Handle(new GetCompanyContactsQuery(), default);
 
@@ -44,7 +44,7 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
         {
             await using (var scope = provider.CreateAsyncScope())
             {
-                var result = await new UpdateCompanyContactsCommandHandler(
+                var result = await new UpdateCompanyContactsHandler(
                         scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyContacts>>(),
                         new TestContentEditor(),
                         TimeProvider.System)
@@ -65,7 +65,7 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
         finally
         {
             await using var scope = provider.CreateAsyncScope();
-            await new UpdateCompanyContactsCommandHandler(
+            await new UpdateCompanyContactsHandler(
                     scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyContacts>>(),
                     new TestContentEditor(),
                     TimeProvider.System)
@@ -78,6 +78,6 @@ public sealed class CompanyContactsPostgresTests(ContentPostgresFixture postgres
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 }

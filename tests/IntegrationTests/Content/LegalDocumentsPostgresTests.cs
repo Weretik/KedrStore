@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using BuildingBlocks.Application.Contracts;
-using Content.Application.Contracts.Html;
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Documents.Admin.CreateDraft;
-using Content.Application.Features.Documents.Admin.Publish;
-using Content.Application.Features.Documents.Public.GetPublished;
+using Content.Application.Abstractions.Integrations;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Documents.Commands.CreateLegalDocumentDraft;
+using Content.Application.Features.Documents.Commands.PublishLegalDocumentDraft;
+using Content.Application.Features.Documents.Queries.GetPublishedLegalDocument;
+using Content.Application.Features.Documents.Shared;
 using Content.Domain.Documents;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
@@ -29,9 +30,9 @@ public sealed class LegalDocumentsPostgresTests(ContentPostgresFixture postgres)
         await using var provider = BuildProvider();
         await using var scope = provider.CreateAsyncScope();
 
-        var result = await new GetPublishedLegalDocumentQueryHandler(
+        var result = await new GetPublishedLegalDocumentHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>())
-            .Handle(new GetPublishedLegalDocumentQuery(kind, language), default);
+            .Handle(new GetPublishedLegalDocumentQuery(LegalDocumentKinds.ToSlug(kind), language), default);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(new DateOnly(2026, 11, 3), result.Value.EffectiveFrom);
@@ -48,12 +49,12 @@ public sealed class LegalDocumentsPostgresTests(ContentPostgresFixture postgres)
         {
             await using (var scope = provider.CreateAsyncScope())
             {
-                var draft = await new CreateLegalDocumentDraftCommandHandler(
+                var draft = await new CreateLegalDocumentDraftHandler(
                         scope.ServiceProvider.GetRequiredService<IContentRepository<LegalDocumentVersion>>(),
                         scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
                         scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(), new AdminUser(),
                         TimeProvider.System)
-                    .Handle(new CreateLegalDocumentDraftCommand(LegalDocumentKind.ReturnsPolicy, null), default);
+                    .Handle(new CreateLegalDocumentDraftCommand("returns-policy", null), default);
                 Assert.True(draft.IsSuccess);
                 draftId = draft.Value.Id;
             }
@@ -69,7 +70,7 @@ public sealed class LegalDocumentsPostgresTests(ContentPostgresFixture postgres)
 
             await using (var scope = provider.CreateAsyncScope())
             {
-                var published = await new PublishLegalDocumentDraftCommandHandler(
+                var published = await new PublishLegalDocumentDraftHandler(
                         scope.ServiceProvider.GetRequiredService<IContentRepository<LegalDocumentVersion>>(),
                         new AdminUser(), TimeProvider.System)
                     .Handle(new PublishLegalDocumentDraftCommand(draftId.Value, new DateOnly(2026, 11, 5)), default);
@@ -101,7 +102,7 @@ public sealed class LegalDocumentsPostgresTests(ContentPostgresFixture postgres)
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 
     private sealed class AdminUser : ICurrentUserService

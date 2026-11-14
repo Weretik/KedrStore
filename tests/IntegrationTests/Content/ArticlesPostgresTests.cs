@@ -1,17 +1,17 @@
 using Ardalis.Result;
-using Content.Application.Contracts.Images;
-using Content.Application.Features.Articles.Admin.Create;
-using Content.Application.Features.Articles.Admin.Delete;
-using Content.Application.Features.Articles.Admin.MoveLegacyCovers;
-using Content.Application.Features.Articles.Admin.Update;
-using Content.Application.Features.Articles.Admin.UploadCover;
-using Content.Application.Features.Articles.Common;
-using Content.Application.Features.Articles.Public.GetBySlug;
-using Content.Application.Features.Articles.Public.GetCover;
-using Content.Application.Features.Articles.Public.GetList;
-using Content.Application.Contracts.Html;
-using Content.Application.Contracts.MediaLibrary;
-using Content.Application.Contracts.Persistence;
+using Content.Application.Abstractions.Media;
+using Content.Application.Features.Articles.Commands.CreateArticle;
+using Content.Application.Features.Articles.Commands.DeleteArticle;
+using Content.Application.Features.Articles.Commands.MoveLegacyArticleCovers;
+using Content.Application.Features.Articles.Commands.UpdateArticle;
+using Content.Application.Features.Articles.Commands.UploadArticleCover;
+using Content.Application.Features.Articles.Shared;
+using Content.Application.Features.Articles.Queries.GetPublicArticle;
+using Content.Application.Features.Articles.Queries.GetArticleCover;
+using Content.Application.Features.Articles.Queries.GetPublicArticles;
+using Content.Application.Abstractions.Integrations;
+using Content.Application.Abstractions.Media;
+using Content.Application.Abstractions.Persistence;
 using Content.Domain.Articles;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.Identity.Avatars;
@@ -64,12 +64,12 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
 
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<IReadContentDbContext>();
-        var list = await new GetPublicArticlesQueryHandler(db, _media).Handle(new GetPublicArticlesQuery("ru"), default);
-        var page = await new GetPublicArticleQueryHandler(db, _media)
+        var list = await new GetPublicArticlesHandler(db, _media).Handle(new GetPublicArticlesQuery("ru"), default);
+        var page = await new GetPublicArticleHandler(db, _media)
             .Handle(new GetPublicArticleQuery("uk", "prykhovani-petli"), default);
-        var hidden = await new GetPublicArticleQueryHandler(db, _media)
+        var hidden = await new GetPublicArticleHandler(db, _media)
             .Handle(new GetPublicArticleQuery("uk", draft.Value.Slug), default);
-        var cover = await new GetArticleCoverQueryHandler(db).Handle(new GetArticleCoverQuery(4), default);
+        var cover = await new GetArticleCoverHandler(db).Handle(new GetArticleCoverQuery(4), default);
 
         Assert.Equal(6, list.Value.Count);
         Assert.DoesNotContain(list.Value, item => item.Id == draft.Value.Id);
@@ -112,7 +112,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         Result<UploadedArticleCover> uploaded;
         await using (var scope = provider.CreateAsyncScope())
         {
-            uploaded = await new UploadArticleCoverCommandHandler(
+            uploaded = await new UploadArticleCoverHandler(
                     scope.ServiceProvider.GetRequiredService<ICoverImageProcessor>(), _media)
                 .Handle(new UploadArticleCoverCommand(
                     new CoverUpload("Петлі.jpg", "image/jpeg", bytes.Length, () => new MemoryStream(bytes))), default);
@@ -126,7 +126,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
 
         await using (var scope = provider.CreateAsyncScope())
         {
-            var deleted = await new DeleteArticleCommandHandler(
+            var deleted = await new DeleteArticleHandler(
                     scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                     scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>())
                 .Handle(new DeleteArticleCommand(created.Value.Id), default);
@@ -215,7 +215,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
     private async Task<Result<LegacyArticleCoversMoved>> SendMoveLegacy(ServiceProvider provider)
     {
         await using var scope = provider.CreateAsyncScope();
-        return await new MoveLegacyArticleCoversCommandHandler(
+        return await new MoveLegacyArticleCoversHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                 scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 _media,
@@ -233,7 +233,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
     private async Task<Result<AdminArticleDetails>> SendCreate(ServiceProvider provider, ArticleInput input)
     {
         await using var scope = provider.CreateAsyncScope();
-        return await new CreateArticleCommandHandler(
+        return await new CreateArticleHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                 scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
@@ -247,7 +247,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
     private async Task<Result<AdminArticleDetails>> SendUpdate(ServiceProvider provider, long id, ArticleInput input)
     {
         await using var scope = provider.CreateAsyncScope();
-        return await new UpdateArticleCommandHandler(
+        return await new UpdateArticleHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
                 scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
@@ -269,6 +269,6 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 }
