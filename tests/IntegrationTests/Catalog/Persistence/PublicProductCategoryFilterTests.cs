@@ -1,11 +1,23 @@
 using Ardalis.Result;
-using Catalog.Application.Features.Products.GetPublicList;
-using Catalog.Application.Slugs;
+using Catalog.Application.Features.Products.Queries.GetPublicProductList;
+using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Products.GetList;
-using Catalog.Domain.Entities;
-using Catalog.Domain.ValueObjects;
-using Catalog.Infrastructure.DataBase;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+using Catalog.Infrastructure.Persistence;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -28,7 +40,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 15, 3, "grandchild", exportToSite: false);
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
+        var handler = new GetPublicProductListHandler(db, new SlugService(db), Roots);
         var first = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest
         {
             CategorySlug = "parent", Page = 1, PageSize = 2
@@ -75,7 +87,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedProduct(db, 12, 920000, "kosmos");
         await db.SaveChangesAsync();
 
-        var handler = new GetPublicProductListQueryHandler(db, new SlugService(db), Roots);
+        var handler = new GetPublicProductListHandler(db, new SlugService(db), Roots);
         var all = await handler.Handle(new GetPublicProductListQuery(new GetProductsRequest { PageSize = 10 }),
             CancellationToken.None);
 

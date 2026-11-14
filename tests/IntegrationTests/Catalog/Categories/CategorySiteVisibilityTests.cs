@@ -1,9 +1,21 @@
-using Catalog.Application.Features.Category.SiteVisibility;
-using Catalog.Application.Integrations.OneC.DTOs;
-using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Domain.Entities;
-using Catalog.Domain.ValueObjects;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility;
+using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Mapping;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
@@ -15,7 +27,7 @@ public sealed class CategorySiteVisibilityTests
 {
     private const string Doors = "000007226";
 
-    private static SetCategorySiteVisibilityCommandHandler Handler(CatalogDbContext db)
+    private static SetCategorySiteVisibilityHandler Handler(CatalogDbContext db)
         => new(new TestRepository<ProductCategory>(db), Options.Create(new RootCategoryId
         {
             DoorsRootCategoryId = Doors,

@@ -1,11 +1,23 @@
-using Catalog.Application.Contracts.Media;
-using Catalog.Application.Features.ProductMedia.FileChanges;
-using Catalog.Application.Features.ProductMedia.Set;
-using Catalog.Application.Jobs.ProductMedia;
+using Catalog.Application.Abstractions.Media;
+using Catalog.Application.Features.ProductMedia.Shared;
+using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;
+using Catalog.Application.Features.ProductMedia.Jobs;
 using Catalog.Contracts.Products.Media;
-using Catalog.Domain.Entities;
-using Catalog.Domain.ValueObjects;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -156,7 +168,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         SetProductMediaCommand command)
     {
         await using var scope = provider.CreateAsyncScope();
-        var handler = ActivatorUtilities.CreateInstance<SetProductMediaCommandHandler>(scope.ServiceProvider);
+        var handler = ActivatorUtilities.CreateInstance<SetProductMediaHandler>(scope.ServiceProvider);
         return await handler.Handle(command, default);
     }
 

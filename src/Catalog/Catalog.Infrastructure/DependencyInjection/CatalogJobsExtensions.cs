@@ -1,7 +1,7 @@
-using Catalog.Application.Integrations.OneC.Jobs;
-using Catalog.Application.Integrations.OneC.Sync;
-using Catalog.Application.Jobs.Attributes;
-using Catalog.Application.Jobs.Slugs;
+using Catalog.Application.Features.OneCSync.Jobs;
+using Catalog.Application.Features.OneCSync.Sync;
+using Catalog.Application.Features.Attributes.Jobs;
+using Catalog.Application.Features.Slugs.Jobs;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

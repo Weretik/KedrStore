@@ -6,7 +6,7 @@ Public `POST /api/orders` with Excel generation and Telegram notification.
 
 ## Structure and relationships
 
-[OrderController](../../../../src/Catalog/Catalog.Api/Controllers/OrderController.cs) invokes [CreateOrderCommandHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs). The handler creates a GUID, generates an Excel file through an exporter, and sends it with a notifier. This flow does not persist a [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs); do not confuse it with Sales admin orders.
+[OrderController](../../../../src/Catalog/Catalog.Api/Features/Orders/OrderController.cs) invokes [CreateOrderHandler](../../../../src/Catalog/Catalog.Application/Features/Orders/Commands/CreateOrder/CreateOrderHandler.cs). The handler creates a GUID, generates an Excel file through an exporter, and sends it with a notifier. This flow does not persist a [Sales Order](../../../../src/Sales/Sales.Domain/Orders/Entities/Order.cs); do not confuse it with Sales admin orders.
 
 ## Code structure
 
@@ -16,7 +16,7 @@ The tree lists verified entry points and key components, not every supporting fi
 src/
 ├── Catalog/
 │   ├── Catalog.Api/Controllers/OrderController.cs  # HTTP entry point
-│   └── Catalog.Application/Features/Orders/Create/CreateOrderCommandHandler.cs  # use-case handler
+│   └── Catalog.Application/Features/Orders/Create/CreateOrderHandler.cs  # use-case handler
 └── Sales/Sales.Domain/Orders/Entities/Order.cs  # domain model
 ```
 
@@ -24,7 +24,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["OrderController"] --> B["CreateOrderCommandHandler"]
+    A["OrderController"] --> B["CreateOrderHandler"]
     B --> C["Order GUID"]
     B --> D["Excel exporter"]
     D --> E["Order file"]

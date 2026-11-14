@@ -1,7 +1,19 @@
-using Catalog.Domain.Entities;
-using Catalog.Application.Integrations.OneC.DTOs;
-using Catalog.Domain.ValueObjects;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 

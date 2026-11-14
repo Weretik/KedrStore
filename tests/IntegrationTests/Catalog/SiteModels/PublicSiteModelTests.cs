@@ -1,21 +1,66 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using global::Catalog.Application.Attributes.Import;
-using global::Catalog.Application.Features.SiteModels.Accept;
-using global::Catalog.Application.Features.SiteModels.Common;
-using global::Catalog.Application.Features.SiteModels.Public.Common;
-using global::Catalog.Application.Features.SiteModels.Public.Get;
-using global::Catalog.Application.Features.SiteModels.Public.GetList;
-using global::Catalog.Application.Features.SiteModels.Public.GetProductAddress;
-using global::Catalog.Application.Features.SiteModels.SetTexts;
-using global::Catalog.Application.Integrations.OneC.Options;
-using global::Catalog.Application.Slugs;
+using global::Catalog.Application.Features.Attributes.Shared.Import;
+using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
+using global::Catalog.Application.Features.SiteModels.Shared;
+using global::Catalog.Application.Features.SiteModels.Shared.Public;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModel;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicProductModelAddress;
+using global::Catalog.Application.Features.SiteModels.Commands.SetSiteModelText;
+using global::Catalog.Application.Features.OneCSync.Mapping;
+using global::Catalog.Application.Features.Slugs.Shared;
 using global::Catalog.Contracts.SiteModels;
 using global::Catalog.Contracts.SiteModels.Public;
-using global::Catalog.Domain.Entities;
-using global::Catalog.Domain.Entities.Groups;
-using global::Catalog.Domain.ValueObjects;
-using global::Catalog.Infrastructure.DataBase;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Infrastructure.Adapters.Media;
+using global::Catalog.Infrastructure.Contracts.Products;
+using global::Catalog.Infrastructure.Contracts.Reference;
+using global::Catalog.Infrastructure.Contracts.Sales;
+using global::Catalog.Infrastructure.DependencyInjection;
+using global::Catalog.Infrastructure.Integrations.Excel;
+using global::Catalog.Infrastructure.Integrations.Html;
+using global::Catalog.Infrastructure.Integrations.OneC;
+using global::Catalog.Infrastructure.Integrations.Telegram;
+using global::Catalog.Infrastructure.Persistence;
+using global::Catalog.Infrastructure.Persistence.Attributes;
+using global::Catalog.Infrastructure.Persistence.Categories;
+using global::Catalog.Infrastructure.Persistence.Categories.Content;
+using global::Catalog.Infrastructure.Persistence.Groups;
+using global::Catalog.Infrastructure.Persistence.PriceTypes;
+using global::Catalog.Infrastructure.Persistence.Products;
+using global::Catalog.Infrastructure.Persistence.Products.Prices;
+using global::Catalog.Infrastructure.Persistence.Slugs;
+using global::Infrastructure;
 using IntegrationTests.Catalog.ProductMedia;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
@@ -66,15 +111,15 @@ public sealed class PublicSiteModelTests
         var hinges = await db.ProductGroupMembers.AsNoTracking()
             .Where(member => member.ProductId == ProductId.From(1)).Select(member => member.GroupId!.Value).SingleAsync();
         var state = new SiteModelStateReader(db);
-        var accepted = await new AcceptSiteModelsCommandHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
+        var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroupAxis>(db),
-                    new global::Catalog.Application.Features.Groups.Common.ProductGroupPins(db,
+                    new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
                 state, TimeProvider.System)
             .Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [hinges.Value] }),
                 CancellationToken.None);
         Assert.True(accepted.IsSuccess);
-        await new SetSiteModelTextCommandHandler(db, new TestRepository<ProductGroupText>(db), new SiteModelReader(state),
+        await new SetSiteModelTextHandler(db, new TestRepository<ProductGroupText>(db), new SiteModelReader(state),
                 TimeProvider.System)
             .Handle(new SetSiteModelTextCommand(hinges.Value, "uk", new SetSiteModelTextRequest
             {
@@ -93,7 +138,7 @@ public sealed class PublicSiteModelTests
 
     private static async Task<Ardalis.Result.Result<PublicSiteModelListDto>> ListAsync(CatalogDbContext db,
         string? category, GetPublicSiteModelsRequest request, string lang = "uk")
-        => await new GetPublicSiteModelsQueryHandler(Reader(db), new SlugService(db))
+        => await new GetPublicSiteModelsHandler(Reader(db), new SlugService(db))
             .Handle(new GetPublicSiteModelsQuery(lang, category, request), CancellationToken.None);
 
     private static async Task<(string Attribute, string Left, string Right)> SideSlugsAsync(CatalogDbContext db)
@@ -186,7 +231,7 @@ public sealed class PublicSiteModelTests
     {
         await using var db = await CatalogAsync();
         var side = await SideSlugsAsync(db);
-        var handler = new GetPublicSiteModelQueryHandler(Reader(db), new SlugService(db));
+        var handler = new GetPublicSiteModelHandler(Reader(db), new SlugService(db));
         var slug = (await ListAsync(db, "katehoriia-11", new GetPublicSiteModelsRequest())).Value.Items[0].Slug;
 
         var page = (await handler.Handle(new GetPublicSiteModelQuery("ru", slug), CancellationToken.None)).Value.Model!;
@@ -219,7 +264,7 @@ public sealed class PublicSiteModelTests
     {
         await using var db = await CatalogAsync();
         var side = await SideSlugsAsync(db);
-        var handler = new GetPublicProductModelAddressQueryHandler(Reader(db), new SlugService(db), db);
+        var handler = new GetPublicProductModelAddressHandler(Reader(db), new SlugService(db), db);
 
         var hinge = (await handler.Handle(new GetPublicProductModelAddressQuery("product-1"), CancellationToken.None)).Value;
         Assert.Equal(side.Left, hinge.Item!.Selection[side.Attribute]);

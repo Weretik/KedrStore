@@ -6,7 +6,7 @@ A separate read model for product lists and its updates.
 
 ## Structure and relationships
 
-[ProductListProjection](../../../../src/Catalog/Catalog.Domain/Entities/ProductListProjection.cs) stores list data in [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/DataBase/CatalogDbContext.cs). The [rebuilder](../../../../src/Catalog/Catalog.Infrastructure/Projections/ProductListProjectionRebuilder.cs) rebuilds the projection; the [stock job](../../../../src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCStocksJob.cs) updates stock. The [public handler](../../../../src/Catalog/Catalog.Application/Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs) reads the projection.
+[ProductListProjection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs) stores list data in [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/Persistence/CatalogDbContext.cs). The [rebuilder](../../../../src/Catalog/Catalog.Infrastructure/Persistence/Products/ProductListProjectionRebuilder.cs) rebuilds the projection; the [stock job](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCStocksJob.cs) updates stock. The [public handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetPublicProductList/GetPublicProductListHandler.cs) reads the projection.
 
 ## Code structure
 
@@ -16,7 +16,7 @@ The tree lists verified entry points and key components, not every supporting fi
 src/
 └── Catalog/
     ├── Catalog.Application/
-    │   ├── Features/Products/GetPublicList/GetPublicProductListQueryHandler.cs  # use-case handler
+    │   ├── Features/Products/GetPublicList/GetPublicProductListHandler.cs  # use-case handler
     │   └── Integrations/OneC/Jobs/SyncOneCStocksJob.cs  # background job
     ├── Catalog.Domain/Entities/ProductListProjection.cs  # domain model
     └── Catalog.Infrastructure/
@@ -35,7 +35,7 @@ flowchart LR
     E --> F["ProductListProjectionRebuilder"]
     F --> G["CatalogDbContext"]
     G --> H["ProductListProjection"]
-    I["GetPublicProductListQueryHandler"] --> H
+    I["GetPublicProductListHandler"] --> H
 ```
 
 ## Tests

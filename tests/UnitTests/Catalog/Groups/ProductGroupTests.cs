@@ -1,8 +1,16 @@
-using Catalog.Application.Groups;
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
+using Catalog.Application.Features.Groups.Shared;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace UnitTests.Catalog.Groups;
 

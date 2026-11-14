@@ -2,6 +2,14 @@ using Host.Api.DependencyInjection.ServiceRegistration.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Fail at startup, in every environment, when a Singleton holds a Scoped service (a captive DbContext) or a
+// registration is missing. Development enables this by default; production must too.
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
+
 builder.AddSerilog();
 builder.Services.AddHostServices(builder.Configuration);
 

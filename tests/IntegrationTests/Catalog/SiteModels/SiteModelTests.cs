@@ -1,28 +1,91 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using BuildingBlocks.Application.Contracts;
-using global::Catalog.Application.Features.Groups.Common;
-using global::Catalog.Application.Features.SiteModels.Accept;
-using global::Catalog.Application.Features.SiteModels.Common;
-using global::Catalog.Application.Features.SiteModels.Create;
-using global::Catalog.Application.Features.SiteModels.FillFromNames;
-using global::Catalog.Application.Features.SiteModels.Get;
-using global::Catalog.Application.Features.SiteModels.GetHealth;
-using global::Catalog.Application.Features.SiteModels.GetCategories;
-using global::Catalog.Application.Features.SiteModels.GetList;
-using global::Catalog.Application.Features.SiteModels.GetShowcase;
-using global::Catalog.Application.Features.SiteModels.RemoveProduct;
-using global::Catalog.Application.Features.SiteModels.SetAxes;
-using global::Catalog.Application.Features.SiteModels.SetTexts;
-using global::Catalog.Application.Attributes.Import;
-using global::Catalog.Application.Slugs;
+using global::Catalog.Application.Features.Groups.Shared;
+using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
+using global::Catalog.Application.Features.SiteModels.Shared;
+using global::Catalog.Application.Features.SiteModels.Commands.CreateSiteModel;
+using global::Catalog.Application.Features.SiteModels.Commands.FillSiteModelFromNames;
+using global::Catalog.Application.Features.SiteModels.Queries.GetSiteModel;
+using global::Catalog.Application.Features.SiteModels.Queries.GetSiteModelHealth;
+using global::Catalog.Application.Features.SiteModels.Queries.GetSiteModelCategories;
+using global::Catalog.Application.Features.SiteModels.Queries.GetSiteModels;
+using global::Catalog.Application.Features.SiteModels.Queries.GetSiteShowcase;
+using global::Catalog.Application.Features.SiteModels.Commands.RemoveSiteModelProduct;
+using global::Catalog.Application.Features.SiteModels.Commands.SetSiteModelAxes;
+using global::Catalog.Application.Features.SiteModels.Commands.SetSiteModelText;
+using global::Catalog.Application.Features.Attributes.Shared.Import;
+using global::Catalog.Application.Features.Slugs.Shared;
 using global::Catalog.Contracts.SiteModels;
-using global::Catalog.Domain.Entities;
-using global::Catalog.Domain.Entities.Attributes;
-using global::Catalog.Domain.Entities.Groups;
-using global::Catalog.Domain.Enums;
-using global::Catalog.Domain.ValueObjects;
-using global::Catalog.Infrastructure.DataBase;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Infrastructure.Adapters.Media;
+using global::Catalog.Infrastructure.Contracts.Products;
+using global::Catalog.Infrastructure.Contracts.Reference;
+using global::Catalog.Infrastructure.Contracts.Sales;
+using global::Catalog.Infrastructure.DependencyInjection;
+using global::Catalog.Infrastructure.Integrations.Excel;
+using global::Catalog.Infrastructure.Integrations.Html;
+using global::Catalog.Infrastructure.Integrations.OneC;
+using global::Catalog.Infrastructure.Integrations.Telegram;
+using global::Catalog.Infrastructure.Persistence;
+using global::Catalog.Infrastructure.Persistence.Attributes;
+using global::Catalog.Infrastructure.Persistence.Categories;
+using global::Catalog.Infrastructure.Persistence.Categories.Content;
+using global::Catalog.Infrastructure.Persistence.Groups;
+using global::Catalog.Infrastructure.Persistence.PriceTypes;
+using global::Catalog.Infrastructure.Persistence.Products;
+using global::Catalog.Infrastructure.Persistence.Products.Prices;
+using global::Catalog.Infrastructure.Persistence.Slugs;
+using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 
@@ -73,40 +136,40 @@ public sealed class SiteModelTests
         public SiteModelChanges Changes => new(db, new TestRepository<ProductGroupAxis>(db),
             new ProductGroupPins(db, new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), State);
 
-        public AcceptSiteModelsCommandHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
+        public AcceptSiteModelsHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
             Changes, State, TimeProvider.System);
 
-        public CreateSiteModelCommandHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
+        public CreateSiteModelHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
             Changes, Reader, TimeProvider.System);
 
-        public SetSiteModelAxesCommandHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
+        public SetSiteModelAxesHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
 
-        public SetSiteModelTextCommandHandler SetText => new(db, new TestRepository<ProductGroupText>(db), Reader,
+        public SetSiteModelTextHandler SetText => new(db, new TestRepository<ProductGroupText>(db), Reader,
             TimeProvider.System);
 
-        public FillSiteModelFromNamesCommandHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
+        public FillSiteModelFromNamesHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
             State, Changes, Reader, TimeProvider.System);
 
-        public RemoveSiteModelProductCommandHandler Remove => new(db, Changes, Reader, TimeProvider.System);
+        public RemoveSiteModelProductHandler Remove => new(db, Changes, Reader, TimeProvider.System);
 
         public async Task<SiteModelDto> GetAsync(int id)
-            => (await new GetSiteModelQueryHandler(Reader).Handle(new GetSiteModelQuery(id), CancellationToken.None))
+            => (await new GetSiteModelHandler(Reader).Handle(new GetSiteModelQuery(id), CancellationToken.None))
                 .Value;
 
         public async Task<SiteModelHealthDto> HealthAsync()
-            => (await new GetSiteModelHealthQueryHandler(State).Handle(new GetSiteModelHealthQuery(),
+            => (await new GetSiteModelHealthHandler(State).Handle(new GetSiteModelHealthQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteShowcaseListDto> ShowcaseAsync(GetSiteShowcaseRequest request)
-            => (await new GetSiteShowcaseQueryHandler(State).Handle(new GetSiteShowcaseQuery(request),
+            => (await new GetSiteShowcaseHandler(State).Handle(new GetSiteShowcaseQuery(request),
                 CancellationToken.None)).Value;
 
         public async Task<List<SiteModelCategoryDto>> CategoriesAsync()
-            => (await new GetSiteModelCategoriesQueryHandler(State).Handle(new GetSiteModelCategoriesQuery(),
+            => (await new GetSiteModelCategoriesHandler(State).Handle(new GetSiteModelCategoriesQuery(),
                 CancellationToken.None)).Value;
 
         public async Task<SiteModelListDto> ListAsync(GetSiteModelsRequest request)
-            => (await new GetSiteModelsQueryHandler(State).Handle(new GetSiteModelsQuery(request),
+            => (await new GetSiteModelsHandler(State).Handle(new GetSiteModelsQuery(request),
                 CancellationToken.None)).Value;
     }
 

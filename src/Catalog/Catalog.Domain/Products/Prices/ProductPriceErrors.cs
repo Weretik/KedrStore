@@ -1,0 +1,40 @@
+namespace Catalog.Domain.Products.Prices;
+
+public static class ProductPriceErrors
+{
+    public static CatalogDomainError IdRequired() =>
+        new("Catalog.ProductPrice.Id.Required",
+            "Product price id is required");
+
+    public static CatalogDomainError ProductIdRequired() =>
+        new("Catalog.ProductPrice.ProductId.Required",
+            "Product id type is required");
+
+    public static CatalogDomainError PriceTypeRequired() =>
+        new("Catalog.ProductPrice.PriceType.Required",
+            "Price type is required");
+
+    public static CatalogDomainError AmountNegative(decimal value) =>
+        new(
+            "Catalog.ProductPrice.Amount.Negative",
+            $"Price amount cannot be negative. Actual: {value}");
+
+    public static CatalogDomainError AmountOutOfRange(decimal value) =>
+        new(
+            "Catalog.ProductPrice.Amount.OutOfRange",
+            $"Price amount must be between 0 and 5 000 000. Actual: {value}");
+
+    public static CatalogDomainError CurrencyCodeRequired() =>
+        new("Catalog.ProductPrice.Currency.Code.Required",
+            "Currency ISO code is required");
+
+    public static CatalogDomainError CurrencyCodeLengthInvalid(string code) =>
+        new(
+            "Catalog.ProductPrice.Currency.Code.LengthInvalid",
+            $"Currency ISO code must be exactly 3 characters. Actual: {code}");
+
+    public static CatalogDomainError CurrencyCodeNonLetters(string code) =>
+        new(
+            "Catalog.ProductPrice.Currency.Code.NonLetters",
+            $"Currency ISO code must contain only letters. Actual: {code}");
+}

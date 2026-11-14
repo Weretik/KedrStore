@@ -1,7 +1,7 @@
-using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Features.Orders.Create;
-using Catalog.Application.Features.Orders.Create.DTOs;
-using Catalog.Application.Features.Orders.Create.Notifications;
+using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.Orders.Commands.CreateOrder;
+using Catalog.Application.Features.Orders.Commands.CreateOrder;
+using Catalog.Application.Abstractions.Integrations;
 
 namespace UnitTests.Catalog.Application;
 
@@ -11,7 +11,7 @@ public sealed class CreateQuickOrderHandlerTests
     public async Task Handle_EscapesCustomerTextInTheTelegramHtmlCaption()
     {
         var telegram = new RecordingTelegram();
-        var handler = new CreateOrderCommandHandler(telegram, new StubExporter());
+        var handler = new CreateOrderHandler(telegram, new StubExporter());
         var request = new CreateOrderRequest(
             "<b>Іван & Co</b>",
             "+38 (067) 000-00-00",

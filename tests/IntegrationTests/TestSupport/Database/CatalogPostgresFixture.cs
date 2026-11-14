@@ -1,4 +1,4 @@
-using Catalog.Infrastructure.DataBase;
+using Catalog.Infrastructure.Persistence;
 using DotNet.Testcontainers.Builders;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;

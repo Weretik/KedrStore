@@ -1,15 +1,69 @@
 using Microsoft.EntityFrameworkCore;
-using global::Catalog.Application.Features.Groups.Common;
-using global::Catalog.Application.Features.Groups.Create;
-using global::Catalog.Application.Features.Groups.SetForProduct;
-using global::Catalog.Application.Features.Groups.SetMain;
-using global::Catalog.Application.Slugs;
+using global::Catalog.Application.Features.Groups.Shared;
+using global::Catalog.Application.Features.Groups.Commands.CreateProductGroup;
+using global::Catalog.Application.Features.Groups.Commands.SetProductGroup;
+using global::Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
+using global::Catalog.Application.Features.Slugs.Shared;
 using global::Catalog.Contracts.Groups;
-using global::Catalog.Domain.Entities.Attributes;
-using global::Catalog.Domain.Enums;
-using global::Catalog.Domain.Entities.Groups;
-using global::Catalog.Domain.ValueObjects;
-using global::Catalog.Infrastructure.DataBase;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Infrastructure.Adapters.Media;
+using global::Catalog.Infrastructure.Contracts.Products;
+using global::Catalog.Infrastructure.Contracts.Reference;
+using global::Catalog.Infrastructure.Contracts.Sales;
+using global::Catalog.Infrastructure.DependencyInjection;
+using global::Catalog.Infrastructure.Integrations.Excel;
+using global::Catalog.Infrastructure.Integrations.Html;
+using global::Catalog.Infrastructure.Integrations.OneC;
+using global::Catalog.Infrastructure.Integrations.Telegram;
+using global::Catalog.Infrastructure.Persistence;
+using global::Catalog.Infrastructure.Persistence.Attributes;
+using global::Catalog.Infrastructure.Persistence.Categories;
+using global::Catalog.Infrastructure.Persistence.Categories.Content;
+using global::Catalog.Infrastructure.Persistence.Groups;
+using global::Catalog.Infrastructure.Persistence.PriceTypes;
+using global::Catalog.Infrastructure.Persistence.Products;
+using global::Catalog.Infrastructure.Persistence.Products.Prices;
+using global::Catalog.Infrastructure.Persistence.Slugs;
+using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 
@@ -122,7 +176,7 @@ public sealed class ProductGroupBuilderTests
         var group = await db.ProductGroups.AsNoTracking().SingleAsync();
         Assert.Equal(3, group.MainProductId?.Value);
 
-        var setMain = new SetProductGroupMainCommandHandler(db, new TestRepository<ProductGroup>(db),
+        var setMain = new SetProductGroupMainHandler(db, new TestRepository<ProductGroup>(db),
             new ProductGroupReader(db), TimeProvider.System);
         var notOnSite = await setMain.Handle(
             new SetProductGroupMainCommand(group.Id.Value, new SetProductGroupMainRequest { ProductId = 1 }),
@@ -188,7 +242,7 @@ public sealed class ProductGroupBuilderTests
         await RunAsync(db, Dictionary, csv, apply: true);
         var handle = (await db.ProductGroups.AsNoTracking().SingleAsync(group => group.Name == "Ручка")).Id;
 
-        var create = new CreateProductGroupCommandHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
+        var create = new CreateProductGroupHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
             Pins(db), GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
         var created = await create.Handle(new CreateProductGroupCommand(new CreateProductGroupRequest
         {
@@ -204,7 +258,7 @@ public sealed class ProductGroupBuilderTests
         }), CancellationToken.None);
         Assert.False(wrongCategory.IsSuccess);
 
-        var move = new SetProductGroupCommandHandler(db, new TestRepository<ProductGroupMember>(db), Pins(db),
+        var move = new SetProductGroupHandler(db, new TestRepository<ProductGroupMember>(db), Pins(db),
             GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
         var outOfGroups = await move.Handle(new SetProductGroupCommand(2, new SetProductGroupRequest()),
             CancellationToken.None);

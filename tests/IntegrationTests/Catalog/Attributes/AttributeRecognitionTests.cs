@@ -1,19 +1,73 @@
 using Xunit.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using global::Catalog.Application.Attributes.Import;
-using global::Catalog.Application.Jobs.Attributes;
-using global::Catalog.Application.Features.Attributes.Common;
-using global::Catalog.Application.Features.Attributes.DecideCode;
-using global::Catalog.Application.Features.Attributes.GetCodeProducts;
-using global::Catalog.Application.Features.ProductAttributes.Common;
-using global::Catalog.Application.Features.ProductAttributes.Set;
+using global::Catalog.Application.Features.Attributes.Shared.Import;
+using global::Catalog.Application.Features.Attributes.Jobs;
+using global::Catalog.Application.Features.Attributes.Shared;
+using global::Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
+using global::Catalog.Application.Features.Attributes.Queries.GetCodeProducts;
+using global::Catalog.Application.Features.ProductAttributes.Shared;
+using global::Catalog.Application.Features.ProductAttributes.Commands.SetProductAttribute;
 using global::Catalog.Contracts.Attributes;
-using global::Catalog.Domain.Entities;
-using global::Catalog.Domain.Entities.Attributes;
-using global::Catalog.Domain.Enums;
-using global::Catalog.Domain.ValueObjects;
-using global::Catalog.Infrastructure.DataBase;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Domain;
+using global::Catalog.Domain.Attributes;
+using global::Catalog.Domain.Categories;
+using global::Catalog.Domain.Categories.Content;
+using global::Catalog.Domain.Groups;
+using global::Catalog.Domain.PriceTypes;
+using global::Catalog.Domain.Products;
+using global::Catalog.Domain.Products.Media;
+using global::Catalog.Domain.Products.Prices;
+using global::Catalog.Domain.Slugs;
+using global::Catalog.Infrastructure.Adapters.Media;
+using global::Catalog.Infrastructure.Contracts.Products;
+using global::Catalog.Infrastructure.Contracts.Reference;
+using global::Catalog.Infrastructure.Contracts.Sales;
+using global::Catalog.Infrastructure.DependencyInjection;
+using global::Catalog.Infrastructure.Integrations.Excel;
+using global::Catalog.Infrastructure.Integrations.Html;
+using global::Catalog.Infrastructure.Integrations.OneC;
+using global::Catalog.Infrastructure.Integrations.Telegram;
+using global::Catalog.Infrastructure.Persistence;
+using global::Catalog.Infrastructure.Persistence.Attributes;
+using global::Catalog.Infrastructure.Persistence.Categories;
+using global::Catalog.Infrastructure.Persistence.Categories.Content;
+using global::Catalog.Infrastructure.Persistence.Groups;
+using global::Catalog.Infrastructure.Persistence.PriceTypes;
+using global::Catalog.Infrastructure.Persistence.Products;
+using global::Catalog.Infrastructure.Persistence.Products.Prices;
+using global::Catalog.Infrastructure.Persistence.Slugs;
+using global::Infrastructure;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
 
@@ -131,7 +185,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var color = await db.Attributes.AsNoTracking().SingleAsync(attribute => attribute.Code == "color");
         var otherColor = await db.AttributeValues.AsNoTracking()
             .SingleAsync(value => value.AttributeId == color.Id && value.Code == "AB");
-        var set = new SetProductAttributeCommandHandler(db, new TestRepository<ProductAttributeValue>(db),
+        var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
             GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
         Assert.True((await set.Handle(new SetProductAttributeCommand(60, color.Id.Value,
                 new SetProductAttributeRequest([new SetProductAttributeValueRequest(otherColor.Id.Value, null)])),
@@ -162,9 +216,9 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var before = await ReviewTextAsync(db, 60);
         Assert.Contains("AL", before);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId, new DecideAttributeCodeRequest(null)),
             CancellationToken.None);
         db.ChangeTracker.Clear();
@@ -187,15 +241,15 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.Contains("«AL»", await ReviewTextAsync(db, 60));
         Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
 
-        var listed = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
+        var listed = await new GetCodeProductsHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
             CancellationToken.None);
         var handles = Assert.Single(listed.Value.Categories, category => category.CategoryId == 5915);
         Assert.Contains(handles.Products, product => product.ProductId == 60);
         Assert.False(handles.HasOwnValue);
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId,
                 new DecideAttributeCodeRequest(null, ApplyToAll: false,
                     [new DecideAttributeCodeCategoryRequest(5915, null)])),
@@ -209,7 +263,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.False(alias.IsEditedManually);
         Assert.DoesNotContain("«AL»", await ReviewTextAsync(db, 60));
         Assert.Contains("«AL»", await ReviewTextAsync(db, 80));
-        var after = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
+        var after = await new GetCodeProductsHandler(db, new CodeMeaningReader(db)).Handle(new GetCodeProductsQuery(al.AliasId),
             CancellationToken.None);
         Assert.True(Assert.Single(after.Value.Categories, category => category.CategoryId == 5915).HasOwnValue);
 
@@ -232,7 +286,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var products = (await db.Products.IgnoreQueryFilters().AsNoTracking()
                 .Select(product => new { product.Id, product.CategoryId, product.Name })
                 .ToListAsync())
-            .Where(product => global::Catalog.Application.Attributes.Recognition.ProductAttributeRecognizer
+            .Where(product => global::Catalog.Application.Features.Attributes.Shared.Recognition.ProductAttributeRecognizer
                 .Mentions(product.Name, "ZCG"))
             .ToList();
         // 7894 is a cylinder (2680) and 7158 a hinge (6139) of the real catalog; the hinge's ZCG is not a cylinder code.
@@ -242,9 +296,9 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         output.WriteLine(await ReviewTextAsync(db, cylinder));
         Assert.Contains("ZCG", await ReviewTextAsync(db, cylinder));
 
-        var decide = new DecideAttributeCodeCommandHandler(db, new TestRepository<AttributeAlias>(db),
+        var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
             new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
-            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeCommandHandler>.Instance);
+            RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(zcg.AliasId,
                 new DecideAttributeCodeRequest(null, Meanings: [new CodeMeaningRequest(color.Id.Value, gold.Id.Value)])),
             CancellationToken.None);
@@ -265,7 +319,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
             CancellationToken.None)).IsSuccess);
         db.ChangeTracker.Clear();
         Assert.False(await HasGoldAsync(cylinder));
-        var listed = await new GetCodeProductsQueryHandler(db, new CodeMeaningReader(db))
+        var listed = await new GetCodeProductsHandler(db, new CodeMeaningReader(db))
             .Handle(new GetCodeProductsQuery(zcg.AliasId), CancellationToken.None);
         var own = Assert.Single(listed.Value.Categories, category => category.CategoryId == cylinders);
         Assert.True(own.HasOwnValue);

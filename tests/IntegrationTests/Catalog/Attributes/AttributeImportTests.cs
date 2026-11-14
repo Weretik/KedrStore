@@ -1,8 +1,16 @@
 using Xunit.Abstractions;
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
-using Catalog.Infrastructure.DataBase;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
+using Catalog.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using static IntegrationTests.Catalog.Attributes.AttributeImportTestSupport;
 using static IntegrationTests.Catalog.Import.CatalogImportTestSupport;
@@ -142,7 +150,7 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
         var csv = await File.ReadAllTextAsync(csvPath);
 
         await using var db = CreateContext();
-        var rows = global::Catalog.Application.Attributes.Import.AttributeCsvFile.Read(new StringReader(csv)).Products;
+        var rows = global::Catalog.Application.Features.Attributes.Shared.Import.AttributeCsvFile.Read(new StringReader(csv)).Products;
         var lines = csv.Split('\n');
         foreach (var categoryId in rows.Select(row => CategoryOf(lines, row.LineNumber)).Distinct())
             AddCategory(db, categoryId);

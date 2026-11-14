@@ -1,0 +1,57 @@
+﻿using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.OneCSync.Source;
+
+namespace Catalog.Application.Features.OneCSync.Jobs;
+
+public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceType> priceTypeRepo,
+    ILogger<SyncOneCPricesJob> logger)
+{
+    public async Task RunAsync(CancellationToken cancellationToken)
+    {
+        logger.LogInformation("[DEBUG_LOG] SyncOneCPriceTypesJob started");
+
+        var pricesTypesOneC = await oneC.GetPriceTypesAsync(cancellationToken);
+        logger.LogInformation("[DEBUG_LOG] Received {Count} price types from 1C", pricesTypesOneC.Count);
+
+        if (pricesTypesOneC.Count == 0)
+        {
+            logger.LogWarning("[DEBUG_LOG] No price types received from 1C. Sync stopping.");
+            return;
+        }
+
+        await CreateOrUpsertPriceTypesAsync(pricesTypesOneC, cancellationToken);
+
+        logger.LogInformation("SyncOneCPriceTypesJob finished");
+    }
+    private async Task CreateOrUpsertPriceTypesAsync(IReadOnlyList<OneCPriceTypeDto> priceTypeDtos, CancellationToken cancellationToken)
+    {
+        // Получаем все существующие ID одним запросом, чтобы избежать проблемы параллельных запусков или дублей
+        var existingPriceTypes = await priceTypeRepo.ListAsync(cancellationToken);
+        var existingIds = existingPriceTypes.Select(x => x.Id).ToHashSet();
+
+        foreach (var item in priceTypeDtos)
+        {
+            var priceTypeId = PriceTypeId.From(item.PriceTypeId);
+
+            if (!existingIds.Contains(priceTypeId))
+            {
+                var priceType = PriceType.Create(
+                    id: priceTypeId,
+                    priceTypeName: item.PriceTypeName);
+
+                await priceTypeRepo.AddAsync(priceType, cancellationToken);
+                existingIds.Add(priceTypeId);
+                logger.LogInformation("[DEBUG_LOG] Prepared new PriceType: {Name} (ID: {Id})", item.PriceTypeName, item.PriceTypeId);
+            }
+            else
+            {
+                var existing = existingPriceTypes.First(x => x.Id == priceTypeId);
+                existing.UpdateName(item.PriceTypeName);
+            }
+        }
+
+        await priceTypeRepo.SaveChangesAsync(cancellationToken);
+    }
+
+}

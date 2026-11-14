@@ -1,8 +1,20 @@
 using System.Reflection;
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Application.Features.Category.AdminGetList;
-using Catalog.Domain.Entities;
-using Catalog.Domain.ValueObjects;
+using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 
 namespace UnitTests.Catalog.Application;
 
@@ -14,7 +26,7 @@ public sealed class AdminCategoriesListApplicationTests
         var root = CreateCategory(5513, "n5513", 0, 0);
         var child = CreateCategory(900001, "n5513.n900001", 0, 1);
         var empty = CreateCategory(900002, "n5513.n900002", 1, 1);
-        var handler = new GetAdminCategoriesQueryHandler(
+        var handler = new GetAdminCategoriesHandler(
             Repository([root, child, empty]),
             new FixedInsights(
                 new Dictionary<int, int> { [5513] = 1, [900001] = 4 },
@@ -33,7 +45,7 @@ public sealed class AdminCategoriesListApplicationTests
     public async Task DeletedList_DoesNotReadInsights()
     {
         var deleted = CreateCategory(900003, "n5513.n900003", 0, 1);
-        var handler = new GetAdminCategoriesQueryHandler(Repository([deleted]), new ThrowingInsights());
+        var handler = new GetAdminCategoriesHandler(Repository([deleted]), new ThrowingInsights());
 
         var result = await handler.Handle(new GetAdminCategoriesQuery(Deleted: true), CancellationToken.None);
 

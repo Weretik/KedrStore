@@ -1,13 +1,27 @@
-using Catalog.Application.Features.SiteModels.Public.Common;
-using Catalog.Application.Features.SiteModels.Public.GetList;
-using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Application.Slugs;
+using Catalog.Application.Features.SiteModels.Shared.Public;
+using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
+using Catalog.Application.Features.OneCSync.Mapping;
+using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.SiteModels.Public;
-using Catalog.Domain.Entities;
-using Catalog.Domain.Entities.Attributes;
-using Catalog.Domain.Entities.Groups;
-using Catalog.Domain.Enums;
-using Catalog.Domain.ValueObjects;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Categories.Content;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Products.Prices;
+using Catalog.Domain.Slugs;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Groups;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Attributes;
+using Catalog.Domain.Categories;
+using Catalog.Domain.Groups;
+using Catalog.Domain.PriceTypes;
+using Catalog.Domain.Products;
+using Catalog.Domain.Products.Media;
+using Catalog.Domain.Slugs;
 using IntegrationTests.Catalog.ProductMedia;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +84,7 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
             DoorsRootCategoryId = "000007226", HardwareRootCategoryId = Root, CosmosRootCategoryId = "Космос",
             CosmosCategoryId = 920000
         }));
-        var result = await new GetPublicSiteModelsQueryHandler(reader, new SlugService(context))
+        var result = await new GetPublicSiteModelsHandler(reader, new SlugService(context))
             .Handle(new GetPublicSiteModelsQuery("uk", "zavisy", new GetPublicSiteModelsRequest
             {
                 Filter = ["storona:prava"]
