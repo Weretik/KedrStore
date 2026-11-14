@@ -1,6 +1,6 @@
 using System.Reflection;
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Application.Features.Category.AdminGetList;
+using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

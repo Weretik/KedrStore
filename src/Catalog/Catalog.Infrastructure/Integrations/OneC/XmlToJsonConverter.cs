@@ -2,7 +2,7 @@
 using Catalog.Infrastructure.Persistence.Categories;
 using System.Text;
 using System.Xml.Linq;
-using Catalog.Application.Contracts.Json;
+using Catalog.Application.Abstractions.Integrations;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Media;
+using Catalog.Application.Abstractions.Media;
 using Media.Contracts.Files;
 
 namespace Catalog.Infrastructure.Adapters.Media;

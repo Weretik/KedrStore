@@ -1,5 +1,5 @@
 using Catalog.Contracts.Pricing;
-using Catalog.Application.Contracts.Json;
+using Catalog.Application.Abstractions.Integrations;
 using Catalog.Infrastructure.Integrations.OneC;
 using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.Persistence.Categories;

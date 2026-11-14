@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Content;
+using Catalog.Application.Abstractions.Integrations;
 using Ganss.Xss;
 
 namespace Catalog.Infrastructure.Integrations.Html;

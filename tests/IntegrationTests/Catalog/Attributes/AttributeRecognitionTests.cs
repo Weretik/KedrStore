@@ -1,13 +1,13 @@
 using Xunit.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using global::Catalog.Application.Attributes.Import;
-using global::Catalog.Application.Jobs.Attributes;
-using global::Catalog.Application.Features.Attributes.Common;
-using global::Catalog.Application.Features.Attributes.DecideCode;
-using global::Catalog.Application.Features.Attributes.GetCodeProducts;
-using global::Catalog.Application.Features.ProductAttributes.Common;
-using global::Catalog.Application.Features.ProductAttributes.Set;
+using global::Catalog.Application.Features.Attributes.Shared.Import;
+using global::Catalog.Application.Features.Attributes.Jobs;
+using global::Catalog.Application.Features.Attributes.Shared;
+using global::Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
+using global::Catalog.Application.Features.Attributes.Queries.GetCodeProducts;
+using global::Catalog.Application.Features.ProductAttributes.Shared;
+using global::Catalog.Application.Features.ProductAttributes.Commands.SetProductAttribute;
 using global::Catalog.Contracts.Attributes;
 using global::Catalog.Domain;
 using global::Catalog.Domain.Attributes;
@@ -286,7 +286,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var products = (await db.Products.IgnoreQueryFilters().AsNoTracking()
                 .Select(product => new { product.Id, product.CategoryId, product.Name })
                 .ToListAsync())
-            .Where(product => global::Catalog.Application.Attributes.Recognition.ProductAttributeRecognizer
+            .Where(product => global::Catalog.Application.Features.Attributes.Shared.Recognition.ProductAttributeRecognizer
                 .Mentions(product.Name, "ZCG"))
             .ToList();
         // 7894 is a cylinder (2680) and 7158 a hinge (6139) of the real catalog; the hinge's ZCG is not a cylinder code.

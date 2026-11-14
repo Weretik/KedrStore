@@ -1,4 +1,4 @@
-using Catalog.Application.Attributes.Import;
+using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;

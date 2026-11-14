@@ -1,8 +1,8 @@
-using Catalog.Application.Integrations.OneC.Jobs;
-using Catalog.Application.Contracts.Projections;
-using Catalog.Application.Jobs.ProductMedia;
-using Catalog.Application.Jobs.Attributes;
-using Catalog.Application.Jobs.Slugs;
+using Catalog.Application.Features.OneCSync.Jobs;
+using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Features.ProductMedia.Jobs;
+using Catalog.Application.Features.Attributes.Jobs;
+using Catalog.Application.Features.Slugs.Jobs;
 using Host.Jobs;
 using Media.Application.Jobs.CdnSync;
 using Sales.Application.Integrations.OneC.Contracts;

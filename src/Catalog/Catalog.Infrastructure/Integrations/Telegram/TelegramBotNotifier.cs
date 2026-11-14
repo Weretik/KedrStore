@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Features.Orders.Create.Notifications;
+﻿using Catalog.Application.Abstractions.Integrations;
 using Telegram.Bot.Types;
 
 namespace Catalog.Infrastructure.Integrations.Telegram;

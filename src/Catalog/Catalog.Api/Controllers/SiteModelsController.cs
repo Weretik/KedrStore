@@ -1,6 +1,6 @@
-using Catalog.Application.Features.SiteModels.Public.Get;
-using Catalog.Application.Features.SiteModels.Public.GetList;
-using Catalog.Application.Features.SiteModels.Public.GetProductAddress;
+using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModel;
+using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
+using Catalog.Application.Features.SiteModels.Queries.GetPublicProductModelAddress;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.SiteModels.Public;
 using Microsoft.AspNetCore.Authorization;

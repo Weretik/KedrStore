@@ -1,7 +1,7 @@
-using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Features.Orders.Create;
-using Catalog.Application.Features.Orders.Create.DTOs;
-using Catalog.Application.Features.Orders.Create.Notifications;
+using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.Orders.Commands.CreateOrder;
+using Catalog.Application.Features.Orders.Commands.CreateOrder;
+using Catalog.Application.Abstractions.Integrations;
 
 namespace UnitTests.Catalog.Application;
 

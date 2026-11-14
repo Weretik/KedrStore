@@ -1,5 +1,5 @@
-using Catalog.Application.Attributes.Import;
-using Catalog.Application.Attributes.Recognition;
+using Catalog.Application.Features.Attributes.Shared.Import;
+using Catalog.Application.Features.Attributes.Shared.Recognition;
 
 namespace UnitTests.Catalog.Attributes;
 

@@ -1,5 +1,5 @@
 using BuildingBlocks.Api.Snapshots;
-using Catalog.Application.Features.MobileSync;
+using Catalog.Application.Features.MobileSync.Queries.GetCatalogSnapshot;
 using Catalog.Contracts.MobileSync;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;

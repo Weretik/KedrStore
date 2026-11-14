@@ -1,4 +1,4 @@
-using Catalog.Application.Features.ProductMedia.FileChanges;
+using Catalog.Application.Features.ProductMedia.Shared;
 using Media.Contracts.Files;
 
 namespace Catalog.Infrastructure.Adapters.Media;

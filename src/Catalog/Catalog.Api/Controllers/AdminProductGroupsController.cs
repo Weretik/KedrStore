@@ -1,9 +1,9 @@
-using Catalog.Application.Features.Groups.Create;
-using Catalog.Application.Features.Groups.Get;
-using Catalog.Application.Features.Groups.GetList;
-using Catalog.Application.Features.Groups.Rename;
-using Catalog.Application.Features.Groups.SetMain;
-using Catalog.Application.Features.Slugs.Change;
+using Catalog.Application.Features.Groups.Commands.CreateProductGroup;
+using Catalog.Application.Features.Groups.Queries.GetProductGroup;
+using Catalog.Application.Features.Groups.Queries.GetProductGroups;
+using Catalog.Application.Features.Groups.Commands.RenameProductGroup;
+using Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
+using Catalog.Application.Features.Slugs.Commands.ChangeSlug;
 using Catalog.Contracts.Groups;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.Attributes;

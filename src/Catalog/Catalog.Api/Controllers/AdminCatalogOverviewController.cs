@@ -1,4 +1,4 @@
-using Catalog.Application.Features.Overview;
+using Catalog.Application.Features.Overview.Queries.GetAdminCatalogOverview;
 using Catalog.Contracts.Overview;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;

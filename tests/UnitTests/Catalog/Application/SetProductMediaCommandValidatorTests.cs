@@ -1,4 +1,4 @@
-using Catalog.Application.Features.ProductMedia.Set;
+using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;
 using Catalog.Contracts.Products.Media;
 
 namespace UnitTests.Catalog.Application;

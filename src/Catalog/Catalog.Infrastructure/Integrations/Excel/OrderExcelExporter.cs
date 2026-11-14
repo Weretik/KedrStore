@@ -1,5 +1,5 @@
-﻿using Catalog.Application.Contracts.ClosedXML;
-using Catalog.Application.Features.Orders.Create.DTOs;
+﻿using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.Orders.Commands.CreateOrder;
 using ClosedXML.Excel;
 
 namespace Catalog.Infrastructure.Integrations.Excel;

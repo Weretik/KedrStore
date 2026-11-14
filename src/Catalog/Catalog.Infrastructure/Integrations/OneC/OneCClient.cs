@@ -1,7 +1,7 @@
 using System.Globalization;
 using BuildingBlocks.Integrations.OneC.Factory;
-using Catalog.Application.Integrations.OneC.Contracts;
-using Catalog.Application.Integrations.OneC.DTOs;
+using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.OneCSync.Source;
 
 namespace Catalog.Infrastructure.Integrations.OneC;
 

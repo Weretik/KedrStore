@@ -1,7 +1,7 @@
-using Catalog.Application.Features.Category;
-using Catalog.Application.Features.Category.GetBySlug;
-using Catalog.Application.Features.Category.GetList;
-using Catalog.Application.Features.Category.GetList.DTOs;
+using Catalog.Application.Features.Categories.Shared;
+using Catalog.Application.Features.Categories.Queries.GetCategoryBySlug;
+using Catalog.Application.Features.Categories.Queries.GetCategories;
+using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Contracts.Category;
 using Microsoft.AspNetCore.Authorization;
 

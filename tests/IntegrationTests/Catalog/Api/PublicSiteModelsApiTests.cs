@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

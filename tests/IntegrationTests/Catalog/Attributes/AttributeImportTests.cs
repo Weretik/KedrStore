@@ -150,7 +150,7 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
         var csv = await File.ReadAllTextAsync(csvPath);
 
         await using var db = CreateContext();
-        var rows = global::Catalog.Application.Attributes.Import.AttributeCsvFile.Read(new StringReader(csv)).Products;
+        var rows = global::Catalog.Application.Features.Attributes.Shared.Import.AttributeCsvFile.Read(new StringReader(csv)).Products;
         var lines = csv.Split('\n');
         foreach (var categoryId in rows.Select(row => CategoryOf(lines, row.LineNumber)).Distinct())
             AddCategory(db, categoryId);

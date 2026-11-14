@@ -1,8 +1,8 @@
-using Catalog.Application.Features.ProductAttributes.AcceptReview;
-using Catalog.Application.Features.ProductAttributes.Get;
-using Catalog.Application.Features.ProductAttributes.ReopenReview;
-using Catalog.Application.Features.ProductAttributes.Restore;
-using Catalog.Application.Features.ProductAttributes.Set;
+using Catalog.Application.Features.ProductAttributes.Commands.AcceptProductReview;
+using Catalog.Application.Features.ProductAttributes.Queries.GetProductAttributes;
+using Catalog.Application.Features.ProductAttributes.Commands.ReopenProductReview;
+using Catalog.Application.Features.ProductAttributes.Commands.RestoreProductAttribute;
+using Catalog.Application.Features.ProductAttributes.Commands.SetProductAttribute;
 using Catalog.Contracts.Attributes;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Authorization;

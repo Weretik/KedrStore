@@ -29,7 +29,7 @@ global using BuildingBlocks.Domain.Abstractions;
 global using Catalog.Contracts.Products.GetList;
 
 // Application namespaces
-global using Catalog.Application.Features.Products.GetSalesList;
+global using Catalog.Application.Features.Products.Queries.GetProductList;
 
 // Services
 global using Ardalis.Result;

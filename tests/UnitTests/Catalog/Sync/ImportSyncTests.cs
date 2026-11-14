@@ -1,9 +1,9 @@
-using Catalog.Application.Features.Category.Stats;
-using Catalog.Application.Features.Category;
-using Catalog.Application.Integrations.OneC.DTOs;
-using Catalog.Application.Integrations.OneC.Mappers;
-using Catalog.Application.Integrations.OneC.Specifications;
-using Catalog.Application.Integrations.OneC.Sync;
+using Catalog.Application.Features.Categories.Shared;
+using Catalog.Application.Features.Categories.Shared;
+using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Mapping;
+using Catalog.Application.Features.OneCSync.Sync;
+using Catalog.Application.Features.OneCSync.Sync;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

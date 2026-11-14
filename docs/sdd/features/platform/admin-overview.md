@@ -7,7 +7,7 @@ Three read-only endpoints feed the admin home page «Огляд». Each module c
 ## Structure and relationships
 
 - Sales: [WorkspaceOverviewReader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs) counts today's orders (Kyiv day from [WorkspaceDateRange](../../../../src/Sales/Sales.Api/Controllers/WorkspaceDateRange.cs)), drafts and retryable 1C problems, and lists the newest orders.
-- Catalog: [GetAdminCatalogOverviewQueryHandler](../../../../src/Catalog/Catalog.Application/Features/Overview/GetAdminCatalogOverviewQueryHandler.cs) reads the product list projection and category texts with the same «filled» rule as the category list.
+- Catalog: [GetAdminCatalogOverviewQueryHandler](../../../../src/Catalog/Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/GetAdminCatalogOverviewQueryHandler.cs) reads the product list projection and category texts with the same «filled» rule as the category list.
 - Content: [GetAdminContentOverviewQueryHandler](../../../../src/Content/Content.Application/Features/Overview/GetAdminContentOverviewQueryHandler.cs) counts article drafts, legacy covers and document drafts.
 
 ## Code structure

@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Media;
+using Catalog.Application.Abstractions.Media;
 
 namespace IntegrationTests.Catalog.ProductMedia;
 

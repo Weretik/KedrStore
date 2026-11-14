@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using Catalog.Application.Features.Category.AdminGetById;
-using Catalog.Application.Features.Category.AdminGetList;
-using Catalog.Application.Features.Category.Content.Get;
-using Catalog.Application.Features.Category.Content.Save;
-using Catalog.Application.Features.Category.SiteVisibility;
-using Catalog.Application.Features.Slugs.Change;
+using Catalog.Application.Features.Categories.Queries.GetAdminCategoryById;
+using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
+using Catalog.Application.Features.Categories.Queries.GetCategoryContent;
+using Catalog.Application.Features.Categories.Commands.SaveCategoryContent;
+using Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility;
+using Catalog.Application.Features.Slugs.Commands.ChangeSlug;
 using Catalog.Contracts.Category;
 using Catalog.Contracts.Slugs;
 using Catalog.Domain.Attributes;

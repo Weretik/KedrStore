@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using global::Catalog.Application.Features.Groups.Common;
-using global::Catalog.Application.Features.Groups.Create;
-using global::Catalog.Application.Features.Groups.SetForProduct;
-using global::Catalog.Application.Features.Groups.SetMain;
-using global::Catalog.Application.Slugs;
+using global::Catalog.Application.Features.Groups.Shared;
+using global::Catalog.Application.Features.Groups.Commands.CreateProductGroup;
+using global::Catalog.Application.Features.Groups.Commands.SetProductGroup;
+using global::Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
+using global::Catalog.Application.Features.Slugs.Shared;
 using global::Catalog.Contracts.Groups;
 using global::Catalog.Domain;
 using global::Catalog.Domain.Attributes;

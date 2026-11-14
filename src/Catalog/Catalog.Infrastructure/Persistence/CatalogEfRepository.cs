@@ -1,4 +1,4 @@
-﻿using Catalog.Application.Contracts.Persistence;
+﻿using Catalog.Application.Abstractions.Persistence;
 using Catalog.Infrastructure.Persistence;
 
 namespace Catalog.Infrastructure.Persistence;

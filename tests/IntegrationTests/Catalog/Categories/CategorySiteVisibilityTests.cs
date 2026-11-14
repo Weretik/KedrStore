@@ -1,6 +1,6 @@
-using Catalog.Application.Features.Category.SiteVisibility;
-using Catalog.Application.Integrations.OneC.DTOs;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility;
+using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

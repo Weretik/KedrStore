@@ -1,5 +1,5 @@
-using Catalog.Application.Features.Products.GetSalesList;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Features.Products.Queries.GetProductList;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Contracts.Pricing;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Categories;

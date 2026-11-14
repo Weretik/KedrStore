@@ -1,4 +1,4 @@
-using Catalog.Application.Groups;
+using Catalog.Application.Features.Groups.Shared;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;

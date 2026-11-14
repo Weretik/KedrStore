@@ -1,5 +1,5 @@
-using Catalog.Application.Integrations.OneC.Contracts;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Abstractions.Integrations;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Infrastructure.Integrations.OneC;
 
 namespace Catalog.Infrastructure.DependencyInjection;

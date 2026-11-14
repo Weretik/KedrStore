@@ -1,7 +1,7 @@
-using Catalog.Application.Contracts.Media;
-using Catalog.Application.Features.ProductMedia.FileChanges;
-using Catalog.Application.Features.ProductMedia.Set;
-using Catalog.Application.Jobs.ProductMedia;
+using Catalog.Application.Abstractions.Media;
+using Catalog.Application.Features.ProductMedia.Shared;
+using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;
+using Catalog.Application.Features.ProductMedia.Jobs;
 using Catalog.Contracts.Products.Media;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;

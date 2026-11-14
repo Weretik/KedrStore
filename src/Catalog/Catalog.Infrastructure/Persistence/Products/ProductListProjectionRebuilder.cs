@@ -1,5 +1,5 @@
-using Catalog.Application.Contracts.Projections;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Contracts.Pricing;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;

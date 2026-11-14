@@ -1,5 +1,5 @@
-using Catalog.Application.Integrations.OneC.DTOs;
-using Catalog.Application.Integrations.OneC.Mappers;
+using Catalog.Application.Features.OneCSync.Source;
+using Catalog.Application.Features.OneCSync.Mapping;
 
 namespace UnitTests.Catalog.Application;
 

@@ -1,7 +1,7 @@
-using Catalog.Application.Features.SiteModels.Public.Common;
-using Catalog.Application.Features.SiteModels.Public.GetList;
-using Catalog.Application.Integrations.OneC.Options;
-using Catalog.Application.Slugs;
+using Catalog.Application.Features.SiteModels.Shared.Public;
+using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
+using Catalog.Application.Features.OneCSync.Mapping;
+using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.SiteModels.Public;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;

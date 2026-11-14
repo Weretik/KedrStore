@@ -1,7 +1,7 @@
-using Catalog.Application.Attributes.Import;
-using Catalog.Application.Groups;
-using Catalog.Application.Jobs.Attributes;
-using Catalog.Application.Slugs;
+using Catalog.Application.Features.Attributes.Shared.Import;
+using Catalog.Application.Features.Groups.Shared;
+using Catalog.Application.Features.Attributes.Jobs;
+using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

@@ -1,4 +1,4 @@
-using Catalog.Application.Contracts.Persistence;
+using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Reference;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Categories;

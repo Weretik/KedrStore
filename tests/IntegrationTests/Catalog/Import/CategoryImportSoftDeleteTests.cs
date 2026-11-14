@@ -5,7 +5,7 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
-using Catalog.Application.Integrations.OneC.DTOs;
+using Catalog.Application.Features.OneCSync.Source;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Groups;

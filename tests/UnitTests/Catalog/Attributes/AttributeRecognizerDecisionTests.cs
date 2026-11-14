@@ -1,4 +1,4 @@
-using Catalog.Application.Attributes.Recognition;
+using Catalog.Application.Features.Attributes.Shared.Recognition;
 
 namespace UnitTests.Catalog.Attributes;
 

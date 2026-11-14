@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
-using Catalog.Application.Attributes.Import;
-using Catalog.Application.Attributes.Recognition;
+using Catalog.Application.Features.Attributes.Shared.Import;
+using Catalog.Application.Features.Attributes.Shared.Recognition;
 
 namespace UnitTests.Catalog.Attributes;
 
@@ -58,7 +58,7 @@ public sealed class AttributeRecognizerGoldenTests
     {
         using var reader = new StreamReader(RepositoryFile("docs/catalog-attributes/products_attributes.csv"));
         var records = CsvText.ReadRecords(reader).ToList();
-        var header = records[0].Fields.Select(name => name.TrimStart('﻿')).ToList();
+        var header = records[0].Fields.Select(name => name.TrimStart('\uFEFF')).ToList();
         return records.Skip(1)
             .Where(record => record.Fields.Count == header.Count)
             .Select(record => header.Select((name, index) => (name, value: record.Fields[index]))

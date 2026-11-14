@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using Catalog.Application.Contracts.Media;
-using Catalog.Application.Features.Attributes.UploadSwatch;
+using Catalog.Application.Abstractions.Media;
+using Catalog.Application.Features.Attributes.Commands.UploadAttributeSwatch;
 
 namespace UnitTests.Catalog.Attributes;
 

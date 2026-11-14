@@ -1,11 +1,11 @@
-using Catalog.Application.Features.Category.Stats;
+using Catalog.Application.Features.Categories.Shared;
 using System.Reflection;
 using Microsoft.Extensions.Options;
-using Catalog.Application.Contracts.Persistence;
-using Catalog.Application.Features.Category;
-using Catalog.Application.Features.Category.GetList;
-using Catalog.Application.Features.Category.GetList.DTOs;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Abstractions.Persistence;
+using Catalog.Application.Features.Categories.Shared;
+using Catalog.Application.Features.Categories.Queries.GetCategories;
+using Catalog.Application.Features.Categories.Queries.GetCategories;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;

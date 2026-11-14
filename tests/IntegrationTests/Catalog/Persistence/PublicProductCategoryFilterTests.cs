@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using Catalog.Application.Features.Products.GetPublicList;
-using Catalog.Application.Slugs;
+using Catalog.Application.Features.Products.Queries.GetPublicProductList;
+using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -17,7 +17,7 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
 using Catalog.Infrastructure.Persistence;
-using Catalog.Application.Integrations.OneC.Options;
+using Catalog.Application.Features.OneCSync.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 

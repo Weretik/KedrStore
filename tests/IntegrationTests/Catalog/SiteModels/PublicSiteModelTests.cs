@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using global::Catalog.Application.Attributes.Import;
-using global::Catalog.Application.Features.SiteModels.Accept;
-using global::Catalog.Application.Features.SiteModels.Common;
-using global::Catalog.Application.Features.SiteModels.Public.Common;
-using global::Catalog.Application.Features.SiteModels.Public.Get;
-using global::Catalog.Application.Features.SiteModels.Public.GetList;
-using global::Catalog.Application.Features.SiteModels.Public.GetProductAddress;
-using global::Catalog.Application.Features.SiteModels.SetTexts;
-using global::Catalog.Application.Integrations.OneC.Options;
-using global::Catalog.Application.Slugs;
+using global::Catalog.Application.Features.Attributes.Shared.Import;
+using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
+using global::Catalog.Application.Features.SiteModels.Shared;
+using global::Catalog.Application.Features.SiteModels.Shared.Public;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModel;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
+using global::Catalog.Application.Features.SiteModels.Queries.GetPublicProductModelAddress;
+using global::Catalog.Application.Features.SiteModels.Commands.SetSiteModelText;
+using global::Catalog.Application.Features.OneCSync.Mapping;
+using global::Catalog.Application.Features.Slugs.Shared;
 using global::Catalog.Contracts.SiteModels;
 using global::Catalog.Contracts.SiteModels.Public;
 using global::Catalog.Domain;
@@ -113,7 +113,7 @@ public sealed class PublicSiteModelTests
         var state = new SiteModelStateReader(db);
         var accepted = await new AcceptSiteModelsCommandHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroupAxis>(db),
-                    new global::Catalog.Application.Features.Groups.Common.ProductGroupPins(db,
+                    new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
                 state, TimeProvider.System)
             .Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [hinges.Value] }),
