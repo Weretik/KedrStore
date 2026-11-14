@@ -1,5 +1,6 @@
 using Host.Api.DependencyInjection.ServiceRegistration.Web;
 using Media.Api.DependencyInjection;
+using Sales.Api.DependencyInjection;
 using Work.Api.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,7 @@ app.UseWorkActivity();
 
 app.MapControllers();
 app.MapMediaEndpoints();
+app.MapSalesEndpoints();
 app.MapWorkEndpoints();
 app.MapHealthChecks("/health").AllowAnonymous();
 

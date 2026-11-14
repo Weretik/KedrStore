@@ -14,7 +14,7 @@ Three read-only endpoints feed the admin home page «Огляд». Each module c
 
 ```text
 src/Sales/
-├── Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs  # GET overview
+├── Sales.Api/Endpoints/OrderWorkspace/GetWorkspaceOverviewEndpoint.cs  # GET overview
 ├── Sales.Application/Abstractions/Orders/{IWorkspaceOverviewReader,WorkspaceOverviewContracts}.cs
 ├── Sales.Application/Features/OrderWorkspace/Queries/GetWorkspaceOverview/
 └── Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs

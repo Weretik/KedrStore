@@ -14,7 +14,7 @@ Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete l
 
 ## Structure and relationships
 
-[AdminCustomersController](../../../../src/Sales/Sales.Api/Features/Customers/AdminCustomersController.cs) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
+The Minimal API group [CustomersEndpoints](../../../../src/Sales/Sales.Api/Endpoints/Customers/CustomersEndpoints.cs) (tag `AdminCustomers`, `CanManageOrders`) reads through the [list handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and schedules Identity deletion.
 
 ## Code structure
 
@@ -23,7 +23,7 @@ The tree lists verified entry points and key components; it does not include eve
 ```text
 src/
 ├── Sales/
-│   ├── Sales.Api/Features/Customers/AdminCustomersController.cs  # HTTP entry point and query parameters
+│   ├── Sales.Api/Endpoints/Customers/                       # HTTP group, one endpoint per use case, query parameters
 │   ├── Sales.Application/Features/Customers/Queries/
 │   │   ├── GetCustomerById/GetCustomerByIdHandler.cs  # use-case handler
 │   │   └── GetCustomerList/GetCustomerListHandler.cs  # use-case handler
@@ -44,7 +44,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["AdminCustomersController"] --> B["GetCustomerListHandler"]
+    A["GetCustomerListEndpoint"] --> B["GetCustomerListHandler"]
     A --> C["GetCustomerByIdHandler"]
     B --> G["CustomerReadService"]
     G --> D["Counterparty"]

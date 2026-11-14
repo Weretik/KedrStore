@@ -6,7 +6,7 @@ Authorized product list for sales.
 
 ## Structure and relationships
 
-[Sales CatalogController](../../../../src/Sales/Sales.Api/Features/Catalog/CatalogController.cs) serves `GET /api/sales/{lang}/catalog/products`; the [handler](../../../../src/Sales/Sales.Application/Features/Catalog/Queries/GetCatalogList/GetCatalogListHandler.cs) builds a read result through Catalog contracts. [Price policy](../../../../src/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) belongs to Sales. This is a separate use case from the anonymous public catalog.
+[GetCatalogListEndpoint](../../../../src/Sales/Sales.Api/Endpoints/Catalog/GetCatalogListEndpoint.cs) in the [Catalog group](../../../../src/Sales/Sales.Api/Endpoints/Catalog/CatalogEndpoints.cs) serves `GET /api/sales/{lang}/catalog/products`; the [handler](../../../../src/Sales/Sales.Application/Features/Catalog/Queries/GetCatalogList/GetCatalogListHandler.cs) builds a read result through Catalog contracts. [Price policy](../../../../src/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) belongs to Sales. This is a separate use case from the anonymous public catalog.
 
 ## Code structure
 
@@ -15,7 +15,7 @@ The tree lists verified entry points and key components, not every supporting fi
 ```text
 src/
 └── Sales/
-    ├── Sales.Api/Features/Catalog/CatalogController.cs  # HTTP entry point
+    ├── Sales.Api/Endpoints/Catalog/GetCatalogListEndpoint.cs  # HTTP entry point
     ├── Sales.Application/Features/Catalog/Queries/GetCatalogList/GetCatalogListHandler.cs  # use-case handler
     └── Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs  # infrastructure implementation
 ```
@@ -24,7 +24,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["Sales CatalogController"] --> B["GetCatalogListHandler"]
+    A["GetCatalogListEndpoint"] --> B["GetCatalogListHandler"]
     B --> C["Catalog contracts"]
     B --> D["DefaultPricePolicyProvider"]
     C --> E["Manager catalog"]

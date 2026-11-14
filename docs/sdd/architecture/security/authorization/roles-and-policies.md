@@ -12,9 +12,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 
 | Controller | Routes | Access |
 | --- | --- | --- |
-| `AdminOrderWorkspaceController` | `/api/admin/order-workspace` | `CanManageOrders` |
-| `AdminOrdersController` | `/api/admin/orders` | `CanManageOrders` |
-| `AdminCustomersController` | `/api/admin/customers` | `CanManageOrders` |
+| Sales endpoints, tags `AdminOrderWorkspace`, `AdminOrders`, `AdminCustomers` | `/api/admin/order-workspace`, `/api/admin/orders`, `/api/admin/customers` | `CanManageOrders` on each group |
 | `AdminProductsController` | `/api/admin/products` | `CanManageProducts`; slug and `deleted=true` need `CanManageSiteCatalog` |
 | `AdminCategoriesController` | `/api/categories` | `CanManageProducts`; slug, content, «show on site», and `deleted=true` need `CanManageSiteCatalog` |
 | `AdminCatalogAttributesController` | `/api/admin/catalog-attributes` | `CanManageProducts`; every change needs `CanManageSiteCatalog` |
@@ -31,7 +29,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
 | Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
-| `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
+| Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
 | `ArticlesController` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
