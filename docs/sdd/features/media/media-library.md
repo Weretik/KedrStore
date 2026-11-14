@@ -59,7 +59,7 @@ Tables `media."MediaFolders"` and `media."MediaFiles"`; see the [database map](.
 
 ## Tests
 
-- Unit: [MediaDomainTests](../../../../tests/UnitTests/Media/MediaDomainTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Media"`.
+- Unit: [MediaDomainTests](../../../../tests/UnitTests/Media/MediaDomainTests.cs) and [MediaValidatorsTests](../../../../tests/UnitTests/Media/MediaValidatorsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Media"`.
 - Integration: [HTTP, access, uploads, folders](../../../../tests/IntegrationTests/Media/MediaApiTests.cs), [PostgreSQL schema, CDN sync, list queries](../../../../tests/IntegrationTests/Media/MediaPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Media"`.
 
 ## Related sources
