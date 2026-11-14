@@ -10,13 +10,13 @@ public sealed class WorkTaskStep
 
     private WorkTaskStep() { }
 
-    internal static WorkTaskStep Create(string? title, bool isDone)
+    internal static DomainResult<WorkTaskStep> Create(string? title, bool isDone)
     {
         var normalized = title?.Trim() ?? string.Empty;
         if (normalized.Length == 0)
-            throw new DomainException(WorkErrors.Required("Step"));
+            return WorkErrors.Required("Steps");
         if (normalized.Length > TitleMaxLength)
-            throw new DomainException(WorkErrors.TooLong("Step", TitleMaxLength, normalized.Length));
+            return WorkErrors.TooLong("Steps", TitleMaxLength, normalized.Length);
         return new WorkTaskStep { Title = normalized, IsDone = isDone };
     }
 

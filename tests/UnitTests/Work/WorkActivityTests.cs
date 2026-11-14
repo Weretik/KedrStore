@@ -9,7 +9,7 @@ public sealed class WorkActivityTests
     private static readonly DateTimeOffset Now = new(2026, 11, 6, 10, 0, 0, TimeSpan.Zero);
 
     private static WorkActivity Entry(DateTimeOffset at, string target = "id=12, lang=uk", Guid? user = null) =>
-        WorkActivity.Record(user ?? User, "seo@kedr.ua", "Categories", "UpdateContent", "put", target, at);
+        WorkActivity.Record(user ?? User, "seo@kedr.ua", "Categories", "UpdateContent", "put", target, at).Value;
 
     [Fact]
     public void Repeat_Within_Ten_Minutes_Merges()

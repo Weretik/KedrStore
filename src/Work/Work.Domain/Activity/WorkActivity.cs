@@ -27,19 +27,25 @@ public sealed class WorkActivity : IAggregateRoot
 
     private WorkActivity() { }
 
-    public static WorkActivity Record(Guid userId, string? userEmail, string area, string operation, string method,
-        string? target, DateTimeOffset now)
+    public static DomainResult<WorkActivity> Record(Guid userId, string? userEmail, string area, string operation,
+        string method, string? target, DateTimeOffset now)
     {
         if (userId == Guid.Empty)
-            throw new DomainException(WorkErrors.UserRequired());
+            return WorkErrors.UserRequired();
+        if (string.IsNullOrWhiteSpace(area))
+            return WorkErrors.Required(nameof(Area));
+        if (string.IsNullOrWhiteSpace(operation))
+            return WorkErrors.Required(nameof(Operation));
+        if (string.IsNullOrWhiteSpace(method))
+            return WorkErrors.Required(nameof(Method));
 
         return new WorkActivity
         {
             UserId = userId,
             UserEmail = Cut(userEmail, UserEmailMaxLength),
-            Area = Required(area, nameof(Area), AreaMaxLength),
-            Operation = Required(operation, nameof(Operation), OperationMaxLength),
-            Method = Required(method, nameof(Method), MethodMaxLength).ToUpperInvariant(),
+            Area = Cut(area, AreaMaxLength),
+            Operation = Cut(operation, OperationMaxLength),
+            Method = Cut(method, MethodMaxLength).ToUpperInvariant(),
             Target = Cut(target, TargetMaxLength),
             Count = 1,
             FirstAt = now,
@@ -61,14 +67,6 @@ public sealed class WorkActivity : IAggregateRoot
     {
         Count++;
         OccurredAt = now;
-    }
-
-    private static string Required(string? value, string field, int maxLength)
-    {
-        var normalized = value?.Trim() ?? string.Empty;
-        if (normalized.Length == 0)
-            throw new DomainException(WorkErrors.Required(field));
-        return normalized.Length > maxLength ? normalized[..maxLength] : normalized;
     }
 
     private static string Cut(string? value, int maxLength)

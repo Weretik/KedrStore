@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Work.Domain.Tasks;
 
 namespace UnitTests.Work;
@@ -11,7 +11,7 @@ public sealed class WorkTaskTests
     [Fact]
     public void Create_Starts_In_Planned_With_Trimmed_Text()
     {
-        var task = WorkTask.Create(Owner, Owner, "  Тексти для ручок  ", "  ", null, null, Now);
+        var task = WorkTask.Create(Owner, Owner, "  Тексти для ручок  ", "  ", null, null, Now).Value;
 
         Assert.Equal(WorkTaskStatus.Planned, task.Status);
         Assert.Equal("Тексти для ручок", task.Title);
@@ -22,15 +22,15 @@ public sealed class WorkTaskTests
     [Fact]
     public void Create_Rejects_Empty_Title_And_Missing_Owner()
     {
-        Assert.Throws<DomainException>(() => WorkTask.Create(Owner, Owner, "   ", null, null, null, Now));
-        Assert.Throws<DomainException>(() => WorkTask.Create(Guid.Empty, Owner, "Задача", null, null, null, Now));
-        Assert.Throws<DomainException>(() => WorkTask.Create(Owner, Owner, new string('a', WorkTask.TitleMaxLength + 1), null, null, null, Now));
+        DomainAssert.Fails(WorkTask.Create(Owner, Owner, "   ", null, null, null, Now));
+        DomainAssert.Fails(WorkTask.Create(Guid.Empty, Owner, "Задача", null, null, null, Now));
+        DomainAssert.Fails(WorkTask.Create(Owner, Owner, new string('a', WorkTask.TitleMaxLength + 1), null, null, null, Now));
     }
 
     [Fact]
     public void ChangeStatus_Sets_Start_Once_And_Keeps_Result_Only_While_Done()
     {
-        var task = WorkTask.Create(Owner, Owner, "Задача", null, null, null, Now);
+        var task = WorkTask.Create(Owner, Owner, "Задача", null, null, null, Now).Value;
 
         task.ChangeStatus(WorkTaskStatus.InProgress, "ignored", Now.AddHours(1));
         Assert.Equal(Now.AddHours(1), task.StartedAt);
@@ -50,7 +50,7 @@ public sealed class WorkTaskTests
     [Fact]
     public void ChangeStatus_Done_To_Done_Keeps_Completion_Time()
     {
-        var task = WorkTask.Create(Owner, Guid.NewGuid(), "Від адміністратора", null, null, null, Now);
+        var task = WorkTask.Create(Owner, Guid.NewGuid(), "Від адміністратора", null, null, null, Now).Value;
         task.ChangeStatus(WorkTaskStatus.Done, "Готово", Now.AddHours(1));
         task.ChangeStatus(WorkTaskStatus.Done, "Уточнено", Now.AddHours(2));
 
@@ -63,7 +63,7 @@ public sealed class WorkTaskTests
     public void Steps_AreReplacedOnEdit_AndTickedByPosition()
     {
         var task = WorkTask.Create(Owner, Owner, "Категорія «Петлі»", null, null,
-            [new WorkTaskStepInput(" Title ", false), new WorkTaskStepInput("Description", false)], Now);
+            [new WorkTaskStepInput(" Title ", false), new WorkTaskStepInput("Description", false)], Now).Value;
         Assert.Equal(["Title", "Description"], task.Steps.Select(step => step.Title));
 
         Assert.True(task.SetStepDone(1, true, Now.AddHours(1)));
@@ -73,8 +73,8 @@ public sealed class WorkTaskTests
 
         task.Edit("Категорія «Петлі»", null, null, [new WorkTaskStepInput("FAQ", true)], Now.AddHours(2));
         Assert.Equal("FAQ", Assert.Single(task.Steps).Title);
-        Assert.Throws<DomainException>(() => task.Edit("Задача", null, null, [new WorkTaskStepInput(" ", false)], Now));
-        Assert.Throws<DomainException>(() => task.Edit("Задача", null, null,
+        DomainAssert.Fails(task.Edit("Задача", null, null, [new WorkTaskStepInput(" ", false)], Now));
+        DomainAssert.Fails(task.Edit("Задача", null, null,
             Enumerable.Range(0, WorkTask.StepsMaxCount + 1).Select(i => new WorkTaskStepInput($"Крок {i}", false)).ToList(),
             Now));
     }
@@ -83,13 +83,13 @@ public sealed class WorkTaskTests
     public void IsOverdue_OnlyForAnOpenTaskPastItsDueDay()
     {
         var due = new DateOnly(2026, 11, 6);
-        var task = WorkTask.Create(Owner, Owner, "Задача", null, due, null, Now);
+        var task = WorkTask.Create(Owner, Owner, "Задача", null, due, null, Now).Value;
 
         Assert.False(task.IsOverdue(due));
         Assert.True(task.IsOverdue(due.AddDays(1)));
 
         task.ChangeStatus(WorkTaskStatus.Done, "Зроблено", Now);
         Assert.False(task.IsOverdue(due.AddDays(1)));
-        Assert.False(WorkTask.Create(Owner, Owner, "Без строку", null, null, null, Now).IsOverdue(due.AddDays(9)));
+        Assert.False(WorkTask.Create(Owner, Owner, "Без строку", null, null, null, Now).Value.IsOverdue(due.AddDays(9)));
     }
 }

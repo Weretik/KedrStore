@@ -14,8 +14,12 @@ public sealed class CreateWorkTaskForUserCommandHandler(
         if (WorkViewer.UserId(user) is not { } admin)
             return Result<WorkTaskDto>.Unauthorized();
 
-        var task = WorkTask.Create(command.OwnerUserId, admin, command.Title, command.Details, command.DueDate,
+        var created = WorkTask.Create(command.OwnerUserId, admin, command.Title, command.Details, command.DueDate,
             command.Steps, clock.GetUtcNow());
+        if (created.IsFailure)
+            return created.Error!.ToResult<WorkTaskDto>();
+
+        var task = created.Value;
         await tasks.AddAsync(task, cancellationToken);
         return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }

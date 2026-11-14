@@ -6,8 +6,11 @@ public sealed class RecordWorkActivityCommandHandler(
 {
     public async ValueTask<Result> Handle(RecordWorkActivityCommand command, CancellationToken cancellationToken)
     {
-        var next = WorkActivity.Record(command.UserId, command.UserEmail, command.Area, command.Operation,
+        var recorded = WorkActivity.Record(command.UserId, command.UserEmail, command.Area, command.Operation,
             command.Method, command.Target, clock.GetUtcNow());
+        if (recorded.IsFailure)
+            return recorded.Error!.ToResult();
+        var next = recorded.Value;
 
         // R-6: the user's latest entry absorbs a repeat of the same change. The read context is the
         // repository's DbContext, so the entry read here is tracked for the update.

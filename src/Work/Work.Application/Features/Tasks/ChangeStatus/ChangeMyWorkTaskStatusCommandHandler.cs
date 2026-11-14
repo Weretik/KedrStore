@@ -15,10 +15,12 @@ public sealed class ChangeMyWorkTaskStatusCommandHandler(
             return found.Map(task => WorkTaskDto.From(task, WorkCalendar.Today(clock)));
 
         if (!WorkTaskStatusNames.TryParse(command.Status, out var status))
-            return Result<WorkTaskDto>.Invalid(new ValidationError(nameof(command.Status), "Unknown status."));
+            return Result<WorkTaskDto>.Invalid(new ValidationError(nameof(command.Status), "Невідомий статус."));
 
         var task = found.Value;
-        task.ChangeStatus(status, command.Result, clock.GetUtcNow());
+        var changed = task.ChangeStatus(status, command.Result, clock.GetUtcNow());
+        if (changed.IsFailure)
+            return changed.Error!.ToResult<WorkTaskDto>();
         await tasks.UpdateAsync(task, cancellationToken);
         return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }
