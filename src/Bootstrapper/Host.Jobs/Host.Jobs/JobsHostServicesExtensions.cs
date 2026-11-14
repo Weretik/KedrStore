@@ -25,7 +25,7 @@ public static class JobsHostServicesExtensions
         services.AddIdentityInfrastructureServices(configuration);
         services.AddContentInfrastructure(configuration);
         services.AddMediaInfrastructureServices(configuration);
-        services.AddWorkInfrastructureServices(configuration);
+        services.AddWorkInfrastructure(configuration);
 
         services.AddOneCIntegrationServices();
         services.AddCatalogIntegrationOneCServices(configuration);

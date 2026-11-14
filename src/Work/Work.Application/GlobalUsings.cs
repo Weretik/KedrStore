@@ -4,7 +4,7 @@ global using FluentValidation;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 
-global using Work.Application.Contracts.Persistence;
+global using Work.Application.Abstractions.Persistence;
 global using Work.Domain;
 global using Work.Domain.Activity;
 global using Work.Domain.Tasks;

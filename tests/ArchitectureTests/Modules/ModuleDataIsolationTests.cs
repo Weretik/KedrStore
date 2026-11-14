@@ -5,7 +5,7 @@ using Media.Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Sales.Infrastructure.DataBase;
-using Work.Infrastructure.DataBase;
+using Work.Infrastructure.Persistence;
 
 namespace ArchitectureTests.Modules;
 

@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Work.Application.Contracts.Persistence;
-using Work.Infrastructure.DataBase;
+using Work.Application.Abstractions.Persistence;
+using Work.Infrastructure.Persistence;
 
 namespace IntegrationTests.Work;
 

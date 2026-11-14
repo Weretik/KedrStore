@@ -1,4 +1,4 @@
-using Work.Api.Activity;
+using Work.Api.Features.Activity;
 using Work.Domain.Activity;
 
 namespace UnitTests.Work;
