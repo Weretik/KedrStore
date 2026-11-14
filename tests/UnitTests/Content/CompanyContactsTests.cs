@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain.Exceptions;
-using Content.Application.Features.Contacts.Common;
-using Content.Application.Features.Contacts.Update;
+using Content.Application.Features.Contacts.Shared;
+using Content.Application.Features.Contacts.Commands.UpdateCompanyContacts;
 using Content.Domain.Contacts;
 
 namespace UnitTests.Content;
@@ -49,7 +49,7 @@ public sealed class CompanyContactsTests
         var input = new CompanyContactsInput("068", "nope", "https://example.com", "+380687135049", "ftp://map",
             "", "Харьков");
 
-        var result = new UpdateCompanyContactsCommandValidator().Validate(new UpdateCompanyContactsCommand(input));
+        var result = new UpdateCompanyContactsValidator().Validate(new UpdateCompanyContactsCommand(input));
 
         Assert.Equal(["cityUk", "email", "mapUrl", "salesPhone", "telegramUrl"],
             result.Errors.Select(e => e.PropertyName).Distinct().Order());

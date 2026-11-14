@@ -1,6 +1,6 @@
 using BuildingBlocks.Domain.Exceptions;
-using Content.Application.Features.SeoSettings.Common;
-using Content.Application.Features.SeoSettings.Update;
+using Content.Application.Features.SeoSettings.Shared;
+using Content.Application.Features.SeoSettings.Commands.UpdateSiteSeoSettings;
 using Content.Domain.Seo;
 
 namespace UnitTests.Content;
@@ -61,7 +61,7 @@ public sealed class SiteSeoSettingsTests
     {
         var input = new SiteSeoSettingsInput("GA-1", "GTM-1", "short", "has space in it", 0);
 
-        var result = new UpdateSiteSeoSettingsCommandValidator().Validate(new UpdateSiteSeoSettingsCommand(input));
+        var result = new UpdateSiteSeoSettingsValidator().Validate(new UpdateSiteSeoSettingsCommand(input));
 
         Assert.Equal(["bingSiteVerification", "googleAnalyticsId", "googleSiteVerification", "googleTagManagerId",
                 "shareImageMediaFileId"],
@@ -73,6 +73,6 @@ public sealed class SiteSeoSettingsTests
     {
         var input = new SiteSeoSettingsInput(null, "", " ", null, null);
 
-        Assert.True(new UpdateSiteSeoSettingsCommandValidator().Validate(new UpdateSiteSeoSettingsCommand(input)).IsValid);
+        Assert.True(new UpdateSiteSeoSettingsValidator().Validate(new UpdateSiteSeoSettingsCommand(input)).IsValid);
     }
 }

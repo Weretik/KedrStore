@@ -1,7 +1,7 @@
 using BuildingBlocks.Domain.Exceptions;
-using Content.Application.Features.Articles.Admin.Create;
-using Content.Application.Features.Articles.Admin.Update;
-using Content.Application.Features.Articles.Common;
+using Content.Application.Features.Articles.Commands.CreateArticle;
+using Content.Application.Features.Articles.Commands.UpdateArticle;
+using Content.Application.Features.Articles.Shared;
 using Content.Domain.Articles;
 
 namespace UnitTests.Content;
@@ -97,7 +97,7 @@ public sealed class ArticleTests
     {
         var missingRu = new ArticleInput("Bad Slug", Day, true, [new ArticleTextInput("uk", "Т", "К", "<p>Т</p>")]);
 
-        var result = new CreateArticleCommandValidator().Validate(new CreateArticleCommand(missingRu));
+        var result = new CreateArticleValidator().Validate(new CreateArticleCommand(missingRu));
 
         Assert.Contains(result.Errors, e => e.PropertyName == "slug");
         Assert.Contains(result.Errors, e => e.PropertyName == "texts");
@@ -110,7 +110,7 @@ public sealed class ArticleTests
             [new ArticleTextInput("uk", "Т", "К", "<p>Т</p>"), new ArticleTextInput("ru", "Т", "К", "<p>Т</p>")],
             CoverMediaFileId: 5, RemoveCover: true);
 
-        var result = new UpdateArticleCommandValidator().Validate(new UpdateArticleCommand(1, input));
+        var result = new UpdateArticleValidator().Validate(new UpdateArticleCommand(1, input));
 
         Assert.Contains(result.Errors, e => e.PropertyName == "removeCover");
     }
@@ -121,7 +121,7 @@ public sealed class ArticleTests
         var input = new ArticleInput(null, Day, true,
             [new ArticleTextInput("uk", "Т", "К", "<p>Т</p>"), new ArticleTextInput("ru", "Т", "К", "<p>Т</p>")]);
 
-        Assert.True(new CreateArticleCommandValidator().Validate(new CreateArticleCommand(input)).IsValid);
-        Assert.False(new UpdateArticleCommandValidator().Validate(new UpdateArticleCommand(1, input)).IsValid);
+        Assert.True(new CreateArticleValidator().Validate(new CreateArticleCommand(input)).IsValid);
+        Assert.False(new UpdateArticleValidator().Validate(new UpdateArticleCommand(1, input)).IsValid);
     }
 }

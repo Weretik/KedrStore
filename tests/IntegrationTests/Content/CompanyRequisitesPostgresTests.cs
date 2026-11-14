@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using BuildingBlocks.Application.Contracts;
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Requisites.Common;
-using Content.Application.Features.Requisites.Get;
-using Content.Application.Features.Requisites.History;
-using Content.Application.Features.Requisites.Update;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Requisites.Shared;
+using Content.Application.Features.Requisites.Queries.GetCompanyRequisites;
+using Content.Application.Features.Requisites.Queries.GetCompanyRequisitesHistory;
+using Content.Application.Features.Requisites.Commands.UpdateCompanyRequisites;
 using Content.Domain.Requisites;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
@@ -28,7 +28,7 @@ public sealed class CompanyRequisitesPostgresTests(ContentPostgresFixture postgr
         await using var provider = BuildProvider();
         await using var scope = provider.CreateAsyncScope();
 
-        var result = await new GetCompanyRequisitesQueryHandler(
+        var result = await new GetCompanyRequisitesHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>())
             .Handle(new GetCompanyRequisitesQuery(), default);
 
@@ -54,7 +54,7 @@ public sealed class CompanyRequisitesPostgresTests(ContentPostgresFixture postgr
 
             await using (var scope = provider.CreateAsyncScope())
             {
-                var history = await new GetCompanyRequisitesHistoryQueryHandler(
+                var history = await new GetCompanyRequisitesHistoryHandler(
                         scope.ServiceProvider.GetRequiredService<IReadContentDbContext>())
                     .Handle(new GetCompanyRequisitesHistoryQuery(), default);
                 var entry = history.Value[0];
@@ -83,9 +83,9 @@ public sealed class CompanyRequisitesPostgresTests(ContentPostgresFixture postgr
         }
     }
 
-    private static UpdateCompanyRequisitesCommandHandler Handler(AsyncServiceScope scope)
+    private static UpdateCompanyRequisitesHandler Handler(AsyncServiceScope scope)
     {
-        return new UpdateCompanyRequisitesCommandHandler(
+        return new UpdateCompanyRequisitesHandler(
             scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyRequisites>>(),
             scope.ServiceProvider.GetRequiredService<IContentRepository<CompanyRequisitesChange>>(),
             new AdminUser(), TimeProvider.System);
@@ -96,7 +96,7 @@ public sealed class CompanyRequisitesPostgresTests(ContentPostgresFixture postgr
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 
     private sealed class AdminUser : ICurrentUserService

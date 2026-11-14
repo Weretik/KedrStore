@@ -20,6 +20,10 @@ public static class LegalDocumentErrors
     public static DomainError NotPublished(long id) =>
         new("Content.Document.NotPublished", $"Version {id} is not the published one");
 
+    public static DomainError EffectiveFromTooEarly(DateOnly current) =>
+        new("Content.Document.EffectiveFrom.TooEarly",
+            $"The date may not be earlier than the current edition ({current:yyyy-MM-dd}).");
+
     public static DomainError NumberInvalid(int number) =>
         new("Content.Document.Number.Invalid", $"A version number must be positive. Actual: {number}");
 }

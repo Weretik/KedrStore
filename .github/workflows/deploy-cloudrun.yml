@@ -26,9 +26,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Check documentation links
         run: python3 tools/docs/check_doc_links.py
+
+      - name: Test the test selection
+        run: python3 -m unittest discover -s tools/ci
+
+      # A pull request runs only the tests of the changed modules and of the modules that reference them;
+      # shared code, hosts and build files run everything. A push to master always runs everything.
+      - name: Select affected tests
+        id: affected
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 tools/ci/affected_tests.py "origin/${{ github.base_ref }}"
+          else
+            echo "scope=all" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -42,13 +58,19 @@ jobs:
         run: dotnet build KedrStore.sln --no-restore --configuration Release
 
       - name: Run unit tests with coverage
-        run: dotnet test tests/UnitTests/UnitTests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory artifacts/test-results/unit
+        if: steps.affected.outputs.scope != 'none'
+        env:
+          TEST_FILTER: ${{ steps.affected.outputs.unit_filter }}
+        run: dotnet test tests/UnitTests/UnitTests.csproj --no-build --configuration Release ${TEST_FILTER:+--filter "$TEST_FILTER"} --collect:"XPlat Code Coverage" --results-directory artifacts/test-results/unit
 
       - name: Run architecture tests with coverage
         run: dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory artifacts/test-results/architecture
 
       - name: Run integration and PostgreSQL tests with coverage
-        run: dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory artifacts/test-results/integration
+        if: steps.affected.outputs.scope != 'none'
+        env:
+          TEST_FILTER: ${{ steps.affected.outputs.integration_filter }}
+        run: dotnet test tests/IntegrationTests/IntegrationTests.csproj --no-build --configuration Release ${TEST_FILTER:+--filter "$TEST_FILTER"} --collect:"XPlat Code Coverage" --results-directory artifacts/test-results/integration
 
       - name: Upload coverage
         if: ${{ always() }}
@@ -56,7 +78,7 @@ jobs:
         with:
           name: code-coverage-${{ github.sha }}
           path: artifacts/test-results/**/coverage.cobertura.xml
-          if-no-files-found: error
+          if-no-files-found: warn
 
   deploy:
     if: github.event_name == 'push'

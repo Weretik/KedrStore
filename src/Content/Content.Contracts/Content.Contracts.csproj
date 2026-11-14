@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What other modules may use from Content: interfaces, DTOs and events. Empty until another module needs Content. -->
+
+</Project>

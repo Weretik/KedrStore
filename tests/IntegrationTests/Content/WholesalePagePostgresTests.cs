@@ -1,8 +1,8 @@
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Wholesale.Admin.Get;
-using Content.Application.Features.Wholesale.Admin.Update;
-using Content.Application.Features.Wholesale.Common;
-using Content.Application.Features.Wholesale.Public.Get;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Wholesale.Queries.GetAdminWholesalePage;
+using Content.Application.Features.Wholesale.Commands.UpdateWholesalePage;
+using Content.Application.Features.Wholesale.Shared;
+using Content.Application.Features.Wholesale.Queries.GetPublicWholesalePage;
 using Content.Domain.Wholesale;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Content;
@@ -25,8 +25,8 @@ public sealed class WholesalePagePostgresTests(ContentPostgresFixture postgres)
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<IReadContentDbContext>();
 
-        var uk = await new GetPublicWholesalePageQueryHandler(db).Handle(new GetPublicWholesalePageQuery("uk"), default);
-        var ru = await new GetPublicWholesalePageQueryHandler(db).Handle(new GetPublicWholesalePageQuery("ru"), default);
+        var uk = await new GetPublicWholesalePageHandler(db).Handle(new GetPublicWholesalePageQuery("uk"), default);
+        var ru = await new GetPublicWholesalePageHandler(db).Handle(new GetPublicWholesalePageQuery("ru"), default);
 
         Assert.Equal("Дверна фурнітура оптом", uk.Value.Text.HeroTitle);
         Assert.Equal("Дверная фурнитура оптом", ru.Value.Text.HeroTitle);
@@ -42,7 +42,7 @@ public sealed class WholesalePagePostgresTests(ContentPostgresFixture postgres)
         await using var provider = BuildProvider();
         AdminWholesalePage original;
         await using (var scope = provider.CreateAsyncScope())
-            original = (await new GetAdminWholesalePageQueryHandler(
+            original = (await new GetAdminWholesalePageHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>())
                 .Handle(new GetAdminWholesalePageQuery(), default)).Value;
 
@@ -74,7 +74,7 @@ public sealed class WholesalePagePostgresTests(ContentPostgresFixture postgres)
         IReadOnlyList<WholesaleTextDto> texts)
     {
         await using var scope = provider.CreateAsyncScope();
-        return await new UpdateWholesalePageCommandHandler(
+        return await new UpdateWholesalePageHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<WholesalePage>>(),
                 new TestContentEditor(),
                 TimeProvider.System)
@@ -86,6 +86,6 @@ public sealed class WholesalePagePostgresTests(ContentPostgresFixture postgres)
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 }

@@ -1,8 +1,8 @@
-using Content.Application.Contracts.Images;
+using Content.Application.Abstractions.Media;
 using Content.Domain.Articles;
-using Content.Infrastructure.Html;
-using Content.Infrastructure.Images;
-using Content.Infrastructure.Seed;
+using Content.Infrastructure.Integrations.Html;
+using Content.Infrastructure.Integrations.Images;
+using Content.Infrastructure.Persistence.Seed;
 using IntegrationTests.Identity.Avatars;
 using SkiaSharp;
 

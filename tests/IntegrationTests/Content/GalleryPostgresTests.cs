@@ -1,8 +1,8 @@
-using Content.Application.Contracts.MediaLibrary;
-using Content.Application.Contracts.Persistence;
-using Content.Application.Features.Gallery.Public.GetList;
+using Content.Application.Abstractions.Media;
+using Content.Application.Abstractions.Persistence;
+using Content.Application.Features.Gallery.Queries.GetPublicGallery;
 using Content.Domain.Gallery;
-using Content.Infrastructure.DataBase;
+using Content.Infrastructure.Persistence;
 using Content.Infrastructure.DependencyInjection;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public sealed class GalleryPostgresTests(ContentPostgresFixture postgres)
         await using var provider = BuildProvider();
         await using var scope = provider.CreateAsyncScope();
 
-        var result = await new GetPublicGalleryQueryHandler(
+        var result = await new GetPublicGalleryHandler(
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(), new NoPhotos())
             .Handle(new GetPublicGalleryQuery("uk"), default);
 
@@ -51,7 +51,7 @@ public sealed class GalleryPostgresTests(ContentPostgresFixture postgres)
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Default"] = postgres.ConnectionString })
             .Build();
-        return new ServiceCollection().AddContentInfrastructureServices(configuration).BuildServiceProvider();
+        return new ServiceCollection().AddContentInfrastructure(configuration).BuildServiceProvider();
     }
 
     private sealed class NoPhotos : IMediaImageReader

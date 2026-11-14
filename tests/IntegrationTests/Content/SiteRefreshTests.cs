@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
-using Content.Application.Contracts.Site;
-using Content.Infrastructure.Site;
+using Content.Application.Abstractions.Integrations;
+using Content.Infrastructure.Integrations.Site;
 using IntegrationTests.TestSupport.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
