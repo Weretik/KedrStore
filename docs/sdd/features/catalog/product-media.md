@@ -34,14 +34,14 @@ src/
     │   ├── Features/ProductMedia/{Get,Set,FileChanges,Common}/ # endpoints, listener use case
     │   └── Jobs/ProductMedia/LinkProductMediaJob.cs            # auto-link and cache refresh
     ├── Catalog.Infrastructure/MediaLibrary/                    # port adapter and listener
-    └── Catalog.Api/Controllers/AdminProductsController.cs      # /{id}/media
+    └── Catalog.Api/Endpoints/Products/*ProductMediaEndpoint.cs # /{id}/media
 ```
 
 ## Structure diagram
 
 ```mermaid
 flowchart LR
-    A["AdminProductsController /{id}/media"] --> B["Set / Get handlers"]
+    A["Product media endpoints /{id}/media"] --> B["Set / Get handlers"]
     B --> P["Product + ProductMediaLink"]
     B --> L["IProductMediaLibrary"]
     L --> D["Media IMediaFileDirectory"]

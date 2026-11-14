@@ -6,7 +6,7 @@ Anonymous reads the new public site is built from: model cards of a category wit
 
 ## Structure and relationships
 
-[SiteModelsController](../../../../src/Catalog/Catalog.Api/Features/SiteModels/SiteModelsController.cs) (route `api/catalog/{lang}`, anonymous) sends four queries. Each reads [PublicModelCatalog](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Shared/Public/PublicModelCatalog.cs) through [PublicModelCatalogReader](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Shared/Public/PublicModelCatalogReader.cs) once per request: on-site products of public categories from the [list projection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs) (Cosmos and its subtree stay out), accepted models with their on-site products, saved axes and texts, confirmed attribute values, the shared dictionary with swatch textures from the media library, and the category filters. An on-site product outside an accepted model becomes a model of its own under its product slug (M-04); an accepted model keeps its slug when the two collide.
+[SiteModels endpoints](../../../../src/Catalog/Catalog.Api/Endpoints/SiteModels/SiteModelsEndpoints.cs) (route `api/catalog/{lang}`, anonymous) sends four queries. Each reads [PublicModelCatalog](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Shared/Public/PublicModelCatalog.cs) through [PublicModelCatalogReader](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Shared/Public/PublicModelCatalogReader.cs) once per request: on-site products of public categories from the [list projection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs) (Cosmos and its subtree stay out), accepted models with their on-site products, saved axes and texts, confirmed attribute values, the shared dictionary with swatch textures from the media library, and the category filters. An on-site product outside an accepted model becomes a model of its own under its product slug (M-04); an accepted model keeps its slug when the two collide.
 
 - `GET {categorySlug}/models` and `GET models` — [list handler](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/GetPublicSiteModelsHandler.cs): models of the category tree (a former category slug still works) or of every category for the search. [PublicModelFilter](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/PublicModelFilter.cs) keeps a model when one of its products matches the attribute choices and the common filters; attribute filters only in a final category (400 in a parent, 404 for an unknown slug). [PublicModelFacets](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/PublicModelFacets.cs) counts models per value of the category's filters, applying every other choice. The search matches every word in the model name or in one product's names or 1C code; an exact on-site 1C code also gives `exactMatch`.
 - `GET model/{modelSlug}` — [model handler](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModel/GetPublicSiteModelHandler.cs) and [PublicModelPageMapper](../../../../src/Catalog/Catalog.Application/Features/SiteModels/Shared/Public/PublicModelPageMapper.cs): axes with the values the products have, each product with its axis values (`selection`), texts (Russian falls back to Ukrainian field by field), breadcrumbs, and the shared characteristics. A former model slug or the slug of a product inside an accepted model answers 404 with the address to redirect to.
@@ -18,7 +18,7 @@ The product endpoints of [public products](public-products.md) stay for the curr
 
 ```text
 src/Catalog/
-├── Catalog.Api/Controllers/SiteModelsController.cs   # four anonymous GET routes
+├── Catalog.Api/Endpoints/SiteModels/  # public group: four anonymous GET routes
 ├── Catalog.Contracts/SiteModels/Public/              # request, list and page DTOs
 └── Catalog.Application/Features/SiteModels/Public/
     ├── Common/      # PublicModelCatalog (+ reader, facts records), PublicModelPageMapper
@@ -31,7 +31,7 @@ src/Catalog/
 
 ```mermaid
 flowchart LR
-    A["SiteModelsController"] --> B["GetPublicSiteModelsHandler"]
+    A["Public site model endpoints"] --> B["GetPublicSiteModelsHandler"]
     A --> C["GetPublicSiteModelHandler"]
     A --> D["GetPublicProductModelAddressHandler"]
     B --> E["PublicModelCatalogReader"]

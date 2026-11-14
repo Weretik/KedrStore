@@ -4,3 +4,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using Mediator;
 global using Ardalis.Result;
 global using BuildingBlocks.Api.Results;
+global using IResult = Microsoft.AspNetCore.Http.IResult;

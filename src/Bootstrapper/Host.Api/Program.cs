@@ -1,4 +1,5 @@
 using Host.Api.DependencyInjection.ServiceRegistration.Web;
+using Catalog.Api.DependencyInjection;
 using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;
 using Media.Api.DependencyInjection;
@@ -61,6 +62,7 @@ app.UseAuthorization();
 app.UseWorkActivity();
 
 app.MapControllers();
+app.MapCatalogEndpoints();
 app.MapContentEndpoints();
 app.MapIdentityEndpoints();
 app.MapMediaEndpoints();

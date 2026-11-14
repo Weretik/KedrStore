@@ -19,7 +19,7 @@ src/Sales/
 ├── Sales.Application/Features/OrderWorkspace/Queries/GetWorkspaceOverview/
 └── Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs
 src/Catalog/
-├── Catalog.Api/Features/Overview/AdminCatalogOverviewController.cs
+├── Catalog.Api/Endpoints/Overview/GetAdminCatalogOverviewEndpoint.cs
 ├── Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/
 └── Catalog.Contracts/Overview/AdminCatalogOverviewResponse.cs
 src/Content/

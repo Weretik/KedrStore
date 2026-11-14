@@ -19,7 +19,7 @@ src/BuildingBlocks/
 ├── BuildingBlocks.Application/Snapshots/SnapshotVersion.cs
 └── BuildingBlocks.Api/Snapshots/SnapshotResult.cs
 src/Catalog/
-├── Catalog.Api/Features/MobileSync/MobileSyncCatalogController.cs # GET /api/mobile/sync/catalog
+├── Catalog.Api/Endpoints/MobileSync/GetMobileCatalogSnapshotEndpoint.cs # GET /api/mobile/sync/catalog
 ├── Catalog.Application/Features/MobileSync/Queries/GetCatalogSnapshot/GetCatalogSnapshot{Query,Handler}.cs
 └── Catalog.Contracts/MobileSync/CatalogSnapshotResponse.cs
 src/Sales/
