@@ -26,7 +26,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminCompanyRequisitesController` | `/api/admin/content/requisites` | `RequireAdminRole` |
 | `LegalDocumentsController` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
 | `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
-| `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
+| Media endpoints, tags `AdminMediaFolders`, `AdminMediaFiles` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
 | Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
 | Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
