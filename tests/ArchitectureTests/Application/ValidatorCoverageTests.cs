@@ -16,9 +16,6 @@ public sealed class ValidatorCoverageTests
         "Sales.Application", "Work.Application",
     ];
 
-    /// <summary>Known deviations: the Sales order workspace still checks input in Infrastructure until the Sales stage.</summary>
-    private static readonly string[] PendingNamespaces = ["Sales.Application.Features.Orders.AdminWorkspace"];
-
     [Fact]
     public void EveryMessageWithInput_HasAValidator()
     {
@@ -38,7 +35,6 @@ public sealed class ValidatorCoverageTests
                 .Where(IsMessage)
                 .Where(HasInput)
                 .Where(type => !validated.Contains(type))
-                .Where(type => !PendingNamespaces.Any(ns => type.Namespace?.StartsWith(ns, StringComparison.Ordinal) == true))
                 .Select(type => type.FullName!));
         }
 

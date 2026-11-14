@@ -1,7 +1,6 @@
-using Sales.Api.Controllers;
-using Sales.Application.Contracts.Orders;
+using Sales.Application.Features.Orders.AdminWorkspace;
 
-namespace UnitTests.Sales.Api;
+namespace UnitTests.Sales.Application;
 
 public sealed class WorkspaceDateRangeTests
 {
@@ -12,25 +11,23 @@ public sealed class WorkspaceDateRangeTests
     [InlineData(null, "2026-03-9")]
     public void Parse_RejectsDatesOutsideExactIsoFormat(string? from, string? to)
     {
-        var exception = Assert.Throws<WorkspaceException>(() => WorkspaceDateRange.Parse(from, to));
+        var result = WorkspaceDateRange.Parse(from, to);
 
-        Assert.Equal(400, exception.StatusCode);
-        Assert.Equal("invalid_date_range", exception.Code);
+        Assert.Equal("invalid_date_range", result.Error?.Code);
     }
 
     [Fact]
     public void Parse_RejectsReversedRange()
     {
-        var exception = Assert.Throws<WorkspaceException>(() =>
-            WorkspaceDateRange.Parse("2026-03-10", "2026-03-09"));
+        var result = WorkspaceDateRange.Parse("2026-03-10", "2026-03-09");
 
-        Assert.Equal("invalid_date_range", exception.Code);
+        Assert.Equal("invalid_date_range", result.Error?.Code);
     }
 
     [Fact]
     public void Parse_UsesInclusiveKyivCalendarDayWithExclusiveNextMidnight()
     {
-        var range = WorkspaceDateRange.Parse("2026-01-15", "2026-01-15");
+        var range = WorkspaceDateRange.Parse("2026-01-15", "2026-01-15").Value;
 
         Assert.Equal(DateTimeOffset.Parse("2026-01-14T22:00:00Z"), range.FromUtc);
         Assert.Equal(DateTimeOffset.Parse("2026-01-15T22:00:00Z"), range.ToUtcExclusive);
@@ -45,7 +42,7 @@ public sealed class WorkspaceDateRangeTests
         string expectedToUtc,
         int expectedHours)
     {
-        var range = WorkspaceDateRange.Parse(date, date);
+        var range = WorkspaceDateRange.Parse(date, date).Value;
 
         Assert.Equal(DateTimeOffset.Parse(expectedFromUtc), range.FromUtc);
         Assert.Equal(DateTimeOffset.Parse(expectedToUtc), range.ToUtcExclusive);

@@ -30,6 +30,10 @@ public static class DomainResultExtensions
     public static Result ToResult(this DomainResult result)
         => result.IsSuccess ? Result.Success() : result.Error!.ToResult();
 
+    /// <summary>The value on success, otherwise the failure as the matching result status.</summary>
+    public static Result<T> AsResult<T>(this DomainResult<T> result)
+        => result.IsSuccess ? Result.Success(result.Value) : result.Error!.ToResult<T>();
+
     /// <summary>The failure of <paramref name="result"/> as a result of another value type.</summary>
     public static Result<T> ToResult<T>(this DomainResult result)
         => result.IsFailure ? result.Error!.ToResult<T>() : throw new InvalidOperationException("The result succeeded.");

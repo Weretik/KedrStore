@@ -6,7 +6,5 @@ public sealed class QuoteWorkspaceOrderQueryHandler(IWorkspacePricing port)
     : IQueryHandler<QuoteWorkspaceOrderQuery, Result<WorkspaceQuote>>
 {
     public async ValueTask<Result<WorkspaceQuote>> Handle(QuoteWorkspaceOrderQuery request, CancellationToken cancellationToken)
-    {
-        return Result.Success(await port.QuoteAsync(request.Quote, cancellationToken));
-    }
+        => (await port.QuoteAsync(request.Quote, cancellationToken)).AsResult();
 }

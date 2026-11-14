@@ -6,8 +6,5 @@ public sealed class UpdateWorkspaceDraftCommandHandler(IWorkspaceDraftWriter por
     : ICommandHandler<UpdateWorkspaceDraftCommand, Result<WorkspaceDraftDetail>>
 {
     public async ValueTask<Result<WorkspaceDraftDetail>> Handle(UpdateWorkspaceDraftCommand request, CancellationToken cancellationToken)
-    {
-        var value = await port.UpdateDraftAsync(request.DraftId, request.Version, request.Draft, cancellationToken);
-        return value is null ? Result.NotFound() : Result.Success(value);
-    }
+        => (await port.UpdateDraftAsync(request.DraftId, request.Version, request.Draft, cancellationToken)).AsResult();
 }

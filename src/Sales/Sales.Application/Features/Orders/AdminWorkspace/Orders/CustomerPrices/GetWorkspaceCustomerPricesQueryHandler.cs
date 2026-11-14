@@ -6,7 +6,5 @@ public sealed class GetWorkspaceCustomerPricesQueryHandler(IWorkspacePricing por
     : IQueryHandler<GetWorkspaceCustomerPricesQuery, Result<WorkspaceCustomerPrices>>
 {
     public async ValueTask<Result<WorkspaceCustomerPrices>> Handle(GetWorkspaceCustomerPricesQuery request, CancellationToken cancellationToken)
-    {
-        return Result.Success(await port.GetCustomerPricesAsync(request.Request, cancellationToken));
-    }
+        => (await port.GetCustomerPricesAsync(request.Request, cancellationToken)).AsResult();
 }

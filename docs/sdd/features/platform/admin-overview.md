@@ -6,7 +6,7 @@ Three read-only endpoints feed the admin home page «Огляд». Each module c
 
 ## Structure and relationships
 
-- Sales: [WorkspaceOverviewReader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs) counts today's orders (Kyiv day from [WorkspaceDateRange](../../../../src/Sales/Sales.Api/Controllers/WorkspaceDateRange.cs)), drafts and retryable 1C problems, and lists the newest orders.
+- Sales: [WorkspaceOverviewReader](../../../../src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOverviewReader.cs) counts today's orders (Kyiv day from [WorkspaceDateRange](../../../../src/Sales/Sales.Application/Features/Orders/AdminWorkspace/WorkspaceDateRange.cs)), drafts and retryable 1C problems, and lists the newest orders.
 - Catalog: [GetAdminCatalogOverviewHandler](../../../../src/Catalog/Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/GetAdminCatalogOverviewHandler.cs) reads the product list projection and category texts with the same «filled» rule as the category list.
 - Content: [GetAdminContentOverviewHandler](../../../../src/Content/Content.Application/Features/Overview/Queries/GetAdminContentOverview/GetAdminContentOverviewHandler.cs) counts article drafts, legacy covers and document drafts.
 
@@ -30,7 +30,7 @@ src/Content/
 ## Tests
 
 - Integration: [orders](../../../../tests/IntegrationTests/Sales/Persistence/WorkspaceOverviewReaderTests.cs), [catalog](../../../../tests/IntegrationTests/Catalog/Api/AdminCatalogOverviewApiTests.cs), [content](../../../../tests/IntegrationTests/Content/ContentOverviewApiTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~Overview"`.
-- Unit: [Kyiv day](../../../../tests/UnitTests/Sales/Api/WorkspaceDateRangeTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WorkspaceDateRangeTests"`.
+- Unit: [Kyiv day](../../../../tests/UnitTests/Sales/Application/WorkspaceDateRangeTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~WorkspaceDateRangeTests"`.
 
 ## Related sources
 

@@ -10,7 +10,6 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
         DateTimeOffset? createdFromUtc, DateTimeOffset? createdToUtcExclusive,
         string sort, int page, int pageSize, CancellationToken ct)
     {
-        ValidatePage(searchTerm, counterpartyId, page, pageSize);
         var query =
             from draft in db.OrderDrafts.AsNoTracking()
             join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking()
@@ -38,7 +37,7 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
             "-title" => query.OrderByDescending(x => x.draft.Title).ThenByDescending(x => x.draft.Id),
             "customerName" => query.OrderBy(x => x.customer.Name).ThenBy(x => x.draft.Id),
             "-customerName" => query.OrderByDescending(x => x.customer.Name).ThenByDescending(x => x.draft.Id),
-            _ => throw new WorkspaceException(400, "invalid_sort", "Unsupported draft sort.")
+            _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, "The validator allows only known sorts.")
         };
         var rows = await query.Skip((page - 1) * pageSize).Take(pageSize)
             .Select(x => new WorkspaceDraftListItem(x.draft.Id.Value, x.draft.Title,

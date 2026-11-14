@@ -87,8 +87,8 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     [Fact]
     public async Task Quote_UsesCategoryRuleForSubcategories_AndDefaultTypeElsewhere()
     {
-        var quote = await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId,
-            [new WorkspaceInputLine("101", 2), new WorkspaceInputLine("102", 1)]), CancellationToken.None);
+        var quote = (await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId,
+            [new WorkspaceInputLine("101", 2), new WorkspaceInputLine("102", 1)]), CancellationToken.None)).Value;
 
         Assert.Equal([200m, 100m], quote.Lines.Select(x => x.UnitPrice));
         Assert.Equal(500m, quote.TotalAmount);
@@ -97,8 +97,8 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     [Fact]
     public async Task Quote_AppliesPerUnitDiscountAndMarkup()
     {
-        var quote = await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId,
-            [new WorkspaceInputLine("101", 2, -50m), new WorkspaceInputLine("102", 3, 10.5m)]), CancellationToken.None);
+        var quote = (await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId,
+            [new WorkspaceInputLine("101", 2, -50m), new WorkspaceInputLine("102", 3, 10.5m)]), CancellationToken.None)).Value;
 
         var discounted = quote.Lines[0];
         Assert.Equal((200m, -50m, 150m, 300m),
@@ -110,33 +110,31 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     [Fact]
     public async Task Quote_ChangesFingerprintWhenAdjustmentChanges()
     {
-        var plain = await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1)]), CancellationToken.None);
-        var same = await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, 0.00m)]), CancellationToken.None);
-        var discounted = await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, -1m)]), CancellationToken.None);
+        var plain = (await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1)]), CancellationToken.None)).Value;
+        var same = (await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, 0.00m)]), CancellationToken.None)).Value;
+        var discounted = (await Pricing.QuoteAsync(new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, -1m)]), CancellationToken.None)).Value;
 
         Assert.Equal(plain.QuoteFingerprint, same.QuoteFingerprint);
         Assert.NotEqual(plain.QuoteFingerprint, discounted.QuoteFingerprint);
     }
 
     [Theory]
-    [InlineData(-199.01, "price_below_minimum")]
-    [InlineData(-200.01, "price_below_minimum")]
-    [InlineData(0.001, "invalid_price_adjustment")]
-    [InlineData(1_000_000.01, "invalid_price_adjustment")]
-    public async Task Quote_RejectsInvalidAdjustments(double adjustment, string code)
+    [InlineData(-199.01)]
+    [InlineData(-200.01)]
+    public async Task Quote_RejectsADiscountBelowOneHryvnia(double adjustment)
     {
-        var error = await Assert.ThrowsAsync<WorkspaceException>(() => Pricing.QuoteAsync(
-            new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, (decimal)adjustment)]), CancellationToken.None));
+        var result = await Pricing.QuoteAsync(
+            new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 1, (decimal)adjustment)]), CancellationToken.None);
 
-        Assert.Equal(code, error.Code);
-        Assert.Equal(400, error.StatusCode);
+        Assert.True(result.IsFailure);
+        Assert.Equal("price_below_minimum", result.Error!.Code);
     }
 
     [Fact]
     public async Task Quote_AllowsADiscountDownToOneHryvnia()
     {
-        var quote = await Pricing.QuoteAsync(
-            new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 2, -199m)]), CancellationToken.None);
+        var quote = (await Pricing.QuoteAsync(
+            new WorkspaceQuoteRequest(CustomerId, [new WorkspaceInputLine("101", 2, -199m)]), CancellationToken.None)).Value;
 
         Assert.Equal(1m, quote.Lines[0].UnitPrice);
         Assert.Equal(2m, quote.TotalAmount);
@@ -145,22 +143,21 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     [Fact]
     public async Task CustomerPrices_ReturnPricesRegardlessOfStock_AndNullWhenMissing()
     {
-        var result = await Pricing.GetCustomerPricesAsync(
-            new WorkspaceCustomerPricesRequest(CustomerId, ["101", "103", "104", "999"]), CancellationToken.None);
+        var result = (await Pricing.GetCustomerPricesAsync(
+            new WorkspaceCustomerPricesRequest(CustomerId, ["101", "103", "104", "999"]), CancellationToken.None)).Value;
 
         Assert.Equal([("101", 200m), ("103", 70m), ("104", (decimal?)null), ("999", null)],
             result.Prices.Select(x => (x.ProductId, x.UnitPrice)));
     }
 
-    [Theory]
-    [InlineData("missing", 404)]
-    [InlineData(" ", 400)]
-    public async Task CustomerPrices_RejectUnknownOrEmptyCustomer(string customerId, int status)
+    [Fact]
+    public async Task CustomerPrices_RejectAnUnknownCustomer()
     {
-        var error = await Assert.ThrowsAsync<WorkspaceException>(() => Pricing.GetCustomerPricesAsync(
-            new WorkspaceCustomerPricesRequest(customerId, ["101"]), CancellationToken.None));
+        var result = await Pricing.GetCustomerPricesAsync(
+            new WorkspaceCustomerPricesRequest("missing", ["101"]), CancellationToken.None);
 
-        Assert.Equal(status, error.StatusCode);
+        Assert.Equal(BuildingBlocks.Domain.Abstractions.ErrorType.NotFound, result.Error?.Type);
+        Assert.Equal("customer_not_found", result.Error?.Code);
     }
 
     private static void AddCategory(CatalogDbContext db, int id, int? parentId)

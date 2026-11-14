@@ -7,8 +7,11 @@ public sealed class GetWorkspaceOrdersQueryHandler(IWorkspaceOrderReader port)
 {
     public async ValueTask<Result<WorkspacePage<WorkspaceOrderListItem>>> Handle(GetWorkspaceOrdersQuery request, CancellationToken cancellationToken)
     {
+        var dates = WorkspaceDateRange.Parse(request.CreatedFrom, request.CreatedTo);
+        if (dates.IsFailure)
+            return dates.Error!.ToResult<WorkspacePage<WorkspaceOrderListItem>>();
         return Result.Success(await port.GetOrdersAsync(request.SearchTerm, request.CounterpartyId,
-            request.CreatedFromUtc, request.CreatedToUtcExclusive,
+            dates.Value.FromUtc, dates.Value.ToUtcExclusive,
             request.Sort, request.Page, request.PageSize, cancellationToken));
     }
 }
