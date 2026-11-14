@@ -32,7 +32,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
 | Catalog endpoints, tags `Categories`, `Products` | `/api/catalog/{lang}` | public |
 | Content endpoints, tag `Articles` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
-| Catalog endpoints, tag `Order` | `POST /api/orders` (quick order) | public, rate-limited |
+| Sales endpoints, tag `Order` | `POST /api/orders` (quick order) | public, rate-limited |
 | Identity endpoints, tags `CookieAuth`, `MobileAuth`, `AuthSession` | login, refresh | public, rate-limited; logout and `me` need a session |
 
 A new endpoint in an admin controller or endpoint group inherits its policy (`RequireAuthorization` on the `MapGroup`). A public endpoint needs `[AllowAnonymous]` (`.AllowAnonymous()` on an endpoint) and a reason in its contract.

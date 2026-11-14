@@ -21,7 +21,6 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Slugify.Core" />
-    <PackageReference Include="ClosedXML" />
     <PackageReference Include="NodaMoney" />
     <PackageReference Include="Ardalis.Specification" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

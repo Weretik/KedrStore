@@ -51,16 +51,18 @@ src/BuildingBlocks/BuildingBlocks.Infrastructure/Outbox/
 ├── OutboxRetrySchedule.cs          planned: R-004 delays and limits
 └── DependencyInjection/OutboxRegistration.cs  planned: AddOutbox<TDbContext>(schema), AddOutboxHandler<TMessage, THandler>()
 src/Sales/
-├── Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/   planned (moved from Catalog): command, handler, validator, QuickOrderPlaced message, handler that sends it
-├── Sales.Application/Abstractions/QuickOrders/                        planned: IQuickOrderStore, IQuickOrderNotifier
-├── Sales.Infrastructure/QuickOrders/                                  planned: store (outbox write), Excel file, Telegram sender
-├── Sales.Infrastructure/Persistence/SalesDbContext.cs                 existing: ApplyOutbox("sales")
-├── Sales.Infrastructure/Migrations/<ts>_AddSalesOutbox.cs             planned: schema sales, table OutboxMessages
-└── Sales.Api/Endpoints/QuickOrders/                                   planned (moved from Catalog.Api/Endpoints/Orders): same route, tag, records
-src/Catalog/…/Orders, Integrations/Excel, Integrations/Telegram         removed after the move
-tests/UnitTests/BuildingBlocks/Outbox/                                  planned: retry schedule, type registry
-tests/IntegrationTests/Platform/Outbox/                                 planned: same transaction, dispatch once, retry, failed, SKIP LOCKED, endpoint auth
-tests/IntegrationTests/Sales/QuickOrders/                               planned: SC-001, SC-002, SC-006
+├── Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/   done (moved from Catalog): command, validator, handler
+├── Sales.Application/Features/QuickOrders/Messages/                   done: QuickOrderPlaced ("sales.quick-order-placed"), QuickOrderLine
+├── Sales.Application/Abstractions/QuickOrders/                        done: IQuickOrderStore
+├── Sales.Infrastructure/QuickOrders/                                  done: store (outbox write), Excel file, Telegram caption, sender (the outbox handler)
+├── Sales.Infrastructure/Persistence/SalesDbContext.cs                 done: ApplyOutbox("sales")
+├── Sales.Infrastructure/Migrations/20261114122151_AddSalesOutbox.cs   done: schema sales, table OutboxMessages
+└── Sales.Api/Endpoints/QuickOrders/                                   done (moved from Catalog.Api/Endpoints/Orders): same route, tag, records
+src/Catalog/…/Orders, Integrations/Excel, Integrations/Telegram         removed
+tests/UnitTests/BuildingBlocks/Outbox/                                  done: retry schedule
+tests/UnitTests/Sales/QuickOrders/                                      done: caption and file name
+tests/IntegrationTests/Platform/Outbox/                                 done: same transaction, dispatch once, retry, failed, SKIP LOCKED, retention; endpoint auth with TS-002
+tests/IntegrationTests/Sales/QuickOrders/                               done: SC-001, SC-002, SC-006
 ```
 
 ## Risks
@@ -75,9 +77,9 @@ tests/IntegrationTests/Sales/QuickOrders/                               planned:
 
 ## Tasks
 
-- TS-001 Shared outbox (BuildingBlocks), Sales outbox table and migration, `IOutboxDispatcher`; integration tests for SC-002…SC-004 with a test message.
+- TS-001 Shared outbox (BuildingBlocks), Sales outbox table and migration, `IOutboxDispatcher`; integration tests for SC-002…SC-004 with a test message. **Done** (#214).
 - TS-002 Entry point of the scheduled dispatch (SC-005), fitted to the shared background-jobs dispatcher when it is designed.
-- TS-003 Quick order moves to Sales and goes through the outbox (R-007, SC-001, SC-002, SC-006, SC-007); Catalog order code removed; feature cards updated.
+- TS-003 Quick order moves to Sales and goes through the outbox (R-007, SC-001, SC-002, SC-006, SC-007); Catalog order code removed; feature cards updated. **Done.** The Telegram sender is the outbox handler itself (no extra notifier port). Field errors of a 400 are now keyed `FirstName`, `Phone`, `Lines` (were `Request.FirstName`…); the site already reads these names.
 - TS-004 (cloud, through the coordinator and the owner) The shared background-jobs dispatcher runs the outbox dispatch on its schedule.
 - TS-005 Order → 1C on the shared outbox (keeps the sending window, the stable order number key and the dead-letter Telegram signal); then the `onec-orders-sync` job and its schedule are removed through the coordinator. Also moves that logic from Sales.Infrastructure to Sales.Application (jobs audit J-1).
 - TS-006 Customer → Identity deletion on the shared outbox.

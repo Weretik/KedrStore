@@ -11,7 +11,6 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Public site models](catalog/public-site-models.md) — anonymous model cards with filters, search, the model page, and old product addresses (spec 007 stage 5).
 - [Admin products](catalog/admin-products.md) — paged lists with server filters (including `withoutPhoto`), full list, and product details by slug.
 - [Product photos and schemes](catalog/product-media.md) — photos in order and a scheme linked from the media library, auto-link in the CDN sync run.
-- [Quick order](catalog/quick-order.md) — public `POST /api/orders` with Excel generation and Telegram notification.
 - [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
 - [Catalog attributes](catalog/attributes.md) — attribute dictionary, product attribute values, review state, the CSV import, and variant groups with their admin API, and the site models (spec 007) with theirs.
 - [Product and stock projection](catalog/stock-projection.md) — separate read model for product lists and its updates.
@@ -20,6 +19,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Manager orders and 1C](sales/admin-orders.md) — order creation, reading, synchronization status, and retry.
 - [Admin order workspace](sales/admin-order-workspace.md) — separate protected operations for search, customer prices, server-side quoting with per-unit discounts and markups, checkout, and saved drafts in React Admin.
+- [Site quick order](sales/quick-order.md) — public `POST /api/orders`, stored in the Sales outbox and sent to the managers' Telegram chat as an Excel file.
 - [Customers and counterparties](sales/customers.md) — Admin counterparty list and details, local synchronization with 1C.
 - [Manager catalog](sales/manager-catalog.md) — authorized sales product list.
 

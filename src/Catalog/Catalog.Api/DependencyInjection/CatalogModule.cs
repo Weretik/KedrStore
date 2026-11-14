@@ -5,7 +5,6 @@ using Catalog.Api.Endpoints.Attributes;
 using Catalog.Api.Endpoints.Categories;
 using Catalog.Api.Endpoints.Groups;
 using Catalog.Api.Endpoints.MobileSync;
-using Catalog.Api.Endpoints.Orders;
 using Catalog.Api.Endpoints.Overview;
 using Catalog.Api.Endpoints.ProductAttributes;
 using Catalog.Api.Endpoints.Products;
@@ -32,7 +31,6 @@ public static class CatalogModule
         endpoints.MapCategoriesEndpoints();
         endpoints.MapGroupsEndpoints();
         endpoints.MapMobileSyncEndpoints();
-        endpoints.MapOrdersEndpoints();
         endpoints.MapOverviewEndpoints();
         endpoints.MapProductAttributesEndpoints();
         endpoints.MapProductsEndpoints();
