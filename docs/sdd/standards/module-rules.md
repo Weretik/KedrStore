@@ -204,6 +204,22 @@ Host.Api/
 - One module's `DbContext` maps only its own tables. Do not add foreign keys, joins, or EF navigation to another module's tables; store the other module's identifier as a value and read its data through that module's `Contracts`.
 - The first migration of a new module creates its schema; check it against an empty database as the [database rules](database-rules.md) require.
 
+## Extensibility without over-engineering
+
+Add new behavior by adding a class, not by editing a growing chain of conditions, but only when the need is real.
+
+| What is added | Tool | Example |
+| --- | --- | --- |
+| Another variant of the same action | Strategy: one port in `Application/Abstractions/`, one implementation per variant in Infrastructure, chosen through keyed DI or a registry, never a growing `switch` | Delivery providers, payment methods |
+| The same behavior around every use case | A Mediator pipeline behavior in `BuildingBlocks.Application/Behaviors/` | Logging, validation, performance, transactions |
+| Another reaction to something that happened | A new domain or integration event handler; across modules or to an outside system through the outbox | «Order placed» → notification, export to the accounting system |
+| Switching a capability on or off without a deploy | A feature flag, only by a recorded product decision, with an owner and a removal date | Gradual rollout of a new checkout |
+
+- **Rule of three.** Introduce the abstraction at the third variant, reaction, or copy, not before. Two cases stay a plain `if` or a short `switch`; mapping an enum to a name or a status is not a growing chain and stays a `switch` expression.
+- No speculative interfaces, factories, base classes, generic repositories, or plug-in points "for the future". An interface exists only for a port (an outside dependency that Application must not know) or for a variant that already has at least two implementations.
+- A pipeline behavior holds only cross-cutting plumbing; business rules stay in Domain and handlers.
+- An audit reports both directions: a `switch` or `if` chain on a type or code that has reached three branches in more than one place, and an abstraction with a single implementation and no port role.
+
 ## Errors
 
 Business outcomes travel as results; exceptions are only for the unexpected.
