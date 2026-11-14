@@ -67,6 +67,18 @@ src/BuildingBlocks/
 - Folders inside a shared project follow the same rules as a module: by concern (`Persistence/`, `Outbox/`, `Logging/`, `Notifications/`, `Behaviors/`, `Results/`), never `Helpers/`, `Utils/`, `Extensions/`, `Services/`, `Common/`, `Contracts/`, or a misspelled name. Registration extensions go to `DependencyInjection/`.
 - The architecture tests check the package and project references of each building-block project and that no building-block project references a module.
 
+## Transactional outbox
+
+A use case that writes data and also has an external side effect (1C or another ERP, Telegram or e-mail, site revalidation, payment or delivery API, CDN upload) or must tell another module about the change does not call the outside world inside or around its transaction. It writes an outbox row in the same `SaveChanges`; after the commit the request tries the row once, and a dispatcher retries what is left.
+
+- The outbox table and the dispatcher are shared code in `BuildingBlocks.Infrastructure`; each module owns its rows (in its own schema) and its handlers. Handlers are idempotent: the receiver gets a stable key and ignores a repeat.
+- On a scale-to-zero host such as Cloud Run there is no in-process loop, hosted timer, or Hangfire. One protected internal endpoint per backend (`POST /internal/outbox/dispatch`, OIDC token of the scheduler's service account) is called every minute by one Cloud Scheduler job; it returns at once when nothing is due. No message bus or MassTransit.
+- A failed row stays visible (admin page or log alert) with its last error after the retry limit; nothing is dropped silently.
+- Not for work inside one module's transaction, for read-only calls, or when the user must see the external result synchronously.
+- The SDD design names the message types, payload, handler, idempotency key, and retry limit. Details: the `backend-feature-spec` skill reference `references/transactional-outbox.md`.
+
+**KedrStore today:** there is no shared outbox yet (a planned stage of the architecture restructure). `Sales` already keeps a module-specific outbox for orders sent to 1C (`OneCOrderSync` rows with status, retries, and a dead-letter Telegram alert), processed by a `Host.Jobs` job. The public quick order (`Catalog` `CreateOrder`) sends its Excel file to Telegram without saving the order; when site orders start being saved, that send goes through the outbox.
+
 ## Communication between modules
 
 A module never reads another module's database, entities, `DbContext`, repositories, handlers, or Domain types. It uses only the other module's `Contracts` project.
@@ -215,6 +227,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | All modules | Type folders (`Entities/`, `Enums/`, `Errors/`, `ValueObjects/`, `Configurations/`, `Common/`), Application features without `Commands/` / `Queries/`, controllers in `Controllers/` | Stage: folder restructuring, one module per change |
 | All Application projects | Use cases named `<UseCase>CommandHandler` / `<UseCase>QueryHandler`; `DTOs/` and `Validators/` subfolders inside use cases; several queries in one use-case folder (`Products/GetAdminList`); ports in `Application/Contracts/` instead of `Abstractions/` | Folder restructuring, one module per change |
 | Handlers (audit 2026-11-14 of 96 commands) | Domain is rich (no public setters, rules raise `DomainException`), and no command returns an entity. Remaining: legal-document handlers (`Content` Documents Create/Update/Delete/Publish) repeat the draft-status checks the aggregate already makes, and the «Редакція від» date rule sits in the handler; category site visibility spreads the change over the category tree in the handler instead of a domain service; Api controllers in `Catalog` use `Catalog.Domain` value objects | Fixed with the folder restructuring of each module |
+| Side effects | No shared outbox: Sales uses its own `OneCOrderSync` table and job; the quick order sends Telegram directly | Stage: transactional outbox (Cloud Scheduler calls one internal endpoint every minute) |
 | Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | Tests | No unit tests for Identity; few handler tests for Content, Media, Work | Stage: missing unit tests |
 | Repository root | `dotnet-install.ps1`, `SALES_1C_SYNC_INSTRUCTION.txt` | Move to `tools/` and `docs/sdd/operations/` with the folder restructuring |
