@@ -13,7 +13,7 @@ public static class ScheduledTaskCatalog
     [
         new(K.Outbox, "Досилання повідомлень",
             "Повторює те, що не пішло з першого разу: швидкі замовлення з сайту в 1С і повідомлення в Telegram.",
-            TaskSchedule.Interval(1).Value, MaxMinutes: 5, Editable: false, RunsInTick: true),
+            TaskSchedule.Interval(5).Value, MaxMinutes: 5, Editable: false, RunsInTick: true),
         new(K.Stocks, "Залишки з 1С", "Оновлює залишки товарів з 1С: дверей, фурнітури й Cosmos.",
             TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(7, 0), new TimeOnly(13, 0)), 30,
             EnabledByDefault: false),

@@ -7,6 +7,7 @@ using Scheduling.Application.Features.Tasks.Queries.GetScheduledTaskRuns;
 using Scheduling.Application.Features.Tasks.Queries.GetScheduledTasks;
 using Scheduling.Application.Features.Tasks.Shared;
 using Scheduling.Domain.Schedules;
+using Scheduling.Domain.Tasks;
 
 namespace IntegrationTests.Scheduling.Tasks;
 
@@ -115,5 +116,23 @@ public sealed class ScheduledTaskAdminTests
             .Handle(new GetScheduledTaskRunsQuery(ScheduledTaskKeys.Stocks), CancellationToken.None)).Value;
         Assert.Equal("manual", runs.Single().Trigger);
         Assert.Equal("Олена", runs.Single().RequestedBy);
+    }
+
+    [Fact]
+    public async Task Outbox_row_saved_with_an_older_schedule_follows_the_catalogue()
+    {
+        using var harness = new SchedulingTestHarness();
+        harness.Db.Tasks.Add(ScheduledTask.Create(ScheduledTaskKeys.Outbox, TaskSchedule.Interval(1).Value, true,
+            harness.Time.GetUtcNow()));
+        await harness.Db.SaveChangesAsync();
+
+        var tasks = (await new GetScheduledTasksHandler(harness.NewContext(), harness.Time)
+            .Handle(new GetScheduledTasksQuery(), CancellationToken.None)).Value;
+
+        var outbox = tasks.Single(x => x.Key == ScheduledTaskKeys.Outbox);
+        Assert.Equal(5, outbox.Schedule.EveryMinutes);
+        Assert.True(outbox.Enabled);
+        var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
+        Assert.Equal(TaskSchedule.Interval(5).Value, saved.Schedule);
     }
 }

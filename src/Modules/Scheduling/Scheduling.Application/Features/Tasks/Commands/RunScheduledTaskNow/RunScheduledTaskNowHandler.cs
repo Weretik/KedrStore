@@ -7,7 +7,7 @@ public sealed class RunScheduledTaskNowHandler(ISchedulingDbContext db, TimeProv
     : ICommandHandler<RunScheduledTaskNowCommand, Result<ScheduledTaskResponse>>
 {
     public static DomainError RunsInTick { get; } =
-        DomainError.Conflict("Scheduling.Task.RunsInTick", "Ця задача і так працює щохвилини.");
+        DomainError.Conflict("Scheduling.Task.RunsInTick", "Ця задача і так працює з кожним викликом планувальника.");
 
     public async ValueTask<Result<ScheduledTaskResponse>> Handle(RunScheduledTaskNowCommand command,
         CancellationToken cancellationToken)

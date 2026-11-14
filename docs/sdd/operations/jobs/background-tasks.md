@@ -4,7 +4,7 @@ Spec [platform/007](../../specs/platform/007-background-tasks/README.md); featur
 
 ## How it runs
 
-1. Cloud Scheduler calls `POST https://<api>/internal/scheduler/tick` every minute with a Google OIDC token.
+1. Cloud Scheduler calls `POST https://<api>/internal/scheduler/tick` every five minutes with a Google OIDC token.
 2. The API sends the outbox, fails stuck runs, claims due tasks and starts one execution of the Cloud Run Job `kedr-tasks` with `--job=tasks --tasks=key:runId,...`.
 3. The job runs the tasks one after another and writes each result; the admin page «Адміністрування → Фонові задачі» shows them.
 
@@ -16,7 +16,7 @@ Until these steps are done the tick answers `404` and nothing changes: the old C
 
 1. **EN-01.** The deploy workflow gives the API's runtime service account the role `roles/run.jobsExecutorWithOverrides` on the job `kedr-tasks` only, so this step needs no one by hand. The deploy account has Cloud Run Admin; the owner's day-to-day account cannot grant it.
 2. **EN-02.** Create a service account for the scheduler (for example `kedr-scheduler`) and set on the API `Scheduler__Audience=https://<api run.app URL>/internal/scheduler/tick` and `Scheduler__SchedulerServiceAccount=<that account's e-mail>` (`gcloud run services update api --update-env-vars …`).
-3. **EN-03.** Create one Cloud Scheduler job `kedr-tick`: every minute (`* * * * *`, time zone Europe/Kyiv), `POST` to that URL, OIDC token of that account with that audience. Check on the page that «Досилання повідомлень» shows a recent success.
+3. **EN-03.** Create one Cloud Scheduler job `kedr-tick`: every five minutes (`*/5 * * * *`, time zone Europe/Kyiv; the owner chose five minutes over one on 2026-11-14), `POST` to that URL, OIDC token of that account with that audience. Check on the page that «Досилання повідомлень» shows a recent success.
 4. The same day: on the page enable «Залишки з 1С», «Ціни з 1С», «Каталог з 1С», «Клієнти з 1С», «Замовлення в 1С», «Фото з CDN» (adjust the times if needed) and **pause** the old Cloud Scheduler entries of `onec-*` and `media-cdn-sync`.
 5. Done 2026-11-14: the deploy no longer updates the old jobs `onec-stocks`, `onec-prices`, `onec-category`, `onec-productdetails`, `onec-pricetypes`, `onec-full`, `onec-orders-sync`, `onec-sales-customers-full`, `media-cdn-sync`; the owner deletes them and their paused Cloud Scheduler entries. A one-off run of any Host.Jobs command goes through `kedr-tasks`: `gcloud run jobs execute kedr-tasks --region europe-central2 --args=--job=<command>,...`.
 
