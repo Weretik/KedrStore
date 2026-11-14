@@ -9,7 +9,7 @@ namespace ArchitectureTests.Modules;
 public sealed class ModuleContractsTests
 {
     private static readonly RepositoryProjectGraph Graph = RepositoryProjectGraph.Load();
-    private static readonly string[] BusinessModules = ["Catalog", "Content", "Identity", "Media", "Sales", "Work"];
+    private static readonly string[] BusinessModules = ["Catalog", "Content", "Identity", "Media", "Sales", "Scheduling", "Work"];
     private static readonly string[] Layers = ["Api", "Application", "Contracts", "Domain", "Infrastructure"];
 
     public static TheoryData<string> Modules => new(BusinessModules);

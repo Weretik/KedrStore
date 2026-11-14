@@ -22,6 +22,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=<name>
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |
 | `sync-one-c-orders` | — | One ready-to-run batch of saved Sales manager orders |
+| `tasks` | `--tasks=<key>:<runId>,...` | Tasks of «Фонові задачі» the scheduler tick claimed, one after another; only the tick starts it (Cloud Run job `kedr-tasks`), a run id unknown to the database is skipped ([runbook](background-tasks.md)) |
 
 Example:
 

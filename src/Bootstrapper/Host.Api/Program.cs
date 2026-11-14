@@ -4,6 +4,7 @@ using Identity.Api.DependencyInjection;
 using Media.Api.DependencyInjection;
 using Sales.Api.DependencyInjection;
 using Work.Api.DependencyInjection;
+using Scheduling.Api.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,7 @@ app.MapIdentityEndpoints();
 app.MapMediaEndpoints();
 app.MapSalesEndpoints();
 app.MapWorkEndpoints();
+app.MapSchedulingEndpoints();
 app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

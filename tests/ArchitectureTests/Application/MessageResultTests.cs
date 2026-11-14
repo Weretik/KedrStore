@@ -12,7 +12,7 @@ public sealed class MessageResultTests
     private static readonly string[] ApplicationAssemblies =
     [
         "Catalog.Application", "Content.Application", "Identity.Application", "Media.Application",
-        "Sales.Application", "Work.Application",
+        "Sales.Application", "Scheduling.Application", "Work.Application",
     ];
 
     [Fact]

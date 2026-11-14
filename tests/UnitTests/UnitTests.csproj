@@ -31,6 +31,7 @@
       <ProjectReference Include="..\..\src\Modules\Media\Media.Application\Media.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Application\Work.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Api\Work.Api.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Application\Scheduling.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
