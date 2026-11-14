@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Orders.Commands.CreateOrder;
+namespace Sales.Api.Endpoints.QuickOrders;
 
 public sealed record CreateOrderLineRequest(
     string ProductId,

@@ -7,6 +7,9 @@ using Sales.Infrastructure.Integrations.OneC;
 using Sales.Infrastructure.Integrations.OneC.Jobs;
 using Sales.Infrastructure.Integrations.Telegram;
 using Sales.Infrastructure.Orders;
+using Sales.Infrastructure.QuickOrders;
+using Sales.Application.Abstractions.QuickOrders;
+using Sales.Application.Features.QuickOrders.Messages;
 
 namespace Sales.Infrastructure.DependencyInjection;
 
@@ -27,6 +30,8 @@ public static class SalesInfrastructure
 
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
         services.AddOutbox<SalesDbContext>(SalesDbContext.Schema);
+        services.AddScoped<IQuickOrderStore, QuickOrderStore>();
+        services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();

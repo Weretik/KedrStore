@@ -112,7 +112,7 @@ paths:
   /api/admin/catalog-attributes/category-filters/{categoryId}:
     $ref: ./catalog/attributes.openapi.yaml#/paths/~1api~1admin~1catalog-attributes~1category-filters~1{categoryId}
   /api/orders:
-    $ref: ./catalog/orders.openapi.yaml#/paths/~1api~1orders
+    $ref: ./sales/quick-orders.openapi.yaml#/paths/~1api~1orders
   /api/admin/orders:
     get:
       $ref: ./sales/manager-order-read.openapi.yaml#/paths/~1api~1admin~1orders/get

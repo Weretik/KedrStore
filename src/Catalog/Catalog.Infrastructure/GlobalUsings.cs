@@ -28,6 +28,4 @@ global using Ardalis.Result;
 global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
 global using Mediator;
-global using Telegram.Bot;
-global using Telegram.Bot.Types.Enums;
 global using BuildingBlocks.Domain.Results;

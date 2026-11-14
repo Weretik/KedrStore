@@ -79,7 +79,7 @@ A use case that writes data and also has an external side effect (1C or another 
 - Not for work inside one module's transaction, for read-only calls, or when the user must see the external result synchronously.
 - The SDD design names the message types, payload, handler, idempotency key, and retry limit. Details: the `backend-feature-spec` skill reference `references/transactional-outbox.md`.
 
-**KedrStore today:** there is no shared outbox yet (a planned stage of the architecture restructure). `Sales` already keeps a module-specific outbox for orders sent to 1C (`OneCOrderSync` rows with status, retries, and a dead-letter Telegram alert), processed by a `Host.Jobs` job. The public quick order (`Catalog` `CreateOrder`) sends its Excel file to Telegram without saving the order; when site orders start being saved, that send goes through the outbox.
+**KedrStore today:** the shared outbox is in `BuildingBlocks` ([platform spec 006](../specs/platform/006-transactional-outbox/README.md)); Sales has its table `sales."OutboxMessages"`, and the site quick order goes through it. The scheduled dispatch waits for the shared background-jobs dispatcher; until then a message that failed right after its request stays in the table. Orders sent to 1C still use the older module-specific `OneCOrderSync` rows and job (spec 006, TS-005).
 
 ## Communication between modules
 
@@ -260,6 +260,6 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | --- | --- | --- |
 | Host.Api | One Mediator registration lists every module's Application assembly | Keep: the Mediator source generator needs one `AddMediator` call with literal assemblies |
 | `Sales.Infrastructure` | 1C sync jobs live in `Integrations/OneC/Jobs/` instead of `Application/Features/<X>/Jobs/` (Catalog and Media already moved theirs) | Jobs audit stage: report first, then move the job entry points to Application behind ports |
-| Side effects | No shared outbox: Sales uses its own `OneCOrderSync` table and job; the quick order sends Telegram directly | Stage: transactional outbox (Cloud Scheduler calls one internal endpoint every minute) |
+| Side effects | Shared outbox in place, the quick order uses it; Sales 1C order sync still uses its own `OneCOrderSync` table and job | Spec 006: scheduled dispatch through the shared background-jobs dispatcher, then 1C orders and the customer deletion drain move to the outbox |
 | `Catalog.Application`, `Content.Application`, `Media.Application`, `Sales.Application`, `Work.Application` | Reference EF Core directly: handlers query the module's read `DbContext` interface (`DbSet`, `EF.Functions.ILike`); `Catalog.Application` also references import packages (ClosedXML, Newtonsoft.Json, Slugify, NodaMoney, Npgsql) | Folder restructuring moves import and job code to Infrastructure; the read-`DbContext` pattern stays until a separate decision |
 | `Catalog`, `Sales`, `Identity` | Tables and migration history in the `public` schema | Keep: moving existing tables needs a separate migration and rollout plan. New modules use their own schema. |

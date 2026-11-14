@@ -7,6 +7,7 @@ using Sales.Api.Endpoints.Customers;
 using Sales.Api.Endpoints.MobileSync;
 using Sales.Api.Endpoints.Orders;
 using Sales.Api.Endpoints.OrderWorkspace;
+using Sales.Api.Endpoints.QuickOrders;
 using Sales.Infrastructure.DependencyInjection;
 
 namespace Sales.Api.DependencyInjection;
@@ -29,6 +30,7 @@ public static class SalesModule
         endpoints.MapCustomersEndpoints();
         endpoints.MapOrdersEndpoints();
         endpoints.MapOrderWorkspaceEndpoints();
+        endpoints.MapQuickOrdersEndpoints();
         return endpoints;
     }
 }
