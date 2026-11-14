@@ -6,8 +6,8 @@ namespace Media.Application.Features.Files.Common;
 /// <summary>Checks an upload is a real picture and puts it on the CDN under a new unique key (R-4, R-5).</summary>
 internal static class MediaUploadStore
 {
-    public const string StorageUnavailableMessage = "Media storage is not configured.";
-    public const string NotAPictureMessage = "The file must be a JPEG, PNG, or WebP picture.";
+    public const string StorageUnavailableMessage = "Сховище медіа не налаштоване.";
+    public const string NotAPictureMessage = "Файл має бути зображенням JPEG, PNG або WebP.";
     public const string LibraryDirectory = "library";
 
     public static async Task<Result<MediaFileContent>> StoreAsync(MediaUpload upload, IImageInspector inspector,

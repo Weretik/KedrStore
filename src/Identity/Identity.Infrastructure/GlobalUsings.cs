@@ -26,3 +26,4 @@ global using BuildingBlocks.Infrastructure.Seeding;
 global using BuildingBlocks.Domain.Abstractions;
 
 global using Ardalis.Specification.EntityFrameworkCore;
+global using BuildingBlocks.Domain.Results;

@@ -9,3 +9,4 @@ global using Work.Application.Contracts.Persistence;
 global using Work.Domain.Activity;
 global using Work.Domain.Tasks;
 global using Work.Infrastructure.DataBase;
+global using BuildingBlocks.Domain.Results;

@@ -17,7 +17,11 @@ public sealed class CreateMediaFolderCommandHandler(
             return MediaResults.Fail<MediaFolderItem>(placement);
 
         MediaFolderId? parent = command.ParentId is { } id ? MediaFolderId.Create(id) : null;
-        var folder = await folders.AddAsync(MediaFolder.Create(command.Name, parent, clock.GetUtcNow()), cancellationToken);
+        var created = MediaFolder.Create(command.Name, parent, clock.GetUtcNow());
+        if (created.IsFailure)
+            return created.Error!.ToResult<MediaFolderItem>();
+
+        var folder = await folders.AddAsync(created.Value, cancellationToken);
         return Result.Success(new MediaFolderItem(folder.Id.Value, folder.ParentId?.Value, folder.Name, 0));
     }
 }

@@ -7,3 +7,5 @@ global using BuildingBlocks.Domain.Abstractions;
 global using Mediator;
 global using Ardalis.Result;
 global using Ardalis.Specification;
+global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Application.Results;

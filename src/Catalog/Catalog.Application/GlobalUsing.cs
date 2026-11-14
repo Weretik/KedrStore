@@ -30,3 +30,5 @@ global using FluentValidation;
 global using Ardalis.Specification;
 global using Ardalis.Result;
 global using NodaMoney;
+global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Application.Results;

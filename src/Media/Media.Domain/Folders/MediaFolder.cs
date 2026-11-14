@@ -16,31 +16,41 @@ public sealed class MediaFolder : IAggregateRoot
 
     private MediaFolder() { }
 
-    public static MediaFolder Create(string name, MediaFolderId? parentId, DateTimeOffset now)
-        => new() { Name = NormalizeName(name), ParentId = parentId, CreatedAt = now, UpdatedAt = now };
-
-    public void Rename(string name, DateTimeOffset now)
+    public static DomainResult<MediaFolder> Create(string name, MediaFolderId? parentId, DateTimeOffset now)
     {
-        Name = NormalizeName(name);
+        var normalized = NormalizeName(name);
+        if (normalized.IsFailure)
+            return normalized.Error!;
+        return new MediaFolder { Name = normalized.Value, ParentId = parentId, CreatedAt = now, UpdatedAt = now };
+    }
+
+    public DomainResult Rename(string name, DateTimeOffset now)
+    {
+        var normalized = NormalizeName(name);
+        if (normalized.IsFailure)
+            return normalized.Error!;
+        Name = normalized.Value;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
     /// <summary>The caller checks that <paramref name="parentId"/> is not this folder's descendant.</summary>
-    public void MoveTo(MediaFolderId? parentId, DateTimeOffset now)
+    public DomainResult MoveTo(MediaFolderId? parentId, DateTimeOffset now)
     {
         if (parentId == Id)
-            throw new DomainException(MediaErrors.FolderMoveIntoItself());
+            return MediaErrors.FolderMoveIntoItself();
         ParentId = parentId;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
-    public static string NormalizeName(string? name)
+    public static DomainResult<string> NormalizeName(string? name)
     {
         var normalized = name?.Trim() ?? string.Empty;
         if (normalized.Length == 0)
-            throw new DomainException(MediaErrors.Required("Name"));
+            return MediaErrors.Required("Name");
         if (normalized.Length > NameMaxLength)
-            throw new DomainException(MediaErrors.TooLong("Name", NameMaxLength, normalized.Length));
+            return MediaErrors.TooLong("Name", NameMaxLength, normalized.Length);
         return normalized;
     }
 }

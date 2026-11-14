@@ -13,3 +13,6 @@ global using Content.Domain.Home;
 global using Content.Domain.Requisites;
 global using Content.Domain.Seo;
 global using Content.Domain.Wholesale;
+global using BuildingBlocks.Domain.Abstractions;
+global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Application.Results;

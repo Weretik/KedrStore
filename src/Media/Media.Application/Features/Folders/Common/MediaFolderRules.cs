@@ -3,7 +3,7 @@ namespace Media.Application.Features.Folders.Common;
 /// <summary>Folder checks that need the other folders: the folder exists, no name clash, no cycle.</summary>
 internal static class MediaFolderRules
 {
-    public const string NameTakenMessage = "A folder with this name already exists here.";
+    public const string NameTakenMessage = "Тут уже є папка з такою назвою.";
 
     /// <summary>Returns an error result when the target parent is missing or the name is taken there.</summary>
     public static async Task<Result?> CheckPlacementAsync(IReadMediaDbContext db, long? parentId, string name,
@@ -15,7 +15,11 @@ internal static class MediaFolderRules
 
         MediaFolderId? parent = parentId is { } value ? MediaFolderId.Create(value) : null;
 
-        var lowered = MediaFolder.NormalizeName(name).ToLower();
+        var normalized = MediaFolder.NormalizeName(name);
+        if (normalized.IsFailure)
+            return normalized.Error!.ToResult();
+
+        var lowered = normalized.Value.ToLower();
         var taken = await db.MediaFolders.AnyAsync(folder =>
             folder.ParentId == parent &&
             (exceptFolderId == null || folder.Id != MediaFolderId.FromStorage(exceptFolderId.Value)) &&
@@ -32,7 +36,7 @@ internal static class MediaFolderRules
         var id = MediaFolderId.Create(value);
         return await db.MediaFolders.AnyAsync(folder => folder.Id == id, cancellationToken)
             ? null
-            : Result.Invalid(new ValidationError(field, "The folder does not exist."));
+            : Result.Invalid(new ValidationError(field, "Такої папки немає."));
     }
 
     /// <summary>The folder and all its subfolders, at any depth.</summary>

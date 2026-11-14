@@ -108,8 +108,9 @@ internal sealed class MediaFolderArranger(MediaDbContext db, IOptions<MediaCdnSy
                 id = --_nextDryId;
             else
             {
+                // Normalize keeps the name within the rules, so the folder is always valid here.
                 var folder = MediaFolder.Create(normalized,
-                    parent is { } parentId ? MediaFolderId.Create(parentId) : null, now);
+                    parent is { } parentId ? MediaFolderId.Create(parentId) : null, now).Value;
                 db.MediaFolders.Add(folder);
                 await db.SaveChangesAsync(cancellationToken);
                 id = folder.Id.Value;

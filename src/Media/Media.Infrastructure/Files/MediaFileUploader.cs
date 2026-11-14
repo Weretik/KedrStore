@@ -29,7 +29,12 @@ internal sealed class MediaFileUploader(
             return new MediaFileUploadResult(MediaFileUploadStatus.NotAPicture, null);
 
         var now = clock.GetUtcNow();
+        var fileName = MediaFile.NormalizeFileName(request.FileName);
+        if (fileName.IsFailure)
+            return Invalid(fileName.Error!);
         var folder = await RootFolderAsync(request.FolderName, now, cancellationToken);
+        if (folder.IsFailure)
+            return Invalid(folder.Error!);
         var directory = request.StorageDirectory.Trim().Trim('/');
         var key = $"{directory}/{Guid.NewGuid():N}{image.Extension}";
         buffer.Position = 0;
@@ -38,7 +43,14 @@ internal sealed class MediaFileUploader(
         try
         {
             var content = new MediaFileContent(key, image.ContentType, request.Content.Length, image.Width, image.Height);
-            var file = MediaFile.Create(folder, request.FileName, content, now);
+            var created = MediaFile.Create(folder.Value, fileName.Value, content, now);
+            if (created.IsFailure)
+            {
+                await storage.DeleteAsync(key, CancellationToken.None);
+                return Invalid(created.Error!);
+            }
+
+            var file = created.Value;
             db.MediaFiles.Add(file);
             await db.SaveChangesAsync(cancellationToken);
             return new MediaFileUploadResult(MediaFileUploadStatus.Uploaded, new MediaFileReference(
@@ -51,10 +63,17 @@ internal sealed class MediaFileUploader(
         }
     }
 
+    private static MediaFileUploadResult Invalid(DomainError error)
+        => new(MediaFileUploadStatus.Invalid, null, error.Message);
+
     /// <summary>The oldest root folder with this name (case-insensitive), created when there is none.</summary>
-    private async Task<MediaFolderId> RootFolderAsync(string name, DateTimeOffset now, CancellationToken cancellationToken)
+    private async Task<DomainResult<MediaFolderId>> RootFolderAsync(string name, DateTimeOffset now,
+        CancellationToken cancellationToken)
     {
-        var normalized = MediaFolder.NormalizeName(name);
+        var normalizedName = MediaFolder.NormalizeName(name);
+        if (normalizedName.IsFailure)
+            return normalizedName.Error!;
+        var normalized = normalizedName.Value;
         var lowered = normalized.ToLower();
         var existing = await db.MediaFolders.AsNoTracking()
             .Where(folder => folder.ParentId == null && folder.Name.ToLower() == lowered)
@@ -65,8 +84,10 @@ internal sealed class MediaFileUploader(
             return id;
 
         var created = MediaFolder.Create(normalized, null, now);
-        db.MediaFolders.Add(created);
+        if (created.IsFailure)
+            return created.Error!;
+        db.MediaFolders.Add(created.Value);
         await db.SaveChangesAsync(cancellationToken);
-        return created.Id;
+        return created.Value.Id;
     }
 }

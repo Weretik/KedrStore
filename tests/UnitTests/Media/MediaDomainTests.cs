@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Media.Application.Features.Files.GetList;
 using Media.Application.Features.Folders.Create;
 using Media.Domain.Files;
@@ -13,19 +13,19 @@ public sealed class MediaDomainTests
     [Fact]
     public void Folder_NameIsTrimmed_AndMustNotBeEmptyOrTooLong()
     {
-        Assert.Equal("Акції", MediaFolder.Create("  Акції  ", null, Now).Name);
-        Assert.Throws<DomainException>(() => MediaFolder.Create("   ", null, Now));
-        Assert.Throws<DomainException>(() => MediaFolder.Create(new string('a', MediaFolder.NameMaxLength + 1), null, Now));
+        Assert.Equal("Акції", MediaFolder.Create("  Акції  ", null, Now).Value.Name);
+        DomainAssert.Fails(MediaFolder.Create("   ", null, Now));
+        DomainAssert.Fails(MediaFolder.Create(new string('a', MediaFolder.NameMaxLength + 1), null, Now));
     }
 
     [Fact]
     public void File_Replace_KeepsNameAndReturnsOldKey()
     {
-        var file = MediaFile.Create(null, "731.jpg", new MediaFileContent("/products/731.jpg", "image/jpeg", 10, null, null), Now);
+        var file = MediaFile.Create(null, "731.jpg", new MediaFileContent("/products/731.jpg", "image/jpeg", 10, null, null), Now).Value;
         Assert.Equal("products/731.jpg", file.StorageKey);
 
         var later = Now.AddDays(1);
-        var old = file.Replace(new MediaFileContent("library/2026/11/a.webp", "image/webp", 20, 800, 600), later);
+        var old = file.Replace(new MediaFileContent("library/2026/11/a.webp", "image/webp", 20, 800, 600), later).Value;
 
         Assert.Equal("products/731.jpg", old);
         Assert.Equal("library/2026/11/a.webp", file.StorageKey);
@@ -37,12 +37,9 @@ public sealed class MediaDomainTests
     [Fact]
     public void File_RejectsEmptyKeyAndBadDimensions()
     {
-        Assert.Throws<DomainException>(() =>
-            MediaFile.Create(null, "a.jpg", new MediaFileContent(" ", "image/jpeg", 1, null, null), Now));
-        Assert.Throws<DomainException>(() =>
-            MediaFile.Create(null, "a.jpg", new MediaFileContent("a.jpg", "image/jpeg", 1, 0, 10), Now));
-        Assert.Throws<DomainException>(() =>
-            MediaFile.Create(null, " ", new MediaFileContent("a.jpg", "image/jpeg", 1, null, null), Now));
+        DomainAssert.Fails(MediaFile.Create(null, "a.jpg", new MediaFileContent(" ", "image/jpeg", 1, null, null), Now));
+        DomainAssert.Fails(MediaFile.Create(null, "a.jpg", new MediaFileContent("a.jpg", "image/jpeg", 1, 0, 10), Now));
+        DomainAssert.Fails(MediaFile.Create(null, " ", new MediaFileContent("a.jpg", "image/jpeg", 1, null, null), Now));
     }
 
     [Fact]

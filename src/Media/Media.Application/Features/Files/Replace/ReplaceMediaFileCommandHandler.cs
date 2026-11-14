@@ -36,7 +36,14 @@ public sealed class ReplaceMediaFileCommandHandler(
         string previousKey;
         try
         {
-            previousKey = file.Replace(stored.Value, now);
+            var replaced = file.Replace(stored.Value, now);
+            if (replaced.IsFailure)
+            {
+                await storage.DeleteAsync(stored.Value.StorageKey, CancellationToken.None);
+                return replaced.Error!.ToResult<MediaFileItem>();
+            }
+
+            previousKey = replaced.Value;
             await files.SaveChangesAsync(cancellationToken);
         }
         catch

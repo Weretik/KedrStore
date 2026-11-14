@@ -25,8 +25,11 @@ public sealed class UpdateMediaFolderCommandHandler(
             return MediaResults.Fail<MediaFolderItem>(placement);
 
         var now = clock.GetUtcNow();
-        folder.Rename(command.Name, now);
-        folder.MoveTo(command.ParentId is { } parent ? MediaFolderId.Create(parent) : null, now);
+        var changed = DomainResult.Combine(
+            folder.Rename(command.Name, now),
+            folder.MoveTo(command.ParentId is { } parent ? MediaFolderId.Create(parent) : null, now));
+        if (changed.IsFailure)
+            return changed.Error!.ToResult<MediaFolderItem>();
         await folders.SaveChangesAsync(cancellationToken);
 
         var fileCount = await db.MediaFiles.CountAsync(file => file.FolderId == id, cancellationToken);

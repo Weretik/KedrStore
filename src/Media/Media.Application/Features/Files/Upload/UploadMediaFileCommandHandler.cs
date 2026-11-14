@@ -31,7 +31,14 @@ public sealed class UploadMediaFileCommandHandler(
         MediaFolderId? folder = command.FolderId is { } id ? MediaFolderId.Create(id) : null;
         try
         {
-            var file = await files.AddAsync(MediaFile.Create(folder, command.File.FileName, stored.Value, now), cancellationToken);
+            var created = MediaFile.Create(folder, command.File.FileName, stored.Value, now);
+            if (created.IsFailure)
+            {
+                await storage.DeleteAsync(stored.Value.StorageKey, CancellationToken.None);
+                return created.Error!.ToResult<MediaFileItem>();
+            }
+
+            var file = await files.AddAsync(created.Value, cancellationToken);
             return Result.Success(MediaFileMapper.ToItem(file, urls));
         }
         catch

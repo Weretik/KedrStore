@@ -5,7 +5,7 @@ namespace Media.Application.Features.Folders.Delete;
 public sealed class DeleteMediaFolderCommandHandler(IMediaRepository<MediaFolder> folders, IReadMediaDbContext db)
     : ICommandHandler<DeleteMediaFolderCommand, Result>
 {
-    public const string NotEmptyMessage = "The folder is not empty: move or delete its files and subfolders first.";
+    public const string NotEmptyMessage = "Папка не порожня: спочатку перенесіть або видаліть її файли й підпапки.";
 
     public async ValueTask<Result> Handle(DeleteMediaFolderCommand command, CancellationToken cancellationToken)
     {

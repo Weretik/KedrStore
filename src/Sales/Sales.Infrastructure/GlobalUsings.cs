@@ -32,3 +32,4 @@ global using Sales.Infrastructure.Catalog;
 global using Sales.Infrastructure.DataBase;
 global using Sales.Infrastructure.Pricing;
 global using Sales.Infrastructure.Repositories;
+global using BuildingBlocks.Domain.Results;
