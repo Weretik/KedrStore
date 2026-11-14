@@ -66,12 +66,21 @@ public sealed class WorkActivityMiddleware(RequestDelegate next, ILogger<WorkAct
             return new Source(action.ControllerName, action.ActionName, action.ControllerTypeInfo.Assembly);
 
         var tag = endpoint.Metadata.GetMetadata<ITagsMetadata>()?.Tags.FirstOrDefault();
-        var name = endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName;
         var handler = endpoint.Metadata.GetMetadata<MethodInfo>();
-        return tag is null || name is null || handler?.DeclaringType is null
-            ? null
-            : new Source(tag, name, handler.DeclaringType.Assembly);
+        if (tag is null || handler?.DeclaringType is null)
+            return null;
+
+        // An endpoint without a name (no operationId in the document) is named by its endpoint class.
+        var name = endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()?.EndpointName
+                   ?? OperationOf(handler.DeclaringType);
+        return new Source(tag, name, handler.DeclaringType.Assembly);
     }
+
+    /// <summary><c>ChangeAdminCategorySlugEndpoint</c> → <c>ChangeAdminCategorySlug</c>.</summary>
+    internal static string OperationOf(Type endpointClass) =>
+        endpointClass.Name.EndsWith("Endpoint", StringComparison.Ordinal)
+            ? endpointClass.Name[..^"Endpoint".Length]
+            : endpointClass.Name;
 
     internal static bool IsLogged(Source source) =>
         source.Group.StartsWith("Admin", StringComparison.Ordinal)
