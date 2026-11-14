@@ -6,6 +6,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["KedrStore.sln", "./"]
 COPY ["global.json", "./"]
+COPY ["Directory.Build.props", "Directory.Packages.props", "./"]
 COPY ["src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj", "src/Bootstrapper/Host.Jobs/Host.Jobs/"]
 COPY ["src/Catalog/Catalog.Application/Catalog.Application.csproj", "src/Catalog/Catalog.Application/"]
 COPY ["src/Catalog/Catalog.Contracts/Catalog.Contracts.csproj", "src/Catalog/Catalog.Contracts/"]
@@ -29,6 +30,17 @@ COPY ["src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastru
 COPY ["src/BuildingBlocks/BuildingBlocks.Integrations.OneC/BuildingBlocks.Integrations.OneC.csproj", "src/BuildingBlocks/BuildingBlocks.Integrations.OneC/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj", "src/BuildingBlocks/BuildingBlocks.Application/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj", "src/BuildingBlocks/BuildingBlocks.Domain/"]
+
+COPY ["src/BuildingBlocks/BuildingBlocks.Api/BuildingBlocks.Api.csproj", "src/BuildingBlocks/BuildingBlocks.Api/"]
+COPY ["src/Content/Content.Api/Content.Api.csproj", "src/Content/Content.Api/"]
+COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/Identity.Api/"]
+COPY ["src/Identity/Identity.Contracts/Identity.Contracts.csproj", "src/Identity/Identity.Contracts/"]
+COPY ["src/Media/Media.Api/Media.Api.csproj", "src/Media/Media.Api/"]
+COPY ["src/Sales/Sales.Api/Sales.Api.csproj", "src/Sales/Sales.Api/"]
+COPY ["src/Work/Work.Api/Work.Api.csproj", "src/Work/Work.Api/"]
+COPY ["src/Work/Work.Application/Work.Application.csproj", "src/Work/Work.Application/"]
+COPY ["src/Work/Work.Domain/Work.Domain.csproj", "src/Work/Work.Domain/"]
+COPY ["src/Work/Work.Infrastructure/Work.Infrastructure.csproj", "src/Work/Work.Infrastructure/"]
 
 RUN dotnet restore "src/Bootstrapper/Host.Jobs/Host.Jobs/Host.Jobs.csproj"
 COPY . .
