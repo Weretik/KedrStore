@@ -3,6 +3,7 @@ using BuildingBlocks.Api.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace BuildingBlocks.Api.Snapshots;
 
@@ -18,14 +19,30 @@ public static class SnapshotResult
         if (result.Status != ResultStatus.Ok)
             return controller.ToProblem(result);
 
-        var etag = new EntityTagHeaderValue($"\"{version(result.Value)}\"");
-        controller.Response.Headers.ETag = etag.ToString();
-        controller.Response.Headers.CacheControl = "private, no-cache";
+        return IsHeld(controller.HttpContext, version(result.Value))
+            ? new StatusCodeResult(StatusCodes.Status304NotModified)
+            : controller.Ok(result.Value);
+    }
 
-        var held = controller.Request.GetTypedHeaders().IfNoneMatch;
-        if (held.Any(tag => tag.Equals(EntityTagHeaderValue.Any) || tag.Compare(etag, useStrongComparison: true)))
-            return new StatusCodeResult(StatusCodes.Status304NotModified);
+    public static IResult ToSnapshotHttpResult<T>(this Result<T> result, HttpContext httpContext,
+        Func<T, string> version)
+    {
+        if (result.Status != ResultStatus.Ok)
+            return result.ToProblem(httpContext);
 
-        return controller.Ok(result.Value);
+        return IsHeld(httpContext, version(result.Value))
+            ? TypedResults.StatusCode(StatusCodes.Status304NotModified)
+            : TypedResults.Ok(result.Value);
+    }
+
+    /// <summary>Sets the <c>ETag</c> and tells whether the client already holds this version.</summary>
+    private static bool IsHeld(HttpContext httpContext, string version)
+    {
+        var etag = new EntityTagHeaderValue($"\"{version}\"");
+        httpContext.Response.Headers.ETag = etag.ToString();
+        httpContext.Response.Headers.CacheControl = "private, no-cache";
+
+        var held = httpContext.Request.GetTypedHeaders().IfNoneMatch;
+        return held.Any(tag => tag.Equals(EntityTagHeaderValue.Any) || tag.Compare(etag, useStrongComparison: true));
     }
 }

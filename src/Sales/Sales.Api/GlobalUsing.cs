@@ -6,6 +6,4 @@ global using System.Security.Claims;
 global using Mediator;
 global using Ardalis.Result;
 global using BuildingBlocks.Api.Results;
-
-global using Sales.Api.Features.Catalog;
-global using Sales.Application.Features.Catalog.Queries.GetCatalogList;
+global using IResult = Microsoft.AspNetCore.Http.IResult;

@@ -23,7 +23,7 @@ src/Catalog/
 ├── Catalog.Application/Features/MobileSync/Queries/GetCatalogSnapshot/GetCatalogSnapshot{Query,Handler}.cs
 └── Catalog.Contracts/MobileSync/CatalogSnapshotResponse.cs
 src/Sales/
-├── Sales.Api/Features/MobileSync/MobileSyncCustomersController.cs # GET /api/mobile/sync/customers
+├── Sales.Api/Endpoints/MobileSync/GetCustomersSnapshotEndpoint.cs # GET /api/mobile/sync/customers
 └── Sales.Application/Features/MobileSync/Queries/GetCustomersSnapshot/{GetCustomersSnapshotQuery,GetCustomersSnapshotHandler,CustomersSnapshotDto}.cs
 src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/Web/MobileSyncCompressionRegistrationExtensions.cs
 ```

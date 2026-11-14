@@ -6,7 +6,7 @@ Order creation and reads, synchronization status, and retry.
 
 ## Structure and relationships
 
-[AdminOrdersController](../../../../src/Sales/Sales.Api/Features/Orders/AdminOrdersController.cs) invokes the [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Commands/CreateOrder/CreateOrderHandler.cs), which validates the counterparty/products and idempotency, then persists [Order](../../../../src/Sales/Sales.Domain/Orders/Order.cs) and [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/OneCOrderSync.cs) through [IOrderCreationStore](../../../../src/Sales/Sales.Application/Abstractions/Persistence/IOrderCreationStore.cs) and [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/SyncOneCOrdersService.cs) sends orders to 1C.
+The Minimal API group [OrdersEndpoints](../../../../src/Sales/Sales.Api/Endpoints/Orders/OrdersEndpoints.cs) (tag `AdminOrders`, `CanManageOrders`) has one `<UseCase>Endpoint` per use case; [CreateOrderEndpoint](../../../../src/Sales/Sales.Api/Endpoints/Orders/CreateOrderEndpoint.cs) invokes the [create handler](../../../../src/Sales/Sales.Application/Features/Orders/Commands/CreateOrder/CreateOrderHandler.cs), which validates the counterparty/products and idempotency, then persists [Order](../../../../src/Sales/Sales.Domain/Orders/Order.cs) and [OneCOrderSync](../../../../src/Sales/Sales.Domain/Orders/OneCOrderSync.cs) through [IOrderCreationStore](../../../../src/Sales/Sales.Application/Abstractions/Persistence/IOrderCreationStore.cs) and [OrderCreationStore](../../../../src/Sales/Sales.Infrastructure/Orders/OrderCreationStore.cs). [SyncOneCOrdersService](../../../../src/Sales/Sales.Infrastructure/Integrations/OneC/SyncOneCOrdersService.cs) sends orders to 1C.
 
 ## Code structure
 
@@ -15,7 +15,7 @@ The tree lists verified entry points and key components, not every supporting fi
 ```text
 src/
 └── Sales/
-    ├── Sales.Api/Features/Orders/AdminOrdersController.cs  # HTTP entry point
+    ├── Sales.Api/Endpoints/Orders/OrdersEndpoints.cs  # HTTP group; one <UseCase>Endpoint.cs per use case
     ├── Sales.Application/
     │   ├── Abstractions/Persistence/IOrderCreationStore.cs  # port and contract
     │   └── Features/Orders/
@@ -36,7 +36,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["AdminOrdersController"] --> B["CreateOrderHandler"]
+    A["CreateOrderEndpoint"] --> B["CreateOrderHandler"]
     B --> C["Validate counterparty, products, and idempotency"]
     C --> D["Order and OneCOrderSync"]
     B --> E["IOrderCreationStore"]

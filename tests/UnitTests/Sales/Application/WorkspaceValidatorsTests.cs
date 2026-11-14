@@ -1,5 +1,7 @@
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.OrderWorkspace.Commands.CreateWorkspaceDraft;
+using Sales.Application.Features.OrderWorkspace.Commands.DeleteWorkspaceDraft;
+using Sales.Application.Features.OrderWorkspace.Commands.UpdateWorkspaceDraft;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceCustomerPrices;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOrders;
 using Sales.Application.Features.OrderWorkspace.Queries.QuoteWorkspaceOrder;
@@ -62,6 +64,16 @@ public sealed class WorkspaceValidatorsTests
 
         Assert.Equal("invalid_idempotency_key", FirstCode(validator, new CreateWorkspaceDraftCommand(draft, Guid.Empty)));
         Assert.Equal("invalid_draft", FirstCode(validator, new CreateWorkspaceDraftCommand(draft, Guid.NewGuid())));
+    }
+
+    [Fact]
+    public void UpdateAndDeleteDraft_NeedTheIfMatchVersion()
+    {
+        var draft = new WorkspaceDraftInput("Чернетка", null, "customer", [new WorkspaceInputLine("101", 1)]);
+
+        Assert.Equal("invalid_request", FirstCode(new UpdateWorkspaceDraftValidator(), new UpdateWorkspaceDraftCommand(7, "", draft)));
+        Assert.Equal("invalid_request", FirstCode(new DeleteWorkspaceDraftValidator(), new DeleteWorkspaceDraftCommand(7, "")));
+        Assert.True(new DeleteWorkspaceDraftValidator().Validate(new DeleteWorkspaceDraftCommand(7, "\"v1\"")).IsValid);
     }
 
     [Theory]
