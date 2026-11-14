@@ -8,14 +8,15 @@ For new or changed HTTP behavior, link every operation to acceptance scenarios `
 
 Use task-specific DTOs. Do not expose entities, persistence types, secrets, or internal exceptions. Define `Idempotency-Key` semantics before implementing writes that may be retried.
 
-## Controllers
+## Endpoints
 
-Controllers must:
+Modules expose Minimal API endpoints, never controllers ([module rules](module-rules.md), Api layer). An endpoint must:
 
-- accept explicit request models;
+- live in `<Module>.Api/Endpoints/<Feature>/` as one `<UseCase>Endpoint` class (`Map` + `Handle`) mapped by the feature's `<Feature>Endpoints` group, which sets the tag and access policy;
+- bind an explicit request record (body, or query through `[AsParameters]` with nullable values), never an Application command or query, and map it in `Handle`;
 - pass `CancellationToken` to Mediator;
-- use the existing Ardalis.Result HTTP mapping;
-- declare appropriate `ProducesResponseType` attributes;
+- answer through the one result mapper (`ToHttpResult` / `ToProblem`);
+- declare its answers (`.Produces<T>()`, `.ProducesProblem(4xx)`, `.Produces(5xx)`) and its name (`.WithName`, the operation id);
 - contain no validation logic, business rules, or EF code.
 
 ## Validation, results, and errors

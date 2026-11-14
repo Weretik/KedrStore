@@ -8,8 +8,6 @@ public static class ApiRegistrationsExtensions
 {
     public static IServiceCollection AddApiRegistrations(this IServiceCollection services)
     {
-        services.AddControllers();
-
         services.AddEndpointsApiExplorer();
         services.AddSwaggerDocumentation();
         services.AddOpenApi();

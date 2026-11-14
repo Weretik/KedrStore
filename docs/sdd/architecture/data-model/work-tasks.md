@@ -23,7 +23,7 @@ erDiagram
         bigint Id PK "identity"
         uuid UserId "Identity user ID, no FK"
         varchar256 UserEmail "sign-in email at the time"
-        varchar64 Area "controller without Admin, e.g. Categories"
+        varchar64 Area "endpoint tag without Admin, e.g. Categories"
         varchar100 Operation "action method"
         varchar10 Method "POST, PUT, PATCH, DELETE"
         varchar300 Target "route values, e.g. id=12, lang=uk"

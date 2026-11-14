@@ -104,10 +104,10 @@ public sealed class FolderStructureTests
     /// <summary>
     /// Platform spec 005, R-001: a module's HTTP code is <c>Endpoints/&lt;Feature&gt;/</c> (endpoints, their
     /// requests and responses, and HTTP-only pieces such as the Work activity middleware), or registration.
-    /// A module that has endpoints has no controller left.
+    /// No module has controllers: MVC is not registered (TS-007).
     /// </summary>
     [Fact]
-    public void Endpoints_LiveInFeatureFolders_AndReplaceTheModulesControllers()
+    public void Endpoints_LiveInFeatureFolders_AndNoModuleHasControllers()
     {
         var violations = ApiAssemblies.Select(Assembly.Load)
             .SelectMany(assembly =>
@@ -121,10 +121,8 @@ public sealed class FolderStructureTests
                     .Where(type => !EndpointFeatureNamespace.IsMatch(type.Namespace!) ||
                                    !type.Namespace!.StartsWith($"{name}.Endpoints.", StringComparison.Ordinal))
                     .Select(type => $"{type.FullName} is outside {name}.Endpoints.<Feature>");
-                var leftovers = endpoints.Length == 0
-                    ? []
-                    : types.Where(type => typeof(ControllerBase).IsAssignableFrom(type))
-                        .Select(type => $"{type.FullName} is a controller in a module with endpoints");
+                var leftovers = types.Where(type => typeof(ControllerBase).IsAssignableFrom(type))
+                    .Select(type => $"{type.FullName} is a controller; modules expose Minimal API endpoints");
                 return misplaced.Concat(leftovers);
             })
             .Order()

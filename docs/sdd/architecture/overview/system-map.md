@@ -2,7 +2,7 @@
 
 ## Executable hosts
 
-- `src/Bootstrapper/Host.Api` composes DI, middleware, controllers, authentication, and OpenAPI.
+- `src/Bootstrapper/Host.Api` composes DI, middleware, the modules' Minimal API endpoints, authentication, and OpenAPI.
 - `src/Bootstrapper/Host.Jobs/Host.Jobs` runs one explicitly selected `--job=...` command and exits. An external scheduler or CI can invoke this host; it has no persistent internal scheduler. The `--job=migrate` command runs migrations and seeders.
 
 ## Business modules

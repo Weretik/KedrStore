@@ -233,7 +233,7 @@ components:
         userId: { type: string, format: uuid }
         userEmail: { type: string, description: Sign-in email at the time of the change. }
         area: { type: string, description: 'Controller name without `Admin`, for example `Categories`, `PageSeo`, `MediaFiles`.' }
-        operation: { type: string, description: 'Action method name, for example `UpdateContent`.' }
+        operation: { type: string, description: 'Operation: the endpoint name, for example `updateAdminCategoryContent`; an endpoint without one is named by its endpoint class, for example `ChangeAdminCategorySlug`.' }
         method: { type: string, enum: [POST, PUT, PATCH, DELETE] }
         target: { type: string, description: 'Route values in name order, for example `id=12, lang=uk`; may be empty.' }
         count: { type: integer, minimum: 1, description: How many times the same change was saved within 10 minutes. }

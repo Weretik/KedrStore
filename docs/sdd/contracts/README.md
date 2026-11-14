@@ -16,7 +16,7 @@ docs/sdd/contracts/
 ## Current frontend contract handoff
 
 - [Frontend integration guide](frontend-integration.md) describes authentication, CSRF, pagination, errors, and endpoint owners.
-- [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers currently registered controllers.
+- [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers the registered endpoints.
 - [Error answers](problem.openapi.yaml): every error is `application/problem+json` with `code`, `detail` and `traceId`; module contracts reference its schemas.
 - Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [quick orders](catalog/orders.openapi.yaml), [admin «Огляд» block](catalog/admin-overview.openapi.yaml), [variant groups](catalog/product-groups.openapi.yaml), [site models](catalog/site-models.openapi.yaml), [public site models](catalog/public-site-models.openapi.yaml), [attributes admin](catalog/attributes.openapi.yaml), [offline app catalog snapshot](catalog/mobile-sync.openapi.yaml).
 - Sales: [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml), [admin «Огляд» block](sales/admin-overview.openapi.yaml), [offline app customers snapshot](sales/mobile-sync.openapi.yaml).

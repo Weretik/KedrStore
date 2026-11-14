@@ -69,7 +69,26 @@ public sealed class WorkActivityTests
     }
 
     [Fact]
+    public void Middleware_Names_An_Unnamed_Endpoint_By_Its_Class()
+    {
+        var endpoint = new Endpoint(_ => Task.CompletedTask, new EndpointMetadataCollection(
+            new TagsAttribute("AdminCategories"),
+            typeof(ChangeAdminCategorySlugEndpoint).GetMethod(nameof(ChangeAdminCategorySlugEndpoint.Handle))!), "test");
+
+        var source = WorkActivityMiddleware.Describe(endpoint);
+
+        Assert.NotNull(source);
+        Assert.Equal("ChangeAdminCategorySlug", source.Operation);
+    }
+
+    [Fact]
     public void Middleware_Skips_An_Endpoint_Without_A_Tag() =>
         Assert.Null(WorkActivityMiddleware.Describe(new Endpoint(_ => Task.CompletedTask,
             new EndpointMetadataCollection(new EndpointNameMetadata("x")), "test")));
+
+    /// <summary>Stands for a generated endpoint class without a name.</summary>
+    private static class ChangeAdminCategorySlugEndpoint
+    {
+        public static void Handle() { }
+    }
 }

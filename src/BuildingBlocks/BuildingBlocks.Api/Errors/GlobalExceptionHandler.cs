@@ -8,7 +8,7 @@ namespace BuildingBlocks.Api.Errors;
 /// <summary>
 /// The one place that turns an unhandled exception into an HTTP answer: it logs the exception and answers 500 as
 /// ProblemDetails with the request's <c>traceId</c>, never the exception text or stack trace. Expected business
-/// errors do not reach it; they travel as results and map to 400/404/409/403 in <c>ToActionResult</c>.
+/// errors do not reach it; they travel as results and map to 400/404/409/403 in <c>ToHttpResult</c>.
 /// </summary>
 public sealed partial class GlobalExceptionHandler(
     IProblemDetailsService problemDetails,

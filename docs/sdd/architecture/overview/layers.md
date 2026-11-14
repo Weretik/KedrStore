@@ -22,7 +22,7 @@ Contains EF Core `DbContext`, entity configurations, migrations, repository impl
 
 ## API layer
 
-Controllers are a thin transport layer: bind input, send one Mediator request with the cancellation token, and map the Result using the existing API conversion. They contain no business rules, EF queries, or transaction coordination.
+Minimal API endpoints are a thin transport layer: bind a request record, send one Mediator request with the cancellation token, and map the Result with the one `ToHttpResult` mapper. They contain no business rules, EF queries, or transaction coordination.
 
 ## Bootstrapper layer
 

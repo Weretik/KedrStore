@@ -4,17 +4,17 @@
 
 ~~~text
 <Module>.Api/
-├── Features/
+├── Endpoints/
 │   └── <Feature>/
-│       ├── Admin<Feature>Controller.cs     one controller per audience (admin, public, mobile)
-│       ├── Public<Feature>Controller.cs
-│       └── <Action>Request.cs              HTTP request models of the feature
+│       ├── <Feature>Endpoints.cs           Map<Feature>Endpoints(): one MapGroup per audience (admin, public, mobile) with tag and policy
+│       ├── <UseCase>Endpoint.cs            Map(group) + Handle: one operation
+│       └── <UseCase>Request.cs             HTTP request record of the feature (≠ the Application command)
 ├── DependencyInjection/
-│   └── <Module>Module.cs                   Add<Module>Module(): Application, Infrastructure, controllers
+│   └── <Module>Module.cs                   Add<Module>Module(): Application, Infrastructure; Map<Module>Endpoints()
 └── <Module>.Api.csproj
 ~~~
 
-Controllers bind HTTP input, call `ISender.Send` with `CancellationToken`, and return the result through the existing Result mapping. They do not run EF queries, create repositories, use Infrastructure types, or contain domain rules. Access attributes take policy names from `Identity.Contracts`.
+Endpoints bind HTTP input into a request record, call `ISender.Send` with `CancellationToken`, and answer through the one Result mapping (`ToHttpResult`, failures as `ProblemDetails`). They do not run EF queries, create repositories, use Infrastructure types, or contain domain rules. Groups and endpoints take policy names from `Identity.Contracts`.
 
 ## Host structure
 
@@ -42,7 +42,7 @@ HTTP
   → exception handling / Development diagnostics
   → CORS, HTTPS, Serilog request logging, rate limiter
   → authentication → authorization
-  → controller → ISender
+  → Work activity log (admin changes) → endpoint → ISender
   → request logging → exceptions → performance → validation → domain events
   → handler → Result to HTTP mapping
 ~~~
