@@ -4,9 +4,6 @@ using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Application.Shared;
 using Catalog.Contracts.MobileSync;
 using Catalog.Contracts.Pricing;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products.Media;
 
 namespace Catalog.Application.Features.MobileSync.Queries.GetCatalogSnapshot;
 

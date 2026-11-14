@@ -1,11 +1,3 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Categories;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.MobileSync;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.ProductAttributes;
-using Catalog.Api.Features.Products;
-using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Overview.Queries.GetAdminCatalogOverview;
 using Catalog.Contracts.Overview;
 using Identity.Contracts.Authorization;

@@ -1,4 +1,3 @@
-using System.Globalization;
 using BuildingBlocks.Integrations.OneC.Factory;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Application.Features.OneCSync.Source;

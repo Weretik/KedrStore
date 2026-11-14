@@ -1,5 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetAllAdminProducts;
-using Catalog.Application.Features.Products.Shared;
 using Catalog.Contracts.Products.GetAdminList;
 
 namespace Catalog.Application.Features.Products.Queries.GetAdminProductList;

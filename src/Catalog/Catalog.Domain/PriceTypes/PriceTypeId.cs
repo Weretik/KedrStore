@@ -1,10 +1,4 @@
-﻿using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
-namespace Catalog.Domain.PriceTypes;
+﻿namespace Catalog.Domain.PriceTypes;
 
 [ValueObject<int>]
 public readonly partial struct PriceTypeId

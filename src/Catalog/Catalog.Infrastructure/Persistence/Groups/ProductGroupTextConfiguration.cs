@@ -1,9 +1,3 @@
-using Catalog.Infrastructure.Persistence.Categories;
-using Catalog.Infrastructure.Persistence.Categories.Content;
-using Catalog.Infrastructure.Persistence.PriceTypes;
-using Catalog.Infrastructure.Persistence.Products;
-using Catalog.Infrastructure.Persistence.Products.Prices;
-using Catalog.Infrastructure.Persistence.Slugs;
 using Catalog.Domain.Groups;
 
 namespace Catalog.Infrastructure.Persistence.Groups;

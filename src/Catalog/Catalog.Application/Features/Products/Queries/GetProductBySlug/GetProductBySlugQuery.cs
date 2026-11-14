@@ -1,4 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetProductBySlug;
 using Catalog.Contracts.Category;
 
 namespace Catalog.Application.Features.Products.Queries.GetProductBySlug;

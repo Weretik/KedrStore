@@ -1,11 +1,3 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Categories;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.Overview;
-using Catalog.Api.Features.ProductAttributes;
-using Catalog.Api.Features.Products;
-using Catalog.Api.Features.SiteModels;
 using BuildingBlocks.Api.Snapshots;
 using Catalog.Application.Features.MobileSync.Queries.GetCatalogSnapshot;
 using Catalog.Contracts.MobileSync;

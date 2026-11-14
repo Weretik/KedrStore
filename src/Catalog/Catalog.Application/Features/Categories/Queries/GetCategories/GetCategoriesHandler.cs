@@ -1,15 +1,6 @@
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.OneCSync.Mapping;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.Categories.Queries.GetCategories;
 

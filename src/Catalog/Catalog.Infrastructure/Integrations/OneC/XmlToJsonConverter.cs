@@ -1,9 +1,4 @@
-﻿using Catalog.Infrastructure.Persistence;
-using Catalog.Infrastructure.Persistence.Categories;
-using System.Text;
-using System.Xml.Linq;
-using Catalog.Application.Abstractions.Integrations;
-using Microsoft.Extensions.Logging;
+﻿using Catalog.Application.Abstractions.Integrations;
 using Newtonsoft.Json;
 
 namespace Catalog.Infrastructure.Integrations.OneC;

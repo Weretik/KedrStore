@@ -1,16 +1,7 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Categories;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.MobileSync;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.Overview;
-using Catalog.Api.Features.ProductAttributes;
-using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Groups.Queries.GetProductGroupForProduct;
 using Catalog.Application.Features.Groups.Commands.SetProductGroup;
 using Catalog.Application.Features.Products.Queries.GetAdminProductList;
 using Catalog.Application.Features.Products.Queries.GetAllAdminProducts;
-using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Features.Products.Queries.GetAdminProductBySlug;
 using Catalog.Application.Features.ProductMedia.Queries.GetProductMedia;
 using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;

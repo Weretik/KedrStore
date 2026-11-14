@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using static Catalog.Application.Features.Attributes.Shared.Recognition.RecognitionPatterns;
 
 namespace Catalog.Application.Features.Attributes.Shared.Recognition;

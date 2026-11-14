@@ -1,8 +1,6 @@
 using Catalog.Contracts.Pricing;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Infrastructure.Integrations.OneC;
-using Catalog.Infrastructure.Persistence;
-using Catalog.Infrastructure.Persistence.Categories;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

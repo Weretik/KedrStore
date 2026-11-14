@@ -1,24 +1,9 @@
-using Catalog.Application.Features.Products.Queries.GetAllAdminProducts;
 using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Shared;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
 using Catalog.Contracts.Products.GetList;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using Catalog.Domain.Slugs;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.Products.Queries.GetAdminProductList;
 

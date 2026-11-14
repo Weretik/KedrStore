@@ -1,4 +1,3 @@
-using Catalog.Application.Features.Categories.Shared;
 using Catalog.Contracts.Category;
 
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategories;

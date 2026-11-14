@@ -1,4 +1,3 @@
-using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategories;

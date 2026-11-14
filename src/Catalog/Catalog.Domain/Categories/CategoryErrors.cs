@@ -1,12 +1,4 @@
-﻿using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using System.Globalization;
-
-namespace Catalog.Domain.Categories;
+﻿namespace Catalog.Domain.Categories;
 
 public static class CategoryErrors
 {

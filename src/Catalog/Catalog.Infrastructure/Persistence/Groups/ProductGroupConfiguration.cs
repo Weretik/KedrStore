@@ -1,29 +1,6 @@
-using Catalog.Infrastructure.Persistence.Categories.Content;
-using Catalog.Infrastructure.Persistence.PriceTypes;
-using Catalog.Infrastructure.Persistence.Products;
-using Catalog.Infrastructure.Persistence.Products.Prices;
-using Catalog.Infrastructure.Persistence.Slugs;
 using Catalog.Domain.Categories;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.PriceTypes;
 using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using Catalog.Domain.Slugs;
 using Catalog.Domain.Groups;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
-using Catalog.Infrastructure.Integrations.OneC;
-using Catalog.Infrastructure.Persistence;
-using Catalog.Infrastructure.Persistence.Categories;
 
 namespace Catalog.Infrastructure.Persistence.Groups;
 

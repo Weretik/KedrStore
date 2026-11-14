@@ -1,4 +1,3 @@
-using Catalog.Application.Features.Categories.Shared;
 namespace Catalog.Application.Features.Categories.Queries.GetCategoryBySlug;
 
 public sealed class GetCategoryBySlugValidator : AbstractValidator<GetCategoryBySlugQuery>

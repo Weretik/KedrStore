@@ -1,14 +1,5 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.MobileSync;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.Overview;
-using Catalog.Api.Features.ProductAttributes;
-using Catalog.Api.Features.Products;
-using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Features.Categories.Queries.GetCategoryBySlug;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Contracts.Category;
 using Microsoft.AspNetCore.Authorization;

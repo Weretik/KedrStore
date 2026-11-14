@@ -1,5 +1,3 @@
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products.Media;
 namespace Catalog.Domain.Attributes;
 
 /// <summary>Whether a person has to look at the attributes recognized for a product.</summary>

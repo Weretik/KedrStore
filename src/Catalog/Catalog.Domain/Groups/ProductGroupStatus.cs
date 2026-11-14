@@ -1,5 +1,3 @@
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Products.Media;
 namespace Catalog.Domain.Groups;
 
 /// <summary>State of a site model (a product group, spec catalog/007).</summary>

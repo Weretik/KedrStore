@@ -1,11 +1,3 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.MobileSync;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.Overview;
-using Catalog.Api.Features.ProductAttributes;
-using Catalog.Api.Features.Products;
-using Catalog.Api.Features.SiteModels;
 using System.Security.Claims;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategoryById;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;

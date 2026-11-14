@@ -1,12 +1,7 @@
 using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Contracts.SiteModels.Public;
 using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
 using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.SiteModels.Shared.Public;
 

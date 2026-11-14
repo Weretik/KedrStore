@@ -1,11 +1,3 @@
-using Catalog.Api.Features.Attributes;
-using Catalog.Api.Features.Categories;
-using Catalog.Api.Features.Groups;
-using Catalog.Api.Features.MobileSync;
-using Catalog.Api.Features.Orders;
-using Catalog.Api.Features.Overview;
-using Catalog.Api.Features.Products;
-using Catalog.Api.Features.SiteModels;
 using Catalog.Application.Features.ProductAttributes.Commands.AcceptProductReview;
 using Catalog.Application.Features.ProductAttributes.Queries.GetProductAttributes;
 using Catalog.Application.Features.ProductAttributes.Commands.ReopenProductReview;

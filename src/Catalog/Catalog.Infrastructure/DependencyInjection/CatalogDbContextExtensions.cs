@@ -3,17 +3,12 @@ using Catalog.Application.Features.SiteModels.Shared;
 using Catalog.Application.Features.Attributes.Shared;
 using Catalog.Application.Features.ProductAttributes.Shared;
 using Catalog.Application.Features.Groups.Shared;
-using Catalog.Application.Features.Groups.Shared;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Infrastructure.Persistence;
 using Catalog.Infrastructure.Persistence.Products;
-using Catalog.Infrastructure.Persistence;
-using Catalog.Infrastructure.Contracts.Products;
 
 namespace Catalog.Infrastructure.DependencyInjection;
 

@@ -1,5 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetProductBySlug;
-
 namespace Catalog.Application.Features.Products.Queries.GetProductBySlug;
 
 public static class ProductCategoryBreadcrumbExtensions

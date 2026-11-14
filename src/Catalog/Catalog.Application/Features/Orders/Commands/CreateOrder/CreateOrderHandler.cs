@@ -1,7 +1,5 @@
 ﻿using System.Net;
 using Catalog.Application.Abstractions.Integrations;
-using Catalog.Application.Features.Orders.Commands.CreateOrder;
-using Catalog.Application.Abstractions.Integrations;
 
 namespace Catalog.Application.Features.Orders.Commands.CreateOrder;
 

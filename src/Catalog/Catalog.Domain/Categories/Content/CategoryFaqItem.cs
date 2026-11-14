@@ -1,8 +1,3 @@
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using Catalog.Domain.Slugs;
 namespace Catalog.Domain.Categories.Content;
 
 /// <summary>One question and answer of a category content row.</summary>

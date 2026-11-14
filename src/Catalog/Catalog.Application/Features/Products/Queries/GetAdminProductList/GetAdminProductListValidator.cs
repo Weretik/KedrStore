@@ -1,7 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetAdminProductList;
-using Catalog.Application.Features.Products.Queries.GetAllAdminProducts;
-using Catalog.Application.Features.Products.Shared;
-
 namespace Catalog.Application.Features.Products.Queries.GetAdminProductList;
 
 public sealed class GetAdminProductListValidator : AbstractValidator<GetAdminProductListQuery>

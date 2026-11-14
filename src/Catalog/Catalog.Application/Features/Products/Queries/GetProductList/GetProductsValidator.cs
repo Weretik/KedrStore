@@ -1,5 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetProductList;
-
 namespace Catalog.Application.Features.Products.Queries.GetProductList;
 
 public sealed class GetProductsValidator : AbstractValidator<GetProductListQuery>

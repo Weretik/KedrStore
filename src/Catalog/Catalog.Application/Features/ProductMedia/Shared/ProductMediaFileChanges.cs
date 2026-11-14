@@ -1,6 +1,4 @@
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Features.ProductMedia.Shared;
 
 namespace Catalog.Application.Features.ProductMedia.Shared;
 

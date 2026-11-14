@@ -1,18 +1,3 @@
-using Catalog.Domain.Categories;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
-using Catalog.Domain.Slugs;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
-
 namespace Catalog.Application.Features.Categories.Shared;
 
 /// <summary>IDs of a selected category and all its descendants among the given categories.</summary>

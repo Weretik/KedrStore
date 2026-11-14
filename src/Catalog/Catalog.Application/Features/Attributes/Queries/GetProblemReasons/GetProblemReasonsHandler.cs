@@ -1,8 +1,6 @@
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Attributes;
 using Catalog.Domain.Attributes;
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products.Media;
 
 namespace Catalog.Application.Features.Attributes.Queries.GetProblemReasons;
 

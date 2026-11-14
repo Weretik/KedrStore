@@ -1,5 +1,3 @@
-using Catalog.Application.Features.OneCSync.Sync;
-
 namespace Catalog.Application.Features.OneCSync.Sync;
 
 /// <summary>

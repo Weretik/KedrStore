@@ -1,14 +1,6 @@
 using System.Text.RegularExpressions;
 using Catalog.Application.Abstractions.Media;
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Abstractions.Persistence;
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 
 namespace Catalog.Application.Features.ProductMedia.Jobs;
 

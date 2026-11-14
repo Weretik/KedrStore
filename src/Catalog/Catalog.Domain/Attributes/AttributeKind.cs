@@ -1,5 +1,3 @@
-using Catalog.Domain.Groups;
-using Catalog.Domain.Products.Media;
 namespace Catalog.Domain.Attributes;
 
 /// <summary>How an attribute stores its values.</summary>

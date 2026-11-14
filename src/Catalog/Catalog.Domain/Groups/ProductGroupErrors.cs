@@ -1,9 +1,3 @@
-using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
-using Catalog.Domain.Categories.Content;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Products.Prices;
 namespace Catalog.Domain.Groups;
 
 public static class ProductGroupErrors

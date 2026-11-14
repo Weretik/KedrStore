@@ -1,5 +1,3 @@
-using Catalog.Application.Features.Products.Queries.GetAdminProductList;
-using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
 

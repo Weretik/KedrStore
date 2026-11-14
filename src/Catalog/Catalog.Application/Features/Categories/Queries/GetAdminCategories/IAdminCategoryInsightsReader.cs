@@ -1,4 +1,3 @@
-using Catalog.Application.Features.Categories.Shared;
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 
 /// <summary>What the admin category list shows beside each row: how many products and which texts exist.</summary>
