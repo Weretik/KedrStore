@@ -2,6 +2,11 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.SeoSettings.GetSiteSeoSettings;
+
+using Content.Api.Endpoints.SeoSettings.GetAdminSiteSeoSettings;
+using Content.Api.Endpoints.SeoSettings.UpdateAdminSiteSeoSettings;
+
 namespace Content.Api.Endpoints.SeoSettings;
 
 /// <summary>

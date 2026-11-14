@@ -2,6 +2,19 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Identity.Api.Endpoints.Users.GrantStaffAccess;
+
+using Identity.Api.Endpoints.Users.ChangeStaffRole;
+using Identity.Api.Endpoints.Users.CreateStaffAccount;
+using Identity.Api.Endpoints.Users.SetStaffPassword;
+using Identity.Api.Endpoints.Users.ChangeStaffEmail;
+using Identity.Api.Endpoints.Users.SearchStaffCandidates;
+using Identity.Api.Endpoints.Users.RemoveStaffAvatar;
+using Identity.Api.Endpoints.Users.GetStaffAccounts;
+using Identity.Api.Endpoints.Users.SetStaffBlocked;
+using Identity.Api.Endpoints.Users.UploadStaffAvatar;
+using Identity.Api.Endpoints.Users.ChangeStaffName;
+
 namespace Identity.Api.Endpoints.Users;
 
 /// <summary>

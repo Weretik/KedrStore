@@ -6,7 +6,7 @@ Authorized product list for sales.
 
 ## Structure and relationships
 
-[GetCatalogListEndpoint](../../../../src/Modules/Sales/Sales.Api/Endpoints/Catalog/GetCatalogListEndpoint.cs) in the [Catalog group](../../../../src/Modules/Sales/Sales.Api/Endpoints/Catalog/CatalogEndpoints.cs) serves `GET /api/sales/{lang}/catalog/products`; the [handler](../../../../src/Modules/Sales/Sales.Application/Features/Catalog/Queries/GetCatalogList/GetCatalogListHandler.cs) builds a read result through Catalog contracts. [Price policy](../../../../src/Modules/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) belongs to Sales. This is a separate use case from the anonymous public catalog.
+[GetCatalogListEndpoint](../../../../src/Modules/Sales/Sales.Api/Endpoints/Catalog/GetCatalogList/GetCatalogListEndpoint.cs) in the [Catalog group](../../../../src/Modules/Sales/Sales.Api/Endpoints/Catalog/CatalogEndpoints.cs) serves `GET /api/sales/{lang}/catalog/products`; the [handler](../../../../src/Modules/Sales/Sales.Application/Features/Catalog/Queries/GetCatalogList/GetCatalogListHandler.cs) builds a read result through Catalog contracts. [Price policy](../../../../src/Modules/Sales/Sales.Infrastructure/Pricing/DefaultPricePolicyProvider.cs) belongs to Sales. This is a separate use case from the anonymous public catalog.
 
 ## Code structure
 

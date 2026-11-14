@@ -2,6 +2,10 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Work.Api.Endpoints.Report.GetMyWorkReport;
+
+using Work.Api.Endpoints.Report.GetWorkReport;
+
 namespace Work.Api.Endpoints.Report;
 
 /// <summary>«Звіт роботи» (spec work/001, R-7): the staff member's own report and, for the administrator, anybody's.</summary>

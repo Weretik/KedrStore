@@ -2,6 +2,16 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Documents.GetAdminLegalDocuments;
+
+using Content.Api.Endpoints.Documents.GetPublishedLegalDocument;
+using Content.Api.Endpoints.Documents.GetAdminLegalDocumentVersion;
+using Content.Api.Endpoints.Documents.DeleteAdminLegalDocumentDraft;
+using Content.Api.Endpoints.Documents.GetAdminLegalDocumentVersions;
+using Content.Api.Endpoints.Documents.CreateAdminLegalDocumentDraft;
+using Content.Api.Endpoints.Documents.UpdateAdminLegalDocumentDraft;
+using Content.Api.Endpoints.Documents.PublishAdminLegalDocumentDraft;
+
 namespace Content.Api.Endpoints.Documents;
 
 /// <summary>

@@ -2,6 +2,16 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Gallery.GetPublicGallery;
+
+using Content.Api.Endpoints.Gallery.DeleteAdminGalleryItem;
+using Content.Api.Endpoints.Gallery.GetAdminGallery;
+using Content.Api.Endpoints.Gallery.PreviewAdminGalleryYoutubeVideo;
+using Content.Api.Endpoints.Gallery.ReorderAdminGallery;
+using Content.Api.Endpoints.Gallery.UpdateAdminGalleryItem;
+using Content.Api.Endpoints.Gallery.AddAdminGalleryVideo;
+using Content.Api.Endpoints.Gallery.AddAdminGalleryPhotos;
+
 namespace Content.Api.Endpoints.Gallery;
 
 /// <summary>

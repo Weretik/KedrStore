@@ -2,6 +2,7 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Overview.GetAdminContentOverview;
 namespace Content.Api.Endpoints.Overview;
 
 /// <summary>Site content problems shown on the admin «Огляд».</summary>

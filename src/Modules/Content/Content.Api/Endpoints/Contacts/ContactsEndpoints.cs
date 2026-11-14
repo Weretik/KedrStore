@@ -2,6 +2,11 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Contacts.GetAdminCompanyContacts;
+
+using Content.Api.Endpoints.Contacts.GetCompanyContacts;
+using Content.Api.Endpoints.Contacts.UpdateAdminCompanyContacts;
+
 namespace Content.Api.Endpoints.Contacts;
 
 /// <summary>

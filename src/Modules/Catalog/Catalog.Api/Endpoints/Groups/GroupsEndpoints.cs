@@ -2,6 +2,14 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.Groups.CreateAdminProductGroup;
+
+using Catalog.Api.Endpoints.Groups.GetAdminProductGroups;
+using Catalog.Api.Endpoints.Groups.ChangeAdminProductGroupSlug;
+using Catalog.Api.Endpoints.Groups.GetAdminProductGroup;
+using Catalog.Api.Endpoints.Groups.SetAdminProductGroupMain;
+using Catalog.Api.Endpoints.Groups.RenameAdminProductGroup;
+
 namespace Catalog.Api.Endpoints.Groups;
 
 /// <summary>

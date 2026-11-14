@@ -2,6 +2,14 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Identity.Api.Endpoints.Profile.RemoveMyAvatar;
+
+using Identity.Api.Endpoints.Profile.ChangeMyName;
+using Identity.Api.Endpoints.Profile.GetMyProfile;
+using Identity.Api.Endpoints.Profile.UploadMyAvatar;
+using Identity.Api.Endpoints.Profile.ChangeMyPassword;
+using Identity.Api.Endpoints.Profile.ChangeMyEmail;
+
 namespace Identity.Api.Endpoints.Profile;
 
 /// <summary>

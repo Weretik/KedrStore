@@ -2,6 +2,10 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Sales.Api.Endpoints.Customers.GetCustomerList;
+
+using Sales.Api.Endpoints.Customers.GetCustomerById;
+
 namespace Sales.Api.Endpoints.Customers;
 
 /// <summary>Customers (1C counterparties) for the admin.</summary>

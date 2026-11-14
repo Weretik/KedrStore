@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Sales.Api.Endpoints.Catalog.GetCatalogList;
 namespace Sales.Api.Endpoints.Catalog;
 
 /// <summary>The manager's catalog with the signed-in customer's prices.</summary>

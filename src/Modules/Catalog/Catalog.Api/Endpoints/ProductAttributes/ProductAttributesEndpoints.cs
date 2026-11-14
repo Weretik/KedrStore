@@ -2,6 +2,13 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.ProductAttributes.AcceptAdminProductReview;
+
+using Catalog.Api.Endpoints.ProductAttributes.ReopenAdminProductReview;
+using Catalog.Api.Endpoints.ProductAttributes.RestoreAdminProductAttribute;
+using Catalog.Api.Endpoints.ProductAttributes.GetAdminProductAttributes;
+using Catalog.Api.Endpoints.ProductAttributes.SetAdminProductAttribute;
+
 namespace Catalog.Api.Endpoints.ProductAttributes;
 
 /// <summary>

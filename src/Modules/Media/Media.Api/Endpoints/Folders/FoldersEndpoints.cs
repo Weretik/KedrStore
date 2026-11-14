@@ -2,6 +2,12 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Media.Api.Endpoints.Folders.GetMediaFolderTree;
+
+using Media.Api.Endpoints.Folders.DeleteMediaFolder;
+using Media.Api.Endpoints.Folders.CreateMediaFolder;
+using Media.Api.Endpoints.Folders.UpdateMediaFolder;
+
 namespace Media.Api.Endpoints.Folders;
 
 /// <summary>Folders of the media library. Delete is for Admins only.</summary>

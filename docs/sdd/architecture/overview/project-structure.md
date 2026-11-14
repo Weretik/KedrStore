@@ -15,12 +15,13 @@ KedrStore.sln
 │   │   ├── BuildingBlocks.Infrastructure/
 │   │   ├── BuildingBlocks.Integrations.OneC/
 │   │   └── BuildingBlocks.Api/
-│   └── <Module>/                     Catalog, Sales, Identity, Content, Media, Work
-│       ├── <Module>.Api/             Endpoints/<Feature>/ Minimal API endpoints, DependencyInjection/Add<Module>Module(), Map<Module>Endpoints()
-│       ├── <Module>.Application/     Abstractions/, Features/<Feature>/Commands|Queries/<UseCase>/
-│       ├── <Module>.Contracts/       what other modules may use: interfaces, DTOs, events
-│       ├── <Module>.Domain/          <Aggregate>/
-│       └── <Module>.Infrastructure/  Persistence/<Aggregate>/, Integrations/<System>/, Adapters/<Provider>/, Contracts/<Feature>/
+│   └── Modules/
+│       └── <Module>/                 Catalog, Sales, Identity, Content, Media, Work
+│           ├── <Module>.Api/             Endpoints/<Feature>/<UseCase>/ Minimal API endpoints, DependencyInjection/Add<Module>Module(), Map<Module>Endpoints()
+│           ├── <Module>.Application/     Abstractions/, Features/<Feature>/Commands|Queries/<UseCase>/
+│           ├── <Module>.Contracts/       what other modules may use: interfaces, DTOs, events
+│           ├── <Module>.Domain/          <Aggregate>/
+│           └── <Module>.Infrastructure/  Persistence/<Aggregate>/, Integrations/<System>/, Adapters/<Provider>/, Contracts/<Feature>/
 │
 ├── tests/
 │   ├── UnitTests/                    <Module>/Domain|Application/...

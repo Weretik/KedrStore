@@ -6,6 +6,7 @@ using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
 using Identity.Infrastructure.Users;
 
+using Identity.Api.Endpoints.Auth.Shared;
 namespace Identity.Api.DependencyInjection;
 
 internal static class IdentityOptionsRegistrationExtensions

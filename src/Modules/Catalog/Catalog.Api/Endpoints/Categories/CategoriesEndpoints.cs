@@ -2,6 +2,16 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Catalog.Api.Endpoints.Categories.GetAdminCategoryContent;
+
+using Catalog.Api.Endpoints.Categories.GetCategoryBySlug;
+using Catalog.Api.Endpoints.Categories.SetAdminCategorySiteVisibility;
+using Catalog.Api.Endpoints.Categories.GetAdminCategory;
+using Catalog.Api.Endpoints.Categories.ChangeAdminCategorySlug;
+using Catalog.Api.Endpoints.Categories.GetCategories;
+using Catalog.Api.Endpoints.Categories.GetAdminCategories;
+using Catalog.Api.Endpoints.Categories.SaveAdminCategoryContent;
+
 namespace Catalog.Api.Endpoints.Categories;
 
 /// <summary>Categories: the admin tree, slug, site visibility and content, and the public tree and category by slug.</summary>

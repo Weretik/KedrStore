@@ -2,6 +2,13 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Sales.Api.Endpoints.Orders.GetOrderById;
+
+using Sales.Api.Endpoints.Orders.RetryOrderSync;
+using Sales.Api.Endpoints.Orders.GetOrderList;
+using Sales.Api.Endpoints.Orders.CreateOrder;
+using Sales.Api.Endpoints.Orders.GetOrderSyncStatus;
+
 namespace Sales.Api.Endpoints.Orders;
 
 /// <summary>Orders for the admin: create with an idempotency key, read, and the 1C sync status and retry.</summary>

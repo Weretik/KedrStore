@@ -2,6 +2,12 @@ using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
+using Content.Api.Endpoints.Requisites.GetAdminCompanyRequisitesHistory;
+
+using Content.Api.Endpoints.Requisites.GetCompanyRequisites;
+using Content.Api.Endpoints.Requisites.GetAdminCompanyRequisites;
+using Content.Api.Endpoints.Requisites.UpdateAdminCompanyRequisites;
+
 namespace Content.Api.Endpoints.Requisites;
 
 /// <summary>
