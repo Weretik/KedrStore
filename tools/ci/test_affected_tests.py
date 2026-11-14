@@ -9,10 +9,10 @@ REFS = {"Sales": {"Catalog"}, "Catalog": set(), "Content": set(), "Identity": se
 
 class SelectTests(unittest.TestCase):
     def test_module_change_runs_that_module_and_the_modules_that_reference_it(self):
-        self.assertEqual(select(["src/Catalog/Catalog.Domain/Products/Product.cs"], REFS), {"Catalog", "Sales"})
+        self.assertEqual(select(["src/Modules/Catalog/Catalog.Domain/Products/Product.cs"], REFS), {"Catalog", "Sales"})
 
     def test_change_in_a_module_nobody_references_runs_only_that_module(self):
-        self.assertEqual(select(["src/Content/Content.Api/Features/Home/HomeBlocksController.cs"], REFS), {"Content"})
+        self.assertEqual(select(["src/Modules/Content/Content.Api/Features/Home/HomeBlocksController.cs"], REFS), {"Content"})
 
     def test_module_test_change_runs_that_module(self):
         self.assertEqual(select(["tests/UnitTests/Identity/UserTests.cs"], REFS), {"Identity"})

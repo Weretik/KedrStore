@@ -6,16 +6,16 @@ One set of company contacts that every site page shows: sales phone, email, Tele
 
 ## Structure and relationships
 
-The [public and admin endpoint groups](../../../../src/Content/Content.Api/Endpoints/Contacts/ContactsEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to one query and one command. [CompanyContacts](../../../../src/Content/Content.Domain/Contacts/CompanyContacts.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint): it is never created or deleted through the API, only replaced as a whole. Phones are stored in E.164 (`+380XXXXXXXXX`) and formatted by clients; Telegram must be an `https://t.me/` or `https://telegram.me/` link, the map any `https` link. The [validator](../../../../src/Content/Content.Application/Features/Contacts/Commands/UpdateCompanyContacts/UpdateCompanyContactsValidator.cs) reports each field by its JSON name, so the admin form can show it.
+The [public and admin endpoint groups](../../../../src/Modules/Content/Content.Api/Endpoints/Contacts/ContactsEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to one query and one command. [CompanyContacts](../../../../src/Modules/Content/Content.Domain/Contacts/CompanyContacts.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint): it is never created or deleted through the API, only replaced as a whole. Phones are stored in E.164 (`+380XXXXXXXXX`) and formatted by clients; Telegram must be an `https://t.me/` or `https://telegram.me/` link, the map any `https` link. The [validator](../../../../src/Modules/Content/Content.Application/Features/Contacts/Commands/UpdateCompanyContacts/UpdateCompanyContactsValidator.cs) reports each field by its JSON name, so the admin form can show it.
 
-A save stores `UpdatedBy`, the editor's email ([ContentEditor](../../../../src/Content/Content.Application/Shared/ContentEditor.cs)); only the admin responses (`AdminCompanyContacts`) return it.
+A save stores `UpdatedBy`, the editor's email ([ContentEditor](../../../../src/Modules/Content/Content.Application/Shared/ContentEditor.cs)); only the admin responses (`AdminCompanyContacts`) return it.
 
 Access: `GET /api/content/contacts` is anonymous; `/api/admin/content/contacts` needs `CanManageContent` (Manager, Seo, or Admin).
 
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/Contacts/ public group       # public GET
 │   ├── Endpoints/Contacts/ admin group  # admin GET and PUT

@@ -3,7 +3,7 @@
 - **ID завдання:** EN-002
 - **Забезпечує:** SC-001, SC-002, SC-003
 - **Залежить від:** EN-001
-- **Точні шляхи:** `src/Sales/Sales.Application/Abstractions/Customers/ICustomerReadService.cs`, `src/Sales/Sales.Application/Features/Customers/GetList/DTOs/`, `src/Sales/Sales.Application/Features/Customers/GetById/DTOs/`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Application/Abstractions/Customers/ICustomerReadService.cs`, `src/Modules/Sales/Sales.Application/Features/Customers/GetList/DTOs/`, `src/Modules/Sales/Sales.Application/Features/Customers/GetById/DTOs/`
 - **Рівень тестування:** перевірка компіляції Application і контрактів
 
 ## Чому це спільна передумова
@@ -21,8 +21,8 @@
 ## Виняток із підходу «спочатку тест» і замінна перевірка
 
 - **Причина:** контракти часу компіляції передують тестам поведінки обробників та інфраструктури.
-- **Замінна перевірка:** зібрати `src/Sales/Sales.Application/Sales.Application.csproj` і скомпілювати цільові тестові фікстури.
-- **Результат:** `dotnet build src/Sales/Sales.Application/Sales.Application.csproj --no-restore` пройшов; цільові фікстури скомпільовано, згодом їхні тести пройшли.
+- **Замінна перевірка:** зібрати `src/Modules/Sales/Sales.Application/Sales.Application.csproj` і скомпілювати цільові тестові фікстури.
+- **Результат:** `dotnet build src/Modules/Sales/Sales.Application/Sales.Application.csproj --no-restore` пройшов; цільові фікстури скомпільовано, згодом їхні тести пройшли.
 
 ## Контрольна точка
 

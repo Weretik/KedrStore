@@ -3,7 +3,7 @@
 - **ID завдання:** TS-004
 - **Охоплює:** SC-001, SC-002, SC-003, SC-004
 - **Залежить від:** TS-002, TS-003, EN-003
-- **Точні шляхи:** `src/Sales/Sales.Api/Features/Customers/AdminCustomersController.cs`, `src/Sales/Sales.Api/Contracts/Customers/`, `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`
+- **Точні шляхи:** `src/Modules/Sales/Sales.Api/Features/Customers/AdminCustomersController.cs`, `src/Modules/Sales/Sales.Api/Contracts/Customers/`, `tests/IntegrationTests/Sales/Api/AdminCustomerApiTests.cs`
 - **Рівень тестування:** інтеграційні тести API
 
 ## Свідчення

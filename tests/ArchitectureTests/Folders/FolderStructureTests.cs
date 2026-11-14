@@ -29,6 +29,26 @@ public sealed class FolderStructureTests
     private static readonly string[] ApiAssemblies =
         ["Catalog.Api", "Content.Api", "Identity.Api", "Media.Api", "Sales.Api", "Work.Api"];
 
+    /// <summary>
+    /// <c>src/</c> holds the hosts, the shared code and the business modules, each module in
+    /// <c>src/Modules/&lt;Module&gt;/</c> with its <c>Api</c>, <c>Application</c>, <c>Contracts</c>, <c>Domain</c> and
+    /// <c>Infrastructure</c> projects.
+    /// </summary>
+    [Fact]
+    public void Source_HasHostsSharedCodeAndModules_AndEveryModuleProjectSitsInModules()
+    {
+        var src = Path.Combine(FindRepositoryRoot(), "src");
+        var topFolders = Directory.EnumerateDirectories(src).Select(Path.GetFileName).Order().ToArray();
+        Assert.Equal(["Bootstrapper", "BuildingBlocks", "Modules"], topFolders);
+
+        var misplaced = ApplicationAssemblies.Concat(ApiAssemblies)
+            .Select(project => project[..project.IndexOf('.')])
+            .Distinct()
+            .Where(module => !Directory.Exists(Path.Combine(src, "Modules", module)))
+            .ToArray();
+        Assert.Empty(misplaced);
+    }
+
     [Fact]
     public void SourceFolders_AreNotNamedByTypeOrAsADump()
     {
@@ -158,7 +178,7 @@ public sealed class FolderStructureTests
         if (name == "Contracts")
         {
             // A module's own Contracts project, or Infrastructure/Contracts/ that implements it, is allowed.
-            return !(segments.Length == 3 && segments[1].EndsWith(".Infrastructure", StringComparison.Ordinal));
+            return !(segments.Length >= 2 && segments[^2].EndsWith(".Infrastructure", StringComparison.Ordinal));
         }
 
         return TypeOrDumpFolders.Contains(name, StringComparer.Ordinal);

@@ -6,11 +6,11 @@ The cards of the site gallery page: photos picked from the media library and You
 
 ## Structure and relationships
 
-[GalleryItem](../../../../src/Content/Content.Domain/Gallery/GalleryItem.cs) is the aggregate: a photo holds a `MediaFileId` (a value, not a foreign key), a video holds the 11-character YouTube ID, and both hold a position and the optional texts ([GalleryItemTexts](../../../../src/Content/Content.Domain/Gallery/GalleryItemTexts.cs): empty becomes none, title up to 150, caption up to 500). [YoutubeVideoId](../../../../src/Content/Content.Domain/Gallery/YoutubeVideoId.cs) reads the ID from watch, youtu.be, shorts, embed and live links or the bare ID and rejects other hosts.
+[GalleryItem](../../../../src/Modules/Content/Content.Domain/Gallery/GalleryItem.cs) is the aggregate: a photo holds a `MediaFileId` (a value, not a foreign key), a video holds the 11-character YouTube ID, and both hold a position and the optional texts ([GalleryItemTexts](../../../../src/Modules/Content/Content.Domain/Gallery/GalleryItemTexts.cs): empty becomes none, title up to 150, caption up to 500). [YoutubeVideoId](../../../../src/Modules/Content/Content.Domain/Gallery/YoutubeVideoId.cs) reads the ID from watch, youtu.be, shorts, embed and live links or the bare ID and rejects other hosts.
 
-Photos come from the Media module only through [IMediaFileLookup](../../../../src/Media/Media.Contracts/Files/IMediaFileLookup.cs) (Media.Contracts): Content.Application asks its own port `IMediaImageReader`, and [MediaImageReader](../../../../src/Content/Content.Infrastructure/Adapters/Media/MediaImageReader.cs) adapts the lookup. A photo whose library file was deleted is hidden on the site and marked `fileMissing` in the admin. A video poster is YouTube's `hqdefault.jpg`. The paste preview asks YouTube's public oEmbed for the title ([YoutubeOEmbedClient](../../../../src/Content/Content.Infrastructure/Integrations/Youtube/YoutubeOEmbedClient.cs), 5 s timeout, `null` on any failure).
+Photos come from the Media module only through [IMediaFileLookup](../../../../src/Modules/Media/Media.Contracts/Files/IMediaFileLookup.cs) (Media.Contracts): Content.Application asks its own port `IMediaImageReader`, and [MediaImageReader](../../../../src/Modules/Content/Content.Infrastructure/Adapters/Media/MediaImageReader.cs) adapts the lookup. A photo whose library file was deleted is hidden on the site and marked `fileMissing` in the admin. A video poster is YouTube's `hqdefault.jpg`. The paste preview asks YouTube's public oEmbed for the title ([YoutubeOEmbedClient](../../../../src/Modules/Content/Content.Infrastructure/Integrations/Youtube/YoutubeOEmbedClient.cs), 5 s timeout, `null` on any failure).
 
-Handlers live in `Features/Gallery/{Public,Admin}`; every admin change answers with the whole gallery ([GalleryAdminList](../../../../src/Content/Content.Application/Features/Gallery/Shared/GalleryAdminList.cs)):
+Handlers live in `Features/Gallery/{Public,Admin}`; every admin change answers with the whole gallery ([GalleryAdminList](../../../../src/Modules/Content/Content.Application/Features/Gallery/Shared/GalleryAdminList.cs)):
 
 - add photos — up to 100 IDs, appended in order, already present ones skipped, an unknown file 400 with nothing added;
 - add video — 409 when the video is already there;
@@ -20,9 +20,9 @@ Handlers live in `Features/Gallery/{Public,Admin}`; every admin change answers w
 ## Code structure
 
 ```text
-src/Media/Media.Contracts/Files/IMediaFileLookup.cs   # read port other modules use (URL, file name, size)
-src/Media/Media.Infrastructure/Contracts/Files/MediaFileLookup.cs
-src/Content/
+src/Modules/Media/Media.Contracts/Files/IMediaFileLookup.cs   # read port other modules use (URL, file name, size)
+src/Modules/Media/Media.Infrastructure/Contracts/Files/MediaFileLookup.cs
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/Gallery/ public group         # public GET {lang}/gallery
 │   ├── Endpoints/Gallery/ admin group    # list, photos, videos, youtube-preview, items/{id}, order

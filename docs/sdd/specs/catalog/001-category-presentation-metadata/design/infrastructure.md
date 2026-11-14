@@ -2,9 +2,9 @@
 
 ## Збереження та інтеграції
 
-Відображення EF Core у `src/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs` зберігає метадані, визначені в [моделі даних](../data-model.md). Міграція додається до `src/Catalog/Catalog.Infrastructure/Migrations/`; застосовані міграції ніколи не редагуються.
+Відображення EF Core у `src/Modules/Catalog/Catalog.Infrastructure/Configurations/ProductCategoryConfiguration.cs` зберігає метадані, визначені в [моделі даних](../data-model.md). Міграція додається до `src/Modules/Catalog/Catalog.Infrastructure/Migrations/`; застосовані міграції ніколи не редагуються.
 
-Типізована модель options поруч із `RootCategoryId` у `src/Catalog/Catalog.Application/Integrations/OneC/Options/` зберігає затверджені записи представлення. Обидва конфігураційні файли хостів прив'язують однакові затверджені метадані:
+Типізована модель options поруч із `RootCategoryId` у `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Options/` зберігає затверджені записи представлення. Обидва конфігураційні файли хостів прив'язують однакові затверджені метадані:
 
 - `src/Bootstrapper/Host.Api/appsettings.json`
 - `src/Bootstrapper/Host.Jobs/Host.Jobs/appsettings.json`

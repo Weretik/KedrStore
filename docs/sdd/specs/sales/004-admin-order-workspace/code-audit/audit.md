@@ -19,4 +19,4 @@
 
 ## Перевірка й межі
 
-`dotnet build src/Sales/Sales.Api/Sales.Api.csproj --no-restore -v:q`: exit 0, 0 errors/warnings. `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-restore --filter FullyQualifiedName~Layers -v:q`: 7 тестів, exit 0. `dotnet test tests/UnitTests/UnitTests.csproj --no-restore --filter FullyQualifiedName~OrderDraftTests -v:q`: 5 тестів, exit 0. Відносні Markdown-посилання перевірено. PostgreSQL integration, міграцію, job 1C та повний solution test не запускали; це не є доказом продуктивності SQL або поведінки реальної БД.
+`dotnet build src/Modules/Sales/Sales.Api/Sales.Api.csproj --no-restore -v:q`: exit 0, 0 errors/warnings. `dotnet test tests/ArchitectureTests/ArchitectureTests.csproj --no-restore --filter FullyQualifiedName~Layers -v:q`: 7 тестів, exit 0. `dotnet test tests/UnitTests/UnitTests.csproj --no-restore --filter FullyQualifiedName~OrderDraftTests -v:q`: 5 тестів, exit 0. Відносні Markdown-посилання перевірено. PostgreSQL integration, міграцію, job 1C та повний solution test не запускали; це не є доказом продуктивності SQL або поведінки реальної БД.

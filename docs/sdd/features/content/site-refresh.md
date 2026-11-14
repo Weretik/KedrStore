@@ -11,7 +11,7 @@
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Application/Contracts/Site/ISiteCacheRefresher.cs      # port and SiteRefreshOutcome
 ├── Content.Application/Features/Site/Refresh/                     # RefreshSiteCommand and handler
 ├── Content.Infrastructure/Site/SiteCacheRefresher.cs              # HTTP call with the secret header

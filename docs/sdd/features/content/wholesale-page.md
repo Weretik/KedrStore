@@ -6,12 +6,12 @@ The editable copy of the site page «Співпраця» (wholesale offer) in U
 
 ## Structure and relationships
 
-[WholesalePage](../../../../src/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Content/Content.Application/Features/Wholesale/Shared/WholesaleTextValidator.cs)).
+[WholesalePage](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePage.cs) is a single-row aggregate; each language is a [WholesalePageText](../../../../src/Modules/Content/Content.Domain/Wholesale/WholesalePageText.cs) value (exactly three steps, 1–12 questions, plain trimmed texts with limits) stored as one jsonb document. Handlers live in `Features/Wholesale/{Public,Admin}`; the admin update validates both texts per field ([WholesaleTextValidator](../../../../src/Modules/Content/Content.Application/Features/Wholesale/Shared/WholesaleTextValidator.cs)).
 
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/Wholesale/ public group        # public GET {lang}/wholesale
 │   ├── Endpoints/Wholesale/ admin group   # GET, PUT

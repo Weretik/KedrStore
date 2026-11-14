@@ -6,12 +6,12 @@ The search title and description, in Ukrainian and Russian, of the site pages th
 
 ## Structure and relationships
 
-[PageSeo](../../../../src/Content/Content.Domain/Seo/PageSeo.cs) is one row per edited page, keyed by a name from [SitePages](../../../../src/Content/Content.Domain/Seo/SitePages.cs) (the list and its menu order). Values are trimmed and a blank one is stored as null. Handlers live in `Features/SiteSeo/{Public,Admin}`; the first save of a page creates its row.
+[PageSeo](../../../../src/Modules/Content/Content.Domain/Seo/PageSeo.cs) is one row per edited page, keyed by a name from [SitePages](../../../../src/Modules/Content/Content.Domain/Seo/SitePages.cs) (the list and its menu order). Values are trimmed and a blank one is stored as null. Handlers live in `Features/SiteSeo/{Public,Admin}`; the first save of a page creates its row.
 
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/SiteSeo/ public group        # public GET {lang}/page-seo
 │   ├── Endpoints/SiteSeo/ admin group   # GET list, PUT {page}

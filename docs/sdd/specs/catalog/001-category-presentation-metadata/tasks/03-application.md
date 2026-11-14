@@ -2,9 +2,9 @@
 
 **Статус:** завершено й перевірено
 
-- [x] T013 Оновити `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs`, щоб визначати й застосовувати затверджені метадані після побудови остаточної ієрархії, обчислювати рівні та зберігати захист від видалення за порожньої відповіді. **Залежності:** T009, T011.
-- [x] T014 Зберегти й розширити шлях віртуальної категорії Cosmos у `SyncOneCCategoryJob.cs`, щоб застосовувати затверджені метадані без виклику `GetCategories`; перевірити, що `src/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs` і надалі безпосередньо призначає `CosmosCategoryId`. **Залежності:** T010, T011.
-- [x] T015 Оновити проєкцію читання категорій без відстеження у `src/Catalog/Catalog.Application/Features/Category/GetList/`, щоб будувати детерміноване дерево з пріоритетом `SortOrder` і включати метадані лише відповідно до погодженої межі споживача. **Залежності:** T003, T011.
+- [x] T013 Оновити `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCCategoryJob.cs`, щоб визначати й застосовувати затверджені метадані після побудови остаточної ієрархії, обчислювати рівні та зберігати захист від видалення за порожньої відповіді. **Залежності:** T009, T011.
+- [x] T014 Зберегти й розширити шлях віртуальної категорії Cosmos у `SyncOneCCategoryJob.cs`, щоб застосовувати затверджені метадані без виклику `GetCategories`; перевірити, що `src/Modules/Catalog/Catalog.Application/Integrations/OneC/Jobs/SyncOneCProductDetailsJob.cs` і надалі безпосередньо призначає `CosmosCategoryId`. **Залежності:** T010, T011.
+- [x] T015 Оновити проєкцію читання категорій без відстеження у `src/Modules/Catalog/Catalog.Application/Features/Category/GetList/`, щоб будувати детерміноване дерево з пріоритетом `SortOrder` і включати метадані лише відповідно до погодженої межі споживача. **Залежності:** T003, T011.
 - [x] T016 [P] Додати тести імпорту й query-handler у `tests/UnitTests/`, зокрема fixtures фурнітури, дверей, fallback для невідомої категорії та Cosmos. **Залежності:** T013–T015.
 - [x] T017 Перевірити токени скасування, використання репозиторіїв, відсутність відстеження для запитів і поведінку `Ardalis.Result` у змінених потоках. **Залежності:** T013–T016.
 

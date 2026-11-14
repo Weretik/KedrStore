@@ -18,7 +18,7 @@ KedrStore.sln
 ├── Directory.Build.props      settings shared by every project: TargetFramework, Nullable, ImplicitUsings, analyzers
 ├── Directory.Packages.props   central package management: every NuGet version, ManagePackageVersionsCentrally=true
 ├── global.json                SDK version
-├── src/                       Bootstrapper/, BuildingBlocks/, <Module>/
+├── src/                       Bootstrapper/ (hosts), BuildingBlocks/ (shared code), Modules/<Module>/ (business modules)
 ├── tests/                     UnitTests/, IntegrationTests/, ArchitectureTests/
 ├── tools/                     scripts the team runs by hand
 └── docs/
@@ -246,7 +246,7 @@ Business outcomes travel as results; exceptions are only for the unexpected.
 
 ## KedrStore specifics
 
-- Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`), `Media` (CDN picture library; schema `media`), `Work` (staff tasks and activity log; schema `work`). Projects live in `src/<Module>/<Module>.<Layer>/`.
+- Business modules: `Catalog`, `Sales`, `Identity`, `Content` (site articles; schema `content`), `Media` (CDN picture library; schema `media`), `Work` (staff tasks and activity log; schema `work`). Projects live in `src/Modules/<Module>/<Module>.<Layer>/`; `src/` holds only `Bootstrapper/`, `BuildingBlocks/` and `Modules/` (architecture test `FolderStructureTests`), and the solution view mirrors these folders.
 - `Host.Api` calls `Add<Module>Module()` for each module in `src/Bootstrapper/Host.Api/DependencyInjection/ServiceRegistration/ModulesRegistrationExtensions.cs`; each module defines it in `<Module>.Api/DependencyInjection/<Module>Module.cs`. `Host.Jobs` registers module Infrastructure and jobs (`AddCatalogJobs()`) in `src/Bootstrapper/Host.Jobs/Host.Jobs/JobsHostServicesExtensions.cs`.
 - Access policy and role names are in `Identity.Contracts/Authorization` (`PolicyNames`, `RoleNames`); every module's Api uses them from there.
 - Architecture tests list business modules in `BusinessModules` in `tests/ArchitectureTests/Modules/ProjectModuleIsolationTests.cs`; add the new module there.

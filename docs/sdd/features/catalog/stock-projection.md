@@ -6,7 +6,7 @@ A separate read model for product lists and its updates.
 
 ## Structure and relationships
 
-[ProductListProjection](../../../../src/Catalog/Catalog.Domain/Products/ProductListProjection.cs) stores list data in [CatalogDbContext](../../../../src/Catalog/Catalog.Infrastructure/Persistence/CatalogDbContext.cs). The [rebuilder](../../../../src/Catalog/Catalog.Infrastructure/Persistence/Products/ProductListProjectionRebuilder.cs) rebuilds the projection; the [stock job](../../../../src/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCStocksJob.cs) updates stock. The [public handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetPublicProductList/GetPublicProductListHandler.cs) reads the projection.
+[ProductListProjection](../../../../src/Modules/Catalog/Catalog.Domain/Products/ProductListProjection.cs) stores list data in [CatalogDbContext](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/CatalogDbContext.cs). The [rebuilder](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/Products/ProductListProjectionRebuilder.cs) rebuilds the projection; the [stock job](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Jobs/SyncOneCStocksJob.cs) updates stock. The [public handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Products/Queries/GetPublicProductList/GetPublicProductListHandler.cs) reads the projection.
 
 ## Code structure
 

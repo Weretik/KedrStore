@@ -50,7 +50,7 @@ src/BuildingBlocks/BuildingBlocks.Infrastructure/Outbox/
 ├── OutboxDispatcher.cs             planned: IOutboxDispatcher over every module's ModuleOutbox
 ├── OutboxRetrySchedule.cs          planned: R-004 delays and limits
 └── DependencyInjection/OutboxRegistration.cs  planned: AddOutbox<TDbContext>(schema), AddOutboxHandler<TMessage, THandler>()
-src/Sales/
+src/Modules/Sales/
 ├── Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/   done (moved from Catalog): command, validator, handler
 ├── Sales.Application/Features/QuickOrders/Messages/                   done: QuickOrderPlaced ("sales.quick-order-placed"), QuickOrderLine
 ├── Sales.Application/Abstractions/QuickOrders/                        done: IQuickOrderStore
@@ -58,7 +58,7 @@ src/Sales/
 ├── Sales.Infrastructure/Persistence/SalesDbContext.cs                 done: ApplyOutbox("sales")
 ├── Sales.Infrastructure/Migrations/20261114122151_AddSalesOutbox.cs   done: schema sales, table OutboxMessages
 └── Sales.Api/Endpoints/QuickOrders/                                   done (moved from Catalog.Api/Endpoints/Orders): same route, tag, records
-src/Catalog/…/Orders, Integrations/Excel, Integrations/Telegram         removed
+src/Modules/Catalog/…/Orders, Integrations/Excel, Integrations/Telegram         removed
 tests/UnitTests/BuildingBlocks/Outbox/                                  done: retry schedule
 tests/UnitTests/Sales/QuickOrders/                                      done: caption and file name
 tests/IntegrationTests/Platform/Outbox/                                 done: same transaction, dispatch once, retry, failed, SKIP LOCKED, retention; endpoint auth with TS-002

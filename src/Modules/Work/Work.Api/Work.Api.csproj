@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Work.Application\Work.Application.csproj" />
+    <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
+    <ProjectReference Include="..\Work.Infrastructure\Work.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

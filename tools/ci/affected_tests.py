@@ -2,7 +2,7 @@
 
 usage: affected_tests.py <base ref>   (writes scope= and filters to $GITHUB_OUTPUT, or prints them)
 
-A change in src/<Module>/ runs the tests of that module and of every module whose projects reference it.
+A change in src/Modules/<Module>/ runs the tests of that module and of every module whose projects reference it.
 A change in tests/<Project>/<Module>/ runs that module's tests. Shared code (BuildingBlocks), hosts
 (Bootstrapper), build files, test support and CI files run everything. Documentation runs no module tests.
 Architecture tests and the platform integration tests always run; a push to master always runs everything.
@@ -18,8 +18,8 @@ TEST_PROJECTS = ("UnitTests", "IntegrationTests")
 
 def module_of_src(path):
     parts = path.split("/")
-    if len(parts) > 2 and parts[0] == "src" and parts[1] not in ("BuildingBlocks", "Bootstrapper"):
-        return parts[1]
+    if len(parts) > 3 and parts[0] == "src" and parts[1] == "Modules":
+        return parts[2]
     return None
 
 
@@ -51,11 +51,11 @@ def select(changed, references):
     return affected
 
 
-def module_references(root="src"):
+def module_references(root="src/Modules"):
     refs = {}
     for module in sorted(os.listdir(root)):
         folder = os.path.join(root, module)
-        if module in ("BuildingBlocks", "Bootstrapper") or not os.path.isdir(folder):
+        if not os.path.isdir(folder):
             continue
         refs[module] = set()
         for dirpath, dirs, files in os.walk(folder):

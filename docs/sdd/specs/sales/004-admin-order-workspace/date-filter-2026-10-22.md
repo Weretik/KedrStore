@@ -23,9 +23,9 @@ The request flows through `AdminOrderWorkspaceController` → `GetWorkspaceOrder
 | Path | State | Responsibility |
 | --- | --- | --- |
 | `docs/sdd/contracts/sales/admin-order-workspace.openapi.yaml` | existing | versioned HTTP date contract |
-| `src/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs` | existing | query binding and 400 |
-| `src/Sales/Sales.Application/Features/Orders/AdminWorkspace/Orders/GetList/` | existing | validation/condition passing |
-| `src/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs` | existing | UTC conditions, count, and page |
+| `src/Modules/Sales/Sales.Api/Features/OrderWorkspace/AdminOrderWorkspaceController.cs` | existing | query binding and 400 |
+| `src/Modules/Sales/Sales.Application/Features/Orders/AdminWorkspace/Orders/GetList/` | existing | validation/condition passing |
+| `src/Modules/Sales/Sales.Infrastructure/Orders/Admin/Read/WorkspaceOrderReader.cs` | existing | UTC conditions, count, and page |
 | `tests/IntegrationTests/Sales/Api/` | existing directory | focused API/SQL boundary and pagination tests |
 | `docs/sdd/features/sales/admin-order-workspace.md` | existing | reconcile feature map after implementation |
 

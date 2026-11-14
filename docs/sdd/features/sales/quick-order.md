@@ -6,14 +6,14 @@ Public `POST /api/orders`: a buyer without an account sends a name, a phone and 
 
 ## Structure and relationships
 
-[QuickOrdersEndpoints](../../../../src/Sales/Sales.Api/Endpoints/QuickOrders/QuickOrdersEndpoints.cs) maps the request to `PlaceQuickOrderCommand`. [PlaceQuickOrderValidator](../../../../src/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderValidator.cs) checks it (400 with field errors `FirstName`, `Phone`, `Lines`). [PlaceQuickOrderHandler](../../../../src/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderHandler.cs) saves a `QuickOrderPlaced` message in `sales."OutboxMessages"` and tries to send it once after the commit. The buyer gets 200 with the order id even when Telegram is down: the row waits for the next outbox dispatch, which retries it (1, 5, 15, 30, 60 minutes, then hourly; failed after 10 attempts). Until the scheduled dispatch runs (spec 006, TS-004), a failed row waits in the table.
+[QuickOrdersEndpoints](../../../../src/Modules/Sales/Sales.Api/Endpoints/QuickOrders/QuickOrdersEndpoints.cs) maps the request to `PlaceQuickOrderCommand`. [PlaceQuickOrderValidator](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderValidator.cs) checks it (400 with field errors `FirstName`, `Phone`, `Lines`). [PlaceQuickOrderHandler](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderHandler.cs) saves a `QuickOrderPlaced` message in `sales."OutboxMessages"` and tries to send it once after the commit. The buyer gets 200 with the order id even when Telegram is down: the row waits for the next outbox dispatch, which retries it (1, 5, 15, 30, 60 minutes, then hourly; failed after 10 attempts). Until the scheduled dispatch runs (spec 006, TS-004), a failed row waits in the table.
 
-The quick order is not a Sales [Order](../../../../src/Sales/Sales.Domain/Orders/Order.cs) and is not sent to 1C; managers work it from the Excel file. Processed rows, with the phone number, are deleted after 30 days.
+The quick order is not a Sales [Order](../../../../src/Modules/Sales/Sales.Domain/Orders/Order.cs) and is not sent to 1C; managers work it from the Excel file. Processed rows, with the phone number, are deleted after 30 days.
 
 ## Code structure
 
 ```text
-src/Sales/
+src/Modules/Sales/
 ├── Sales.Api/Endpoints/QuickOrders/                      # route, tag Order, request/response records (OpenAPI names)
 ├── Sales.Application/Features/QuickOrders/
 │   ├── Commands/PlaceQuickOrder/                         # command, validator, handler

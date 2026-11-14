@@ -6,14 +6,14 @@ One set of site-wide SEO codes that every site page carries: the Google Analytic
 
 ## Structure and relationships
 
-The [public and admin endpoint groups](../../../../src/Content/Content.Api/Endpoints/SeoSettings/SeoSettingsEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to one query and one command. [SiteSeoSettings](../../../../src/Content/Content.Domain/Seo/SiteSeoSettings.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint) created empty by the migration and only replaced. Ids are upper-cased; for a verification code a pasted meta tag is reduced to its `content`. The picture is a media-library file ID read through `IMediaImageReader`; the save refuses a file that is not in the library, and a file deleted later is returned to the admin as `missing` and left out of the public answer.
+The [public and admin endpoint groups](../../../../src/Modules/Content/Content.Api/Endpoints/SeoSettings/SeoSettingsEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to one query and one command. [SiteSeoSettings](../../../../src/Modules/Content/Content.Domain/Seo/SiteSeoSettings.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint) created empty by the migration and only replaced. Ids are upper-cased; for a verification code a pasted meta tag is reduced to its `content`. The picture is a media-library file ID read through `IMediaImageReader`; the save refuses a file that is not in the library, and a file deleted later is returned to the admin as `missing` and left out of the public answer.
 
 Access: `GET /api/content/seo-settings` is anonymous; `/api/admin/content/seo-settings` needs `CanManageContent` (Manager, Seo, or Admin).
 
 ## Code structure
 
 ```text
-src/Content/
+src/Modules/Content/
 ├── Content.Api/
 │   ├── Endpoints/SeoSettings/ public group       # public GET
 │   ├── Endpoints/SeoSettings/ admin group  # admin GET and PUT

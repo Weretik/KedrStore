@@ -1,6 +1,6 @@
 # Catalog — products and prices: data
 
-**Source:** [Catalog snapshot](../../../../src/Catalog/Catalog.Infrastructure/Persistence/Migrations/CatalogDbContextModelSnapshot.cs) and [configurations](../../../../src/Catalog/Catalog.Infrastructure/Persistence/Products/), checked 2026-11-05. [Back to database map](README.md) · [public products](../../features/catalog/public-products.md) · [1C import](../../features/catalog/one-c-import.md).
+**Source:** [Catalog snapshot](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/Migrations/CatalogDbContextModelSnapshot.cs) and [configurations](../../../../src/Modules/Catalog/Catalog.Infrastructure/Persistence/Products/), checked 2026-11-05. [Back to database map](README.md) · [public products](../../features/catalog/public-products.md) · [1C import](../../features/catalog/one-c-import.md).
 
 | Table | PK | Purpose and important fields |
 | --- | --- | --- |
