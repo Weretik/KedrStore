@@ -1,4 +1,5 @@
 using Host.Api.DependencyInjection.ServiceRegistration.Web;
+using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;
 using Media.Api.DependencyInjection;
 using Sales.Api.DependencyInjection;
@@ -60,6 +61,7 @@ app.UseAuthorization();
 app.UseWorkActivity();
 
 app.MapControllers();
+app.MapContentEndpoints();
 app.MapIdentityEndpoints();
 app.MapMediaEndpoints();
 app.MapSalesEndpoints();

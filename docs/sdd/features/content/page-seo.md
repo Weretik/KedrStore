@@ -13,8 +13,8 @@ The search title and description, in Ukrainian and Russian, of the site pages th
 ```text
 src/Content/
 ├── Content.Api/
-│   ├── Controllers/PageSeoController.cs        # public GET {lang}/page-seo
-│   ├── Controllers/AdminPageSeoController.cs   # GET list, PUT {page}
+│   ├── Endpoints/SiteSeo/ public group        # public GET {lang}/page-seo
+│   ├── Endpoints/SiteSeo/ admin group   # GET list, PUT {page}
 │   └── SiteSeo/PageSeoResponses.cs              # payloads and mapping
 ├── Content.Application/Features/SiteSeo/
 │   ├── Common/PageSeoDtos.cs

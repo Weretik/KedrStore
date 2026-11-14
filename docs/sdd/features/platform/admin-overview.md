@@ -23,7 +23,7 @@ src/Catalog/
 ├── Catalog.Application/Features/Overview/Queries/GetAdminCatalogOverview/
 └── Catalog.Contracts/Overview/AdminCatalogOverviewResponse.cs
 src/Content/
-├── Content.Api/Features/Overview/AdminContentOverviewController.cs
+├── Content.Api/Endpoints/Overview/GetAdminContentOverviewEndpoint.cs
 └── Content.Application/Features/Overview/
 ```
 

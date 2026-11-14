@@ -6,7 +6,7 @@ The texts of four site pages: the public offer, the privacy policy, the returns 
 
 ## Structure and relationships
 
-The [public controller](../../../../src/Content/Content.Api/Features/Documents/LegalDocumentsController.cs) and [admin controller](../../../../src/Content/Content.Api/Features/Documents/AdminLegalDocumentsController.cs) turn the URL kind (`public-offer`, `privacy-policy`, `returns-policy`, `delivery-payment`; [LegalDocumentKinds](../../../../src/Content/Content.Application/Features/Documents/Shared/LegalDocumentKinds.cs)) into the enum and answer 404 for anything else. [LegalDocumentVersion](../../../../src/Content/Content.Domain/Documents/LegalDocumentVersion.cs) is the aggregate: status Draft → Published → Archived, both language texts owned by it, and only a draft accepts new texts. Handlers live in `Features/Documents/{Public,Admin}`:
+The [public and admin endpoint groups](../../../../src/Content/Content.Api/Endpoints/Documents/DocumentsEndpoints.cs) (one `<UseCase>Endpoint` per operation) turn the URL kind (`public-offer`, `privacy-policy`, `returns-policy`, `delivery-payment`; [LegalDocumentKinds](../../../../src/Content/Content.Application/Features/Documents/Shared/LegalDocumentKinds.cs)) into the enum and answer 404 for anything else. [LegalDocumentVersion](../../../../src/Content/Content.Domain/Documents/LegalDocumentVersion.cs) is the aggregate: status Draft → Published → Archived, both language texts owned by it, and only a draft accepts new texts. Handlers live in `Features/Documents/{Public,Admin}`:
 
 - create draft — 409 when a draft exists; copies the published texts when no texts are sent;
 - update draft — sanitizes the HTML with the article sanitizer, 409 for a non-draft;
@@ -22,8 +22,8 @@ The HTML may contain `{site}`, `{email}` and `{phone}`; the site replaces them w
 ```text
 src/Content/
 ├── Content.Api/
-│   ├── Controllers/LegalDocumentsController.cs        # public GET {lang}/documents/{kind}
-│   ├── Controllers/AdminLegalDocumentsController.cs   # list, versions, draft CRUD, publish
+│   ├── Endpoints/Documents/ public group        # public GET {lang}/documents/{kind}
+│   ├── Endpoints/Documents/ admin group   # list, versions, draft CRUD, publish
 │   └── Documents/LegalDocumentResponses.cs            # responses, requests, mapping
 ├── Content.Application/Features/Documents/
 │   ├── Common/                                        # DTOs, kinds, texts validator, specs, editor name + sanitizing
