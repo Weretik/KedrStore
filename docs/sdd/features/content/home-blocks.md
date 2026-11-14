@@ -18,8 +18,8 @@ Handlers live in `Features/Home/{Public,Admin}`; every admin change answers with
 ```text
 src/Content/
 ├── Content.Api/
-│   ├── Controllers/HomeBlocksController.cs        # public GET {lang}/home
-│   ├── Controllers/AdminHomeBlocksController.cs   # GET; faq, faq/{id}, faq/order; brands, brands/{id}, brands/order
+│   ├── Endpoints/Home/ public group        # public GET {lang}/home
+│   ├── Endpoints/Home/ admin group   # GET; faq, faq/{id}, faq/order; brands, brands/{id}, brands/order
 │   └── Home/HomeResponses.cs                      # responses, requests, mapping
 ├── Content.Application/Features/Home/
 │   ├── Common/                                    # DTOs, admin loader and reorder helper, validators

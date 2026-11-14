@@ -17,13 +17,13 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminCategoriesController` | `/api/categories` | `CanManageProducts`; slug, content, «show on site», and `deleted=true` need `CanManageSiteCatalog` |
 | `AdminCatalogAttributesController` | `/api/admin/catalog-attributes` | `CanManageProducts`; every change needs `CanManageSiteCatalog` |
 | `AdminProductGroupsController` | `/api/admin/product-groups` | `CanManageProducts`; group slug needs `CanManageSiteCatalog` |
-| `AdminArticlesController` | `/api/admin/articles` | `CanManageContent` |
-| `CompanyContactsController` | `/api/content/contacts` | public (site contacts) |
-| `AdminCompanyContactsController` | `/api/admin/content/contacts` | `CanManageContent` |
-| `CompanyRequisitesController` | `/api/content/requisites` | public (requisites page) |
-| `AdminCompanyRequisitesController` | `/api/admin/content/requisites` | `RequireAdminRole` |
-| `LegalDocumentsController` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
-| `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
+| Content endpoints, tag `AdminArticles` | `/api/admin/articles` | `CanManageContent` |
+| Content endpoints, tag `CompanyContacts` | `/api/content/contacts` | public (site contacts) |
+| Content endpoints, tag `AdminCompanyContacts` | `/api/admin/content/contacts` | `CanManageContent` |
+| Content endpoints, tag `CompanyRequisites` | `/api/content/requisites` | public (requisites page) |
+| Content endpoints, tag `AdminCompanyRequisites` | `/api/admin/content/requisites` | `RequireAdminRole` |
+| Content endpoints, tag `LegalDocuments` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
+| Content endpoints, tag `AdminLegalDocuments` | `/api/admin/content/documents` | `CanManageContent` |
 | Media endpoints, tags `AdminMediaFolders`, `AdminMediaFiles` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | Identity endpoints, tag `AdminUsers` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
 | Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
@@ -31,7 +31,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | Identity endpoints, tag `Profile` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
-| `ArticlesController` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
+| Content endpoints, tag `Articles` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
 | Identity endpoints, tags `CookieAuth`, `MobileAuth`, `AuthSession` | login, refresh | public, rate-limited; logout and `me` need a session |
 

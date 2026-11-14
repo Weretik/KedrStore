@@ -7,7 +7,7 @@ public sealed class UploadArticleCoverValidator : AbstractValidator<UploadArticl
 
     public UploadArticleCoverValidator()
     {
-        RuleFor(x => x.File).NotNull().OverridePropertyName("file");
+        RuleFor(x => x.File).NotNull().WithMessage("Виберіть зображення.").OverridePropertyName("file");
         RuleFor(x => x.File.Length)
             .GreaterThan(0).LessThanOrEqualTo(MaxUploadBytes)
             .When(x => x.File is not null)

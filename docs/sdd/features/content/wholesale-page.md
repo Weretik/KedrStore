@@ -13,8 +13,8 @@ The editable copy of the site page «Співпраця» (wholesale offer) in U
 ```text
 src/Content/
 ├── Content.Api/
-│   ├── Controllers/WholesalePageController.cs        # public GET {lang}/wholesale
-│   ├── Controllers/AdminWholesalePageController.cs   # GET, PUT
+│   ├── Endpoints/Wholesale/ public group        # public GET {lang}/wholesale
+│   ├── Endpoints/Wholesale/ admin group   # GET, PUT
 │   └── Wholesale/WholesaleResponses.cs                # payloads and mapping
 ├── Content.Application/Features/Wholesale/
 │   ├── Common/                                        # DTOs, mapper, per-field validator

@@ -6,7 +6,7 @@ Articles of the public site in Ukrainian and Russian: the site reads published o
 
 ## Structure and relationships
 
-The [public controller](../../../../src/Content/Content.Api/Features/Articles/ArticlesController.cs) and [admin controller](../../../../src/Content/Content.Api/Features/Articles/AdminArticlesController.cs) dispatch to Application handlers. [Article](../../../../src/Content/Content.Domain/Articles/Article.cs) holds one slug, the publication date and flag, the cover (`CoverMediaFileId`, a media-library file by value), and exactly one [translation](../../../../src/Content/Content.Domain/Articles/ArticleTranslation.cs) per language (title, excerpt, sanitized body). The cover is uploaded before the article is saved (`POST /api/admin/articles/covers`), so a new article gets it in its first save: the [upload handler](../../../../src/Content/Content.Application/Features/Articles/Commands/UploadArticleCover/UploadArticleCoverHandler.cs) puts the WebP into the media library through [IMediaImageWriter](../../../../src/Content/Content.Application/Abstractions/Media/IMediaImageWriter.cs) → `Media.Contracts.IMediaFileUploader` (CDN `articles/`, library folder «Статті»), and create/update take `coverMediaFileId` or `removeCover` ([ArticleCovers](../../../../src/Content/Content.Application/Features/Articles/Shared/ArticleCovers.cs)). Responses carry the CDN `coverUrl`. The six legacy covers are still bytes in [ArticleCover](../../../../src/Content/Content.Domain/Articles/ArticleCover.cs), served with a versioned `coverPath`, until an editor picks a new cover or presses the list's move action (`POST /api/admin/articles/covers/move-legacy`, [handler](../../../../src/Content/Content.Application/Features/Articles/Commands/MoveLegacyArticleCovers/MoveLegacyArticleCoversHandler.cs)) ([Content 008](../../specs/content/008-article-cover-cdn/README.md)).
+The [public and admin endpoint groups](../../../../src/Content/Content.Api/Endpoints/Articles/ArticlesEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to Application handlers. [Article](../../../../src/Content/Content.Domain/Articles/Article.cs) holds one slug, the publication date and flag, the cover (`CoverMediaFileId`, a media-library file by value), and exactly one [translation](../../../../src/Content/Content.Domain/Articles/ArticleTranslation.cs) per language (title, excerpt, sanitized body). The cover is uploaded before the article is saved (`POST /api/admin/articles/covers`), so a new article gets it in its first save: the [upload handler](../../../../src/Content/Content.Application/Features/Articles/Commands/UploadArticleCover/UploadArticleCoverHandler.cs) puts the WebP into the media library through [IMediaImageWriter](../../../../src/Content/Content.Application/Abstractions/Media/IMediaImageWriter.cs) → `Media.Contracts.IMediaFileUploader` (CDN `articles/`, library folder «Статті»), and create/update take `coverMediaFileId` or `removeCover` ([ArticleCovers](../../../../src/Content/Content.Application/Features/Articles/Shared/ArticleCovers.cs)). Responses carry the CDN `coverUrl`. The six legacy covers are still bytes in [ArticleCover](../../../../src/Content/Content.Domain/Articles/ArticleCover.cs), served with a versioned `coverPath`, until an editor picks a new cover or presses the list's move action (`POST /api/admin/articles/covers/move-legacy`, [handler](../../../../src/Content/Content.Application/Features/Articles/Commands/MoveLegacyArticleCovers/MoveLegacyArticleCoversHandler.cs)) ([Content 008](../../specs/content/008-article-cover-cdn/README.md)).
 
 On save the body passes the [article sanitizer](../../../../src/Content/Content.Infrastructure/Integrations/Html/ArticleHtmlSanitizer.cs); an uploaded cover goes through the [cover processor](../../../../src/Content/Content.Infrastructure/Integrations/Images/CoverImageProcessor.cs) (JPEG/PNG/WebP up to 10 MB, at least 600 px wide, stored as WebP at most 1600 px wide with EXIF orientation applied). Without a slug, create builds one from the Ukrainian title with the shared [KMU-2010 transliterator](../../../../src/BuildingBlocks/BuildingBlocks.Application/Text/UkrainianTransliterator.cs) and adds `-2`, `-3`… on a clash.
 
@@ -20,8 +20,8 @@ Access: public reads are anonymous; `/api/admin/articles` needs `CanManageConten
 src/
 ├── Content/
 │   ├── Content.Api/
-│   │   ├── Controllers/ArticlesController.cs       # public HTTP: list, by slug, cover bytes
-│   │   ├── Controllers/AdminArticlesController.cs  # admin HTTP: CRUD and cover upload
+│   │   ├── Endpoints/Articles/ public group       # public HTTP: list, by slug, cover bytes
+│   │   ├── Endpoints/Articles/ admin group  # admin HTTP: CRUD and cover upload
 │   │   └── Articles/                               # response/request records, coverUrl/coverPath mapping
 │   ├── Content.Application/
 │   │   ├── Contracts/                              # repository, read context, sanitizer, cover processor, media library ports
@@ -45,8 +45,8 @@ src/
 
 ```mermaid
 flowchart LR
-    Site[Next.js site] -->|GET /api/content/lang/articles| Public[ArticlesController]
-    Admin[React Admin] -->|/api/admin/articles| AdminApi[AdminArticlesController]
+    Site[Next.js site] -->|GET /api/content/lang/articles| Public[Articles endpoints]
+    Admin[React Admin] -->|/api/admin/articles| AdminApi[AdminArticles endpoints]
     Public --> Q[Public queries] --> Db[(content schema)]
     AdminApi --> C[Admin commands] --> San[Sanitizer] & Img[Cover processor]
     C --> Db

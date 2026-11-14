@@ -17,7 +17,7 @@ src/Content/
 ├── Content.Infrastructure/Site/SiteCacheRefresher.cs              # HTTP call with the secret header
 ├── Content.Infrastructure/Site/SiteRevalidationOptions.cs         # SiteRevalidation:Url, Secret, tags
 ├── Content.Api/Site/SiteRefreshResponse.cs
-└── Content.Api/Controllers/AdminSiteRefreshController.cs          # outcome → 200/503/502
+└── Content.Api/Endpoints/Site/RefreshSiteEndpoint.cs           # outcome → 200/503/502
 ```
 
 ## Tests

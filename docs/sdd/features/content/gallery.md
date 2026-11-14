@@ -24,8 +24,8 @@ src/Media/Media.Contracts/Files/IMediaFileLookup.cs   # read port other modules 
 src/Media/Media.Infrastructure/Contracts/Files/MediaFileLookup.cs
 src/Content/
 ├── Content.Api/
-│   ├── Controllers/GalleryController.cs         # public GET {lang}/gallery
-│   ├── Controllers/AdminGalleryController.cs    # list, photos, videos, youtube-preview, items/{id}, order
+│   ├── Endpoints/Gallery/ public group         # public GET {lang}/gallery
+│   ├── Endpoints/Gallery/ admin group    # list, photos, videos, youtube-preview, items/{id}, order
 │   └── Gallery/GalleryResponses.cs              # responses, requests, mapping
 ├── Content.Application/
 │   ├── Contracts/Gallery/IYoutubeVideoInfo.cs
