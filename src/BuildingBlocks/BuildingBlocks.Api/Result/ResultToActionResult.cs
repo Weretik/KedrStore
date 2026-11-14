@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BuildingBlocks.Api.Result;
 
+/// <summary>The one place that turns a use-case result status into an HTTP answer.</summary>
 public static class ResultToActionResult
 {
     public static ActionResult ToActionResult<T>(this ControllerBase c, Result<T> result)
@@ -16,6 +17,7 @@ public static class ResultToActionResult
             ResultStatus.Conflict => c.Conflict(result.Errors),
             ResultStatus.Forbidden => c.Forbid(),
             ResultStatus.Unauthorized => c.Unauthorized(),
+            ResultStatus.Unavailable => c.StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors),
             _ => new StatusCodeResult(StatusCodes.Status500InternalServerError)
         };
 }

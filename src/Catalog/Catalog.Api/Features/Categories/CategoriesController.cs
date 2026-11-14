@@ -19,7 +19,7 @@ public sealed class CategoriesController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetCategoriesQuery(new CategoryFilter(), lang), cancellationToken);
-        if (!result.IsSuccess) return BadRequest();
+        if (!result.IsSuccess) return this.ToActionResult(result).Result!;
         return Ok(result.Value.Select(CategoryReadMapper.ToResponse).ToList());
     }
 
