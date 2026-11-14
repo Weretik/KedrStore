@@ -33,12 +33,12 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
         {
             await db.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")));
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Завіси", "zavisy", CategoryPath.From("n11")));
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")).Value);
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Завіси", "zavisy", CategoryPath.From("n11")).Value);
             foreach (var (id, exported) in new[] { (801, true), (802, false) })
             {
                 var product = Product.Create(ProductId.From(id), Root, $"Замок {id}", $"zamok-{id}",
-                    ProductCategoryId.From(10), Created, 5, 1, false, false, exported);
+                    ProductCategoryId.From(10), Created, 5, 1, false, false, exported).Value;
                 db.Products.Add(product);
                 db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
                     product.ProductSlug, string.Empty, ProductCategoryId.From(10), "zamky",

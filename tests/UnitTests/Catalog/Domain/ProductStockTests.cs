@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -33,9 +33,9 @@ public sealed class ProductStockTests
     {
         var product = CreateProduct();
 
-        var exception = Assert.Throws<DomainException>(() => product.UpdateStock(Product.MaximumStock + 1));
+        var exception = DomainAssert.Fails(product.UpdateStock(Product.MaximumStock + 1));
 
-        Assert.Equal("Catalog.Product.Stock.OutOfRange", exception.Error.Code);
+        Assert.Equal("Catalog.Product.Stock.OutOfRange", exception.Code);
     }
 
     private static Product CreateProduct()
@@ -50,5 +50,5 @@ public sealed class ProductStockTests
             1,
             false,
             false,
-            true);
+            true).Value;
 }

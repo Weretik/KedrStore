@@ -40,6 +40,6 @@ public sealed class CookieCsrfMiddleware(
         }
 
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        return context.Response.WriteAsync("Invalid CSRF token.");
+        return context.Response.WriteAsync("Сесія застаріла, оновіть сторінку.");
     }
 }

@@ -22,7 +22,7 @@ public sealed class ReopenProductReviewHandler(
         if (review is null)
         {
             return await db.Products.IgnoreQueryFilters().AnyAsync(product => product.Id == productId, cancellationToken)
-                ? AttributeValidation.Invalid("productId", "The product has no recognized attributes yet.", "NoReview")
+                ? AttributeValidation.Invalid("productId", "Для товару ще не розпізнано властивостей.", "NoReview")
                 : Result.NotFound();
         }
 

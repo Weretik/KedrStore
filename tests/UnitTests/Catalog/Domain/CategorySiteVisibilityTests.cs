@@ -68,5 +68,5 @@ public sealed class CategorySiteVisibilityTests
 
     private static ProductCategory Category(int id, string path, int? parentId = null)
         => ProductCategory.Create(ProductCategoryId.From(id), $"{id:D9}", $"Категорія {id}", $"category-{id}",
-            CategoryPath.From(path), parentId is { } parent ? ProductCategoryId.From(parent) : null);
+            CategoryPath.From(path), parentId is { } parent ? ProductCategoryId.From(parent) : null).Value;
 }

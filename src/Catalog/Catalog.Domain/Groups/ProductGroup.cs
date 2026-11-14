@@ -36,28 +36,46 @@ public class ProductGroup : IAggregateRoot
 
     private ProductGroup() { }
 
-    public static ProductGroup CreateAutomatic(ProductCategoryId categoryId, string name, string groupKey, string slug,
-        DateTimeOffset now)
-        => new()
+    public static DomainResult<ProductGroup> CreateAutomatic(ProductCategoryId categoryId, string name,
+        string groupKey, string slug, DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedName = checks.Take(Text(name, NameMaxLength, nameof(Name)));
+        var checkedKey = checks.Take(Text(groupKey, NameMaxLength, nameof(GroupKey)));
+        var checkedSlug = checks.Take(Text(slug, SlugMaxLength, nameof(Slug)));
+        if (checks.Error is { } error)
+            return error;
+
+        return new ProductGroup
         {
             CategoryId = categoryId,
-            Name = Text(name, NameMaxLength, nameof(Name)),
-            GroupKey = Text(groupKey, NameMaxLength, nameof(GroupKey)),
-            Slug = Text(slug, SlugMaxLength, nameof(Slug)),
+            Name = checkedName,
+            GroupKey = checkedKey,
+            Slug = checkedSlug,
             UpdatedAt = now
         };
+    }
 
-    public static ProductGroup CreateManual(ProductCategoryId categoryId, string name, string slug, DateTimeOffset now)
-        => new()
+    public static DomainResult<ProductGroup> CreateManual(ProductCategoryId categoryId, string name, string slug,
+        DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedName = checks.Take(Text(name, NameMaxLength, nameof(Name)));
+        var checkedSlug = checks.Take(Text(slug, SlugMaxLength, nameof(Slug)));
+        if (checks.Error is { } error)
+            return error;
+
+        return new ProductGroup
         {
             CategoryId = categoryId,
-            Name = Text(name, NameMaxLength, nameof(Name)),
-            Slug = Text(slug, SlugMaxLength, nameof(Slug)),
+            Name = checkedName,
+            Slug = checkedSlug,
             IsCreatedManually = true,
             Status = ProductGroupStatus.Accepted,
             AcceptedAt = now,
             UpdatedAt = now
         };
+    }
 
     /// <summary>
     /// A person accepts the model. Its base-name key is dropped, so automation proposes new products with the same base
@@ -76,9 +94,12 @@ public class ProductGroup : IAggregateRoot
         return true;
     }
 
-    public bool Rename(string name, DateTimeOffset now)
+    public DomainResult<bool> Rename(string name, DateTimeOffset now)
     {
-        var value = Text(name, NameMaxLength, nameof(Name));
+        var checkedName = Text(name, NameMaxLength, nameof(Name));
+        if (checkedName.IsFailure)
+            return checkedName.Error!;
+        var value = checkedName.Value;
         if (value == Name)
             return false;
 
@@ -87,10 +108,14 @@ public class ProductGroup : IAggregateRoot
         return true;
     }
 
-    public void ChangeSlug(string slug, DateTimeOffset now)
+    public DomainResult ChangeSlug(string slug, DateTimeOffset now)
     {
-        Slug = Text(slug, SlugMaxLength, nameof(Slug));
+        var checkedSlug = Text(slug, SlugMaxLength, nameof(Slug));
+        if (checkedSlug.IsFailure)
+            return checkedSlug;
+        Slug = checkedSlug.Value;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
     /// <summary>Automation picks the main product; a choice made by a person is dropped. Returns whether it changed.</summary>
@@ -112,14 +137,11 @@ public class ProductGroup : IAggregateRoot
         UpdatedAt = now;
     }
 
-    private static string Text(string? value, int maxLength, string field)
+    private static DomainResult<string> Text(string? value, int maxLength, string field)
     {
         var trimmed = value?.Trim();
         if (string.IsNullOrEmpty(trimmed))
-            throw new DomainException(ProductGroupErrors.Required(field));
-        if (trimmed.Length > maxLength)
-            throw new DomainException(ProductGroupErrors.TooLong(field, maxLength, trimmed.Length));
-
-        return trimmed;
+            return ProductGroupErrors.Required(field);
+        return trimmed.Length > maxLength ? ProductGroupErrors.TooLong(field, maxLength, trimmed.Length) : trimmed;
     }
 }

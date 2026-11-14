@@ -22,7 +22,7 @@ public sealed class CreateProductGroupHandler(
         var request = command.Request;
         var categoryId = ProductCategoryId.From(request.CategoryId);
         if (!await db.Categories.AnyAsync(category => category.Id == categoryId, cancellationToken))
-            return ProductGroupValidation.Invalid("categoryId", "Category not found.", "CategoryNotFound");
+            return ProductGroupValidation.Invalid("categoryId", "Категорію не знайдено.", "CategoryNotFound");
 
         var productIds = request.ProductIds.Select(ProductId.From).ToList();
         var inCategory = await db.Products
@@ -33,12 +33,15 @@ public sealed class CreateProductGroupHandler(
         if (wrong.Count > 0)
         {
             return ProductGroupValidation.Invalid("productIds",
-                $"Products not found in this category: {string.Join(", ", wrong)}.", "ProductNotInCategory");
+                $"Цих товарів немає в категорії: {string.Join(", ", wrong)}.", "ProductNotInCategory");
         }
 
         var now = clock.GetUtcNow();
         var allocator = await slugs.LoadAllocatorAsync(CatalogEntityType.ProductGroup, cancellationToken);
-        var group = ProductGroup.CreateManual(categoryId, request.Name, allocator.Allocate(request.Name), now);
+        var created = ProductGroup.CreateManual(categoryId, request.Name, allocator.Allocate(request.Name), now);
+        if (created.IsFailure)
+            return created.Error!.ToResult<AdminProductGroupDto>();
+        var group = created.Value;
         await groups.AddAsync(group, cancellationToken);
 
         if (productIds.Count > 0)

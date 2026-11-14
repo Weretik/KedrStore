@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Application.Logging;
-using BuildingBlocks.Domain.Exceptions;
 
 namespace BuildingBlocks.Application.Behaviors;
 
@@ -35,33 +34,6 @@ public sealed class ExceptionBehavior<TMessage, TResponse>(
             var exType = ex.GetType().Name;
 
             UnhandledLog.Critical(logger, messageType, exType, ex);
-            throw;
-        }
-        catch (DomainException ex)
-        {
-            var messageType = typeof(TMessage).Name;
-
-            DomainLog.RuleViolated(logger, messageType, ex.Error.Code);
-
-            var validationError = new ValidationError(
-                ex.Error.Code,
-                ex.Error.Message
-            );
-
-            if (typeof(TResponse) == typeof(Result))
-                return (TResponse)(object)Result.Invalid([validationError]);
-
-            if (typeof(TResponse).IsGenericType &&
-                typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
-            {
-                var typeResponse = typeof(TResponse).GetGenericArguments()[0];
-                var method = typeof(Result<>)
-                    .MakeGenericType(typeResponse)
-                    .GetMethod(nameof(Result<object>.Invalid), [typeof(IEnumerable<ValidationError>)]);
-
-                var result = method!.Invoke(null, [new[] { validationError }]);
-                return (TResponse)result!;
-            }
             throw;
         }
         catch (Exception ex)

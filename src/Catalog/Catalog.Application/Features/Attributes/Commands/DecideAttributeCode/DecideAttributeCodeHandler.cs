@@ -46,7 +46,7 @@ public sealed class DecideAttributeCodeHandler(
             .Select(value => (value.AttributeId, ValueId: value.Id))
             .ToHashSet();
         if (wanted.Any(pair => !known.Contains(pair)))
-            return AttributeValidation.Invalid("valueId", "The value is not in the attribute.", "ValueNotFound");
+            return AttributeValidation.Invalid("valueId", "Цього значення немає у властивості.", "ValueNotFound");
 
         var categoryIds = ownValues.Select(item => item.CategoryId).ToList();
         var knownCategories = await db.Categories.IgnoreQueryFilters()

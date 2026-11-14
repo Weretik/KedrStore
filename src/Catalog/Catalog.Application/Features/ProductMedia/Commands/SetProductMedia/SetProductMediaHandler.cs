@@ -31,7 +31,7 @@ public sealed class SetProductMediaHandler(
         if (unknown.Length > 0)
         {
             return Result.Invalid(new ValidationError(
-                "mediaFileIds", $"Media files not found: {string.Join(", ", unknown)}.",
+                "mediaFileIds", $"Цих файлів немає в медіатеці: {string.Join(", ", unknown)}.",
                 "Catalog.Product.Media.FileNotFound", ValidationSeverity.Error));
         }
 
@@ -40,8 +40,10 @@ public sealed class SetProductMediaHandler(
             request.PhotoIds.Select(ToFile).ToArray(),
             request.SchemeId is { } scheme ? ToFile(scheme) : null,
             clock.GetUtcNow());
+        if (changed.IsFailure)
+            return changed.Error!.ToResult<ProductMediaDto>();
 
-        if (changed)
+        if (changed.Value)
         {
             await products.SaveChangesAsync(cancellationToken);
             await projections.RefreshPhotosAsync(cancellationToken);

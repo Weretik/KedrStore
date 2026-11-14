@@ -65,7 +65,7 @@ public sealed class AttributeImportFilesTests
     {
         var now = DateTimeOffset.UtcNow;
         var value = ProductAttributeValue.CreateManual(ProductId.From(1), AttributeId.Create(1), 0,
-            AttributeValueId.Create(5), null, now);
+            AttributeValueId.Create(5), null, now).Value;
 
         Assert.False(value.ApplyAutomatic(AttributeValueId.Create(6), null, true, AttributeValueSource.Parser, now));
         Assert.Equal(AttributeValueId.Create(5), value.ValueId);

@@ -131,13 +131,13 @@ public sealed class ProductImportSoftDeleteTests
 
     private static void Seed(CatalogDbContext db, int productCount)
     {
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")));
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Ручки", "ruchky", CategoryPath.From("n11")));
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(12), Root, "ручки", "ruchky-2", CategoryPath.From("n12")));
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Ручки", "ruchky", CategoryPath.From("n11")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(12), Root, "ручки", "ruchky-2", CategoryPath.From("n12")).Value);
         for (var id = 1; id <= productCount; id++)
         {
             db.Products.Add(Product.Create(ProductId.From(id), Root, $"Product {id}", $"product-{id}", ProductCategoryId.From(10),
-                DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true));
+                DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true).Value);
         }
 
         db.SaveChanges();

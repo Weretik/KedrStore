@@ -15,7 +15,7 @@ public sealed class AvatarService(
     UserManager<AppUser> userManager,
     ILogger<AvatarService> logger)
 {
-    public const string StorageUnavailableMessage = "Avatar storage is not configured.";
+    public const string StorageUnavailableMessage = "Сховище аватарів не налаштоване.";
 
     public async Task<Result<AvatarResult>> ReplaceAsync(AppUser user, AvatarUpload upload, CancellationToken cancellationToken = default)
     {

@@ -64,7 +64,7 @@ public sealed class AdminCategoriesListApplicationTests
     private static ProductCategory CreateCategory(int id, string path, int sortOrder, int level)
     {
         var category = ProductCategory.Create(
-            ProductCategoryId.From(id), "000005513", $"Category {id}", $"category-{id}", CategoryPath.From(path));
+            ProductCategoryId.From(id), "000005513", $"Category {id}", $"category-{id}", CategoryPath.From(path)).Value;
         category.UpdatePresentationMetadata($"Категорія {id}", $"Категория {id}", sortOrder, level);
         return category;
     }

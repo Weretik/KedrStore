@@ -26,29 +26,43 @@ public class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
 
     private CatalogAttribute() { }
 
-    public static CatalogAttribute Create(string code, string nameUk, AttributeKind kind, string? unit, string slug,
-        bool isFilterable, bool isVariantAxis, int sortOrder, DateTimeOffset now)
-        => new()
+    public static DomainResult<CatalogAttribute> Create(string code, string nameUk, AttributeKind kind, string? unit,
+        string slug, bool isFilterable, bool isVariantAxis, int sortOrder, DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedCode = checks.Take(AttributeText.Required(code, CodeMaxLength, nameof(Code)));
+        var checkedName = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
+        var checkedUnit = checks.Take(AttributeText.Optional(unit, UnitMaxLength, nameof(Unit)));
+        var checkedSlug = checks.Take(AttributeText.Slug(slug));
+        if (checks.Error is { } error)
+            return error;
+
+        return new CatalogAttribute
         {
-            Code = AttributeText.Required(code, CodeMaxLength, nameof(Code)),
-            NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)),
+            Code = checkedCode,
+            NameUk = checkedName,
             Kind = kind,
-            Unit = AttributeText.Optional(unit, UnitMaxLength, nameof(Unit)),
-            Slug = AttributeText.Slug(slug),
+            Unit = checkedUnit,
+            Slug = checkedSlug,
             IsFilterable = isFilterable,
             IsVariantAxis = isVariantAxis,
             SortOrder = sortOrder,
             UpdatedAt = now
         };
+    }
 
     /// <summary>Applies dictionary fields unless a person edited the attribute. Returns whether anything changed.</summary>
-    public bool ApplyDictionary(string nameUk, AttributeKind kind, string? unit, int sortOrder, DateTimeOffset now)
+    public DomainResult<bool> ApplyDictionary(string nameUk, AttributeKind kind, string? unit, int sortOrder,
+        DateTimeOffset now)
     {
         if (IsEditedManually)
             return false;
 
-        var name = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
-        var normalizedUnit = AttributeText.Optional(unit, UnitMaxLength, nameof(Unit));
+        var checks = new DomainChecks();
+        var name = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
+        var normalizedUnit = checks.Take(AttributeText.Optional(unit, UnitMaxLength, nameof(Unit)));
+        if (checks.Error is { } error)
+            return error;
         if (NameUk == name && Kind == kind && Unit == normalizedUnit && SortOrder == sortOrder)
             return false;
 
@@ -61,13 +75,20 @@ public class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
     }
 
     /// <summary>A person edits the attribute in «Властивості»; the dictionary import no longer changes it.</summary>
-    public void EditManually(string nameUk, string? nameRu, bool isFilterable, int sortOrder, DateTimeOffset now)
+    public DomainResult EditManually(string nameUk, string? nameRu, bool isFilterable, int sortOrder, DateTimeOffset now)
     {
-        NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
-        NameRu = AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu));
+        var checks = new DomainChecks();
+        var checkedNameUk = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
+        var checkedNameRu = checks.Take(AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu)));
+        if (checks.Error is { } error)
+            return error;
+
+        NameUk = checkedNameUk;
+        NameRu = checkedNameRu;
         IsFilterable = isFilterable;
         SortOrder = sortOrder;
         IsEditedManually = true;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 }

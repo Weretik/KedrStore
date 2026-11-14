@@ -21,7 +21,10 @@ public sealed class RenameSiteModelHandler(
         if (model is null)
             return Result.NotFound();
 
-        if (model.Rename(command.Request.Name, clock.GetUtcNow()))
+        var renamed = model.Rename(command.Request.Name, clock.GetUtcNow());
+        if (renamed.IsFailure)
+            return renamed.Error!.ToResult<SiteModelDto>();
+        if (renamed.Value)
             await models.SaveChangesAsync(cancellationToken);
 
         return Result.Success((await reader.ReadAsync(command.ModelId, cancellationToken))!);

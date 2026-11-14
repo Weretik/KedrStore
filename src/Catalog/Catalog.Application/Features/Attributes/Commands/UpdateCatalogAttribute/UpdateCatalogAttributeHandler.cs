@@ -21,8 +21,10 @@ public sealed class UpdateCatalogAttributeHandler(
             return Result.NotFound();
 
         var request = command.Request;
-        attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder,
+        var edited = attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder,
             clock.GetUtcNow());
+        if (edited.IsFailure)
+            return edited.Error!.ToResult<AdminCatalogAttributeDto>();
         await attributes.SaveChangesAsync(cancellationToken);
         return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
     }

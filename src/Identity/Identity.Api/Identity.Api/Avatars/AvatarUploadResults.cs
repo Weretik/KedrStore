@@ -15,7 +15,6 @@ internal static class AvatarUploadResults
         result.Status switch
         {
             Ardalis.Result.ResultStatus.Ok => controller.Ok(new AvatarResponse(result.Value.AvatarUrl)),
-            Ardalis.Result.ResultStatus.Unavailable => controller.StatusCode(StatusCodes.Status503ServiceUnavailable, result.Errors),
             _ => controller.ToActionResult(result)
         };
 }

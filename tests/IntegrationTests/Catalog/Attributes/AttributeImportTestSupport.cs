@@ -66,14 +66,14 @@ internal static class AttributeImportTestSupport
     public static void AddCategory(CatalogDbContext db, int id)
     {
         var category = ProductCategory.Create(ProductCategoryId.From(id), Root, $"Категорія {id}", $"katehoriia-{id}",
-            CategoryPath.From($"n{id}"));
+            CategoryPath.From($"n{id}")).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
     }
 
     public static void AddProduct(CatalogDbContext db, int id, int categoryId, string name)
         => db.Products.Add(Product.Create(ProductId.From(id), Root, name, $"product-{id}", ProductCategoryId.From(categoryId),
-            DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true));
+            DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true).Value);
 
     /// <summary>The repository root, where <c>docs/catalog-attributes</c> lives.</summary>
     public static string RepositoryFile(string relativePath)

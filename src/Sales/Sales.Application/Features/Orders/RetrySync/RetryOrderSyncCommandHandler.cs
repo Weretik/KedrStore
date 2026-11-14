@@ -26,10 +26,10 @@ public sealed class RetryOrderSyncCommandHandler(IOrderSyncRetryStore store)
                 OneCOrderSyncStatus.RetryScheduled)),
             OrderSyncRetryStoreOutcome.NotFound => Result.NotFound(),
             OrderSyncRetryStoreOutcome.InvalidStatus => Result.Conflict(
-                $"Manual retry is not allowed from status {result.PreviousStatus}."),
+                $"Повторна відправка недоступна для статусу {result.PreviousStatus}."),
             OrderSyncRetryStoreOutcome.ConcurrencyConflict => Result.Conflict(
-                "The synchronization state changed while the retry was being scheduled."),
-            _ => Result.Error("Manual retry could not be scheduled.")
+                "Стан синхронізації змінився, оновіть сторінку й спробуйте ще раз."),
+            _ => Result.Error("Не вдалося запланувати повторну відправку.")
         };
     }
 }

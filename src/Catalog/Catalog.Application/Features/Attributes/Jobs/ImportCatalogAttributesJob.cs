@@ -62,16 +62,27 @@ public sealed class ImportCatalogAttributesJob(
         {
             if (byCode.TryGetValue(definition.Code, out var attribute))
             {
-                RecognizedProductWriter.Count(report.Attributes, attribute.IsEditedManually,
-                    attribute.ApplyDictionary(definition.NameUk, definition.Kind, definition.Unit, definition.SortOrder, now));
+                var applied = attribute.ApplyDictionary(definition.NameUk, definition.Kind, definition.Unit,
+                    definition.SortOrder, now);
+                if (applied.IsFailure)
+                    report.Errors.Add($"Attribute {definition.Code}: {applied.Error!.Message}");
+                else
+                    RecognizedProductWriter.Count(report.Attributes, attribute.IsEditedManually, applied.Value);
                 continue;
             }
 
             var slug = RecognizedProductWriter.UniqueSlug(
                 definition.Slug.Length > 0 ? definition.Slug : SlugText.FromName(definition.NameUk, "vlastyvist"),
                 usedSlugs);
-            attribute = CatalogAttribute.Create(definition.Code, definition.NameUk, definition.Kind, definition.Unit,
-                slug, definition.IsFilterable, definition.IsVariantAxis, definition.SortOrder, now);
+            var createdAttribute = CatalogAttribute.Create(definition.Code, definition.NameUk, definition.Kind,
+                definition.Unit, slug, definition.IsFilterable, definition.IsVariantAxis, definition.SortOrder, now);
+            if (createdAttribute.IsFailure)
+            {
+                report.Errors.Add($"Attribute {definition.Code}: {createdAttribute.Error!.Message}");
+                continue;
+            }
+
+            attribute = createdAttribute.Value;
             byCode[definition.Code] = attribute;
             created.Add(attribute);
             report.Attributes.Created++;
@@ -122,13 +133,23 @@ public sealed class ImportCatalogAttributesJob(
             var key = (definition.AttributeCode, definition.Scope, definition.RawValue.Trim());
             if (existing.TryGetValue(key, out var alias))
             {
-                RecognizedProductWriter.Count(report.Aliases, alias.IsEditedManually,
-                    alias.ApplyDictionary(valueId, definition.IsConfirmed, definition.Note, now));
+                var applied = alias.ApplyDictionary(valueId, definition.IsConfirmed, definition.Note, now);
+                if (applied.IsFailure)
+                    report.Errors.Add($"Alias {definition.RawValue}: {applied.Error!.Message}");
+                else
+                    RecognizedProductWriter.Count(report.Aliases, alias.IsEditedManually, applied.Value);
                 continue;
             }
 
-            alias = AttributeAlias.Create(attribute.Id, definition.Scope, definition.RawValue, valueId,
+            var createdAlias = AttributeAlias.Create(attribute.Id, definition.Scope, definition.RawValue, valueId,
                 definition.IsConfirmed, definition.Note, now);
+            if (createdAlias.IsFailure)
+            {
+                report.Errors.Add($"Alias {definition.RawValue}: {createdAlias.Error!.Message}");
+                continue;
+            }
+
+            alias = createdAlias.Value;
             existing[key] = alias;
             created.Add(alias);
             report.Aliases.Created++;

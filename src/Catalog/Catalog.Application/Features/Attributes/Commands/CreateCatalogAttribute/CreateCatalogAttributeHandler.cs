@@ -31,7 +31,7 @@ public sealed class CreateCatalogAttributeHandler(
             : request.Slug.Trim();
         var usedSlugs = existing.Select(attribute => attribute.Slug).ToHashSet(StringComparer.Ordinal);
         if (!string.IsNullOrWhiteSpace(request.Slug) && usedSlugs.Contains(slug))
-            return AttributeValidation.Invalid("slug", "Another attribute has this slug.", "SlugTaken");
+            return AttributeValidation.Invalid("slug", "Ця адреса вже є в іншої властивості.", "SlugTaken");
         var unique = slug;
         for (var number = 2; usedSlugs.Contains(unique); number++)
             unique = SlugText.WithSuffix(slug, number);
@@ -39,20 +39,26 @@ public sealed class CreateCatalogAttributeHandler(
         var code = string.IsNullOrWhiteSpace(request.Code) ? Shorten(unique.Replace('-', '_'), CatalogAttribute.CodeMaxLength)
             : request.Code.Trim();
         if (existing.Any(attribute => string.Equals(attribute.Code, code, StringComparison.OrdinalIgnoreCase)))
-            return AttributeValidation.Invalid("code", "Another attribute has this code.", "CodeTaken");
+            return AttributeValidation.Invalid("code", "Цей код вже є в іншої властивості.", "CodeTaken");
 
         var now = clock.GetUtcNow();
         var kind = request.Kind == "number" ? AttributeKind.Number : AttributeKind.Enum;
-        var attribute = CatalogAttribute.Create(code, request.NameUk, kind, request.Unit, unique, request.IsFilterable,
+        var created = CatalogAttribute.Create(code, request.NameUk, kind, request.Unit, unique, request.IsFilterable,
             request.IsVariantAxis, request.SortOrder, now);
-        attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder, now);
+        if (created.IsFailure)
+            return created.Error!.ToResult<AdminCatalogAttributeDto>();
+        var attribute = created.Value;
+        var edited = attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder, now);
+        if (edited.IsFailure)
+            return edited.Error!.ToResult<AdminCatalogAttributeDto>();
         await attributes.AddAsync(attribute, cancellationToken);
         if (request.Kind == CreateCatalogAttributeCommand.YesNo)
         {
+            // Fixed values that always pass the rules.
             await values.AddRangeAsync(
             [
-                AttributeValue.CreateManual(attribute.Id, "yes", "Так", "Да", "tak", 1, null, null, now),
-                AttributeValue.CreateManual(attribute.Id, "no", "Ні", "Нет", "ni", 2, null, null, now)
+                AttributeValue.CreateManual(attribute.Id, "yes", "Так", "Да", "tak", 1, null, null, now).Value,
+                AttributeValue.CreateManual(attribute.Id, "no", "Ні", "Нет", "ni", 2, null, null, now).Value
             ], cancellationToken);
         }
 

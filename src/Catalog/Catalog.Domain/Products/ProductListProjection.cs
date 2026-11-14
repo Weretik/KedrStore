@@ -85,67 +85,45 @@ public sealed class ProductListProjection
             retailPrice);
     #endregion
 
-    #region Validation & Setters
+    #region Guards & Setters
     private static string BuildSearchText(ProductId productId, string name)
         => $"{productId.Value} {name}".Trim();
 
+    // The projection is rebuilt from stored products that already passed the domain rules, so a bad value here is a
+    // bug in the rebuilder, not user input.
     private void SetProductId(ProductId productId)
     {
-        if (productId.Value <= 0) throw new DomainException(ProductErrors.IdRequired());
-
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(productId.Value, nameof(productId));
         ProductId = productId;
     }
 
     private void SetCategoryId(ProductCategoryId categoryId)
     {
-        if (categoryId.Value <= 0) throw new DomainException(ProductErrors.CategoryIdRequired());
-
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(categoryId.Value, nameof(categoryId));
         CategoryId = categoryId;
     }
 
     private void SetCategorySlug(string categorySlug)
     {
-        if (string.IsNullOrWhiteSpace(categorySlug))
-        {
-            throw new DomainException(CategoryErrors.SlugIsRequired());
-        }
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(categorySlug);
         CategorySlug = categorySlug.Trim();
     }
 
-    private void SetNameUk(string nameUk)
-    {
-        NameUk = NormalizeName(nameUk);
-    }
+    private void SetNameUk(string nameUk) => NameUk = NormalizeName(nameUk);
 
-    private void SetNameRu(string nameRu)
-    {
-        NameRu = NormalizeName(nameRu);
-    }
+    private void SetNameRu(string nameRu) => NameRu = NormalizeName(nameRu);
 
     private static string NormalizeName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new DomainException(ProductErrors.NameRequired());
-        }
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
         var trimmed = name.Trim();
-        if (trimmed.Length is < 1 or > 300)
-        {
-            throw new DomainException(ProductErrors.NameLengthInvalid(trimmed.Length));
-        }
-
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(trimmed.Length, Product.NameMaxLength, nameof(name));
         return trimmed;
     }
 
     private void SetProductSlug(string productSlug)
     {
-        if (string.IsNullOrWhiteSpace(productSlug))
-        {
-            throw new DomainException(ProductErrors.NameRequired());
-        }
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(productSlug);
         ProductSlug = productSlug.Trim();
     }
 

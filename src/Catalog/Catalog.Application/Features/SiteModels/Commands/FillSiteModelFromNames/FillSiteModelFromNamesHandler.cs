@@ -42,7 +42,8 @@ public sealed class FillSiteModelFromNamesHandler(
                 continue;
 
             foreach (var row in cell)
-                changed |= row.SetManually(row.ValueId, row.NumberValue, now);
+                // The row already holds a value, so keeping it passes the value rule.
+                changed |= row.SetManually(row.ValueId, row.NumberValue, now).Value;
         }
 
         if (changed)

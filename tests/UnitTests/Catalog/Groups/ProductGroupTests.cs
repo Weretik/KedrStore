@@ -28,7 +28,7 @@ public sealed class ProductGroupTests
     [Fact]
     public void AutomaticMain_DropsThePersonsChoice()
     {
-        var group = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now);
+        var group = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now).Value;
         group.SetMainManually(ProductId.From(2), Now);
 
         Assert.True(group.IsMainManual);

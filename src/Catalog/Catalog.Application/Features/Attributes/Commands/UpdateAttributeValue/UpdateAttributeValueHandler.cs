@@ -23,8 +23,10 @@ public sealed class UpdateAttributeValueHandler(
             return Result.NotFound();
 
         var request = command.Request;
-        value.EditManually(request.NameUk, request.NameRu, request.SortOrder, request.SwatchHex,
+        var edited = value.EditManually(request.NameUk, request.NameRu, request.SortOrder, request.SwatchHex,
             request.SwatchMediaFileId, clock.GetUtcNow());
+        if (edited.IsFailure)
+            return edited.Error!.ToResult<AdminCatalogAttributeDto>();
         await values.SaveChangesAsync(cancellationToken);
         return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
     }

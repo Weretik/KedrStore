@@ -18,7 +18,10 @@ public sealed class RenameProductGroupHandler(
         if (group is null)
             return Result.NotFound();
 
-        if (group.Rename(command.Request.Name, clock.GetUtcNow()))
+        var renamed = group.Rename(command.Request.Name, clock.GetUtcNow());
+        if (renamed.IsFailure)
+            return renamed.Error!.ToResult<AdminProductGroupDto>();
+        if (renamed.Value)
             await groups.SaveChangesAsync(cancellationToken);
 
         return Result.Success((await reader.ReadAsync(group.Id, cancellationToken))!);

@@ -3,22 +3,19 @@ namespace Catalog.Domain.Products;
 public static class ProductTranslationErrors
 {
     public static DomainError ProductIdRequired() =>
-        new("Catalog.ProductTranslation.ProductId.Required",
-            "Product id is required");
+        new("Catalog.ProductTranslation.ProductId.Required", "Потрібен код товару.", Field: "ProductId");
 
     public static DomainError LanguageRequired() =>
-        new("Catalog.ProductTranslation.Language.Required",
-            "Language is required");
+        new("Catalog.ProductTranslation.Language.Required", "Вкажіть мову.", Field: "Language");
 
-    public static DomainError LanguageLengthInvalid(int length) =>
-        new("Catalog.ProductTranslation.Language.LengthInvalid",
-            $"Language length must be between 2 and 10 characters. Actual: {length}");
+    public static DomainError LanguageInvalid() =>
+        new("Catalog.ProductTranslation.Language.LengthInvalid", "Код мови має містити від 2 до 10 символів.",
+            Field: "Language");
 
     public static DomainError NameRequired() =>
-        new("Catalog.ProductTranslation.Name.Required",
-            "Translated product name is required");
+        new("Catalog.ProductTranslation.Name.Required", "Заповніть це поле.", Field: "Name");
 
-    public static DomainError NameLengthInvalid(int length) =>
+    public static DomainError NameTooLong(int length) =>
         new("Catalog.ProductTranslation.Name.LengthInvalid",
-            $"Translated product name length must be between 1 and 300 characters. Actual: {length}");
+            $"Не більше {ProductTranslation.NameMaxLength} символів (зараз {length}).", Field: "Name");
 }

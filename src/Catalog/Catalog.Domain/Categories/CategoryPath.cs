@@ -9,10 +9,10 @@ public readonly partial struct CategoryPath
     private static Validation Validate(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Validation.Invalid("Path is required.");
+            return Validation.Invalid("Потрібне місце категорії в дереві.");
 
         if (!_ltreeRegex.IsMatch(value))
-            return Validation.Invalid("Invalid ltree format.");
+            return Validation.Invalid("Некоректне місце категорії в дереві.");
 
         return Validation.Ok;
     }

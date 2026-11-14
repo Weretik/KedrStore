@@ -120,7 +120,7 @@ public sealed class CategoryPresentationApplicationTests
         var hardware = CreateCategory(5513, "n5513", "Root", 0, 0);
         var child = CreateCategory(900001, "n5513.n900001", "Child", 0, 1);
         var cosmos = ProductCategory.Create(
-            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000"));
+            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")).Value;
         cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [hardware, child, cosmos];
@@ -156,7 +156,7 @@ public sealed class CategoryPresentationApplicationTests
             "000005513",
             name,
             $"category-{id}",
-            CategoryPath.From(path));
+            CategoryPath.From(path)).Value;
         category.UpdatePresentationMetadata($"{name} uk", $"{name} ru", sortOrder, level);
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         return category;

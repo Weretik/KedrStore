@@ -25,31 +25,44 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     public DateTimeOffset? UpdatedAt { get; private set; }
     #endregion
 
+    public const int NameMaxLength = 100;
+
     #region Constructors
     private ProductCategory() { }
-    private ProductCategory(ProductCategoryId id, string productTypeIdOneC, string name, string slug, CategoryPath path,
-        ProductCategoryId? parentId = null)
-    {
-        Id = id;
-        SetProductTypeIdOneC(productTypeIdOneC);
-        SetName(name);
-        SetSlug(slug);
-        SetPath(path);
-        SetParentId(parentId);
-        UpdatePresentationMetadata(Name, Name, int.MaxValue, GetLevelFromPath(path));
-    }
     #endregion
 
     #region Factories
-    public static ProductCategory Create(ProductCategoryId id, string productTypeIdOneC, string name, string slug,
-        CategoryPath path, ProductCategoryId? parentId = null)
-        => new(id, productTypeIdOneC, name, slug,path, parentId);
+    public static DomainResult<ProductCategory> Create(ProductCategoryId id, string productTypeIdOneC, string name,
+        string slug, CategoryPath path, ProductCategoryId? parentId = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(productTypeIdOneC);
+        var checks = new DomainChecks();
+        var checkedName = checks.Take(CheckName(name));
+        var checkedSlug = checks.Take(CheckSlug(slug));
+        checks.Check(CheckPath(path));
+        if (checks.Error is { } error)
+            return error;
+
+        var category = new ProductCategory
+        {
+            Id = id,
+            ProductTypeIdOneC = productTypeIdOneC,
+            Name = checkedName,
+            Slug = checkedSlug,
+            Path = path,
+            ParentId = parentId,
+        };
+        var metadata = category.UpdatePresentationMetadata(checkedName, checkedName, int.MaxValue,
+            GetLevelFromPath(path));
+        return metadata.IsFailure ? metadata.Error! : category;
+    }
 
     /// <summary>
     /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
     /// Returns whether anything changed.
     /// </summary>
-    public bool UpdateFromOneC(string name, CategoryPath path, ProductCategoryId? parentId, DateTimeOffset now)
+    public DomainResult<bool> UpdateFromOneC(string name, CategoryPath path, ProductCategoryId? parentId,
+        DateTimeOffset now)
     {
         var trimmedName = name?.Trim() ?? string.Empty;
         if (string.Equals(Name, trimmedName, StringComparison.Ordinal) &&
@@ -59,9 +72,15 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
             return false;
         }
 
-        SetName(name!);
-        SetPath(path);
-        SetParentId(parentId);
+        var checks = new DomainChecks();
+        var checkedName = checks.Take(CheckName(name!));
+        checks.Check(CheckPath(path));
+        if (checks.Error is { } error)
+            return error;
+
+        Name = checkedName;
+        Path = path;
+        ParentId = parentId;
         Level = GetLevelFromPath(path);
         UpdatedAt = now;
         return true;
@@ -69,10 +88,14 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     #endregion
 
     #region Lifecycle
-    public void ChangeSlug(string slug, DateTimeOffset now)
+    public DomainResult ChangeSlug(string slug, DateTimeOffset now)
     {
-        SetSlug(slug);
+        var checkedSlug = CheckSlug(slug);
+        if (checkedSlug.IsFailure)
+            return checkedSlug;
+        Slug = checkedSlug.Value;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 
     public bool MarkDeleted(DateTimeOffset now)
@@ -103,89 +126,53 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     }
     #endregion
 
-    #region Setters/Validation
-    private void SetProductTypeIdOneC(string productTypeIdOneC)
+    #region Validation
+    private static DomainResult<string> CheckName(string name)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(productTypeIdOneC);
-        ProductTypeIdOneC = productTypeIdOneC;
+        if (string.IsNullOrWhiteSpace(name))
+            return CategoryErrors.NameRequired();
+        var trimmed = name.Trim();
+        return trimmed.Length > NameMaxLength ? CategoryErrors.NameTooLong(trimmed.Length) : trimmed;
     }
 
-    private void SetName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name)) throw new DomainException(CategoryErrors.NameIsRequired());
-        if (name.Length is < 1 or > 100) throw new DomainException(CategoryErrors.NameLengthInvalid(name.Length));
-        Name = name.Trim();
-    }
+    private static DomainResult<string> CheckSlug(string slug)
+        => string.IsNullOrWhiteSpace(slug) ? CategoryErrors.SlugRequired() : slug.Trim();
 
-    private void SetSlug(string slug)
-    {
-        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(CategoryErrors.SlugIsRequired());
-        Slug = slug.Trim();
-    }
-    private void SetPath(CategoryPath path)
-    {
-        if(path.Value.Length == 0) throw new DomainException(CategoryErrors.PathIsRequired());
-        Path = path;
-    }
-    private void SetParentId(ProductCategoryId? parentId)
-    {
-        ParentId = parentId;
-    }
+    private static DomainResult CheckPath(CategoryPath path)
+        => path.Value.Length == 0 ? CategoryErrors.PathRequired() : DomainResult.Success();
 
-    private static string ValidateShortName(
-        string shortName,
-        Func<DomainError> requiredError,
-        Func<int, DomainError> invalidLengthError)
+    private static DomainResult<string> CheckShortName(string shortName, string field)
     {
         if (string.IsNullOrWhiteSpace(shortName))
-            throw new DomainException(requiredError());
+            return CategoryErrors.ShortNameRequired(field);
 
         var trimmed = shortName.Trim();
-        if (trimmed.Length > ShortNameMaxLength)
-            throw new DomainException(invalidLengthError(trimmed.Length));
-
-        return trimmed;
+        return trimmed.Length > ShortNameMaxLength ? CategoryErrors.ShortNameTooLong(field, trimmed.Length) : trimmed;
     }
 
-    private static void GuardSortOrder(int sortOrder)
-    {
-        if (sortOrder < 0)
-            throw new DomainException(CategoryErrors.SortOrderNegative(sortOrder));
-    }
-
-    private void GuardLevel(int level)
+    private DomainResult CheckLevel(int level)
     {
         if (level < 0)
-            throw new DomainException(CategoryErrors.LevelNegative(level));
+            return CategoryErrors.LevelNegative();
 
         var pathLevel = GetLevelFromPath(Path);
-        if (level != pathLevel)
-            throw new DomainException(CategoryErrors.LevelDoesNotMatchPath(level, pathLevel));
+        return level != pathLevel ? CategoryErrors.LevelDoesNotMatchPath(pathLevel) : DomainResult.Success();
     }
     #endregion
 
     #region ProductCategory API
-    public void Rename(string name) => SetName(name);
-    public void Repath(CategoryPath newPath)
-    {
-        SetPath(newPath);
-        Level = GetLevelFromPath(Path);
-    }
-
     /// <summary>Sets presentation metadata and returns whether anything changed.</summary>
-    public bool UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder, int level)
+    public DomainResult<bool> UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder,
+        int level)
     {
-        var validatedShortNameUk = ValidateShortName(
-            shortNameUk,
-            CategoryErrors.ShortNameUkIsRequired,
-            CategoryErrors.ShortNameUkLengthInvalid);
-        var validatedShortNameRu = ValidateShortName(
-            shortNameRu,
-            CategoryErrors.ShortNameRuIsRequired,
-            CategoryErrors.ShortNameRuLengthInvalid);
-
-        GuardSortOrder(sortOrder);
-        GuardLevel(level);
+        var checks = new DomainChecks();
+        var validatedShortNameUk = checks.Take(CheckShortName(shortNameUk, nameof(ShortNameUk)));
+        var validatedShortNameRu = checks.Take(CheckShortName(shortNameRu, nameof(ShortNameRu)));
+        if (sortOrder < 0)
+            checks.Check(CategoryErrors.SortOrderNegative());
+        checks.Check(CheckLevel(level));
+        if (checks.Error is { } error)
+            return error;
 
         var changed = !string.Equals(ShortNameUk, validatedShortNameUk, StringComparison.Ordinal) ||
                       !string.Equals(ShortNameRu, validatedShortNameRu, StringComparison.Ordinal) ||
@@ -198,64 +185,10 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         Level = level;
         return changed;
     }
-
-    public void Reparent(ProductCategoryId? newParentId, CategoryPath newParentPath)
-    {
-        GuardReparentInvariant(newParentPath);
-        SetParentId(newParentId);
-        SetPath(Concat(newParentPath, GetSelfSegment()));
-        Level = GetLevelFromPath(Path);
-    }
     #endregion
 
-    #region Internal rules
-    protected void GuardReparentInvariant(CategoryPath newParentPath)
-    {
-        if (newParentPath.Value == Path.Value)
-            throw new DomainException(CategoryErrors.CannotSetSelfAsParent(Path.Value));
-
-        if (IsDescendantOf(newParentPath, Path))
-            throw new DomainException(CategoryErrors.CannotMoveUnderDescendant(
-                Path.Value, newParentPath.Value)
-            );
-    }
-    protected bool IsSameParent(CategoryPath newParentPath)
-        => TryGetParentPath(out var currentParent) && currentParent.Value == newParentPath.Value;
-
-    protected static CategoryPath Concat(CategoryPath parent, string segment) =>
-        CategoryPath.From($"{parent.Value}.{segment}");
-
-    protected string GetSelfSegment()
-    {
-        var s = Path.Value;
-        var idx = s.LastIndexOf('.');
-        return idx < 0 ? s : s[(idx + 1)..];
-    }
-
-    private bool TryGetParentPath(out CategoryPath parentPath)
-    {
-        if (IsRoot)
-        {
-            parentPath = CategoryPath.None;
-            return false;
-        }
-
-        var s = Path.Value;
-        var idx = s.LastIndexOf('.');
-        parentPath = CategoryPath.From(s[..idx]);
-        return true;
-    }
-
+    #region Path rules
     public bool IsRoot => SegmentCount(Path) <= 1;
-
-    private static bool IsDescendantOf(CategoryPath candidateChild, CategoryPath candidateAncestor)
-    {
-        var anc = candidateAncestor.Value;
-        var child = candidateChild.Value;
-        return child.Length > anc.Length &&
-               child.StartsWith(anc, StringComparison.Ordinal) &&
-               child[anc.Length] == '.';
-    }
 
     private static int SegmentCount(CategoryPath path)
         => 1 + path.Value.Count(ch => ch == '.');

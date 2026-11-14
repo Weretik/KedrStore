@@ -138,11 +138,11 @@ public sealed class ProductMediaApiTests
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), "000005513", "Завіси", "zavisy",
-            CategoryPath.From("n10")));
+            CategoryPath.From("n10")).Value);
         foreach (var (id, photo) in new[] { (731, "https://images-kedr.cdn.express/products/731.jpg"), (732, "") })
         {
             var product = Product.Create(ProductId.From(id), "000005513", $"Завіса {id}", $"zavisa-{id}",
-                ProductCategoryId.From(10), Now, 5, 1, false, false, true);
+                ProductCategoryId.From(10), Now, 5, 1, false, false, true).Value;
             db.Products.Add(product);
             db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
                 product.ProductSlug, photo, ProductCategoryId.From(10), "zavisy", inStock: true, isSale: false,

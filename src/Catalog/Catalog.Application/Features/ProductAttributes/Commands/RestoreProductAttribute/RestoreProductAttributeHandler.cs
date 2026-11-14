@@ -26,7 +26,7 @@ public sealed class RestoreProductAttributeHandler(
         var attribute = await db.Attributes.AsNoTracking()
             .FirstOrDefaultAsync(item => item.Id == attributeId, cancellationToken);
         if (attribute is null)
-            return AttributeValidation.Invalid("attributeId", "Attribute not found.", "NotFound");
+            return AttributeValidation.Invalid("attributeId", "Властивість не знайдено.", "NotFound");
 
         var manual = await db.ProductAttributeValues
             .Where(value => value.ProductId == productId && value.AttributeId == attributeId)

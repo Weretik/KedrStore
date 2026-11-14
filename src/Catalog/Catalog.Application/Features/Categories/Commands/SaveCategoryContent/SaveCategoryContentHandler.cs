@@ -28,7 +28,10 @@ public sealed class SaveCategoryContentHandler(
         var body = string.IsNullOrWhiteSpace(request.BodyHtml) ? null : sanitizer.Sanitize(request.BodyHtml);
         var faq = (request.Faq ?? []).Select(item => (item.Question, item.Answer)).ToList();
 
-        content.Replace(request.SeoTitle, request.MetaDescription, request.H1, body, faq, command.UserId, DateTimeOffset.UtcNow);
+        var replaced = content.Replace(request.SeoTitle, request.MetaDescription, request.H1, body, faq, command.UserId,
+            DateTimeOffset.UtcNow);
+        if (replaced.IsFailure)
+            return replaced.Error!.ToResult<AdminCategoryContentItem>();
 
         if (isNew)
             await contentRepo.AddAsync(content, cancellationToken);

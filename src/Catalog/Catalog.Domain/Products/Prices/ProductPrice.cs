@@ -13,65 +13,55 @@ public class ProductPrice : BaseEntity<int>, IAggregateRoot
     public Money Price => new(Amount, Currency.FromCode(CurrencyIso));
     #endregion
 
+    public const decimal MaximumAmount = 5_000_000m;
+
     #region Constructors
     private ProductPrice() { }
-
-    private ProductPrice(string productTypeIdOneC, ProductId productId, PriceTypeId priceTypeId, Money price)
-    {
-        SetProductId(productId);
-        SetPriceTypeId(priceTypeId);
-        SetMoney(price);
-        ProductTypeIdOneC = productTypeIdOneC;
-    }
     #endregion
 
     #region Factories
-    public static ProductPrice Create(string productTypeIdOneC, ProductId productId, PriceTypeId priceTypeId, Money price)
-        => new(productTypeIdOneC, productId, priceTypeId, price);
-
-    public void Update(ProductId productId, PriceTypeId priceTypeId, Money price)
+    public static DomainResult<ProductPrice> Create(string productTypeIdOneC, ProductId productId,
+        PriceTypeId priceTypeId, Money price)
     {
-        SetProductId(productId);
-        SetPriceTypeId(priceTypeId);
-        SetMoney(price);
+        var created = new ProductPrice { ProductTypeIdOneC = productTypeIdOneC };
+        var updated = created.Update(productId, priceTypeId, price);
+        return updated.IsFailure ? updated.Error! : created;
+    }
+
+    public DomainResult Update(ProductId productId, PriceTypeId priceTypeId, Money price)
+    {
+        var checks = new DomainChecks();
+        if (productId.Value <= 0)
+            checks.Check(ProductPriceErrors.ProductIdRequired());
+        if (priceTypeId.Value <= 0)
+            checks.Check(ProductPriceErrors.PriceTypeRequired());
+        var currency = checks.Take(CheckMoney(price));
+        if (checks.Error is { } error)
+            return error;
+
+        ProductId = productId;
+        PriceTypeId = priceTypeId;
+        Amount = price.Amount;
+        CurrencyIso = currency;
+        return DomainResult.Success();
     }
     #endregion
 
-    #region Validation & Setters
-    private void SetProductId(ProductId productId)
-    {
-        if (productId.Value <= 0) throw new DomainException(ProductPriceErrors.ProductIdRequired());
-        ProductId = productId;
-    }
-    private void SetPriceTypeId(PriceTypeId priceTypeId)
-    {
-        if (priceTypeId.Value <= 0) throw new DomainException(ProductPriceErrors.PriceTypeRequired());
-        PriceTypeId = priceTypeId;
-    }
-
-    private void SetMoney(Money price)
+    #region Validation
+    /// <summary>The checked currency code, upper case.</summary>
+    private static DomainResult<string> CheckMoney(Money price)
     {
         if (price.Amount < 0m)
-            throw new DomainException(ProductPriceErrors.AmountNegative(price.Amount));
+            return ProductPriceErrors.AmountNegative();
+        if (price.Amount > MaximumAmount)
+            return ProductPriceErrors.AmountOutOfRange();
 
-        if (price.Amount > 5_000_000m)
-            throw new DomainException(ProductPriceErrors.AmountOutOfRange(price.Amount));
-
-        var code = price.Currency.Code;
-
-        if (string.IsNullOrWhiteSpace(code))
-            throw new DomainException(ProductPriceErrors.CurrencyCodeRequired());
-
-        code = code.Trim();
-
-        if (code.Length != 3)
-            throw new DomainException(ProductPriceErrors.CurrencyCodeLengthInvalid(code));
-
-        if (!code.All(char.IsLetter))
-            throw new DomainException(ProductPriceErrors.CurrencyCodeNonLetters(code));
-
-        Amount = price.Amount;
-        CurrencyIso = code.ToUpperInvariant();
+        var code = price.Currency.Code?.Trim() ?? string.Empty;
+        if (code.Length == 0)
+            return ProductPriceErrors.CurrencyCodeRequired();
+        if (code.Length != 3 || !code.All(char.IsLetter))
+            return ProductPriceErrors.CurrencyCodeInvalid();
+        return code.ToUpperInvariant();
     }
     #endregion
 }

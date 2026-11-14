@@ -3,26 +3,26 @@ namespace Catalog.Domain.Products;
 public static class ProductErrors
 {
     public static DomainError IdRequired() =>
-        new("Catalog.Product.Id.Required",
-            "Product id is required");
+        new("Catalog.Product.Id.Required", "Потрібен код товару.", Field: "Id");
 
     public static DomainError NameRequired() =>
-        new("Catalog.Product.Name.Required",
-            "Product name is required");
+        new("Catalog.Product.Name.Required", "Заповніть це поле.", Field: "Name");
 
-    public static DomainError NameLengthInvalid(int length) =>
-        new("Catalog.Product.Name.LengthInvalid",
-            $"Product name length must be between 1 and 300 characters. Actual: {length}");
+    public static DomainError NameTooLong(int length) =>
+        new("Catalog.Product.Name.LengthInvalid", $"Не більше {Product.NameMaxLength} символів (зараз {length}).",
+            Field: "Name");
+
+    public static DomainError SlugRequired() =>
+        new("Catalog.Product.Slug.Required", "Заповніть це поле.", Field: "Slug");
 
     public static DomainError CategoryIdRequired() =>
-        new("Catalog.Product.CategoryId.Required",
-            "Product category id is required");
+        new("Catalog.Product.CategoryId.Required", "Оберіть категорію.", Field: "CategoryId");
 
     public static DomainError StockOutOfRange(decimal value) =>
-        new("Catalog.Product.Stock.OutOfRange",
-            $"Stock must be between 0 and 10000. Actual: {value}");
+        new("Catalog.Product.Stock.OutOfRange", $"Залишок має бути від 0 до {Product.MaximumStock:0} (зараз {value}).",
+            Field: "Stock");
 
-    public static DomainError QuantityInPackNegative(int value) =>
-        new("Catalog.Product.QuantityInPack.Negative",
-            $"Quantity in pack cannot be negative. Actual: {value}");
+    public static DomainError QuantityInPackNegative() =>
+        new("Catalog.Product.QuantityInPack.Negative", "Кількість в упаковці не може бути від'ємною.",
+            Field: "QuantityInPack");
 }

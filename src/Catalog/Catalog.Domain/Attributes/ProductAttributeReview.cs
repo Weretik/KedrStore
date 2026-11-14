@@ -41,7 +41,8 @@ public class ProductAttributeReview : IAggregateRoot
     {
         var normalized = Normalize(reasons.Where(reason => !AttributeReviewReason.IsOwnedByGroups(reason))
             .Concat(_reasons.Where(AttributeReviewReason.IsOwnedByGroups)).ToList());
-        var name = AttributeText.Required(baseName, BaseNameMaxLength, nameof(BaseName));
+        var name = AttributeText.Guarded(AttributeText.Required(baseName, BaseNameMaxLength, nameof(BaseName)),
+            nameof(baseName));
         if (BaseName == name && _reasons.SequenceEqual(normalized) && State == NextState(normalized))
             return false;
 
@@ -70,7 +71,8 @@ public class ProductAttributeReview : IAggregateRoot
     public void Accept(string acceptedBy, DateTimeOffset now)
     {
         State = AttributeReviewState.Accepted;
-        AcceptedBy = AttributeText.Required(acceptedBy, AcceptedByMaxLength, nameof(AcceptedBy));
+        AcceptedBy = AttributeText.Guarded(AttributeText.Required(acceptedBy, AcceptedByMaxLength, nameof(AcceptedBy)),
+            nameof(acceptedBy));
         AcceptedAt = now;
         UpdatedAt = now;
     }
@@ -86,7 +88,8 @@ public class ProductAttributeReview : IAggregateRoot
 
     private void Apply(string baseName, IReadOnlyList<AttributeReviewReason> reasons, DateTimeOffset now)
     {
-        BaseName = AttributeText.Required(baseName, BaseNameMaxLength, nameof(BaseName));
+        BaseName = AttributeText.Guarded(AttributeText.Required(baseName, BaseNameMaxLength, nameof(BaseName)),
+            nameof(baseName));
         _reasons = Normalize(reasons);
         State = NextState(_reasons);
         UpdatedAt = now;
@@ -100,8 +103,10 @@ public class ProductAttributeReview : IAggregateRoot
     private static List<AttributeReviewReason> Normalize(IReadOnlyList<AttributeReviewReason> reasons)
         => reasons
             .Select(reason => new AttributeReviewReason(
-                AttributeText.Required(reason.Code, AttributeReviewReason.CodeMaxLength, "ReasonCode"),
-                AttributeText.Optional(reason.Text, AttributeReviewReason.TextMaxLength, "ReasonText")))
+                AttributeText.Guarded(
+                    AttributeText.Required(reason.Code, AttributeReviewReason.CodeMaxLength, "ReasonCode"), "reasons"),
+                AttributeText.Guarded(
+                    AttributeText.Optional(reason.Text, AttributeReviewReason.TextMaxLength, "ReasonText"), "reasons")))
             .DistinctBy(reason => reason.Code)
             .Take(MaxReasons)
             .ToList();

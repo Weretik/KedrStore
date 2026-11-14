@@ -141,8 +141,8 @@ public sealed class MobileCatalogSnapshotApiTests
         lockProduct.SetMedia(
             [new ProductMediaFile(1, "https://cdn/20-a.webp"), new ProductMediaFile(2, "https://cdn/20-b.webp")],
             new ProductMediaFile(3, "https://cdn/20-scheme.webp"), Now);
-        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "uk", "Замок український", Now));
-        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "ru", "Замок русский", Now));
+        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "uk", "Замок український", Now).Value);
+        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "ru", "Замок русский", Now).Value);
         AddPrice(db, 20, 12, 150m);
         AddPrice(db, 20, 14, 120m);
 
@@ -159,7 +159,7 @@ public sealed class MobileCatalogSnapshotApiTests
     private static ProductCategory AddCategory(CatalogDbContext db, int id, string name, string path, int? parentId)
     {
         var category = ProductCategory.Create(ProductCategoryId.From(id), Hardware, name, $"category-{id}",
-            CategoryPath.From(path), parentId is null ? null : ProductCategoryId.From(parentId.Value));
+            CategoryPath.From(path), parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
         db.Categories.Add(category);
         return category;
     }
@@ -167,14 +167,14 @@ public sealed class MobileCatalogSnapshotApiTests
     private static Product AddProduct(CatalogDbContext db, int id, int categoryId, decimal stock)
     {
         var product = Product.Create(ProductId.From(id), Hardware, $"Товар {id}", $"tovar-{id}",
-            ProductCategoryId.From(categoryId), Now, stock, qtyInPack: 1, isNew: false, isSale: false);
+            ProductCategoryId.From(categoryId), Now, stock, qtyInPack: 1, isNew: false, isSale: false).Value;
         db.Products.Add(product);
         return product;
     }
 
     private static void AddPrice(CatalogDbContext db, int productId, int priceTypeId, decimal amount)
         => db.ProductPrices.Add(ProductPrice.Create(Hardware, ProductId.From(productId), PriceTypeId.From(priceTypeId),
-            new Money(amount, "UAH")));
+            new Money(amount, "UAH")).Value);
 
     private static WebApplicationFactory<Program> CreateFactory(CatalogDbContext db)
         => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>

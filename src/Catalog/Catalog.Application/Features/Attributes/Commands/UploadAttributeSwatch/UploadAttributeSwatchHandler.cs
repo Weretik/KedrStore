@@ -13,7 +13,7 @@ public sealed class UploadAttributeSwatchHandler(IAttributeSwatchStorage storage
         var data = await ReadLimitedAsync(command.File.OpenReadStream, cancellationToken);
         if (data is null)
             return Result<AdminAttributeSwatchUploadDto>.Invalid(
-                new ValidationError("file", "The picture must be between 1 byte and 5 MB.", null, ValidationSeverity.Error));
+                new ValidationError("file", "Зображення має бути не більше 5 МБ.", null, ValidationSeverity.Error));
 
         var name = Path.GetFileName(command.File.FileName);
         var stored = await storage.UploadAsync(string.IsNullOrWhiteSpace(name) ? "swatch" : name, data,

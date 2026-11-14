@@ -44,8 +44,9 @@ public class ProductAttributeValue : IAggregateRoot
         {
             ProductId = productId,
             AttributeId = attributeId,
-            Position = CheckPosition(position)
+            Position = AttributeText.Guarded(CheckPosition(position), nameof(position))
         };
+        AttributeText.Guarded(CheckValue(valueId, numberValue), nameof(valueId));
         value.Set(valueId, numberValue, isConfirmed, source, now);
         return value;
     }
@@ -62,9 +63,7 @@ public class ProductAttributeValue : IAggregateRoot
 
         if (!IsAutomatic)
         {
-            if (valueId is null && numberValue is null)
-                throw new DomainException(AttributeErrors.ValueOrNumberRequired());
-
+            AttributeText.Guarded(CheckValue(valueId, numberValue), nameof(valueId));
             AutomaticValueId = valueId;
             AutomaticNumberValue = numberValue;
             AutomaticIsConfirmed = isConfirmed;
@@ -75,32 +74,41 @@ public class ProductAttributeValue : IAggregateRoot
         if (ValueId == valueId && NumberValue == numberValue && IsConfirmed == isConfirmed && Source == source)
             return false;
 
+        AttributeText.Guarded(CheckValue(valueId, numberValue), nameof(valueId));
         Set(valueId, numberValue, isConfirmed, source, now);
         return true;
     }
 
     /// <summary>A person sets the value. It becomes manual and locked: automatic sources no longer change it.</summary>
-    public static ProductAttributeValue CreateManual(ProductId productId, AttributeId attributeId, int position,
-        AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
+    public static DomainResult<ProductAttributeValue> CreateManual(ProductId productId, AttributeId attributeId,
+        int position, AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
     {
+        var checkedPosition = CheckPosition(position);
+        if (checkedPosition.IsFailure)
+            return checkedPosition.Error!;
+
         var value = new ProductAttributeValue
         {
             ProductId = productId,
             AttributeId = attributeId,
-            Position = CheckPosition(position)
+            Position = checkedPosition.Value
         };
-        value.SetManually(valueId, numberValue, now);
-        return value;
+        var set = value.SetManually(valueId, numberValue, now);
+        return set.IsFailure ? set.Error! : value;
     }
 
     /// <summary>
     /// A person changes the value. It becomes manual and locked; the automatic value it replaces is kept.
     /// Returns whether anything changed.
     /// </summary>
-    public bool SetManually(AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
+    public DomainResult<bool> SetManually(AttributeValueId? valueId, decimal? numberValue, DateTimeOffset now)
     {
         if (!IsAutomatic && ValueId == valueId && NumberValue == numberValue)
             return false;
+
+        var checkedValue = CheckValue(valueId, numberValue);
+        if (checkedValue.IsFailure)
+            return checkedValue.Error!;
 
         if (IsAutomatic && Source != default)
         {
@@ -153,9 +161,6 @@ public class ProductAttributeValue : IAggregateRoot
     private void Set(AttributeValueId? valueId, decimal? numberValue, bool isConfirmed, AttributeValueSource source,
         DateTimeOffset now)
     {
-        if (valueId is null && numberValue is null)
-            throw new DomainException(AttributeErrors.ValueOrNumberRequired());
-
         ValueId = valueId;
         NumberValue = numberValue;
         IsConfirmed = isConfirmed;
@@ -163,11 +168,9 @@ public class ProductAttributeValue : IAggregateRoot
         UpdatedAt = now;
     }
 
-    private static short CheckPosition(int position)
-    {
-        if (position is < 0 or > MaxPosition)
-            throw new DomainException(AttributeErrors.PositionInvalid(position));
+    private static DomainResult CheckValue(AttributeValueId? valueId, decimal? numberValue)
+        => valueId is null && numberValue is null ? AttributeErrors.ValueOrNumberRequired() : DomainResult.Success();
 
-        return (short)position;
-    }
+    private static DomainResult<short> CheckPosition(int position)
+        => position is < 0 or > MaxPosition ? AttributeErrors.PositionInvalid() : (short)position;
 }

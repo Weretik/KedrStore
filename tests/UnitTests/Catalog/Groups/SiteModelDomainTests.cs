@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
@@ -21,7 +21,7 @@ public sealed class SiteModelDomainTests
     [Fact]
     public void Accept_PinsTheProposal_AndDropsItsKey_Once()
     {
-        var model = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now);
+        var model = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now).Value;
         Assert.Equal(ProductGroupStatus.Proposed, model.Status);
 
         Assert.True(model.Accept("manager@example.com", Now));
@@ -36,7 +36,7 @@ public sealed class SiteModelDomainTests
     [Fact]
     public void ManualModel_IsAcceptedAtOnce()
     {
-        var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Ручка KEDR", "ruchka-kedr", Now);
+        var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Ручка KEDR", "ruchka-kedr", Now).Value;
 
         Assert.True(model.IsAccepted);
     }
@@ -47,12 +47,12 @@ public sealed class SiteModelDomainTests
         var text = ProductGroupText.Create(ProductGroupId.Create(1), "uk", Now);
         Assert.False(text.IsComplete);
 
-        Assert.True(text.Update("  Ручка ", null, "", "Опис для пошуку", Now));
+        Assert.True(text.Update("  Ручка ", null, "", "Опис для пошуку", Now).Value);
         Assert.Equal(("Ручка", string.Empty), (text.ShortDescription, text.Description));
         Assert.True(text.IsComplete);
-        Assert.False(text.Update("Ручка", " ", null, "Опис для пошуку", Now));
+        Assert.False(text.Update("Ручка", " ", null, "Опис для пошуку", Now).Value);
 
-        Assert.Throws<DomainException>(() => text.Update(new string('x', 501), null, null, null, Now));
-        Assert.Throws<DomainException>(() => ProductGroupText.Create(ProductGroupId.Create(1), "en", Now));
+        DomainAssert.Fails(text.Update(new string('x', 501), null, null, null, Now));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ProductGroupText.Create(ProductGroupId.Create(1), "en", Now));
     }
 }

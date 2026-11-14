@@ -50,16 +50,25 @@ public sealed class ProductTranslationImporter(
 
             if (existing is null)
             {
-                created.Add(ProductTranslation.Create(productId, RuLanguage, nameRu!, now));
+                var translation = ProductTranslation.Create(productId, RuLanguage, nameRu!, now);
+                if (translation.IsFailure)
+                {
+                    counters.Skipped++;
+                    continue;
+                }
+
+                created.Add(translation.Value);
                 counters.Created++;
-            }
-            else if (existing.Apply(nameRu!, now))
-            {
-                counters.Updated++;
             }
             else
             {
-                counters.Unchanged++;
+                var applied = existing.Apply(nameRu!, now);
+                if (applied.IsFailure)
+                    counters.Skipped++;
+                else if (applied.Value)
+                    counters.Updated++;
+                else
+                    counters.Unchanged++;
             }
         }
 

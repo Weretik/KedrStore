@@ -17,8 +17,8 @@ public sealed class ProductMediaLink
 
     internal static ProductMediaLink Create(ProductMediaFile file, ProductMediaKind kind, int position)
     {
-        if (file.Id <= 0)
-            throw new DomainException(ProductMediaErrors.FileIdInvalid(file.Id));
+        // Files and their URLs come from the media library, never typed by a person.
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(file.Id, nameof(file));
 
         var link = new ProductMediaLink { MediaFileId = file.Id };
         link.Place(kind, position);
@@ -40,7 +40,8 @@ public sealed class ProductMediaLink
     {
         var normalized = url?.Trim() ?? string.Empty;
         if (normalized.Length is 0 or > UrlMaxLength)
-            throw new DomainException(ProductMediaErrors.UrlInvalid());
+            throw new ArgumentOutOfRangeException(nameof(url), normalized.Length,
+                $"A media URL holds 1-{UrlMaxLength} characters.");
         if (string.Equals(Url, normalized, StringComparison.Ordinal))
             return false;
 

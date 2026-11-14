@@ -24,17 +24,17 @@ public sealed class SetSiteModelTextHandler(
         var request = command.Request;
         var text = await db.ProductGroupTexts
             .SingleOrDefaultAsync(row => row.GroupId == modelId && row.Language == command.Language, cancellationToken);
-        if (text is null)
-        {
-            text = ProductGroupText.Create(modelId, command.Language, now);
-            text.Update(request.ShortDescription, request.Description, request.SeoTitle, request.SeoDescription, now);
+        var isNew = text is null;
+        text ??= ProductGroupText.Create(modelId, command.Language, now);
+        var updated = text.Update(request.ShortDescription, request.Description, request.SeoTitle,
+            request.SeoDescription, now);
+        if (updated.IsFailure)
+            return updated.Error!.ToResult<SiteModelDto>();
+
+        if (isNew)
             await texts.AddAsync(text, cancellationToken);
-        }
-        else if (text.Update(request.ShortDescription, request.Description, request.SeoTitle, request.SeoDescription,
-                     now))
-        {
+        else if (updated.Value)
             await texts.SaveChangesAsync(cancellationToken);
-        }
 
         return Result.Success((await reader.ReadAsync(command.ModelId, cancellationToken))!);
     }

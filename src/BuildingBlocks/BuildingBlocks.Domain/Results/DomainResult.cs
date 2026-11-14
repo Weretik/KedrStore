@@ -29,6 +29,13 @@ public sealed class DomainResult
     /// <summary>The first failure of the checks, in order, or success.</summary>
     public static DomainResult Combine(params DomainResult[] results)
         => results.FirstOrDefault(result => result.IsFailure) ?? Ok;
+
+    /// <summary>For input the code built itself (fixed values, stored data), where a failure is a programming error.</summary>
+    public void ThrowIfFailure()
+    {
+        if (Error is not null)
+            throw new InvalidOperationException($"The operation failed with {Error.Code}: {Error.Message}");
+    }
 }
 
 /// <summary>The outcome of a domain operation that produces a value.</summary>
@@ -61,4 +68,7 @@ public sealed class DomainResult<T>
 
     /// <summary>The plain outcome without the value.</summary>
     public DomainResult WithoutValue() => Error is null ? DomainResult.Success() : DomainResult.Failure(Error);
+
+    /// <inheritdoc cref="DomainResult.ThrowIfFailure"/>
+    public void ThrowIfFailure() => WithoutValue().ThrowIfFailure();
 }

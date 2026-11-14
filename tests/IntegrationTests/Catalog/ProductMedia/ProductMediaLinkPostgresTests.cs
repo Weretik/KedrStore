@@ -129,9 +129,9 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         await using (var db = postgres.CreateContext())
         {
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Петлі", "petli",
-                CategoryPath.From("n10.n11"), ProductCategoryId.From(10)));
+                CategoryPath.From("n10.n11"), ProductCategoryId.From(10)).Value);
             db.Products.Add(Product.Create(ProductId.From(734), Root, "Петля 734", "petlia-734",
-                ProductCategoryId.From(11), Created, 5, 1, false, false, true));
+                ProductCategoryId.From(11), Created, 5, 1, false, false, true).Value);
             await db.SaveChangesAsync();
         }
 
@@ -184,11 +184,11 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync(
             """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")));
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")).Value);
         foreach (var id in new[] { 731, 732, 733 })
         {
             var product = Product.Create(ProductId.From(id), Root, $"Завіса {id}",
-                $"zavisa-{id}", ProductCategoryId.From(10), Created, 5, 1, false, false, true);
+                $"zavisa-{id}", ProductCategoryId.From(10), Created, 5, 1, false, false, true).Value;
             if (id == 733)
                 product.MarkDeleted(Created);
             db.Products.Add(product);

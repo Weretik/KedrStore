@@ -123,10 +123,19 @@ public sealed class SyncOneCProductDetailsJob(
         {
             if (existingById.TryGetValue(item.Id, out var existing))
             {
-                var restored = existing.Restore(now);
                 var categoryId = item.CategoryId is { } resolved ? ProductCategoryId.From(resolved) : existing.CategoryId;
-                var updated = existing.UpdateFromOneC(item.Name, categoryId,
+                var fromOneC = existing.UpdateFromOneC(item.Name, categoryId,
                     item.QuantityInPack, item.ExportToSite, item.IsNew, item.IsSale, now);
+                if (fromOneC.IsFailure)
+                {
+                    logger.LogWarning("Skipping product {ProductId} from 1C: {Error}", item.Id, fromOneC.Error!.Message);
+                    counters.Skipped++;
+                    synced.Add(existing.Id);
+                    continue;
+                }
+
+                var restored = existing.Restore(now);
+                var updated = fromOneC.Value;
 
                 if (restored) counters.Restored++;
                 else if (updated) counters.Updated++;
@@ -143,7 +152,7 @@ public sealed class SyncOneCProductDetailsJob(
             }
 
             slugs ??= await slugService.LoadAllocatorAsync(CatalogEntityType.Product, cancellationToken);
-            var product = Product.Create(
+            var createdProduct = Product.Create(
                 id: ProductId.From(item.Id),
                 productTypeIdOneC: item.ProductTypeIdOneC,
                 name: item.Name,
@@ -155,6 +164,15 @@ public sealed class SyncOneCProductDetailsJob(
                 isNew: item.IsNew,
                 isSale: item.IsSale,
                 exportToSite: item.ExportToSite);
+            if (createdProduct.IsFailure)
+            {
+                logger.LogWarning("Skipping new product {ProductId} from 1C: {Error}", item.Id,
+                    createdProduct.Error!.Message);
+                counters.Skipped++;
+                continue;
+            }
+
+            var product = createdProduct.Value;
             created.Add(product);
             synced.Add(product.Id);
             counters.Created++;
