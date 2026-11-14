@@ -49,7 +49,7 @@ Table `content."GalleryItems"`; see the [database map](../../architecture/data-m
 
 ## Tests
 
-- Unit: [GalleryItemTests](../../../../tests/UnitTests/Content/GalleryItemTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
+- Unit: [GalleryItemTests](../../../../tests/UnitTests/Content/GalleryItemTests.cs) and [GalleryAndDocumentValidatorsTests](../../../../tests/UnitTests/Content/GalleryAndDocumentValidatorsTests.cs) — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Content"`.
 - Integration: [HTTP, access, add/reorder/edit/delete](../../../../tests/IntegrationTests/Content/GalleryApiTests.cs), [PostgreSQL seed and unique index](../../../../tests/IntegrationTests/Content/GalleryPostgresTests.cs), [Media lookup on PostgreSQL](../../../../tests/IntegrationTests/Media/MediaPostgresTests.cs) — `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Content|FullyQualifiedName~MediaPostgresTests"`.
 
 ## Related sources

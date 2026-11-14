@@ -32,6 +32,8 @@ src/Identity/
 
 ## Tests
 
+Unit: [ProfileAndSessionValidatorsTests](../../../../tests/UnitTests/Identity/Application/ProfileAndSessionValidatorsTests.cs) check the own name, password and avatar input — `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Identity"`.
+
 [ProfileApiTests](../../../../tests/IntegrationTests/Identity/Api/ProfileApiTests.cs) and [AdminUsersProfileApiTests](../../../../tests/IntegrationTests/Identity/Api/AdminUsersProfileApiTests.cs) run through the real API against PostgreSQL with an in-memory storage. [AvatarImageProcessorTests](../../../../tests/IntegrationTests/Identity/Avatars/AvatarImageProcessorTests.cs) need no database.
 
 `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~IntegrationTests.Identity"`
