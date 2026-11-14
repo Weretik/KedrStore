@@ -10,9 +10,6 @@ namespace Content.Application.Features.Articles.Commands.UploadArticleCover;
 public sealed class UploadArticleCoverHandler(ICoverImageProcessor processor, IMediaImageWriter writer)
     : ICommandHandler<UploadArticleCoverCommand, Result<UploadedArticleCover>>
 {
-    public const string StorageDirectory = "articles";
-    public const string LibraryFolder = "Статті";
-
     public async ValueTask<Result<UploadedArticleCover>> Handle(UploadArticleCoverCommand command,
         CancellationToken cancellationToken)
     {
@@ -23,7 +20,7 @@ public sealed class UploadArticleCoverHandler(ICoverImageProcessor processor, IM
         var name = Path.GetFileNameWithoutExtension(command.File.FileName);
         var fileName = $"{(string.IsNullOrWhiteSpace(name) ? "cover" : name)}.webp";
         var stored = await writer.UploadAsync(
-            new MediaImageUpload(StorageDirectory, LibraryFolder, fileName, processed.Value.Data), cancellationToken);
+            new MediaImageUpload(ArticleCovers.StorageDirectory, ArticleCovers.LibraryFolder, fileName, processed.Value.Data), cancellationToken);
         return stored.Map(image => new UploadedArticleCover(image.MediaFileId, image.Url));
     }
 }

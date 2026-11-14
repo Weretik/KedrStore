@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.ProductAttributes.Shared;
 using Catalog.Application.Features.SiteModels.Shared;

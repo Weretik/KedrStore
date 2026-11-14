@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Microsoft.AspNetCore.Http;
 
-namespace BuildingBlocks.Infrastructure.Services;
+namespace BuildingBlocks.Infrastructure.Users;
 
 public sealed class HttpContextCurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {

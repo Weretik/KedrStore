@@ -1,3 +1,4 @@
+using Identity.Application.Features.Auth.Shared;
 using Identity.Application.Features.Auth.Commands.SessionLogin;
 using Identity.Application.Features.Auth.Queries.SessionMe;
 using Identity.Application.Features.Auth.Commands.SessionRefresh;

@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Catalog.Domain.Attributes;
 
 namespace Catalog.Application.Features.ProductAttributes.Shared;

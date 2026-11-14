@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Content.Application.Shared;
 using Content.Application.Abstractions.Integrations;
 using Content.Application.Abstractions.Media;

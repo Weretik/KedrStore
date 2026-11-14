@@ -1,9 +1,6 @@
 using Identity.Api.Features.Auth;
 using Identity.Infrastructure.DependencyInjection;
-using Identity.Infrastructure.Avatars;
-using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.Sessions;
-using Identity.Infrastructure.Users;
 using Microsoft.Extensions.Options;
 
 namespace Host.Api.Security.Csrf;

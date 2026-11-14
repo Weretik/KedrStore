@@ -1,4 +1,4 @@
-using Identity.Application.Features.Auth.Queries.SessionMe;
+using Identity.Application.Features.Auth.Shared;
 
 namespace Identity.Application.Features.Auth.Commands.CookieLogin;
 

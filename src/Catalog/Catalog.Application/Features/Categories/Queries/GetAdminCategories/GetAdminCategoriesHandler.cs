@@ -1,5 +1,4 @@
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Contracts.Category;
 

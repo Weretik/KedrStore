@@ -2,8 +2,6 @@ using Catalog.Application.Features.Categories.Shared;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using Catalog.Application.Abstractions.Persistence;
-using Catalog.Application.Features.Categories.Shared;
-using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Application.Features.Categories.Queries.GetCategories;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Domain.Categories;
@@ -14,12 +12,7 @@ using Catalog.Domain.Products.Media;
 using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
 using Catalog.Domain.Attributes;
-using Catalog.Domain.Categories;
 using Catalog.Domain.Groups;
-using Catalog.Domain.PriceTypes;
-using Catalog.Domain.Products;
-using Catalog.Domain.Products.Media;
-using Catalog.Domain.Slugs;
 
 namespace UnitTests.Catalog.Application;
 
@@ -75,7 +68,7 @@ public sealed class CategoryPresentationApplicationTests
         var first = CreateCategory(900001, "n5513.n900001", "First", 1, 1);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [root, second, first];
-        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        var handler = new GetCategoriesHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
         {
             [900001] = new(2, 10m, 20m),
             [900002] = new(1, 5m, 5m)
@@ -102,7 +95,7 @@ public sealed class CategoryPresentationApplicationTests
         var full = CreateCategory(900001, "n5513.n900001", "Full", 1, 1);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [root, empty, full];
-        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        var handler = new GetCategoriesHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
         {
             [900001] = new(4, 10m, 20m)
         }), Roots);
@@ -124,7 +117,7 @@ public sealed class CategoryPresentationApplicationTests
         cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [hardware, child, cosmos];
-        var handler = new GetCategoriesQuryHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        var handler = new GetCategoriesHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
         {
             [900001] = new(2, 10m, 20m),
             [920000] = new(5, 1m, 9m)

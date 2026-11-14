@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Content.Application.Abstractions.Media;
 using Content.Application.Shared;
 using Content.Application.Features.SeoSettings.Shared;

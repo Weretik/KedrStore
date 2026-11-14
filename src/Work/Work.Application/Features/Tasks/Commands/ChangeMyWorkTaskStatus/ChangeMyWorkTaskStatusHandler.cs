@@ -1,4 +1,4 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Work.Application.Features.Tasks.Shared;
 
 namespace Work.Application.Features.Tasks.Commands.ChangeMyWorkTaskStatus;

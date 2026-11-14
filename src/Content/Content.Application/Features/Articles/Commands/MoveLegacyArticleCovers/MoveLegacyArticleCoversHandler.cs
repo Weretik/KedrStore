@@ -1,6 +1,5 @@
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Content.Application.Abstractions.Media;
-using Content.Application.Features.Articles.Commands.UploadArticleCover;
 using Content.Application.Features.Articles.Shared;
 using Content.Application.Shared;
 
@@ -35,8 +34,8 @@ public sealed class MoveLegacyArticleCoversHandler(
                 continue;
             }
 
-            var stored = await writer.UploadAsync(new MediaImageUpload(UploadArticleCoverHandler.StorageDirectory,
-                UploadArticleCoverHandler.LibraryFolder, $"{article.Slug}.webp", cover.Data), cancellationToken);
+            var stored = await writer.UploadAsync(new MediaImageUpload(ArticleCovers.StorageDirectory,
+                ArticleCovers.LibraryFolder, $"{article.Slug}.webp", cover.Data), cancellationToken);
             if (!stored.IsSuccess)
                 return stored.Map(_ => default(LegacyArticleCoversMoved)!);
 

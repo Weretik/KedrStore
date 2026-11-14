@@ -1,4 +1,4 @@
-﻿namespace Catalog.Application.Features.Categories.Queries.GetCategories;
+namespace Catalog.Application.Features.Categories.Shared;
 
 public sealed class AllCategoriesSpec : Specification<ProductCategory>
 {

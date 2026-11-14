@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 
 namespace IntegrationTests.TestSupport.Content;
 

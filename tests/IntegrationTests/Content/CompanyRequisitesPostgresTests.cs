@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using Content.Application.Abstractions.Persistence;
 using Content.Application.Features.Requisites.Shared;
 using Content.Application.Features.Requisites.Queries.GetCompanyRequisites;

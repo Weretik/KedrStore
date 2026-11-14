@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using BuildingBlocks.Application.Contracts;
+using BuildingBlocks.Application.Users;
 using global::Catalog.Application.Features.Groups.Shared;
 using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 using global::Catalog.Application.Features.SiteModels.Shared;
