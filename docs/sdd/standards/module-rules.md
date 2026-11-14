@@ -11,6 +11,23 @@ Every feature belongs to one business module. Before an SDD design, name the own
 - A new module is an architecture decision: record it in the SDD design with the owned data, the public contract other modules may use, and the alternatives considered (extend an existing module or create a new one). The user accepts it before implementation.
 - Do not split a capability into a separate module only because it has many files; size is a reason to split folders inside the module.
 
+## Solution root
+
+```text
+KedrStore.sln
+├── Directory.Build.props      settings shared by every project: TargetFramework, Nullable, ImplicitUsings, analyzers
+├── Directory.Packages.props   central package management: every NuGet version, ManagePackageVersionsCentrally=true
+├── global.json                SDK version
+├── src/                       Bootstrapper/, BuildingBlocks/, <Module>/
+├── tests/                     UnitTests/, IntegrationTests/, ArchitectureTests/
+├── tools/                     scripts the team runs by hand
+└── docs/
+```
+
+- A `.csproj` holds only what is specific to that project: its SDK, references, and `<PackageReference Include="..." />` without `Version`. Settings that every project shares go into `Directory.Build.props`; package versions go only into `Directory.Packages.props`, so one package has one version in the whole solution.
+- Dockerfiles that restore before copying the sources copy `Directory.Build.props`, `Directory.Packages.props`, and `global.json` together with the project files.
+- No other files at the root besides the solution, these props files, repository configuration (`.editorconfig`, `.gitignore`, `.gitattributes`, `.config/`), `README.md`, `AGENTS.md`, `CLAUDE.md`, and the license.
+
 ## Module shape
 
 Every business module has the same five projects. The host only registers modules; it holds no business code.
@@ -28,6 +45,27 @@ Every business module has the same five projects. The host only registers module
 - Create `<Module>.Contracts` together with the module, even while it is empty: it is the only place another module may look at.
 - Register the module in the host with one call, `Add<Module>Module(configuration)`, defined in `<Module>.Api/DependencyInjection/`. It registers the module's Application, Infrastructure, Contracts implementations, and controllers. Controllers and request models never use Infrastructure types.
 - Add the module to the architecture tests so its project references, its isolation, and its folder rules are checked.
+
+## Shared building blocks
+
+Code that every module uses lives in `src/BuildingBlocks/` (some solutions call these projects `Shared.*`; the name does not matter, the content rules do). Each shared project mirrors one layer and follows that layer's dependency rules.
+
+```text
+src/BuildingBlocks/
+├── BuildingBlocks.Domain           kernel: Entity, AggregateRoot, IDomainEvent, Result/Error, Money, strongly typed ids, Guard
+├── BuildingBlocks.Application      Mediator pipeline behaviors, ports (ICurrentUser, IClock, ICacheService, INotificationSender), paging, text and phone normalization
+├── BuildingBlocks.Infrastructure   EF base DbContext and interceptors, domain-event dispatch, outbox, logging, caching, notification and other client implementations, migration and seed runners
+└── BuildingBlocks.Api              Result→HTTP mapping, problem details, exception and correlation middleware, endpoint conventions
+```
+
+- `BuildingBlocks.Domain` (the kernel) holds only primitives that have no business meaning of their own: base entity and event types, `Result`/`Error`, `Money`, ids, guards. No EF Core, no ASP.NET Core or HTTP, no logging, no configuration, no business rule of any module. Allowed packages: value-object and result libraries (for example `Vogen`, `Ardalis.Result`, `Ardalis.SmartEnum`, a money type).
+- `BuildingBlocks.Application` holds use-case plumbing and ports: pipeline behaviors and the interfaces that Infrastructure implements. It references no EF Core, database driver, ASP.NET Core Identity, HTTP client, bot, file-format, or scheduler package; their implementations go to `BuildingBlocks.Infrastructure` (or a module's Infrastructure) behind a port.
+- `BuildingBlocks.Infrastructure` holds the technical implementations every module shares: base persistence, the outbox when the project has one, logging and telemetry setup, cache, notification clients, middleware that is not HTTP-specific. It references `BuildingBlocks.Application` and `BuildingBlocks.Domain`, never a module.
+- `BuildingBlocks.Api` holds HTTP-only helpers and middleware. It references `BuildingBlocks.Application`, never a module.
+- An integration with one external system that several modules use is its own project, `BuildingBlocks.Integrations.<System>`, with the Infrastructure rules.
+- No business logic in building blocks: a rule that belongs to one module (pricing, order status, catalogue codes) stays in that module, even when two modules need it; the other module reads it through `Contracts`.
+- Folders inside a shared project follow the same rules as a module: by concern (`Persistence/`, `Outbox/`, `Logging/`, `Notifications/`, `Behaviors/`, `Results/`), never `Helpers/`, `Utils/`, `Extensions/`, `Services/`, `Common/`, `Contracts/`, or a misspelled name. Registration extensions go to `DependencyInjection/`.
+- The architecture tests check the package and project references of each building-block project and that no building-block project references a module.
 
 ## Communication between modules
 
@@ -156,5 +194,7 @@ Existing code that does not follow these rules yet. Do not copy it into new modu
 | Architecture tests | Check only Domain and Application references; Contracts, folder, and host rules not checked | Stage: architecture tests for all rules |
 | Tests | No unit tests for Identity; few handler tests for Content, Media, Work | Stage: missing unit tests |
 | Repository root | `dotnet-install.ps1`, `SALES_1C_SYNC_INSTRUCTION.txt` | Move to `tools/` and `docs/sdd/operations/` with the folder restructuring |
+| `Catalog.Application`, `Content.Application`, `Media.Application`, `Sales.Application`, `Work.Application` | Reference EF Core directly: handlers query the module's read `DbContext` interface (`DbSet`, `EF.Functions.ILike`); `Catalog.Application` also references import packages (Hangfire, ClosedXML, Newtonsoft.Json, Slugify, NodaMoney, Npgsql) | Folder restructuring moves import and job code to Infrastructure; the read-`DbContext` pattern stays until a separate decision |
+| `BuildingBlocks.*` | Type and dump folders (`Application/Contracts/`, `Application/Helpers/`, `Infrastructure/Extensions/`, `Infrastructure/Services/`); no outbox | Folder restructuring renames them by concern; an outbox is added only with a feature that needs reliable cross-module events |
 | `Catalog`, `Sales`, `Identity` | Tables and migration history in the `public` schema | Keep: moving existing tables needs a separate migration and rollout plan. New modules use their own schema. |
 | 58 of 173 commands and queries | No FluentValidation validator | Final audit decides which accept client input and need one |

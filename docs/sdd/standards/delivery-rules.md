@@ -32,13 +32,13 @@ A new feature needs a concise description of its actual architecture in `docs/sd
 - A small fix that does not change the card's facts does not touch the card.
 - When a YAML file in `docs/sdd/contracts/` changes, say in the PR that kedr-web needs `npm run contracts:sync -- <path-to-KedrStore>`.
 
-## Staged structure check
+## Full audit after the feature
 
-Implement a feature in stages (one scenario, task slice, or layer at a time). After each stage, run a short structure check on the files that stage touched: split files and classes that mix responsibilities, and move crowded folders into logical folders or modules under the [backend rules](backend-rules.md). Do not leave this for the end of the feature. The check is local to changed files and is not the full code audit. After the last stage, do a short final pass over the whole feature and compare the planned map with the actual tree in the feature map.
+Implement a feature in stages (one scenario, task slice, or layer at a time) and place each new file by the [module rules](module-rules.md) and [backend rules](backend-rules.md) as you write it. There is no separate structure check after each stage: a local check of changed files missed important problems (owner decision 2026-11-14). When the whole feature is implemented, run one full audit of the feature against all architecture rules, not only the changed files: module ownership and `Contracts`-only access between modules, project references, folders (Domain by aggregate, Application `Features/<Feature>/Commands|Queries/<UseCase>/`, Infrastructure `Persistence/`, Api by feature, no type or dump folders), host and job composition, shared building blocks, validators, tests by level and architecture tests, and the feature card, map, and contract against the code. Fix confirmed findings before reporting the feature complete.
 
 ## Closing checklist
 
-Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the staged structure checks are done.
+Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the full feature audit against the architecture rules is done and its findings are fixed.
 
 When changing an existing feature, open its card and the code and tests it lists before editing.
 
