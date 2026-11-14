@@ -6,25 +6,27 @@ Browser cookie login (Admin, storefront), mobile token login and refresh, logout
 
 ## Structure and relationships
 
-[CookieAuthController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/CookieAuthController.cs) signs a browser in through [CookieSessionService](../../../../src/Identity/Identity.Infrastructure/Services/Sessions/CookieSessionService.cs). [MobileAuthController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/MobileAuthController.cs) uses [IdentitySessionService](../../../../src/Identity/Identity.Infrastructure/Services/Sessions/IdentitySessionService.cs), which issues tokens with [IdentityBearerTokenIssuer](../../../../src/Identity/Identity.Infrastructure/Services/Sessions/IdentityBearerTokenIssuer.cs) and keeps refresh sessions in [RefreshSessionStore](../../../../src/Identity/Identity.Infrastructure/Services/Sessions/RefreshSessionStore.cs). [AuthSessionController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/AuthSessionController.cs) serves `me` for both kinds of client. [SessionCookieWriter](../../../../src/Identity/Identity.Api/Identity.Api/Cookies/SessionCookieWriter.cs) owns the CSRF cookie; [CookieCsrfMiddleware](../../../../src/Bootstrapper/Host.Api/Security/Csrf/CookieCsrfMiddleware.cs) checks the CSRF header. The `Kedr` scheme is registered in [IdentityAuthenticationExtensions](../../../../src/Identity/Identity.Infrastructure/DependencyInjection/IdentityAuthenticationExtensions.cs).
+[CookieAuthController](../../../../src/Identity/Identity.Api/Features/Auth/CookieAuthController.cs) signs a browser in through [CookieSessionService](../../../../src/Identity/Identity.Infrastructure/Sessions/CookieSessionService.cs). [MobileAuthController](../../../../src/Identity/Identity.Api/Features/Auth/MobileAuthController.cs) uses [IdentitySessionService](../../../../src/Identity/Identity.Infrastructure/Sessions/IdentitySessionService.cs), which issues tokens with [IdentityBearerTokenIssuer](../../../../src/Identity/Identity.Infrastructure/Sessions/IdentityBearerTokenIssuer.cs) and keeps refresh sessions in [RefreshSessionStore](../../../../src/Identity/Identity.Infrastructure/Sessions/RefreshSessionStore.cs). [AuthSessionController](../../../../src/Identity/Identity.Api/Features/Auth/AuthSessionController.cs) serves `me` for both kinds of client. [SessionCookieWriter](../../../../src/Identity/Identity.Api/Features/Auth/SessionCookieWriter.cs) owns the CSRF cookie; [CookieCsrfMiddleware](../../../../src/Bootstrapper/Host.Api/Security/Csrf/CookieCsrfMiddleware.cs) checks the CSRF header. The `Kedr` scheme is registered in [IdentityAuthenticationExtensions](../../../../src/Identity/Identity.Infrastructure/DependencyInjection/IdentityAuthenticationExtensions.cs).
 
 ## Code structure
 
 ```text
 src/
 ├── Identity/
-│   ├── Identity.Api/Identity.Api/
-│   │   ├── Controllers/
-│   │   │   ├── CookieAuthController.cs  # browser login/logout
-│   │   │   ├── MobileAuthController.cs  # mobile login/refresh/logout
-│   │   │   └── AuthSessionController.cs  # me (current user)
-│   │   └── Cookies/SessionCookieWriter.cs  # CSRF and refresh cookies
-│   ├── Identity.Application/Features/Auth/
-│   │   ├── CookieLogin/, CookieLogout/  # browser use cases
-│   │   └── SessionLogin/, SessionRefresh/, SessionLogout/, SessionMe/  # token use cases and me
+│   ├── Identity.Api/Features/Auth/
+│   │   ├── CookieAuthController.cs  # browser login/logout
+│   │   ├── MobileAuthController.cs  # mobile login/refresh/logout
+│   │   ├── AuthSessionController.cs  # me (current user)
+│   │   └── SessionCookieWriter.cs  # CSRF and refresh cookies
+│   ├── Identity.Application/
+│   │   ├── Abstractions/Sessions/  # ICookieSessionService, IIdentitySessionService
+│   │   └── Features/Auth/
+│   │       ├── Commands/CookieLogin/, CookieLogout/  # browser use cases
+│   │       ├── Commands/SessionLogin/, SessionRefresh/, SessionLogout/  # token use cases
+│   │       └── Queries/SessionMe/  # me
 │   └── Identity.Infrastructure/
 │       ├── DependencyInjection/IdentityAuthenticationExtensions.cs  # Kedr policy scheme, cookie, bearer
-│       └── Services/Sessions/
+│       └── Sessions/
 │           ├── CookieSessionService.cs  # SignInManager cookie sign-in
 │           ├── IdentitySessionService.cs  # token login, refresh, logout, me
 │           ├── IdentityBearerTokenIssuer.cs  # access token + random refresh token

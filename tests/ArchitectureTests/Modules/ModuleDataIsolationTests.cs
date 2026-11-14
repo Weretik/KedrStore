@@ -1,6 +1,6 @@
 using Catalog.Infrastructure.Persistence;
 using Content.Infrastructure.Persistence;
-using Identity.Infrastructure.DataBase;
+using Identity.Infrastructure.Persistence;
 using Media.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;

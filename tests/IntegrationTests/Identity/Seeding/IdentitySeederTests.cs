@@ -1,5 +1,5 @@
 using Identity.Contracts.Authorization;
-using Identity.Infrastructure.Contracts;
+using Identity.Infrastructure.Seeding;
 using Identity.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.Entities;
 using IntegrationTests.TestSupport.Database;
@@ -32,7 +32,7 @@ public sealed class IdentitySeederTests(IdentityPostgresFixture fixture)
         services.AddLogging();
         services.AddHttpContextAccessor();
         services.AddSingleton<IConfiguration>(configuration);
-        services.AddIdentityInfrastructureServices(configuration);
+        services.AddIdentityInfrastructure(configuration);
         await using var provider = services.BuildServiceProvider();
 
         await using (var scope = provider.CreateAsyncScope())

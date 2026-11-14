@@ -44,7 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{23
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host.Jobs", "src\Bootstrapper\Host.Jobs\Host.Jobs\Host.Jobs.csproj", "{BB00F4AE-65C4-44EC-9F40-57C793E8CD1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "src\Identity\Identity.Api\Identity.Api\Identity.Api.csproj", "{578012F9-1B50-467C-B55D-3C479C6F9648}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Api", "src\Identity\Identity.Api\Identity.Api.csproj", "{578012F9-1B50-467C-B55D-3C479C6F9648}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Api", "src\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj", "{54E1CA89-BEC4-4A76-8A3A-BFA26AFD3284}"
 EndProject

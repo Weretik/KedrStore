@@ -33,7 +33,7 @@ COPY ["src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj", "
 
 COPY ["src/BuildingBlocks/BuildingBlocks.Api/BuildingBlocks.Api.csproj", "src/BuildingBlocks/BuildingBlocks.Api/"]
 COPY ["src/Content/Content.Api/Content.Api.csproj", "src/Content/Content.Api/"]
-COPY ["src/Identity/Identity.Api/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/Identity.Api/"]
+COPY ["src/Identity/Identity.Api/Identity.Api.csproj", "src/Identity/Identity.Api/"]
 COPY ["src/Identity/Identity.Contracts/Identity.Contracts.csproj", "src/Identity/Identity.Contracts/"]
 COPY ["src/Media/Media.Api/Media.Api.csproj", "src/Media/Media.Api/"]
 COPY ["src/Sales/Sales.Api/Sales.Api.csproj", "src/Sales/Sales.Api/"]

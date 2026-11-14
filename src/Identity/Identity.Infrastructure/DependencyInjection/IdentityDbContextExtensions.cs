@@ -1,16 +1,19 @@
-using Identity.Infrastructure.Contracts;
-using Identity.Infrastructure.DataBase;
+using Identity.Infrastructure.Seeding;
+using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.Entities;
-using Identity.Infrastructure.Options;
+using Identity.Infrastructure.Avatars;
+using Identity.Infrastructure.Seeding;
+using Identity.Infrastructure.Sessions;
+using Identity.Infrastructure.Users;
 using Identity.Infrastructure.Security;
-using Identity.Infrastructure.Seeders;
+using Identity.Infrastructure.Seeding;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace Identity.Infrastructure.DependencyInjection;
 
 public static class IdentityDbContextExtensions
 {
-    public static IServiceCollection AddIdentityDbContextServices(
+    internal static IServiceCollection AddIdentityDbContextServices(
         this IServiceCollection services,
         IConfiguration configuration)
     {

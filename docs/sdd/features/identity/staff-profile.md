@@ -6,27 +6,24 @@ Every staff account reads its profile and changes its name and avatar; an admini
 
 ## Structure and relationships
 
-[ProfileController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/ProfileController.cs) (`/api/profile`) dispatches the `Features/Profile` use cases to [ProfileService](../../../../src/Identity/Identity.Infrastructure/Services/Profile/ProfileService.cs). The Users page routes in [AdminUsersController](../../../../src/Identity/Identity.Api/Identity.Api/Controllers/AdminUsersController.cs) go to [StaffProfileEditService](../../../../src/Identity/Identity.Infrastructure/Services/Users/StaffProfileEditService.cs), which uses [ManagedStaffResolver](../../../../src/Identity/Identity.Infrastructure/Services/Users/ManagedStaffResolver.cs) to refuse administrator targets. Both use [AvatarService](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarService.cs): [AvatarImageProcessor](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarImageProcessor.cs) checks and converts the image (SkiaSharp), `IAvatarStorage` uploads it ([FtpAvatarStorage](../../../../src/Identity/Identity.Infrastructure/Avatars/FtpAvatarStorage.cs), or `UnconfiguredAvatarStorage` → `503` without credentials), the user's `AvatarPath` is saved and the previous file deleted. [AvatarUrlBuilder](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarUrlBuilder.cs) turns the key into the public URL for the profile, `me`, and the staff list. Email changes go through [AccountEmailWriter](../../../../src/Identity/Identity.Infrastructure/Services/Users/AccountEmailWriter.cs).
+[ProfileController](../../../../src/Identity/Identity.Api/Features/Profile/ProfileController.cs) (`/api/profile`) dispatches the `Features/Profile` use cases to [ProfileService](../../../../src/Identity/Identity.Infrastructure/Profile/ProfileService.cs). The Users page routes in [AdminUsersController](../../../../src/Identity/Identity.Api/Features/Users/AdminUsersController.cs) go to [StaffProfileEditService](../../../../src/Identity/Identity.Infrastructure/Users/StaffProfileEditService.cs), which uses [ManagedStaffResolver](../../../../src/Identity/Identity.Infrastructure/Users/ManagedStaffResolver.cs) to refuse administrator targets. Both use [AvatarService](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarService.cs): [AvatarImageProcessor](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarImageProcessor.cs) checks and converts the image (SkiaSharp), `IAvatarStorage` uploads it ([FtpAvatarStorage](../../../../src/Identity/Identity.Infrastructure/Avatars/FtpAvatarStorage.cs), or `UnconfiguredAvatarStorage` → `503` without credentials), the user's `AvatarPath` is saved and the previous file deleted. [AvatarUrlBuilder](../../../../src/Identity/Identity.Infrastructure/Avatars/AvatarUrlBuilder.cs) turns the key into the public URL for the profile, `me`, and the staff list. Email changes go through [AccountEmailWriter](../../../../src/Identity/Identity.Infrastructure/Users/AccountEmailWriter.cs).
 
 ## Code structure
 
 ```text
 src/Identity/
-├── Identity.Api/Identity.Api/
-│   ├── Controllers/ProfileController.cs  # own profile, RequireManagerRole (email/password: RequireAdminRole)
-│   ├── Avatars/AvatarUploadResults.cs  # multipart limit, 200/400/503 mapping
-│   └── Contracts/Profile/  # requests and responses
+├── Identity.Api/Features/
+│   ├── Profile/  # ProfileController (RequireManagerRole; email/password: RequireAdminRole), requests and responses
+│   └── Avatars/AvatarUploadResults.cs  # multipart limit, 200/400/503 mapping
 ├── Identity.Application/
-│   ├── Features/Profile/  # GetProfile, ChangeOwnName, UploadOwnAvatar, RemoveOwnAvatar, ChangeOwnEmail, ChangeOwnPassword
-│   ├── Features/Users/  # ChangeStaffName, ChangeStaffEmail, UploadStaffAvatar, RemoveStaffAvatar
-│   ├── Features/Avatars/  # AvatarRules (limits), AvatarUpload, AvatarResult
-│   └── Services/IProfileService.cs, IStaffProfileEditService.cs
+│   ├── Abstractions/Accounts/  # IProfileService, IStaffProfileEditService
+│   ├── Features/Profile/  # Queries/GetProfile; Commands/ChangeOwnName, UploadOwnAvatar, RemoveOwnAvatar, ChangeOwnEmail, ChangeOwnPassword
+│   ├── Features/Users/Commands/  # ChangeStaffName, ChangeStaffEmail, UploadStaffAvatar, RemoveStaffAvatar
+│   └── Features/Avatars/  # AvatarRules (limits), AvatarUpload, AvatarResult
 └── Identity.Infrastructure/
-    ├── Avatars/  # processor, upload pipeline, FTP and unconfigured storage, URL builder
-    ├── Options/AvatarStorageOptions.cs  # AvatarStorage section
-    └── Services/
-        ├── Profile/ProfileService.cs  # own profile, keeps the current browser session after email/password change
-        └── Users/  # StaffProfileEditService, ManagedStaffResolver, AccountEmailWriter
+    ├── Avatars/  # processor, upload pipeline, FTP and unconfigured storage, URL builder, AvatarStorageOptions
+    ├── Profile/ProfileService.cs  # own profile, keeps the current browser session after email/password change
+    └── Users/  # StaffProfileEditService, ManagedStaffResolver, AccountEmailWriter
 ```
 
 ## Configuration

@@ -47,8 +47,8 @@ Set-Cookie: kedr.csrf
 
 ## Mobile token rules
 
-- The access token is protected by the bearer scheme's Data Protection protector; the refresh token is 32 random bytes (Base64Url). [IdentityBearerTokenIssuer](../../../../../src/Identity/Identity.Infrastructure/Services/Sessions/IdentityBearerTokenIssuer.cs) creates both.
-- [RefreshSessionStore](../../../../../src/Identity/Identity.Infrastructure/Services/Sessions/RefreshSessionStore.cs) keeps each refresh token in `AppRefreshSessions` only as a SHA-256 hash, with timestamps and limited client context.
+- The access token is protected by the bearer scheme's Data Protection protector; the refresh token is 32 random bytes (Base64Url). [IdentityBearerTokenIssuer](../../../../../src/Identity/Identity.Infrastructure/Sessions/IdentityBearerTokenIssuer.cs) creates both.
+- [RefreshSessionStore](../../../../../src/Identity/Identity.Infrastructure/Sessions/RefreshSessionStore.cs) keeps each refresh token in `AppRefreshSessions` only as a SHA-256 hash, with timestamps and limited client context.
 - Refresh sessions have an absolute lifetime (`RefreshAbsoluteLifetimeDays`, 30) and an inactivity limit (`RefreshIdleTimeoutDays`, 14).
 - A successful refresh rotates the session: it revokes the old one and links it to the new one. Rotation is guarded by the PostgreSQL `xmin` concurrency token, so parallel refresh requests rotate a session once; the others fail.
 - A rotated token presented again within `RefreshReuseGraceSeconds` (default 60) fails quietly. This covers parallel requests and retries.

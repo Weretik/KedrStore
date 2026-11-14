@@ -1,4 +1,7 @@
-using Identity.Infrastructure.Options;
+using Identity.Infrastructure.Avatars;
+using Identity.Infrastructure.Seeding;
+using Identity.Infrastructure.Sessions;
+using Identity.Infrastructure.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Identity.Infrastructure.DependencyInjection;
@@ -10,7 +13,7 @@ public static class IdentityAuthenticationExtensions
 {
     public const string KedrScheme = "Kedr";
 
-    public static IServiceCollection AddIdentityAuthentication(
+    internal static IServiceCollection AddIdentityAuthentication(
         this IServiceCollection services,
         IConfiguration configuration)
     {

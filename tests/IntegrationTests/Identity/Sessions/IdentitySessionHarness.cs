@@ -1,9 +1,13 @@
 using System.Security.Claims;
-using Identity.Application.Services;
-using Identity.Infrastructure.DataBase;
+using Identity.Application.Abstractions.Accounts;
+using Identity.Application.Abstractions.Sessions;
+using Identity.Infrastructure.Persistence;
 using Identity.Infrastructure.DependencyInjection;
 using Identity.Infrastructure.Entities;
-using Identity.Infrastructure.Options;
+using Identity.Infrastructure.Avatars;
+using Identity.Infrastructure.Seeding;
+using Identity.Infrastructure.Sessions;
+using Identity.Infrastructure.Users;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -37,7 +41,7 @@ internal sealed class IdentitySessionHarness : IAsyncDisposable
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddHttpContextAccessor();
-        services.AddIdentityInfrastructureServices(configuration);
+        services.AddIdentityInfrastructure(configuration);
         services.Configure<IdentitySessionSecurityOptions>(configuration.GetSection(IdentitySessionSecurityOptions.SectionName));
         services.Configure<IdentitySessionPerformanceOptions>(_ => { });
         return new IdentitySessionHarness(services.BuildServiceProvider());
