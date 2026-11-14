@@ -15,7 +15,7 @@ The default scheme `Kedr` is a policy scheme ([registration](../../../../../src/
 Browser                               Mobile
   | POST /api/auth/cookie/login         | POST /api/auth/mobile/login
   v                                     v
-CookieAuthController                  MobileAuthController
+CookieLoginEndpoint                   MobileLoginEndpoint
   v                                     v
 CookieSessionService                  IdentitySessionService
   SignInManager.PasswordSignInAsync     CheckPasswordSignInAsync -> IdentityBearerTokenIssuer

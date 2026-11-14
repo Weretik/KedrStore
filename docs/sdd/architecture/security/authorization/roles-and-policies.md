@@ -25,15 +25,15 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `LegalDocumentsController` | `/api/content/{lang}/documents/{kind}` | public (offer, privacy, returns, delivery pages) |
 | `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
 | Media endpoints, tags `AdminMediaFolders`, `AdminMediaFiles` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
-| `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
+| Identity endpoints, tag `AdminUsers` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
 | Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
 | Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
-| `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
+| Identity endpoints, tag `Profile` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
 | `ArticlesController` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
-| `CookieAuthController`, `MobileAuthController`, `AuthSessionController` | login, refresh | public, rate-limited; logout and `me` need a session |
+| Identity endpoints, tags `CookieAuth`, `MobileAuth`, `AuthSession` | login, refresh | public, rate-limited; logout and `me` need a session |
 
 A new endpoint in an admin controller or endpoint group inherits its policy (`RequireAuthorization` on the `MapGroup`). A public endpoint needs `[AllowAnonymous]` (`.AllowAnonymous()` on an endpoint) and a reason in its contract.
 
