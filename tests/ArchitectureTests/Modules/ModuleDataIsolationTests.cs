@@ -1,7 +1,7 @@
 using Catalog.Infrastructure.Persistence;
 using Content.Infrastructure.Persistence;
 using Identity.Infrastructure.DataBase;
-using Media.Infrastructure.DataBase;
+using Media.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Sales.Infrastructure.DataBase;

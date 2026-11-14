@@ -24,7 +24,7 @@ public static class JobsHostServicesExtensions
         services.AddSalesInfrastructureServices(configuration, includeCatalogReadServices: false);
         services.AddIdentityInfrastructureServices(configuration);
         services.AddContentInfrastructure(configuration);
-        services.AddMediaInfrastructureServices(configuration);
+        services.AddMediaInfrastructure(configuration);
         services.AddWorkInfrastructure(configuration);
 
         services.AddOneCIntegrationServices();

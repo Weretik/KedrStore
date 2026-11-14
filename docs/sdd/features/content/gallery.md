@@ -21,7 +21,7 @@ Handlers live in `Features/Gallery/{Public,Admin}`; every admin change answers w
 
 ```text
 src/Media/Media.Contracts/Files/IMediaFileLookup.cs   # read port other modules use (URL, file name, size)
-src/Media/Media.Infrastructure/Lookup/MediaFileLookup.cs
+src/Media/Media.Infrastructure/Contracts/Files/MediaFileLookup.cs
 src/Content/
 ├── Content.Api/
 │   ├── Controllers/GalleryController.cs         # public GET {lang}/gallery

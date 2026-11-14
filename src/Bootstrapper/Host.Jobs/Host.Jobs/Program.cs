@@ -4,7 +4,7 @@ using Catalog.Application.Features.ProductMedia.Jobs;
 using Catalog.Application.Features.Attributes.Jobs;
 using Catalog.Application.Features.Slugs.Jobs;
 using Host.Jobs;
-using Media.Application.Jobs.CdnSync;
+using Media.Application.Features.Files.Jobs.SyncCdnMedia;
 using Sales.Application.Integrations.OneC.Contracts;
 using Sales.Application.Integrations.OneC.DTOs;
 using Microsoft.Extensions.Configuration;

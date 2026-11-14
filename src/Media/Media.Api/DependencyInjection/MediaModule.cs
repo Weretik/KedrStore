@@ -9,7 +9,7 @@ public static class MediaModule
 {
     public static IServiceCollection AddMediaModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddMediaInfrastructureServices(configuration);
+        services.AddMediaInfrastructure(configuration);
         services.AddValidatorsFromAssembly(typeof(Media.Application.MediaApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
         services.AddControllers().AddApplicationPart(typeof(MediaApiAssemblyMarker).Assembly);
 

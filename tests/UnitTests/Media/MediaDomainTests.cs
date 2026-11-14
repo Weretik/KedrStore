@@ -1,6 +1,6 @@
 using UnitTests.BuildingBlocks.Results;
-using Media.Application.Features.Files.GetList;
-using Media.Application.Features.Folders.Create;
+using Media.Application.Features.Files.Queries.GetMediaFiles;
+using Media.Application.Features.Folders.Commands.CreateMediaFolder;
 using Media.Domain.Files;
 using Media.Domain.Folders;
 
@@ -45,10 +45,10 @@ public sealed class MediaDomainTests
     [Fact]
     public void Validators_RejectBadInput()
     {
-        Assert.False(new CreateMediaFolderCommandValidator().Validate(new CreateMediaFolderCommand("", 0)).IsValid);
-        Assert.True(new CreateMediaFolderCommandValidator().Validate(new CreateMediaFolderCommand("Схеми", null)).IsValid);
+        Assert.False(new CreateMediaFolderValidator().Validate(new CreateMediaFolderCommand("", 0)).IsValid);
+        Assert.True(new CreateMediaFolderValidator().Validate(new CreateMediaFolderCommand("Схеми", null)).IsValid);
 
-        var list = new GetMediaFilesQueryValidator();
+        var list = new GetMediaFilesValidator();
         Assert.False(list.Validate(new GetMediaFilesQuery(5, true, null)).IsValid);
         Assert.False(list.Validate(new GetMediaFilesQuery(null, false, null, PageSize: 500)).IsValid);
         Assert.True(list.Validate(new GetMediaFilesQuery(null, true, "731")).IsValid);
