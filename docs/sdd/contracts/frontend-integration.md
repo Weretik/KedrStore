@@ -18,8 +18,9 @@ The host has a fallback policy that requires authentication. Public endpoints ar
 
 - JSON property names use ASP.NET Core camelCase.
 - Lists have the shape `{ pagedInfo, value }`. `pagedInfo` contains `pageNumber`, `pageSize`, `totalPages`, and `totalRecords`; `value` is an array of rows.
-- Validation errors return `400` with the existing Ardalis validation error array. Do not couple logic to localized error text.
-- `404` has no response body. `409` returns an array of conflict messages. `401` means authentication is missing/invalid; `403` means an authenticated user lacks permission.
+- Every error is `application/problem+json` (RFC 9457): `title`, `status`, `detail` (the first message, Ukrainian), `traceId`, and `code`: the rule's own code (for example `invalid_lines`) or `validation`, `invalid_request` (unreadable body), `unauthorized`, `forbidden`, `not_found`, `conflict`, `unavailable`, `unexpected`. Branch on `code`, not on the localized text.
+- A `400` with field errors also has `errors`: `{ field: [messages] }`.
+- The order checkout `409` keeps `code` (`quote_changed` or `idempotency_conflict`) and `quote` at the top level. `401` means authentication is missing/invalid; `403` means an authenticated user lacks permission.
 - Decimal values are JSON numbers. Identifiers are integers unless the schema explicitly defines `uuid` or `string`.
 
 ## Endpoint map

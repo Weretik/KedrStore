@@ -51,7 +51,7 @@ public sealed class SiteModelsController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(new GetPublicSiteModelQuery(lang, modelSlug), cancellationToken);
         if (!result.IsSuccess)
-            return this.ToActionResult(result).Result ?? NotFound();
+            return this.ToProblem(result);
 
         return result.Value.Model is { } model
             ? Ok(model)

@@ -31,7 +31,7 @@ public sealed class AdminCustomersController(ISender sender) : ControllerBase
             cancellationToken);
 
         if (result.Status != ResultStatus.Ok)
-            return this.ToActionResult(result).Result!;
+            return this.ToProblem(result);
 
         var rows = result.Value.Value.Select(ToResponse).ToList();
         return Ok(new PagedResult<List<GetAdminCustomerListItemResponse>>(result.Value.PagedInfo, rows));
@@ -46,7 +46,7 @@ public sealed class AdminCustomersController(ISender sender) : ControllerBase
         var result = await sender.Send(new GetCustomerByIdQuery(counterpartyId), cancellationToken);
         return result.Status == ResultStatus.Ok
             ? Ok(ToResponse(result.Value))
-            : this.ToActionResult(result).Result!;
+            : this.ToProblem(result);
     }
 
     private static GetAdminCustomerListItemResponse ToResponse(CustomerListItemDto result)

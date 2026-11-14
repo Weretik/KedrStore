@@ -11,7 +11,7 @@ HTTP request
   → Domain + Application abstractions
   → Infrastructure adapter / database
   → Ardalis.Result
-  → HTTP response through ToActionResult
+  → HTTP response through ToActionResult (errors as ProblemDetails)
 ~~~
 
 ## CQRS rules

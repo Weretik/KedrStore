@@ -254,9 +254,8 @@ components:
     Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
     PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
   responses:
-    ValidationError: { description: Input validation failed, content: { application/json: { schema: { $ref: '#/components/schemas/ValidationErrors' } } } }
+    ValidationError: { description: Input validation failed, content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' } } } }
   schemas:
-    ValidationErrors: { type: array, items: { type: object, additionalProperties: true } }
     PagedInfo:
       type: object
       required: [pageNumber, pageSize, totalPages, totalRecords]

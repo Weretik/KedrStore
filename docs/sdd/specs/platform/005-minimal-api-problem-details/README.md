@@ -16,8 +16,9 @@ Every HTTP endpoint is a Minimal API endpoint grouped by feature, binds its own 
 - R-002 Request ≠ Command. A body or query object is a `<Operation>Request` record in the same feature folder; the handler maps it to the Application command or query. Application messages are never bound from HTTP. Response records stay in the Api feature folder.
 - R-003 One mapper: `BuildingBlocks.Api/Results/ResultHttp.ToHttpResult()` turns every `Result`/`Result<T>` into an `IResult`. Success keeps today's status and body (200 body, 201 with body, 204 for `Result` without value where the action answered `NoContent` today).
 - R-004 Error body: `application/problem+json` with `type`, `title`, `status`, `detail` (the first error message, Ukrainian), `traceId`, and extensions:
-  - `code`: the first `ValidationError.ErrorCode` when set, otherwise `validation` (400), `not_found` (404), `conflict` (409), `forbidden` (403), `unavailable` (503);
-  - `errors`: `{ field: [messages] }` for 400 with field errors (the shape of `ValidationProblemDetails`, which Admin, Mobile and Site already read).
+  - `code`: the first `ValidationError.ErrorCode` when a rule set its own (a FluentValidation built-in code such as `NotEmptyValidator` does not count), otherwise `validation` (400), `unauthorized` (401), `forbidden` (403), `not_found` (404), `conflict` (409), `unavailable` (503), `unexpected` (500);
+  - `errors`: `{ field: [messages] }` for 400 with field errors (the shape of `ValidationProblemDetails`, which Admin, Mobile and Site already read). Keys are the validator's identifiers, unchanged (for example `Request.Password`, `currentPassword`, `file`).
+- R-004a Typed error bodies that the OpenAPI document already declares stay as they are: site refresh 502/503 `SiteRefreshResponse` and the public site model 404 redirect address.
 - R-005 A 409 that carries a body object today (order checkout `WorkspaceOrderConflict`: `code` + `quote`) keeps those members at the top level as `ProblemDetails` extensions, so `code: quote_changed | idempotency_conflict` and `quote` stay where Admin reads them.
 - R-006 Errors that do not come from a result answer `ProblemDetails` too: model-binding failures (400, `code: invalid_request`), 401/403 from authorization (empty body as today, `UseStatusCodePages` adds `ProblemDetails`), unhandled exceptions (500 from `GlobalExceptionHandler`, `code: unexpected`, never the exception text).
 - R-007 The generated `/openapi/v1.json` stays identical to the snapshot taken before the move: paths, methods, parameters (complex query objects stay expanded through `[AsParameters]`), request and response schemas, tags (the old controller name without `Controller`), status codes. Error responses keep `.Produces(status)` without a type.
@@ -30,7 +31,7 @@ Every HTTP endpoint is a Minimal API endpoint grouped by feature, binds its own 
 - SC-002 A request for a deleted article: 404 `ProblemDetails` with `code: not_found`; the admin shows «Не знайдено».
 - SC-003 The order workspace refuses an unknown product in a quote: 400 with `code: product_not_found`-style workspace code; the admin shows the message for that `reason` (needs F-001).
 - SC-004 Checkout with a changed quote: 409 with `code: quote_changed` and `quote` at the top level; the admin opens the «ціни змінилися» dialog as today.
-- SC-005 A sign-in with a 600-character password: 400 `ProblemDetails` with `errors.Password` (Identity used an Ardalis array before; both clients read the new shape).
+- SC-005 A sign-in with a 600-character password: 400 `ProblemDetails` with `code: validation` and `errors["Request.Password"]` (Identity used an Ardalis array before; both clients read the new shape).
 - SC-006 `GET /openapi/v1.json` after each module's move equals the committed snapshot byte for byte after normalization.
 - SC-007 An exception in a handler: 500 `ProblemDetails` with `traceId` and `code: unexpected`, no stack trace.
 - SC-008 A cookie request without the CSRF header to a moved upload endpoint is still refused by the host middleware.
@@ -50,9 +51,12 @@ Checked 2026-11-14 at kedr-web `55330647`:
 
 ```text
 src/BuildingBlocks/BuildingBlocks.Api/
-├── Results/ResultHttp.cs                  planned: Result → IResult, ProblemDetails with code/errors (replaces Result/ResultToActionResult.cs)
-├── Results/ProblemCodes.cs                planned: validation, not_found, conflict, forbidden, unavailable, invalid_request, unexpected
-└── Errors/GlobalExceptionHandler.cs       existing: adds code: unexpected
+├── Results/ResultProblems.cs              existing (EN-002): failed result → ProblemDetails with code/errors/traceId
+├── Results/ProblemCodes.cs                existing (EN-002): validation, invalid_request, unauthorized, forbidden, not_found, conflict, unavailable, unexpected
+├── Results/ProblemDetailsSetup.cs         existing (EN-002): AddApiProblemDetails, code + traceId for binding, status-page and exception problems
+├── Results/ResultToActionResult.cs        existing (EN-002): controllers' ToActionResult / ToProblem; removed in TS-007
+├── Results/ResultHttp.cs                  planned (TS-001): Result → IResult for endpoints
+└── Errors/GlobalExceptionHandler.cs       existing: code: unexpected through ProblemDetailsSetup
 src/<Module>/<Module>.Api/
 ├── Endpoints/<Feature>/<Feature>Endpoints.cs   planned: MapGroup, policies, tags, Produces, handlers
 ├── Endpoints/<Feature>/<Operation>Request.cs   planned: HTTP request records (moved from Features/<Feature>/)
@@ -62,11 +66,13 @@ src/<Module>/<Module>.Api/
 src/Bootstrapper/Host.Api/Program.cs            existing: MapControllers() → Map<Module>Endpoints() for each module
 tests/IntegrationTests/Platform/Api/
 ├── OpenApiSnapshotTests.cs + openapi.v1.json  existing: golden document (EN-001)
-└── ProblemDetailsContractTests.cs             planned: SC-001…SC-007 bodies (EN-002)
+└── ProblemDetailsContractTests.cs             existing (EN-002): 400 validation, 400 invalid_request, 401 bodies
+tests/UnitTests/BuildingBlocks/Results/ResultToActionResultTests.cs  existing (EN-002): every status → body
 tests/ArchitectureTests/Folders/               existing: controller rule becomes an endpoint rule (TS-007)
 ```
 
-- Status mapping (R-003/R-004): Ok → 200, Created → 201, NoContent → 204, Invalid → 400, NotFound → 404, Conflict → 409, Forbidden → 403, Unauthorized → 401, Unavailable → 503, Error/CriticalError → 500 through `GlobalExceptionHandler` rules (no message leak).
+- Status mapping (R-003/R-004): Ok → 200 (no body for a `Result` without value), Created → 201, NoContent → 204, Invalid → 400, NotFound → 404, Conflict → 409, Forbidden → 403, Unauthorized → 401, Unavailable → 503, Error/CriticalError → 500 `unexpected` with our own Ukrainian message (never exception text; `ExceptionBehavior` turns an exception into `Виникла невідома помилка.`). `Ardalis.Result.AspNetCore` answered Error with 422; nothing in the clients reads 422.
+- A workspace 400 without its own rule code said `invalid_request` before and says `validation` now; the admin falls back to the message for any code it does not know.
 - Snapshot normalization: the JSON document is re-serialized with sorted object keys; nothing else is ignored.
 - Order of moves, smallest first, one PR each so a regression points at one module: Work (9) → Media (11) → Sales (20) → Identity (23) → Content (54) → Catalog (63).
 
@@ -83,9 +89,9 @@ tests/ArchitectureTests/Folders/               existing: controller rule becomes
 ## Tasks
 
 - EN-001 Golden OpenAPI snapshot test (`UPDATE_OPENAPI_SNAPSHOT=1` rewrites it after an intended contract change).
-- EN-002 Error-body contract tests (Red for R-004…R-006), then `ResultHttp` + `ProblemDetails` for every controller (controllers call it; `WorkspaceErrorAnswers` and `ResultToActionResult` removed). Depends on F-001. Error bodies switch here, once, for all modules.
+- EN-002 Error-body contract tests (Red for R-004…R-006), then one `ProblemDetails` mapper for every controller (`ToActionResult` from BuildingBlocks.Api in all modules; `WorkspaceErrorAnswers` and `Ardalis.Result.AspNetCore` removed). Depends on F-001. Error bodies switch here, once, for all modules. Hand-written contracts reference [problem.openapi.yaml](../../../contracts/problem.openapi.yaml).
 - TS-001 … TS-006 Move Work, Media, Sales, Identity, Content, Catalog to `Endpoints/` (one PR each): snapshot identical, module API tests green, Request records split from commands.
-- TS-007 Remove MVC: `AddControllers`, `MapControllers`, `Ardalis.Result.AspNetCore`; architecture tests for R-009; module rules, API rules, `frontend-integration.md` errors section, feature cards updated.
+- TS-007 Remove MVC: `AddControllers`, `MapControllers`, `ResultToActionResult` (`Ardalis.Result.AspNetCore` already goes in EN-002); architecture tests for R-009; module rules, API rules, `frontend-integration.md` errors section, feature cards updated.
 
 Each task: Red (snapshot or contract test fails on the planned change), Green, then the module's API integration tests and architecture tests.
 

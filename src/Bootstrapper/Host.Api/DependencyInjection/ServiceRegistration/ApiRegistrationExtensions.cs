@@ -1,3 +1,4 @@
+using BuildingBlocks.Api.Results;
 using BuildingBlocks.Api.Errors;
 using Host.Api.DependencyInjection.ServiceRegistration.Web;
 
@@ -14,7 +15,7 @@ public static class ApiRegistrationsExtensions
         services.AddOpenApi();
 
         services.AddHealthChecks();
-        services.AddProblemDetails();
+        services.AddApiProblemDetails();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddMobileSyncCompression();
         services.AddSingleton(TimeProvider.System);

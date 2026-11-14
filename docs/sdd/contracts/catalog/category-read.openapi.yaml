@@ -208,12 +208,9 @@ components:
     ValidationError:
       description: Input validation failed.
       content:
-        application/json:
-          schema: { $ref: '#/components/schemas/ValidationErrors' }
+        application/problem+json:
+          schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' }
   schemas:
-    ValidationErrors:
-      type: array
-      items: { type: object, additionalProperties: true }
     CategoryTreeNode:
       type: object
       required: [id, slug, name, parentId, sortOrder, level, children, productCount]

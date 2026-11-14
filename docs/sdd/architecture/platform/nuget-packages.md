@@ -7,7 +7,6 @@ Kedr runs on Google Cloud Run: there is no in-process job scheduler (Hangfire or
 | Direct dependency | Version | Projects | Purpose |
 | --- | --- | --- | --- |
 | `Ardalis.Result` | 10.1.0 | BuildingBlocks.Api, Catalog.Contracts, Identity.Contracts | Typed result and response contract; HTTP mapping is described in [BuildingBlocks.Api](building-blocks/api.md). |
-| `Ardalis.Result.AspNetCore` | 10.1.0 | BuildingBlocks.Api | `Result` to HTTP mapping in BuildingBlocks.Api. |
 | `Ardalis.Result.FluentValidation` | 10.1.0 | BuildingBlocks.Application | Integration of `FluentValidation` errors with `Result`; check exact code usage. |
 | `Ardalis.SmartEnum` | 8.2.0 | Catalog.Domain | Typed enumerations in the Catalog domain. |
 | `Ardalis.Specification` | 9.3.1 | Catalog.Application, Content.Application, Identity.Application, Media.Application, Sales.Application, Work.Application | Specifications for repository queries; [persistence approach](../runtime/persistence-and-integrations.md). |

@@ -229,7 +229,7 @@ paths:
         '404': { description: Model not found. }
 components:
   responses:
-    ValidationError: { description: Input validation failed, content: { application/json: { schema: { type: array, items: { type: object, additionalProperties: true } } } } }
+    ValidationError: { description: Input validation failed, content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' } } } }
   schemas:
     SiteModelListItem:
       type: object

@@ -35,6 +35,7 @@ public sealed class GlobalExceptionHandlerTests
         using var json = JsonDocument.Parse(body);
         Assert.Equal(500, json.RootElement.GetProperty("status").GetInt32());
         Assert.False(string.IsNullOrWhiteSpace(json.RootElement.GetProperty("traceId").GetString()));
+        Assert.Equal("unexpected", json.RootElement.GetProperty("code").GetString());
     }
 
     /// <summary>

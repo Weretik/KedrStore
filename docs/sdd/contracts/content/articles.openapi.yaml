@@ -225,10 +225,8 @@ components:
     ValidationError:
       description: Invalid input; each error names the field (`slug`, `texts`, `coverMediaFileId`, `file`…).
       content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: true
+        application/problem+json:
+          schema: { $ref: '../problem.openapi.yaml#/components/schemas/ValidationProblem' }
   schemas:
     CoverPath:
       type: [string, 'null']

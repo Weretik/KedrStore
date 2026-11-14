@@ -7,7 +7,6 @@ using Media.Contracts.Folders;
 using Media.Infrastructure.Contracts.Files;
 using Media.Infrastructure.Contracts.Folders;
 using Media.Infrastructure.Integrations.Images;
-using Media.Infrastructure.Contracts.Files;
 using Media.Infrastructure.Persistence;
 using Media.Infrastructure.Integrations.Storage;
 using Microsoft.Extensions.DependencyInjection.Extensions;
