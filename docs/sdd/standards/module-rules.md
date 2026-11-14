@@ -93,6 +93,19 @@ tests/<Kind>/TestSupport/                                   factories, fakes, bu
 - A test file sits in exactly one module and one layer folder; a namespace follows its path. No loose files at a test project root and no folders such as `Misc/`, `Helpers/`, `Common/`, or `Temp/`.
 - Every module has at least: unit tests of its Domain aggregates, unit tests of its command and query handlers and validators, integration tests of its endpoints and persistence, and its place in the architecture tests.
 
+## Architecture tests
+
+The rules above are only real when a test fails on a violation. The architecture test project checks, for every business module:
+
+- project references: Domain only `BuildingBlocks.Domain`; Application, Infrastructure, and Api reference another module only through its `Contracts`; `Contracts` references no module project;
+- code dependencies (namespaces), the same rules, so a transitive reference cannot bypass them;
+- Api controllers do not use Infrastructure types;
+- folders: no type folders (`Entities`, `Enums`, `Errors`, `ValueObjects`, `Configurations`, `Interfaces`, `DTOs`, `Models`, `Common`, `Helpers`, `Utils`), command and query handlers sit under `Features.<Feature>.Commands` / `.Queries`;
+- hosts contain no class that implements a module port;
+- test sources sit in a responsibility folder and their namespace follows the path.
+
+A new module, layer, or rule is added to these tests in the same change, test first: the new architecture test must fail on the old code (Red) before the code is moved (Green), as the project's testing rules require for any behavior.
+
 ## Hosts and jobs
 
 A host is the composition root, nothing more.
