@@ -24,21 +24,25 @@ public class ProductGroupText : IAggregateRoot
 
     public static ProductGroupText Create(ProductGroupId groupId, string language, DateTimeOffset now)
     {
+        // The language comes from the validated request or the fixed language list.
         if (!Languages.Contains(language))
-            throw new DomainException(ProductGroupErrors.Required(nameof(Language)));
+            throw new ArgumentOutOfRangeException(nameof(language), language, "Expected uk or ru.");
 
         return new ProductGroupText { GroupId = groupId, Language = language, UpdatedAt = now };
     }
 
     /// <summary>Replaces all four texts; blanks are stored as empty. Returns whether anything changed.</summary>
-    public bool Update(string? shortDescription, string? description, string? seoTitle, string? seoDescription,
-        DateTimeOffset now)
+    public DomainResult<bool> Update(string? shortDescription, string? description, string? seoTitle,
+        string? seoDescription, DateTimeOffset now)
     {
+        var checks = new DomainChecks();
         var values = (
-            Text(shortDescription, ShortDescriptionMaxLength, nameof(ShortDescription)),
-            Text(description, DescriptionMaxLength, nameof(Description)),
-            Text(seoTitle, SeoTitleMaxLength, nameof(SeoTitle)),
-            Text(seoDescription, SeoDescriptionMaxLength, nameof(SeoDescription)));
+            checks.Take(Text(shortDescription, ShortDescriptionMaxLength, nameof(ShortDescription))),
+            checks.Take(Text(description, DescriptionMaxLength, nameof(Description))),
+            checks.Take(Text(seoTitle, SeoTitleMaxLength, nameof(SeoTitle))),
+            checks.Take(Text(seoDescription, SeoDescriptionMaxLength, nameof(SeoDescription))));
+        if (checks.Error is { } error)
+            return error;
         if (values == (ShortDescription, Description, SeoTitle, SeoDescription))
             return false;
 
@@ -47,11 +51,11 @@ public class ProductGroupText : IAggregateRoot
         return true;
     }
 
-    private static string Text(string? value, int maxLength, string field)
+    private static DomainResult<string> Text(string? value, int maxLength, string field)
     {
         var trimmed = value?.Trim() ?? string.Empty;
         if (trimmed.Length > maxLength)
-            throw new DomainException(ProductGroupErrors.TooLong(field, maxLength, trimmed.Length));
+            return ProductGroupErrors.TooLong(field, maxLength, trimmed.Length);
 
         return trimmed;
     }

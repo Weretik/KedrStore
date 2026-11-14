@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -40,14 +40,14 @@ public sealed class ProductMediaTests
     {
         var product = NewProduct();
 
-        Assert.True(product.SetMedia([B, A], C, Later));
+        Assert.True(product.SetMedia([B, A], C, Later).Value);
 
         Assert.Equal([2L, 1L], product.Photos.Select(link => link.MediaFileId));
         Assert.Equal(3, product.Scheme!.MediaFileId);
         Assert.Equal(B.Url, product.Photo);
         Assert.Equal(C.Url, product.Sсheme);
         Assert.Equal(Later, product.UpdatedAt);
-        Assert.False(product.SetMedia([B, A], C, Later.AddHours(1)));
+        Assert.False(product.SetMedia([B, A], C, Later.AddHours(1)).Value);
         Assert.Equal(Later, product.UpdatedAt);
     }
 
@@ -57,11 +57,11 @@ public sealed class ProductMediaTests
         var product = NewProduct();
         product.SetMedia([B, A], C, Later);
 
-        Assert.True(product.SetMedia([A], null, Later));
+        Assert.True(product.SetMedia([A], null, Later).Value);
 
         Assert.Equal(A.Url, Assert.Single(product.MediaLinks).Url);
         Assert.Equal(string.Empty, product.Sсheme);
-        Assert.True(product.SetMedia([], null, Later));
+        Assert.True(product.SetMedia([], null, Later).Value);
         Assert.Equal(string.Empty, product.Photo);
     }
 
@@ -70,11 +70,11 @@ public sealed class ProductMediaTests
     {
         var product = NewProduct();
 
-        Assert.Throws<DomainException>(() => product.SetMedia([A, A], null, Later));
-        Assert.Throws<DomainException>(() => product.SetMedia([A], A, Later));
+        DomainAssert.Fails(product.SetMedia([A, A], null, Later));
+        DomainAssert.Fails(product.SetMedia([A], A, Later));
         var many = Enumerable.Range(1, Product.MaximumPhotos + 1)
             .Select(id => new ProductMediaFile(id, $"https://cdn.test/{id}.jpg")).ToArray();
-        Assert.Throws<DomainException>(() => product.SetMedia(many, null, Later));
+        DomainAssert.Fails(product.SetMedia(many, null, Later));
     }
 
     [Fact]
@@ -122,5 +122,5 @@ public sealed class ProductMediaTests
 
     private static Product NewProduct()
         => Product.Create(ProductId.From(731), "R", "Петля", "petlia", ProductCategoryId.From(10),
-            Created, 0, 1, false, false, true);
+            Created, 0, 1, false, false, true).Value;
 }

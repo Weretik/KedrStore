@@ -48,7 +48,13 @@ public sealed class RecognizedProductWriter(
             if (byKey.TryGetValue(key, out var value))
             {
                 if (updateExisting)
-                    Count(report.Values, value.IsEditedManually, value.ApplyDictionary(definition.NameUk, definition.SortOrder, now));
+                {
+                    var applied = value.ApplyDictionary(definition.NameUk, definition.SortOrder, now);
+                    if (applied.IsFailure)
+                        report.Errors.Add($"Value {definition.Code}: {applied.Error!.Message}");
+                    else
+                        Count(report.Values, value.IsEditedManually, applied.Value);
+                }
                 else
                     report.Values.Unchanged++;
                 continue;
@@ -58,7 +64,15 @@ public sealed class RecognizedProductWriter(
                 slugsByAttribute[definition.AttributeCode] = usedSlugs = new HashSet<string>(StringComparer.Ordinal);
 
             var slug = UniqueSlug(SlugText.FromName(definition.NameUk, "znachennia"), usedSlugs);
-            value = AttributeValue.Create(attribute.Id, definition.Code, definition.NameUk, slug, definition.SortOrder, now);
+            var createdValue = AttributeValue.Create(attribute.Id, definition.Code, definition.NameUk, slug,
+                definition.SortOrder, now);
+            if (createdValue.IsFailure)
+            {
+                report.Errors.Add($"Value {definition.Code}: {createdValue.Error!.Message}");
+                continue;
+            }
+
+            value = createdValue.Value;
             byKey[key] = value;
             created.Add(value);
             report.Values.Created++;

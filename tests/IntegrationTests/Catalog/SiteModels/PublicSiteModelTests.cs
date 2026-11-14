@@ -85,7 +85,7 @@ public sealed class PublicSiteModelTests
         foreach (var child in new[] { Final, OtherFinal })
         {
             var category = ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
-                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent));
+                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent)).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);
         }

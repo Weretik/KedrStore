@@ -167,16 +167,16 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
     {
         var path = parentId is null ? CategoryPath.Root(id.ToString()) : CategoryPath.From($"n{parentId}.n{id}");
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(id), "000000001", $"Category {id}", $"category-{id}",
-            path, parentId is null ? null : ProductCategoryId.From(parentId.Value)));
+            path, parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value);
     }
 
     private static void AddProduct(CatalogDbContext db, int id, int categoryId, decimal stock,
         params (int Type, decimal Amount)[] prices)
     {
         db.Products.Add(Product.Create(ProductId.From(id), "000000001", $"Товар {id}", $"product-{id}",
-            ProductCategoryId.From(categoryId), DateTimeOffset.UtcNow, stock, 1, false, false));
+            ProductCategoryId.From(categoryId), DateTimeOffset.UtcNow, stock, 1, false, false).Value);
         foreach (var (type, amount) in prices)
             db.ProductPrices.Add(ProductPrice.Create("000000001", ProductId.From(id), PriceTypeId.From(type),
-                new Money(amount, "UAH")));
+                new Money(amount, "UAH")).Value);
     }
 }

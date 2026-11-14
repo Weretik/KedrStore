@@ -6,6 +6,7 @@ namespace Catalog.Domain.Products;
 public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 {
     public const decimal MaximumStock = 10_000m;
+    public const int NameMaxLength = 300;
 
     #region Properties
     public string ProductTypeIdOneC { get; private set; } = null!;
@@ -26,46 +27,39 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
 
     #region Constructors
     private Product() { }
-    private Product(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
-    {
-        SetProductId(id);
-        SetName(name);
-        SetProductSlug(productSlug);
-        SetCategoryId(categoryId);
-        SetStock(stock);
-        MarkAsCreated(createdDate);
-        SetQuantityInPack(qtyInPack);
-        if(isNew) MarkAsNew();
-        if(isSale) MarkAsSale();
-
-        ProductTypeIdOneC = productTypeIdOneC;
-    }
     #endregion
 
     #region Factories
     /// <summary>A new product starts without photos and scheme; they are linked from the media library (R-32).</summary>
-    public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale)
-        => new(id, productTypeIdOneC, name, productSlug, categoryId, createdDate, stock, qtyInPack, isNew, isSale);
-
-    public static Product Create(ProductId id, string productTypeIdOneC, string name, string productSlug, ProductCategoryId categoryId,
-        DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale,
-        bool exportToSite)
+    public static DomainResult<Product> Create(ProductId id, string productTypeIdOneC, string name, string productSlug,
+        ProductCategoryId categoryId, DateTimeOffset createdDate, decimal stock, int qtyInPack, bool isNew, bool isSale,
+        bool exportToSite = false)
     {
-        var product = Create(
-            id,
-            productTypeIdOneC,
-            name,
-            productSlug,
-            categoryId,
-            createdDate,
-            stock,
-            qtyInPack,
-            isNew,
-            isSale);
+        var checks = new DomainChecks();
+        if (id.Value <= 0)
+            checks.Check(ProductErrors.IdRequired());
+        var checkedName = checks.Take(CheckName(name));
+        var slug = checks.Take(CheckSlug(productSlug));
+        checks.Check(CheckCategoryId(categoryId));
+        checks.Check(CheckStock(stock));
+        checks.Check(CheckQuantityInPack(qtyInPack));
+        if (checks.Error is { } error)
+            return error;
 
-        product.ExportToSite = exportToSite;
+        var product = new Product
+        {
+            Id = id,
+            Name = checkedName,
+            ProductSlug = slug,
+            CategoryId = categoryId,
+            Stock = stock,
+            QuantityInPack = qtyInPack,
+            IsNew = isNew,
+            IsSale = isSale,
+            ExportToSite = exportToSite,
+            ProductTypeIdOneC = productTypeIdOneC,
+        };
+        product.MarkAsCreated(createdDate);
         return product;
     }
 
@@ -73,7 +67,7 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     /// Applies 1C-owned fields. The slug and the media links are not 1C-owned and never change here (R-32).
     /// Returns whether anything changed; <see cref="BaseAuditableEntity{TId}.UpdatedAt"/> moves only then.
     /// </summary>
-    public bool UpdateFromOneC(string name, ProductCategoryId categoryId,
+    public DomainResult<bool> UpdateFromOneC(string name, ProductCategoryId categoryId,
         int qtyInPack, bool exportToSite, bool isNew, bool isSale, DateTimeOffset now)
     {
         var changed = !string.Equals(Name, name?.Trim(), StringComparison.Ordinal) ||
@@ -86,9 +80,16 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
         if (!changed)
             return false;
 
-        SetName(name!);
-        SetCategoryId(categoryId);
-        SetQuantityInPack(qtyInPack);
+        var checks = new DomainChecks();
+        var checkedName = checks.Take(CheckName(name!));
+        checks.Check(CheckCategoryId(categoryId));
+        checks.Check(CheckQuantityInPack(qtyInPack));
+        if (checks.Error is { } error)
+            return error;
+
+        Name = checkedName;
+        CategoryId = categoryId;
+        QuantityInPack = qtyInPack;
         ExportToSite = exportToSite;
         IsNew = isNew;
         IsSale = isSale;
@@ -98,10 +99,14 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #endregion
 
     #region Lifecycle
-    public void ChangeSlug(string slug, DateTimeOffset now)
+    public DomainResult ChangeSlug(string slug, DateTimeOffset now)
     {
-        SetProductSlug(slug);
+        var checkedSlug = CheckSlug(slug);
+        if (checkedSlug.IsFailure)
+            return checkedSlug;
+        ProductSlug = checkedSlug.Value;
         MarkAsUpdated(now);
+        return DomainResult.Success();
     }
 
     public bool MarkDeleted(DateTimeOffset now)
@@ -122,53 +127,28 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     }
     #endregion
 
-    #region Validation & Setters
+    #region Validation
 
-    private void SetProductId(ProductId id)
-    {
-        if (id.Value <= 0) throw new DomainException(ProductErrors.IdRequired());
-        Id = id;
-    }
-    private void SetCategoryId(ProductCategoryId categoryId)
-    {
-        if (categoryId.Value <= 0) throw new DomainException(ProductErrors.CategoryIdRequired());
-        CategoryId = categoryId;
-    }
+    private static DomainResult CheckCategoryId(ProductCategoryId categoryId)
+        => categoryId.Value <= 0 ? ProductErrors.CategoryIdRequired() : DomainResult.Success();
 
-    private void SetName(string name)
+    private static DomainResult<string> CheckName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException(ProductErrors.NameRequired());
+            return ProductErrors.NameRequired();
 
         var trimmed = name.Trim();
-
-        if (trimmed.Length is < 1 or > 300)
-            throw new DomainException(ProductErrors.NameLengthInvalid(trimmed.Length));
-
-        Name = trimmed;
+        return trimmed.Length > NameMaxLength ? ProductErrors.NameTooLong(trimmed.Length) : trimmed;
     }
 
-    private void SetProductSlug(string slug)
-    {
-        if (string.IsNullOrWhiteSpace(slug)) throw new DomainException(ProductErrors.NameRequired());
-        ProductSlug = slug.Trim();
-    }
+    private static DomainResult<string> CheckSlug(string slug)
+        => string.IsNullOrWhiteSpace(slug) ? ProductErrors.SlugRequired() : slug.Trim();
 
-    private void SetStock(decimal stock)
-    {
-        if (stock < 0m || stock > MaximumStock)
-            throw new DomainException(ProductErrors.StockOutOfRange(stock));
+    private static DomainResult CheckStock(decimal stock)
+        => stock < 0m || stock > MaximumStock ? ProductErrors.StockOutOfRange(stock) : DomainResult.Success();
 
-        Stock = stock;
-    }
-
-    private void SetQuantityInPack(int qtyInPack)
-    {
-        if (qtyInPack < 0)
-            throw new DomainException(ProductErrors.QuantityInPackNegative(qtyInPack));
-
-        QuantityInPack = qtyInPack;
-    }
+    private static DomainResult CheckQuantityInPack(int qtyInPack)
+        => qtyInPack < 0 ? ProductErrors.QuantityInPackNegative() : DomainResult.Success();
     #endregion
 
     #region Markers
@@ -191,6 +171,13 @@ public partial class Product : BaseAuditableEntity<ProductId>, IAggregateRoot
     #endregion
 
     #region Update API
-    public void UpdateStock(decimal stock) => SetStock(stock);
+    public DomainResult UpdateStock(decimal stock)
+    {
+        var checkedStock = CheckStock(stock);
+        if (checkedStock.IsFailure)
+            return checkedStock;
+        Stock = stock;
+        return DomainResult.Success();
+    }
     #endregion
 }

@@ -22,25 +22,37 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
 
     private AttributeValue() { }
 
-    public static AttributeValue Create(AttributeId attributeId, string code, string nameUk, string slug, int sortOrder,
-        DateTimeOffset now)
-        => new()
+    public static DomainResult<AttributeValue> Create(AttributeId attributeId, string code, string nameUk, string slug,
+        int sortOrder, DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedCode = checks.Take(AttributeText.Required(code, CodeMaxLength, nameof(Code)));
+        var checkedName = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
+        var checkedSlug = checks.Take(AttributeText.Slug(slug));
+        if (checks.Error is { } error)
+            return error;
+
+        return new AttributeValue
         {
             AttributeId = attributeId,
-            Code = AttributeText.Required(code, CodeMaxLength, nameof(Code)),
-            NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)),
-            Slug = AttributeText.Slug(slug),
+            Code = checkedCode,
+            NameUk = checkedName,
+            Slug = checkedSlug,
             SortOrder = sortOrder,
             UpdatedAt = now
         };
+    }
 
     /// <summary>Applies dictionary fields unless a person edited the value. Returns whether anything changed.</summary>
-    public bool ApplyDictionary(string nameUk, int sortOrder, DateTimeOffset now)
+    public DomainResult<bool> ApplyDictionary(string nameUk, int sortOrder, DateTimeOffset now)
     {
         if (IsEditedManually)
             return false;
 
-        var name = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
+        var checkedName = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
+        if (checkedName.IsFailure)
+            return checkedName.Error!;
+        var name = checkedName.Value;
         if (NameUk == name && SortOrder == sortOrder)
             return false;
 
@@ -51,26 +63,36 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
     }
 
     /// <summary>A person adds a value in «Властивості». It is manual from the start.</summary>
-    public static AttributeValue CreateManual(AttributeId attributeId, string code, string nameUk, string? nameRu,
-        string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
+    public static DomainResult<AttributeValue> CreateManual(AttributeId attributeId, string code, string nameUk,
+        string? nameRu, string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
     {
-        var value = Create(attributeId, code, nameUk, slug, sortOrder, now);
-        value.EditManually(nameUk, nameRu, sortOrder, swatchHex, swatchMediaFileId, now);
-        return value;
+        var created = Create(attributeId, code, nameUk, slug, sortOrder, now);
+        if (created.IsFailure)
+            return created;
+        var edited = created.Value.EditManually(nameUk, nameRu, sortOrder, swatchHex, swatchMediaFileId, now);
+        return edited.IsFailure ? edited.Error! : created;
     }
 
     /// <summary>A person edits the value; the dictionary import no longer changes it.</summary>
-    public void EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex, long? swatchMediaFileId,
-        DateTimeOffset now)
+    public DomainResult EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex,
+        long? swatchMediaFileId, DateTimeOffset now)
     {
-        NameUk = AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk));
-        NameRu = AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu));
-        SortOrder = sortOrder;
-        SwatchHex = AttributeText.SwatchHex(swatchHex);
+        var checks = new DomainChecks();
+        var checkedNameUk = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
+        var checkedNameRu = checks.Take(AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu)));
+        var checkedHex = checks.Take(AttributeText.SwatchHex(swatchHex));
         if (swatchMediaFileId is <= 0)
-            throw new DomainException(AttributeErrors.SwatchMediaInvalid(swatchMediaFileId.Value));
+            checks.Check(AttributeErrors.SwatchMediaInvalid());
+        if (checks.Error is { } error)
+            return error;
+
+        NameUk = checkedNameUk;
+        NameRu = checkedNameRu;
+        SortOrder = sortOrder;
+        SwatchHex = checkedHex;
         SwatchMediaFileId = swatchMediaFileId;
         IsEditedManually = true;
         UpdatedAt = now;
+        return DomainResult.Success();
     }
 }

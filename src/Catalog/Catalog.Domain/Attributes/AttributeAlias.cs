@@ -23,26 +23,39 @@ public class AttributeAlias : BaseEntity<AttributeAliasId>, IAggregateRoot
 
     private AttributeAlias() { }
 
-    public static AttributeAlias Create(AttributeId attributeId, string scope, string rawValue, AttributeValueId? valueId,
-        bool isConfirmed, string? note, DateTimeOffset now)
-        => new()
+    public static DomainResult<AttributeAlias> Create(AttributeId attributeId, string scope, string rawValue,
+        AttributeValueId? valueId, bool isConfirmed, string? note, DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedScope = checks.Take(AttributeText.Required(scope, ScopeMaxLength, nameof(Scope)));
+        var checkedRawValue = checks.Take(AttributeText.Required(rawValue, RawValueMaxLength, nameof(RawValue)));
+        var checkedNote = checks.Take(AttributeText.Optional(note, NoteMaxLength, nameof(Note)));
+        if (checks.Error is { } error)
+            return error;
+
+        return new AttributeAlias
         {
             AttributeId = attributeId,
-            Scope = AttributeText.Required(scope, ScopeMaxLength, nameof(Scope)),
-            RawValue = AttributeText.Required(rawValue, RawValueMaxLength, nameof(RawValue)),
+            Scope = checkedScope,
+            RawValue = checkedRawValue,
             ValueId = valueId,
             IsConfirmed = isConfirmed,
-            Note = AttributeText.Optional(note, NoteMaxLength, nameof(Note)),
+            Note = checkedNote,
             UpdatedAt = now
         };
+    }
 
     /// <summary>Applies dictionary fields unless a person edited the alias. Returns whether anything changed.</summary>
-    public bool ApplyDictionary(AttributeValueId? valueId, bool isConfirmed, string? note, DateTimeOffset now)
+    public DomainResult<bool> ApplyDictionary(AttributeValueId? valueId, bool isConfirmed, string? note,
+        DateTimeOffset now)
     {
         if (IsEditedManually)
             return false;
 
-        var normalizedNote = AttributeText.Optional(note, NoteMaxLength, nameof(Note));
+        var checkedNote = AttributeText.Optional(note, NoteMaxLength, nameof(Note));
+        if (checkedNote.IsFailure)
+            return checkedNote.Error!;
+        var normalizedNote = checkedNote.Value;
         if (ValueId == valueId && IsConfirmed == isConfirmed && Note == normalizedNote)
             return false;
 

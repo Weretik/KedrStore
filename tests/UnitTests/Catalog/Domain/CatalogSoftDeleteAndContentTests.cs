@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -26,7 +26,7 @@ public sealed class CatalogSoftDeleteAndContentTests
     {
         var product = NewProduct();
 
-        var changed = product.UpdateFromOneC("Замок", ProductCategoryId.From(10), 1, true, false, false, Later);
+        var changed = product.UpdateFromOneC("Замок", ProductCategoryId.From(10), 1, true, false, false, Later).Value;
 
         Assert.False(changed);
         Assert.Null(product.UpdatedAt);
@@ -38,7 +38,7 @@ public sealed class CatalogSoftDeleteAndContentTests
     {
         var product = NewProduct();
 
-        var changed = product.UpdateFromOneC("Новий замок", ProductCategoryId.From(10), 1, true, true, false, Later);
+        var changed = product.UpdateFromOneC("Новий замок", ProductCategoryId.From(10), 1, true, true, false, Later).Value;
 
         Assert.True(changed);
         Assert.Equal(Later, product.UpdatedAt);
@@ -66,13 +66,13 @@ public sealed class CatalogSoftDeleteAndContentTests
     public void Category_SoftDeleteRestoreAndChangeDetection()
     {
         var category = ProductCategory.Create(ProductCategoryId.From(10), "R", "Замки", "zamky", CategoryPath.From("n1.n10"),
-            ProductCategoryId.From(1));
+            ProductCategoryId.From(1)).Value;
 
-        Assert.False(category.UpdateFromOneC("Замки", CategoryPath.From("n1.n10"), ProductCategoryId.From(1), Later));
+        Assert.False(category.UpdateFromOneC("Замки", CategoryPath.From("n1.n10"), ProductCategoryId.From(1), Later).Value);
         Assert.Null(category.UpdatedAt);
         Assert.True(category.MarkDeleted(Later));
         Assert.True(category.Restore(Later));
-        Assert.True(category.UpdateFromOneC("Замки врізні", CategoryPath.From("n1.n10"), ProductCategoryId.From(1), Later));
+        Assert.True(category.UpdateFromOneC("Замки врізні", CategoryPath.From("n1.n10"), ProductCategoryId.From(1), Later).Value);
         Assert.Equal("zamky", category.Slug);
     }
 
@@ -100,14 +100,14 @@ public sealed class CatalogSoftDeleteAndContentTests
     {
         var content = CategoryContent.Create(ProductCategoryId.From(10), "ru");
 
-        Assert.Throws<DomainException>(() => content.Replace(new string('a', 71), null, null, null, [], "admin", Later));
-        Assert.Throws<DomainException>(() => content.Replace(null, null, null, null,
+        DomainAssert.Fails(content.Replace(new string('a', 71), null, null, null, [], "admin", Later));
+        DomainAssert.Fails(content.Replace(null, null, null, null,
             Enumerable.Range(0, 21).Select(index => ($"q{index}", "a")).ToList(), "admin", Later));
-        Assert.Throws<DomainException>(() => content.Replace(null, null, null, null, [("q", " ")], "admin", Later));
-        Assert.Throws<DomainException>(() => CategoryContent.Create(ProductCategoryId.From(10), "en"));
+        DomainAssert.Fails(content.Replace(null, null, null, null, [("q", " ")], "admin", Later));
+        Assert.Throws<ArgumentOutOfRangeException>(() => CategoryContent.Create(ProductCategoryId.From(10), "en"));
     }
 
     private static Product NewProduct()
         => Product.Create(ProductId.From(1), "R", "Замок", "zamok", ProductCategoryId.From(10),
-            Created, 0, 1, false, false, true);
+            Created, 0, 1, false, false, true).Value;
 }

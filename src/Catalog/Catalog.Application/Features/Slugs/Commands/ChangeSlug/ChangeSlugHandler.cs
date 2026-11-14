@@ -30,13 +30,15 @@ public sealed class ChangeSlugHandler(
         if (await slugService.IsTakenByOtherAsync(command.EntityType, newSlug, command.Id, cancellationToken))
         {
             return Result.Invalid(new ValidationError(
-                "slug", "This slug is used by another item now or was used before.", "Catalog.Slug.Taken",
+                "slug", "Цю адресу вже використовує або використовував інший запис.", "Catalog.Slug.Taken",
                 ValidationSeverity.Error));
         }
 
         var now = DateTimeOffset.UtcNow;
+        var applied = target.Apply(newSlug, now);
+        if (applied.IsFailure)
+            return applied.Error!.ToResult<ChangeSlugResponse>();
         await slugService.RecordChangeAsync(command.EntityType, command.Id, target.Slug, newSlug, now, cancellationToken);
-        target.Apply(newSlug, now);
         // Both repositories share one DbContext: this saves the entity and its history rows together.
         await productRepo.SaveChangesAsync(cancellationToken);
         await UpdateProjectionsAsync(command.EntityType, command.Id, newSlug, cancellationToken);
@@ -91,5 +93,5 @@ public sealed class ChangeSlugHandler(
                 .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.CategorySlug, slug), cancellationToken);
     }
 
-    private sealed record Target(string Name, string Slug, Action<string, DateTimeOffset> Apply);
+    private sealed record Target(string Name, string Slug, Func<string, DateTimeOffset, DomainResult> Apply);
 }

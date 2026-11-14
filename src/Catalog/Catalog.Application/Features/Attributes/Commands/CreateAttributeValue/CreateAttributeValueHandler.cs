@@ -29,17 +29,20 @@ public sealed class CreateAttributeValueHandler(
         var slug = string.IsNullOrWhiteSpace(request.Slug) ? SlugText.FromName(request.NameUk, "znachennia") : request.Slug.Trim();
         var usedSlugs = existing.Select(value => value.Slug).ToHashSet(StringComparer.Ordinal);
         if (!string.IsNullOrWhiteSpace(request.Slug) && usedSlugs.Contains(slug))
-            return AttributeValidation.Invalid("slug", "Another value of this attribute has this slug.", "SlugTaken");
+            return AttributeValidation.Invalid("slug", "Ця адреса вже є в іншого значення цієї властивості.", "SlugTaken");
         var unique = slug;
         for (var number = 2; usedSlugs.Contains(unique); number++)
             unique = SlugText.WithSuffix(slug, number);
 
         var code = string.IsNullOrWhiteSpace(request.Code) ? unique : request.Code.Trim();
         if (existing.Any(value => string.Equals(value.Code, code, StringComparison.OrdinalIgnoreCase)))
-            return AttributeValidation.Invalid("code", "Another value of this attribute has this code.", "CodeTaken");
+            return AttributeValidation.Invalid("code", "Цей код вже є в іншого значення цієї властивості.", "CodeTaken");
 
-        await values.AddAsync(AttributeValue.CreateManual(attributeId, code, request.NameUk, request.NameRu, unique,
-            request.SortOrder, request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow()), cancellationToken);
+        var value = AttributeValue.CreateManual(attributeId, code, request.NameUk, request.NameRu, unique,
+            request.SortOrder, request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow());
+        if (value.IsFailure)
+            return value.Error!.ToResult<AdminCatalogAttributeDto>();
+        await values.AddAsync(value.Value, cancellationToken);
         return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
     }
 }

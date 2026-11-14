@@ -89,7 +89,7 @@ public sealed class AdminCatalogOverviewApiTests
     private static ProductCategory AddCategory(CatalogDbContext db, int id, string name, string slug, string path, int? parentId)
     {
         var category = ProductCategory.Create(ProductCategoryId.From(id), "000005513", name, slug, CategoryPath.From(path),
-            parentId is null ? null : ProductCategoryId.From(parentId.Value));
+            parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
         return category;

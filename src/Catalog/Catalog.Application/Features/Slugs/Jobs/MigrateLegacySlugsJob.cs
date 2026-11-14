@@ -51,7 +51,8 @@ public sealed class MigrateLegacySlugsJob(
         {
             var newSlug = allocator.Allocate(item.Name);
             await slugService.RecordChangeAsync(entityType, item.Id, item.Slug, newSlug, now, cancellationToken);
-            item.Apply(newSlug, now);
+            // The allocator always returns a non-empty free slug.
+            item.Apply(newSlug, now).ThrowIfFailure();
 
             if (++changed % SaveBatchSize == 0)
                 await productRepo.SaveChangesAsync(cancellationToken);
@@ -65,7 +66,7 @@ public sealed class MigrateLegacySlugsJob(
     public static bool IsLegacy(string slug, int id)
         => slug.EndsWith("-" + id.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
 
-    private sealed record Item(int Id, string Name, string Slug, Action<string, DateTimeOffset> Apply);
+    private sealed record Item(int Id, string Name, string Slug, Func<string, DateTimeOffset, DomainResult> Apply);
 
     private sealed class AllCategoriesIncludingDeletedSpec : Specification<ProductCategory>
     {

@@ -24,11 +24,12 @@ public partial class Product
     /// Replaces the whole set: photos in the given order and an optional scheme (R-30). Links that stay keep
     /// their row; the cache is rewritten. Returns whether anything changed.
     /// </summary>
-    public bool SetMedia(IReadOnlyList<ProductMediaFile> photos, ProductMediaFile? scheme, DateTimeOffset now)
+    public DomainResult<bool> SetMedia(IReadOnlyList<ProductMediaFile> photos, ProductMediaFile? scheme,
+        DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(photos);
         if (photos.Count > MaximumPhotos)
-            throw new DomainException(ProductMediaErrors.TooManyPhotos(photos.Count, MaximumPhotos));
+            return ProductMediaErrors.TooManyPhotos(photos.Count, MaximumPhotos);
 
         var wanted = photos
             .Select((file, index) => (File: file, Kind: ProductMediaKind.Photo, Position: index))
@@ -38,7 +39,7 @@ public partial class Product
 
         var duplicate = wanted.GroupBy(item => item.File.Id).FirstOrDefault(group => group.Count() > 1);
         if (duplicate is not null)
-            throw new DomainException(ProductMediaErrors.DuplicateFile(duplicate.Key));
+            return ProductMediaErrors.DuplicateFile();
 
         var wantedIds = wanted.Select(item => item.File.Id).ToHashSet();
         var changed = _mediaLinks.RemoveAll(link => !wantedIds.Contains(link.MediaFileId)) > 0;

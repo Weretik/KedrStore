@@ -73,7 +73,10 @@ public sealed class SyncOneCStocksJob(
                         stock);
                 }
 
-                product.UpdateStock(stock);
+                var updated = product.UpdateStock(stock);
+                if (updated.IsFailure)
+                    logger.LogWarning("Skipping stock from 1C for ProductId={ProductId}: {Error}.", product.Id.Value,
+                        updated.Error!.Message);
             }
         }
 

@@ -1,3 +1,4 @@
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
@@ -29,7 +30,7 @@ public sealed class AttributeManualEditTests
     {
         var value = Imported();
 
-        Assert.True(value.SetManually(Chrome, null, Now));
+        Assert.True(value.SetManually(Chrome, null, Now).Value);
         Assert.False(value.IsAutomatic);
         Assert.Equal((Bronze, AttributeValueSource.Import), (value.AutomaticValueId, value.AutomaticSource));
 
@@ -45,21 +46,21 @@ public sealed class AttributeManualEditTests
     [Fact]
     public void ManualOnlyValue_HasNothingToRestore()
     {
-        var value = ProductAttributeValue.CreateManual(ProductId.From(7), AttributeId.Create(1), 1, Chrome, null, Now);
+        var value = ProductAttributeValue.CreateManual(ProductId.From(7), AttributeId.Create(1), 1, Chrome, null, Now).Value;
 
         Assert.Null(value.AutomaticSource);
         Assert.False(value.RestoreAutomatic(Now));
-        Assert.False(value.SetManually(Chrome, null, Now));
+        Assert.False(value.SetManually(Chrome, null, Now).Value);
     }
 
     [Fact]
     public void AliasDecision_IsConfirmedAndManual()
     {
-        var alias = AttributeAlias.Create(AttributeId.Create(1), "general", "CP", Chrome, false, null, Now);
+        var alias = AttributeAlias.Create(AttributeId.Create(1), "general", "CP", Chrome, false, null, Now).Value;
 
         Assert.True(alias.Decide(null, Now));
         Assert.Equal(((AttributeValueId?)null, true, true), (alias.ValueId, alias.IsConfirmed, alias.IsEditedManually));
-        Assert.False(alias.ApplyDictionary(Chrome, false, null, Now));
+        Assert.False(alias.ApplyDictionary(Chrome, false, null, Now).Value);
     }
 
     [Theory]
@@ -67,7 +68,7 @@ public sealed class AttributeManualEditTests
     [InlineData(" ", null)]
     public void ValueSwatch_IsNormalized(string input, string? expected)
     {
-        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now);
+        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now).Value;
 
         value.EditManually("Графіт", null, 1, input, null, Now);
 
@@ -77,8 +78,9 @@ public sealed class AttributeManualEditTests
     [Fact]
     public void ValueSwatch_RejectsANonHexColor()
     {
-        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now);
+        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now).Value;
 
-        Assert.ThrowsAny<Exception>(() => value.EditManually("Графіт", null, 1, "graphite", null, Now));
+        var error = DomainAssert.Fails(value.EditManually("Графіт", null, 1, "graphite", null, Now));
+        Assert.Equal("SwatchHex", error.Field);
     }
 }

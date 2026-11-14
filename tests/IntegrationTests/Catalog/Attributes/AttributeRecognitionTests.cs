@@ -117,7 +117,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
             var separator = path.LastIndexOf(" > ", StringComparison.Ordinal);
             ProductCategoryId? parentId = separator < 0 ? null : ProductCategoryId.From(idByPath[path[..separator]]);
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(id), Root, path[(separator < 0 ? 0 : separator + 3)..],
-                $"katehoriia-{id}", CategoryPath.From($"n{id}"), parentId));
+                $"katehoriia-{id}", CategoryPath.From($"n{id}"), parentId).Value);
         }
 
         foreach (var row in rows)

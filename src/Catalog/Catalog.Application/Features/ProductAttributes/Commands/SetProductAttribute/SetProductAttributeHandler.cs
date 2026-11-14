@@ -26,24 +26,24 @@ public sealed class SetProductAttributeHandler(
         var attribute = await db.Attributes.AsNoTracking()
             .FirstOrDefaultAsync(item => item.Id == attributeId, cancellationToken);
         if (attribute is null)
-            return AttributeValidation.Invalid("attributeId", "Attribute not found.", "NotFound");
+            return AttributeValidation.Invalid("attributeId", "Властивість не знайдено.", "NotFound");
 
         var requested = command.Request.Values;
         if (attribute.Kind == AttributeKind.Number)
         {
             if (requested.Any(value => value.Number is null))
-                return AttributeValidation.Invalid("values", "This attribute takes numbers.", "NumberRequired");
+                return AttributeValidation.Invalid("values", "Ця властивість приймає лише числа.", "NumberRequired");
         }
         else
         {
             if (requested.Any(value => value.ValueId is null))
-                return AttributeValidation.Invalid("values", "This attribute takes values from its list.", "ValueRequired");
+                return AttributeValidation.Invalid("values", "Ця властивість приймає лише значення зі свого списку.", "ValueRequired");
 
             var ids = requested.Select(value => AttributeValueId.Create(value.ValueId!.Value)).Distinct().ToList();
             var known = await db.AttributeValues.AsNoTracking()
                 .CountAsync(value => ids.Contains(value.Id) && value.AttributeId == attributeId, cancellationToken);
             if (known != ids.Count)
-                return AttributeValidation.Invalid("values", "A value is not in this attribute's list.", "ValueNotFound");
+                return AttributeValidation.Invalid("values", "Цього значення немає в списку властивості.", "ValueNotFound");
         }
 
         var now = clock.GetUtcNow();
@@ -57,9 +57,18 @@ public sealed class SetProductAttributeHandler(
             AttributeValueId? valueId = item.ValueId is { } id ? AttributeValueId.Create(id) : null;
             var row = rows.FirstOrDefault(value => value.Position == position);
             if (row is null)
-                created.Add(ProductAttributeValue.CreateManual(productId, attributeId, position, valueId, item.Number, now));
+            {
+                var value = ProductAttributeValue.CreateManual(productId, attributeId, position, valueId, item.Number, now);
+                if (value.IsFailure)
+                    return value.Error!.ToResult<AdminProductAttributesDto>();
+                created.Add(value.Value);
+            }
             else
-                row.SetManually(valueId, item.Number, now);
+            {
+                var set = row.SetManually(valueId, item.Number, now);
+                if (set.IsFailure)
+                    return set.Error!.ToResult<AdminProductAttributesDto>();
+            }
         }
 
         // Positions beyond the list are dropped; the import adds no positions to a manual attribute.

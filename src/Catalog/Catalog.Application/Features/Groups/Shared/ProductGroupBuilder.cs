@@ -69,7 +69,9 @@ public sealed class ProductGroupBuilder(
             {
                 allocator ??= await slugs.LoadAllocatorAsync(CatalogEntityType.ProductGroup, cancellationToken);
                 var name = ProductGroupKey.DisplayName(keyReviews[0].BaseName);
-                existing = ProductGroup.CreateAutomatic(key.CategoryId, name, key.Key, allocator.Allocate(name), now);
+                // A base name fits the model name, and the allocator returns a free slug of the allowed length.
+                existing = ProductGroup.CreateAutomatic(key.CategoryId, name, key.Key, allocator.Allocate(name), now)
+                    .Value;
                 createdGroups.Add(existing);
                 report.Groups.Created++;
             }

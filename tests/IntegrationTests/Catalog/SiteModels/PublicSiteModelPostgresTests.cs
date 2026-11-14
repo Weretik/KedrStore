@@ -44,26 +44,26 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
         {
             await db.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-            var category = ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10"));
+            var category = ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);
             foreach (var id in new[] { 801, 802, 803 })
             {
                 var product = Product.Create(ProductId.From(id), Root, $"Завіса {id}", $"zavisa-{id}",
-                    ProductCategoryId.From(10), Now, 5, 1, false, false, true);
+                    ProductCategoryId.From(10), Now, 5, 1, false, false, true).Value;
                 db.Products.Add(product);
                 db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
                     product.ProductSlug, string.Empty, ProductCategoryId.From(10), "zavisy",
                     inStock: true, isSale: false, isNew: false, exportToSite: true, retailPrice: id));
             }
 
-            var side = CatalogAttribute.Create("side", "Сторона", AttributeKind.Enum, null, "storona", true, true, 1, Now);
+            var side = CatalogAttribute.Create("side", "Сторона", AttributeKind.Enum, null, "storona", true, true, 1, Now).Value;
             db.Attributes.Add(side);
             await db.SaveChangesAsync();
-            var left = AttributeValue.Create(side.Id, "L", "Ліва", "liva", 1, Now);
-            var right = AttributeValue.Create(side.Id, "R", "Права", "prava", 2, Now);
+            var left = AttributeValue.Create(side.Id, "L", "Ліва", "liva", 1, Now).Value;
+            var right = AttributeValue.Create(side.Id, "R", "Права", "prava", 2, Now).Value;
             db.AttributeValues.AddRange(left, right);
-            var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Завіса KEDR", "zavisa-kedr", Now);
+            var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Завіса KEDR", "zavisa-kedr", Now).Value;
             db.ProductGroups.Add(model);
             db.CategoryAttributes.Add(CategoryAttribute.Create(ProductCategoryId.From(10), side.Id, true, 1, Now));
             await db.SaveChangesAsync();
@@ -72,9 +72,9 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
                 ProductGroupMember.CreatePinned(ProductId.From(802), model.Id, Now));
             db.ProductGroupAxes.Add(ProductGroupAxis.Create(model.Id, side.Id, 0));
             db.ProductAttributeValues.AddRange(
-                ProductAttributeValue.CreateManual(ProductId.From(801), side.Id, 0, left.Id, null, Now),
-                ProductAttributeValue.CreateManual(ProductId.From(802), side.Id, 0, right.Id, null, Now),
-                ProductAttributeValue.CreateManual(ProductId.From(803), side.Id, 0, left.Id, null, Now));
+                ProductAttributeValue.CreateManual(ProductId.From(801), side.Id, 0, left.Id, null, Now).Value,
+                ProductAttributeValue.CreateManual(ProductId.From(802), side.Id, 0, right.Id, null, Now).Value,
+                ProductAttributeValue.CreateManual(ProductId.From(803), side.Id, 0, left.Id, null, Now).Value);
             await db.SaveChangesAsync();
         }
 

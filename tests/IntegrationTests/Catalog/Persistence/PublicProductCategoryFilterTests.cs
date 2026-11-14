@@ -80,7 +80,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedCategory(db, 1, "parent");
         // Even marked «show on site», the Cosmos import root stays hidden.
         var cosmos = ProductCategory.Create(
-            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000"));
+            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")).Value;
         cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(cosmos);
         SeedProduct(db, 11, 1, "parent");
@@ -122,7 +122,7 @@ public sealed class PublicProductCategoryFilterTests
         };
         var category = ProductCategory.Create(
             ProductCategoryId.From(id), "000005513", $"Category {id}", slug, path,
-            parentId is null ? null : ProductCategoryId.From(parentId.Value));
+            parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
     }

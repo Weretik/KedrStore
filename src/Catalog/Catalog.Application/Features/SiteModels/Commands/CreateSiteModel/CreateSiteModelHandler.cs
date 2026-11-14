@@ -23,7 +23,7 @@ public sealed class CreateSiteModelHandler(
         if (!await changes.IsFinalCategoryAsync(categoryId, cancellationToken))
         {
             return SiteModelValidation.Invalid("categoryId",
-                "A model lives in a final category (one without subcategories).", "CategoryNotFinal");
+                "Модель може бути лише в кінцевій категорії (без підкатегорій).", "CategoryNotFinal");
         }
 
         var productIds = request.ProductIds.Select(ProductId.From).ToList();
@@ -32,7 +32,10 @@ public sealed class CreateSiteModelHandler(
 
         var now = clock.GetUtcNow();
         var allocator = await slugs.LoadAllocatorAsync(CatalogEntityType.ProductGroup, cancellationToken);
-        var model = ProductGroup.CreateManual(categoryId, request.Name, allocator.Allocate(request.Name), now);
+        var created = ProductGroup.CreateManual(categoryId, request.Name, allocator.Allocate(request.Name), now);
+        if (created.IsFailure)
+            return created.Error!.ToResult<SiteModelDto>();
+        var model = created.Value;
         await models.AddAsync(model, cancellationToken);
 
         if (productIds.Count > 0)

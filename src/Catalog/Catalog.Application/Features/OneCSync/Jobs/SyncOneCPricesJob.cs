@@ -102,18 +102,25 @@ public sealed class SyncOneCPricesJob(
                     productId: productId,
                     priceTypeId: priceTypeId,
                     price: priceValue);
-
-                await priceRepo.AddAsync(price, cancellationToken);
+                if (price.IsSuccess)
+                    await priceRepo.AddAsync(price.Value, cancellationToken);
+                else
+                    LogSkipped(productId, price.Error!);
             }
             else
             {
-                existing.Update(
+                var updated = existing.Update(
                     productId: productId,
                     priceTypeId: priceTypeId,
                     price: priceValue);
+                if (updated.IsFailure)
+                    LogSkipped(productId, updated.Error!);
             }
         }
 
         await priceRepo.SaveChangesAsync(cancellationToken);
     }
+
+    private void LogSkipped(ProductId productId, DomainError error)
+        => logger.LogWarning("Skipping a price from 1C for ProductId={ProductId}: {Error}", productId.Value, error.Message);
 }

@@ -85,5 +85,5 @@ public sealed class ImportSyncTests
     }
 
     private static ProductCategory Category(int id, string path)
-        => ProductCategory.Create(ProductCategoryId.From(id), "R", $"Category {id}", $"category-{id}", CategoryPath.From(path));
+        => ProductCategory.Create(ProductCategoryId.From(id), "R", $"Category {id}", $"category-{id}", CategoryPath.From(path)).Value;
 }

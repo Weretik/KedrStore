@@ -1,4 +1,4 @@
-using BuildingBlocks.Domain.Exceptions;
+using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -42,10 +42,9 @@ public sealed class ProductCategoryPresentationMetadataTests
     {
         var category = CreateCategory();
 
-        var exception = Assert.Throws<DomainException>(
-            () => category.UpdatePresentationMetadata(shortNameUk, shortNameRu, 0, 0));
+        var exception = DomainAssert.Fails(category.UpdatePresentationMetadata(shortNameUk, shortNameRu, 0, 0));
 
-        Assert.Equal(expectedCode, exception.Error.Code);
+        Assert.Equal(expectedCode, exception.Code);
     }
 
     [Fact]
@@ -53,10 +52,9 @@ public sealed class ProductCategoryPresentationMetadataTests
     {
         var category = CreateCategory();
 
-        var exception = Assert.Throws<DomainException>(
-            () => category.UpdatePresentationMetadata(new string('a', ProductCategory.ShortNameMaxLength + 1), "Петли", 0, 0));
+        var exception = DomainAssert.Fails(category.UpdatePresentationMetadata(new string('a', ProductCategory.ShortNameMaxLength + 1), "Петли", 0, 0));
 
-        Assert.Equal("Catalog.Category.ShortNameUk.LengthInvalid", exception.Error.Code);
+        Assert.Equal("Catalog.Category.ShortNameUk.LengthInvalid", exception.Code);
     }
 
     [Theory]
@@ -69,10 +67,9 @@ public sealed class ProductCategoryPresentationMetadataTests
     {
         var category = CreateCategory();
 
-        var exception = Assert.Throws<DomainException>(
-            () => category.UpdatePresentationMetadata("Завіси", "Петли", sortOrder, level));
+        var exception = DomainAssert.Fails(category.UpdatePresentationMetadata("Завіси", "Петли", sortOrder, level));
 
-        Assert.Equal(expectedCode, exception.Error.Code);
+        Assert.Equal(expectedCode, exception.Code);
     }
 
     [Fact]
@@ -80,10 +77,9 @@ public sealed class ProductCategoryPresentationMetadataTests
     {
         var category = CreateCategory(path: "n5513.n900001");
 
-        var exception = Assert.Throws<DomainException>(
-            () => category.UpdatePresentationMetadata("Завіси", "Петли", 0, 0));
+        var exception = DomainAssert.Fails(category.UpdatePresentationMetadata("Завіси", "Петли", 0, 0));
 
-        Assert.Equal("Catalog.Category.Level.PathMismatch", exception.Error.Code);
+        Assert.Equal("Catalog.Category.Level.PathMismatch", exception.Code);
     }
 
     [Fact]
@@ -103,5 +99,5 @@ public sealed class ProductCategoryPresentationMetadataTests
             "000005513",
             name,
             "furnitura-5513",
-            CategoryPath.From(path));
+            CategoryPath.From(path)).Value;
 }

@@ -8,66 +8,64 @@ public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
 
     private ProductTranslation() { }
 
-    private ProductTranslation(ProductId productId, string language, string name, DateTimeOffset createdAt)
+    public const int NameMaxLength = 300;
+
+    public static DomainResult<ProductTranslation> Create(ProductId productId, string language, string name,
+        DateTimeOffset createdAt)
     {
-        SetProductId(productId);
-        SetLanguage(language);
-        SetName(name);
-        MarkAsCreated(createdAt);
+        var checks = new DomainChecks();
+        if (productId.Value <= 0)
+            checks.Check(ProductTranslationErrors.ProductIdRequired());
+        var checkedLanguage = checks.Take(CheckLanguage(language));
+        var checkedName = checks.Take(CheckName(name));
+        if (checks.Error is { } error)
+            return error;
+
+        var translation = new ProductTranslation { ProductId = productId, Language = checkedLanguage, Name = checkedName };
+        translation.MarkAsCreated(createdAt);
+        return translation;
     }
 
-    public static ProductTranslation Create(ProductId productId, string language, string name, DateTimeOffset createdAt)
-        => new(productId, language, name, createdAt);
-
-    public void Update(string name, DateTimeOffset updatedAt)
+    public DomainResult Update(string name, DateTimeOffset updatedAt)
     {
-        SetName(name);
+        var checkedName = CheckName(name);
+        if (checkedName.IsFailure)
+            return checkedName;
+        Name = checkedName.Value;
         MarkAsUpdated(updatedAt);
+        return DomainResult.Success();
     }
 
     /// <summary>Sets the name and revives a soft-deleted translation. Returns whether anything changed.</summary>
-    public bool Apply(string name, DateTimeOffset now)
+    public DomainResult<bool> Apply(string name, DateTimeOffset now)
     {
         if (!IsDeleted && string.Equals(Name, name?.Trim(), StringComparison.Ordinal))
             return false;
 
-        SetName(name!);
+        var checkedName = CheckName(name!);
+        if (checkedName.IsFailure)
+            return checkedName.Error!;
+        Name = checkedName.Value;
         IsDeleted = false;
         MarkAsUpdated(now);
         return true;
     }
 
-    private void SetProductId(ProductId productId)
-    {
-        if (productId.Value <= 0)
-            throw new DomainException(ProductTranslationErrors.ProductIdRequired());
-
-        ProductId = productId;
-    }
-
-    private void SetLanguage(string language)
+    private static DomainResult<string> CheckLanguage(string language)
     {
         if (string.IsNullOrWhiteSpace(language))
-            throw new DomainException(ProductTranslationErrors.LanguageRequired());
+            return ProductTranslationErrors.LanguageRequired();
 
         var trimmed = language.Trim().ToLowerInvariant();
-
-        if (trimmed.Length is < 2 or > 10)
-            throw new DomainException(ProductTranslationErrors.LanguageLengthInvalid(trimmed.Length));
-
-        Language = trimmed;
+        return trimmed.Length is < 2 or > 10 ? ProductTranslationErrors.LanguageInvalid() : trimmed;
     }
 
-    private void SetName(string name)
+    private static DomainResult<string> CheckName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException(ProductTranslationErrors.NameRequired());
+            return ProductTranslationErrors.NameRequired();
 
         var trimmed = name.Trim();
-
-        if (trimmed.Length is < 1 or > 300)
-            throw new DomainException(ProductTranslationErrors.NameLengthInvalid(trimmed.Length));
-
-        Name = trimmed;
+        return trimmed.Length > NameMaxLength ? ProductTranslationErrors.NameTooLong(trimmed.Length) : trimmed;
     }
 }

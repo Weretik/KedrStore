@@ -85,15 +85,17 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             }
 
             var slugs = await slugService.LoadAllocatorAsync(CatalogEntityType.Category, cancellationToken);
-            var category = ProductCategory.Create(cosmosCategoryId, cosmosRootId, CosmosName, slugs.Allocate(CosmosName), path);
-            ApplyPresentation(category, presentation);
+            // The Cosmos category is built from fixed values, so its rules always pass.
+            var category = ProductCategory.Create(cosmosCategoryId, cosmosRootId, CosmosName, slugs.Allocate(CosmosName),
+                path).Value;
+            ApplyPresentation(category, presentation).ThrowIfFailure();
             await categoryRepo.AddAsync(category, cancellationToken);
             return;
         }
 
         existing.Restore(now);
-        existing.UpdateFromOneC(CosmosName, path, null, now);
-        ApplyPresentation(existing, presentation);
+        existing.UpdateFromOneC(CosmosName, path, null, now).ThrowIfFailure();
+        ApplyPresentation(existing, presentation).ThrowIfFailure();
         await categoryRepo.SaveChangesAsync(cancellationToken);
     }
 
@@ -115,9 +117,17 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
             if (existingById.TryGetValue(item.Id, out var existing))
             {
+                var fromOneC = existing.UpdateFromOneC(item.Name, path, parentId, now);
+                var shown = fromOneC.IsSuccess ? ApplyPresentation(existing, presentation) : fromOneC;
+                if (shown.IsFailure)
+                {
+                    logger.LogWarning("Skipping category {CategoryId} from 1C: {Error}", item.Id, shown.Error!.Message);
+                    counters.Unchanged++;
+                    continue;
+                }
+
                 var restored = existing.Restore(now);
-                var updated = existing.UpdateFromOneC(item.Name, path, parentId, now);
-                updated |= ApplyPresentation(existing, presentation);
+                var updated = fromOneC.Value | shown.Value;
 
                 if (restored) counters.Restored++;
                 else if (updated) counters.Updated++;
@@ -126,14 +136,23 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             }
 
             slugs ??= await slugService.LoadAllocatorAsync(CatalogEntityType.Category, cancellationToken);
-            var category = ProductCategory.Create(
+            var createdCategory = ProductCategory.Create(
                 id: ProductCategoryId.From(item.Id),
                 productTypeIdOneC: rootCategoryOneCId,
                 name: item.Name,
                 slug: slugs.Allocate(item.Name),
                 path: path,
                 parentId: parentId);
-            ApplyPresentation(category, presentation);
+            var presented = createdCategory.IsSuccess
+                ? ApplyPresentation(createdCategory.Value, presentation)
+                : createdCategory.Error!;
+            if (presented.IsFailure)
+            {
+                logger.LogWarning("Skipping new category {CategoryId} from 1C: {Error}", item.Id, presented.Error!.Message);
+                continue;
+            }
+
+            var category = createdCategory.Value;
             created.Add(category);
             counters.Created++;
         }
@@ -202,7 +221,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             .Resolve(rootCategoryOneCId, categoryId, sourceName, level);
     }
 
-    private static bool ApplyPresentation(ProductCategory category, ResolvedCategoryPresentation presentation)
+    private static DomainResult<bool> ApplyPresentation(ProductCategory category, ResolvedCategoryPresentation presentation)
         => category.UpdatePresentationMetadata(
             presentation.ShortNameUk,
             presentation.ShortNameRu,
