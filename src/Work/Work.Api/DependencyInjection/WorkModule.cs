@@ -1,22 +1,34 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
-using Work.Api.Features.Activity;
+using Work.Api.Endpoints.Activity;
+using Work.Api.Endpoints.Report;
+using Work.Api.Endpoints.Tasks;
 using Work.Infrastructure.DependencyInjection;
+
 namespace Work.Api.DependencyInjection;
 
-/// <summary>Registers the Work module: Application validators, Infrastructure, Contracts implementations, and controllers.</summary>
+/// <summary>Registers the Work module: Application validators, Infrastructure, endpoints, and the activity log.</summary>
 public static class WorkModule
 {
     public static IServiceCollection AddWorkModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddWorkInfrastructure(configuration);
-        // Every admin change in any module is logged by this global filter.
-        services.Configure<MvcOptions>(options => options.Filters.Add<WorkActivityFilter>());
         services.AddValidatorsFromAssembly(typeof(Work.Application.WorkApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
-        services.AddControllers().AddApplicationPart(typeof(WorkApiAssemblyMarker).Assembly);
 
         return services;
     }
+
+    public static IEndpointRouteBuilder MapWorkEndpoints(this IEndpointRouteBuilder endpoints)
+    {
+        endpoints.MapTasksEndpoints();
+        endpoints.MapReportEndpoints();
+        return endpoints;
+    }
+
+    /// <summary>Logs every successful admin change of any module; goes after authorization.</summary>
+    public static IApplicationBuilder UseWorkActivity(this IApplicationBuilder app) =>
+        app.UseMiddleware<WorkActivityMiddleware>();
 }

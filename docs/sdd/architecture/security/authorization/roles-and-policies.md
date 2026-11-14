@@ -28,8 +28,8 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `AdminLegalDocumentsController` | `/api/admin/content/documents` | `CanManageContent` |
 | `AdminMediaFoldersController`, `AdminMediaFilesController` | `/api/admin/media/folders`, `/api/admin/media/files` | `CanManageMedia`; delete needs `RequireAdminRole` |
 | `AdminUsersController` | `/api/admin/users` | `CanManageUsers`; name, email, password and avatar edits only for Manager and Seo targets (403 for Admin) |
-| `WorkTasksController` | `/api/work` | `RequireManagerRole`; only the caller's own tasks and report |
-| `AdminWorkController` | `/api/admin/work` | `RequireAdminRole` |
+| Work endpoints, tag `WorkTasks` | `/api/work` | `RequireManagerRole` on the group; only the caller's own tasks and report |
+| Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
 | `ProfileController` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | `CatalogController` (Sales) | `/api/sales/{lang}/catalog` | any signed-in user |
 | `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
@@ -37,7 +37,7 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
 | `CookieAuthController`, `MobileAuthController`, `AuthSessionController` | login, refresh | public, rate-limited; logout and `me` need a session |
 
-A new endpoint in an admin controller inherits the controller's policy. A public endpoint needs `[AllowAnonymous]` and a reason in its contract.
+A new endpoint in an admin controller or endpoint group inherits its policy (`RequireAuthorization` on the `MapGroup`). A public endpoint needs `[AllowAnonymous]` (`.AllowAnonymous()` on an endpoint) and a reason in its contract.
 
 ## Roles
 

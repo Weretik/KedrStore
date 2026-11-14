@@ -101,6 +101,41 @@ public sealed class FolderStructureTests
         Assert.Empty(violations);
     }
 
+    /// <summary>
+    /// Platform spec 005, R-001: a module's HTTP code is <c>Endpoints/&lt;Feature&gt;/</c> (endpoints, their
+    /// requests and responses, and HTTP-only pieces such as the Work activity middleware), or registration.
+    /// A module that has endpoints has no controller left.
+    /// </summary>
+    [Fact]
+    public void Endpoints_LiveInFeatureFolders_AndReplaceTheModulesControllers()
+    {
+        var violations = ApiAssemblies.Select(Assembly.Load)
+            .SelectMany(assembly =>
+            {
+                var name = assembly.GetName().Name!;
+                var types = assembly.GetTypes().Where(type => !type.IsNested && type.Namespace is not null).ToArray();
+                var endpoints = types.Where(type => type.Name.EndsWith("Endpoint", StringComparison.Ordinal)
+                                                    || type.Name.EndsWith("Endpoints", StringComparison.Ordinal))
+                    .ToArray();
+                var misplaced = endpoints
+                    .Where(type => !EndpointFeatureNamespace.IsMatch(type.Namespace!) ||
+                                   !type.Namespace!.StartsWith($"{name}.Endpoints.", StringComparison.Ordinal))
+                    .Select(type => $"{type.FullName} is outside {name}.Endpoints.<Feature>");
+                var leftovers = endpoints.Length == 0
+                    ? []
+                    : types.Where(type => typeof(ControllerBase).IsAssignableFrom(type))
+                        .Select(type => $"{type.FullName} is a controller in a module with endpoints");
+                return misplaced.Concat(leftovers);
+            })
+            .Order()
+            .ToArray();
+
+        Assert.True(violations.Length == 0, string.Join(Environment.NewLine, violations));
+    }
+
+    private static readonly Regex EndpointFeatureNamespace =
+        new(@"^\w+\.Api\.Endpoints\.\w+$", RegexOptions.CultureInvariant);
+
     [Fact]
     public void ApiCode_UsesInfrastructureOnlyForRegistration()
     {
