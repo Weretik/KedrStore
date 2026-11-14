@@ -2,6 +2,7 @@
 
     <ItemGroup>
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Ardalis.Result.AspNetCore" />
       <PackageReference Include="Ardalis.Result" />
     </ItemGroup>
 

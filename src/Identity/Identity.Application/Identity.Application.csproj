@@ -6,4 +6,8 @@
       <ProjectReference Include="..\Identity.Contracts\Identity.Contracts.csproj" />
     </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Specification" />
+  </ItemGroup>
+
 </Project>

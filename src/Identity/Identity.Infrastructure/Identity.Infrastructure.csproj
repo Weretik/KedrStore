@@ -15,6 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
       <PackageReference Include="FluentFTP" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
       <PackageReference Include="SkiaSharp" />

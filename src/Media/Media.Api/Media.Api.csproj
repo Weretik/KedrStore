@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Media.Application\Media.Application.csproj" />
     <ProjectReference Include="..\..\Identity\Identity.Contracts\Identity.Contracts.csproj" />
     <ProjectReference Include="..\Media.Infrastructure\Media.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Api\BuildingBlocks.Api.csproj" />
   </ItemGroup>
 
 </Project>
