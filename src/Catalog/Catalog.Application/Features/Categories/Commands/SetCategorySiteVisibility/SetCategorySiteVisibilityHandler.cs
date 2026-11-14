@@ -5,9 +5,8 @@ using Catalog.Contracts.Category;
 namespace Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility;
 
 /// <summary>
-/// Shows or hides a category on the site (spec catalog/007 R-18). Hiding hides every subcategory too; showing shows
-/// every subcategory and every parent, so a shown category is always reachable. Deleted subcategories follow, so a
-/// category 1C restores keeps its branch's value. The Cosmos import root is never shown (owner decision 2026-11-01).
+/// Shows or hides a category on the site (spec catalog/007 R-18). The tree rule lives in
+/// <see cref="CategorySiteVisibility"/>; the Cosmos import root is never shown (owner decision 2026-11-01).
 /// </summary>
 public sealed class SetCategorySiteVisibilityHandler(
     ICatalogRepository<ProductCategory> repository,
@@ -29,33 +28,11 @@ public sealed class SetCategorySiteVisibilityHandler(
                 "Catalog.Category.CosmosHidden", ValidationSeverity.Error));
         }
 
-        var prefix = selected.Path.Value + ".";
-        var affected = categories
-            .Where(category => category.Path.Value.StartsWith(prefix, StringComparison.Ordinal))
-            .Prepend(selected)
-            .ToList();
-        if (command.IsShownOnSite)
-            affected.AddRange(Ancestors(selected, categories.Where(category => !category.IsDeleted)
-                .ToDictionary(category => category.Id)));
-
-        var now = DateTimeOffset.UtcNow;
-        var changed = affected.Distinct().Count(category => category.SetShownOnSite(command.IsShownOnSite, now));
+        var changed = CategorySiteVisibility.Apply(selected, categories, command.IsShownOnSite, DateTimeOffset.UtcNow);
         if (changed > 0)
             await repository.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new CategorySiteVisibilityResponse(selected.Id.Value, command.IsShownOnSite, changed));
-    }
-
-    private static IEnumerable<ProductCategory> Ancestors(ProductCategory category,
-        IReadOnlyDictionary<ProductCategoryId, ProductCategory> active)
-    {
-        var visited = new HashSet<ProductCategoryId> { category.Id };
-        var current = category;
-        while (current.ParentId is { } parentId && visited.Add(parentId) && active.TryGetValue(parentId, out var parent))
-        {
-            yield return parent;
-            current = parent;
-        }
     }
 }
 
