@@ -1,5 +1,6 @@
 using BuildingBlocks.Application;
 using BuildingBlocks.Application.Behaviors;
+using BuildingBlocks.Application.Validation;
 using Catalog.Application;
 using Content.Application;
 using Identity.Application;
@@ -14,6 +15,7 @@ public static class MediatorRegistrationExtensions
     public static IServiceCollection AddMediatorPipeline(
         this IServiceCollection services)
     {
+        UkrainianValidationMessages.Use();
         services.AddMediator(options =>
         {
             options.ServiceLifetime = ServiceLifetime.Scoped;

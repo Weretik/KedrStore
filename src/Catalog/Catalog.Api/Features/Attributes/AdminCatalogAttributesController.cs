@@ -112,6 +112,7 @@ public sealed class AdminCatalogAttributesController(ISender sender) : Controlle
     /// <summary>On-site products whose names contain the code, by category, with its own decoding there.</summary>
     [HttpGet("codes/{aliasId:int}/products", Name = "getAdminAttributeCodeProducts")]
     [ProducesResponseType(typeof(AdminCodeProductsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminCodeProductsDto>> GetCodeProducts([FromRoute] int aliasId,

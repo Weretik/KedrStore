@@ -233,6 +233,7 @@ paths:
       security: [{ cookieAuth: [] }, { bearerAuth: [] }]
       responses:
         '200': { description: Products by category, content: { application/json: { schema: { $ref: '#/components/schemas/AdminCodeProducts' } } } }
+        '400': { description: The code id is below 1. }
         '401': { description: Not signed in. }
         '403': { description: 'Signed in without the Manager, Seo, or Admin role.' }
         '404': { description: Code not found. }

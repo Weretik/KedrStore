@@ -42,6 +42,7 @@ public sealed class SiteModelsController(ISender sender) : ControllerBase
     /// <summary>The model page; a 404 body with an address means a permanent redirect there.</summary>
     [HttpGet("model/{modelSlug}", Name = "getPublicSiteModel")]
     [ProducesResponseType(typeof(PublicSiteModelDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(PublicSiteModelAddressDto), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PublicSiteModelDto>> Get(
         [FromRoute] string lang,
@@ -62,6 +63,7 @@ public sealed class SiteModelsController(ISender sender) : ControllerBase
     /// <summary>The model address of a current or former product slug, for the permanent redirect (M-11).</summary>
     [HttpGet("product/{productSlug}/model", Name = "getPublicProductModelAddress")]
     [ProducesResponseType(typeof(PublicSiteModelAddressDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CatalogRedirect), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PublicSiteModelAddressDto>> GetProductAddress(
         [FromRoute] string lang,

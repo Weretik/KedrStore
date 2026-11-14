@@ -24,6 +24,9 @@
       <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\..\src\Catalog\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\..\src\Catalog\Catalog.Domain\Catalog.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Content\Content.Application\Content.Application.csproj" />
+      <ProjectReference Include="..\..\src\Media\Media.Application\Media.Application.csproj" />
+      <ProjectReference Include="..\..\src\Work\Work.Application\Work.Application.csproj" />
       <ProjectReference Include="..\..\src\Identity\Identity.Application\Identity.Application.csproj" />
       <ProjectReference Include="..\..\src\Identity\Identity.Domain\Identity.Domain.csproj" />
       <ProjectReference Include="..\..\src\Sales\Sales.Application\Sales.Application.csproj" />

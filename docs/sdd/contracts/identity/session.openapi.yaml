@@ -16,6 +16,7 @@ paths:
         content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
         '200': { description: Signed in, headers: { Set-Cookie: { schema: { type: string }, description: Session and CSRF cookies } }, content: { application/json: { schema: { $ref: '#/components/schemas/SessionMeResponse' } } } }
+        '400': { description: 'Email or password is empty or too long; ValidationProblem with Ukrainian messages' }
         '401': { description: 'Invalid credentials, locked or blocked account' }
         '429': { description: Login rate limit exceeded }
   /api/auth/cookie/logout:
@@ -42,6 +43,7 @@ paths:
         content: { application/json: { schema: { $ref: '#/components/schemas/SessionLoginRequest' } } }
       responses:
         '200': { description: Token pair, content: { application/json: { schema: { $ref: '#/components/schemas/MobileTokenResponse' } } } }
+        '400': { description: 'Email or password is empty or too long; ValidationProblem with Ukrainian messages' }
         '401': { description: 'Invalid credentials, locked or blocked account' }
         '429': { description: Login rate limit exceeded }
   /api/auth/mobile/refresh:
@@ -58,6 +60,7 @@ paths:
         content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } }
       responses:
         '200': { description: New token pair, content: { application/json: { schema: { $ref: '#/components/schemas/MobileTokenResponse' } } } }
+        '400': { description: Refresh token is empty or too long }
         '401': { description: 'Unknown, expired, revoked, or already rotated refresh token' }
         '429': { description: Refresh rate limit exceeded }
   /api/auth/mobile/logout:
@@ -72,6 +75,7 @@ paths:
         content: { application/json: { schema: { type: object, properties: { refreshToken: { type: [string, 'null'] } } } } }
       responses:
         '204': { description: Signed out }
+        '400': { description: Refresh token is too long }
         '401': { description: Missing or invalid access token }
   /api/auth/session/me:
     get:
