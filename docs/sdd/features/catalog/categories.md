@@ -6,7 +6,7 @@ Public tree and category page by slug, Admin reads, Admin slug edit, Admin-writt
 
 ## Structure and relationships
 
-The [public controller](../../../../src/Catalog/Catalog.Api/Features/Categories/CategoriesController.cs) and [admin controller](../../../../src/Catalog/Catalog.Api/Features/Categories/AdminCategoriesController.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Categories/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Slugs/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryStatsReader](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsReader.cs) and [CategoryStatsRollup](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsRollup.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Categories/Content/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Integrations/Html/HtmlSanitizerService.cs) on save. The public tree and category page show only categories marked `IsShownOnSite` and never the Cosmos import root ([PublicCatalogScope](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/PublicCatalogScope.cs)): the tree omits the others and their slugs answer `404`; admin reads still list them.
+The [public endpoints](../../../../src/Catalog/Catalog.Api/Endpoints/Categories/CategoriesEndpoints.cs) and [admin endpoints](../../../../src/Catalog/Catalog.Api/Endpoints/Categories/CategoriesEndpoints.cs) dispatch to Application handlers. [ProductCategory](../../../../src/Catalog/Catalog.Domain/Categories/ProductCategory.cs) is soft-deleted by the 1C import (a global query filter hides it) and keeps its slug for life; former slugs live in [SlugHistoryEntry](../../../../src/Catalog/Catalog.Domain/Slugs/SlugHistoryEntry.cs) and resolve through [SlugService](../../../../src/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs). Product counts and the price range come from the product list projection through [CategoryStatsReader](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsReader.cs) and [CategoryStatsRollup](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryStatsRollup.cs). [CategoryContent](../../../../src/Catalog/Catalog.Domain/Categories/Content/CategoryContent.cs) holds SEO title, meta description, H1, sanitized body, and FAQ per language; the body passes the [HTML sanitizer](../../../../src/Catalog/Catalog.Infrastructure/Integrations/Html/HtmlSanitizerService.cs) on save. The public tree and category page show only categories marked `IsShownOnSite` and never the Cosmos import root ([PublicCatalogScope](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/PublicCatalogScope.cs)): the tree omits the others and their slugs answer `404`; admin reads still list them.
 
 **Show on site** ([spec 007 R-18](../../specs/catalog/007-site-models/README.md#stage-4b-categories-on-the-site-and-the-showcase-by-model)): an Admin sets the mark with `PUT api/categories/{id}/site-visibility` ([handler](../../../../src/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySiteVisibility/SetCategorySiteVisibilityHandler.cs)). Hiding takes every subcategory with it; showing also shows every parent; Cosmos is never shown. The 1C category sync never changes the mark and gives a new category its parent's (a new top category is shown only in the hardware root). The migration `CategorySiteVisibility` shows the whole «Фурнітура» root (1C `000005513`) once. Hidden categories and their products also leave «Вітрина сайту», «Моделі», and the «Огляд» counts.
 
@@ -21,9 +21,9 @@ The tree lists verified entry points and key feature components; it does not inc
 ```text
 src/
 └── Catalog/
-    ├── Catalog.Api/Controllers/
-    │   ├── AdminCategoriesController.cs  # Admin HTTP: list, by id, slug, content, site visibility
-    │   ├── CategoriesController.cs  # public HTTP: tree, by slug
+    ├── Catalog.Api/Endpoints/Categories/
+    │   ├── CategoriesEndpoints.cs  # AdminCategories group: list, by id, slug, content, site visibility; Categories group: tree, by slug
+    │   ├── <UseCase>Endpoint.cs  # one per operation
     │   └── CatalogLookupActionResult.cs  # 404 with redirect body
     ├── Catalog.Application/
     │   ├── Features/Category/
@@ -49,8 +49,8 @@ src/
 
 ```mermaid
 flowchart LR
-    A["CategoriesController"] --> C["GetCategoriesHandler / GetCategoryBySlugHandler"]
-    B["AdminCategoriesController"] --> D["Admin reads, ChangeSlug, Content"]
+    A["Categories endpoints"] --> C["GetCategoriesHandler / GetCategoryBySlugHandler"]
+    B["AdminCategories endpoints"] --> D["Admin reads, ChangeSlug, Content"]
     C --> S["SlugService"]
     C --> T["CategoryStatsReader"]
     D --> I["AdminCategoryInsightsReader"]

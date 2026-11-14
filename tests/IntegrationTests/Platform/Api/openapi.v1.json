@@ -2875,31 +2875,6 @@
         ],
         "type": "object"
       },
-      "CategoryPriceTypeRule": {
-        "properties": {
-          "categoryId": {
-            "format": "int32",
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ]
-          },
-          "priceTypeId": {
-            "format": "int32",
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ]
-          }
-        },
-        "required": [
-          "categoryId",
-          "priceTypeId"
-        ],
-        "type": "object"
-      },
       "CategoryResponse": {
         "properties": {
           "children": {
@@ -21233,21 +21208,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "Lang",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "SearchTerm",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "CategorySlug",
             "schema": {
               "type": "string"
             }
@@ -21302,16 +21263,6 @@
                 "integer",
                 "string"
               ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "PriceTypeRules",
-            "schema": {
-              "items": {
-                "$ref": "#/components/schemas/CategoryPriceTypeRule"
-              },
-              "type": "array"
             }
           },
           {
@@ -21372,14 +21323,6 @@
           {
             "in": "path",
             "name": "lang",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "categorySlug",
             "required": true,
             "schema": {
               "type": "string"
@@ -21639,21 +21582,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "Lang",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
             "name": "SearchTerm",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "CategorySlug",
             "schema": {
               "type": "string"
             }
@@ -21708,16 +21637,6 @@
                 "integer",
                 "string"
               ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "PriceTypeRules",
-            "schema": {
-              "items": {
-                "$ref": "#/components/schemas/CategoryPriceTypeRule"
-              },
-              "type": "array"
             }
           },
           {

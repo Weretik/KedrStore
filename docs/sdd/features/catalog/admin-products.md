@@ -6,7 +6,7 @@ Paged and full product lists, Admin product details by slug, deleted products, a
 
 ## Structure and relationships
 
-[AdminProductsController](../../../../src/Catalog/Catalog.Api/Features/Products/AdminProductsController.cs) dispatches reads to the [list handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductList/GetAdminProductListHandler.cs) or [details handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductBySlug/GetAdminProductBySlugHandler.cs). Lists apply server-side filters and search before counting and paging; boolean parameters distinguish missing, `true`, and `false`. `withoutPhoto=true` keeps rows whose cached photo is empty. Details combine the projection, Product, and category by slug, returning both names, scheme, and flags. HTTP product changes are not implemented here.
+[AdminProducts endpoints](../../../../src/Catalog/Catalog.Api/Endpoints/Products/ProductsEndpoints.cs) dispatches reads to the [list handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductList/GetAdminProductListHandler.cs) or [details handler](../../../../src/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductBySlug/GetAdminProductBySlugHandler.cs). Lists apply server-side filters and search before counting and paging; boolean parameters distinguish missing, `true`, and `false`. `withoutPhoto=true` keeps rows whose cached photo is empty. Details combine the projection, Product, and category by slug, returning both names, scheme, and flags. HTTP product changes are not implemented here.
 
 Both paged Admin lists return `categoryName` from the category's Ukrainian short name, accept `categoryId` including all descendants, and sort `CategoryAsc/CategoryDesc` before paging. The [tree traversal helper](../../../../src/Catalog/Catalog.Application/Features/Categories/Shared/CategoryTreeIds.cs) stops cycles with a visited-ID set. `GET /api/categories` provides the complete ordered lookup for the Admin selector. Changes are specified in the [category SDD](../../specs/catalog/admin-product-list/category-table-2026-10-19.md).
 
@@ -19,7 +19,7 @@ The tree lists verified entry points and key feature components; it does not inc
 ```text
 src/
 └── Catalog/
-    ├── Catalog.Api/Controllers/AdminProductsController.cs  # HTTP entry point
+    ├── Catalog.Api/Endpoints/Products/GetAdminProductsEndpoint.cs  # HTTP entry point
     ├── Catalog.Application/Features/Products/
     │   ├── GetAdminList/
     │   │   ├── DeletedAdminProducts.cs  # Admin and Seo deleted list
@@ -33,7 +33,7 @@ src/
 
 ```mermaid
 flowchart LR
-    A["AdminProductsController"] --> B["GetAdminProductListHandler"]
+    A["GetAdminProductsEndpoint"] --> B["GetAdminProductListHandler"]
     A --> G["GetAdminProductBySlugHandler"]
     B --> D["ProductListProjection"]
     B --> H["ProductCategory"]

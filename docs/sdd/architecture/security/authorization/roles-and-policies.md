@@ -10,13 +10,13 @@ Authentication answers **who is calling**; authorization answers **whether that 
 
 Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/001-authentication-rollout/README.md); the Seo role added 2026-11-06.
 
-| Controller | Routes | Access |
+| Endpoints | Routes | Access |
 | --- | --- | --- |
 | Sales endpoints, tags `AdminOrderWorkspace`, `AdminOrders`, `AdminCustomers` | `/api/admin/order-workspace`, `/api/admin/orders`, `/api/admin/customers` | `CanManageOrders` on each group |
-| `AdminProductsController` | `/api/admin/products` | `CanManageProducts`; slug and `deleted=true` need `CanManageSiteCatalog` |
-| `AdminCategoriesController` | `/api/categories` | `CanManageProducts`; slug, content, «show on site», and `deleted=true` need `CanManageSiteCatalog` |
-| `AdminCatalogAttributesController` | `/api/admin/catalog-attributes` | `CanManageProducts`; every change needs `CanManageSiteCatalog` |
-| `AdminProductGroupsController` | `/api/admin/product-groups` | `CanManageProducts`; group slug needs `CanManageSiteCatalog` |
+| Catalog endpoints, tag `AdminProducts` | `/api/admin/products` | `CanManageProducts`; slug and `deleted=true` need `CanManageSiteCatalog` |
+| Catalog endpoints, tag `AdminCategories` | `/api/categories` | `CanManageProducts`; slug, content, «show on site», and `deleted=true` need `CanManageSiteCatalog` |
+| Catalog endpoints, tag `AdminCatalogAttributes` | `/api/admin/catalog-attributes` | `CanManageProducts`; every change needs `CanManageSiteCatalog` |
+| Catalog endpoints, tag `AdminProductGroups` | `/api/admin/product-groups` | `CanManageProducts`; group slug needs `CanManageSiteCatalog` |
 | Content endpoints, tag `AdminArticles` | `/api/admin/articles` | `CanManageContent` |
 | Content endpoints, tag `CompanyContacts` | `/api/content/contacts` | public (site contacts) |
 | Content endpoints, tag `AdminCompanyContacts` | `/api/admin/content/contacts` | `CanManageContent` |
@@ -30,9 +30,9 @@ Checked 2026-10-28, after the [authentication rollout](../../../specs/identity/0
 | Work endpoints, tag `AdminWork` | `/api/admin/work` | `RequireAdminRole` on the group |
 | Identity endpoints, tag `Profile` | `/api/profile` | `RequireManagerRole`; `email` and `password` need `RequireAdminRole` |
 | Sales endpoints, tag `Catalog` | `/api/sales/{lang}/catalog` | any signed-in user |
-| `CategoriesController`, `ProductsController` | `/api/catalog/{lang}` | public |
+| Catalog endpoints, tags `Categories`, `Products` | `/api/catalog/{lang}` | public |
 | Content endpoints, tag `Articles` | `/api/content/{lang}/articles`, `/api/content/articles/{id}/cover` | public (site articles) |
-| `OrderController` | `POST /api/orders` (quick order) | public, rate-limited |
+| Catalog endpoints, tag `Order` | `POST /api/orders` (quick order) | public, rate-limited |
 | Identity endpoints, tags `CookieAuth`, `MobileAuth`, `AuthSession` | login, refresh | public, rate-limited; logout and `me` need a session |
 
 A new endpoint in an admin controller or endpoint group inherits its policy (`RequireAuthorization` on the `MapGroup`). A public endpoint needs `[AllowAnonymous]` (`.AllowAnonymous()` on an endpoint) and a reason in its contract.
