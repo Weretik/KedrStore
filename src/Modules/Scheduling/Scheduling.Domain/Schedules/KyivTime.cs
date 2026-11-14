@@ -5,12 +5,15 @@ public static class KyivTime
 {
     public static TimeZoneInfo Zone { get; } = TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
 
-    /// <summary>The instant of a Kyiv wall-clock time; a time skipped by the spring change moves one hour later.</summary>
+    /// <summary>
+    /// The instant (in UTC, as PostgreSQL <c>timestamptz</c> stores it) of a Kyiv wall-clock time; a time skipped by the
+    /// spring change moves one hour later.
+    /// </summary>
     public static DateTimeOffset ToInstant(DateTime local)
     {
         var unspecified = DateTime.SpecifyKind(local, DateTimeKind.Unspecified);
         while (Zone.IsInvalidTime(unspecified)) unspecified = unspecified.AddHours(1);
-        return new DateTimeOffset(unspecified, Zone.GetUtcOffset(unspecified));
+        return new DateTimeOffset(unspecified, Zone.GetUtcOffset(unspecified)).ToUniversalTime();
     }
 
     public static DateTime ToLocal(DateTimeOffset instant) => TimeZoneInfo.ConvertTime(instant, Zone).DateTime;

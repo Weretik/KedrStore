@@ -149,7 +149,7 @@ public sealed class ScheduledTask
         if (nextRunAt is { } at && at < now) return ScheduledTaskErrors.NextRunInPast;
         Enabled = enabled;
         Schedule = schedule;
-        NextRunAt = nextRunAt ?? schedule.NextAfter(now);
+        NextRunAt = nextRunAt?.ToUniversalTime() ?? schedule.NextAfter(now);
         UpdatedAt = now;
         UpdatedBy = by;
         Version++;
