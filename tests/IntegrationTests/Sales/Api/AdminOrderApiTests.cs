@@ -296,7 +296,7 @@ public sealed class AdminOrderApiTests
         public Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken)
             => Task.FromResult(state.IdempotencyRecords.GetValueOrDefault(idempotencyKey));
 
-        public Task PersistAsync(
+        public Task<bool> PersistAsync(
             Order order,
             Func<OrderId, OneCOrderSync> synchronizationFactory,
             Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
@@ -313,7 +313,7 @@ public sealed class AdminOrderApiTests
                 state.LastSynchronization.AcceptedAtUtc);
             var record = idempotencyRecordFactory(order.Id);
             state.IdempotencyRecords[record.IdempotencyKey] = record;
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 

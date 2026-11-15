@@ -13,6 +13,7 @@ public sealed class DeleteMyWorkTaskHandler(IWorkRepository<WorkTask> tasks, ICu
             return found.Status == ResultStatus.Unauthorized ? Result.Unauthorized() : Result.NotFound();
 
         await tasks.DeleteAsync(found.Value, cancellationToken);
+        await tasks.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

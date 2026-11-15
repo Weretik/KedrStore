@@ -91,6 +91,28 @@ public sealed class MediaPostgresTests(MediaPostgresFixture postgres)
         Assert.Equal(inProducts[0].Url, Assert.Single(byId).Url);
     }
 
+    /// <summary>Database rules 2.1: every word must be part of the file name, in any order and case.</summary>
+    [SkippableFact]
+    public async Task Search_MatchesEveryWordOfTheFileName()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        var cdn = new FakeMediaStorage();
+        foreach (var key in new[] { "products/ruchka-kedr-731.jpg", "products/ruchka-732.jpg", "products/kedr_50.jpg" })
+            cdn.Files[key] = [1, 2, 3];
+        await using var provider = BuildProvider(cdn);
+        await RunSync(provider, dryRun: false);
+        await using var scope = provider.CreateAsyncScope();
+        var handler = new GetMediaFilesHandler(scope.ServiceProvider.GetRequiredService<IReadMediaDbContext>(),
+            scope.ServiceProvider.GetRequiredService<IMediaUrlBuilder>());
+        async Task<string[]> FindAsync(string search) =>
+            (await handler.Handle(new GetMediaFilesQuery(null, false, search), default)).Value.Items
+            .Select(file => file.FileName).Order().ToArray();
+
+        Assert.Equal(["ruchka-kedr-731.jpg"], await FindAsync("KEDR ruchka"));
+        Assert.Equal(["kedr_50.jpg"], await FindAsync("r_5"));
+    }
+
     [SkippableFact]
     public async Task Lookup_GivesOtherModulesTheUrlOfKnownFilesOnly()
     {

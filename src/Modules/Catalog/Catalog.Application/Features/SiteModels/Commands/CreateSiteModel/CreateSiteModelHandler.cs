@@ -38,6 +38,7 @@ public sealed class CreateSiteModelHandler(
             return created.Error!.ToResult<SiteModelDto>();
         var model = created.Value;
         await models.AddAsync(model, cancellationToken);
+        await models.SaveChangesAsync(cancellationToken);
 
         if (productIds.Count > 0)
             await changes.PinAsync(productIds, model.Id, now, cancellationToken);

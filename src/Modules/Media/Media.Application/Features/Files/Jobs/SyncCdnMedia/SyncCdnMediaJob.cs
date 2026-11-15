@@ -94,6 +94,7 @@ public sealed class SyncCdnMediaJob(
                 created.Add(file.Value);
             }
             await files.AddRangeAsync(created, cancellationToken);
+            await files.SaveChangesAsync(cancellationToken);
         }
     }
 
@@ -113,7 +114,9 @@ public sealed class SyncCdnMediaJob(
                 if (created.IsFailure)
                     return created.Error!;
 
+                // A new folder is saved at once: its id comes from the database and its children need it.
                 var folder = await folders.AddAsync(created.Value, cancellationToken);
+                await folders.SaveChangesAsync(cancellationToken);
                 id = folder.Id;
                 folderIds[key] = id;
             }

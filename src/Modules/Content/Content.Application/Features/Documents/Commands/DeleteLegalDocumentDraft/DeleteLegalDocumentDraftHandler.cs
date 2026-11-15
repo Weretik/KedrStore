@@ -13,6 +13,7 @@ public sealed class DeleteLegalDocumentDraftHandler(IContentRepository<LegalDocu
             return Result.Conflict("Опубліковані редакції зберігаються, видалити можна лише чернетку.");
 
         await versions.DeleteAsync(version, cancellationToken);
+        await versions.SaveChangesAsync(cancellationToken);
         return Result.NoContent();
     }
 }

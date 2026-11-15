@@ -5,9 +5,8 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Products.Prices;
 using Catalog.Domain.Slugs;
-using Ardalis.Specification.EntityFrameworkCore;
+using BuildingBlocks.Infrastructure.Persistence;
 using BuildingBlocks.Domain.Abstractions;
-using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Application.Features.OneCSync.Source;
@@ -43,6 +42,10 @@ internal static class CatalogImportTestSupport
             new NoopProjectionRebuilder(),
             NullLogger<SyncOneCProductDetailsJob>.Instance);
 
+    public static SyncOneCPricesJob PricesJob(CatalogDbContext db, FakeOneC oneC)
+        => new(oneC, new TestRepository<ProductPrice>(db), db, new NoopProjectionRebuilder(),
+            NullLogger<SyncOneCPricesJob>.Instance);
+
     public static SyncOneCCategoryJob CategoryJob(CatalogDbContext db, FakeOneC oneC)
         => new(
             oneC,
@@ -60,13 +63,14 @@ internal static class CatalogImportTestSupport
         CosmosCategoryId = 920000
     };
 
-    public sealed class TestRepository<T>(CatalogDbContext db) : RepositoryBase<T>(db), ICatalogRepository<T>
+    public sealed class TestRepository<T>(CatalogDbContext db) : UnitOfWorkRepositoryBase<T>(db), ICatalogRepository<T>
         where T : class, IAggregateRoot;
 
     public sealed class FakeOneC : IOneCClient
     {
         public List<OneCCategoryDto> Categories { get; set; } = [];
         public List<OneCProductDto> Products { get; set; } = [];
+        public List<OneCPriceDto> Prices { get; set; } = [];
 
         public Task<IReadOnlyList<OneCCategoryDto>> GetCategoriesAsync(string rootCategoryId, CancellationToken cancellationToken)
             => Task.FromResult<IReadOnlyList<OneCCategoryDto>>(Categories);
@@ -78,7 +82,7 @@ internal static class CatalogImportTestSupport
             => throw new NotSupportedException();
 
         public Task<IReadOnlyList<OneCPriceDto>> GetProductPricesAsync(string rootCategoryId, CancellationToken cancellationToken)
-            => throw new NotSupportedException();
+            => Task.FromResult<IReadOnlyList<OneCPriceDto>>(Prices);
 
         public Task<IReadOnlyList<OneCPriceTypeDto>> GetPriceTypesAsync(CancellationToken cancellationToken)
             => throw new NotSupportedException();

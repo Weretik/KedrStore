@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Media.Application.Abstractions.Storage;
 using Media.Application.Features.Files.Shared;
 using Media.Application.Features.Folders.Shared;
@@ -29,11 +30,9 @@ public sealed class GetMediaFilesHandler(IReadMediaDbContext db, IMediaUrlBuilde
             files = files.Where(file => file.FolderId == null);
         }
 
-        if (!string.IsNullOrWhiteSpace(query.Search))
-        {
-            var search = query.Search.Trim().ToLower();
-            files = files.Where(file => file.FileName.ToLower().Contains(search));
-        }
+        // Database rules 2.1: every word must match; a trigram index serves ILIKE on the file name.
+        foreach (var pattern in SearchWords.Patterns(query.Search))
+            files = files.Where(file => EF.Functions.ILike(file.FileName, pattern, SearchWords.EscapeCharacter));
 
         var total = await files.CountAsync(cancellationToken);
         var page = await files

@@ -185,6 +185,12 @@ public sealed class AdminUsersApiTests(IdentityPostgresFixture fixture)
             Assert.True(row.GetProperty("isCustomer").GetBoolean());
         }
 
+        // Database rules 2.1: every word counts, in any order.
+        var words = $"{customer.Email[6..12]} {customer.Email[..5].ToLowerInvariant()}";
+        using var byWords = await adminClient.GetAsync($"/api/admin/users/candidates?search={Uri.EscapeDataString(words)}");
+        using (var rows = JsonDocument.Parse(await byWords.Content.ReadAsStringAsync()))
+            Assert.Contains(rows.RootElement.EnumerateArray(), item => item.GetProperty("id").GetGuid() == customer.Id);
+
         using var granted = await adminClient.PostAsJsonAsync($"/api/admin/users/{customer.Id}/staff-access", new
         {
             fullName = "Клієнт-адмін",

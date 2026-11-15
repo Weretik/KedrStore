@@ -22,6 +22,7 @@ public sealed class CreateMediaFolderHandler(
             return created.Error!.ToResult<MediaFolderItem>();
 
         var folder = await folders.AddAsync(created.Value, cancellationToken);
+        await folders.SaveChangesAsync(cancellationToken);
         return Result.Success(new MediaFolderItem(folder.Id.Value, folder.ParentId?.Value, folder.Name, 0));
     }
 }

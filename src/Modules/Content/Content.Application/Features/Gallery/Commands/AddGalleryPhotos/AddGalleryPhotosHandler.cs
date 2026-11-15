@@ -42,7 +42,10 @@ public sealed class AddGalleryPhotosHandler(
             added.Add(photo.Value);
         }
         if (added.Count > 0)
+        {
             await repository.AddRangeAsync(added, cancellationToken);
+            await repository.SaveChangesAsync(cancellationToken);
+        }
 
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }

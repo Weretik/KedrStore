@@ -23,6 +23,10 @@ internal sealed class MediaFileConfiguration : IEntityTypeConfiguration<MediaFil
 
         builder.HasIndex(file => file.StorageKey).IsUnique();
         builder.HasIndex(file => new { file.FolderId, file.FileName });
+        // Database rules 2.1: the media library search runs ILIKE per word on the file name.
+        builder.HasIndex(file => file.FileName, "IX_MediaFiles_FileName_trgm")
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
         builder.HasOne<MediaFolder>().WithMany().HasForeignKey(file => file.FolderId).OnDelete(DeleteBehavior.Restrict);
     }
 }

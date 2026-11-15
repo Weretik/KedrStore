@@ -29,6 +29,8 @@ public sealed class RecordWorkActivityHandler(
             await activities.AddAsync(next, cancellationToken);
         }
 
+        await activities.SaveChangesAsync(cancellationToken);
+
         return Result.Success();
     }
 }

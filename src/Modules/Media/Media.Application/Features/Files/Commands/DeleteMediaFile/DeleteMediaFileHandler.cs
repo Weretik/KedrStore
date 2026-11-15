@@ -19,6 +19,7 @@ public sealed class DeleteMediaFileHandler(IMediaRepository<MediaFile> files, IM
 
         await storage.DeleteAsync(file.StorageKey, cancellationToken);
         await files.DeleteAsync(file, cancellationToken);
+        await files.SaveChangesAsync(cancellationToken);
         await changes.DeletedAsync(file.Id.Value, cancellationToken);
         return Result.Success();
     }

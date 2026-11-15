@@ -20,9 +20,10 @@ namespace Sales.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BuildingBlocks.Infrastructure.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("BuildingBlocks.Infrastructure.Outbox.Persistence.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -106,8 +107,26 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasIndex("Email");
 
+                    b.HasIndex("Id")
+                        .HasDatabaseName("IX_Counterparties_Id_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Id"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Id"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("IdentityUserId")
                         .IsUnique();
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Counterparties_Name_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("Phone")
+                        .HasDatabaseName("IX_Counterparties_Phone_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Phone"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Phone"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("Counterparties", (string)null);
                 });
@@ -264,10 +283,19 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CounterpartyId");
+                    b.HasIndex("CreatedAt", "Id")
+                        .HasDatabaseName("IX_Orders_CreatedAt_Id");
 
-                    b.HasIndex("OrderNumber")
+                    b.HasIndex("CounterpartyId", "CreatedAt", "Id")
+                        .HasDatabaseName("IX_Orders_CounterpartyId_CreatedAt_Id");
+
+                    b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -307,6 +335,12 @@ namespace Sales.Infrastructure.Migrations
                         .HasColumnType("character varying(32)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .HasDatabaseName("IX_OrderDrafts_Title_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex("UpdatedAtUtc", "Id");
 
@@ -456,7 +490,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderDraftIdempotencyRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.Idempotency.OrderIdempotencyRecord", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -499,7 +533,7 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderIdempotencyRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderSyncRetryAudit", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.SyncRetries.OrderSyncRetryAudit", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -612,16 +646,16 @@ namespace Sales.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.Idempotency.OrderIdempotencyRecord", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.Order", null)
                         .WithOne()
-                        .HasForeignKey("Sales.Infrastructure.Persistence.Orders.OrderIdempotencyRecord", "OrderId")
+                        .HasForeignKey("Sales.Infrastructure.Persistence.Orders.Idempotency.OrderIdempotencyRecord", "OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.OrderSyncRetryAudit", b =>
+            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.SyncRetries.OrderSyncRetryAudit", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.OneCOrderSync", null)
                         .WithMany()

@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Ardalis.Result;
 using Identity.Application.Features.Users.Shared;
 using Identity.Application.Abstractions.Accounts;
@@ -86,7 +87,6 @@ public sealed class StaffAccountService(
         string search,
         CancellationToken cancellationToken = default)
     {
-        var term = search.Trim().ToUpperInvariant();
         var staffUserIds =
             from userRole in dbContext.UserRoles
             join role in dbContext.Roles on userRole.RoleId equals role.Id
@@ -98,10 +98,13 @@ public sealed class StaffAccountService(
             where role.Name == RoleNames.User
             select userRole.UserId;
 
-        return await dbContext.Users
-            .AsNoTracking()
-            .Where(user => !staffUserIds.Contains(user.Id))
-            .Where(user => user.NormalizedEmail!.Contains(term) || user.FullName.ToUpper().Contains(term))
+        var users = dbContext.Users.AsNoTracking().Where(user => !staffUserIds.Contains(user.Id));
+        // Database rules 2.1: every word must match the email or the name; trigram indexes serve ILIKE.
+        foreach (var pattern in SearchWords.Patterns(search))
+            users = users.Where(user => EF.Functions.ILike(user.Email!, pattern, SearchWords.EscapeCharacter) ||
+                                        EF.Functions.ILike(user.FullName, pattern, SearchWords.EscapeCharacter));
+
+        return await users
             .OrderBy(user => user.Email)
             .Take(CandidateLimit)
             .Select(user => new StaffCandidateDto(

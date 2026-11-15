@@ -16,6 +16,7 @@ public sealed class DeleteHomeBrandHandler(
             return Result.NotFound();
 
         await repository.DeleteAsync(item, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

@@ -35,9 +35,7 @@ public sealed class GetSiteModelsHandler(SiteModelStateReader reader)
         return Result.Success(new SiteModelListDto(page, rows.Count, request.Page, request.PageSize));
     }
 
+    /// <summary>Every word is in the model name, in a product name, or is a product number (database rules 2.1).</summary>
     private static bool Matches(SiteModelState state, ProductGroupId modelId, string name, string search)
-        => name.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
-           state.OnSiteMembers(modelId).Any(id =>
-               id.Value.ToString() == search ||
-               state.Products[id].Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+        => SiteModelSearch.Matches(state, name, state.OnSiteMembers(modelId).ToList(), search);
 }

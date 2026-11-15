@@ -6,7 +6,7 @@ This section holds stable rules for backend changes. Frontend rules belong to th
 - [Module rules](module-rules.md) — owning module, when to propose a new module, module shape, schema per module, and FluentValidation.
 - [Identifier strategy](identifier-strategy.md) — required ID choice before creating or changing an entity.
 - [API rules](api-rules.md) — HTTP contracts, validation, results, and errors.
-- [Database rules](database-rules.md) — EF Core, reads, transactions, migrations, and data.
+- [Database rules](database-rules.md) — queries and N+1, indexes and search (pg_trgm per word), transactions, concurrency, and how migrations reach production; known deviations from the 2026-11-15 audit.
 - [Security and observability](security-observability-rules.md) — authorization, privacy, Serilog, and diagnostics.
 - [Testing rules](testing-rules.md) — scenario coverage, Red -> Green -> Refactor, test selection, exceptions, and verification commands.
 - [Delivery rules](delivery-rules.md) — behavior-focused SDD, traceability, scope, and definition of done.

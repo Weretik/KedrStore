@@ -87,13 +87,40 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         var reader = scope.ServiceProvider.GetRequiredService<ICustomerReadService>();
 
         var page = await reader.GetListAsync(
-            new CustomerListRequest { SearchTerm = "ALPHA", Phone = "+380", Sort = "-name", Page = 2, PageSize = 1 },
+            new CustomerListRequest
+            {
+                SearchTerm = "ALPHA", CounterpartyId = "match", Name = "alpha", Phone = "+380", Sort = "-name", Page = 2,
+                PageSize = 1
+            },
             CancellationToken.None);
 
         Assert.True(page.IsSuccess);
         Assert.Equal(2, page.Value.PagedInfo.TotalRecords);
         Assert.Equal(2, page.Value.PagedInfo.TotalPages);
         Assert.Equal(["match-1"], page.Value.Value.Select(customer => customer.CounterpartyId));
+    }
+
+    /// <summary>Database rules 2.1: every word must match some field, in any order and case, and 50% is literal.</summary>
+    [SkippableFact]
+    public async Task GetListAsync_SearchMatchesEveryWordInAnyField()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetDatabaseAsync();
+        var now = new DateTimeOffset(2026, 11, 15, 10, 0, 0, TimeSpan.Zero);
+        await SeedCustomerAsync("k-1", "ТОВ Кедр Фурнітура", now, phone: "+380501112233");
+        await SeedCustomerAsync("k-2", "Кедр Двері", now, phone: "+380509998877");
+        await SeedCustomerAsync("k-3", "Знижка 50% Фурнітура", now, phone: "+380671234567");
+
+        await using var provider = BuildProvider();
+        await using var scope = provider.CreateAsyncScope();
+        var reader = scope.ServiceProvider.GetRequiredService<ICustomerReadService>();
+        async Task<string[]> FindAsync(string search) => (await reader.GetListAsync(
+                new CustomerListRequest { SearchTerm = search, Page = 1, PageSize = 10 }, CancellationToken.None))
+            .Value.Value.Select(customer => customer.CounterpartyId).Order().ToArray();
+
+        Assert.Equal(["k-1"], await FindAsync("фурн кедр"));
+        Assert.Equal(["k-1", "k-2"], await FindAsync("КЕДР 050"));
+        Assert.Equal(["k-3"], await FindAsync("50%"));
     }
 
     [SkippableFact]

@@ -23,6 +23,7 @@ public sealed class UpdateHomeBrandHandler(
         if (updated.IsFailure)
             return updated.Error!.ToResult<AdminHomeBlocks>();
         await repository.UpdateAsync(brand, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

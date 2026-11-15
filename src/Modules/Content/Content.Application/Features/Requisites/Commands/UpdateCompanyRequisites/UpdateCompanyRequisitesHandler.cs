@@ -34,6 +34,7 @@ public sealed class UpdateCompanyRequisitesHandler(
         // One SaveChanges writes the new values and their log entry together.
         await changesRepository.AddAsync(
             CompanyRequisitesChange.Record(changes, now, currentUser.UserId, userName), cancellationToken);
+        await changesRepository.SaveChangesAsync(cancellationToken);
         return Result.Success(CompanyRequisitesMapper.ToDetails(requisites));
     }
 }

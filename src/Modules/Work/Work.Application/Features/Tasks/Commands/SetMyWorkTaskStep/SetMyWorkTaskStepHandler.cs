@@ -20,6 +20,7 @@ public sealed class SetMyWorkTaskStepHandler(
             return Result<WorkTaskDto>.NotFound();
 
         await tasks.UpdateAsync(task, cancellationToken);
+        await tasks.SaveChangesAsync(cancellationToken);
         return Result.Success(WorkTaskDto.From(task, today));
     }
 }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Contracts.Reference;
 using Sales.Application.Abstractions.Customers;
 using Sales.Application.Features.Customers.Queries.GetCustomerById;
@@ -15,24 +16,22 @@ internal sealed class CustomerReadService(
     {
         var query = dbContext.Counterparties.AsNoTracking();
 
-        var searchTerm = request.SearchTerm?.Trim().ToLower();
-        if (!string.IsNullOrEmpty(searchTerm))
+        // Database rules 2.1: every word must match; trigram indexes serve ILIKE on these columns.
+        foreach (var pattern in SearchWords.Patterns(request.SearchTerm))
             query = query.Where(counterparty =>
-                counterparty.Id.ToLower().Contains(searchTerm) ||
-                counterparty.Name.ToLower().Contains(searchTerm) ||
-                (counterparty.Phone != null && counterparty.Phone.ToLower().Contains(searchTerm)));
+                EF.Functions.ILike(counterparty.Id, pattern, SearchWords.EscapeCharacter) ||
+                EF.Functions.ILike(counterparty.Name, pattern, SearchWords.EscapeCharacter) ||
+                (counterparty.Phone != null && EF.Functions.ILike(counterparty.Phone, pattern, SearchWords.EscapeCharacter)));
 
-        var counterpartyId = request.CounterpartyId?.Trim().ToLower();
-        if (!string.IsNullOrEmpty(counterpartyId))
-            query = query.Where(counterparty => counterparty.Id.ToLower().Contains(counterpartyId));
+        foreach (var pattern in SearchWords.Patterns(request.CounterpartyId))
+            query = query.Where(counterparty => EF.Functions.ILike(counterparty.Id, pattern, SearchWords.EscapeCharacter));
 
-        var name = request.Name?.Trim().ToLower();
-        if (!string.IsNullOrEmpty(name))
-            query = query.Where(counterparty => counterparty.Name.ToLower().Contains(name));
+        foreach (var pattern in SearchWords.Patterns(request.Name))
+            query = query.Where(counterparty => EF.Functions.ILike(counterparty.Name, pattern, SearchWords.EscapeCharacter));
 
-        var phone = request.Phone?.Trim().ToLower();
-        if (!string.IsNullOrEmpty(phone))
-            query = query.Where(counterparty => counterparty.Phone != null && counterparty.Phone.ToLower().Contains(phone));
+        foreach (var pattern in SearchWords.Patterns(request.Phone))
+            query = query.Where(counterparty =>
+                counterparty.Phone != null && EF.Functions.ILike(counterparty.Phone, pattern, SearchWords.EscapeCharacter));
 
         var totalRecords = await query.LongCountAsync(cancellationToken);
         var ordered = request.Sort switch

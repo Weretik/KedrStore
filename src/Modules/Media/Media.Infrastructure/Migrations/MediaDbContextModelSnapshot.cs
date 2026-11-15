@@ -21,6 +21,7 @@ namespace Media.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Media.Domain.Files.MediaFile", b =>
@@ -70,6 +71,11 @@ namespace Media.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("FolderId", "FileName");
+
+                    b.HasIndex(new[] { "FileName" }, "IX_MediaFiles_FileName_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "FileName" }, "IX_MediaFiles_FileName_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "FileName" }, "IX_MediaFiles_FileName_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("MediaFiles", "media");
                 });

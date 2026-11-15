@@ -58,17 +58,14 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         if (created.IsFailure)
             return created.Error!;
         var order = created.Value;
-        try
-        {
-            await orderStore.PersistAsync(order,
+        var persisted = await orderStore.PersistAsync(order,
             id => OneCOrderSync.Create(id, now),
             id => new CreateOrderIdempotencyRecord(OrderOperation, key, hash, id,
                 order.OrderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)), ct);
-        }
-        catch (DbUpdateException error) when (IsUniqueViolation(error))
+        if (!persisted)
         {
-            existing = await orderStore.FindIdempotencyRecordAsync(OrderOperation, key, ct);
-            if (existing is null) throw;
+            existing = await orderStore.FindIdempotencyRecordAsync(OrderOperation, key, ct)
+                       ?? throw new InvalidOperationException($"Idempotency key {key} is taken but not found.");
             if (existing.RequestHash != hash)
                 return (null!, false, new WorkspaceOrderConflict("idempotency_conflict", null));
             var replayTotal = await db.OrderLines.AsNoTracking()

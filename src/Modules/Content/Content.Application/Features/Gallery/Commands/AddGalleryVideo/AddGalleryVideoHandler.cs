@@ -29,6 +29,7 @@ public sealed class AddGalleryVideoHandler(
         if (video.IsFailure)
             return video.Error!.ToResult<IReadOnlyList<AdminGalleryItem>>();
         await repository.AddAsync(video.Value, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }
 }

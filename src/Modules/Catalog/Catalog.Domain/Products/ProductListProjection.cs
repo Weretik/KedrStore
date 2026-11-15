@@ -85,6 +85,43 @@ public sealed class ProductListProjection
             retailPrice);
     #endregion
 
+    #region Behavior
+    /// <summary>
+    /// Copies the values of a freshly built row of the same product; true when anything changed, so a rebuild writes
+    /// only the rows that differ (database rules 2.4).
+    /// </summary>
+    public bool SyncWith(ProductListProjection source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        if (source.ProductId != ProductId)
+            throw new ArgumentException("A list row can only take the values of its own product.", nameof(source));
+
+        var changed = NameUk != source.NameUk || NameRu != source.NameRu || ProductSlug != source.ProductSlug ||
+                      Photo != source.Photo || CategoryId != source.CategoryId ||
+                      CategorySlug != source.CategorySlug || InStock != source.InStock ||
+                      IsSale != source.IsSale || IsNew != source.IsNew || ExportToSite != source.ExportToSite ||
+                      RetailPrice != source.RetailPrice || SearchTextUk != source.SearchTextUk ||
+                      SearchTextRu != source.SearchTextRu;
+        if (!changed)
+            return false;
+
+        NameUk = source.NameUk;
+        NameRu = source.NameRu;
+        ProductSlug = source.ProductSlug;
+        Photo = source.Photo;
+        CategoryId = source.CategoryId;
+        CategorySlug = source.CategorySlug;
+        InStock = source.InStock;
+        IsSale = source.IsSale;
+        IsNew = source.IsNew;
+        ExportToSite = source.ExportToSite;
+        RetailPrice = source.RetailPrice;
+        SearchTextUk = source.SearchTextUk;
+        SearchTextRu = source.SearchTextRu;
+        return true;
+    }
+    #endregion
+
     #region Guards & Setters
     private static string BuildSearchText(ProductId productId, string name)
         => $"{productId.Value} {name}".Trim();

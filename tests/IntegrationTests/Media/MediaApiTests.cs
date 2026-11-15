@@ -50,7 +50,8 @@ public sealed class MediaApiTests
         Assert.StartsWith("https://images-kedr.cdn.express/library/", url);
         var firstKey = Assert.Single(cdn.Files.Keys);
 
-        using var list = JsonDocument.Parse(await manager.GetStringAsync($"/api/admin/media/files?folderId={folder}&search=73"));
+        // The search itself runs ILIKE, which needs PostgreSQL: MediaPostgresTests covers it.
+        using var list = JsonDocument.Parse(await manager.GetStringAsync($"/api/admin/media/files?folderId={folder}"));
         Assert.Equal(1, list.RootElement.GetProperty("totalCount").GetInt32());
 
         using var replace = await manager.PutAsync($"/api/admin/media/files/{id}/content",

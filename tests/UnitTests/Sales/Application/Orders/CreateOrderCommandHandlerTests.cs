@@ -109,7 +109,7 @@ public sealed class CreateOrderCommandHandlerTests
         public CreateOrderIdempotencyRecord? LastIdempotency { get; private set; }
         public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken) => Task.FromResult(CounterpartyExists);
         public Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken) => Task.FromResult(Existing);
-        public Task PersistAsync(Order order, Func<OrderId, OneCOrderSync> synchronizationFactory, Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory, CancellationToken cancellationToken)
+        public Task<bool> PersistAsync(Order order, Func<OrderId, OneCOrderSync> synchronizationFactory, Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory, CancellationToken cancellationToken)
         {
             if (ThrowOnPersist)
                 throw new InvalidOperationException("Simulated transaction failure.");
@@ -119,7 +119,7 @@ public sealed class CreateOrderCommandHandlerTests
             LastIdempotency = idempotencyRecordFactory(order.Id);
             PersistedOrder = order;
             Persisted = true;
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 }

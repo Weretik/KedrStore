@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Application.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Categories.Shared;
@@ -109,7 +110,7 @@ public sealed class GetPublicProductListHandler(
             var term = request.SearchTerm.Trim();
             var tokens = term
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(LikePattern.Escape)
+                .Select(SearchWords.Escape)
                 .ToArray();
 
             foreach (var token in tokens)

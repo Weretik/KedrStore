@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Application.Shared;
 using Catalog.Contracts.Products.GetList;
 
@@ -45,12 +46,12 @@ internal static class SalesProductFilters
     {
         var tokens = term
             .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(LikePattern.Escape)
+            .Select(SearchWords.Escape)
             .ToArray();
 
         var nameQuery = productsQuery;
         foreach (var token in tokens)
-            nameQuery = nameQuery.Where(x => EF.Functions.ILike(x.Name, $"%{token}%", LikePattern.EscapeCharacter));
+            nameQuery = nameQuery.Where(x => EF.Functions.ILike(x.Name, $"%{token}%", SearchWords.EscapeCharacter));
 
         if (!int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) || id <= 0)
             return nameQuery;

@@ -12,7 +12,11 @@ public interface IOrderCreationStore
         string idempotencyKey,
         CancellationToken cancellationToken);
 
-    Task PersistAsync(
+    /// <summary>
+    /// Saves the order with its 1C synchronisation and idempotency record in one transaction. Answers false, saving
+    /// nothing, when another request saved the same idempotency key meanwhile (database rules 4).
+    /// </summary>
+    Task<bool> PersistAsync(
         Order order,
         Func<OrderId, OneCOrderSync> synchronizationFactory,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
