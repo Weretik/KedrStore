@@ -53,7 +53,7 @@ public sealed record CategoryContentResponse(
     IReadOnlyList<CategoryFaqItemDto> Faq,
     DateTimeOffset UpdatedAt);
 
-/// <summary>Admin view of one language, including who changed it.</summary>
+/// <summary>Admin view of one language, including who changed it; <c>Version</c> goes back with the next save.</summary>
 public sealed record AdminCategoryContentItem(
     string Language,
     string? SeoTitle,
@@ -62,17 +62,22 @@ public sealed record AdminCategoryContentItem(
     string? BodyHtml,
     IReadOnlyList<CategoryFaqItemDto> Faq,
     DateTimeOffset UpdatedAt,
-    string UpdatedBy);
+    string UpdatedBy,
+    uint Version);
 
 public sealed record AdminCategoryContentResponse(int CategoryId, IReadOnlyList<AdminCategoryContentItem> Items);
 
-/// <summary>Full replacement of one language; empty fields clear them.</summary>
+/// <summary>
+/// Full replacement of one language; empty fields clear them. <c>Version</c> is the one the form read (0 for a
+/// language never saved): when the content changed since, the save answers 409; without it the save is not checked.
+/// </summary>
 public sealed record SaveCategoryContentRequest(
     string? SeoTitle,
     string? MetaDescription,
     string? H1,
     string? BodyHtml,
-    IReadOnlyList<CategoryFaqItemDto>? Faq);
+    IReadOnlyList<CategoryFaqItemDto>? Faq,
+    uint? Version = null);
 
 /// <summary>A category shown or hidden on the site; <c>ChangedCount</c> counts it with its affected relatives.</summary>
 public sealed record CategorySiteVisibilityResponse(int Id, bool IsShownOnSite, int ChangedCount);

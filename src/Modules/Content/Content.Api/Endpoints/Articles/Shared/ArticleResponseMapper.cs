@@ -22,12 +22,13 @@ internal static class ArticleResponseMapper
     public static AdminArticleResponse ToResponse(AdminArticleDetails item) => new(
         item.Id, item.Slug, item.PublishedOn, item.IsPublished, CoverPath(item.Id, item.Cover), item.Cover.Url,
         item.Cover.MediaFileId, item.UpdatedAt, item.UpdatedBy,
-        item.Texts.Select(text => new ArticleTextDto(text.Language, text.Title, text.Excerpt, text.BodyHtml)).ToList());
+        item.Texts.Select(text => new ArticleTextDto(text.Language, text.Title, text.Excerpt, text.BodyHtml)).ToList(),
+        item.Version);
 
     public static ArticleCoverUploadResponse ToResponse(UploadedArticleCover cover) => new(cover.MediaFileId, cover.Url);
 
     public static ArticleInput ToInput(SaveArticleRequest request) => new(
         request.Slug, request.PublishedOn, request.IsPublished,
         (request.Texts ?? []).Select(text => new ArticleTextInput(text.Language, text.Title, text.Excerpt, text.BodyHtml)).ToList(),
-        request.CoverMediaFileId, request.RemoveCover);
+        request.CoverMediaFileId, request.RemoveCover, request.Version);
 }

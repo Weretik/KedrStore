@@ -23,6 +23,8 @@ public sealed class UpdateCatalogAttributeHandler(
             return Result.NotFound();
 
         var request = command.Request;
+        if (RowVersions.IsStale(request.Version, attribute.Version))
+            return RowVersions.Changed<AdminCatalogAttributeDto>();
         var edited = attribute.EditManually(request.NameUk, request.NameRu, request.IsFilterable, request.SortOrder,
             clock.GetUtcNow());
         if (edited.IsFailure)

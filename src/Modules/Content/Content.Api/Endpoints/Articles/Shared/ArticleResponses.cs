@@ -22,16 +22,18 @@ public sealed record ArticleTextDto(string Language, string Title, string Excerp
 /// <summary><c>CoverMediaFileId</c> stays set when the library file was deleted; then <c>CoverUrl</c> is null.</summary>
 public sealed record AdminArticleResponse(
     long Id, string Slug, DateOnly PublishedOn, bool IsPublished, string? CoverPath, string? CoverUrl,
-    long? CoverMediaFileId, DateTimeOffset UpdatedAt, string? UpdatedBy, IReadOnlyList<ArticleTextDto> Texts);
+    long? CoverMediaFileId, DateTimeOffset UpdatedAt, string? UpdatedBy, IReadOnlyList<ArticleTextDto> Texts,
+    uint Version);
 
 /// <summary>
 /// Create and update body. On create an empty slug is generated from the Ukrainian title. <c>CoverMediaFileId</c>
 /// sets the cover (a file from <c>POST /api/admin/articles/covers</c> or the media library); <c>RemoveCover</c> drops
-/// it; with neither the cover stays as it is.
+/// it; with neither the cover stays as it is. On update <c>Version</c> is the one the form read: when the article changed
+/// since, the save answers 409; without it the save is not checked.
 /// </summary>
 public sealed record SaveArticleRequest(
     string? Slug, DateOnly PublishedOn, bool IsPublished, IReadOnlyList<ArticleTextDto> Texts,
-    long? CoverMediaFileId = null, bool RemoveCover = false);
+    long? CoverMediaFileId = null, bool RemoveCover = false, uint? Version = null);
 
 /// <summary>A cover just put into the media library (CDN folder <c>articles</c>).</summary>
 public sealed record ArticleCoverUploadResponse(long MediaFileId, string Url);

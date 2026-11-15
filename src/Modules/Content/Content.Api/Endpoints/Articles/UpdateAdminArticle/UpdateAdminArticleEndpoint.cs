@@ -13,7 +13,8 @@ internal static class UpdateAdminArticleEndpoint
             .WithName("updateAdminArticle")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         [FromRoute] long id, [FromBody] SaveArticleRequest request, ISender sender, HttpContext http,

@@ -22,6 +22,8 @@ public sealed class UpdateSiteSeoSettingsHandler(
         var settings = await repository.GetByIdAsync(SiteSeoSettings.SingletonId, cancellationToken);
         if (settings is null)
             return Result.NotFound();
+        if (RowVersions.IsStale(command.Input.Version, settings.Version))
+            return RowVersions.Changed<SiteSeoSettingsDetails>();
 
         if (command.Input.ShareImageMediaFileId is { } imageId
             && imageId != settings.ShareImageMediaFileId

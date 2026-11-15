@@ -13,7 +13,8 @@ public sealed record ArticleInput(
     bool IsPublished,
     IReadOnlyList<ArticleTextInput> Texts,
     long? CoverMediaFileId = null,
-    bool RemoveCover = false);
+    bool RemoveCover = false,
+    uint? Version = null);
 
 /// <summary>
 /// The cover as clients see it: <see cref="Url"/> on the CDN, or a <see cref="LegacyVersion"/> served by the API
@@ -45,7 +46,8 @@ public sealed record AdminArticleDetails(
     ArticleCoverView Cover,
     DateTimeOffset UpdatedAt,
     string? UpdatedBy,
-    IReadOnlyList<ArticleTextInput> Texts);
+    IReadOnlyList<ArticleTextInput> Texts,
+    uint Version);
 
 public sealed record PublicArticleListItem(
     long Id,

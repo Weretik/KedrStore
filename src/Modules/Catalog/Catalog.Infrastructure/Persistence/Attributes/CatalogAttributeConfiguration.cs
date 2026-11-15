@@ -8,6 +8,8 @@ public sealed class CatalogAttributeConfiguration : IEntityTypeConfiguration<Cat
     {
         builder.ToTable("CatalogAttributes");
         builder.HasKey(x => x.Id);
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(x => x.Version).IsRowVersion();
         builder.Property(x => x.Id).HasConversion(AttributeIdConverters.AttributeId).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
 
         builder.Property(x => x.Code).HasMaxLength(CatalogAttribute.CodeMaxLength).IsRequired();

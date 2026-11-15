@@ -16,6 +16,8 @@ public sealed partial class Article : IAggregateRoot
     private readonly List<ArticleTranslation> _translations = [];
 
     public ArticleId Id { get; private set; }
+    /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
+    public uint Version { get; private set; }
     public string Slug { get; private set; } = null!;
     public DateOnly PublishedOn { get; private set; }
     public bool IsPublished { get; private set; }
