@@ -31,5 +31,7 @@ public sealed class ProductGroupConfiguration : IEntityTypeConfiguration<Product
             .HasFilter("\"GroupKey\" IS NOT NULL")
             .HasDatabaseName("UX_CatalogProductGroups_Category_Key");
         builder.HasIndex(x => x.MainProductId).HasDatabaseName("IX_CatalogProductGroups_MainProductId");
+        // Database rules 2.1: the group picker runs ILIKE per word on the name.
+        builder.HasIndex(x => x.Name, "IX_CatalogProductGroups_Name_trgm").HasMethod("gin").HasOperators("gin_trgm_ops");
     }
 }

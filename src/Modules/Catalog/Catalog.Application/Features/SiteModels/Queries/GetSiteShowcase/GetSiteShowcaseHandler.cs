@@ -52,9 +52,7 @@ public sealed class GetSiteShowcaseHandler(SiteModelStateReader reader)
         => model is null ? GetSiteShowcaseQuery.NoModelStatus : SiteModelState.StatusText(model.Status);
 
     private static bool Matches(SiteModelState state, string name, IReadOnlyList<ProductId> products, string search)
-        => name.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
-           products.Any(id => id.Value.ToString() == search ||
-                              state.Products[id].Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
+        => SiteModelSearch.Matches(state, name, products, search);
 
     private static SiteShowcaseRowDto ToRow(SiteModelState state, IReadOnlyList<SiteModelAttributeFacts> variantAttributes,
         ProductGroup? model, ProductCategoryId categoryId, string name, IReadOnlyList<ProductId> productIds)

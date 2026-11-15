@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Application.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Products.GetAdminList;
@@ -22,7 +23,7 @@ internal static class DeletedAdminProducts
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var term = request.SearchTerm.Trim();
-            var pattern = "%" + LikePattern.Escape(term) + "%";
+            var pattern = "%" + SearchWords.Escape(term) + "%";
             products = int.TryParse(term, NumberStyles.None, CultureInfo.InvariantCulture, out var id)
                 ? products.Where(product => product.Id == ProductId.From(id))
                 : products.Where(product => EF.Functions.ILike(product.Name, pattern, @"\"));

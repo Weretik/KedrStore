@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Shared;
 using Catalog.Application.Features.Categories.Shared;
@@ -84,7 +85,7 @@ public sealed class GetAdminProductListHandler(IReadCatalogDbContext catalogDbCo
         {
             var tokens = request.SearchTerm.Trim()
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(LikePattern.Escape);
+                .Select(SearchWords.Escape);
 
             foreach (var token in tokens)
             {
