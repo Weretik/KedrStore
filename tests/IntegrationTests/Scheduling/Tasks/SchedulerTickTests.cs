@@ -120,12 +120,17 @@ public sealed class SchedulerTickTests
             Assert.True(await harness.Journal(job).StartAsync(launch.Key, launch.RunId, CancellationToken.None));
         }
 
-        harness.Time.Advance(TimeSpan.FromMinutes(31));
+        harness.Time.Advance(TimeSpan.FromMinutes(ScheduledTaskCatalog.JobTaskMaxMinutes - 1));
+        await harness.TickAsync();
+        await using (var slow = harness.NewContext())
+            Assert.Equal(TaskState.Running, (await slow.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks)).State);
+
+        harness.Time.Advance(TimeSpan.FromMinutes(2));
         await harness.TickAsync();
 
         await using var check = harness.NewContext();
         var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
-        Assert.Equal("Задача не завершилася за 30 хв.", task.LastFailureReason);
+        Assert.Equal($"Задача не завершилася за {ScheduledTaskCatalog.JobTaskMaxMinutes} хв.", task.LastFailureReason);
         Assert.Equal(TaskState.Idle, task.State);
     }
 
