@@ -39,6 +39,7 @@ public sealed class UploadMediaFileHandler(
             }
 
             var file = await files.AddAsync(created.Value, cancellationToken);
+            await files.SaveChangesAsync(cancellationToken);
             return Result.Success(MediaFileMapper.ToItem(file, urls));
         }
         catch

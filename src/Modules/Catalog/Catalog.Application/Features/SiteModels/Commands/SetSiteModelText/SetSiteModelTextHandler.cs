@@ -33,7 +33,7 @@ public sealed class SetSiteModelTextHandler(
 
         if (isNew)
             await texts.AddAsync(text, cancellationToken);
-        else if (updated.Value)
+        if (isNew || updated.Value)
             await texts.SaveChangesAsync(cancellationToken);
 
         return Result.Success((await reader.ReadAsync(command.ModelId, cancellationToken))!);

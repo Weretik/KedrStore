@@ -19,6 +19,7 @@ public sealed class ReorderHomeBrandsHandler(
             return Result.Conflict("Список змінився, оновіть сторінку й спробуйте ще раз.");
 
         await repository.UpdateRangeAsync(items, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

@@ -1,5 +1,7 @@
+using BuildingBlocks.Infrastructure.Persistence;
+
 namespace Content.Infrastructure.Persistence;
 
 internal sealed class ContentEfRepository<T>(ContentDbContext dbContext)
-    : RepositoryBase<T>(dbContext), IContentRepository<T>
+    : UnitOfWorkRepositoryBase<T>(dbContext), IContentRepository<T>
     where T : class, IAggregateRoot { }

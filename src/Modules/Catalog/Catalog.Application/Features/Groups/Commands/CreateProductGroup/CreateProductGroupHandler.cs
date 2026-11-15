@@ -43,6 +43,7 @@ public sealed class CreateProductGroupHandler(
             return created.Error!.ToResult<AdminProductGroupDto>();
         var group = created.Value;
         await groups.AddAsync(group, cancellationToken);
+        await groups.SaveChangesAsync(cancellationToken);
 
         if (productIds.Count > 0)
             await pins.PinAsync(productIds, group.Id, now, cancellationToken);

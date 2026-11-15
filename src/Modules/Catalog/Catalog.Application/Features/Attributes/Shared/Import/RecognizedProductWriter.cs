@@ -103,6 +103,8 @@ public sealed class RecognizedProductWriter(
         var categoryByProduct = await SyncProductsAsync(products, attributeByCode, valueByKey, source, apply, now, report,
             cancellationToken);
         await SeedCategoryAttributesAsync(products, categoryByProduct, attributeByCode, apply, now, report, cancellationToken);
+        if (apply)
+            await reviews.SaveChangesAsync(cancellationToken);
     }
 
     private async Task<Dictionary<int, ProductCategoryId>> SyncProductsAsync(IReadOnlyList<RecognizedProduct> products,
@@ -214,7 +216,6 @@ public sealed class RecognizedProductWriter(
                 await productValues.AddRangeAsync(createdValues, cancellationToken);
             if (createdReviews.Count > 0)
                 await reviews.AddRangeAsync(createdReviews, cancellationToken);
-            await reviews.SaveChangesAsync(cancellationToken);
         }
 
         return categoryByProduct;

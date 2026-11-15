@@ -21,6 +21,7 @@ public sealed class CreateWorkTaskForUserHandler(
 
         var task = created.Value;
         await tasks.AddAsync(task, cancellationToken);
+        await tasks.SaveChangesAsync(cancellationToken);
         return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }
 }

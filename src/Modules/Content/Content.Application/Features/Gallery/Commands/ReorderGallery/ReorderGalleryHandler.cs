@@ -26,6 +26,7 @@ public sealed class ReorderGalleryHandler(
         for (var position = 0; position < command.Ids.Count; position++)
             byId[command.Ids[position]].MoveTo(position, now);
         await repository.UpdateRangeAsync(items, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }
 }

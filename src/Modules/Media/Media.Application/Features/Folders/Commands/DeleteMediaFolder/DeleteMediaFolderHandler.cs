@@ -20,6 +20,7 @@ public sealed class DeleteMediaFolderHandler(IMediaRepository<MediaFolder> folde
             return Result.Conflict(NotEmptyMessage);
 
         await folders.DeleteAsync(folder, cancellationToken);
+        await folders.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

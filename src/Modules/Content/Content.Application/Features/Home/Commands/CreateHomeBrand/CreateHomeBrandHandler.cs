@@ -21,6 +21,7 @@ public sealed class CreateHomeBrandHandler(
         if (brand.IsFailure)
             return brand.Error!.ToResult<AdminHomeBlocks>();
         await repository.AddAsync(brand.Value, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

@@ -54,6 +54,7 @@ public sealed class CreateCatalogAttributeHandler(
         if (edited.IsFailure)
             return edited.Error!.ToResult<AdminCatalogAttributeDto>();
         await attributes.AddAsync(attribute, cancellationToken);
+        await attributes.SaveChangesAsync(cancellationToken);
         if (request.Kind == CreateCatalogAttributeCommand.YesNo)
         {
             // Fixed values that always pass the rules.
@@ -62,6 +63,7 @@ public sealed class CreateCatalogAttributeHandler(
                 AttributeValue.CreateManual(attribute.Id, "yes", "Так", "Да", "tak", 1, null, null, now).Value,
                 AttributeValue.CreateManual(attribute.Id, "no", "Ні", "Нет", "ni", 2, null, null, now).Value
             ], cancellationToken);
+            await values.SaveChangesAsync(cancellationToken);
         }
 
         return Result.Success((await reader.ReadAsync(attribute.Id, cancellationToken))!);

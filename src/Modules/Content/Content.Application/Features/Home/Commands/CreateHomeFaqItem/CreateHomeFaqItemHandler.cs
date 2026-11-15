@@ -17,6 +17,7 @@ public sealed class CreateHomeFaqItemHandler(
         if (item.IsFailure)
             return item.Error!.ToResult<AdminHomeBlocks>();
         await repository.AddAsync(item.Value, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }
