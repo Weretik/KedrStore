@@ -37,7 +37,7 @@ On the checkout page a manager sees each product at the selected customer's pric
 - `CustomerPriceResolver` (Infrastructure) loads the customer, its rules, the category parent map (only when the customer has rules) and the products' UAH prices, and walks up the parent chain (depth guard 32).
 - `AdminWorkspacePricing` validates lines, applies stock checks and adjustments, and builds the fingerprint from `productId:quantity:basePrice:adjustment`.
 - `OrderLine.PriceAdjustment` and `OrderDraftLine.PriceAdjustment`: `numeric(18,2)`, not null, default 0.
-- Contract: [order workspace](../../../contracts/sales/admin-order-workspace.openapi.yaml), [drafts](../../../contracts/sales/admin-order-drafts.openapi.yaml). All new request fields are optional; new response fields are additive.
+- Contract: [order workspace](../../../contracts/openapi.json), [drafts](../../../contracts/openapi.json). All new request fields are optional; new response fields are additive.
 
 ## Data and rollout
 

@@ -9,6 +9,8 @@ internal static class GetPublicSiteModelEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("model/{modelSlug}", Handle)
             .WithName("getPublicSiteModel")
+            .WithSummary("The model page")
+            .WithDescription("A current model slug, or the slug of an on-site product shown as a model of its own, gives the page. The page lists the axis values its products have and each product's values, so the site can hide combinations no product has and offer in-stock neighbours. Texts of `ru` fall back to `uk` field by field.")
             .Produces<PublicSiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<PublicSiteModelAddressDto>(StatusCodes.Status404NotFound);

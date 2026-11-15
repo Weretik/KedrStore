@@ -33,6 +33,7 @@ For a new or substantially changed feature, update the [feature map](docs/sdd/fe
 - Focused unit test (fast, no Docker): `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~<Name>"`. Feature cards give the filter.
 - Integration test: the same filter on `tests/IntegrationTests/IntegrationTests.csproj`; slow, needs Docker (Testcontainers), skips without it.
 - Documentation: `python3 tools/docs/check_doc_links.py`.
+- OpenAPI contract: `dotnet build src/Bootstrapper/Host.Api/Host.Api.csproj` regenerates `docs/sdd/contracts/openapi.json`; commit it with the endpoint change.
 - Do not build the whole solution or run every test project unless asked; CI does that.
 
 A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
@@ -53,6 +54,8 @@ A small fix that restores documented behavior needs no SDD, file-role map, or au
 | Double submit, retries, outbox and webhook handlers, sync jobs (what a repeat does) | — | [Idempotency rules](docs/sdd/standards/idempotency-rules.md): decision table, `Idempotency-Key` pattern, audit of every write operation |
 | Verify changes / hand off for review | `$backend-change-verification` / `$backend-pr-handoff` | [Testing rules](docs/sdd/standards/testing-rules.md) |
 | Differences between code and documentation | `$backend-docs-sync` | [Standards index](docs/sdd/standards/README.md) and [feature map](docs/sdd/features/README.md) |
+
+**API contract:** `docs/sdd/contracts/openapi.json` is generated from the code on every build and is the only machine-readable contract; never write OpenAPI YAML by hand. Each endpoint carries `WithName` (unique camelCase operation id), `WithSummary`, `Produces<T>` and `ProducesProblem`; CI fails when the committed file differs from the code, and `OpenApiDocumentRulesTests` checks ids, summaries, typed reads and number types. kedr-web downloads this file from `master` and calls the API through a typed `openapi-fetch` client ([contracts](docs/sdd/contracts/README.md), [ADR-0013](docs/sdd/architecture/decisions/0013-openapi-generated-from-code.md)).
 
 **Folder axiom:** a folder holds at most 6 code files; when it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders, no new one-file folders; only generated code (EF `Migrations/`, `Generated/`) is exempt. It applies to `src/` and `tests/`, the architecture tests enforce it, and every audit checks it ([module rules](docs/sdd/standards/module-rules.md#the-folder-axiom-at-most-six-files)).
 

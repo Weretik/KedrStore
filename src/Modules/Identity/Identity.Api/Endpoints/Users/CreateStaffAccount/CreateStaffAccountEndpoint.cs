@@ -11,6 +11,7 @@ internal static class CreateStaffAccountEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createStaffAccount")
+            .WithSummary("Create an administrator, SEO specialist, or manager")
             .Produces<StaffAccountResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict)

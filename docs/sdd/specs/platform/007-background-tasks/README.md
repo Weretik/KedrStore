@@ -67,7 +67,7 @@ The three roots are `OneC:DoorsRootCategoryId`, `OneC:HardwareRootCategoryId`, `
 | POST `/api/admin/scheduling/tasks/{key}/run` | `runAdminScheduledTaskNow` | task; 404, 409 |
 | POST `/internal/scheduler/tick` | — (not in the contract) | `{ inline, started, launchError }` |
 
-Contract: [scheduling.openapi.yaml](../../../contracts/scheduling/scheduling.openapi.yaml).
+Contract: [OpenAPI](../../../contracts/openapi.json).
 
 ## Data
 

@@ -9,6 +9,8 @@ internal static class SetAdminSiteModelAxesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/axes", Handle)
             .WithName("setAdminSiteModelAxes")
+            .WithSummary("Set the model's axes (switchers), in order")
+            .WithDescription("Up to 6 attributes of the shared dictionary; number attributes are refused. An empty list clears the axes.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

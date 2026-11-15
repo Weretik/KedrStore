@@ -44,7 +44,7 @@ A new module `Media` (Domain, Application, Infrastructure, Api) under the [modul
 
 ## Design
 
-Contract: [media.openapi.yaml](../../../contracts/media/media.openapi.yaml). Feature card: [Media library](../../../features/media/media-library.md). Data: [Media](../../../architecture/data-model/media-library.md). Runbook: [CDN sync](../../../operations/jobs/media-cdn-sync-runbook.md).
+Contract: [OpenAPI](../../../contracts/openapi.json). Feature card: [Media library](../../../features/media/media-library.md). Data: [Media](../../../architecture/data-model/media-library.md). Runbook: [CDN sync](../../../operations/jobs/media-cdn-sync-runbook.md).
 
 - Storage: CDN Express over FTP (FluentFTP), a dedicated FTP user whose home is the CDN root; password in GCP secret `cdn-media-ftp-password` (`MediaStorage__Ftp__Password`). Without credentials the API answers `503` on writes and the sync job fails fast.
 - Public URL = `MediaStorage:PublicBaseUrl` + `/` + key, built at read time (a host change needs no data change).

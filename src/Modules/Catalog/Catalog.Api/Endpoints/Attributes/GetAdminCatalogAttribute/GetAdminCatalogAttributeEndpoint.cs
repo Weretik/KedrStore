@@ -9,6 +9,7 @@ internal static class GetAdminCatalogAttributeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}", Handle)
             .WithName("getAdminCatalogAttribute")
+            .WithSummary("Get an attribute with its values and codes")
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

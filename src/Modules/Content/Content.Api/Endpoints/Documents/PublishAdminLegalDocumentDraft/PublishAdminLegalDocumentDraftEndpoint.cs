@@ -11,6 +11,8 @@ internal static class PublishAdminLegalDocumentDraftEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("versions/{id:long}/publish", Handle)
             .WithName("publishAdminLegalDocumentDraft")
+            .WithSummary("Publish a draft")
+            .WithDescription("Requires `CanManageContent`. The draft gets the next number and the given «Редакція від» date and goes on the site; the edition it replaces becomes archived. Both changes are saved together.")
             .Produces<LegalDocumentVersionResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

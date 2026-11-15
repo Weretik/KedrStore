@@ -11,6 +11,8 @@ internal static class GetArticlesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/articles", Handle)
             .WithName("getArticles")
+            .WithSummary("List published articles in one language, newest first")
+            .WithDescription("Public, because the site renders articles for anonymous visitors.")
             .Produces<IReadOnlyList<ArticleSummaryResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

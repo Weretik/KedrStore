@@ -50,4 +50,4 @@ Unit: [StaffAccountValidatorsTests](../../../../tests/UnitTests/Identity/StaffAc
 
 ## Related sources
 
-[Contract](../../contracts/identity/users.openapi.yaml) · [Authorization](../../architecture/security/authorization/roles-and-policies.md) · [Spec](../../specs/identity/001-authentication-rollout/README.md).
+[Contract](../../contracts/openapi.json) · [Authorization](../../architecture/security/authorization/roles-and-policies.md) · [Spec](../../specs/identity/001-authentication-rollout/README.md).

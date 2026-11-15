@@ -11,6 +11,8 @@ internal static class GetWorkspaceOverviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("overview", Handle)
             .WithName("getAdminWorkspaceOverview")
+            .WithSummary("Orders today, drafts, 1C problems and the newest orders")
+            .WithDescription("Requires `CanManageOrders` (Manager, Seo, or Admin). Lists hold at most 5 rows, newest first.")
             .Produces<WorkspaceOverview>();
 
     /// <summary>Counts and short lists for the admin «Огляд»; «today» is the current Kyiv day.</summary>

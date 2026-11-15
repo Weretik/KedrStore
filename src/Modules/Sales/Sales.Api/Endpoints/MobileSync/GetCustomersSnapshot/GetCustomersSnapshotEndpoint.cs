@@ -9,6 +9,8 @@ internal static class GetCustomersSnapshotEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getMobileCustomersSnapshot")
+            .WithSummary("Customers and their price rules for offline work")
+            .WithDescription("Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted customers are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client accepts it.")
             .Produces<CustomersSnapshotDto>()
             .Produces(StatusCodes.Status304NotModified)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

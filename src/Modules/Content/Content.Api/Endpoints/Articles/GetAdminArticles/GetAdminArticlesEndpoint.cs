@@ -11,6 +11,7 @@ internal static class GetAdminArticlesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminArticles")
+            .WithSummary("List all articles, drafts included, newest first")
             .Produces<IReadOnlyList<AdminArticleSummaryResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

@@ -7,6 +7,8 @@ internal static class GetCustomerListEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
+            .WithName("getAdminCustomers")
+            .WithSummary("Browse active Sales customers")
             .Produces<PagedResult<List<GetAdminCustomerListItemResponse>>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

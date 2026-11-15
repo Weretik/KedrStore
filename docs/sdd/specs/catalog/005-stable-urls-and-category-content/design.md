@@ -35,7 +35,7 @@ Uniqueness across current slugs and history (R-008, R-009) is enforced in the ap
 
 ## HTTP contract
 
-Public routes keep their paths and operation IDs; changes are additive. Contract sources: [category reads](../../../contracts/catalog/category-read.openapi.yaml), [products](../../../contracts/catalog/products.openapi.yaml), [aggregated](../../../contracts/openapi.yaml).
+Public routes keep their paths and operation IDs; changes are additive. Contract sources: [category reads](../../../contracts/openapi.json), [products](../../../contracts/openapi.json), [aggregated](../../../contracts/openapi.json).
 
 | Route | Change |
 | --- | --- |

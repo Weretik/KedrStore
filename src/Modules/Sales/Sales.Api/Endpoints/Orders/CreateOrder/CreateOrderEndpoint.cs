@@ -8,6 +8,7 @@ internal static class CreateOrderEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminOrder")
+            .WithSummary("Create an order and queue its 1C sync")
             .Produces<CreateAdminOrderResponse>()
             .Produces<CreateAdminOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)

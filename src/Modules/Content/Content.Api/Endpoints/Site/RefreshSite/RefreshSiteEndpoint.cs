@@ -9,6 +9,8 @@ internal static class RefreshSiteEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("refreshSite")
+            .WithSummary("Ask the public site to drop its cached content and catalog")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). No request body.")
             .Produces<SiteRefreshResponse>()
             .Produces<SiteRefreshResponse>(StatusCodes.Status502BadGateway)
             .Produces<SiteRefreshResponse>(StatusCodes.Status503ServiceUnavailable);

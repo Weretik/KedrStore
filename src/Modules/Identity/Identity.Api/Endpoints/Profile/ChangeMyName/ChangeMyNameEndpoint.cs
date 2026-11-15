@@ -8,6 +8,7 @@ internal static class ChangeMyNameEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("name", Handle)
             .WithName("changeMyName")
+            .WithSummary("Change the own name")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

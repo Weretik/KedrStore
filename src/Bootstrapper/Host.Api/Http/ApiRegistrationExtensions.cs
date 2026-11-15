@@ -1,3 +1,4 @@
+using Host.Api.Http.OpenApi;
 using BuildingBlocks.Api.Results;
 using BuildingBlocks.Api.Errors;
 namespace Host.Api.Http;
@@ -7,8 +8,7 @@ public static class ApiRegistrationsExtensions
     public static IServiceCollection AddApiRegistrations(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerDocumentation();
-        services.AddOpenApi();
+        services.AddApiDocument();
 
         services.AddHealthChecks();
         services.AddApiProblemDetails();

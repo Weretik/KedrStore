@@ -9,6 +9,7 @@ internal static class CreateWorkTaskForUserEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("tasks", Handle)
             .WithName("createAdminWorkTask")
+            .WithSummary("Put a task on a staff member's board")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

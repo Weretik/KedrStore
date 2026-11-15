@@ -60,4 +60,4 @@ PostgreSQL integration tests in [Identity/Sessions](../../../../tests/Integratio
 
 ## Related sources
 
-[Contract](../../contracts/identity/session.openapi.yaml) · [Staff accounts](staff-accounts.md) · [Provisioning](../../architecture/security/users/provisioning-and-registration.md).
+[Contract](../../contracts/openapi.json) · [Staff accounts](staff-accounts.md) · [Provisioning](../../architecture/security/users/provisioning-and-registration.md).

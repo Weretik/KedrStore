@@ -1,6 +1,6 @@
 # Admin order workspace API contract
 
-**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-workspace.openapi.yaml) is included in the aggregated [contract](../../../../contracts/openapi.yaml). The existing `admin-order-one-c-sync.openapi.yaml` is unchanged.
+**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/openapi.json) is included in the aggregated [contract](../../../../contracts/openapi.json). The existing `admin-order-one-c-sync.openapi.yaml` is unchanged.
 
 | operationId | Method/path | Request/response |
 | --- | --- | --- |

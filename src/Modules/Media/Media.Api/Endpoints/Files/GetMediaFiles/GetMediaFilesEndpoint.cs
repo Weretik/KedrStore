@@ -9,6 +9,8 @@ internal static class GetMediaFilesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminMediaFiles")
+            .WithSummary("A page of files by name")
+            .WithDescription("`folderId` limits the list to one folder, `inRoot=true` to files outside any folder; with neither, the whole library. `includeSubfolders=true` (only with `folderId`) also returns the files of all its subfolders. `search` matches the display name (case-insensitive contains).")
             .Produces<MediaFilePage>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

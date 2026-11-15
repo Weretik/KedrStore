@@ -22,6 +22,7 @@ For a new ADR, create a separate file with a unique number and short name. Inclu
 | [0010](0010-keyless-deploy-to-cloud-run.md) | Keyless deploy from GitHub Actions to Cloud Run | accepted |
 | [0011](0011-media-library-on-cdn.md) | Pictures live on the CDN; the Media module keeps a library of them by id | accepted |
 | [0012](0012-folder-axiom.md) | A code folder holds at most six files | accepted |
+| [0013](0013-openapi-generated-from-code.md) | The OpenAPI contract is generated from the code at build | accepted |
 
 Frontend decisions live in kedr-web: [workspace ADRs](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/adr/README.md), [Next.js public site](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/site/adr/0001-nextjs-public-site.md) and [offline-first mobile app](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/mobile/adr/0005-offline-first-local-database.md). The whole system is drawn in the [C4 diagrams](../c4/README.md).
 
@@ -44,5 +45,6 @@ Every backend keeps an accepted ADR for each area below. A full architecture aud
 | Files and media storage | 0011 |
 | Code organization (folders) | 0004, 0012 |
 | Main external systems (1C) | 0002 |
+| Public API contract (OpenAPI) | 0013 |
 
 A new decision of this kind (a new module, a new external system, a new way to run work or to deploy) gets an ADR in the same change, and the C4 diagrams are updated with it.

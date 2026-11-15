@@ -7,6 +7,8 @@ internal static class GetCustomerByIdEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{counterpartyId}", Handle)
+            .WithName("getAdminCustomerById")
+            .WithSummary("Get one active Sales customer")
             .Produces<GetAdminCustomerDetailResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

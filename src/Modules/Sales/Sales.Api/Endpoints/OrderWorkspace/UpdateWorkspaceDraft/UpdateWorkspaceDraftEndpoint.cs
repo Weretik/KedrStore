@@ -9,7 +9,9 @@ internal static class UpdateWorkspaceDraftEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("drafts/{draftId:long}", Handle)
-            .WithName("updateAdminOrderDraft");
+            .WithName("updateAdminOrderDraft")
+            .WithSummary("Replace editable draft fields")
+            .Produces<WorkspaceDraftDetail>();
 
     // A missing If-Match binds as empty; the validator answers 400.
     private static async Task<IResult> Handle(

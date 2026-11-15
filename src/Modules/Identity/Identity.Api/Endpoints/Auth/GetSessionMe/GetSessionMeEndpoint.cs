@@ -10,6 +10,9 @@ internal static class GetSessionMeEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("me", Handle)
+            .WithName("getCurrentSession")
+            .WithSummary("Get the current user")
+            .WithDescription("Works with the browser session cookie and with a mobile bearer token. For a cookie session it reissues a missing CSRF cookie.")
             .Produces<SessionMeResponse>()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 

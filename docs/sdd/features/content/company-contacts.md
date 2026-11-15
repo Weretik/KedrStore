@@ -42,4 +42,4 @@ Table `content."CompanyContacts"`; see the [database map](../../architecture/dat
 ## Related sources
 
 - [Specification](../../specs/content/002-company-contacts/README.md)
-- [Contract](../../contracts/content/contacts.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

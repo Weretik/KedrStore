@@ -13,6 +13,8 @@ internal static class ReplaceMediaFileEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:long}/content", Handle)
             .WithName("replaceAdminMediaFile")
+            .WithSummary("Replace the picture of a file")
+            .WithDescription("The ID stays (links keep working), the URL changes, the old CDN file is deleted.")
             .WithUploadLimit()
             .DisableAntiforgery()
             .Produces<MediaFileItem>()

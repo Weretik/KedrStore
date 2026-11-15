@@ -8,6 +8,8 @@ internal static class SearchStaffCandidatesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("candidates", Handle)
             .WithName("searchStaffCandidates")
+            .WithSummary("Find existing accounts without staff access")
+            .WithDescription("Up to 20 accounts without a staff role (usually customers imported from 1C) whose email or name contains the search text, case ignored, ordered by email.")
             .Produces<IReadOnlyList<StaffCandidateResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

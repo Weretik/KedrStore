@@ -36,4 +36,4 @@ src/Bootstrapper/Host.Api/Http/MobileSyncCompressionRegistrationExtensions.cs
 ## Related sources
 
 - [Specification](../../specs/platform/004-mobile-offline-sync/README.md)
-- Contracts: [catalog](../../contracts/catalog/mobile-sync.openapi.yaml), [customers](../../contracts/sales/mobile-sync.openapi.yaml)
+- Contracts: [catalog](../../contracts/openapi.json), [customers](../../contracts/openapi.json)

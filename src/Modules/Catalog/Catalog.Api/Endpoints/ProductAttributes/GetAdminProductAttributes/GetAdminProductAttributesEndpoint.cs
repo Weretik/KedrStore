@@ -9,6 +9,7 @@ internal static class GetAdminProductAttributesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("attributes", Handle)
             .WithName("getAdminProductAttributes")
+            .WithSummary("Get the «Властивості» panel of a product")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

@@ -37,4 +37,4 @@ No dedicated automated tests yet.
 
 ## Related sources
 
-[Contract](../../contracts/sales/catalog.openapi.yaml) · [Public catalog](../catalog/public-products.md).
+[Contract](../../contracts/openapi.json) · [Public catalog](../catalog/public-products.md).

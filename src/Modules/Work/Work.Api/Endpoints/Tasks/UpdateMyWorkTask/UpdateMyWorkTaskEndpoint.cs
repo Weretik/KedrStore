@@ -12,6 +12,7 @@ internal static class UpdateMyWorkTaskEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("tasks/{id:long}", Handle)
             .WithName("updateMyWorkTask")
+            .WithSummary("Change an own task's title and details")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

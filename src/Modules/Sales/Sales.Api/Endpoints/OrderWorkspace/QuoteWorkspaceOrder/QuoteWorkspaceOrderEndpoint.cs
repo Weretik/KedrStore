@@ -9,7 +9,9 @@ internal static class QuoteWorkspaceOrderEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("quote", Handle)
-            .WithName("quoteAdminWorkspaceOrder");
+            .WithName("quoteAdminWorkspaceOrder")
+            .WithSummary("Price a selected customer's lines without persisting an order")
+            .Produces<WorkspaceQuote>();
 
     private static async Task<IResult> Handle(
         [FromBody] WorkspaceQuoteRequest request, ISender sender, HttpContext http, CancellationToken cancellationToken)

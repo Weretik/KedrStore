@@ -12,6 +12,8 @@ internal static class UploadAdminAttributeSwatchEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("swatches", Handle)
             .WithName("uploadAdminAttributeSwatch")
+            .WithSummary("Upload a color or decor picture for a value (Admin)")
+            .WithDescription("JPEG, PNG, or WebP up to 5 MB, stored as it is on the CDN under `swatches/` and in the media library folder «Кольори» (created when missing). No value changes: send `mediaFileId` as `swatchMediaFileId` with the value create or update.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .WithMetadata(
                 new RequestSizeLimitAttribute(SwatchRequestLimit),

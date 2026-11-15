@@ -8,6 +8,8 @@ internal static class DeleteAdminArticleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("{id:long}", Handle)
             .WithName("deleteAdminArticle")
+            .WithSummary("Delete an article and its cover for good")
+            .WithDescription("To hide an article from the site without losing it, save it with `isPublished = false`.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound);
 

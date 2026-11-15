@@ -42,8 +42,7 @@ flowchart LR
 - [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input, a repeat and two parallel copies with one `Idempotency-Key` store and send one order, the same key with other lines answers 409. Filter `FullyQualifiedName~QuickOrder`.
 - [PlaceQuickOrderRepeatTests](../../../../tests/UnitTests/Sales/QuickOrders/PlaceQuickOrderRepeatTests.cs): the key is the order id, a repeat returns it without saving or sending, other data is a conflict, the loser of a race answers with the winner.
 - [QuickOrderTelegramCaptionTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTelegramCaptionTests.cs): HTML escaping, order id, Kyiv time, file name.
-- [OpenApiSnapshotTests](../../../../tests/IntegrationTests/Platform/Api/OpenApiSnapshotTests.cs): the contract did not change when the order moved from Catalog.
 
 ## Related sources
 
-[Contract](../../contracts/sales/quick-orders.openapi.yaml) · [Outbox](../../architecture/platform/building-blocks/infrastructure.md) · [Sales orders](admin-orders.md).
+[Contract](../../contracts/openapi.json) · [Outbox](../../architecture/platform/building-blocks/infrastructure.md) · [Sales orders](admin-orders.md).

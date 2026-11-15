@@ -8,6 +8,9 @@ internal static class GetCategoryBySlugEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("categories/by-slug/{categorySlug}", Handle)
+            .WithName("getCategoryBySlug")
+            .WithSummary("Get one localized category, its descendants, breadcrumbs, counts, price range, and content")
+            .WithDescription("A former slug returns 200 with `slug` set to the current slug, so the client can redirect permanently.")
             .Produces<CategoryDetailsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<CatalogRedirect>(StatusCodes.Status404NotFound);

@@ -9,6 +9,7 @@ internal static class ReopenAdminProductReviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("review/reopen", Handle)
             .WithName("reopenAdminProductReview")
+            .WithSummary("«Повернути на перевірку»")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

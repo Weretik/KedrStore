@@ -65,7 +65,7 @@ Every staff account (Admin or Manager) has a profile in Admin: it sees its email
 
 **Session effects.** Own email/password change: Identity updates the security stamp; the service then calls `SignInManager.RefreshSignInAsync` for the current cookie and revokes every refresh session of the user. Manager email/password change by an Admin: security stamp update plus `RevokeAllActiveByUserAsync` (as 001 does for blocking). Email change sets `Email` and `UserName` together, keeps `EmailConfirmed = true`.
 
-**HTTP** (contract: [profile](../../../contracts/identity/profile.openapi.yaml), [staff accounts](../../../contracts/identity/users.openapi.yaml)). Unsafe cookie requests carry `X-CSRF-Token` as in 001.
+**HTTP** (contract: [profile](../../../contracts/openapi.json), [staff accounts](../../../contracts/openapi.json)). Unsafe cookie requests carry `X-CSRF-Token` as in 001.
 
 | Method and route | operationId | Policy | Success | Errors |
 | --- | --- | --- | --- | --- |

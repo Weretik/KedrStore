@@ -9,6 +9,8 @@ internal static class GetAdminAttributeCodeProductsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("codes/{aliasId:int}/products", Handle)
             .WithName("getAdminAttributeCodeProducts")
+            .WithSummary("Where a code occurs (spec catalog/008)")
+            .WithDescription("On-site, not deleted products whose original 1C names contain the code, grouped by category (most products first), with the code's own decoding in each category.")
             .Produces<AdminCodeProductsDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

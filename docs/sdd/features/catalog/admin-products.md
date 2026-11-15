@@ -50,4 +50,4 @@ Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filte
 
 ## Related sources
 
-[Contract](../../contracts/catalog/products.openapi.yaml) · [Product list SDD](../../specs/catalog/admin-product-list/README.md) · [Photo SDD (history, replaced by Media 001 stage 3)](../../specs/catalog/003-missing-product-photos/README.md) · [Product details SDD](../../specs/catalog/004-admin-product-detail/README.md) · [Stable URLs SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md).
+[Contract](../../contracts/openapi.json) · [Product list SDD](../../specs/catalog/admin-product-list/README.md) · [Photo SDD (history, replaced by Media 001 stage 3)](../../specs/catalog/003-missing-product-photos/README.md) · [Product details SDD](../../specs/catalog/004-admin-product-detail/README.md) · [Stable URLs SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md).

@@ -9,6 +9,7 @@ internal static class GetAdminSiteModelEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}", Handle)
             .WithName("getAdminSiteModel")
+            .WithSummary("The model card")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

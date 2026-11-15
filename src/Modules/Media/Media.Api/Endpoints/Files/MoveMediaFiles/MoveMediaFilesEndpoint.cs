@@ -8,6 +8,8 @@ internal static class MoveMediaFilesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("move", Handle)
             .WithName("moveAdminMediaFiles")
+            .WithSummary("Move files to a folder")
+            .WithDescription("Up to 500 IDs; unknown IDs are ignored and not counted.")
             .Produces<MoveMediaFilesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

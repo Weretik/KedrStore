@@ -9,6 +9,8 @@ internal static class SetAdminProductAttributeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("attributes/{attributeId:int}", Handle)
             .WithName("setAdminProductAttribute")
+            .WithSummary("Set the values of one attribute by hand")
+            .WithDescription("The values (in position order) become manual and locked: the import, the parser, and the 1C sync no longer change them. List attributes take `valueId` from the attribute's list, number attributes take `number`. Positions beyond the list are dropped. A change of color, size, or side rebuilds the variant groups.")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

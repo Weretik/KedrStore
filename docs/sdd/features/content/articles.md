@@ -65,4 +65,4 @@ Tables `content."Articles"`, `content."ArticleTranslations"`, `content."ArticleC
 ## Related sources
 
 - [Specification](../../specs/content/001-articles/README.md), [cover on the CDN](../../specs/content/008-article-cover-cdn/README.md)
-- [Contract](../../contracts/content/articles.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

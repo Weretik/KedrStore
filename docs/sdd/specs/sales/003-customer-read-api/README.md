@@ -19,7 +19,7 @@
 - [Інфраструктура](design/infrastructure.md)
 - [Модель даних](data-model.md)
 - [Контракт API](contracts/api-contract.md)
-- [Версійний OpenAPI](../../../contracts/sales/customer-read.openapi.yaml)
+- [Версійний OpenAPI](../../../contracts/openapi.json)
 
 ## Планування та виконання
 
@@ -32,7 +32,7 @@
 
 - [API читання замовлень для менеджера](../002-manager-order-read-api/README.md)
 - [Інструкція із синхронізації клієнтів Sales](../../../operations/jobs/sales-one-c-runbook.md)
-- [Поточний зведений контракт API](../../../contracts/openapi.yaml)
+- [Поточний зведений контракт API](../../../contracts/openapi.json)
 - [Відповідальність модуля Sales](../../../architecture/overview/modules.md)
 
 ## Звіт про виконання

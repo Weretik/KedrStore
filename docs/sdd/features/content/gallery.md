@@ -55,5 +55,5 @@ Table `content."GalleryItems"`; see the [database map](../../architecture/data-m
 ## Related sources
 
 - [Specification](../../specs/content/005-gallery/README.md)
-- [Contract](../../contracts/content/gallery.openapi.yaml)
+- [Contract](../../contracts/openapi.json)
 - [Media library](../media/media-library.md)

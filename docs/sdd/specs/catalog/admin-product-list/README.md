@@ -63,7 +63,7 @@ Provide an anonymously accessible product-list API for administrators, without a
 
 ### Contract, design, and boundaries
 
-An optional query parameter `exportToSite: boolean` was added to `getAdminProducts` in the [versioned OpenAPI](../../../contracts/catalog/products.openapi.yaml). Names, response DTO, `PagedResult`, error codes, and current access model are unchanged. For MUI, convert `page` from zero-based to one-based, pass `pageSize` unchanged, and map `totalRecords` to `rowCount`; this defines the contract boundary, not frontend implementation. Do not pass arbitrary MUI JSON filter models through the API: the consumer maps supported columns to named parameters. Do not confuse `ExportToSite` with photo availability.
+An optional query parameter `exportToSite: boolean` was added to `getAdminProducts` in the [versioned OpenAPI](../../../contracts/openapi.json). Names, response DTO, `PagedResult`, error codes, and current access model are unchanged. For MUI, convert `page` from zero-based to one-based, pass `pageSize` unchanged, and map `totalRecords` to `rowCount`; this defines the contract boundary, not frontend implementation. Do not pass arbitrary MUI JSON filter models through the API: the consumer maps supported columns to named parameters. Do not confuse `ExportToSite` with photo availability.
 
 Filtering runs on `ProductListProjection` before `LongCountAsync` and pagination; joining `Product` preserves existing row fields. Do not change Domain, database schema, import, or `/all`. Verification is limited to targeted automated tests for the changed feature under [testing rules](../../../standards/testing-rules.md); do not run the full suite without a separate user request.
 

@@ -58,6 +58,15 @@ jobs:
       - name: Build
         run: dotnet build KedrStore.sln --no-restore --configuration Release
 
+      # The build writes the OpenAPI document of the code (ADR-0013); the committed copy must match it.
+      - name: Check the OpenAPI contract is up to date
+        run: |
+          if ! git diff --quiet -- docs/sdd/contracts/openapi.json; then
+            git diff --stat -- docs/sdd/contracts/openapi.json
+            echo "::error file=docs/sdd/contracts/openapi.json::OpenAPI contract is out of date. Build Host.Api and commit docs/sdd/contracts/openapi.json."
+            exit 1
+          fi
+
       - name: Run unit tests with coverage
         if: steps.affected.outputs.scope != 'none'
         env:

@@ -1,3 +1,4 @@
+using Host.Api.Http.OpenApi;
 using Catalog.Api.DependencyInjection;
 using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;
@@ -18,15 +19,14 @@ builder.Host.UseDefaultServiceProvider(options =>
 
 builder.AddSerilog();
 builder.Services.AddHostServices(builder.Configuration);
+builder.Services.WithoutBackgroundWorkForBuildTimeDocument();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi().AllowAnonymous();
+    app.MapApiDocument();
 /*
     try
     {

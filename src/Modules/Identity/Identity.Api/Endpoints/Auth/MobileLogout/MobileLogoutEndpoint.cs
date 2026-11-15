@@ -8,6 +8,8 @@ internal static class MobileLogoutEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("logout", Handle)
             .WithName("logoutMobile")
+            .WithSummary("End the mobile session")
+            .WithDescription("Revokes the session of the given refresh token; without it, all of the user's refresh sessions.")
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

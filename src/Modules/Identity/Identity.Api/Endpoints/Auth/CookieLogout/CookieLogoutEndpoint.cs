@@ -11,6 +11,7 @@ internal static class CookieLogoutEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("logout", Handle)
             .WithName("logoutCookieSession")
+            .WithSummary("End the browser session")
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

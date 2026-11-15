@@ -11,6 +11,8 @@ internal static class UpdateAdminHomeBrandEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("brands/{id:long}", Handle)
             .WithName("updateAdminHomeBrand")
+            .WithSummary("Change a brand's name or logo")
+            .WithDescription("Requires `CanManageContent`.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

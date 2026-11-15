@@ -11,6 +11,8 @@ internal static class SetAdminCategorySiteVisibilityEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/site-visibility", Handle)
             .WithName("setAdminCategorySiteVisibility")
+            .WithSummary("Show or hide a category on the site")
+            .WithDescription("Spec catalog/007 R-18. Hiding hides every subcategory too; showing shows every subcategory and every parent. A hidden category and its products leave the public site, «Вітрина сайту», «Моделі», and the counts of «Огляд». The 1C sync never changes the mark; a new category takes its parent's. The Cosmos import root is never shown. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<CategorySiteVisibilityResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -23,17 +23,18 @@ Kedr runs on Google Cloud Run: there is no in-process job scheduler (Hangfire or
 | `Microsoft.AspNetCore.DataProtection.EntityFrameworkCore` | 10.0.14 | Identity.Infrastructure |  |
 | `Microsoft.AspNetCore.Identity.EntityFrameworkCore` | 10.0.14 | Identity.Infrastructure | ASP.NET Core Identity storage in Identity.Infrastructure. |
 | `Microsoft.AspNetCore.Mvc.Testing` | 10.0.14 | IntegrationTests | Test hosting for ASP.NET Core. |
-| `Microsoft.AspNetCore.OpenApi` | 10.0.14 | Host.Api | Built-in OpenAPI endpoint; `Host.Api/Program.cs` calls `MapOpenApi()` in Development. |
+| `Microsoft.AspNetCore.OpenApi` | 10.0.14 | Host.Api | OpenAPI generator: the build writes `docs/sdd/contracts/openapi.json`; Development serves `/openapi/v1.json`. |
 | `Microsoft.EntityFrameworkCore` | 10.0.14 | BuildingBlocks.Infrastructure, Catalog.Application, Content.Application, Media.Application, Sales.Application, Work.Application | EF Core: `DbContext` types and migrations in Infrastructure; module Application projects query the read `DbContext` interface (documented deviation in the [module rules](../../standards/module-rules.md#known-deviations)). |
 | `Microsoft.EntityFrameworkCore.Design` | 10.0.14 | Content.Infrastructure, Media.Infrastructure, Sales.Infrastructure, Work.Infrastructure |  |
 | `Microsoft.EntityFrameworkCore.InMemory` | 10.0.14 | IntegrationTests | Non-relational EF provider for limited test scenarios only; [rules](../../standards/testing-rules.md). |
 | `Microsoft.EntityFrameworkCore.Tools` | 10.0.14 | Host.Api | EF Core design-time tools; not a runtime service. |
+| `Microsoft.Extensions.ApiDescription.Server` | 10.0.14 | Host.Api | Build-time OpenAPI generation (`OpenApiGenerateDocuments`, [ADR-0013](../decisions/0013-openapi-generated-from-code.md)); not a runtime dependency. |
 | `Microsoft.Extensions.Configuration.Abstractions` | 10.0.14 | BuildingBlocks.Application, BuildingBlocks.Integrations.OneC | Configuration interfaces for shared components and 1C. |
 | `Microsoft.Extensions.DependencyInjection.Abstractions` | 10.0.14 | BuildingBlocks.Application | DI interfaces for service registration and resolution. |
 | `Microsoft.Extensions.Logging.Abstractions` | 10.0.14 | BuildingBlocks.Application | Logging interfaces for application components. |
 | `Microsoft.Extensions.Options` | 10.0.14 | BuildingBlocks.Application | Options binding in BuildingBlocks.Application behaviors. |
 | `Microsoft.NET.Test.Sdk` | 18.11.0 | ArchitectureTests, IntegrationTests, UnitTests | Test integration with `dotnet test`. |
-| `Microsoft.OpenApi` | 2.13.0 | Host.Api | OpenAPI object model for schema and Swagger configuration. |
+| `Microsoft.OpenApi` | 2.13.0 | Host.Api | OpenAPI object model for the document transformers in `Host.Api/Http`. |
 | `NetArchTest.Rules` | 1.3.2 | ArchitectureTests | Dependency and architectural-boundary checks. |
 | `Newtonsoft.Json` | 13.0.4 | Catalog.Application | Declared JSON serializer; check exact need and call sites before changing. |
 | `NodaMoney` | 2.9.0 | Catalog.Application, Catalog.Domain | Monetary values and currencies for Catalog contracts/domain. |
@@ -47,7 +48,7 @@ Kedr runs on Google Cloud Run: there is no in-process job scheduler (Hangfire or
 | `SkiaSharp` | 4.154.0 | Content.Infrastructure, Identity.Infrastructure, Media.Infrastructure |  |
 | `SkiaSharp.NativeAssets.Linux.NoDependencies` | 4.154.0 | Content.Infrastructure, Identity.Infrastructure, Media.Infrastructure |  |
 | `Slugify.Core` | 5.2.0 | Catalog.Application, UnitTests | URL slug generation and its unit tests. |
-| `Swashbuckle.AspNetCore` | 10.3.1 | Host.Api | Generates Swagger UI and OpenAPI in Development. |
+| `Swashbuckle.AspNetCore.SwaggerUI` | 10.3.1 | Host.Api | Swagger UI in Development, reading `/openapi/v1.json`. |
 | `System.Security.Cryptography.Xml` | 10.0.14 | BuildingBlocks.Integrations.OneC | XML cryptography declared for the 1C integration; check the specific protocol in the adapter. |
 | `System.ServiceModel.Duplex` | 6.0.0 | BuildingBlocks.Integrations.OneC | WCF duplex API declared by the 1C project; check whether it is actually needed. |
 | `System.ServiceModel.Federation` | 10.1.0 | BuildingBlocks.Integrations.OneC | WCF federation API declared by the 1C project; check whether it is actually needed. |

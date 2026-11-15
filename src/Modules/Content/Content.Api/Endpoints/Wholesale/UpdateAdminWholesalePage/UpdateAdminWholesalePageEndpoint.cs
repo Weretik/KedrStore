@@ -11,6 +11,8 @@ internal static class UpdateAdminWholesalePageEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("", Handle)
             .WithName("updateAdminWholesalePage")
+            .WithSummary("Replace both languages at once")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). Every text is required. Repeating it is safe.")
             .Produces<AdminWholesalePageResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

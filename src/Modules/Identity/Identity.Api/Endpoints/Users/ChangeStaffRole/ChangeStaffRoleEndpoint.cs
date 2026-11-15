@@ -8,6 +8,8 @@ internal static class ChangeStaffRoleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/role", Handle)
             .WithName("changeStaffRole")
+            .WithSummary("Change a staff account's role")
+            .WithDescription("The account's sessions pick up the new role within 5 minutes. An administrator cannot change their own role (400).")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

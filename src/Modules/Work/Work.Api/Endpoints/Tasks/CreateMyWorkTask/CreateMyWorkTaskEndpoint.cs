@@ -12,6 +12,7 @@ internal static class CreateMyWorkTaskEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("tasks", Handle)
             .WithName("createMyWorkTask")
+            .WithSummary("Create an own task in «План»")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

@@ -8,6 +8,7 @@ internal static class DeleteMyWorkTaskEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("tasks/{id:long}", Handle)
             .WithName("deleteMyWorkTask")
+            .WithSummary("Delete an own task")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound);
 

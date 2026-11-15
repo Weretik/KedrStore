@@ -8,6 +8,8 @@ internal static class GetMyProfileEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getMyProfile")
+            .WithSummary("The signed-in staff account's profile")
+            .WithDescription("Policy `RequireManagerRole` (Manager, Seo, or Admin). Customers get 403.")
             .Produces<ProfileResponse>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden);

@@ -30,7 +30,7 @@ A new feature needs a concise description of its actual architecture in `docs/sd
 - When an SDD status changes, update its row in the [specification index](../specs/README.md) in the same change.
 - When tests for a feature are added, moved, or removed, update the card's “Tests” section in the same change.
 - A small fix that does not change the card's facts does not touch the card.
-- When a YAML file in `docs/sdd/contracts/` changes, say in the PR that kedr-web needs `npm run contracts:sync -- <path-to-KedrStore>`.
+- An endpoint change regenerates `docs/sdd/contracts/openapi.json` on build; commit it in the same change (CI fails otherwise) and say in the PR that kedr-web must sync the contract ([contracts](../contracts/README.md)).
 
 ## Full audit after the feature
 

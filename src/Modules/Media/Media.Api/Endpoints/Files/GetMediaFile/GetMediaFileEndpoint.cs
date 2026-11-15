@@ -9,6 +9,7 @@ internal static class GetMediaFileEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:long}", Handle)
             .WithName("getAdminMediaFile")
+            .WithSummary("One file")
             .Produces<MediaFileItem>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

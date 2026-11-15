@@ -11,6 +11,8 @@ internal static class GetSiteSeoSettingsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getSiteSeoSettings")
+            .WithSummary("Read the codes the site places on every page")
+            .WithDescription("Public, because the site renders pages for anonymous visitors. Never returns who edited.")
             .Produces<SiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

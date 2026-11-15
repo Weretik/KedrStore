@@ -11,6 +11,8 @@ internal static class DeleteAdminHomeBrandEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("brands/{id:long}", Handle)
             .WithName("deleteAdminHomeBrand")
+            .WithSummary("Remove a brand")
+            .WithDescription("Requires `CanManageContent`. The logo stays in the media library.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

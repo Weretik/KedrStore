@@ -11,6 +11,8 @@ internal static class CreateAdminHomeBrandEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("brands", Handle)
             .WithName("createAdminHomeBrand")
+            .WithSummary("Add a brand to the end of the list")
+            .WithDescription("Requires `CanManageContent`. The logo must be a media library file.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

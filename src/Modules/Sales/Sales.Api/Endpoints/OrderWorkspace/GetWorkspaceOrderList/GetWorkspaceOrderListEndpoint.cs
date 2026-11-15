@@ -1,3 +1,5 @@
+using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Application.Abstractions.Workspace;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceOrders;
@@ -7,7 +9,9 @@ internal static class GetWorkspaceOrderListEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("orders", Handle)
-            .WithName("getAdminWorkspaceOrders");
+            .WithName("getAdminWorkspaceOrders")
+            .WithSummary("Search persisted Admin orders")
+            .Produces<WorkspacePage<WorkspaceOrderListItem>>();
 
     private static async Task<IResult> Handle(
         ISender sender, HttpContext http,

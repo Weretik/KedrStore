@@ -1,6 +1,6 @@
 # Background tasks «Фонові задачі»
 
-**Static code check:** 2026-11-14. **Module:** Scheduling. **Spec:** [platform/007](../../specs/platform/007-background-tasks/README.md). **Contract:** [scheduling.openapi.yaml](../../contracts/scheduling/scheduling.openapi.yaml).
+**Static code check:** 2026-11-14. **Module:** Scheduling. **Spec:** [platform/007](../../specs/platform/007-background-tasks/README.md). **Contract:** [OpenAPI](../../contracts/openapi.json).
 
 One Cloud Scheduler entry calls the tick every five minutes; the tick sends the outbox and starts every due task in one execution of the Cloud Run Job `kedr-tasks`. The list of tasks is code; an Admin changes only the schedule, the on/off switch and the next run, sees the last success and the last failure with its reason, and presses «Запустити зараз». Stocks (07:00 and 13:00) and prices (Monday 06:00) are separate tasks.
 

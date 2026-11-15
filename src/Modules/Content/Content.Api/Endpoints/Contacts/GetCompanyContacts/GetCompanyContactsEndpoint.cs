@@ -11,6 +11,8 @@ internal static class GetCompanyContactsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getCompanyContacts")
+            .WithSummary("Get the company contacts")
+            .WithDescription("Public, because every site page renders them for anonymous visitors.")
             .Produces<CompanyContactsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

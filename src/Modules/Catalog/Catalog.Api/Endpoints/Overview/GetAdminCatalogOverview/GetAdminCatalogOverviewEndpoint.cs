@@ -9,6 +9,8 @@ internal static class GetAdminCatalogOverviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminCatalogOverview")
+            .WithSummary("Products without a photo and categories without site text")
+            .WithDescription("Requires `CanManageProducts` (Manager, Seo, or Admin). Deleted products and categories are not counted.")
             .Produces<AdminCatalogOverviewResponse>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

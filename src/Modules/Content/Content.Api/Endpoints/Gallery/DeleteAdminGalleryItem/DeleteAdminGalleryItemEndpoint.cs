@@ -11,6 +11,8 @@ internal static class DeleteAdminGalleryItemEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("items/{id:long}", Handle)
             .WithName("deleteAdminGalleryItem")
+            .WithSummary("Remove a card from the gallery")
+            .WithDescription("Requires `CanManageContent`. The picture stays in the media library.")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

@@ -1,6 +1,6 @@
 # Refresh the site now
 
-**Status:** implemented. **Spec:** [Content 007](../../specs/content/007-admin-polish/README.md). **Contract:** [site refresh](../../contracts/content/site-refresh.openapi.yaml).
+**Status:** implemented. **Spec:** [Content 007](../../specs/content/007-admin-polish/README.md). **Contract:** [site refresh](../../contracts/openapi.json).
 
 «Оновити сайт зараз» in the admin. The public site caches content and catalog reads for minutes to hours; this asks it to drop them so the next visit reads fresh data.
 

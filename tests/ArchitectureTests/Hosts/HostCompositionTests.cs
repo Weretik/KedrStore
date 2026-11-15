@@ -1,3 +1,5 @@
+using ArchitectureTests.TestSupport;
+
 namespace ArchitectureTests.Hosts;
 
 /// <summary>
@@ -11,12 +13,12 @@ public sealed class HostCompositionTests
     [Fact]
     public void HostSources_DeclareNoPortImplementationControllerOrDbContext()
     {
-        var hosts = Path.Combine(FindRepositoryRoot(), "src", "Bootstrapper");
+        var hosts = Path.Combine(RepositoryRoot.Find(), "src", "Bootstrapper");
         var ports = BusinessModules
             .SelectMany(module => new[]
             {
-                Path.Combine(FindRepositoryRoot(), "src", "Modules", module, $"{module}.Application", "Abstractions"),
-                Path.Combine(FindRepositoryRoot(), "src", "Modules", module, $"{module}.Contracts"),
+                Path.Combine(RepositoryRoot.Find(), "src", "Modules", module, $"{module}.Application", "Abstractions"),
+                Path.Combine(RepositoryRoot.Find(), "src", "Modules", module, $"{module}.Contracts"),
             })
             .Where(Directory.Exists)
             .SelectMany(path => Directory.EnumerateFiles(path, "*.cs", SearchOption.AllDirectories))
@@ -49,13 +51,4 @@ public sealed class HostCompositionTests
 
     private static bool IsBuildOutput(string path)
         => path.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Any(s => s is "bin" or "obj");
-
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "KedrStore.sln")))
-            directory = directory.Parent;
-
-        return directory?.FullName ?? throw new DirectoryNotFoundException("KedrStore.sln was not found.");
-    }
 }

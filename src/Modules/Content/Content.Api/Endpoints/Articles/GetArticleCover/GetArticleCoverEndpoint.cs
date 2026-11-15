@@ -9,6 +9,8 @@ internal static class GetArticleCoverEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("articles/{id:long}/cover", Handle)
             .WithName("getArticleCover")
+            .WithSummary("Get the cover picture of an article")
+            .WithDescription("Public. Drafts are included so the admin preview works; the path is only known from an article response. With `v` equal to the current cover version the response is `Cache-Control: public, max-age=31536000, immutable`.")
             // The document keeps the response type the controller declared, so the contract stays the same.
             .Produces<FileContentResult>(StatusCodes.Status200OK, "image/webp")
             .ProducesProblem(StatusCodes.Status404NotFound);

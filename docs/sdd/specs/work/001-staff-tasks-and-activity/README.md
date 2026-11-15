@@ -44,7 +44,7 @@ The activity log is written by a global MVC result filter in `Work.Api`, so no o
 | Api | `Controllers/WorkTasksController.cs` (`/api/work/tasks`, `/api/work/report`, policy `RequireManagerRole`), `Controllers/AdminWorkController.cs` (`/api/admin/work`, `RequireAdminRole`), `Activity/WorkActivityFilter.cs` |
 | Host | registration in `ModulesRegistrationExtensions`, Mediator and validators, controllers part and the global filter; Jobs host for the migration |
 
-Contract: [work.openapi.yaml](../../../contracts/work/work.openapi.yaml).
+Contract: [OpenAPI](../../../contracts/openapi.json).
 
 ## Tests
 

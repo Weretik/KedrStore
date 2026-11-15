@@ -11,6 +11,8 @@ internal static class GetAdminLegalDocumentVersionEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("versions/{id:long}", Handle)
             .WithName("getAdminLegalDocumentVersion")
+            .WithSummary("Get one edition with both texts")
+            .WithDescription("Requires `CanManageContent`.")
             .Produces<LegalDocumentVersionResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

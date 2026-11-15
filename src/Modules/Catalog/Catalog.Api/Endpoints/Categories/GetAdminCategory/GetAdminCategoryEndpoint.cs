@@ -9,6 +9,8 @@ internal static class GetAdminCategoryEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}", Handle)
+            .WithName("getAdminCategoryById")
+            .WithSummary("Get one category for catalog administration")
             .Produces<AdminCategoryResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

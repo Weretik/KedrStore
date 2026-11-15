@@ -196,31 +196,6 @@ public sealed class AdminOrderApiTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Fact]
-    public void OpenApiContract_DeclaresTheTestedOperationAndResponses()
-    {
-        var contractPath = Path.Combine(FindRepositoryRoot(), "docs", "sdd", "contracts", "sales", "admin-order-one-c-sync.openapi.yaml");
-        var contract = File.ReadAllText(contractPath);
-
-        Assert.Contains("/api/admin/orders:", contract, StringComparison.Ordinal);
-        Assert.Contains("operationId: createAdminOrder", contract, StringComparison.Ordinal);
-        Assert.Contains("name: Idempotency-Key", contract, StringComparison.Ordinal);
-        Assert.Contains("'201':", contract, StringComparison.Ordinal);
-        Assert.Contains("'200':", contract, StringComparison.Ordinal);
-        Assert.Contains("'400':", contract, StringComparison.Ordinal);
-        Assert.Contains("'404':", contract, StringComparison.Ordinal);
-        Assert.Contains("'409':", contract, StringComparison.Ordinal);
-        Assert.Contains("syncStatus: { type: string, enum: [Pending]", contract, StringComparison.Ordinal);
-        Assert.Contains("/api/admin/orders/{orderId}/sync-status:", contract, StringComparison.Ordinal);
-        Assert.Contains("operationId: getAdminOrderSyncStatus", contract, StringComparison.Ordinal);
-        Assert.Contains("/api/admin/orders/{orderId}/sync/retry:", contract, StringComparison.Ordinal);
-        Assert.Contains("operationId: retryAdminOrderSync", contract, StringComparison.Ordinal);
-        Assert.Contains("RetryOrderSyncRequest:", contract, StringComparison.Ordinal);
-        Assert.Contains("'202':", contract, StringComparison.Ordinal);
-        Assert.Contains("OrderSyncStatusResponse:", contract, StringComparison.Ordinal);
-        Assert.Contains("oneCDocumentNumber: { type: [string, 'null'], maxLength: 128", contract, StringComparison.Ordinal);
-    }
-
     private static WebApplicationFactory<Program> CreateFactory(TestOrderState state)
         => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
@@ -264,19 +239,6 @@ public sealed class AdminOrderApiTests
         return content;
     }
 
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "KedrStore.sln")))
-                return directory.FullName;
-
-            directory = directory.Parent;
-        }
-
-        throw new DirectoryNotFoundException("Repository root was not found.");
-    }
 
     private sealed class TestOrderState
     {

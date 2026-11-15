@@ -11,6 +11,8 @@ internal static class PreviewAdminGalleryYoutubeVideoEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("youtube-preview", Handle)
             .WithName("previewAdminGalleryYoutubeVideo")
+            .WithSummary("Resolve a pasted YouTube link before adding it")
+            .WithDescription("Requires `CanManageContent`. `title` is what YouTube's public oEmbed gives, or `null` when it does not answer (private or deleted video, network error).")
             .Produces<YoutubePreviewResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

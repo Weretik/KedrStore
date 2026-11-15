@@ -18,7 +18,7 @@ internal sealed class RepositoryProjectGraph
 
     public static RepositoryProjectGraph Load()
     {
-        var root = FindRepositoryRoot();
+        var root = RepositoryRoot.Find();
         var projectPaths = Directory.EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories)
             .Where(path => !HasBuildOutputSegment(path))
             .ToArray();
@@ -47,20 +47,6 @@ internal sealed class RepositoryProjectGraph
         }
 
         return new RepositoryProjectGraph(projects);
-    }
-
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, "KedrStore.sln")))
-                return directory.FullName;
-
-            directory = directory.Parent;
-        }
-
-        throw new DirectoryNotFoundException("KedrStore.sln was not found above the test output directory.");
     }
 
     private static bool HasBuildOutputSegment(string path)

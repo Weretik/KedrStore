@@ -8,6 +8,8 @@ internal static class RunScheduledTaskNowEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{key}/run", Handle)
             .WithName("runAdminScheduledTaskNow")
+            .WithSummary("Run a background task now")
+            .WithDescription("«Запустити зараз», also for a disabled task. The next tick, within a minute, starts it.")
             .Produces<ScheduledTaskResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);

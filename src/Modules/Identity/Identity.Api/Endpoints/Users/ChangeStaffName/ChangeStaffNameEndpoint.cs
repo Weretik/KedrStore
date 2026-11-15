@@ -12,6 +12,8 @@ internal static class ChangeStaffNameEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/name", Handle)
             .WithName("changeStaffName")
+            .WithSummary("Change a manager's name")
+            .WithDescription("Manager and Seo accounts only; an administrator target returns 403.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

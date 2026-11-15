@@ -8,6 +8,8 @@ internal static class SetStaffPasswordEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/password", Handle)
             .WithName("setStaffPassword")
+            .WithSummary("Set a new password for a staff account")
+            .WithDescription("Manager and Seo accounts only; ends the account's existing sessions. An administrator account (including the caller's) returns 403 — administrators change their own password in the profile.")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

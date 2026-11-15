@@ -9,6 +9,8 @@ internal static class RemoveAdminSiteModelProductEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("{id:int}/products/{productId:int}", Handle)
             .WithName("removeAdminSiteModelProduct")
+            .WithSummary("Take a product out of a model")
+            .WithDescription("The product is pinned out of models, so automation does not put it back.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

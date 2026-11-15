@@ -35,4 +35,4 @@ src/Modules/Content/
 ## Related sources
 
 - [Specification](../../specs/platform/003-admin-overview/README.md)
-- Contracts: [orders](../../contracts/sales/admin-overview.openapi.yaml), [catalog](../../contracts/catalog/admin-overview.openapi.yaml), [content](../../contracts/content/admin-overview.openapi.yaml)
+- Contracts: [orders](../../contracts/openapi.json), [catalog](../../contracts/openapi.json), [content](../../contracts/openapi.json)
