@@ -51,6 +51,28 @@ public sealed class SchedulerTickTests
     }
 
     [Fact]
+    public async Task Catalog_task_waits_while_another_catalog_task_runs()
+    {
+        using var harness = new SchedulingTestHarness();
+        var daily = TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(9, 0));
+        await EnableAsync(harness, ScheduledTaskKeys.Stocks, daily, harness.Time.GetUtcNow().AddMinutes(-1));
+        await EnableAsync(harness, ScheduledTaskKeys.Orders, daily, harness.Time.GetUtcNow().AddDays(1));
+        await harness.TickAsync();
+        var stocks = harness.Launcher.Launches.Single().Single();
+        await EnableAsync(harness, ScheduledTaskKeys.Prices, daily, harness.Time.GetUtcNow());
+        await EnableAsync(harness, ScheduledTaskKeys.Orders, daily, harness.Time.GetUtcNow());
+
+        harness.Time.Advance(TimeSpan.FromMinutes(5));
+        var whileStocksRuns = await harness.TickAsync();
+        await harness.StartAndFinishAsync(stocks, true, "Готово.");
+        harness.Time.Advance(TimeSpan.FromMinutes(5));
+        var afterStocks = await harness.TickAsync();
+
+        Assert.Equal([ScheduledTaskKeys.Orders], whileStocksRuns.Started);
+        Assert.Equal([ScheduledTaskKeys.Prices], afterStocks.Started);
+    }
+
+    [Fact]
     public async Task Finished_run_records_success_and_the_next_time()
     {
         using var harness = new SchedulingTestHarness();
