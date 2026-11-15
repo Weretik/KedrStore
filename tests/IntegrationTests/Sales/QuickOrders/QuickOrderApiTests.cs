@@ -70,6 +70,60 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         Assert.NotNull(Assert.Single(await scenario.RowsAsync()).ProcessedAtUtc);
     }
 
+    [SkippableFact]
+    public async Task RepeatedQuickOrder_WithTheSameIdempotencyKey_ReturnsTheFirstOrder_AndSendsOnce()
+    {
+        await using var scenario = await CreateAsync();
+        using var client = scenario.Factory.CreateClient();
+        var key = Guid.NewGuid();
+
+        using var first = await client.SendAsync(Keyed(ValidOrder, key));
+        using var repeat = await client.SendAsync(Keyed(ValidOrder, key));
+
+        Assert.Equal(HttpStatusCode.OK, first.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, repeat.StatusCode);
+        Assert.Equal(key, await OrderIdOf(first));
+        Assert.Equal(key, await OrderIdOf(repeat));
+        Assert.Equal(key, Assert.Single(await scenario.RowsAsync()).Id);
+        Assert.Single(scenario.Telegram.Sent);
+    }
+
+    [SkippableFact]
+    public async Task TwoCopiesAtOnce_WithTheSameIdempotencyKey_StoreOneOrder()
+    {
+        await using var scenario = await CreateAsync();
+        using var client = scenario.Factory.CreateClient();
+        var key = Guid.NewGuid();
+
+        var answers = await Task.WhenAll(
+            client.SendAsync(Keyed(ValidOrder, key)), client.SendAsync(Keyed(ValidOrder, key)));
+
+        foreach (var answer in answers)
+        {
+            Assert.Equal(HttpStatusCode.OK, answer.StatusCode);
+            Assert.Equal(key, await OrderIdOf(answer));
+            answer.Dispose();
+        }
+
+        Assert.Single(await scenario.RowsAsync());
+        Assert.Single(scenario.Telegram.Sent);
+    }
+
+    [SkippableFact]
+    public async Task SameIdempotencyKey_WithOtherLines_Answers409_AndSendsNothingNew()
+    {
+        await using var scenario = await CreateAsync();
+        using var client = scenario.Factory.CreateClient();
+        var key = Guid.NewGuid();
+        using var first = await client.SendAsync(Keyed(ValidOrder, key));
+
+        using var other = await client.SendAsync(Keyed(ValidOrder.Replace("\"quantity\":2", "\"quantity\":3"), key));
+
+        Assert.Equal(HttpStatusCode.Conflict, other.StatusCode);
+        Assert.Single(await scenario.RowsAsync());
+        Assert.Single(scenario.Telegram.Sent);
+    }
+
     [SkippableTheory]
     [InlineData("""{"firstName":"Іван","phone":"","lines":[{"productId":"101","title":"Ручка","unitPrice":1,"quantity":1}]}""", "Phone")]
     [InlineData("""{"firstName":"Іван","phone":"+380670000000","lines":[]}""", "Lines")]
@@ -93,6 +147,13 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         """{"firstName":"Іван","phone":"+380670000000","lines":[{"productId":"101","title":"Ручка Кедр","unitPrice":125.50,"quantity":2}]}""";
 
     private static StringContent Body(string json) => new(json, Encoding.UTF8, "application/json");
+
+    private static HttpRequestMessage Keyed(string json, Guid key)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/orders") { Content = Body(json) };
+        request.Headers.Add("Idempotency-Key", key.ToString());
+        return request;
+    }
 
     private static async Task<Guid> OrderIdOf(HttpResponseMessage response)
     {

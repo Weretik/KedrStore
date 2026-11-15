@@ -6,7 +6,7 @@ Public routes, operation names, and response fields are stable by default. Prefe
 
 For new or changed HTTP behavior, link every operation to acceptance scenarios `SC-*`. Agree on the readable decisions in the feature's `contracts/api-contract.md` before implementing the transport layer. Create targeted API Red tests from those decisions, then implement the endpoint with `WithName`, `WithSummary`, `Produces<T>` and `ProducesProblem`; the build regenerates [`openapi.json`](../contracts/openapi.json), which is reviewed and committed with the change ([ADR-0013](../architecture/decisions/0013-openapi-generated-from-code.md)).
 
-Use task-specific DTOs. Do not expose entities, persistence types, secrets, or internal exceptions. Define `Idempotency-Key` semantics before implementing writes that may be retried.
+Use task-specific DTOs. Do not expose entities, persistence types, secrets, or internal exceptions. Decide what a repeat does for every write before implementing it, and take an `Idempotency-Key` where the [idempotency rules](idempotency-rules.md) require one (money, orders, messages, public forms, offline queues).
 
 ## Endpoints
 

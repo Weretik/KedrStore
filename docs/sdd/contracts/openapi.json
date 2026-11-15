@@ -9840,6 +9840,16 @@
         "summary": "Create a quick order",
         "description": "Creates a quick order. This endpoint is currently anonymous and does not implement an Idempotency-Key contract; disable duplicate submission in the frontend.",
         "operationId": "createQuickOrder",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
