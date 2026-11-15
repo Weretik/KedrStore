@@ -1,6 +1,6 @@
 # ADR-0002: 1C sync and migrations as one-shot jobs on Cloud Run Jobs
 
-- Status: accepted
+- Status: accepted; the "Cloud Scheduler starts each job on its own schedule" part is superseded by [ADR-0009](0009-scheduler-tick-for-background-tasks.md)
 
 ## Context
 

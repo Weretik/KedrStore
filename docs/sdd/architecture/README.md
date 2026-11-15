@@ -6,6 +6,7 @@ KedrStore is a modular backend built on ASP.NET Core and .NET 10. Current approa
 
 ### Overview
 
+- [C4 diagrams](c4/README.md) — system context, containers, and backend components.
 - [System map](overview/system-map.md) — hosts, modules, and dependency direction.
 - [Project structure](overview/project-structure.md) — solution tree and layers.
 - [Layer boundaries](overview/layers.md) — responsibilities and forbidden dependencies.
@@ -34,7 +35,7 @@ KedrStore is a modular backend built on ASP.NET Core and .NET 10. Current approa
 - [Direct NuGet dependencies](platform/nuget-packages.md)
 - [Build and delivery tools](platform/tooling-and-delivery.md)
 - [BuildingBlocks guide](platform/building-blocks/README.md)
-- [Architectural decisions](decisions/README.md)
+- [Architectural decisions](decisions/README.md) — ADRs and the list of key decisions every backend must record
 
 ### Identity and access control
 

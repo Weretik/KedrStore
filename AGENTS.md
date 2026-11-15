@@ -9,6 +9,7 @@ Kedr sells door hardware wholesale (with optional retail orders), not services s
 ## Project context
 
 - [Architecture](docs/sdd/architecture/README.md) — modules, layers, and dependency boundaries.
+- [Architecture decisions (ADR)](docs/sdd/architecture/decisions/README.md) and [C4 diagrams](docs/sdd/architecture/c4/README.md) — why the system is built this way and how its parts connect. A new lasting decision (module, external system, way to run work or deploy) gets an ADR and a C4 update in the same change; the full architecture audit reports missing ones.
 - [Standards](docs/sdd/standards/README.md) — stable rules for development, delivery, and verification.
 - [Specifications](docs/sdd/specs/README.md) — feature requirements, decisions, tasks, and completion evidence.
 - [Implemented feature map](docs/sdd/features/README.md) — navigation by module, structure, and code entry points.
