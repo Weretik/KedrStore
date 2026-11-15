@@ -1264,7 +1264,7 @@
         "operationId": "getAdminProductGroups",
         "parameters": [
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1272,7 +1272,7 @@
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
@@ -2064,21 +2064,21 @@
         "operationId": "getAdminProducts",
         "parameters": [
           {
-            "name": "SearchTerm",
+            "name": "searchTerm",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "CategorySlug",
+            "name": "categorySlug",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2086,63 +2086,63 @@
             }
           },
           {
-            "name": "InStock",
+            "name": "inStock",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsSale",
+            "name": "isSale",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsNew",
+            "name": "isNew",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ExportToSite",
+            "name": "exportToSite",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Deleted",
+            "name": "deleted",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "WithoutPhoto",
+            "name": "withoutPhoto",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ProblemsOnly",
+            "name": "problemsOnly",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "ProblemReason",
+            "name": "problemReason",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "PriceFrom",
+            "name": "priceFrom",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2150,7 +2150,7 @@
             }
           },
           {
-            "name": "PriceTo",
+            "name": "priceTo",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2158,14 +2158,14 @@
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ProductSort"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2173,7 +2173,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2637,14 +2637,14 @@
         "operationId": "getPublicProducts",
         "parameters": [
           {
-            "name": "SearchTerm",
+            "name": "searchTerm",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2652,35 +2652,35 @@
             }
           },
           {
-            "name": "InStock",
+            "name": "inStock",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Availability",
+            "name": "availability",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ProductAvailability"
             }
           },
           {
-            "name": "IsSale",
+            "name": "isSale",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsNew",
+            "name": "isNew",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "PriceTypeId",
+            "name": "priceTypeId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2688,7 +2688,7 @@
             }
           },
           {
-            "name": "PriceFrom",
+            "name": "priceFrom",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2696,7 +2696,7 @@
             }
           },
           {
-            "name": "PriceTo",
+            "name": "priceTo",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2704,14 +2704,14 @@
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ProductSort"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2719,7 +2719,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2779,14 +2779,14 @@
         "operationId": "getPublicProductsByCategorySlug",
         "parameters": [
           {
-            "name": "SearchTerm",
+            "name": "searchTerm",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2794,35 +2794,35 @@
             }
           },
           {
-            "name": "InStock",
+            "name": "inStock",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Availability",
+            "name": "availability",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ProductAvailability"
             }
           },
           {
-            "name": "IsSale",
+            "name": "isSale",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsNew",
+            "name": "isNew",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "PriceTypeId",
+            "name": "priceTypeId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2830,7 +2830,7 @@
             }
           },
           {
-            "name": "PriceFrom",
+            "name": "priceFrom",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2838,7 +2838,7 @@
             }
           },
           {
-            "name": "PriceTo",
+            "name": "priceTo",
             "in": "query",
             "schema": {
               "type": "number",
@@ -2846,14 +2846,14 @@
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/ProductSort"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2861,7 +2861,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -2998,7 +2998,7 @@
         "operationId": "getAdminSiteModels",
         "parameters": [
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3006,28 +3006,28 @@
             }
           },
           {
-            "name": "Status",
+            "name": "status",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Problem",
+            "name": "problem",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3035,7 +3035,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3168,7 +3168,7 @@
         "operationId": "getAdminSiteShowcase",
         "parameters": [
           {
-            "name": "CategoryId",
+            "name": "categoryId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3176,28 +3176,28 @@
             }
           },
           {
-            "name": "Status",
+            "name": "status",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Problem",
+            "name": "problem",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3205,7 +3205,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3835,7 +3835,7 @@
             }
           },
           {
-            "name": "Filter",
+            "name": "filter",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3845,35 +3845,35 @@
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "InStock",
+            "name": "inStock",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsSale",
+            "name": "isSale",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsNew",
+            "name": "isNew",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "PriceFrom",
+            "name": "priceFrom",
             "in": "query",
             "schema": {
               "type": "number",
@@ -3881,7 +3881,7 @@
             }
           },
           {
-            "name": "PriceTo",
+            "name": "priceTo",
             "in": "query",
             "schema": {
               "type": "number",
@@ -3889,14 +3889,14 @@
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3904,7 +3904,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -3962,7 +3962,7 @@
             }
           },
           {
-            "name": "Filter",
+            "name": "filter",
             "in": "query",
             "schema": {
               "type": "array",
@@ -3972,35 +3972,35 @@
             }
           },
           {
-            "name": "Search",
+            "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "InStock",
+            "name": "inStock",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsSale",
+            "name": "isSale",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "IsNew",
+            "name": "isNew",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "PriceFrom",
+            "name": "priceFrom",
             "in": "query",
             "schema": {
               "type": "number",
@@ -4008,7 +4008,7 @@
             }
           },
           {
-            "name": "PriceTo",
+            "name": "priceTo",
             "in": "query",
             "schema": {
               "type": "number",
@@ -4016,14 +4016,14 @@
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Page",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -4031,7 +4031,7 @@
             }
           },
           {
-            "name": "PageSize",
+            "name": "pageSize",
             "in": "query",
             "schema": {
               "type": "integer",

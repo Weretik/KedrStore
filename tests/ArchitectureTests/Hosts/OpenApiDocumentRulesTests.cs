@@ -45,6 +45,20 @@ public sealed class OpenApiDocumentRulesTests
     }
 
     [Fact]
+    public void QueryParameters_AreCamelCase()
+    {
+        // [AsParameters] records keep C# names; CamelCaseQueryParameterTransformer names them as the clients send them.
+        var violations = Operations()
+            .SelectMany(op => op.Operation["parameters"] as JsonArray ?? [])
+            .Where(parameter => parameter?["in"]?.GetValue<string>() == "query")
+            .Select(parameter => parameter!["name"]!.GetValue<string>())
+            .Where(name => !char.IsLower(name[0]))
+            .ToList();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
     public void Numbers_AreNotAlsoStrings()
     {
         // System.Text.Json web defaults read "12" as 12, which the generator documents as integer|string with a

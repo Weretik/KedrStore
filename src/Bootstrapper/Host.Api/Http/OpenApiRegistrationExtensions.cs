@@ -20,6 +20,7 @@ public static class OpenApiRegistrationExtensions
         services.AddOpenApi(options =>
         {
             options.AddSchemaTransformer<StrictNumberSchemaTransformer>();
+            options.AddOperationTransformer<CamelCaseQueryParameterTransformer>();
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
