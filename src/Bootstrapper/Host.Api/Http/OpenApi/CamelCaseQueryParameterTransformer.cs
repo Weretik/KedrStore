@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace Host.Api.Http;
+namespace Host.Api.Http.OpenApi;
 
 /// <summary>
 /// Query parameters bound with <c>[AsParameters]</c> keep the C# property name (<c>SearchTerm</c>). The server reads

@@ -1,3 +1,4 @@
+using Host.Api.Http.OpenApi;
 using BuildingBlocks.Api.Results;
 using BuildingBlocks.Api.Errors;
 namespace Host.Api.Http;

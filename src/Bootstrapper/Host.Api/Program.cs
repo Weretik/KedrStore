@@ -1,3 +1,4 @@
+using Host.Api.Http.OpenApi;
 using Catalog.Api.DependencyInjection;
 using Content.Api.DependencyInjection;
 using Identity.Api.DependencyInjection;

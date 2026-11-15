@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace Host.Api.Http;
+namespace Host.Api.Http.OpenApi;
 
 /// <summary>
 /// Documents the mobile bearer token. Browsers sign in with the session cookie instead (see the frontend integration

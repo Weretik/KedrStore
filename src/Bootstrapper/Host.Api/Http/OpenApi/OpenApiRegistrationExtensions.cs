@@ -1,7 +1,7 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Host.Api.Http;
+namespace Host.Api.Http.OpenApi;
 
 /// <summary>
 /// The OpenAPI document of the code. Every build writes it to <c>docs/sdd/contracts/openapi.json</c>, the only
@@ -20,6 +20,7 @@ public static class OpenApiRegistrationExtensions
         services.AddOpenApi(options =>
         {
             options.AddSchemaTransformer<StrictNumberSchemaTransformer>();
+            options.AddSchemaTransformer<EnumSchemaTransformer>();
             options.AddOperationTransformer<CamelCaseQueryParameterTransformer>();
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
