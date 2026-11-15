@@ -48,10 +48,13 @@ A small fix that restores documented behavior needs no SDD, file-role map, or au
 | HTTP/API and external contracts | `$backend-api-contract-sync` | [Contracts](docs/sdd/contracts/README.md) |
 | Find database tables and relationships | — | [Database map](docs/sdd/architecture/data-model/README.md): start with the tree, then read only the relevant owner's file |
 | Database schema, migrations, and seed data | `$backend-database-change` | [Database rules](docs/sdd/standards/database-rules.md) and [data operations](docs/sdd/operations/data/migrations-and-seeding.md) |
+| Queries and N+1, indexes and search, transactions, concurrency, how migrations reach production | — | [Database rules](docs/sdd/standards/database-rules.md): what, where, and how; every audit checks each section and its known deviations |
 | Verify changes / hand off for review | `$backend-change-verification` / `$backend-pr-handoff` | [Testing rules](docs/sdd/standards/testing-rules.md) |
 | Differences between code and documentation | `$backend-docs-sync` | [Standards index](docs/sdd/standards/README.md) and [feature map](docs/sdd/features/README.md) |
 
 **Folder axiom:** a folder holds at most 6 code files; when it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders, no new one-file folders; only generated code (EF `Migrations/`, `Generated/`) is exempt. It applies to `src/` and `tests/`, the architecture tests enforce it, and every audit checks it ([module rules](docs/sdd/standards/module-rules.md#the-folder-axiom-at-most-six-files)).
+
+**Database:** reads use `AsNoTracking` or a projection and page in SQL; no query or `SaveChanges` inside a loop; one `SaveChanges` per command (repositories never save on their own); search splits the input into words, each an escaped `ILIKE` on a `gin_trgm_ops`-indexed column; shared state gets a named race protection (conditional `UPDATE`, row version, or lock) and every idempotency key a unique index with a caught violation; migrations are a separate pre-deploy step and keep the previous release working ([database rules](docs/sdd/standards/database-rules.md)).
 
 For a new feature, apply the [delivery rules](docs/sdd/standards/delivery-rules.md) and [backend code organization rules](docs/sdd/standards/backend-rules.md): plan the file-role map in the SDD first and compare it with actual code before handoff.
 
