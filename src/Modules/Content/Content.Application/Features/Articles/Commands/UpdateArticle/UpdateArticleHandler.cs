@@ -27,6 +27,8 @@ public sealed class UpdateArticleHandler(
             return Result.NotFound();
 
         var input = command.Input;
+        if (RowVersions.IsStale(input.Version, article.Version))
+            return RowVersions.Changed<AdminArticleDetails>();
         var slug = input.Slug!.Trim();
         if (await ArticleSlugs.IsTakenAsync(db, slug, id, cancellationToken))
             return ArticleSlugs.TakenResult(slug);

@@ -50,7 +50,8 @@ public static class SiteModelMapper
         {
             var text = state.Texts[modelId].FirstOrDefault(item => item.Language == language);
             return new SiteModelTextDto(language, text?.ShortDescription ?? string.Empty,
-                text?.Description ?? string.Empty, text?.SeoTitle ?? string.Empty, text?.SeoDescription ?? string.Empty);
+                text?.Description ?? string.Empty, text?.SeoTitle ?? string.Empty, text?.SeoDescription ?? string.Empty,
+                text?.Version ?? 0);
         }).ToList();
 
         return new SiteModelDto(model.Id.Value, model.CategoryId.Value,

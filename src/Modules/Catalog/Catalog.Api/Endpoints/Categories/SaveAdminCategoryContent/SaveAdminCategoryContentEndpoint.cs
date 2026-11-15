@@ -14,7 +14,8 @@ internal static class SaveAdminCategoryContentEndpoint
             .Produces<AdminCategoryContentItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         [FromRoute] int id, [FromRoute] string lang, [FromBody] SaveCategoryContentRequest request,

@@ -16,6 +16,8 @@ public class ProductGroupText : IAggregateRoot
     public string SeoTitle { get; private set; } = string.Empty;
     public string SeoDescription { get; private set; } = string.Empty;
     public DateTimeOffset UpdatedAt { get; private set; }
+    /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
+    public uint Version { get; private set; }
 
     /// <summary>The texts «Огляд» asks for: a short description and an SEO description.</summary>
     public bool IsComplete => ShortDescription.Length > 0 && SeoDescription.Length > 0;

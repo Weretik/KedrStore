@@ -132,7 +132,7 @@ Rules:
 - **Duplicates:** a unique index guards every "must exist once" rule (idempotency key, slug, number). Code that inserts after a "does it exist?" check catches the unique violation (`PostgresException` with `SqlState == PostgresErrorCodes.UniqueViolation`) and answers as if the first request won: for an idempotent create, return the existing result, not 500.
 - **Double submit:** every create endpoint the client may repeat (orders, payments, messages) takes an idempotency key stored with a unique index.
 - **Jobs that rewrite shared data** take `pg_advisory_xact_lock` with a constant key per operation at the start of their transaction, so a scheduled run and a manual run never overlap. A scheduler that launches tasks separately also groups tasks that touch the same data so only one of them runs at a time.
-- **Admin forms:** the read DTO carries the row version; the update command sends it back; a mismatch returns 409 with a Ukrainian message.
+- **Admin forms:** the entity has `public uint Version { get; private set; }` mapped with `IsRowVersion()` (PostgreSQL `xmin`); the read DTO carries `version` (0 while the row does not exist); the update request sends it back as an optional `version`, and the handler returns `RowVersions.Changed<T>()` (409, Ukrainian message) when `RowVersions.IsStale` says it differs. A request without `version` is not checked, so an older client keeps working. A `DbUpdateConcurrencyException` that no handler catches becomes the same 409 in `ExceptionBehavior`.
 - **Numbers and positions:** never `MAX(x) + 1` for a business number that must be unique; use a database sequence or the identity id. For display order (`Position`) `MAX + 1` is acceptable when a duplicate only changes order.
 - **Check.** A read-check-write without a version, unique index, conditional update, or lock on data that two actors can change; a `catch` that is missing for the unique violation behind an idempotency key; a job that can run twice at once.
 
@@ -179,11 +179,10 @@ Renaming or dropping a column, or making it `NOT NULL` without a default, in the
 
 ## Known deviations
 
-Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table. Closed on 2026-11-15: the product list rebuild (one locked transaction, diff), the 1C price sync (load once, save once), auto-saving repositories (`UnitOfWorkRepositoryBase` + `RepositorySaveTests`), per-word trigram search, order list indexes, the double-submitted order, the public model catalogue cache, and `lock_timeout` in the migrator.
+Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table. Closed on 2026-11-15: the product list rebuild (one locked transaction, diff), the 1C price sync (load once, save once), auto-saving repositories (`UnitOfWorkRepositoryBase` + `RepositorySaveTests`), per-word trigram search, order list indexes, the double-submitted order, the public model catalogue cache, and `lock_timeout` in the migrator. Rule 2.3: production statistics showed both suspected `CategoryId` indexes in use (13,518 and 1,549 scans), so no index was dropped; the leftover Hangfire tables were dropped by the Scheduling migration `DropLegacyHangfireTables` at the owner's request.
 
 | Rule | Where | Status | Plan |
 | --- | --- | --- | --- |
 | 3.1 | New rows whose database id the next step needs are saved before that step: `CreateProductGroupHandler`, `CreateSiteModelHandler`, `CreateCatalogAttributeHandler`, `ProductGroupBuilder` (new groups), `SyncCdnMediaJob` (new folders), the attribute import steps | open | A per-command transaction (module transaction port or pipeline behaviour), or ids made before saving |
-| 2.3 | `IX_ProductListProjections_CategoryId` and `IX_Products_CategoryId` look covered by composite indexes | waiting for production statistics | Drop after `pg_stat_user_indexes` confirms (query in 2.3) |
 | 1.4 | `SiteModelStateReader` loads the whole catalog for each admin model page | open | Acceptable for a few staff users; revisit if the admin pages slow down |
-| 4 | Admin edit forms (articles, SEO, categories, models, attributes) have no row version | open | `xmin` + 409, together with kedr-web |
+| 4 | Admin edit forms (article, page SEO, site SEO settings, category content, site model text, catalog attribute): the API checks the row version, but kedr-web does not send it yet | backend done | kedr-web sends `version` back and reloads the form on 409 |

@@ -8,6 +8,8 @@ internal sealed class SiteSeoSettingsConfiguration : IEntityTypeConfiguration<Si
         builder.ToTable("SiteSeoSettings", table => table.HasCheckConstraint(
             "CK_SiteSeoSettings_Singleton", $"\"Id\" = {SiteSeoSettings.SingletonId}"));
         builder.HasKey(settings => settings.Id);
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(settings => settings.Version).IsRowVersion();
         builder.Property(settings => settings.Id).ValueGeneratedNever();
         builder.Property(settings => settings.GoogleAnalyticsId).HasMaxLength(SiteSeoSettings.AnalyticsIdMaxLength);
         builder.Property(settings => settings.GoogleTagManagerId).HasMaxLength(SiteSeoSettings.TagManagerIdMaxLength);

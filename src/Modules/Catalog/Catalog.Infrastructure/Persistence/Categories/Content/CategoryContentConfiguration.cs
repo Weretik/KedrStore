@@ -11,6 +11,9 @@ public sealed class CategoryContentConfiguration : IEntityTypeConfiguration<Cate
 
         builder.HasKey(x => new { x.CategoryId, x.Language });
 
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(x => x.Version).IsRowVersion();
+
         builder.Property(x => x.CategoryId)
             .HasConversion(CatalogConverter.ProductCategoryIdConvert)
             .ValueGeneratedNever();

@@ -153,6 +153,14 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -165,7 +173,8 @@
           "coverMediaFileId",
           "updatedAt",
           "updatedBy",
-          "texts"
+          "texts",
+          "version"
         ],
         "type": "object"
       },
@@ -412,12 +421,21 @@
               "$ref": "#/components/schemas/AdminAttributeValueDto"
             },
             "type": "array"
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
           "attribute",
           "values",
-          "aliases"
+          "aliases",
+          "version"
         ],
         "type": "object"
       },
@@ -690,6 +708,14 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -700,7 +726,8 @@
           "bodyHtml",
           "faq",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object"
       },
@@ -1347,6 +1374,14 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -1356,7 +1391,8 @@
           "descriptionUk",
           "descriptionRu",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object"
       },
@@ -1995,6 +2031,14 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -2004,7 +2048,8 @@
           "bingSiteVerification",
           "shareImage",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object"
       },
@@ -6296,6 +6341,15 @@
               "$ref": "#/components/schemas/ArticleTextDto"
             },
             "type": "array"
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -6338,6 +6392,15 @@
           "seoTitle": {
             "type": [
               "null",
+              "string"
+            ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
               "string"
             ]
           }
@@ -6480,6 +6543,15 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -6518,6 +6590,15 @@
           },
           "shareImageMediaFileId": {
             "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "version": {
+            "format": "uint32",
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "null",
@@ -7052,6 +7133,15 @@
           "shortDescription": {
             "type": [
               "null",
+              "string"
+            ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
               "string"
             ]
           }
@@ -7659,6 +7749,14 @@
           },
           "shortDescription": {
             "type": "string"
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
           }
         },
         "required": [
@@ -7666,7 +7764,8 @@
           "shortDescription",
           "description",
           "seoTitle",
-          "seoDescription"
+          "seoDescription",
+          "version"
         ],
         "type": "object"
       },
@@ -8155,6 +8254,15 @@
             "format": "int32",
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "version": {
+            "format": "uint32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
               "integer",
               "string"
             ]
@@ -9181,6 +9289,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [
@@ -9780,6 +9898,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [
@@ -11225,6 +11353,16 @@
               }
             },
             "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [
@@ -11404,6 +11542,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [
@@ -15337,6 +15485,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [
@@ -17628,6 +17786,16 @@
               }
             },
             "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Conflict"
           }
         },
         "tags": [

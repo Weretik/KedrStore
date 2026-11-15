@@ -8,4 +8,5 @@ public sealed record UpdatePageSeoCommand(
     string? TitleUk,
     string? TitleRu,
     string? DescriptionUk,
-    string? DescriptionRu) : ICommand<Result<AdminPageSeo>>;
+    string? DescriptionRu,
+    uint? Version = null) : ICommand<Result<AdminPageSeo>>;

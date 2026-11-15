@@ -1,5 +1,7 @@
 ﻿using BuildingBlocks.Application.Logging;
 using BuildingBlocks.Application.Logging.Failures;
+using BuildingBlocks.Application.Results;
+using Microsoft.EntityFrameworkCore;
 
 namespace BuildingBlocks.Application.Behaviors;
 
@@ -25,6 +27,11 @@ public sealed class ExceptionBehavior<TMessage, TResponse>(
 
             throw;
         }
+        catch (DbUpdateConcurrencyException) when (IsResult())
+        {
+            // Another save changed the row between this command's read and its write (database rules 4).
+            return Failure(nameof(Result.Conflict), new[] { RowVersions.ChangedMessage });
+        }
         catch (Exception ex) when (IsCritical(ex))
         {
             var messageType = typeof(TMessage).Name;
@@ -39,27 +46,26 @@ public sealed class ExceptionBehavior<TMessage, TResponse>(
             var exType = ex.GetType().Name;
             UnhandledLog.Error(logger, messageType, exType, ex);
 
-            const string errorMessage = "Виникла невідома помилка.";
-
-            if (typeof(TResponse) == typeof(Result))
-            {
-                var result = Result.Error(errorMessage);
-                return (TResponse)(object)result;
-            }
-            if(typeof(TResponse).IsGenericType &&
-               typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
-            {
-                var method = typeof(Result<>)
-                    .MakeGenericType(typeof(TResponse).GetGenericArguments()[0])
-                    .GetMethod("Error", [typeof(string)]);
-
-                ArgumentNullException.ThrowIfNull(method);
-                var result = method.Invoke(null, [errorMessage]);
-                return (TResponse)result!;
-            }
+            if (IsResult())
+                return Failure(nameof(Result.Error), "Виникла невідома помилка.");
 
             throw;
         }
+    }
+
+    private static bool IsResult()
+        => typeof(TResponse) == typeof(Result)
+           || (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>));
+
+    /// <summary>
+    /// A failed <c>Result</c> or <c>Result&lt;T&gt;</c> from its static factory <paramref name="factory"/>
+    /// (<c>Error(string)</c> or <c>Conflict(params string[])</c>).
+    /// </summary>
+    private static TResponse Failure(string factory, object argument)
+    {
+        var method = typeof(TResponse).GetMethod(factory, [argument.GetType()]);
+        ArgumentNullException.ThrowIfNull(method);
+        return (TResponse)method.Invoke(null, [argument])!;
     }
 
     private static bool IsCritical(Exception ex)

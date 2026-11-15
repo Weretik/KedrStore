@@ -13,7 +13,8 @@ internal static class UpdateAdminSiteSeoSettingsEndpoint
             .WithName("updateAdminSiteSeoSettings")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         [FromBody] SaveSiteSeoSettingsRequest request, ISender sender, HttpContext http,

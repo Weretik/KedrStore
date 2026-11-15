@@ -39,13 +39,17 @@ public sealed record SiteModelProductDto(
     IReadOnlyList<SiteModelProductValueDto> Values,
     IReadOnlyList<string> Problems);
 
-/// <summary>Description and SEO texts of a model in one language (<c>uk</c> or <c>ru</c>).</summary>
+/// <summary>
+/// Description and SEO texts of a model in one language (<c>uk</c> or <c>ru</c>); <c>Version</c> (0 until first saved)
+/// goes back with the next save.
+/// </summary>
 public sealed record SiteModelTextDto(
     string Language,
     string ShortDescription,
     string Description,
     string SeoTitle,
-    string SeoDescription);
+    string SeoDescription,
+    uint Version);
 
 /// <summary>An attribute every on-site product of the model shares (not an axis): a line of «Характеристики».</summary>
 public sealed record SiteModelCharacteristicDto(int AttributeId, string Name, IReadOnlyList<string> Values);

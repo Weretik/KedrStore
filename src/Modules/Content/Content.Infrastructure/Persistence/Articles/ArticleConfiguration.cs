@@ -6,6 +6,8 @@ internal sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
     {
         builder.ToTable("Articles");
         builder.HasKey(article => article.Id);
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(article => article.Version).IsRowVersion();
         builder.Property(article => article.Id)
             .HasConversion(id => id.Value, value => ArticleId.FromStorage(value))
             .HasColumnType("bigint").ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
