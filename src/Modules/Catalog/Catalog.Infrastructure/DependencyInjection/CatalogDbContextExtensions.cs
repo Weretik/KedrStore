@@ -41,6 +41,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped<SiteModelStateReader>();
         services.AddScoped<SiteModelReader>();
         services.AddScoped<PublicModelCatalogReader>();
+        services.AddSingleton<PublicModelCatalogCache>();
         services.AddScoped<SiteModelChanges>();
         services.AddScoped<UnresolvedCodeReader>();
         services.AddScoped<CodeMeaningReader>();
