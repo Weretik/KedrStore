@@ -10,7 +10,7 @@ internal static class PlaceQuickOrderEndpoint
         group.MapPost("", Handle)
             .WithName("createQuickOrder")
             .WithSummary("Create a quick order")
-            .WithDescription("Creates a quick order. This endpoint is currently anonymous and does not implement an Idempotency-Key contract; disable duplicate submission in the frontend.")
+            .WithDescription("Anonymous. Creates a quick order. Send an Idempotency-Key made once per order attempt and reuse it on a retry: a repeat returns the same order id, and the same key with other data answers 409.")
             .AllowAnonymous()
             .RequireRateLimiting("QuickOrder")
             .Produces<QuickOrderResponse>()
