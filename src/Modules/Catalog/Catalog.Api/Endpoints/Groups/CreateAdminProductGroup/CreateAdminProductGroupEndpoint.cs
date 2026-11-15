@@ -10,6 +10,7 @@ internal static class CreateAdminProductGroupEndpoint
         group.MapPost("", Handle)
             .WithName("createAdminProductGroup")
             .WithSummary("Create a group («Нова група»)")
+            .WithDescription("The listed products (up to 200, all in the category) move into the new group and are pinned: automation never moves them again. The slug is built from the name.")
             .Produces<AdminProductGroupDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

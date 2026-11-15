@@ -10,6 +10,7 @@ internal static class GetMyWorkTasksEndpoint
         group.MapGet("tasks", Handle)
             .WithName("getMyWorkTasks")
             .WithSummary("The caller's board")
+            .WithDescription("Open tasks and tasks done in the last 30 days, most recently changed first.")
             .Produces<IReadOnlyList<WorkTaskDto>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

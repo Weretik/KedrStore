@@ -11,6 +11,7 @@ internal static class SetAdminCategoryAttributeFiltersEndpoint
         group.MapPut("category-filters/{categoryId:int}", Handle)
             .WithName("setAdminCategoryAttributeFilters")
             .WithSummary("Turn category filters on or off and order them (Admin)")
+            .WithDescription("Attributes left out stay as they are. The attribute import no longer changes the listed filters.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<List<AdminCategoryAttributeFilterDto>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

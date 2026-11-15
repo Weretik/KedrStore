@@ -12,6 +12,7 @@ internal static class GetPublicWholesalePageEndpoint
         group.MapGet("{lang}/wholesale", Handle)
             .WithName("getPublicWholesalePage")
             .WithSummary("Get the page texts in one language")
+            .WithDescription("Public, because the site renders the page for anonymous visitors.")
             .Produces<PublicWholesalePageResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

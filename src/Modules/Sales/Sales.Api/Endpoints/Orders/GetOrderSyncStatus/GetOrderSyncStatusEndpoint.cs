@@ -9,6 +9,7 @@ internal static class GetOrderSyncStatusEndpoint
         group.MapGet("{orderId:long}/sync-status", Handle)
             .WithName("getAdminOrderSyncStatus")
             .WithSummary("Get the current 1C delivery status for an admin order")
+            .WithDescription("Policy CanManageOrders (Manager, Seo, and Admin).")
             .Produces<GetAdminOrderSyncStatusResponse>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden)

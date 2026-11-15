@@ -10,6 +10,7 @@ internal static class SetAdminProductGroupOfProductEndpoint
         group.MapPut("{id:int}/group", Handle)
             .WithName("setAdminProductGroupOfProduct")
             .WithSummary("Move a product to a group, out of groups, or back to automatic grouping")
+            .WithDescription("`automatic: true` returns the product to automatic grouping (no `groupId`). Otherwise the product is pinned to `groupId` (a group of the product's category) or, with `groupId: null`, kept out of groups.")
             .Produces<AdminProductGroupMembershipDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

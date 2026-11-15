@@ -10,6 +10,7 @@ internal static class AcceptAdminProductReviewEndpoint
         group.MapPost("review/accept", Handle)
             .WithName("acceptAdminProductReview")
             .WithSummary("«Прийняти як є»")
+            .WithDescription("Permanent; automation keeps the product accepted until «Повернути на перевірку». Records who and when.")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

@@ -10,6 +10,7 @@ internal static class GetAdminCategoryAttributeFiltersEndpoint
         group.MapGet("category-filters/{categoryId:int}", Handle)
             .WithName("getAdminCategoryAttributeFilters")
             .WithSummary("«Фільтри категорій» of one category")
+            .WithDescription("Filter rows in order, then attributes the category's products have that are not offered yet (off).")
             .Produces<List<AdminCategoryAttributeFilterDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

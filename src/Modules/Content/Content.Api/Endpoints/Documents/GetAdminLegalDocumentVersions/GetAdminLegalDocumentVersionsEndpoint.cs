@@ -12,6 +12,7 @@ internal static class GetAdminLegalDocumentVersionsEndpoint
         group.MapGet("{kind}/versions", Handle)
             .WithName("getAdminLegalDocumentVersions")
             .WithSummary("List all editions of a document")
+            .WithDescription("Requires `CanManageContent`. The draft first, then editions by number, newest first.")
             .Produces<IReadOnlyList<LegalDocumentVersionSummaryResponse>>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

@@ -10,6 +10,7 @@ internal static class ChangeMyEmailEndpoint
         group.MapPut("email", Handle)
             .WithName("changeMyEmail")
             .WithSummary("Change the own sign-in email (administrators)")
+            .WithDescription("Policy `RequireAdminRole`. Needs the current password; a wrong one counts towards lockout. The calling browser session stays signed in; every other session ends.")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

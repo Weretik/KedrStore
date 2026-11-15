@@ -10,6 +10,7 @@ internal static class GetProductBySlugEndpoint
         group.MapGet("product/{productSlug}", Handle)
             .WithName("getPublicProductBySlug")
             .WithSummary("Get a public product by slug")
+            .WithDescription("A former slug returns 200 with `productSlug` set to the current slug, so the client can redirect permanently. A product of a deleted category is not public.")
             .Produces<ProductBySlugDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<CatalogRedirect>(StatusCodes.Status404NotFound);

@@ -12,6 +12,7 @@ internal static class GetPublishedLegalDocumentEndpoint
         group.MapGet("{lang}/documents/{kind}", Handle)
             .WithName("getPublishedLegalDocument")
             .WithSummary("Get the published edition of a document")
+            .WithDescription("Public. `bodyHtml` is sanitized HTML (h2, h3, p, lists, strong, em, blockquote, links); the site builds its table of contents from the h2 headings and fills the `{site}`, `{email}` and `{phone}` placeholders.")
             .Produces<PublishedLegalDocumentResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

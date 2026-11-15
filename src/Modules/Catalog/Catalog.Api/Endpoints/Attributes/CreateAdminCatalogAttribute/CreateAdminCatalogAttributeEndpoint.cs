@@ -11,6 +11,7 @@ internal static class CreateAdminCatalogAttributeEndpoint
         group.MapPost("", Handle)
             .WithName("createAdminCatalogAttribute")
             .WithSummary("Add an attribute («Нова ознака», Admin)")
+            .WithDescription("The attribute is manual from the start, so the dictionary import leaves it. Code and slug come from the request or from the name (a slug made from the name gets a number when taken); a taken code or explicit slug is rejected.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -12,6 +12,7 @@ internal static class GetStaffAccountsEndpoint
         group.MapGet("", Handle)
             .WithName("getStaffAccounts")
             .WithSummary("List administrators, SEO specialists, and managers")
+            .WithDescription("Policy `CanManageUsers` (role Admin). Customers are not listed.")
             .Produces<IReadOnlyList<StaffAccountResponse>>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden);

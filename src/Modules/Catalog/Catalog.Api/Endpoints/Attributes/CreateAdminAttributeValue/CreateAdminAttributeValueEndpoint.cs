@@ -11,6 +11,7 @@ internal static class CreateAdminAttributeValueEndpoint
         group.MapPost("{id:int}/values", Handle)
             .WithName("createAdminAttributeValue")
             .WithSummary("Add a value (Admin)")
+            .WithDescription("Code and slug come from the request or from the name; a taken code or explicit slug is rejected.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

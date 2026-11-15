@@ -14,6 +14,7 @@ internal static class UploadMediaFileEndpoint
         group.MapPost("", Handle)
             .WithName("uploadAdminMediaFile")
             .WithSummary("Upload a picture")
+            .WithDescription("JPEG, PNG, or WebP (checked by content) up to 15 MB, stored unchanged under a new unique CDN key. The display name is the uploaded file name.")
             .WithUploadLimit()
             .DisableAntiforgery()
             .Produces<MediaFileItem>()

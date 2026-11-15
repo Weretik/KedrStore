@@ -15,6 +15,7 @@ internal static class UploadAdminArticleCoverEndpoint
         group.MapPost("covers", Handle)
             .WithName("uploadAdminArticleCover")
             .WithSummary("Upload a cover picture before saving the article")
+            .WithDescription("JPEG, PNG, or WebP up to 10 MB, at least 600 px wide. Stored as WebP at most 1600 px wide with the EXIF orientation applied, on the CDN under `articles/` and in the media library folder «Статті» (created when missing). Nothing about an article changes: send `mediaFileId` as `coverMediaFileId` with the create or update.")
             .WithMetadata(
                 new RequestSizeLimitAttribute(CoverRequestLimit),
                 new RequestFormLimitsAttribute { MultipartBodyLengthLimit = CoverRequestLimit })

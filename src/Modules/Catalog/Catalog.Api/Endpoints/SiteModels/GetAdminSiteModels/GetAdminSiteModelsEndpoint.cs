@@ -13,6 +13,7 @@ internal static class GetAdminSiteModelsEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminSiteModels")
             .WithSummary("The «Моделі» list")
+            .WithDescription("Models with problems first, then by name. `search` matches part of the model name, part of a product name, or a 1C code exactly.")
             .Produces<SiteModelListDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

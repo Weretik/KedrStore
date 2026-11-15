@@ -10,6 +10,7 @@ internal static class GetAdminUnresolvedAttributeCodesEndpoint
         group.MapGet("unresolved-codes", Handle)
             .WithName("getAdminUnresolvedAttributeCodes")
             .WithSummary("«Не розшифровані коди»")
+            .WithDescription("Codes without a value or with an unconfirmed decoding that the owner has not decided yet.")
             .Produces<List<AdminUnresolvedCodeDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

@@ -12,6 +12,7 @@ internal static class MobileLoginEndpoint
         group.MapPost("login", Handle)
             .WithName("loginMobile")
             .WithSummary("Sign the mobile app in")
+            .WithDescription("Rate-limited by the AuthLogin policy. Returns both tokens in JSON; the app stores them in the device secure store. Sets no cookies.")
             .AllowAnonymous()
             .RequireRateLimiting("AuthLogin")
             .Produces<MobileTokenResponse>()

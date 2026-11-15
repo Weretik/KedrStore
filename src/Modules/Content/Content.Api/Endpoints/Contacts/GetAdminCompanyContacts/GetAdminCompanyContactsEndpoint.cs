@@ -12,6 +12,7 @@ internal static class GetAdminCompanyContactsEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminCompanyContacts")
             .WithSummary("Get the company contacts for editing")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin).")
             .Produces<AdminCompanyContactsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

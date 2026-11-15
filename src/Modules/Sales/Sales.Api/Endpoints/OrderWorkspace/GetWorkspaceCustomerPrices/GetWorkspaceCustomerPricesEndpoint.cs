@@ -10,7 +10,8 @@ internal static class GetWorkspaceCustomerPricesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("customer-prices", Handle)
             .WithName("getAdminWorkspaceCustomerPrices")
-            .WithSummary("Read a customer's unit prices for products, ignoring stock");
+            .WithSummary("Read a customer's unit prices for products, ignoring stock")
+            .WithDescription("Uses the price type of the nearest customer rule on the product's category or any parent category, otherwise the customer's default price type. A product without such a UAH price, or an unknown product, returns a null unitPrice.");
 
     private static async Task<IResult> Handle(
         [FromBody] WorkspaceCustomerPricesRequest request, ISender sender, HttpContext http,

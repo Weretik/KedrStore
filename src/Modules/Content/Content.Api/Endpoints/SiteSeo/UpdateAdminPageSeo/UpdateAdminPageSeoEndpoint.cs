@@ -12,6 +12,7 @@ internal static class UpdateAdminPageSeoEndpoint
         group.MapPut("{page}", Handle)
             .WithName("updateAdminPageSeo")
             .WithSummary("Replace the texts of one page")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). Values are trimmed; an empty or missing value returns that text to the site default. The first save creates the page row. Repeating it is safe.")
             .Produces<AdminPageSeoResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

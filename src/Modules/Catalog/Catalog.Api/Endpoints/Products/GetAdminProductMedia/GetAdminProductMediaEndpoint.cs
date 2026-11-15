@@ -11,6 +11,7 @@ internal static class GetAdminProductMediaEndpoint
         group.MapGet("{id:int}/media", Handle)
             .WithName("getAdminProductMedia")
             .WithSummary("Get the photos and the scheme linked to a product")
+            .WithDescription("Policies CanManageProducts and CanManageMedia (Manager, Seo, and Admin). Photos come in gallery order; file names are read from the media library.")
             .RequireAuthorization(PolicyNames.CanManageMedia)
             .Produces<ProductMediaDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

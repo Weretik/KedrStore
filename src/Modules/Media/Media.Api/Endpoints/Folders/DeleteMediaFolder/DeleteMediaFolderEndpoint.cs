@@ -10,6 +10,7 @@ internal static class DeleteMediaFolderEndpoint
         group.MapDelete("{id:long}", Handle)
             .WithName("deleteAdminMediaFolder")
             .WithSummary("Delete an empty folder")
+            .WithDescription("Admin only.")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)

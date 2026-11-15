@@ -10,6 +10,7 @@ internal static class GetAdminProductBySlugEndpoint
         group.MapGet("by-slug/{productSlug}", Handle)
             .WithName("getAdminProductBySlug")
             .WithSummary("Get one admin product by slug")
+            .WithDescription("Policy CanManageProducts (Manager, Seo, and Admin).")
             .Produces<AdminProductDetailsDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

@@ -12,6 +12,7 @@ internal static class GetCompanyContactsEndpoint
         group.MapGet("", Handle)
             .WithName("getCompanyContacts")
             .WithSummary("Get the company contacts")
+            .WithDescription("Public, because every site page renders them for anonymous visitors.")
             .Produces<CompanyContactsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

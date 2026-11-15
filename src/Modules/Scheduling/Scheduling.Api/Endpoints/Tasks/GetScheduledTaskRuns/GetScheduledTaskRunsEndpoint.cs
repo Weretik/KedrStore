@@ -9,6 +9,7 @@ internal static class GetScheduledTaskRunsEndpoint
         group.MapGet("{key}/runs", Handle)
             .WithName("getAdminScheduledTaskRuns")
             .WithSummary("List recent runs of a background task")
+            .WithDescription("The last 50 runs of a task, newest first. Runs are kept 90 days.")
             .Produces<IReadOnlyList<ScheduledTaskRunResponse>>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

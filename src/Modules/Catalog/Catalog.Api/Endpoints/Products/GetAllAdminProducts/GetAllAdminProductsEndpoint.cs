@@ -10,6 +10,7 @@ internal static class GetAllAdminProductsEndpoint
         group.MapGet("all", Handle)
             .WithName("getAllAdminProducts")
             .WithSummary("List all admin product rows")
+            .WithDescription("Policy CanManageProducts (Manager, Seo, and Admin). Returns the unpaged admin row model.")
             .Produces<List<AdminProductListRowDto>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

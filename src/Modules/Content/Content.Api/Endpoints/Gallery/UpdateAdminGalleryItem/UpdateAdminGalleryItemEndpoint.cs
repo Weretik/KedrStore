@@ -13,6 +13,7 @@ internal static class UpdateAdminGalleryItemEndpoint
         group.MapPut("items/{id:long}", Handle)
             .WithName("updateAdminGalleryItem")
             .WithSummary("Replace the title and caption of a card")
+            .WithDescription("Requires `CanManageContent`. Empty or missing values are stored as none.")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

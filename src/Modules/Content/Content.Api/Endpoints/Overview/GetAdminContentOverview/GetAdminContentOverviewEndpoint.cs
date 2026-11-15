@@ -9,6 +9,7 @@ internal static class GetAdminContentOverviewEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminContentOverview")
             .WithSummary("Article drafts, legacy covers and document drafts")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin).")
             .Produces<AdminContentOverview>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

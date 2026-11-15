@@ -12,6 +12,7 @@ internal static class GetPublicHomeBlocksEndpoint
         group.MapGet("{lang}/home", Handle)
             .WithName("getPublicHomeBlocks")
             .WithSummary("Get the home page FAQ and brands in one language")
+            .WithDescription("Public, in site order. A brand whose logo file was deleted from the library is left out. An empty `brands` list means the admin has not added any.")
             .Produces<PublicHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

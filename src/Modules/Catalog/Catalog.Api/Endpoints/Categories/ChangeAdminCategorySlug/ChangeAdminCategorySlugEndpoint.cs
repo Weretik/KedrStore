@@ -12,6 +12,7 @@ internal static class ChangeAdminCategorySlugEndpoint
         group.MapPut("{id:int}/slug", Handle)
             .WithName("changeAdminCategorySlug")
             .WithSummary("Set or regenerate a category slug")
+            .WithDescription("The previous slug moves to history and keeps resolving to this category. A slug used now or before by another category is rejected. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<ChangeSlugResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

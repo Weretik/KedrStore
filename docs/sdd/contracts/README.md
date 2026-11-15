@@ -4,7 +4,7 @@
 
 ## How it works
 
-1. An endpoint describes itself in code: `.WithName("getAdminArticles")` (unique camelCase operation id, the frontends see it), `.WithSummary("List articles")`, typed `.Produces<TResponse>()` and `.ProducesProblem(status)` for every error it returns, and its request type through the handler parameters.
+1. An endpoint describes itself in code: `.WithName("getAdminArticles")` (unique camelCase operation id, the frontends see it), `.WithSummary("List articles")` (and `.WithDescription(...)` when a rule needs explaining), typed `.Produces<TResponse>()` and `.ProducesProblem(status)` for every error it returns, and its request type through the handler parameters.
 2. `dotnet build` (or any build or test of `Host.Api`) regenerates `openapi.json`. Commit it together with the endpoint change.
 3. CI builds the solution and fails with «OpenAPI contract is out of date» when the committed file differs from the code.
 4. The architecture test [`OpenApiDocumentRulesTests`](../../../tests/ArchitectureTests/Hosts/OpenApiDocumentRulesTests.cs) requires an operation id, a summary and a tag on every operation, unique ids, and numbers documented as numbers.

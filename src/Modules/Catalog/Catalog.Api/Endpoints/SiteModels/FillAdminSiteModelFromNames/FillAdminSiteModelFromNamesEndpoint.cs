@@ -10,6 +10,7 @@ internal static class FillAdminSiteModelFromNamesEndpoint
         group.MapPost("{id:int}/fill-from-names", Handle)
             .WithName("fillAdminSiteModelFromNames")
             .WithSummary("«Заповнити з назв»")
+            .WithDescription("For each product and axis without a value a person set, the confirmed value the recognizer read from the 1C name becomes a manual value. Codes nobody decoded stay empty.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

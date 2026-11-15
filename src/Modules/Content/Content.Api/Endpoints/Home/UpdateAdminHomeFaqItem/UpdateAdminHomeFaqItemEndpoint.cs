@@ -12,6 +12,7 @@ internal static class UpdateAdminHomeFaqItemEndpoint
         group.MapPut("faq/{id:long}", Handle)
             .WithName("updateAdminHomeFaqItem")
             .WithSummary("Replace the texts of a question")
+            .WithDescription("Requires `CanManageContent`.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

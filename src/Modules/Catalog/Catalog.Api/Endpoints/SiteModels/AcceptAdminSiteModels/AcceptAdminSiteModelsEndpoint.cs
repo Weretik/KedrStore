@@ -10,6 +10,7 @@ internal static class AcceptAdminSiteModelsEndpoint
         group.MapPost("accept", Handle)
             .WithName("acceptAdminSiteModels")
             .WithSummary("Accept models («Прийняти»)")
+            .WithDescription("Accepts up to 500 models; offered axes are saved for models without saved axes; products are pinned. Already accepted models stay as they are. Returns the new counts.")
             .Produces<SiteModelHealthDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

@@ -9,6 +9,7 @@ internal static class SetStaffBlockedEndpoint
         group.MapPut("{userId:guid}/blocked", Handle)
             .WithName("setStaffBlocked")
             .WithSummary("Block or unblock a staff account")
+            .WithDescription("Blocking ends mobile sessions at once and browser sessions within 5 minutes. An administrator cannot block their own account (400).")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

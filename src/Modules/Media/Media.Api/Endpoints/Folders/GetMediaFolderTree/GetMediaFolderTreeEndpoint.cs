@@ -10,6 +10,7 @@ internal static class GetMediaFolderTreeEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminMediaFolders")
             .WithSummary("All folders with file counts")
+            .WithDescription("A flat list ordered by name; the client builds the tree from `parentId`.")
             .Produces<MediaFolderTree>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

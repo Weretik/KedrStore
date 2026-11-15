@@ -11,6 +11,7 @@ internal static class SetAdminProductMediaEndpoint
         group.MapPut("{id:int}/media", Handle)
             .WithName("setAdminProductMedia")
             .WithSummary("Replace the photos and the scheme of a product")
+            .WithDescription("Replaces the whole set with media library files: up to 20 photos in order (the first is the list photo) and an optional scheme. A file can appear once. Every ID must exist in the library.")
             .RequireAuthorization(PolicyNames.CanManageMedia)
             .Produces<ProductMediaDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -12,6 +12,7 @@ internal static class ListAdminPageSeoEndpoint
         group.MapGet("", Handle)
             .WithName("listAdminPageSeo")
             .WithSummary("List every site page with its texts")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). Pages never saved have empty values.")
             .Produces<IReadOnlyList<AdminPageSeoResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

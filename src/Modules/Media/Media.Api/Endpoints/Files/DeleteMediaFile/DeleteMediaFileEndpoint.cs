@@ -10,6 +10,7 @@ internal static class DeleteMediaFileEndpoint
         group.MapDelete("{id:long}", Handle)
             .WithName("deleteAdminMediaFile")
             .WithSummary("Delete a file from the CDN and the library")
+            .WithDescription("Admin only.")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)

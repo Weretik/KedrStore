@@ -10,6 +10,7 @@ internal static class UploadStaffAvatarEndpoint
         group.MapPut("{userId:guid}/avatar", Handle)
             .WithName("uploadStaffAvatar")
             .WithSummary("Upload a manager's avatar")
+            .WithDescription("Manager and Seo accounts only. Same limits as `uploadMyAvatar`.")
             .AsAvatarUpload()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

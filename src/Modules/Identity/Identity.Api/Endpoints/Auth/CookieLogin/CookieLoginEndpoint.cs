@@ -12,6 +12,7 @@ internal static class CookieLoginEndpoint
         group.MapPost("login", Handle)
             .WithName("loginCookieSession")
             .WithSummary("Sign a browser in with the session cookie")
+            .WithDescription("Admin and storefront. Rate-limited by the AuthLogin policy. Sets the HttpOnly session cookie `__Host-kedr.session` (SameSite=Lax, sliding 7 days) and the readable `kedr.csrf` cookie. No token is returned. Five wrong passwords lock the account for 15 minutes.")
             .AllowAnonymous()
             .RequireRateLimiting("AuthLogin")
             .Produces<SessionMeResponse>()

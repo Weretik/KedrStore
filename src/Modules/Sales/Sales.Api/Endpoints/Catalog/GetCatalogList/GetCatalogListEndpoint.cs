@@ -9,6 +9,7 @@ internal static class GetCatalogListEndpoint
         group.MapPost("products", Handle)
             .WithName("getSalesCatalogProducts")
             .WithSummary("List products with prices for the current user")
+            .WithDescription("Returns prices determined for the authenticated user. `search` is a query parameter; all filters and paging are in the optional JSON body.")
             .Produces<PagedResult<List<CatalogListItemDto>>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

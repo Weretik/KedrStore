@@ -12,6 +12,7 @@ internal static class GetAdminGalleryEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminGallery")
             .WithSummary("List the gallery cards with previews")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin).")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

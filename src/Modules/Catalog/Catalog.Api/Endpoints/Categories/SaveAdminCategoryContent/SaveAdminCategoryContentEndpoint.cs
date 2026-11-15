@@ -12,6 +12,7 @@ internal static class SaveAdminCategoryContentEndpoint
         group.MapPut("{id:int}/content/{lang}", Handle)
             .WithName("saveAdminCategoryContent")
             .WithSummary("Replace the SEO text and FAQ of a category in one language")
+            .WithDescription("Full replacement: empty fields clear them and the FAQ list replaces the stored one. `bodyHtml` is sanitized to p, br, strong, em, ul, ol, li, h2, h3, and a[href] (http, https, or a path starting with `/`); everything else is removed. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCategoryContentItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -1,3 +1,5 @@
+using Sales.Application.Abstractions.Workspace.Drafts;
+using Sales.Application.Abstractions.Workspace;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceDrafts;
@@ -8,7 +10,8 @@ internal static class GetWorkspaceDraftListEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("drafts", Handle)
             .WithName("getAdminOrderDrafts")
-            .WithSummary("Search saved drafts");
+            .WithSummary("Search saved drafts")
+            .Produces<WorkspacePage<WorkspaceDraftListItem>>();
 
     private static async Task<IResult> Handle(
         ISender sender, HttpContext http,

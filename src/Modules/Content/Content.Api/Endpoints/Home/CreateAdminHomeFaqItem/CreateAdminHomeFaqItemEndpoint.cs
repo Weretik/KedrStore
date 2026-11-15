@@ -12,6 +12,7 @@ internal static class CreateAdminHomeFaqItemEndpoint
         group.MapPost("faq", Handle)
             .WithName("createAdminHomeFaqItem")
             .WithSummary("Add a question to the end of the FAQ")
+            .WithDescription("Requires `CanManageContent`. All four texts are required.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

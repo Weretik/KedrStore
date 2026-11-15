@@ -12,6 +12,7 @@ internal static class UpdateAdminSiteSeoSettingsEndpoint
         group.MapPut("", Handle)
             .WithName("updateAdminSiteSeoSettings")
             .WithSummary("Replace all settings")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). Ids are trimmed and upper-cased; for a verification code the whole meta tag may be sent and its `content` is kept. A blank or missing value removes that code or picture. A new picture must be in the media library. Repeating it is safe.")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

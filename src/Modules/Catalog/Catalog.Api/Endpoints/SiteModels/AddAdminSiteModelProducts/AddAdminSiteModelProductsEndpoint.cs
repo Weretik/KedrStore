@@ -10,6 +10,7 @@ internal static class AddAdminSiteModelProductsEndpoint
         group.MapPost("{id:int}/products", Handle)
             .WithName("addAdminSiteModelProducts")
             .WithSummary("Add products to a model")
+            .WithDescription("The products must be in the model's category and not in another accepted model; they are pinned.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

@@ -11,6 +11,7 @@ internal static class UpdateAdminAttributeValueEndpoint
         group.MapPut("{id:int}/values/{valueId:int}", Handle)
             .WithName("updateAdminAttributeValue")
             .WithSummary("Edit a value (Admin)")
+            .WithDescription("Names, order, and swatch (a color or a media-library texture). The dictionary import then leaves it.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

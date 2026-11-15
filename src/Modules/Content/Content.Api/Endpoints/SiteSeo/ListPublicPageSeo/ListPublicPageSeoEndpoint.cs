@@ -12,6 +12,7 @@ internal static class ListPublicPageSeoEndpoint
         group.MapGet("{lang}/page-seo", Handle)
             .WithName("listPublicPageSeo")
             .WithSummary("List the set search texts in one language")
+            .WithDescription("Public, because the site builds page metadata for anonymous visitors. Only pages with a title or a description in this language are listed.")
             .Produces<IReadOnlyList<PublicPageSeoResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

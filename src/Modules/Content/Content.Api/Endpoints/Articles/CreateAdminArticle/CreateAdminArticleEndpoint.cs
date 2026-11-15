@@ -12,6 +12,7 @@ internal static class CreateAdminArticleEndpoint
         group.MapPost("", Handle)
             .WithName("createAdminArticle")
             .WithSummary("Create an article")
+            .WithDescription("An empty `slug` is generated from the Ukrainian title (KMU-2010 transliteration, `-2`, `-3`… on a clash). `bodyHtml` is sanitized to p, br, strong, em, ul, ol, li, h2, h3, blockquote, and a[href] (http, https, or a path starting with `/`). Not idempotent: repeating the request creates another article.")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

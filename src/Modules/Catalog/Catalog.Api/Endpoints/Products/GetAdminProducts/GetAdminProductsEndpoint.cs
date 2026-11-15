@@ -11,6 +11,7 @@ internal static class GetAdminProductsEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminProducts")
             .WithSummary("List admin product rows")
+            .WithDescription("Policy CanManageProducts (Manager, Seo, and Admin).")
             .Produces<PagedResult<List<AdminProductListRowDto>>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

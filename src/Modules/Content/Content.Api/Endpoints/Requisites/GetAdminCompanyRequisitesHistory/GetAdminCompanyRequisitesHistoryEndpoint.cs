@@ -12,6 +12,7 @@ internal static class GetAdminCompanyRequisitesHistoryEndpoint
         group.MapGet("history", Handle)
             .WithName("getAdminCompanyRequisitesHistory")
             .WithSummary("List the latest requisites changes")
+            .WithDescription("Requires the Admin role. The 50 newest entries, newest first.")
             .Produces<IReadOnlyList<CompanyRequisitesChangeResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

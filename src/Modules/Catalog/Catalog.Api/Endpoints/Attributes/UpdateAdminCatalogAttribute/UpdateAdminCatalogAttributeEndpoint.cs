@@ -11,6 +11,7 @@ internal static class UpdateAdminCatalogAttributeEndpoint
         group.MapPut("{id:int}", Handle)
             .WithName("updateAdminCatalogAttribute")
             .WithSummary("Edit an attribute (Admin)")
+            .WithDescription("Names, filter flag, and order. The dictionary import no longer changes the attribute.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -11,10 +11,12 @@ internal static class GetProductsEndpoint
     {
         Describe(group.MapGet("products", HandleAll)
             .WithName("getPublicProducts")
-            .WithSummary("List public products"));
+            .WithSummary("List public products")
+            .WithDescription("When `categoryId` is supplied, the page contains public products of that category and of every descendant category at any depth; sibling branches are excluded. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. An unknown valid `categoryId` returns `200` with an empty page and `totalRecords = 0`."));
         Describe(group.MapGet("{categorySlug}/products", HandleCategory)
             .WithName("getPublicProductsByCategorySlug")
-            .WithSummary("List public products in a category"));
+            .WithSummary("List public products in a category")
+            .WithDescription("Returns public products of the category selected by `categorySlug` and of every descendant category at any depth; sibling branches are excluded. When `categoryId` is also supplied, it takes precedence over the slug. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. A former category slug selects its category. An unknown or deleted category slug returns `404`; an unknown `categoryId` returns `200` with an empty page."));
     }
 
     private static void Describe(RouteHandlerBuilder endpoint) =>

@@ -13,6 +13,7 @@ internal static class GetPublicSiteModelsEndpoint
         group.MapGet("models", Handle)
             .WithName("getPublicSiteModels")
             .WithSummary("Search models")
+            .WithDescription("Models over all categories, without attribute filters. `search` matches every word in the model name, or in one product's Ukrainian or Russian name or 1C code. When the whole search is the 1C code of an on-site product, `exactMatch` is its model address.")
             .Produces<PublicSiteModelListDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

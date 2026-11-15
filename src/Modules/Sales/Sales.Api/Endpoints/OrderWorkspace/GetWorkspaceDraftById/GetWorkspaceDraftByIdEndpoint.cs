@@ -1,3 +1,4 @@
+using Sales.Application.Abstractions.Workspace.Drafts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Features.OrderWorkspace.Queries.GetWorkspaceDraft;
@@ -8,7 +9,8 @@ internal static class GetWorkspaceDraftByIdEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("drafts/{draftId:long}", Handle)
             .WithName("getAdminOrderDraftById")
-            .WithSummary("Read one draft with current pricing availability");
+            .WithSummary("Read one draft with current pricing availability")
+            .Produces<WorkspaceDraftDetail>();
 
     private static async Task<IResult> Handle(
         long draftId, ISender sender, HttpContext http, CancellationToken cancellationToken)

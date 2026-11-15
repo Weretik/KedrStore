@@ -12,6 +12,7 @@ internal static class AddAdminGalleryPhotosEndpoint
         group.MapPost("photos", Handle)
             .WithName("addAdminGalleryPhotos")
             .WithSummary("Add media-library photos to the end of the gallery")
+            .WithDescription("Requires `CanManageContent`. Up to 100 file IDs in the order to add; a photo already in the gallery is skipped. A file that is not in the library answers 400 and nothing is added.")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

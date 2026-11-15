@@ -12,6 +12,7 @@ internal static class GetAdminSiteSeoSettingsEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminSiteSeoSettings")
             .WithSummary("Read the settings for editing")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin).")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

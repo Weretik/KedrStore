@@ -10,6 +10,7 @@ internal static class ChangeMyWorkTaskStatusEndpoint
         group.MapPut("tasks/{id:long}/status", Handle)
             .WithName("changeMyWorkTaskStatus")
             .WithSummary("Move an own task to another column")
+            .WithDescription("`InProgress` and `Done` set the start time once; `Done` sets the completion time and keeps `result`; leaving `Done` clears both.")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

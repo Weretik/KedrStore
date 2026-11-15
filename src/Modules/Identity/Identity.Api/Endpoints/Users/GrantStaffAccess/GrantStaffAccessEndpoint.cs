@@ -12,6 +12,7 @@ internal static class GrantStaffAccessEndpoint
         group.MapPost("{userId:guid}/staff-access", Handle)
             .WithName("grantStaffAccess")
             .WithSummary("Give an existing account a staff role and a password")
+            .WithDescription("The account gets the role, the name, and a new password; its email stays. A customer keeps the customer role, orders and prices, and signs in on the site with the new password too. Its active refresh sessions end. Later 1C customer syncs no longer change the email, name, password, or block state of a staff account, and a customer removed from 1C keeps the staff account without the customer role.")
             .Produces<StaffAccountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

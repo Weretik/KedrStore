@@ -10,6 +10,7 @@ internal static class RenameAdminSiteModelEndpoint
         group.MapPut("{id:int}", Handle)
             .WithName("renameAdminSiteModel")
             .WithSummary("Rename a model")
+            .WithDescription("The slug stays as it is.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

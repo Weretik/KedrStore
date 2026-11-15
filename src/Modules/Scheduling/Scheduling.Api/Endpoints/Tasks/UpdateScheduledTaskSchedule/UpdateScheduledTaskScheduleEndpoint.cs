@@ -9,6 +9,7 @@ internal static class UpdateScheduledTaskScheduleEndpoint
         group.MapPut("{key}/schedule", Handle)
             .WithName("updateAdminScheduledTaskSchedule")
             .WithSummary("Change the schedule of a background task")
+            .WithDescription("Changes the schedule and the on/off switch. nextRunAt moves the next run once; without it the next run follows the schedule.")
             .Produces<ScheduledTaskResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

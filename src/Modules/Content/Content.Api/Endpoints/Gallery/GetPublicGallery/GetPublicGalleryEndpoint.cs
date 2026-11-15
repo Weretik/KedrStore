@@ -12,6 +12,7 @@ internal static class GetPublicGalleryEndpoint
         group.MapGet("{lang}/gallery", Handle)
             .WithName("getPublicGallery")
             .WithSummary("Get the site gallery in one language")
+            .WithDescription("Public, in site order. A video's `imageUrl` is YouTube's poster (480×360); a photo's is its CDN URL, with `width`/`height` when the library knows them. A photo whose library file was deleted is left out.")
             .Produces<IReadOnlyList<PublicGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

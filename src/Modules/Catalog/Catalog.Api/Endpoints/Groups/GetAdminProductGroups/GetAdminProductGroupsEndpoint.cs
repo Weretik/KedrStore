@@ -10,6 +10,7 @@ internal static class GetAdminProductGroupsEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminProductGroups")
             .WithSummary("Find groups by category and part of the name")
+            .WithDescription("Up to 50 groups ordered by name, for the «Перенести в іншу групу» picker.")
             .Produces<List<AdminProductGroupListItemDto>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

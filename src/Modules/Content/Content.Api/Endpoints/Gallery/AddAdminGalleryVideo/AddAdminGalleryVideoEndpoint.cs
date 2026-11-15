@@ -13,6 +13,7 @@ internal static class AddAdminGalleryVideoEndpoint
         group.MapPost("videos", Handle)
             .WithName("addAdminGalleryVideo")
             .WithSummary("Add a YouTube video by its link to the end of the gallery")
+            .WithDescription("Requires `CanManageContent`. `url` may be a watch, youtu.be, shorts, embed or live link, or the bare 11-character ID.")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);

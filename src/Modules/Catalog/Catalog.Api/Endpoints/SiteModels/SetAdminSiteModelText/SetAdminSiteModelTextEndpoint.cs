@@ -10,6 +10,7 @@ internal static class SetAdminSiteModelTextEndpoint
         group.MapPut("{id:int}/texts/{language}", Handle)
             .WithName("setAdminSiteModelText")
             .WithSummary("Save the model's texts in one language")
+            .WithDescription("All four texts are replaced; a missing or blank text is stored empty.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

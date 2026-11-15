@@ -32,6 +32,19 @@ public sealed class OpenApiDocumentRulesTests
     }
 
     [Fact]
+    public void EveryRead_DeclaresItsSuccessBody()
+    {
+        // A GET without .Produces<T>() is documented as a bodiless 200, so the typed client gets `never` for its data.
+        var violations = Operations()
+            .Where(op => op.Name.StartsWith("GET ", StringComparison.Ordinal))
+            .Where(op => op.Operation["responses"]?["200"]?["content"] is null)
+            .Select(op => op.Name)
+            .ToList();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
     public void Numbers_AreNotAlsoStrings()
     {
         // System.Text.Json web defaults read "12" as 12, which the generator documents as integer|string with a

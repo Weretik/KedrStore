@@ -11,6 +11,7 @@ internal static class ChangeAdminProductSlugEndpoint
         group.MapPut("{id:int}/slug", Handle)
             .WithName("changeAdminProductSlug")
             .WithSummary("Set or regenerate a product slug")
+            .WithDescription("The previous slug moves to history and keeps resolving to this product. A slug used now or before by another product is rejected. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<ChangeSlugResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

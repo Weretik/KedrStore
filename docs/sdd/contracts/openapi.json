@@ -43,6 +43,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Add an attribute («Нова ознака», Admin)",
+        "description": "The attribute is manual from the start, so the dictionary import leaves it. Code and slug come from the request or from the name (a slug made from the name gets a number when taken); a taken code or explicit slug is rejected.",
         "operationId": "createAdminCatalogAttribute",
         "requestBody": {
           "content": {
@@ -145,6 +146,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Edit an attribute (Admin)",
+        "description": "Names, filter flag, and order. The dictionary import no longer changes the attribute.",
         "operationId": "updateAdminCatalogAttribute",
         "parameters": [
           {
@@ -218,6 +220,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Add a value (Admin)",
+        "description": "Code and slug come from the request or from the name; a taken code or explicit slug is rejected.",
         "operationId": "createAdminAttributeValue",
         "parameters": [
           {
@@ -291,6 +294,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Edit a value (Admin)",
+        "description": "Names, order, and swatch (a color or a media-library texture). The dictionary import then leaves it.",
         "operationId": "updateAdminAttributeValue",
         "parameters": [
           {
@@ -374,6 +378,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Upload a color or decor picture for a value (Admin)",
+        "description": "JPEG, PNG, or WebP up to 5 MB, stored as it is on the CDN under `swatches/` and in the media library folder «Кольори» (created when missing). No value changes: send `mediaFileId` as `swatchMediaFileId` with the value create or update.",
         "operationId": "uploadAdminAttributeSwatch",
         "requestBody": {
           "content": {
@@ -443,6 +448,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "«Не розшифровані коди»",
+        "description": "Codes without a value or with an unconfirmed decoding that the owner has not decided yet.",
         "operationId": "getAdminUnresolvedAttributeCodes",
         "responses": {
           "200": {
@@ -477,6 +483,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Where a code occurs (spec catalog/008)",
+        "description": "On-site, not deleted products whose original 1C names contain the code, grouped by category (most products first), with the code's own decoding in each category.",
         "operationId": "getAdminAttributeCodeProducts",
         "parameters": [
           {
@@ -540,6 +547,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Decode a code (Admin)",
+        "description": "With applyToAll (default true): a value of the code's attribute for all products, or null when the code means nothing to filter by. Product values that waited only for this confirmation become confirmed at once. The dictionary import no longer changes the code. categories, when sent, replaces the code's own decodings per category (spec catalog/008): they win over the decoding for all; a category left out follows it. The products whose names contain the code are recognized again at once.",
         "operationId": "decideAdminAttributeCode",
         "parameters": [
           {
@@ -647,6 +655,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "«Фільтри категорій» of one category",
+        "description": "Filter rows in order, then attributes the category's products have that are not offered yet (off).",
         "operationId": "getAdminCategoryAttributeFilters",
         "parameters": [
           {
@@ -701,6 +710,7 @@
           "AdminCatalogAttributes"
         ],
         "summary": "Turn category filters on or off and order them (Admin)",
+        "description": "Attributes left out stay as they are. The attribute import no longer changes the listed filters.",
         "operationId": "setAdminCategoryAttributeFilters",
         "parameters": [
           {
@@ -873,6 +883,7 @@
           "AdminCategories"
         ],
         "summary": "Set or regenerate a category slug",
+        "description": "The previous slug moves to history and keeps resolving to this category. A slug used now or before by another category is rejected. Repeating the same request is safe.",
         "operationId": "changeAdminCategorySlug",
         "parameters": [
           {
@@ -946,6 +957,7 @@
           "AdminCategories"
         ],
         "summary": "Show or hide a category on the site",
+        "description": "Spec catalog/007 R-18. Hiding hides every subcategory too; showing shows every subcategory and every parent. A hidden category and its products leave the public site, «Вітрина сайту», «Моделі», and the counts of «Огляд». The 1C sync never changes the mark; a new category takes its parent's. The Cosmos import root is never shown. Repeating the same request is safe.",
         "operationId": "setAdminCategorySiteVisibility",
         "parameters": [
           {
@@ -1062,6 +1074,7 @@
           "AdminCategories"
         ],
         "summary": "Replace the SEO text and FAQ of a category in one language",
+        "description": "Full replacement: empty fields clear them and the FAQ list replaces the stored one. `bodyHtml` is sanitized to p, br, strong, em, ul, ol, li, h2, h3, and a[href] (http, https, or a path starting with `/`); everything else is removed. Repeating the same request is safe.",
         "operationId": "saveAdminCategoryContent",
         "parameters": [
           {
@@ -1187,6 +1200,7 @@
           "Categories"
         ],
         "summary": "Get one localized category, its descendants, breadcrumbs, counts, price range, and content",
+        "description": "A former slug returns 200 with `slug` set to the current slug, so the client can redirect permanently.",
         "operationId": "getCategoryBySlug",
         "parameters": [
           {
@@ -1246,6 +1260,7 @@
           "AdminProductGroups"
         ],
         "summary": "Find groups by category and part of the name",
+        "description": "Up to 50 groups ordered by name, for the «Перенести в іншу групу» picker.",
         "operationId": "getAdminProductGroups",
         "parameters": [
           {
@@ -1305,6 +1320,7 @@
           "AdminProductGroups"
         ],
         "summary": "Create a group («Нова група»)",
+        "description": "The listed products (up to 200, all in the category) move into the new group and are pinned: automation never moves them again. The slug is built from the name.",
         "operationId": "createAdminProductGroup",
         "requestBody": {
           "content": {
@@ -1407,6 +1423,7 @@
           "AdminProductGroups"
         ],
         "summary": "Rename a group",
+        "description": "The slug stays as it is.",
         "operationId": "renameAdminProductGroup",
         "parameters": [
           {
@@ -1480,6 +1497,7 @@
           "AdminProductGroups"
         ],
         "summary": "Choose the main product («Зробити головним»)",
+        "description": "The product must be in the group and on the site. It stays main until it is deleted or taken off the site; then automation picks the main product again.",
         "operationId": "setAdminProductGroupMain",
         "parameters": [
           {
@@ -1553,6 +1571,7 @@
           "AdminProductGroups"
         ],
         "summary": "Change a group slug",
+        "description": "Admin or Seo only. The old slug goes to the slug history and is never given to another group.",
         "operationId": "changeAdminProductGroupSlug",
         "parameters": [
           {
@@ -1626,6 +1645,7 @@
           "MobileSyncCatalog"
         ],
         "summary": "Products, prices, categories and price types for offline work",
+        "description": "Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted products and categories are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client accepts it.",
         "operationId": "getMobileCatalogSnapshot",
         "responses": {
           "200": {
@@ -1670,6 +1690,7 @@
           "AdminCatalogOverview"
         ],
         "summary": "Products without a photo and categories without site text",
+        "description": "Requires `CanManageProducts` (Manager, Seo, or Admin). Deleted products and categories are not counted.",
         "operationId": "getAdminCatalogOverview",
         "responses": {
           "200": {
@@ -1754,6 +1775,7 @@
           "AdminProductAttributes"
         ],
         "summary": "Set the values of one attribute by hand",
+        "description": "The values (in position order) become manual and locked: the import, the parser, and the 1C sync no longer change them. List attributes take `valueId` from the attribute's list, number attributes take `number`. Positions beyond the list are dropped. A change of color, size, or side rebuilds the variant groups.",
         "operationId": "setAdminProductAttribute",
         "parameters": [
           {
@@ -1837,6 +1859,7 @@
           "AdminProductAttributes"
         ],
         "summary": "«Повернути автоматичне»",
+        "description": "Drops the manual values of the attribute and brings back the automatic ones kept for them (`hasAutomatic`). Positions automation never had disappear; new automatic positions come with the next recognition run.",
         "operationId": "restoreAdminProductAttribute",
         "parameters": [
           {
@@ -1910,6 +1933,7 @@
           "AdminProductAttributes"
         ],
         "summary": "«Прийняти як є»",
+        "description": "Permanent; automation keeps the product accepted until «Повернути на перевірку». Records who and when.",
         "operationId": "acceptAdminProductReview",
         "parameters": [
           {
@@ -2036,6 +2060,7 @@
           "AdminProducts"
         ],
         "summary": "List admin product rows",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin).",
         "operationId": "getAdminProducts",
         "parameters": [
           {
@@ -2186,6 +2211,7 @@
           "AdminProducts"
         ],
         "summary": "List all admin product rows",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin). Returns the unpaged admin row model.",
         "operationId": "getAllAdminProducts",
         "responses": {
           "200": {
@@ -2210,6 +2236,7 @@
           "AdminProducts"
         ],
         "summary": "Get one admin product by slug",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin).",
         "operationId": "getAdminProductBySlug",
         "parameters": [
           {
@@ -2261,6 +2288,7 @@
           "AdminProducts"
         ],
         "summary": "Set or regenerate a product slug",
+        "description": "The previous slug moves to history and keeps resolving to this product. A slug used now or before by another product is rejected. Repeating the same request is safe.",
         "operationId": "changeAdminProductSlug",
         "parameters": [
           {
@@ -2334,6 +2362,7 @@
           "AdminProducts"
         ],
         "summary": "Get the photos and the scheme linked to a product",
+        "description": "Policies CanManageProducts and CanManageMedia (Manager, Seo, and Admin). Photos come in gallery order; file names are read from the media library.",
         "operationId": "getAdminProductMedia",
         "parameters": [
           {
@@ -2395,6 +2424,7 @@
           "AdminProducts"
         ],
         "summary": "Replace the photos and the scheme of a product",
+        "description": "Replaces the whole set with media library files: up to 20 photos in order (the first is the list photo) and an optional scheme. A file can appear once. Every ID must exist in the library.",
         "operationId": "setAdminProductMedia",
         "parameters": [
           {
@@ -2529,6 +2559,7 @@
           "AdminProducts"
         ],
         "summary": "Move a product to a group, out of groups, or back to automatic grouping",
+        "description": "`automatic: true` returns the product to automatic grouping (no `groupId`). Otherwise the product is pinned to `groupId` (a group of the product's category) or, with `groupId: null`, kept out of groups.",
         "operationId": "setAdminProductGroupOfProduct",
         "parameters": [
           {
@@ -2602,6 +2633,7 @@
           "Products"
         ],
         "summary": "List public products",
+        "description": "When `categoryId` is supplied, the page contains public products of that category and of every descendant category at any depth; sibling branches are excluded. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. An unknown valid `categoryId` returns `200` with an empty page and `totalRecords = 0`.",
         "operationId": "getPublicProducts",
         "parameters": [
           {
@@ -2743,6 +2775,7 @@
           "Products"
         ],
         "summary": "List public products in a category",
+        "description": "Returns public products of the category selected by `categorySlug` and of every descendant category at any depth; sibling branches are excluded. When `categoryId` is also supplied, it takes precedence over the slug. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. A former category slug selects its category. An unknown or deleted category slug returns `404`; an unknown `categoryId` returns `200` with an empty page.",
         "operationId": "getPublicProductsByCategorySlug",
         "parameters": [
           {
@@ -2892,6 +2925,7 @@
           "Products"
         ],
         "summary": "Get a public product by slug",
+        "description": "A former slug returns 200 with `productSlug` set to the current slug, so the client can redirect permanently. A product of a deleted category is not public.",
         "operationId": "getPublicProductBySlug",
         "parameters": [
           {
@@ -2960,6 +2994,7 @@
           "AdminSiteModels"
         ],
         "summary": "The «Моделі» list",
+        "description": "Models with problems first, then by name. `search` matches part of the model name, part of a product name, or a 1C code exactly.",
         "operationId": "getAdminSiteModels",
         "parameters": [
           {
@@ -3046,6 +3081,7 @@
           "AdminSiteModels"
         ],
         "summary": "Create a model («Нова модель»)",
+        "description": "The model is accepted at once. The category must be final (no children); the products (up to 200) must be in it and not in another accepted model; a proposed model gives its products up. Axes are offered from the products and saved.",
         "operationId": "createAdminSiteModel",
         "requestBody": {
           "content": {
@@ -3128,6 +3164,7 @@
           "AdminSiteModels"
         ],
         "summary": "«Вітрина сайту» - models with their on-site products, variant values, and problems",
+        "description": "One row per model with on-site products and one row per on-site product in no model (spec catalog/007 R-19). On site means exported from 1C, not deleted, and in a category shown on the site (R-18). Products in no model come first, then other rows with problems, then by name. `categoryId` takes the category with its subcategories; `status` keeps proposed models, accepted models, or products in no model (`none`); `search` matches part of the model or product name, or a 1C code exactly.",
         "operationId": "getAdminSiteShowcase",
         "parameters": [
           {
@@ -3216,6 +3253,7 @@
           "AdminSiteModels"
         ],
         "summary": "Category tree with models and problems, for «Моделі» and «Вітрина сайту»",
+        "description": "Categories shown on the site (R-18) with on-site products in them or below them, each with its parent; counts include subcategories. Ordered by name; the client builds the tree from `parentId`.",
         "operationId": "getAdminSiteModelCategories",
         "responses": {
           "200": {
@@ -3301,6 +3339,7 @@
           "AdminSiteModels"
         ],
         "summary": "Rename a model",
+        "description": "The slug stays as it is.",
         "operationId": "renameAdminSiteModel",
         "parameters": [
           {
@@ -3374,6 +3413,7 @@
           "AdminSiteModels"
         ],
         "summary": "Accept models («Прийняти»)",
+        "description": "Accepts up to 500 models; offered axes are saved for models without saved axes; products are pinned. Already accepted models stay as they are. Returns the new counts.",
         "operationId": "acceptAdminSiteModels",
         "requestBody": {
           "content": {
@@ -3425,6 +3465,7 @@
           "AdminSiteModels"
         ],
         "summary": "Set the model's axes (switchers), in order",
+        "description": "Up to 6 attributes of the shared dictionary; number attributes are refused. An empty list clears the axes.",
         "operationId": "setAdminSiteModelAxes",
         "parameters": [
           {
@@ -3498,6 +3539,7 @@
           "AdminSiteModels"
         ],
         "summary": "Add products to a model",
+        "description": "The products must be in the model's category and not in another accepted model; they are pinned.",
         "operationId": "addAdminSiteModelProducts",
         "parameters": [
           {
@@ -3571,6 +3613,7 @@
           "AdminSiteModels"
         ],
         "summary": "Take a product out of a model",
+        "description": "The product is pinned out of models, so automation does not put it back.",
         "operationId": "removeAdminSiteModelProduct",
         "parameters": [
           {
@@ -3644,6 +3687,7 @@
           "AdminSiteModels"
         ],
         "summary": "Save the model's texts in one language",
+        "description": "All four texts are replaced; a missing or blank text is stored empty.",
         "operationId": "setAdminSiteModelText",
         "parameters": [
           {
@@ -3725,6 +3769,7 @@
           "AdminSiteModels"
         ],
         "summary": "«Заповнити з назв»",
+        "description": "For each product and axis without a value a person set, the confirmed value the recognizer read from the 1C name becomes a manual value. Codes nobody decoded stay empty.",
         "operationId": "fillAdminSiteModelFromNames",
         "parameters": [
           {
@@ -3778,6 +3823,7 @@
           "SiteModels"
         ],
         "summary": "Search models",
+        "description": "Models over all categories, without attribute filters. `search` matches every word in the model name, or in one product's Ukrainian or Russian name or 1C code. When the whole search is the 1C code of an on-site product, `exactMatch` is its model address.",
         "operationId": "getPublicSiteModels",
         "parameters": [
           {
@@ -3896,6 +3942,7 @@
           "SiteModels"
         ],
         "summary": "Models of a category",
+        "description": "Models of the category and every category below it. A final category (without children) takes attribute filters and returns them with counts in `filters`; a parent category gives `filters` empty and refuses attribute filters with 400. A former category slug still selects its category. A model matches when one of its on-site products matches every filter; the card's price, stock, sale, and new count only those products.",
         "operationId": "getPublicCategorySiteModels",
         "parameters": [
           {
@@ -4032,6 +4079,7 @@
           "SiteModels"
         ],
         "summary": "The model page",
+        "description": "A current model slug, or the slug of an on-site product shown as a model of its own, gives the page. The page lists the axis values its products have and each product's values, so the site can hide combinations no product has and offer in-stock neighbours. Texts of `ru` fall back to `uk` field by field.",
         "operationId": "getPublicSiteModel",
         "parameters": [
           {
@@ -4091,6 +4139,7 @@
           "SiteModels"
         ],
         "summary": "The model address of an old product address",
+        "description": "A current or former slug of an on-site product gives its model and the product's axis values, for the permanent redirect of the old product page.",
         "operationId": "getPublicProductModelAddress",
         "parameters": [
           {
@@ -4172,6 +4221,7 @@
           "AdminArticles"
         ],
         "summary": "Create an article",
+        "description": "An empty `slug` is generated from the Ukrainian title (KMU-2010 transliteration, `-2`, `-3`… on a clash). `bodyHtml` is sanitized to p, br, strong, em, ul, ol, li, h2, h3, blockquote, and a[href] (http, https, or a path starting with `/`). Not idempotent: repeating the request creates another article.",
         "operationId": "createAdminArticle",
         "requestBody": {
           "content": {
@@ -4254,6 +4304,7 @@
           "AdminArticles"
         ],
         "summary": "Replace an article's slug, date, publication flag, and both texts",
+        "description": "Full replacement; `slug` is required and must not belong to another article. Repeating it is safe.",
         "operationId": "updateAdminArticle",
         "parameters": [
           {
@@ -4315,6 +4366,7 @@
           "AdminArticles"
         ],
         "summary": "Delete an article and its cover for good",
+        "description": "To hide an article from the site without losing it, save it with `isPublished = false`.",
         "operationId": "deleteAdminArticle",
         "parameters": [
           {
@@ -4351,6 +4403,7 @@
           "AdminArticles"
         ],
         "summary": "Upload a cover picture before saving the article",
+        "description": "JPEG, PNG, or WebP up to 10 MB, at least 600 px wide. Stored as WebP at most 1600 px wide with the EXIF orientation applied, on the CDN under `articles/` and in the media library folder «Статті» (created when missing). Nothing about an article changes: send `mediaFileId` as `coverMediaFileId` with the create or update.",
         "operationId": "uploadAdminArticleCover",
         "requestBody": {
           "content": {
@@ -4410,6 +4463,7 @@
           "AdminArticles"
         ],
         "summary": "Move covers saved before Content 008 to the CDN",
+        "description": "Uploads each legacy cover to the CDN under `articles/` (library folder «Статті», named after the slug), sets it as the article cover, and deletes the stored bytes. Safe to repeat: a second call moves nothing. Stops at the first failed upload and keeps what was already moved.",
         "operationId": "moveLegacyAdminArticleCovers",
         "responses": {
           "200": {
@@ -4434,6 +4488,7 @@
           "Articles"
         ],
         "summary": "List published articles in one language, newest first",
+        "description": "Public, because the site renders articles for anonymous visitors.",
         "operationId": "getArticles",
         "parameters": [
           {
@@ -4537,6 +4592,7 @@
           "Articles"
         ],
         "summary": "Get the cover picture of an article",
+        "description": "Public. Drafts are included so the admin preview works; the path is only known from an article response. With `v` equal to the current cover version the response is `Cache-Control: public, max-age=31536000, immutable`.",
         "operationId": "getArticleCover",
         "parameters": [
           {
@@ -4588,6 +4644,7 @@
           "AdminCompanyContacts"
         ],
         "summary": "Get the company contacts for editing",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminCompanyContacts",
         "responses": {
           "200": {
@@ -4617,6 +4674,7 @@
           "AdminCompanyContacts"
         ],
         "summary": "Replace all company contacts",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). All fields are required and replaced at once.",
         "operationId": "updateAdminCompanyContacts",
         "requestBody": {
           "content": {
@@ -4668,6 +4726,7 @@
           "CompanyContacts"
         ],
         "summary": "Get the company contacts",
+        "description": "Public, because every site page renders them for anonymous visitors.",
         "operationId": "getCompanyContacts",
         "responses": {
           "200": {
@@ -4699,6 +4758,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "List the documents with their published edition and waiting draft",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). Always four items, in a fixed order.",
         "operationId": "getAdminLegalDocuments",
         "responses": {
           "200": {
@@ -4723,6 +4783,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "List all editions of a document",
+        "description": "Requires `CanManageContent`. The draft first, then editions by number, newest first.",
         "operationId": "getAdminLegalDocumentVersions",
         "parameters": [
           {
@@ -4765,6 +4826,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "Start a draft",
+        "description": "Requires `CanManageContent`. Without a body (or without `texts`) the draft copies the published texts; with `texts` it starts from them (sanitized).",
         "operationId": "createAdminLegalDocumentDraft",
         "parameters": [
           {
@@ -4842,6 +4904,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "Get one edition with both texts",
+        "description": "Requires `CanManageContent`.",
         "operationId": "getAdminLegalDocumentVersion",
         "parameters": [
           {
@@ -4883,6 +4946,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "Replace both texts of a draft",
+        "description": "Requires `CanManageContent`. The HTML is sanitized on save.",
         "operationId": "updateAdminLegalDocumentDraft",
         "parameters": [
           {
@@ -4954,6 +5018,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "Delete a draft",
+        "description": "Requires `CanManageContent`. Published and archived editions cannot be deleted.",
         "operationId": "deleteAdminLegalDocumentDraft",
         "parameters": [
           {
@@ -5000,6 +5065,7 @@
           "AdminLegalDocuments"
         ],
         "summary": "Publish a draft",
+        "description": "Requires `CanManageContent`. The draft gets the next number and the given «Редакція від» date and goes on the site; the edition it replaces becomes archived. Both changes are saved together.",
         "operationId": "publishAdminLegalDocumentDraft",
         "parameters": [
           {
@@ -5073,6 +5139,7 @@
           "LegalDocuments"
         ],
         "summary": "Get the published edition of a document",
+        "description": "Public. `bodyHtml` is sanitized HTML (h2, h3, p, lists, strong, em, blockquote, links); the site builds its table of contents from the h2 headings and fills the `{site}`, `{email}` and `{phone}` placeholders.",
         "operationId": "getPublishedLegalDocument",
         "parameters": [
           {
@@ -5132,6 +5199,7 @@
           "AdminGallery"
         ],
         "summary": "List the gallery cards with previews",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminGallery",
         "responses": {
           "200": {
@@ -5156,6 +5224,7 @@
           "AdminGallery"
         ],
         "summary": "Add media-library photos to the end of the gallery",
+        "description": "Requires `CanManageContent`. Up to 100 file IDs in the order to add; a photo already in the gallery is skipped. A file that is not in the library answers 400 and nothing is added.",
         "operationId": "addAdminGalleryPhotos",
         "requestBody": {
           "content": {
@@ -5200,6 +5269,7 @@
           "AdminGallery"
         ],
         "summary": "Add a YouTube video by its link to the end of the gallery",
+        "description": "Requires `CanManageContent`. `url` may be a watch, youtu.be, shorts, embed or live link, or the bare 11-character ID.",
         "operationId": "addAdminGalleryVideo",
         "requestBody": {
           "content": {
@@ -5254,6 +5324,7 @@
           "AdminGallery"
         ],
         "summary": "Resolve a pasted YouTube link before adding it",
+        "description": "Requires `CanManageContent`. `title` is what YouTube's public oEmbed gives, or `null` when it does not answer (private or deleted video, network error).",
         "operationId": "previewAdminGalleryYoutubeVideo",
         "parameters": [
           {
@@ -5294,6 +5365,7 @@
           "AdminGallery"
         ],
         "summary": "Replace the title and caption of a card",
+        "description": "Requires `CanManageContent`. Empty or missing values are stored as none.",
         "operationId": "updateAdminGalleryItem",
         "parameters": [
           {
@@ -5358,6 +5430,7 @@
           "AdminGallery"
         ],
         "summary": "Remove a card from the gallery",
+        "description": "Requires `CanManageContent`. The picture stays in the media library.",
         "operationId": "deleteAdminGalleryItem",
         "parameters": [
           {
@@ -5404,6 +5477,7 @@
           "AdminGallery"
         ],
         "summary": "Save the order of all cards",
+        "description": "Requires `CanManageContent`. `ids` must hold every current card exactly once, first shown first; a list built from a stale page answers 409.",
         "operationId": "reorderAdminGallery",
         "requestBody": {
           "content": {
@@ -5458,6 +5532,7 @@
           "Gallery"
         ],
         "summary": "Get the site gallery in one language",
+        "description": "Public, in site order. A video's `imageUrl` is YouTube's poster (480×360); a photo's is its CDN URL, with `width`/`height` when the library knows them. A photo whose library file was deleted is left out.",
         "operationId": "getPublicGallery",
         "parameters": [
           {
@@ -5502,6 +5577,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "List the home page FAQ and brands",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminHomeBlocks",
         "responses": {
           "200": {
@@ -5523,6 +5599,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Add a question to the end of the FAQ",
+        "description": "Requires `CanManageContent`. All four texts are required.",
         "operationId": "createAdminHomeFaqItem",
         "requestBody": {
           "content": {
@@ -5564,6 +5641,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Replace the texts of a question",
+        "description": "Requires `CanManageContent`.",
         "operationId": "updateAdminHomeFaqItem",
         "parameters": [
           {
@@ -5625,6 +5703,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Remove a question",
+        "description": "Requires `CanManageContent`.",
         "operationId": "deleteAdminHomeFaqItem",
         "parameters": [
           {
@@ -5668,6 +5747,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Save the order of all questions",
+        "description": "Requires `CanManageContent`. `ids` must hold every current question exactly once, first shown first; a list built from a stale page answers 409.",
         "operationId": "reorderAdminHomeFaq",
         "requestBody": {
           "content": {
@@ -5719,6 +5799,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Add a brand to the end of the list",
+        "description": "Requires `CanManageContent`. The logo must be a media library file.",
         "operationId": "createAdminHomeBrand",
         "requestBody": {
           "content": {
@@ -5760,6 +5841,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Change a brand's name or logo",
+        "description": "Requires `CanManageContent`.",
         "operationId": "updateAdminHomeBrand",
         "parameters": [
           {
@@ -5821,6 +5903,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Remove a brand",
+        "description": "Requires `CanManageContent`. The logo stays in the media library.",
         "operationId": "deleteAdminHomeBrand",
         "parameters": [
           {
@@ -5864,6 +5947,7 @@
           "AdminHomeBlocks"
         ],
         "summary": "Save the order of all brands",
+        "description": "Requires `CanManageContent`. `ids` must hold every current brand exactly once; a stale list answers 409.",
         "operationId": "reorderAdminHomeBrands",
         "requestBody": {
           "content": {
@@ -5915,6 +5999,7 @@
           "HomeBlocks"
         ],
         "summary": "Get the home page FAQ and brands in one language",
+        "description": "Public, in site order. A brand whose logo file was deleted from the library is left out. An empty `brands` list means the admin has not added any.",
         "operationId": "getPublicHomeBlocks",
         "parameters": [
           {
@@ -5956,6 +6041,7 @@
           "AdminContentOverview"
         ],
         "summary": "Article drafts, legacy covers and document drafts",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminContentOverview",
         "responses": {
           "200": {
@@ -5977,6 +6063,7 @@
           "AdminCompanyRequisites"
         ],
         "summary": "Get the company requisites for editing",
+        "description": "Requires the Admin role.",
         "operationId": "getAdminCompanyRequisites",
         "responses": {
           "200": {
@@ -6006,6 +6093,7 @@
           "AdminCompanyRequisites"
         ],
         "summary": "Replace all company requisites",
+        "description": "Requires the Admin role. All fields are required and replaced at once; values are trimmed and spaces are removed from the IBAN. When something changed, one history entry is written in the same transaction; saving the same values writes nothing.",
         "operationId": "updateAdminCompanyRequisites",
         "requestBody": {
           "content": {
@@ -6057,6 +6145,7 @@
           "AdminCompanyRequisites"
         ],
         "summary": "List the latest requisites changes",
+        "description": "Requires the Admin role. The 50 newest entries, newest first.",
         "operationId": "getAdminCompanyRequisitesHistory",
         "responses": {
           "200": {
@@ -6081,6 +6170,7 @@
           "CompanyRequisites"
         ],
         "summary": "Get the company requisites",
+        "description": "Public, because the requisites page is shown to anonymous visitors.",
         "operationId": "getCompanyRequisites",
         "responses": {
           "200": {
@@ -6112,6 +6202,7 @@
           "AdminSiteSeoSettings"
         ],
         "summary": "Read the settings for editing",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminSiteSeoSettings",
         "responses": {
           "200": {
@@ -6141,6 +6232,7 @@
           "AdminSiteSeoSettings"
         ],
         "summary": "Replace all settings",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). Ids are trimmed and upper-cased; for a verification code the whole meta tag may be sent and its `content` is kept. A blank or missing value removes that code or picture. A new picture must be in the media library. Repeating it is safe.",
         "operationId": "updateAdminSiteSeoSettings",
         "requestBody": {
           "content": {
@@ -6192,6 +6284,7 @@
           "SiteSeoSettings"
         ],
         "summary": "Read the codes the site places on every page",
+        "description": "Public, because the site renders pages for anonymous visitors. Never returns who edited.",
         "operationId": "getSiteSeoSettings",
         "responses": {
           "200": {
@@ -6223,6 +6316,7 @@
           "AdminSiteRefresh"
         ],
         "summary": "Ask the public site to drop its cached content and catalog",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). No request body.",
         "operationId": "refreshSite",
         "responses": {
           "200": {
@@ -6264,6 +6358,7 @@
           "AdminPageSeo"
         ],
         "summary": "List every site page with its texts",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). Pages never saved have empty values.",
         "operationId": "listAdminPageSeo",
         "responses": {
           "200": {
@@ -6288,6 +6383,7 @@
           "AdminPageSeo"
         ],
         "summary": "Replace the texts of one page",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). Values are trimmed; an empty or missing value returns that text to the site default. The first save creates the page row. Repeating it is safe.",
         "operationId": "updateAdminPageSeo",
         "parameters": [
           {
@@ -6339,6 +6435,7 @@
           "PageSeo"
         ],
         "summary": "List the set search texts in one language",
+        "description": "Public, because the site builds page metadata for anonymous visitors. Only pages with a title or a description in this language are listed.",
         "operationId": "listPublicPageSeo",
         "parameters": [
           {
@@ -6383,6 +6480,7 @@
           "AdminWholesalePage"
         ],
         "summary": "Get both languages for editing",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin).",
         "operationId": "getAdminWholesalePage",
         "responses": {
           "200": {
@@ -6412,6 +6510,7 @@
           "AdminWholesalePage"
         ],
         "summary": "Replace both languages at once",
+        "description": "Requires `CanManageContent` (Manager, Seo, or Admin). Every text is required. Repeating it is safe.",
         "operationId": "updateAdminWholesalePage",
         "requestBody": {
           "content": {
@@ -6463,6 +6562,7 @@
           "WholesalePage"
         ],
         "summary": "Get the page texts in one language",
+        "description": "Public, because the site renders the page for anonymous visitors.",
         "operationId": "getPublicWholesalePage",
         "parameters": [
           {
@@ -6514,6 +6614,7 @@
           "AuthSession"
         ],
         "summary": "Get the current user",
+        "description": "Works with the browser session cookie and with a mobile bearer token. For a cookie session it reissues a missing CSRF cookie.",
         "operationId": "getCurrentSession",
         "responses": {
           "200": {
@@ -6545,6 +6646,7 @@
           "CookieAuth"
         ],
         "summary": "Sign a browser in with the session cookie",
+        "description": "Admin and storefront. Rate-limited by the AuthLogin policy. Sets the HttpOnly session cookie `__Host-kedr.session` (SameSite=Lax, sliding 7 days) and the readable `kedr.csrf` cookie. No token is returned. Five wrong passwords lock the account for 15 minutes.",
         "operationId": "loginCookieSession",
         "requestBody": {
           "content": {
@@ -6640,6 +6742,7 @@
           "MobileAuth"
         ],
         "summary": "Sign the mobile app in",
+        "description": "Rate-limited by the AuthLogin policy. Returns both tokens in JSON; the app stores them in the device secure store. Sets no cookies.",
         "operationId": "loginMobile",
         "requestBody": {
           "content": {
@@ -6701,6 +6804,7 @@
           "MobileAuth"
         ],
         "summary": "Rotate the mobile token pair",
+        "description": "Rate-limited by the AuthRefresh policy. The old refresh token stops working. A token rotated less than 60 seconds ago returns 401 without other effect; one rotated earlier is treated as stolen and ends all of the user's sessions.",
         "operationId": "refreshMobile",
         "requestBody": {
           "content": {
@@ -6762,6 +6866,7 @@
           "MobileAuth"
         ],
         "summary": "End the mobile session",
+        "description": "Revokes the session of the given refresh token; without it, all of the user's refresh sessions.",
         "operationId": "logoutMobile",
         "requestBody": {
           "content": {
@@ -6806,6 +6911,7 @@
           "Profile"
         ],
         "summary": "The signed-in staff account's profile",
+        "description": "Policy `RequireManagerRole` (Manager, Seo, or Admin). Customers get 403.",
         "operationId": "getMyProfile",
         "responses": {
           "200": {
@@ -6901,6 +7007,7 @@
           "Profile"
         ],
         "summary": "Upload the own avatar",
+        "description": "JPEG, PNG or WebP, at most 2 MB, at least 128×128 px, at most 24 megapixels. The server stores the centre square as a 256×256 WebP under a new name and deletes the previous file.",
         "operationId": "uploadMyAvatar",
         "requestBody": {
           "content": {
@@ -7012,6 +7119,7 @@
           "Profile"
         ],
         "summary": "Change the own sign-in email (administrators)",
+        "description": "Policy `RequireAdminRole`. Needs the current password; a wrong one counts towards lockout. The calling browser session stays signed in; every other session ends.",
         "operationId": "changeMyEmail",
         "requestBody": {
           "content": {
@@ -7076,6 +7184,7 @@
           "Profile"
         ],
         "summary": "Change the own password (administrators)",
+        "description": "Policy `RequireAdminRole`. Needs the current password. The calling browser session stays signed in; every other session ends.",
         "operationId": "changeMyPassword",
         "requestBody": {
           "content": {
@@ -7130,6 +7239,7 @@
           "AdminUsers"
         ],
         "summary": "List administrators, SEO specialists, and managers",
+        "description": "Policy `CanManageUsers` (role Admin). Customers are not listed.",
         "operationId": "getStaffAccounts",
         "responses": {
           "200": {
@@ -7243,6 +7353,7 @@
           "AdminUsers"
         ],
         "summary": "Find existing accounts without staff access",
+        "description": "Up to 20 accounts without a staff role (usually customers imported from 1C) whose email or name contains the search text, case ignored, ordered by email.",
         "operationId": "searchStaffCandidates",
         "parameters": [
           {
@@ -7306,6 +7417,7 @@
           "AdminUsers"
         ],
         "summary": "Give an existing account a staff role and a password",
+        "description": "The account gets the role, the name, and a new password; its email stays. A customer keeps the customer role, orders and prices, and signs in on the site with the new password too. Its active refresh sessions end. Later 1C customer syncs no longer change the email, name, password, or block state of a staff account, and a customer removed from 1C keeps the staff account without the customer role.",
         "operationId": "grantStaffAccess",
         "parameters": [
           {
@@ -7398,6 +7510,7 @@
           "AdminUsers"
         ],
         "summary": "Change a staff account's role",
+        "description": "The account's sessions pick up the new role within 5 minutes. An administrator cannot change their own role (400).",
         "operationId": "changeStaffRole",
         "parameters": [
           {
@@ -7473,6 +7586,7 @@
           "AdminUsers"
         ],
         "summary": "Block or unblock a staff account",
+        "description": "Blocking ends mobile sessions at once and browser sessions within 5 minutes. An administrator cannot block their own account (400).",
         "operationId": "setStaffBlocked",
         "parameters": [
           {
@@ -7548,6 +7662,7 @@
           "AdminUsers"
         ],
         "summary": "Set a new password for a staff account",
+        "description": "Manager and Seo accounts only; ends the account's existing sessions. An administrator account (including the caller's) returns 403 — administrators change their own password in the profile.",
         "operationId": "setStaffPassword",
         "parameters": [
           {
@@ -7623,6 +7738,7 @@
           "AdminUsers"
         ],
         "summary": "Change a manager's name",
+        "description": "Manager and Seo accounts only; an administrator target returns 403.",
         "operationId": "changeStaffName",
         "parameters": [
           {
@@ -7698,6 +7814,7 @@
           "AdminUsers"
         ],
         "summary": "Change a manager's sign-in email",
+        "description": "Manager and Seo accounts only. Ends the manager's sessions (mobile at once, browser within 5 minutes).",
         "operationId": "changeStaffEmail",
         "parameters": [
           {
@@ -7783,6 +7900,7 @@
           "AdminUsers"
         ],
         "summary": "Upload a manager's avatar",
+        "description": "Manager and Seo accounts only. Same limits as `uploadMyAvatar`.",
         "operationId": "uploadStaffAvatar",
         "parameters": [
           {
@@ -7936,6 +8054,7 @@
           "AdminMediaFiles"
         ],
         "summary": "A page of files by name",
+        "description": "`folderId` limits the list to one folder, `inRoot=true` to files outside any folder; with neither, the whole library. `includeSubfolders=true` (only with `folderId`) also returns the files of all its subfolders. `search` matches the display name (case-insensitive contains).",
         "operationId": "getAdminMediaFiles",
         "parameters": [
           {
@@ -8016,6 +8135,7 @@
           "AdminMediaFiles"
         ],
         "summary": "Upload a picture",
+        "description": "JPEG, PNG, or WebP (checked by content) up to 15 MB, stored unchanged under a new unique CDN key. The display name is the uploaded file name.",
         "operationId": "uploadAdminMediaFile",
         "requestBody": {
           "content": {
@@ -8191,6 +8311,7 @@
           "AdminMediaFiles"
         ],
         "summary": "Delete a file from the CDN and the library",
+        "description": "Admin only.",
         "operationId": "deleteAdminMediaFile",
         "parameters": [
           {
@@ -8230,6 +8351,7 @@
           "AdminMediaFiles"
         ],
         "summary": "Replace the picture of a file",
+        "description": "The ID stays (links keep working), the URL changes, the old CDN file is deleted.",
         "operationId": "replaceAdminMediaFile",
         "parameters": [
           {
@@ -8311,6 +8433,7 @@
           "AdminMediaFiles"
         ],
         "summary": "Move files to a folder",
+        "description": "Up to 500 IDs; unknown IDs are ignored and not counted.",
         "operationId": "moveAdminMediaFiles",
         "requestBody": {
           "content": {
@@ -8352,6 +8475,7 @@
           "AdminMediaFolders"
         ],
         "summary": "All folders with file counts",
+        "description": "A flat list ordered by name; the client builds the tree from `parentId`.",
         "operationId": "getAdminMediaFolders",
         "responses": {
           "200": {
@@ -8422,6 +8546,7 @@
           "AdminMediaFolders"
         ],
         "summary": "Rename a folder and set its parent",
+        "description": "Moving a folder into itself or its subfolder is `400` on `parentId`.",
         "operationId": "updateAdminMediaFolder",
         "parameters": [
           {
@@ -8493,6 +8618,7 @@
           "AdminMediaFolders"
         ],
         "summary": "Delete an empty folder",
+        "description": "Admin only.",
         "operationId": "deleteAdminMediaFolder",
         "parameters": [
           {
@@ -8539,6 +8665,7 @@
           "Catalog"
         ],
         "summary": "List products with prices for the current user",
+        "description": "Returns prices determined for the authenticated user. `search` is a query parameter; all filters and paging are in the optional JSON body.",
         "operationId": "getSalesCatalogProducts",
         "parameters": [
           {
@@ -8623,6 +8750,7 @@
           "MobileSyncCustomers"
         ],
         "summary": "Customers and their price rules for offline work",
+        "description": "Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted customers are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client accepts it.",
         "operationId": "getMobileCustomersSnapshot",
         "responses": {
           "200": {
@@ -8957,6 +9085,7 @@
           "AdminOrders"
         ],
         "summary": "Get the current 1C delivery status for an admin order",
+        "description": "Policy CanManageOrders (Manager, Seo, and Admin).",
         "operationId": "getAdminOrderSyncStatus",
         "parameters": [
           {
@@ -9020,6 +9149,7 @@
           "AdminOrders"
         ],
         "summary": "Schedule a failed order for another 1C delivery cycle",
+        "description": "Allowed only for BusinessError and DeadLetter. The request records an audit entry and changes the state to RetryScheduled; it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).",
         "operationId": "retryAdminOrderSync",
         "parameters": [
           {
@@ -9166,6 +9296,7 @@
           "AdminOrderWorkspace"
         ],
         "summary": "Orders today, drafts, 1C problems and the newest orders",
+        "description": "Requires `CanManageOrders` (Manager, Seo, or Admin). Lists hold at most 5 rows, newest first.",
         "operationId": "getAdminWorkspaceOverview",
         "responses": {
           "200": {
@@ -9246,7 +9377,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspacePageOfWorkspaceOrderListItem"
+                }
+              }
+            }
           }
         }
       },
@@ -9304,7 +9442,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceOrderDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -9339,6 +9484,7 @@
           "AdminOrderWorkspace"
         ],
         "summary": "Read a customer's unit prices for products, ignoring stock",
+        "description": "Uses the price type of the nearest customer rule on the product's category or any parent category, otherwise the customer's default price type. A product without such a UAH price, or an unknown product, returns a null unitPrice.",
         "operationId": "getAdminWorkspaceCustomerPrices",
         "requestBody": {
           "content": {
@@ -9422,7 +9568,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspacePageOfWorkspaceDraftListItem"
+                }
+              }
+            }
           }
         }
       },
@@ -9480,7 +9633,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDraftDetail"
+                }
+              }
+            }
           }
         }
       },
@@ -9563,6 +9723,7 @@
           "Order"
         ],
         "summary": "Create a quick order",
+        "description": "Creates a quick order. This endpoint is currently anonymous and does not implement an Idempotency-Key contract; disable duplicate submission in the frontend.",
         "operationId": "createQuickOrder",
         "requestBody": {
           "content": {
@@ -9624,6 +9785,7 @@
           "WorkTasks"
         ],
         "summary": "The caller's board",
+        "description": "Open tasks and tasks done in the last 30 days, most recently changed first.",
         "operationId": "getMyWorkTasks",
         "responses": {
           "200": {
@@ -9784,6 +9946,7 @@
           "WorkTasks"
         ],
         "summary": "Move an own task to another column",
+        "description": "`InProgress` and `Done` set the start time once; `Done` sets the completion time and keeps `result`; leaving `Done` clears both.",
         "operationId": "changeMyWorkTaskStatus",
         "parameters": [
           {
@@ -10067,6 +10230,7 @@
           "AdminScheduledTasks"
         ],
         "summary": "List background tasks with their schedules and last results",
+        "description": "Every task in page order with its schedule, next run and last success and failure.",
         "operationId": "getAdminScheduledTasks",
         "responses": {
           "200": {
@@ -10091,6 +10255,7 @@
           "AdminScheduledTasks"
         ],
         "summary": "List recent runs of a background task",
+        "description": "The last 50 runs of a task, newest first. Runs are kept 90 days.",
         "operationId": "getAdminScheduledTaskRuns",
         "parameters": [
           {
@@ -10135,6 +10300,7 @@
           "AdminScheduledTasks"
         ],
         "summary": "Change the schedule of a background task",
+        "description": "Changes the schedule and the on/off switch. nextRunAt moves the next run once; without it the next run follows the schedule.",
         "operationId": "updateAdminScheduledTaskSchedule",
         "parameters": [
           {
@@ -10206,6 +10372,7 @@
           "AdminScheduledTasks"
         ],
         "summary": "Run a background task now",
+        "description": "«Запустити зараз», also for a disabled task. The next tick, within a minute, starts it.",
         "operationId": "runAdminScheduledTaskNow",
         "parameters": [
           {
@@ -17787,6 +17954,77 @@
           }
         }
       },
+      "WorkspaceDraftDetail": {
+        "required": [
+          "draftId",
+          "version",
+          "title",
+          "note",
+          "counterpartyId",
+          "counterpartyName",
+          "createdAtUtc",
+          "updatedAtUtc",
+          "lines",
+          "totalAmount",
+          "pricingStatus",
+          "pricingErrorCode"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "version": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "counterpartyId": {
+            "type": "string"
+          },
+          "counterpartyName": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDraftQuotedLine"
+            }
+          },
+          "totalAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "pricingStatus": {
+            "type": "string"
+          },
+          "pricingErrorCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "WorkspaceDraftInput": {
         "required": [
           "title",
@@ -17816,6 +18054,92 @@
           }
         }
       },
+      "WorkspaceDraftListItem": {
+        "required": [
+          "draftId",
+          "title",
+          "counterpartyId",
+          "counterpartyName",
+          "updatedAtUtc",
+          "lineCount"
+        ],
+        "type": "object",
+        "properties": {
+          "draftId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "counterpartyId": {
+            "type": "string"
+          },
+          "counterpartyName": {
+            "type": "string"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lineCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "WorkspaceDraftQuotedLine": {
+        "required": [
+          "productId",
+          "productName",
+          "quantity",
+          "unitPrice",
+          "lineAmount",
+          "priceAdjustment",
+          "baseUnitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unitPrice": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "lineAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "priceAdjustment": {
+            "type": "number",
+            "format": "double"
+          },
+          "baseUnitPrice": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "WorkspaceInputLine": {
         "required": [
           "productId",
@@ -17834,6 +18158,65 @@
             "type": "number",
             "format": "double",
             "default": 0
+          }
+        }
+      },
+      "WorkspaceOrderDetail": {
+        "required": [
+          "orderId",
+          "orderNumber",
+          "counterpartyId",
+          "counterpartyName",
+          "createdAtUtc",
+          "comment",
+          "lines",
+          "totalAmount",
+          "syncStatus",
+          "oneCDocumentNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderNumber": {
+            "type": "string"
+          },
+          "counterpartyId": {
+            "type": "string"
+          },
+          "counterpartyName": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceStoredLine"
+            }
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "syncStatus": {
+            "type": "string"
+          },
+          "oneCDocumentNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -17921,6 +18304,69 @@
           }
         }
       },
+      "WorkspacePagedInfo": {
+        "required": [
+          "pageNumber",
+          "pageSize",
+          "totalPages",
+          "totalRecords"
+        ],
+        "type": "object",
+        "properties": {
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalRecords": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "WorkspacePageOfWorkspaceDraftListItem": {
+        "required": [
+          "pagedInfo",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "pagedInfo": {
+            "$ref": "#/components/schemas/WorkspacePagedInfo"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceDraftListItem"
+            }
+          }
+        }
+      },
+      "WorkspacePageOfWorkspaceOrderListItem": {
+        "required": [
+          "pagedInfo",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "pagedInfo": {
+            "$ref": "#/components/schemas/WorkspacePagedInfo"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceOrderListItem"
+            }
+          }
+        }
+      },
       "WorkspaceQuoteRequest": {
         "required": [
           "counterpartyId",
@@ -17936,6 +18382,36 @@
             "items": {
               "$ref": "#/components/schemas/WorkspaceInputLine"
             }
+          }
+        }
+      },
+      "WorkspaceStoredLine": {
+        "required": [
+          "productId",
+          "productName",
+          "quantity",
+          "amount",
+          "priceAdjustment"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "priceAdjustment": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

@@ -10,6 +10,7 @@ internal static class CreateAdminSiteModelEndpoint
         group.MapPost("", Handle)
             .WithName("createAdminSiteModel")
             .WithSummary("Create a model («Нова модель»)")
+            .WithDescription("The model is accepted at once. The category must be final (no children); the products (up to 200) must be in it and not in another accepted model; a proposed model gives its products up. Axes are offered from the products and saved.")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

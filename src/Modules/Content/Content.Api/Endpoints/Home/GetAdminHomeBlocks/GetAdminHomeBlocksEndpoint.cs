@@ -12,6 +12,7 @@ internal static class GetAdminHomeBlocksEndpoint
         group.MapGet("", Handle)
             .WithName("getAdminHomeBlocks")
             .WithSummary("List the home page FAQ and brands")
+            .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin).")
             .Produces<AdminHomeBlocksResponse>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

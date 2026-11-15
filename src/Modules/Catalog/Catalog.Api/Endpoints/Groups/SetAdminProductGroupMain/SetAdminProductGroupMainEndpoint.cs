@@ -10,6 +10,7 @@ internal static class SetAdminProductGroupMainEndpoint
         group.MapPut("{id:int}/main", Handle)
             .WithName("setAdminProductGroupMain")
             .WithSummary("Choose the main product («Зробити головним»)")
+            .WithDescription("The product must be in the group and on the site. It stays main until it is deleted or taken off the site; then automation picks the main product again.")
             .Produces<AdminProductGroupDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

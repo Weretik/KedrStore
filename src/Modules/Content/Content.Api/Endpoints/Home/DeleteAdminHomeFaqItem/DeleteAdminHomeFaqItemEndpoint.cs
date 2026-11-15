@@ -12,6 +12,7 @@ internal static class DeleteAdminHomeFaqItemEndpoint
         group.MapDelete("faq/{id:long}", Handle)
             .WithName("deleteAdminHomeFaqItem")
             .WithSummary("Remove a question")
+            .WithDescription("Requires `CanManageContent`.")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

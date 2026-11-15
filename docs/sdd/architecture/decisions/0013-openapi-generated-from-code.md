@@ -18,7 +18,7 @@ The public API contract was written by hand as 36 YAML files in `docs/sdd/contra
 
 - The build of `Host.Api` writes the document of the code to [`docs/sdd/contracts/openapi.json`](../../contracts/openapi.json) through `Microsoft.Extensions.ApiDescription.Server` (`OpenApiGenerateDocuments`). It is the only machine-readable API contract; the hand-written YAML files are removed.
 - CI builds the solution and fails when the committed `openapi.json` differs from the generated one: commit the regenerated file with every endpoint change.
-- Each endpoint describes itself in code: `WithName` (a unique camelCase operation id), `WithSummary`, typed `Produces<T>` and `ProducesProblem` for errors. The architecture test `OpenApiDocumentRulesTests` requires an operation id, a summary and a tag on every operation and forbids `integer|string` numbers.
+- Each endpoint describes itself in code: `WithName` (a unique camelCase operation id), `WithSummary`, typed `Produces<T>` and `ProducesProblem` for errors. The architecture test `OpenApiDocumentRulesTests` requires an operation id, a summary and a tag on every operation, a typed success body on every read, and forbids `integer|string` numbers. A longer explanation goes into `WithDescription`.
 - Host transformers shape the document: `StrictNumberSchemaTransformer` documents numbers as numbers, `BearerSecuritySchemeTransformer` documents the mobile token. Swagger UI (Development) reads `/openapi/v1.json`; Swashbuckle's generator is removed.
 - Decisions a person must read (consumers, compatibility, idempotency, errors) stay in the feature's `contracts/api-contract.md`.
 - Frontends download `openapi.json` from `master` of this repository, generate types with `openapi-typescript` and call the API through `openapi-fetch`; their CI fails when their copy is behind (kedr-web ADR).
@@ -31,7 +31,7 @@ The public API contract was written by hand as 36 YAML files in `docs/sdd/contra
 ## Trade-offs
 
 - Every build starts the host once (about 3 seconds) without a database; the host removes background services for that run. The container image build skips it.
-- Text descriptions and examples of the old YAML are gone; only summaries moved into the code.
+- Descriptions of the old YAML moved into `WithDescription`; its examples are gone.
 - Schema names follow the C# types (`AdminArticleSummaryResponse`), so the frontends renamed their type references once.
 
 ## Sources and checks
