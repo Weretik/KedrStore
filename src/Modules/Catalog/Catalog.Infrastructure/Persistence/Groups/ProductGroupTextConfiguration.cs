@@ -8,6 +8,8 @@ public sealed class ProductGroupTextConfiguration : IEntityTypeConfiguration<Pro
     {
         builder.ToTable("CatalogProductGroupTexts");
         builder.HasKey(x => new { x.GroupId, x.Language });
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(x => x.Version).IsRowVersion();
         builder.Property(x => x.GroupId).HasConversion(ProductGroupConfiguration.GroupIdConvert);
         builder.Property(x => x.Language).HasMaxLength(2);
         builder.Property(x => x.ShortDescription).HasMaxLength(ProductGroupText.ShortDescriptionMaxLength).IsRequired();

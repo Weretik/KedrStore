@@ -19,6 +19,7 @@ public sealed class DeleteArticleHandler(
         if (cover is not null)
             await covers.DeleteAsync(cover, cancellationToken);
         await articles.DeleteAsync(article, cancellationToken);
+        await articles.SaveChangesAsync(cancellationToken);
         return Result.NoContent();
     }
 }

@@ -8,12 +8,17 @@ using Sales.Application.Abstractions.Customers;
 using Sales.Domain.Customers;
 using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
+
 namespace IntegrationTests.Sales.Persistence.Customers;
 
+/// <summary>
+/// Reference names on the in-memory provider. The list search runs ILIKE, which needs PostgreSQL, so it is covered in
+/// <see cref="SalesCustomerReadModelTests"/>.
+/// </summary>
 public sealed class SalesCustomerReferenceNamesTests
 {
     [Fact]
-    public async Task CustomerRead_ResolvesNamesAndFiltersWholeListBeforePaging()
+    public async Task CustomerRead_ResolvesReferenceNames()
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -58,22 +63,6 @@ public sealed class SalesCustomerReferenceNamesTests
         Assert.Equal(1, catalog.CategoryLookupCount);
         Assert.Equal(1, catalog.PriceTypeLookupCount);
 
-        var list = await scope.ServiceProvider.GetRequiredService<ICustomerReadService>()
-            .GetListAsync(new()
-            {
-                SearchTerm = "ALPHA",
-                CounterpartyId = "match",
-                Name = "alpha",
-                Phone = "+380",
-                Sort = "-name",
-                Page = 2,
-                PageSize = 1
-            }, CancellationToken.None);
-
-        Assert.True(list.IsSuccess);
-        Assert.Equal(2, list.Value.PagedInfo.TotalRecords);
-        Assert.Equal(2, list.Value.PagedInfo.TotalPages);
-        Assert.Equal(["match-1"], list.Value.Value.Select(item => item.CounterpartyId));
     }
 
     private sealed class RecordingCatalogReferences : ICatalogReferenceDataReader

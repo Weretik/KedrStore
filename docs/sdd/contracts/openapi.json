@@ -210,6 +210,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1139,6 +1149,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3759,6 +3779,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -4351,6 +4381,16 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -6274,6 +6314,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -6418,6 +6468,16 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -10516,7 +10576,8 @@
           "coverMediaFileId",
           "updatedAt",
           "updatedBy",
-          "texts"
+          "texts",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -10568,6 +10629,10 @@
             "items": {
               "$ref": "#/components/schemas/ArticleTextDto"
             }
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -10774,7 +10839,8 @@
         "required": [
           "attribute",
           "values",
-          "aliases"
+          "aliases",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -10792,6 +10858,10 @@
             "items": {
               "$ref": "#/components/schemas/AdminAttributeAliasDto"
             }
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -10983,7 +11053,8 @@
           "bodyHtml",
           "faq",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -11026,6 +11097,10 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -11553,7 +11628,8 @@
           "descriptionUk",
           "descriptionRu",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -11596,6 +11672,10 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -12145,7 +12225,8 @@
           "bingSiteVerification",
           "shareImage",
           "updatedAt",
-          "updatedBy"
+          "updatedBy",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -12192,6 +12273,10 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -16130,6 +16215,13 @@
           "removeCover": {
             "type": "boolean",
             "default": false
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },
@@ -16175,6 +16267,13 @@
             "items": {
               "$ref": "#/components/schemas/CategoryFaqItemDto"
             }
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },
@@ -16312,6 +16411,13 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },
@@ -16355,6 +16461,13 @@
               "integer"
             ],
             "format": "int64"
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },
@@ -16845,6 +16958,13 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },
@@ -17317,7 +17437,8 @@
           "shortDescription",
           "description",
           "seoTitle",
-          "seoDescription"
+          "seoDescription",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -17335,6 +17456,10 @@
           },
           "seoDescription": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint32"
           }
         }
       },
@@ -17782,6 +17907,13 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "version": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "uint32"
           }
         }
       },

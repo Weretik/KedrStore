@@ -43,12 +43,19 @@ public sealed record AdminAttributeAliasDto(
     string? Note,
     bool IsEditedManually);
 
+/// <summary>One attribute with its values and aliases; <c>Version</c> goes back with the next attribute save.</summary>
 public sealed record AdminCatalogAttributeDto(
     AdminCatalogAttributeListItemDto Attribute,
     IReadOnlyList<AdminAttributeValueDto> Values,
-    IReadOnlyList<AdminAttributeAliasDto> Aliases);
+    IReadOnlyList<AdminAttributeAliasDto> Aliases,
+    uint Version);
 
-public sealed record UpdateCatalogAttributeRequest(string NameUk, string? NameRu, bool IsFilterable, int SortOrder);
+/// <summary>
+/// <c>Version</c> is the one the form read: when the attribute changed since, the save answers 409; without it the
+/// save is not checked.
+/// </summary>
+public sealed record UpdateCatalogAttributeRequest(string NameUk, string? NameRu, bool IsFilterable, int SortOrder,
+    uint? Version = null);
 
 /// <summary>
 /// A new attribute a person adds in «Ознаки». <c>Kind</c>: <c>enum</c> (a list of values), <c>yesno</c> (a list with «Так» and «Ні» created at once), or <c>number</c> (a number in

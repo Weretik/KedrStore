@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using BuildingBlocks.Application.Results;
 using Content.Application.Abstractions.Media;
 using Content.Application.Features.Articles.Commands.CreateArticle;
 using Content.Application.Features.Articles.Commands.DeleteArticle;
@@ -99,6 +100,33 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         var update = await SendUpdate(provider, second.Value.Id, Input("prykhovani-petli", "Інша"));
         Assert.Equal(ResultStatus.Invalid, update.Status);
         Assert.Equal("slug", Assert.Single(update.ValidationErrors).Identifier);
+    }
+
+    /// <summary>Database rules 4: a form that read an older version cannot overwrite a newer save.</summary>
+    [SkippableFact]
+    public async Task Update_WithAnOlderVersion_AnswersConflict_AndKeepsTheNewerSave()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetAsync();
+        await using var provider = BuildProvider();
+        var created = await SendCreate(provider, Input(null, "Версія"));
+        Assert.NotEqual(0u, created.Value.Version);
+
+        var first = await SendUpdate(provider, created.Value.Id,
+            Input(created.Value.Slug, "Перша правка") with { Version = created.Value.Version });
+        var stale = await SendUpdate(provider, created.Value.Id,
+            Input(created.Value.Slug, "Друга правка") with { Version = created.Value.Version });
+        var withoutVersion = await SendUpdate(provider, created.Value.Id, Input(created.Value.Slug, "Без версії"));
+
+        Assert.True(first.IsSuccess);
+        Assert.NotEqual(created.Value.Version, first.Value.Version);
+        Assert.Equal(ResultStatus.Conflict, stale.Status);
+        Assert.Equal(RowVersions.ChangedMessage, Assert.Single(stale.Errors));
+        Assert.True(withoutVersion.IsSuccess);
+        await using var db = postgres.CreateContext();
+        var titles = await db.Articles.AsNoTracking().Where(a => a.Id == ArticleId.Create(created.Value.Id))
+            .SelectMany(a => a.Translations).Select(t => t.Title).ToListAsync();
+        Assert.All(titles, title => Assert.Equal("Без версії", title));
     }
 
     [SkippableFact]

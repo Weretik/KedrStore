@@ -42,6 +42,7 @@ public sealed class CreateLegalDocumentDraftHandler(
             return created.Error!.ToResult<LegalDocumentVersionDetails>();
         var draft = created.Value;
         await versions.AddAsync(draft, cancellationToken);
+        await versions.SaveChangesAsync(cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(draft));
     }
 }

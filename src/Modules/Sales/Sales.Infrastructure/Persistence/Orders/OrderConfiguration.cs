@@ -18,7 +18,17 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.OrderNumber)
             .HasMaxLength(32)
             .IsRequired();
-        builder.HasIndex(order => order.OrderNumber).IsUnique();
+        // Two indexes on one column need names: a unique one and the trigram one for search.
+        builder.HasIndex(order => order.OrderNumber, "IX_Orders_OrderNumber").IsUnique();
+        builder.HasIndex(order => order.OrderNumber, "IX_Orders_OrderNumber_trgm")
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
+        // Database rules 2.2: a customer's orders and all orders are listed newest first; the first one also serves the
+        // foreign key.
+        builder.HasIndex(order => new { order.CounterpartyId, order.CreatedAt, order.Id })
+            .HasDatabaseName("IX_Orders_CounterpartyId_CreatedAt_Id");
+        builder.HasIndex(order => new { order.CreatedAt, order.Id })
+            .HasDatabaseName("IX_Orders_CreatedAt_Id");
 
         builder.Property(order => order.CounterpartyId)
             .HasMaxLength(64)

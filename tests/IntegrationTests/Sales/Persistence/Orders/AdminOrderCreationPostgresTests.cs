@@ -8,8 +8,11 @@ using Sales.Application.Abstractions.Orders;
 using Sales.Application.Abstractions.Persistence;
 using Sales.Application.Features.Orders.Commands.CreateOrder;
 using Sales.Domain.Customers;
+using Sales.Domain.Orders;
+using Sales.Domain.Orders.ValueObjects;
 using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
+
 namespace IntegrationTests.Sales.Persistence.Orders;
 
 [Collection(SalesPostgresCollection.Name)]
@@ -51,6 +54,62 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
         Assert.Matches("^SO-[0-9]{8}-[0-9]+$", initial.Value.OrderNumber);
         Assert.False(initial.Value.OrderNumber.StartsWith("P", StringComparison.Ordinal));
         Assert.False(replay.Value.OrderNumber.StartsWith("P", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Database rules 4 (audit 2026-11-15 finding G): a double submit that passes the replay check at the same time
+    /// breaks the idempotency index; the second request answers with the first order instead of a 500.
+    /// </summary>
+    [SkippableFact]
+    public async Task Create_WhenTheSameKeyWinsMeanwhile_ReplaysTheWinner()
+    {
+        postgres.SkipIfUnavailable();
+        await ResetDatabaseAsync();
+        const string counterpartyId = "create-order-race";
+        await SeedCounterpartyAsync(counterpartyId);
+        var command = new CreateOrderCommand(
+            new CreateOrderRequest(counterpartyId, null, [new CreateOrderLineRequest("101", 1, 50m)]), Guid.NewGuid());
+
+        await using var provider = BuildProvider();
+        await using var first = provider.CreateAsyncScope();
+        var winner = await Handler(first.ServiceProvider, first.ServiceProvider.GetRequiredService<IOrderCreationStore>()).Handle(command,
+            CancellationToken.None);
+        await using var second = provider.CreateAsyncScope();
+        var late = await Handler(second.ServiceProvider,
+                new MissesTheFirstLookup(second.ServiceProvider.GetRequiredService<IOrderCreationStore>()))
+            .Handle(command, CancellationToken.None);
+
+        await using var verificationDb = postgres.CreateContext();
+        Assert.Equal(ResultStatus.Created, winner.Status);
+        Assert.Equal(ResultStatus.Ok, late.Status);
+        Assert.Equal(winner.Value.OrderNumber, late.Value.OrderNumber);
+        Assert.Equal(1, await verificationDb.Orders.CountAsync());
+    }
+
+    private static CreateOrderHandler Handler(IServiceProvider services, IOrderCreationStore store)
+        => new(store, new ProductReader(), services.GetRequiredService<IOrderNumberGenerator>());
+
+    /// <summary>The request that checked for a replay before the other one saved.</summary>
+    private sealed class MissesTheFirstLookup(IOrderCreationStore inner) : IOrderCreationStore
+    {
+        private bool _missed;
+
+        public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken)
+            => inner.CounterpartyExistsAsync(counterpartyId, cancellationToken);
+
+        public Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey,
+            CancellationToken cancellationToken)
+        {
+            if (_missed)
+                return inner.FindIdempotencyRecordAsync(operation, idempotencyKey, cancellationToken);
+            _missed = true;
+            return Task.FromResult<CreateOrderIdempotencyRecord?>(null);
+        }
+
+        public Task<bool> PersistAsync(Order order, Func<OrderId, OneCOrderSync> synchronizationFactory,
+            Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
+            CancellationToken cancellationToken)
+            => inner.PersistAsync(order, synchronizationFactory, idempotencyRecordFactory, cancellationToken);
     }
 
     private ServiceProvider BuildProvider()

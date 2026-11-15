@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Persistence;
 using System.Text.Json;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
 using Sales.Application.Abstractions.Orders;
@@ -44,7 +45,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
             await db.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
         }
-        catch (DbUpdateException error) when (IsUniqueViolation(error))
+        catch (DbUpdateException error) when (UniqueViolation.Is(error))
         {
             await transaction.RollbackAsync(ct);
             existing = await db.OrderDraftIdempotencyRecords.AsNoTracking()

@@ -23,6 +23,7 @@ public sealed class UpdateGalleryItemHandler(
             return texts.Error!.ToResult<IReadOnlyList<AdminGalleryItem>>();
         item.UpdateTexts(texts.Value, clock.GetUtcNow());
         await repository.UpdateAsync(item, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }
 }

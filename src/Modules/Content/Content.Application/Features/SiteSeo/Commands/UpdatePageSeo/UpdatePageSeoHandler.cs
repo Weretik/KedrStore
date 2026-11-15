@@ -19,6 +19,8 @@ public sealed class UpdatePageSeoHandler(
         var editor = ContentEditor.Name(currentUser);
 
         var seo = await repository.GetByIdAsync(command.Page, cancellationToken);
+        if (RowVersions.IsStale(command.Version, seo?.Version ?? 0))
+            return RowVersions.Changed<AdminPageSeo>();
         if (seo is null)
         {
             var created = PageSeo.Create(command.Page, values, now, editor);
@@ -32,8 +34,9 @@ public sealed class UpdatePageSeoHandler(
             var updated = seo.Update(values, now, editor);
             if (updated.IsFailure)
                 return updated.Error!.ToResult<AdminPageSeo>();
-            await repository.SaveChangesAsync(cancellationToken);
         }
+
+        await repository.SaveChangesAsync(cancellationToken);
 
         return Result.Success(PageSeoMapper.ToAdmin(seo.Page, seo));
     }

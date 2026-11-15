@@ -26,11 +26,7 @@ public sealed class CreateOrderHandler(
         var idempotencyKey = command.IdempotencyKey.ToString("D");
         var existing = await orderCreationStore.FindIdempotencyRecordAsync(Operation, idempotencyKey, cancellationToken);
         if (existing is not null)
-        {
-            return string.Equals(existing.RequestHash, requestHash, StringComparison.Ordinal)
-                ? Result.Success(new CreateOrderResult(existing.OrderId.Value, existing.OrderNumber, existing.SyncStatus))
-                : Result.Conflict();
-        }
+            return Replay(existing, requestHash);
 
         if (!await orderCreationStore.CounterpartyExistsAsync(command.Request.CounterpartyId, cancellationToken))
             return Result.NotFound();
@@ -57,15 +53,27 @@ public sealed class CreateOrderHandler(
             return placed.Error!.ToResult<CreateOrderResult>();
         var order = placed.Value;
 
-        await orderCreationStore.PersistAsync(
+        var persisted = await orderCreationStore.PersistAsync(
             order,
             orderId => OneCOrderSync.Create(orderId, now),
             orderId => new CreateOrderIdempotencyRecord(
                 Operation, idempotencyKey, requestHash, orderId, order.OrderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)),
             cancellationToken);
+        if (!persisted)
+        {
+            // A double submit saved the same key meanwhile: answer with that order (database rules 4).
+            var winner = await orderCreationStore.FindIdempotencyRecordAsync(Operation, idempotencyKey, cancellationToken)
+                         ?? throw new InvalidOperationException($"Idempotency key {idempotencyKey} is taken but not found.");
+            return Replay(winner, requestHash);
+        }
 
         return Result.Created(new CreateOrderResult(order.Id.Value, order.OrderNumber, OneCOrderSyncStatus.Pending));
     }
+
+    private static Result<CreateOrderResult> Replay(CreateOrderIdempotencyRecord existing, string requestHash)
+        => string.Equals(existing.RequestHash, requestHash, StringComparison.Ordinal)
+            ? Result.Success(new CreateOrderResult(existing.OrderId.Value, existing.OrderNumber, existing.SyncStatus))
+            : Result.Conflict();
 
     private static string CalculateRequestHash(CreateOrderRequest request)
     {

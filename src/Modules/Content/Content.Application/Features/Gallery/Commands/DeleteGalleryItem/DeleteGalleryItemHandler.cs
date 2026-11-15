@@ -17,6 +17,7 @@ public sealed class DeleteGalleryItemHandler(
             return Result.NotFound();
 
         await repository.DeleteAsync(item, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));
     }
 }

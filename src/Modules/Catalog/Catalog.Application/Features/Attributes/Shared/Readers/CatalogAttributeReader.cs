@@ -60,7 +60,8 @@ public sealed class CatalogAttributeReader(IReadCatalogDbContext db, IProductMed
                 value.IsEditedManually, valueProducts.GetValueOrDefault(value.Id))).ToList(),
             aliases.Select(alias => new AdminAttributeAliasDto(
                 alias.Id.Value, alias.Scope, alias.RawValue, alias.ValueId?.Value, alias.IsConfirmed, alias.Note,
-                alias.IsEditedManually)).ToList());
+                alias.IsEditedManually)).ToList(),
+            attribute.Version);
     }
 
     private async Task<Dictionary<AttributeId, int>> ProductCountsAsync(AttributeId? attributeId,

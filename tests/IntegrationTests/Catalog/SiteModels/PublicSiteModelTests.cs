@@ -134,7 +134,7 @@ public sealed class PublicSiteModelTests
         {
             DoorsRootCategoryId = "000007226", HardwareRootCategoryId = Root, CosmosRootCategoryId = "Космос",
             CosmosCategoryId = 920000
-        }));
+        }), new PublicModelCatalogCache(TimeProvider.System));
 
     private static async Task<Ardalis.Result.Result<PublicSiteModelListDto>> ListAsync(CatalogDbContext db,
         string? category, GetPublicSiteModelsRequest request, string lang = "uk")

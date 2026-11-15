@@ -14,6 +14,7 @@ public sealed class MediaDbContext(DbContextOptions<MediaDbContext> options)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema(Schema);
+        modelBuilder.HasPostgresExtension("pg_trgm");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MediaDbContext).Assembly);
     }
 

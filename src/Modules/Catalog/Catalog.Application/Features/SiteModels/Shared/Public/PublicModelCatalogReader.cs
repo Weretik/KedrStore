@@ -11,14 +11,18 @@ namespace Catalog.Application.Features.SiteModels.Shared.Public;
 /// <summary>
 /// Reads <see cref="PublicModelCatalog"/> without tracking. Hidden categories (R-18), the Cosmos import root (owner
 /// decision 2026-11-01), and everything under them stay out with their products; only values a person confirmed count
-/// (spec catalog/006 R-06).
+/// (spec catalog/006 R-06). The result is shared through <see cref="PublicModelCatalogCache"/>.
 /// </summary>
 public sealed class PublicModelCatalogReader(
     IReadCatalogDbContext db,
     IProductMediaLibrary media,
-    IOptions<RootCategoryId> roots)
+    IOptions<RootCategoryId> roots,
+    PublicModelCatalogCache cache)
 {
-    public async Task<PublicModelCatalog> ReadAsync(CancellationToken cancellationToken)
+    public Task<PublicModelCatalog> ReadAsync(CancellationToken cancellationToken)
+        => cache.GetAsync(LoadAsync, cancellationToken);
+
+    private async Task<PublicModelCatalog> LoadAsync(CancellationToken cancellationToken)
     {
         var categories = await ReadCategoriesAsync(cancellationToken);
         var products = (await (from projection in db.ProductListProjections.AsNoTracking()

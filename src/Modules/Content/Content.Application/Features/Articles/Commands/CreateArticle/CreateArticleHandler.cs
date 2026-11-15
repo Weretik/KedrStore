@@ -45,6 +45,7 @@ public sealed class CreateArticleHandler(
             return coverError.ToResult<AdminArticleDetails>();
 
         await articles.AddAsync(article, cancellationToken);
+        await articles.SaveChangesAsync(cancellationToken);
         return Result.Success(ArticleMapper.ToAdmin(article,
             await ArticleCovers.ViewAsync(images, article, cancellationToken)));
     }

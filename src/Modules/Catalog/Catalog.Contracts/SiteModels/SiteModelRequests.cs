@@ -43,13 +43,17 @@ public sealed record AddSiteModelProductsRequest
     public IReadOnlyList<int> ProductIds { get; init; } = [];
 }
 
-/// <summary>All four texts of one language; a missing or blank text is stored empty.</summary>
+/// <summary>
+/// All four texts of one language; a missing or blank text is stored empty. <c>Version</c> is the one the form read:
+/// when the texts changed since, the save answers 409; without it the save is not checked.
+/// </summary>
 public sealed record SetSiteModelTextRequest
 {
     public string? ShortDescription { get; init; }
     public string? Description { get; init; }
     public string? SeoTitle { get; init; }
     public string? SeoDescription { get; init; }
+    public uint? Version { get; init; }
 }
 
 /// <summary>

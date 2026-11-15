@@ -21,6 +21,8 @@ public sealed class SaveCategoryContentHandler(
 
         var language = command.Language.Trim().ToLowerInvariant();
         var content = await contentRepo.FirstOrDefaultAsync(new CategoryContentSpec(categoryId, language), cancellationToken);
+        if (RowVersions.IsStale(command.Request.Version, content?.Version ?? 0))
+            return RowVersions.Changed<AdminCategoryContentItem>();
         var isNew = content is null;
         content ??= CategoryContent.Create(categoryId, language);
 
@@ -35,8 +37,7 @@ public sealed class SaveCategoryContentHandler(
 
         if (isNew)
             await contentRepo.AddAsync(content, cancellationToken);
-        else
-            await contentRepo.SaveChangesAsync(cancellationToken);
+        await contentRepo.SaveChangesAsync(cancellationToken);
 
         return Result.Success(CategoryContentMapper.ToAdmin(content));
     }

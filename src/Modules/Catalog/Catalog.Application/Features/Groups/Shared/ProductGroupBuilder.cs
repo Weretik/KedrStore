@@ -82,7 +82,11 @@ public sealed class ProductGroupBuilder(
         }
 
         if (apply && createdGroups.Count > 0)
+        {
+            // New groups get their ids from the database, and their rows below need them.
             await groups.AddRangeAsync(createdGroups, cancellationToken);
+            await groups.SaveChangesAsync(cancellationToken);
+        }
 
         // 2. Rows: candidates follow their key; pinned rows stay; other rows leave their group.
         var final = new Dictionary<ProductId, ProductGroup>();

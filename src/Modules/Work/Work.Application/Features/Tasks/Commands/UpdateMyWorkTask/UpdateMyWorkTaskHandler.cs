@@ -19,6 +19,7 @@ public sealed class UpdateMyWorkTaskHandler(
         if (edited.IsFailure)
             return edited.Error!.ToResult<WorkTaskDto>();
         await tasks.UpdateAsync(task, cancellationToken);
+        await tasks.SaveChangesAsync(cancellationToken);
         return Result.Success(WorkTaskDto.From(task, WorkCalendar.Today(clock)));
     }
 }

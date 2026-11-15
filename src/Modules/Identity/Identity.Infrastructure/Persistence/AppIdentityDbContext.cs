@@ -15,6 +15,7 @@ public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.HasPostgresExtension("pg_trgm");
         builder.ApplyConfigurationsFromAssembly(
             typeof(AppIdentityDbContext).Assembly,
             type => type.Namespace?.StartsWith("Identity.Infrastructure.Persistence", StringComparison.Ordinal) ?? false);

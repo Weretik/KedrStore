@@ -20,6 +20,7 @@ public sealed class UpdateHomeFaqItemHandler(
         if (updated.IsFailure)
             return updated.Error!.ToResult<AdminHomeBlocks>();
         await repository.UpdateAsync(item, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await HomeAdminBlocks.LoadAsync(db, images, cancellationToken));
     }
 }

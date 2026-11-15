@@ -8,7 +8,8 @@ public sealed record SiteSeoSettingsInput(
     string? GoogleTagManagerId,
     string? GoogleSiteVerification,
     string? BingSiteVerification,
-    long? ShareImageMediaFileId);
+    long? ShareImageMediaFileId,
+    uint? Version = null);
 
 /// <summary>
 /// The picture for link previews. <c>Missing</c> marks a file deleted from the media library: the site then keeps its
@@ -24,7 +25,8 @@ public sealed record SiteSeoSettingsDetails(
     string? BingSiteVerification,
     SiteShareImage? ShareImage,
     DateTimeOffset UpdatedAt,
-    string? UpdatedBy);
+    string? UpdatedBy,
+    uint Version);
 
 internal static class SiteSeoSettingsMapper
 {
@@ -47,6 +49,6 @@ internal static class SiteSeoSettingsMapper
 
         return new SiteSeoSettingsDetails(settings.GoogleAnalyticsId, settings.GoogleTagManagerId,
             settings.GoogleSiteVerification, settings.BingSiteVerification, shareImage, settings.UpdatedAt,
-            settings.UpdatedBy);
+            settings.UpdatedBy, settings.Version);
     }
 }

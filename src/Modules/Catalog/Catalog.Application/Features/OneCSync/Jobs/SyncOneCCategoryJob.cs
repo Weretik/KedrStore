@@ -91,6 +91,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                 path).Value;
             ApplyPresentation(category, presentation).ThrowIfFailure();
             await categoryRepo.AddAsync(category, cancellationToken);
+            await categoryRepo.SaveChangesAsync(cancellationToken);
             return;
         }
 

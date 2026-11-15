@@ -4,15 +4,17 @@ using Catalog.Application.Features.OneCSync.Source;
 using Catalog.Application.Features.OneCSync.Sync;
 using BuildingBlocks.Domain.Abstractions.Errors;
 using Catalog.Application.Features.OneCSync.Source.Prices;
-using Catalog.Application.Features.OneCSync.Sync.Prices;
-using Catalog.Application.Features.OneCSync.Sync.Products;
 
 namespace Catalog.Application.Features.OneCSync.Jobs;
 
+/// <summary>
+/// Brings the prices of one 1C root in line with 1C. It reads the products and prices it needs in two queries and saves
+/// once, so a price list is replaced as a whole (database rules 1.2 and 3.1).
+/// </summary>
 public sealed class SyncOneCPricesJob(
     IOneCClient oneC,
     ICatalogRepository<ProductPrice> priceRepo,
-    ICatalogRepository<Product> productRepo,
+    IReadCatalogDbContext db,
     IProductListProjectionRebuilder productListProjectionRebuilder,
     ILogger<SyncOneCPricesJob> logger)
 {
@@ -21,108 +23,99 @@ public sealed class SyncOneCPricesJob(
         CancellationToken cancellationToken,
         bool rebuildProjection = true)
     {
-        logger.LogInformation("[DEBUG_LOG] SyncOneCPricesJob started for {Root}", rootCategoryOneCId);
-
         var pricesOneC = await oneC.GetProductPricesAsync(rootCategoryOneCId, cancellationToken);
-        logger.LogInformation("[DEBUG_LOG] Received {Count} prices from 1C for root {Root}", pricesOneC.Count, rootCategoryOneCId);
+        logger.LogInformation("Received {Count} prices from 1C for root {Root}", pricesOneC.Count, rootCategoryOneCId);
 
         if (pricesOneC.Count == 0)
             return;
 
-        // FIX #1: убираем дубли по (ProductId, PriceTypeId), чтобы не словить 23505 на SaveChanges
+        // 1C may send one price twice; the last one wins, so the unique (product, price type) index holds.
         var deduped = pricesOneC
             .GroupBy(x => (x.ProductId, x.PriceTypeId))
             .Select(g => g.Last())
             .ToList();
 
-        await DeletePricesMissingAsync(deduped, rootCategoryOneCId, cancellationToken);
-        await CreateOrUpsertPricesAsync(deduped, rootCategoryOneCId, cancellationToken);
+        var productIds = deduped.Select(x => ProductId.From(x.ProductId)).Distinct().ToArray();
+        // Tracked on purpose: the prices found here are updated or removed and saved below.
+        var existing = await db.ProductPrices
+            .Where(price => productIds.Contains(price.ProductId))
+            .ToDictionaryAsync(price => (price.ProductId, price.PriceTypeId), cancellationToken);
+
+        var removed = RemoveMissing(deduped, existing.Values, rootCategoryOneCId);
+        var (added, changed) = await AddOrUpdateAsync(deduped, existing, productIds, rootCategoryOneCId, cancellationToken);
+        await priceRepo.SaveChangesAsync(cancellationToken);
 
         if (rebuildProjection)
-        {
             await productListProjectionRebuilder.RebuildAsync(cancellationToken);
-        }
 
-        logger.LogInformation("SyncOneCPricesJob finished for {Root}", rootCategoryOneCId);
+        logger.LogInformation(
+            "SyncOneCPricesJob finished for {Root}: added {Added}, changed {Changed}, removed {Removed}",
+            rootCategoryOneCId, added, changed, removed);
     }
 
-    private async Task DeletePricesMissingAsync(
-        IReadOnlyList<OneCPriceDto> priceDtos,
-        string productTypeIdOneC,
-        CancellationToken cancellationToken)
+    /// <summary>Removes this root's prices of the received products that 1C no longer sends.</summary>
+    private int RemoveMissing(IReadOnlyList<OneCPriceDto> priceDtos, IEnumerable<ProductPrice> existing,
+        string productTypeIdOneC)
     {
-        var productIds = priceDtos
-            .Select(x => ProductId.From(x.ProductId))
-            .Distinct()
-            .ToArray();
-
         var keepKeys = priceDtos
-            .Select(x => (
-                ProductTypeIdOneC: productTypeIdOneC,
-                ProductId: ProductId.From(x.ProductId),
-                PriceTypeId: PriceTypeId.From(x.PriceTypeId))
-            )
+            .Select(x => (ProductId.From(x.ProductId), PriceTypeId.From(x.PriceTypeId)))
             .ToHashSet();
 
-        var existing = await priceRepo.ListAsync(
-            new PricesByProductIdsSpec(productIds, productTypeIdOneC),
-            cancellationToken);
-
         var toDelete = existing
-            .Where(p => !keepKeys.Contains((p.ProductTypeIdOneC, p.ProductId, p.PriceTypeId)))
+            .Where(p => p.ProductTypeIdOneC == productTypeIdOneC && !keepKeys.Contains((p.ProductId, p.PriceTypeId)))
             .ToList();
 
-        if (toDelete.Count == 0) return;
-
-        await priceRepo.DeleteRangeAsync(toDelete, cancellationToken);
+        foreach (var price in toDelete)
+            db.ProductPrices.Remove(price);
+        return toDelete.Count;
     }
 
-    private async Task CreateOrUpsertPricesAsync(
-        IReadOnlyList<OneCPriceDto> priceDtos,
-        string productTypeIdOneC,
-        CancellationToken cancellationToken)
+    private async Task<(int Added, int Changed)> AddOrUpdateAsync(IReadOnlyList<OneCPriceDto> priceDtos,
+        IReadOnlyDictionary<(ProductId, PriceTypeId), ProductPrice> existing, ProductId[] productIds,
+        string productTypeIdOneC, CancellationToken cancellationToken)
     {
+        // A price of a product that is not in the catalogue would break the foreign key, so it is skipped.
+        var knownProducts = (await db.Products.AsNoTracking()
+                .Where(product => productIds.Contains(product.Id))
+                .Select(product => product.Id)
+                .ToListAsync(cancellationToken))
+            .ToHashSet();
+
+        var (added, changed) = (0, 0);
         foreach (var item in priceDtos)
         {
             var productId = ProductId.From(item.ProductId);
+            if (!knownProducts.Contains(productId)) continue;
+
             var priceTypeId = PriceTypeId.From(item.PriceTypeId);
             var priceValue = new Money(item.Price, item.Currency);
 
-            // FIX #2: защита от FK (23503) — если товара нет, цену не пишем
-            var product = await productRepo.FirstOrDefaultAsync(
-                new ProductByIdSpec(productId),
-                cancellationToken);
-
-            if (product is null) continue;
-
-            var existing = await priceRepo.FirstOrDefaultAsync(
-                new ProductPriceByProductAndTypeSpec(productId, priceTypeId),
-                cancellationToken);
-
-            if (existing is null)
+            if (existing.TryGetValue((productId, priceTypeId), out var price))
             {
-                var price = ProductPrice.Create(
-                    productTypeIdOneC: productTypeIdOneC,
-                    productId: productId,
-                    priceTypeId: priceTypeId,
-                    price: priceValue);
-                if (price.IsSuccess)
-                    await priceRepo.AddAsync(price.Value, cancellationToken);
-                else
-                    LogSkipped(productId, price.Error!);
-            }
-            else
-            {
-                var updated = existing.Update(
-                    productId: productId,
-                    priceTypeId: priceTypeId,
-                    price: priceValue);
+                var updated = price.Update(productId: productId, priceTypeId: priceTypeId, price: priceValue);
                 if (updated.IsFailure)
                     LogSkipped(productId, updated.Error!);
+                else
+                    changed++;
+                continue;
             }
+
+            var created = ProductPrice.Create(
+                productTypeIdOneC: productTypeIdOneC,
+                productId: productId,
+                priceTypeId: priceTypeId,
+                price: priceValue);
+            if (created.IsFailure)
+            {
+                LogSkipped(productId, created.Error!);
+                continue;
+            }
+
+            await priceRepo.AddAsync(created.Value, cancellationToken);
+            added++;
         }
 
-        await priceRepo.SaveChangesAsync(cancellationToken);
+        return (added, changed);
     }
 
     private void LogSkipped(ProductId productId, DomainError error)

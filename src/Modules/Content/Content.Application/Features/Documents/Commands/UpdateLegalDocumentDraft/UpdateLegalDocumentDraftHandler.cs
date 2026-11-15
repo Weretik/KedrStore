@@ -25,6 +25,7 @@ public sealed class UpdateLegalDocumentDraftHandler(
         if (updated.IsFailure)
             return updated.Error!.ToResult<LegalDocumentVersionDetails>();
         await versions.UpdateAsync(version, cancellationToken);
+        await versions.SaveChangesAsync(cancellationToken);
         return Result.Success(LegalDocumentMapper.ToDetails(version));
     }
 }

@@ -43,6 +43,8 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     public long? ShareImageMediaFileId { get; private set; }
 
     public DateTimeOffset UpdatedAt { get; private set; }
+    /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
+    public uint Version { get; private set; }
 
     /// <summary>Who saved the last change; empty for the row created by the migration.</summary>
     public string? UpdatedBy { get; private set; }

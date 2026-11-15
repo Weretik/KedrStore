@@ -7,9 +7,9 @@ using Catalog.Domain.Attributes.ValueObjects;
 namespace Catalog.Application.Features.SiteModels.Shared.Public;
 
 /// <summary>
-/// The public site's catalog of models, read once per request (a few thousand on-site products): on-site products of
-/// public categories, models (accepted ones and products of their own, M-04), confirmed attribute values, the shared
-/// dictionary, categories, their filters, and the model texts.
+/// The public site's catalog of models, read once per cache lifetime (a few thousand on-site products): on-site
+/// products of public categories, models (accepted ones and products of their own, M-04), confirmed attribute values,
+/// the shared dictionary, categories, their filters, and the model texts.
 /// </summary>
 public sealed class PublicModelCatalog
 {

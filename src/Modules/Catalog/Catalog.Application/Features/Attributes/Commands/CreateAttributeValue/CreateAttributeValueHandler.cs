@@ -45,6 +45,7 @@ public sealed class CreateAttributeValueHandler(
         if (value.IsFailure)
             return value.Error!.ToResult<AdminCatalogAttributeDto>();
         await values.AddAsync(value.Value, cancellationToken);
+        await values.SaveChangesAsync(cancellationToken);
         return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
     }
 }

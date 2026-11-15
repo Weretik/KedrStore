@@ -15,7 +15,8 @@ internal static class UpdateAdminArticleEndpoint
             .WithDescription("Full replacement; `slug` is required and must not belong to another article. Repeating it is safe.")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         [FromRoute] long id, [FromBody] SaveArticleRequest request, ISender sender, HttpContext http,

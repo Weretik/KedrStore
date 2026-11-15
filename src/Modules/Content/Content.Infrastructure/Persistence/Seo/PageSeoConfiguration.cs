@@ -7,6 +7,8 @@ internal sealed class PageSeoConfiguration : IEntityTypeConfiguration<PageSeo>
     {
         builder.ToTable("PageSeo");
         builder.HasKey(seo => seo.Page);
+        // PostgreSQL xmin: a stale admin save answers 409 (database rules 4).
+        builder.Property(seo => seo.Version).IsRowVersion();
         builder.Property(seo => seo.Page).HasMaxLength(SitePages.MaxLength).ValueGeneratedNever();
         builder.Property(seo => seo.TitleUk).HasMaxLength(PageSeo.TitleMaxLength);
         builder.Property(seo => seo.TitleRu).HasMaxLength(PageSeo.TitleMaxLength);

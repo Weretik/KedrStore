@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Contracts.Groups;
 
@@ -13,9 +14,9 @@ public sealed class GetProductGroupsHandler(IReadCatalogDbContext db)
         if (query.Request.CategoryId is { } categoryId)
             groups = groups.Where(group => group.CategoryId == ProductCategoryId.From(categoryId));
 
-        var search = query.Request.Search?.Trim();
-        if (!string.IsNullOrEmpty(search))
-            groups = groups.Where(group => EF.Functions.ILike(group.Name, $"%{EscapeLike(search)}%", @"\"));
+        // Database rules 2.1: every word must match; a trigram index serves ILIKE on the name.
+        foreach (var pattern in SearchWords.Patterns(query.Request.Search))
+            groups = groups.Where(group => EF.Functions.ILike(group.Name, pattern, SearchWords.EscapeCharacter));
 
         var rows = await groups
             .OrderBy(group => group.Name)
@@ -30,7 +31,4 @@ public sealed class GetProductGroupsHandler(IReadCatalogDbContext db)
         return Result.Success(rows.Select(row => new AdminProductGroupListItemDto(row.Id.Value, row.CategoryId.Value,
             row.Name, row.Slug, row.Count, row.IsCreatedManually)).ToList());
     }
-
-    private static string EscapeLike(string text)
-        => text.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }

@@ -21,6 +21,8 @@ public class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
     /// <summary>The attribute part of a filter URL, for example <c>kolir</c> in <c>kolir-antychna-bronza</c>.</summary>
     public string Slug { get; private set; } = null!;
     public bool IsFilterable { get; private set; }
+    /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
+    public uint Version { get; private set; }
     /// <summary>Products of one group that differ by this attribute are variants of each other.</summary>
     public bool IsVariantAxis { get; private set; }
     public int SortOrder { get; private set; }

@@ -32,15 +32,20 @@ public sealed record AdminSiteSeoSettingsResponse(
     string? BingSiteVerification,
     AdminSiteShareImageResponse? ShareImage,
     DateTimeOffset UpdatedAt,
-    string? UpdatedBy);
+    string? UpdatedBy,
+    uint Version);
 
-/// <summary>All fields are replaced at once; a blank or null field removes that code or picture.</summary>
+/// <summary>
+/// All fields are replaced at once; a blank or null field removes that code or picture. <c>Version</c> is the one the
+/// form read: when the settings changed since, the save answers 409; without it the save is not checked.
+/// </summary>
 public sealed record SaveSiteSeoSettingsRequest(
     string? GoogleAnalyticsId,
     string? GoogleTagManagerId,
     string? GoogleSiteVerification,
     string? BingSiteVerification,
-    long? ShareImageMediaFileId);
+    long? ShareImageMediaFileId,
+    uint? Version = null);
 
 internal static class SiteSeoSettingsResponseMapper
 {
@@ -58,9 +63,9 @@ internal static class SiteSeoSettingsResponseMapper
             ? new AdminSiteShareImageResponse(image.MediaFileId, image.Url, image.FileName, image.Width, image.Height,
                 image.Missing)
             : null,
-        details.UpdatedAt, details.UpdatedBy);
+        details.UpdatedAt, details.UpdatedBy, details.Version);
 
     public static SiteSeoSettingsInput ToInput(SaveSiteSeoSettingsRequest request) => new(
         request.GoogleAnalyticsId, request.GoogleTagManagerId, request.GoogleSiteVerification,
-        request.BingSiteVerification, request.ShareImageMediaFileId);
+        request.BingSiteVerification, request.ShareImageMediaFileId, request.Version);
 }

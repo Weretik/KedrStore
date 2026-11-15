@@ -4,7 +4,7 @@ namespace Scheduling.Application.Features.Tick.Commands.RunSchedulerTick;
 
 /// <summary>
 /// platform/007 R-04: (a) inline work (outbox), (b) stuck runs failed, (c, d) due tasks claimed one by one with the
-/// concurrency check, (e) one job execution for all of them, R-05 when it cannot start, (f) old runs deleted.
+/// concurrency check, a task waiting while another task of its group runs, (e) one job execution for all of them, R-05 when it cannot start, (f) old runs deleted.
 /// </summary>
 public sealed class RunSchedulerTickHandler(
     ISchedulingDbContext db,
@@ -75,10 +75,14 @@ public sealed class RunSchedulerTickHandler(
         IReadOnlyList<ScheduledTaskRow> rows, CancellationToken cancellationToken)
     {
         var claimed = new List<(ScheduledTask, ScheduledTaskRun)>();
+        // Claimed in this tick run one after another in one job; running from an earlier tick would overlap.
+        var busyGroups = rows.Where(x => x.Task.State == TaskState.Running && x.Definition.Group is not null)
+            .Select(x => x.Definition.Group!).ToHashSet(StringComparer.Ordinal);
         foreach (var row in rows.Where(x => !x.Definition.RunsInTick))
         {
             var now = clock.GetUtcNow();
             if (!row.Task.IsDue(now)) continue;
+            if (row.Definition.Group is { } group && busyGroups.Contains(group)) continue;
             var run = row.Task.Claim(now);
             db.Runs.Add(run);
             if (await SaveQuietlyAsync(cancellationToken)) claimed.Add((row.Task, run));

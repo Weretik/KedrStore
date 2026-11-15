@@ -21,6 +21,8 @@ public class CategoryContent : IAggregateRoot
     public string? BodyHtml { get; private set; }
     public IReadOnlyList<CategoryFaqItem> Faq => _faq;
     public DateTimeOffset UpdatedAt { get; private set; }
+    /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
+    public uint Version { get; private set; }
     public string UpdatedBy { get; private set; } = null!;
 
     private CategoryContent() { }

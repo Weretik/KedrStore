@@ -15,7 +15,8 @@ internal static class UpdateAdminSiteSeoSettingsEndpoint
             .WithDescription("Requires `CanManageContent` (Manager, Seo, or Admin). Ids are trimmed and upper-cased; for a verification code the whole meta tag may be sent and its `content` is kept. A blank or missing value removes that code or picture. A new picture must be in the media library. Repeating it is safe.")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound);
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         [FromBody] SaveSiteSeoSettingsRequest request, ISender sender, HttpContext http,
