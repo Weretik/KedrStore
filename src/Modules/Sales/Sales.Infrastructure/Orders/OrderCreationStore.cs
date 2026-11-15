@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Persistence;
 using Sales.Application.Abstractions.Persistence;
 using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.Persistence.Customers;
@@ -23,7 +24,25 @@ internal sealed class OrderCreationStore(SalesDbContext dbContext) : IOrderCreat
                 order.OrderNumber, synchronization.Status, record.CreatedAtUtc, record.ExpiresAtUtc))
             .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task PersistAsync(
+    public async Task<bool> PersistAsync(
+        Order order,
+        Func<OrderId, OneCOrderSync> synchronizationFactory,
+        Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await PersistInTransactionAsync(order, synchronizationFactory, idempotencyRecordFactory, cancellationToken);
+            return true;
+        }
+        catch (DbUpdateException error) when (UniqueViolation.Is(error))
+        {
+            dbContext.ChangeTracker.Clear();
+            return false;
+        }
+    }
+
+    private async Task PersistInTransactionAsync(
         Order order,
         Func<OrderId, OneCOrderSync> synchronizationFactory,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
