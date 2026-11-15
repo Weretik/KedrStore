@@ -10889,7 +10889,10 @@
         "required": [
           "productsWithoutPhoto",
           "topCategoryWithoutPhoto",
-          "categoriesWithoutText"
+          "categoriesWithoutText",
+          "productsWithProblems",
+          "noNameProducts",
+          "siteModels"
         ],
         "type": "object",
         "properties": {
@@ -11058,7 +11061,9 @@
           "level",
           "isDeleted",
           "deletedAt",
-          "isShownOnSite"
+          "isShownOnSite",
+          "productCount",
+          "filledContentLanguages"
         ],
         "type": "object",
         "properties": {
@@ -11738,6 +11743,23 @@
         }
       },
       "AdminProductDetailsDto": {
+        "required": [
+          "id",
+          "nameUk",
+          "nameRu",
+          "productSlug",
+          "photo",
+          "scheme",
+          "categoryId",
+          "categoryName",
+          "inStock",
+          "isSale",
+          "isNew",
+          "exportToSite",
+          "price",
+          "stock",
+          "quantityInPack"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -11975,6 +11997,27 @@
         }
       },
       "AdminProductListRowDto": {
+        "required": [
+          "id",
+          "nameUk",
+          "nameRu",
+          "productSlug",
+          "photo",
+          "categoryId",
+          "categoryName",
+          "inStock",
+          "isSale",
+          "isNew",
+          "exportToSite",
+          "price",
+          "stock",
+          "quantityInPack",
+          "isDeleted",
+          "deletedAt",
+          "groupId",
+          "groupName",
+          "problems"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -12442,6 +12485,17 @@
         }
       },
       "CatalogListItemDto": {
+        "required": [
+          "productId",
+          "categoryId",
+          "name",
+          "productSlug",
+          "photo",
+          "inStock",
+          "isSale",
+          "isNew",
+          "price"
+        ],
         "type": "object",
         "properties": {
           "productId": {
@@ -12522,7 +12576,8 @@
       },
       "CatalogRedirect": {
         "required": [
-          "redirectSlug"
+          "redirectSlug",
+          "redirectType"
         ],
         "type": "object",
         "properties": {
@@ -13702,6 +13757,10 @@
         }
       },
       "EntityTagHeaderValue": {
+        "required": [
+          "tag",
+          "isWeak"
+        ],
         "type": "object",
         "properties": {
           "tag": {
@@ -13713,6 +13772,14 @@
         }
       },
       "FileContentResult": {
+        "required": [
+          "fileContents",
+          "contentType",
+          "fileDownloadName",
+          "lastModified",
+          "entityTag",
+          "enableRangeProcessing"
+        ],
         "type": "object",
         "properties": {
           "fileContents": {
@@ -14580,7 +14647,14 @@
       "PagedResultOfListOfAdminProductListRowDto": {
         "required": [
           "pagedInfo",
-          "value"
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
         ],
         "type": "object",
         "properties": {
@@ -14643,7 +14717,14 @@
       "PagedResultOfListOfCatalogListItemDto": {
         "required": [
           "pagedInfo",
-          "value"
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
         ],
         "type": "object",
         "properties": {
@@ -14706,7 +14787,14 @@
       "PagedResultOfListOfGetAdminCustomerListItemResponse": {
         "required": [
           "pagedInfo",
-          "value"
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
         ],
         "type": "object",
         "properties": {
@@ -14769,7 +14857,14 @@
       "PagedResultOfListOfGetAdminOrderListItemResponse": {
         "required": [
           "pagedInfo",
-          "value"
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
         ],
         "type": "object",
         "properties": {
@@ -14832,7 +14927,14 @@
       "PagedResultOfListOfProductListRowDto": {
         "required": [
           "pagedInfo",
-          "value"
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
         ],
         "type": "object",
         "properties": {
@@ -14893,6 +14995,13 @@
         }
       },
       "ProblemDetails": {
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance"
+        ],
         "type": "object",
         "properties": {
           "type": {
@@ -14936,6 +15045,21 @@
         "type": "string"
       },
       "ProductBySlugDto": {
+        "required": [
+          "id",
+          "name",
+          "productSlug",
+          "photo",
+          "scheme",
+          "photos",
+          "stock",
+          "categoryName",
+          "categorySlug",
+          "quantityInPack",
+          "price",
+          "updatedAt",
+          "breadcrumbs"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -14994,6 +15118,17 @@
         }
       },
       "ProductListRowDto": {
+        "required": [
+          "id",
+          "name",
+          "productSlug",
+          "photo",
+          "categoryId",
+          "inStock",
+          "isSale",
+          "isNew",
+          "price"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -16447,7 +16582,12 @@
       },
       "ScheduleInput": {
         "required": [
-          "kind"
+          "kind",
+          "everyMinutes",
+          "fromHour",
+          "toHour",
+          "times",
+          "days"
         ],
         "type": "object",
         "properties": {
@@ -17546,6 +17686,13 @@
         }
       },
       "StringSegment": {
+        "required": [
+          "buffer",
+          "offset",
+          "length",
+          "value",
+          "hasValue"
+        ],
         "type": "object",
         "properties": {
           "buffer": {
@@ -17693,6 +17840,12 @@
         }
       },
       "ValidationError": {
+        "required": [
+          "identifier",
+          "errorMessage",
+          "errorCode",
+          "severity"
+        ],
         "type": "object",
         "properties": {
           "identifier": {

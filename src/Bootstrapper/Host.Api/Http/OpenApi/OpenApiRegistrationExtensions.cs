@@ -22,6 +22,7 @@ public static class OpenApiRegistrationExtensions
             options.AddSchemaTransformer<StrictNumberSchemaTransformer>();
             options.AddSchemaTransformer<EnumSchemaTransformer>();
             options.AddOperationTransformer<CamelCaseQueryParameterTransformer>();
+            options.AddDocumentTransformer<ResponsePropertiesRequiredTransformer>();
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
