@@ -15,9 +15,12 @@ internal static class PlaceQuickOrderEndpoint
             .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
-    // Missing values bind as null; they become empty values here, and the validator answers 400.
+    // Missing values bind as null; they become empty values here, and the validator answers 400. The optional
+    // Idempotency-Key is made by the site once per order attempt: a repeat returns the same order id (409 when the
+    // same key comes with other data).
     private static async Task<IResult> Handle(
-        [FromBody] CreateOrderRequest request, ISender sender, HttpContext http, CancellationToken cancellationToken)
+        [FromBody] CreateOrderRequest request, ISender sender, HttpContext http, CancellationToken cancellationToken,
+        [FromHeader(Name = "Idempotency-Key")] Guid? idempotencyKey = null)
     {
         var lines = (request.Lines ?? [])
             .Select(line => line is null
@@ -26,7 +29,7 @@ internal static class PlaceQuickOrderEndpoint
             .ToList();
 
         var result = await sender.Send(
-            new PlaceQuickOrderCommand(request.FirstName, request.Phone, lines), cancellationToken);
+            new PlaceQuickOrderCommand(request.FirstName, request.Phone, lines, idempotencyKey), cancellationToken);
 
         return result.IsSuccess ? TypedResults.Ok(new QuickOrderResponse(result.Value)) : result.ToProblem(http);
     }

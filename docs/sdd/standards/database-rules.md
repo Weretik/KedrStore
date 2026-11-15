@@ -130,7 +130,7 @@ Two requests or jobs can change the same data at the same time. Pick a protectio
 Rules:
 
 - **Duplicates:** a unique index guards every "must exist once" rule (idempotency key, slug, number). Code that inserts after a "does it exist?" check catches the unique violation (`PostgresException` with `SqlState == PostgresErrorCodes.UniqueViolation`) and answers as if the first request won: for an idempotent create, return the existing result, not 500.
-- **Double submit:** every create endpoint the client may repeat (orders, payments, messages) takes an idempotency key stored with a unique index.
+- **Double submit:** every create endpoint the client may repeat (orders, payments, messages) takes an idempotency key stored with a unique index; where it is required and how the handler answers a repeat is in the [idempotency rules](idempotency-rules.md).
 - **Jobs that rewrite shared data** take `pg_advisory_xact_lock` with a constant key per operation at the start of their transaction, so a scheduled run and a manual run never overlap. A scheduler that launches tasks separately also groups tasks that touch the same data so only one of them runs at a time.
 - **Admin forms:** the read DTO carries the row version; the update command sends it back; a mismatch returns 409 with a Ukrainian message.
 - **Numbers and positions:** never `MAX(x) + 1` for a business number that must be unique; use a database sequence or the identity id. For display order (`Position`) `MAX + 1` is acceptable when a duplicate only changes order.

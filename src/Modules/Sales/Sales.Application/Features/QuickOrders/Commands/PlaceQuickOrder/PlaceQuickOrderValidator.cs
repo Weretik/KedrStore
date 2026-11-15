@@ -20,6 +20,10 @@ public sealed class PlaceQuickOrderValidator : AbstractValidator<PlaceQuickOrder
             .NotEmpty().WithMessage("Додайте хоча б один товар.")
             .WithName("Товари");
 
+        RuleFor(x => x.IdempotencyKey)
+            .NotEqual(Guid.Empty).WithMessage("Некоректний ключ повтору запиту.")
+            .WithName("Idempotency-Key");
+
         RuleForEach(x => x.Lines).ChildRules(line =>
         {
             line.RuleFor(x => x.ProductId)
