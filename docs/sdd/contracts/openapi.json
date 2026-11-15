@@ -9475,8 +9475,25 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceCreatedOrder"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceCreatedOrder"
+                }
+              }
+            }
           }
         }
       }
@@ -9533,7 +9550,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceQuote"
+                }
+              }
+            }
           }
         }
       }
@@ -9558,7 +9582,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceCustomerPrices"
+                }
+              }
+            }
           }
         }
       }
@@ -9666,8 +9697,25 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDraftDetail"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDraftDetail"
+                }
+              }
+            }
           }
         }
       }
@@ -9741,7 +9789,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceDraftDetail"
+                }
+              }
+            }
           }
         }
       },
@@ -18225,6 +18280,31 @@
           }
         }
       },
+      "WorkspaceCreatedOrder": {
+        "required": [
+          "orderId",
+          "orderNumber",
+          "totalAmount",
+          "syncStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderNumber": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "syncStatus": {
+            "type": "string"
+          }
+        }
+      },
       "WorkspaceCreateOrderRequest": {
         "required": [
           "counterpartyId",
@@ -18251,6 +18331,43 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "WorkspaceCustomerPrice": {
+        "required": [
+          "productId",
+          "unitPrice"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "unitPrice": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "WorkspaceCustomerPrices": {
+        "required": [
+          "counterpartyId",
+          "prices"
+        ],
+        "type": "object",
+        "properties": {
+          "counterpartyId": {
+            "type": "string"
+          },
+          "prices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceCustomerPrice"
+            }
           }
         }
       },
@@ -18682,6 +18799,73 @@
             "items": {
               "$ref": "#/components/schemas/WorkspaceOrderListItem"
             }
+          }
+        }
+      },
+      "WorkspaceQuote": {
+        "required": [
+          "counterpartyId",
+          "lines",
+          "totalAmount",
+          "quoteFingerprint"
+        ],
+        "type": "object",
+        "properties": {
+          "counterpartyId": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceQuoteLine"
+            }
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "quoteFingerprint": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkspaceQuoteLine": {
+        "required": [
+          "productId",
+          "productName",
+          "quantity",
+          "unitPrice",
+          "lineAmount",
+          "baseUnitPrice",
+          "priceAdjustment"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unitPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "lineAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "baseUnitPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "priceAdjustment": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

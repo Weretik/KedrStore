@@ -11,7 +11,9 @@ internal static class CreateWorkspaceOrderEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("orders", Handle)
             .WithName("createAdminWorkspaceOrder")
-            .WithSummary("Create one priced order and pending 1C sync");
+            .WithSummary("Create one priced order and pending 1C sync")
+            .Produces<WorkspaceCreatedOrder>(StatusCodes.Status201Created)
+            .Produces<WorkspaceCreatedOrder>();
 
     // A missing key binds as empty, as it did in the controller; the validator answers 400.
     private static async Task<IResult> Handle(
