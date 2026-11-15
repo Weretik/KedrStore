@@ -11,6 +11,7 @@ internal static class UpdateAdminLegalDocumentDraftEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("versions/{id:long}", Handle)
             .WithName("updateAdminLegalDocumentDraft")
+            .WithSummary("Replace both texts of a draft")
             .Produces<LegalDocumentVersionResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

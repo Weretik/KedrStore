@@ -10,6 +10,7 @@ internal static class CreateAdminCatalogAttributeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminCatalogAttribute")
+            .WithSummary("Add an attribute («Нова ознака», Admin)")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

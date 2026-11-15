@@ -9,6 +9,7 @@ internal static class ChangeMyEmailEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("email", Handle)
             .WithName("changeMyEmail")
+            .WithSummary("Change the own sign-in email (administrators)")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

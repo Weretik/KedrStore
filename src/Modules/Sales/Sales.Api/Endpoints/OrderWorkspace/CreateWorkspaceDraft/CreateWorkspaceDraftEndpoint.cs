@@ -9,7 +9,8 @@ internal static class CreateWorkspaceDraftEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("drafts", Handle)
-            .WithName("createAdminOrderDraft");
+            .WithName("createAdminOrderDraft")
+            .WithSummary("Save a reusable draft");
 
     // A missing key binds as empty, as it did in the controller; the validator answers 400.
     private static async Task<IResult> Handle(

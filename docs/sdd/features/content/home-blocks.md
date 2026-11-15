@@ -44,5 +44,5 @@ Tables `content."HomeFaqItems"` and `content."HomeBrands"`; see the [database ma
 ## Related sources
 
 - [Specification](../../specs/content/006-home-blocks/README.md)
-- [Contract](../../contracts/content/home.openapi.yaml)
+- [Contract](../../contracts/openapi.json)
 - [Site gallery](gallery.md) (shares the media picture port)

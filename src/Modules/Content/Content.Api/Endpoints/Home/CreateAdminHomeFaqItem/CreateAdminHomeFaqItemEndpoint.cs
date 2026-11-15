@@ -11,6 +11,7 @@ internal static class CreateAdminHomeFaqItemEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("faq", Handle)
             .WithName("createAdminHomeFaqItem")
+            .WithSummary("Add a question to the end of the FAQ")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

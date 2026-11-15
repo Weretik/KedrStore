@@ -9,6 +9,7 @@ internal static class AcceptAdminSiteModelsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("accept", Handle)
             .WithName("acceptAdminSiteModels")
+            .WithSummary("Accept models («Прийняти»)")
             .Produces<SiteModelHealthDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

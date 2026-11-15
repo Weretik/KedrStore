@@ -11,6 +11,7 @@ internal static class GetAdminArticleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:long}", Handle)
             .WithName("getAdminArticle")
+            .WithSummary("Get an article with both languages")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

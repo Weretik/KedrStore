@@ -10,6 +10,8 @@ internal static class GetSessionMeEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("me", Handle)
+            .WithName("getCurrentSession")
+            .WithSummary("Get the current user")
             .Produces<SessionMeResponse>()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 

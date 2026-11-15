@@ -1,3 +1,4 @@
+using ArchitectureTests.TestSupport;
 using System.Reflection;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ public sealed class FolderStructureTests
     [Fact]
     public void Source_HasHostsSharedCodeAndModules_AndEveryModuleProjectSitsInModules()
     {
-        var src = Path.Combine(FindRepositoryRoot(), "src");
+        var src = Path.Combine(RepositoryRoot.Find(), "src");
         var topFolders = Directory.EnumerateDirectories(src).Select(Path.GetFileName).Order().ToArray();
         Assert.Equal(["Bootstrapper", "BuildingBlocks", "Modules"], topFolders);
 
@@ -57,7 +58,7 @@ public sealed class FolderStructureTests
     [Fact]
     public void Solution_MirrorsTheDisk_AndEveryModuleLayerSitsInModules()
     {
-        var root = FindRepositoryRoot();
+        var root = RepositoryRoot.Find();
         var solution = File.ReadAllText(Path.Combine(root, "KedrStore.sln"));
         var folders = SolutionFolder.Matches(solution).ToDictionary(m => m.Groups["id"].Value, m => m.Groups["name"].Value);
         var nesting = NestedProject.Matches(solution).ToDictionary(m => m.Groups["child"].Value, m => m.Groups["parent"].Value);
@@ -107,7 +108,7 @@ public sealed class FolderStructureTests
     [Fact]
     public void SourceFolders_AreNotNamedByTypeOrAsADump()
     {
-        var src = Path.Combine(FindRepositoryRoot(), "src");
+        var src = Path.Combine(RepositoryRoot.Find(), "src");
         var violations = Directory.EnumerateDirectories(src, "*", SearchOption.AllDirectories)
             .Select(path => Path.GetRelativePath(src, path).Replace('\\', '/'))
             .Where(path => !path.Split('/').Any(segment => segment is "bin" or "obj" or "Migrations" or "Generated"))
@@ -128,7 +129,7 @@ public sealed class FolderStructureTests
     [InlineData("tests")]
     public void CodeFolders_HoldAtMostSixFiles_AndAreNeitherEmptyNorWrappers(string top)
     {
-        var root = Path.Combine(FindRepositoryRoot(), top);
+        var root = Path.Combine(RepositoryRoot.Find(), top);
         var violations = new List<string>();
         foreach (var folder in CodeFolders(root))
         {
@@ -185,7 +186,7 @@ public sealed class FolderStructureTests
     [Fact]
     public void UseCases_DoNotDependOnAnotherUseCase()
     {
-        var src = Path.Combine(FindRepositoryRoot(), "src");
+        var src = Path.Combine(RepositoryRoot.Find(), "src");
         var violations = Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories)
             .Select(path => (Path: path, Folder: UseCaseFolder.Match(path.Replace('\\', '/'))))
             .Where(file => file.Folder.Success)
@@ -271,7 +272,7 @@ public sealed class FolderStructureTests
     [Fact]
     public void EndpointFeatureFolders_HoldOnlyTheRouteGroup_AndOneFolderPerEndpoint()
     {
-        var modules = Path.Combine(FindRepositoryRoot(), "src", "Modules");
+        var modules = Path.Combine(RepositoryRoot.Find(), "src", "Modules");
         var violations = Directory.EnumerateDirectories(modules, "Endpoints", SearchOption.AllDirectories)
             .Where(path => !path.Split(Path.DirectorySeparatorChar).Any(segment => segment is "bin" or "obj"))
             .SelectMany(Directory.EnumerateDirectories)
@@ -328,13 +329,4 @@ public sealed class FolderStructureTests
         => type is { IsAbstract: false, IsInterface: false } && type.GetInterfaces().Any(i => i.IsGenericType &&
             (i.GetGenericTypeDefinition() == typeof(ICommandHandler<,>) ||
              i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)));
-
-    private static string FindRepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "KedrStore.sln")))
-            directory = directory.Parent;
-
-        return directory?.FullName ?? throw new DirectoryNotFoundException("KedrStore.sln was not found.");
-    }
 }

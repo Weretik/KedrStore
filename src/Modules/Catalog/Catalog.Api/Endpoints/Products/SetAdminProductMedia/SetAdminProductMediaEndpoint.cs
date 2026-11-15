@@ -10,6 +10,7 @@ internal static class SetAdminProductMediaEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/media", Handle)
             .WithName("setAdminProductMedia")
+            .WithSummary("Replace the photos and the scheme of a product")
             .RequireAuthorization(PolicyNames.CanManageMedia)
             .Produces<ProductMediaDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

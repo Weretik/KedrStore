@@ -9,6 +9,7 @@ internal static class DeleteMediaFolderEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("{id:long}", Handle)
             .WithName("deleteAdminMediaFolder")
+            .WithSummary("Delete an empty folder")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)

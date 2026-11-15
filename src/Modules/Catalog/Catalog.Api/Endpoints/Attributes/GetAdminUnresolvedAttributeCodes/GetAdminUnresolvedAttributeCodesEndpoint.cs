@@ -9,6 +9,7 @@ internal static class GetAdminUnresolvedAttributeCodesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("unresolved-codes", Handle)
             .WithName("getAdminUnresolvedAttributeCodes")
+            .WithSummary("«Не розшифровані коди»")
             .Produces<List<AdminUnresolvedCodeDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

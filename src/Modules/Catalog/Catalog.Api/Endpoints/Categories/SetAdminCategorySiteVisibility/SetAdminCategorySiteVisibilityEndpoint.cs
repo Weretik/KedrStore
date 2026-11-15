@@ -11,6 +11,7 @@ internal static class SetAdminCategorySiteVisibilityEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/site-visibility", Handle)
             .WithName("setAdminCategorySiteVisibility")
+            .WithSummary("Show or hide a category on the site")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<CategorySiteVisibilityResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

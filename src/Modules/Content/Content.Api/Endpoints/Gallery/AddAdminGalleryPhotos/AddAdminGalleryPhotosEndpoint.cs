@@ -11,6 +11,7 @@ internal static class AddAdminGalleryPhotosEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("photos", Handle)
             .WithName("addAdminGalleryPhotos")
+            .WithSummary("Add media-library photos to the end of the gallery")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

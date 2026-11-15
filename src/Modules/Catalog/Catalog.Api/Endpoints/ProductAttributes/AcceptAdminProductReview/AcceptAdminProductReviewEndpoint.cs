@@ -9,6 +9,7 @@ internal static class AcceptAdminProductReviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("review/accept", Handle)
             .WithName("acceptAdminProductReview")
+            .WithSummary("«Прийняти як є»")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

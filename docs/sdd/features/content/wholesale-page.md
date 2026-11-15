@@ -39,4 +39,4 @@ Table `content."WholesalePages"`; see the [database map](../../architecture/data
 ## Related sources
 
 - [Specification](../../specs/content/009-wholesale-page/README.md)
-- [Contract](../../contracts/content/wholesale.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

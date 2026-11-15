@@ -11,6 +11,7 @@ internal static class GetArticleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/articles/{slug}", Handle)
             .WithName("getArticle")
+            .WithSummary("Get one published article by slug")
             .Produces<ArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

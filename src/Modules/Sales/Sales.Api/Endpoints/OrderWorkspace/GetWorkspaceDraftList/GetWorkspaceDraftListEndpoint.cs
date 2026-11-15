@@ -7,7 +7,8 @@ internal static class GetWorkspaceDraftListEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("drafts", Handle)
-            .WithName("getAdminOrderDrafts");
+            .WithName("getAdminOrderDrafts")
+            .WithSummary("Search saved drafts");
 
     private static async Task<IResult> Handle(
         ISender sender, HttpContext http,

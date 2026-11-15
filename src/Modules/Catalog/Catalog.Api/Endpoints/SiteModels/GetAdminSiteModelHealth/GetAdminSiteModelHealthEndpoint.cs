@@ -9,6 +9,7 @@ internal static class GetAdminSiteModelHealthEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("health", Handle)
             .WithName("getAdminSiteModelHealth")
+            .WithSummary("Site model problem counts (also inside the «Огляд» catalog block)")
             .Produces<SiteModelHealthDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

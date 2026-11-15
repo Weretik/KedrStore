@@ -11,6 +11,7 @@ internal static class CreateAdminArticleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminArticle")
+            .WithSummary("Create an article")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

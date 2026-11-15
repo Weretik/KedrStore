@@ -12,6 +12,7 @@ internal static class GetAdminSiteModelsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminSiteModels")
+            .WithSummary("The «Моделі» list")
             .Produces<SiteModelListDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

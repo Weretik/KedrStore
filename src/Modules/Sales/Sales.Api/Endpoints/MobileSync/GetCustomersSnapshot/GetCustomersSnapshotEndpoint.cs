@@ -9,6 +9,7 @@ internal static class GetCustomersSnapshotEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getMobileCustomersSnapshot")
+            .WithSummary("Customers and their price rules for offline work")
             .Produces<CustomersSnapshotDto>()
             .Produces(StatusCodes.Status304NotModified)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

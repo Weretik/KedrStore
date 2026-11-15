@@ -8,6 +8,7 @@ internal static class MobileLogoutEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("logout", Handle)
             .WithName("logoutMobile")
+            .WithSummary("End the mobile session")
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

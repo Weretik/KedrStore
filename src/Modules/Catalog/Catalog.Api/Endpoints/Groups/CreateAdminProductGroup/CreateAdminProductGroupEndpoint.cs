@@ -9,6 +9,7 @@ internal static class CreateAdminProductGroupEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminProductGroup")
+            .WithSummary("Create a group («Нова група»)")
             .Produces<AdminProductGroupDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

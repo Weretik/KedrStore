@@ -44,4 +44,4 @@ Tables `content."CompanyRequisites"` and `content."CompanyRequisitesChanges"`; s
 ## Related sources
 
 - [Specification](../../specs/content/003-company-requisites/README.md)
-- [Contract](../../contracts/content/requisites.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

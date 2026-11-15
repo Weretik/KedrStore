@@ -11,6 +11,7 @@ internal static class ListPublicPageSeoEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/page-seo", Handle)
             .WithName("listPublicPageSeo")
+            .WithSummary("List the set search texts in one language")
             .Produces<IReadOnlyList<PublicPageSeoResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

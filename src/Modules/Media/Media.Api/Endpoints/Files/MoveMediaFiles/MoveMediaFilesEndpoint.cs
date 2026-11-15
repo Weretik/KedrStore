@@ -8,6 +8,7 @@ internal static class MoveMediaFilesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("move", Handle)
             .WithName("moveAdminMediaFiles")
+            .WithSummary("Move files to a folder")
             .Produces<MoveMediaFilesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

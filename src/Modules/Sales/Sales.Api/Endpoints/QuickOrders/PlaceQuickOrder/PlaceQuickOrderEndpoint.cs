@@ -8,6 +8,8 @@ internal static class PlaceQuickOrderEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
+            .WithName("createQuickOrder")
+            .WithSummary("Create a quick order")
             .AllowAnonymous()
             .RequireRateLimiting("QuickOrder")
             .Produces<QuickOrderResponse>()

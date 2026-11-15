@@ -93,7 +93,7 @@ Rollback: the migration's `Down` drops the two tables and the three columns; not
 
 The main product (`PUT api/admin/product-groups/{id}/main`), the slug (`PUT api/admin/product-groups/{id}/slug`), and a product's attribute value (`PUT api/admin/products/{id}/attributes/{attributeId}`) keep their spec 006 routes. `api/admin/product-groups` stays until the admin moves to the new pages (stage 4) and is then removed.
 
-Contract: [site-models.openapi.yaml](../../../contracts/catalog/site-models.openapi.yaml); «Огляд» counts in [admin-overview.openapi.yaml](../../../contracts/catalog/admin-overview.openapi.yaml).
+Contract: [OpenAPI](../../../contracts/openapi.json); «Огляд» counts in [OpenAPI](../../../contracts/openapi.json).
 
 ### Files (stage 2)
 
@@ -146,7 +146,7 @@ src/Modules/Catalog/
 | `GET /api/catalog/{lang}/model/{modelSlug}` | The model page; 404 with an address body for a redirect |
 | `GET /api/catalog/{lang}/product/{productSlug}/model` | The model address of an old product address |
 
-Contract: [public-site-models.openapi.yaml](../../../contracts/catalog/public-site-models.openapi.yaml). No schema change. The product endpoints stay for the current Angular site. The URL words on the site (`/uk/catalog/<category>/<model>?<axis>=<value>`) come from the attribute and value slugs; stage 7 decides which single-filter pages are indexable.
+Contract: [OpenAPI](../../../contracts/openapi.json). No schema change. The product endpoints stay for the current Angular site. The URL words on the site (`/uk/catalog/<category>/<model>?<axis>=<value>`) come from the attribute and value slugs; stage 7 decides which single-filter pages are indexable.
 
 ### Files (stage 5)
 

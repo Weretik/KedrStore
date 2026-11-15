@@ -10,6 +10,7 @@ internal static class SetAdminCategoryAttributeFiltersEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("category-filters/{categoryId:int}", Handle)
             .WithName("setAdminCategoryAttributeFilters")
+            .WithSummary("Turn category filters on or off and order them (Admin)")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<List<AdminCategoryAttributeFilterDto>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

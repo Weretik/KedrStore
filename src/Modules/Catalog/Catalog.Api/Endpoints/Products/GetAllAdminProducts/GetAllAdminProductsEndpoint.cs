@@ -8,6 +8,8 @@ internal static class GetAllAdminProductsEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("all", Handle)
+            .WithName("getAllAdminProducts")
+            .WithSummary("List all admin product rows")
             .Produces<List<AdminProductListRowDto>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

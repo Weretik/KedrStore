@@ -60,4 +60,4 @@ Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualif
 
 ## Related sources
 
-[Contract](../../contracts/catalog/products.openapi.yaml) · [Data](../../architecture/data-model/catalog-products.md) · [Media library](../media/media-library.md).
+[Contract](../../contracts/openapi.json) · [Data](../../architecture/data-model/catalog-products.md) · [Media library](../media/media-library.md).

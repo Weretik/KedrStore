@@ -8,6 +8,7 @@ internal static class GetOrderListEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminOrders")
+            .WithSummary("Search orders")
             .Produces<PagedResult<List<GetAdminOrderListItemResponse>>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

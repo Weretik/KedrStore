@@ -10,6 +10,8 @@ internal static class GetAdminCategoriesEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
+            .WithName("getAdminCategories")
+            .WithSummary("List categories for catalog administration")
             .Produces<IReadOnlyList<AdminCategoryResponse>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

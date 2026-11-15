@@ -12,6 +12,7 @@ internal static class GetPublicCategorySiteModelsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{categorySlug}/models", Handle)
             .WithName("getPublicCategorySiteModels")
+            .WithSummary("Models of a category")
             .Produces<PublicSiteModelListDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

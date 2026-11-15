@@ -13,6 +13,7 @@ internal static class UploadMediaFileEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("uploadAdminMediaFile")
+            .WithSummary("Upload a picture")
             .WithUploadLimit()
             .DisableAntiforgery()
             .Produces<MediaFileItem>()

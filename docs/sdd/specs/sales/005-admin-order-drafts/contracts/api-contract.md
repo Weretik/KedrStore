@@ -1,6 +1,6 @@
 # Order drafts API contract
 
-**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/sales/admin-order-drafts.openapi.yaml) is included in aggregated `docs/sdd/contracts/openapi.yaml`. All routes are new and separate from `/api/admin/orders`.
+**Status:** Operations implemented in commit `b3797c1`. [OpenAPI 0.1.0](../../../../contracts/openapi.json) is included in aggregated `docs/sdd/contracts/openapi.yaml`. All routes are new and separate from `/api/admin/orders`.
 
 | operationId | Method/path | Behavior |
 | --- | --- | --- |

@@ -7,8 +7,7 @@ public static class ApiRegistrationsExtensions
     public static IServiceCollection AddApiRegistrations(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerDocumentation();
-        services.AddOpenApi();
+        services.AddApiDocument();
 
         services.AddHealthChecks();
         services.AddApiProblemDetails();

@@ -9,6 +9,7 @@ internal static class ChangeMyWorkTaskStatusEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("tasks/{id:long}/status", Handle)
             .WithName("changeMyWorkTaskStatus")
+            .WithSummary("Move an own task to another column")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

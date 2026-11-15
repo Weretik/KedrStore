@@ -40,4 +40,4 @@ Unit: [ProfileAndSessionValidatorsTests](../../../../tests/UnitTests/Identity/Pr
 
 ## Related sources
 
-[Contract](../../contracts/identity/profile.openapi.yaml) · [Staff accounts](staff-accounts.md) · [Authorization](../../architecture/security/authorization/roles-and-policies.md).
+[Contract](../../contracts/openapi.json) · [Staff accounts](staff-accounts.md) · [Authorization](../../architecture/security/authorization/roles-and-policies.md).

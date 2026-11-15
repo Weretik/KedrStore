@@ -9,6 +9,7 @@ internal static class GetAdminCatalogOverviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminCatalogOverview")
+            .WithSummary("Products without a photo and categories without site text")
             .Produces<AdminCatalogOverviewResponse>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

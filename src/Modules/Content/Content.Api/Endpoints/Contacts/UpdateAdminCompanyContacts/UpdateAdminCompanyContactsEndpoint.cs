@@ -11,6 +11,7 @@ internal static class UpdateAdminCompanyContactsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("", Handle)
             .WithName("updateAdminCompanyContacts")
+            .WithSummary("Replace all company contacts")
             .Produces<AdminCompanyContactsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

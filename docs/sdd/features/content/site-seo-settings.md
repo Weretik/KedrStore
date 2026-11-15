@@ -40,4 +40,4 @@ Table `content."SiteSeoSettings"`; see the [database map](../../architecture/dat
 ## Related sources
 
 - [Specification](../../specs/content/011-site-seo-settings/README.md)
-- [Contract](../../contracts/content/seo-settings.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

@@ -12,6 +12,7 @@ internal static class UpdateAdminGalleryItemEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("items/{id:long}", Handle)
             .WithName("updateAdminGalleryItem")
+            .WithSummary("Replace the title and caption of a card")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

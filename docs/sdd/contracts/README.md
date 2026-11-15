@@ -1,39 +1,29 @@
 # API contracts
 
-`docs/sdd/contracts/` is the canonical versioned source for machine-readable public API contracts.
+[`openapi.json`](openapi.json) is the only machine-readable contract of the public HTTP API. It is **generated from the code**: every build of `Host.Api` writes it ([ADR-0013](../architecture/decisions/0013-openapi-generated-from-code.md)). Do not edit it by hand.
 
-## Structure
+## How it works
 
-```text
-docs/sdd/contracts/
-├── openapi.yaml                         # aggregate entry point for public APIs
-└── <module>/
-    └── <feature>.openapi.yaml           # one feature contract
-```
+1. An endpoint describes itself in code: `.WithName("getAdminArticles")` (unique camelCase operation id, the frontends see it), `.WithSummary("List articles")`, typed `.Produces<TResponse>()` and `.ProducesProblem(status)` for every error it returns, and its request type through the handler parameters.
+2. `dotnet build` (or any build or test of `Host.Api`) regenerates `openapi.json`. Commit it together with the endpoint change.
+3. CI builds the solution and fails with «OpenAPI contract is out of date» when the committed file differs from the code.
+4. The architecture test [`OpenApiDocumentRulesTests`](../../../tests/ArchitectureTests/Hosts/OpenApiDocumentRulesTests.cs) requires an operation id, a summary and a tag on every operation, unique ids, and numbers documented as numbers.
+5. kedr-web downloads `openapi.json` from `master` (`npm run contracts:sync`), generates types with `openapi-typescript` and calls the API through `openapi-fetch`. Its CI fails when its copy is behind `master`, and a daily job opens a sync PR. A breaking change of a path, parameter or schema becomes a TypeScript error there.
 
-`openapi.yaml` is the entry point for Swagger UI, frontend client generation, and contract tests. It includes module contracts through `$ref`; do not duplicate operations or schemas in the aggregate file.
+The document describes the code; it does not grant access. Authorization policies and the host fallback policy decide who may call an endpoint.
 
-## Current frontend contract handoff
+## Errors
 
-- [Frontend integration guide](frontend-integration.md) describes authentication, CSRF, pagination, errors, and endpoint owners.
-- [Aggregate OpenAPI 3.1 contract](openapi.yaml) covers the registered endpoints.
-- [Error answers](problem.openapi.yaml): every error is `application/problem+json` with `code`, `detail` and `traceId`; module contracts reference its schemas.
-- Catalog: [products](catalog/products.openapi.yaml), [categories](catalog/category-read.openapi.yaml), [admin «Огляд» block](catalog/admin-overview.openapi.yaml), [variant groups](catalog/product-groups.openapi.yaml), [site models](catalog/site-models.openapi.yaml), [public site models](catalog/public-site-models.openapi.yaml), [attributes admin](catalog/attributes.openapi.yaml), [offline app catalog snapshot](catalog/mobile-sync.openapi.yaml).
-- Sales: [site quick order](sales/quick-orders.openapi.yaml), [manager catalog](sales/catalog.openapi.yaml), [orders and 1C sync](sales/admin-order-one-c-sync.openapi.yaml), [order reads](sales/manager-order-read.openapi.yaml), [customer reads](sales/customer-read.openapi.yaml), [admin «Огляд» block](sales/admin-overview.openapi.yaml), [offline app customers snapshot](sales/mobile-sync.openapi.yaml).
-- Content: [site articles](content/articles.openapi.yaml), [company contacts](content/contacts.openapi.yaml), [company requisites](content/requisites.openapi.yaml), [site documents](content/documents.openapi.yaml), [site gallery](content/gallery.openapi.yaml), [home page FAQ and brands](content/home.openapi.yaml), [page «Співпраця»](content/wholesale.openapi.yaml), [search texts of the site pages](content/page-seo.openapi.yaml), [site SEO settings](content/seo-settings.openapi.yaml), [refresh the site now](content/site-refresh.openapi.yaml), [admin «Огляд» block](content/admin-overview.openapi.yaml).
-- Identity: [session](identity/session.openapi.yaml), [staff accounts](identity/users.openapi.yaml), [staff profile](identity/profile.openapi.yaml).
+Every error is `application/problem+json` with `code`, `detail` and `traceId` (the [frontend integration guide](frontend-integration.md) lists the codes). Validation errors add `errors` by field. A few public reads answer 404 with a typed redirect body (`CatalogRedirect`); they declare it with `Produces<T>(404)`.
 
-The generated document `/openapi/v1.json` is pinned by a golden snapshot, [`openapi.v1.json`](../../../tests/IntegrationTests/Platform/Api/openapi.v1.json), checked by [OpenApiSnapshotTests](../../../tests/IntegrationTests/Platform/Api/OpenApiSnapshotTests.cs) without Docker. A change of any path, parameter, schema, tag or status code fails it; after an intended change run the test with `UPDATE_OPENAPI_SNAPSHOT=1` and commit the new snapshot with the change.
+## Changing the API
 
-The OpenAPI files describe the current code contract. They do not grant endpoint access: authorization attributes and the host fallback access policy remain authoritative.
+- Record decisions a person must read (scope, consumers, compatibility, security, errors, idempotency, deployment order) in the feature's `contracts/api-contract.md`.
+- Write the API test first (`tests/IntegrationTests/<Module>/Api/`), then the endpoint; the regenerated `openapi.json` shows the contract change in review.
+- A breaking change (removed or renamed path, parameter or field, changed type) needs a migration path for the frontends and the mobile app, which may run an old version.
+- In the PR say that kedr-web must sync the contract; its daily job also opens the sync PR on its own.
 
-Record scope, consumers, compatibility, security, errors, idempotency, and deployment decisions in each feature's `contracts/api-contract.md`. For new or changed HTTP behavior, agree on these decisions and, where practical, create or update the machine-readable contract before implementing the transport layer. Add targeted API/contract Red tests against the agreed contract, then implement the transport. The feature document links to `docs/sdd/contracts/<module>/<feature>.openapi.yaml`; update aggregate `openapi.yaml` in the same change.
+## Frontend handoff
 
-Do not create a public OpenAPI document for an internal-only change. Before adding an HTTP contract, agree on route, method, operation ID, DTOs, examples, errors, security, write idempotency for side effects, and a migration path for breaking changes.
-
-## Admin workspace
-
-- [Admin order workspace](sales/admin-order-workspace.openapi.yaml).
-- [Admin order drafts](sales/admin-order-drafts.openapi.yaml).
-
-These operations are implemented in a separate Admin API and included in the aggregate `openapi.yaml`.
+- [Frontend integration guide](frontend-integration.md): authentication, CSRF, pagination, errors, and endpoint owners.
+- Swagger UI in Development: `/swagger`, reading `/openapi/v1.json`.

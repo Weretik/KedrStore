@@ -31,7 +31,7 @@ New table `CatalogAttributeAliasCategoryValues` (`AliasId`, `CategoryId`) → `V
 | Products of a code (C-01) | `Catalog.Application/Features/Attributes/GetCodeProducts/` |
 | Decide (C-02, C-04) | `Catalog.Application/Features/Attributes/DecideCode/` |
 | Recognizer (C-03) | `Catalog.Application/Attributes/Recognition/RecognitionDictionary.cs`, `ProductNameRecognition.Lexical.cs`, `Jobs/Attributes/RecognizeCatalogAttributesJob.cs` |
-| Contract | `Catalog.Contracts/Attributes/CatalogAttributeDtos.cs`, [attributes.openapi.yaml](../../../contracts/catalog/attributes.openapi.yaml) |
+| Contract | `Catalog.Contracts/Attributes/CatalogAttributeDtos.cs`, [OpenAPI](../../../contracts/openapi.json) |
 | HTTP | `Catalog.Api/Controllers/AdminCatalogAttributesController.cs` |
 
 ## Scenarios and evidence

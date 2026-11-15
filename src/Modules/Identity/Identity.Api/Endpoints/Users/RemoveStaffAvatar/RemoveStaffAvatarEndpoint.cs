@@ -8,6 +8,7 @@ internal static class RemoveStaffAvatarEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("{userId:guid}/avatar", Handle)
             .WithName("removeStaffAvatar")
+            .WithSummary("Remove a manager's avatar")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

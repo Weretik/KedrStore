@@ -11,6 +11,7 @@ internal static class MobileLoginEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("login", Handle)
             .WithName("loginMobile")
+            .WithSummary("Sign the mobile app in")
             .AllowAnonymous()
             .RequireRateLimiting("AuthLogin")
             .Produces<MobileTokenResponse>()

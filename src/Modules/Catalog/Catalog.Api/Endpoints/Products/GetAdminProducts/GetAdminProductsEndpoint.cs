@@ -9,6 +9,8 @@ internal static class GetAdminProductsEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
+            .WithName("getAdminProducts")
+            .WithSummary("List admin product rows")
             .Produces<PagedResult<List<AdminProductListRowDto>>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

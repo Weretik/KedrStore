@@ -11,6 +11,7 @@ internal static class MobileRefreshEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("refresh", Handle)
             .WithName("refreshMobile")
+            .WithSummary("Rotate the mobile token pair")
             .AllowAnonymous()
             .RequireRateLimiting("AuthRefresh")
             .Produces<MobileTokenResponse>()

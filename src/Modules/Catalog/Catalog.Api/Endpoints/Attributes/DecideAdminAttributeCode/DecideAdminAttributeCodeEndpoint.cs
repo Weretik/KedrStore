@@ -10,6 +10,7 @@ internal static class DecideAdminAttributeCodeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("codes/{aliasId:int}", Handle)
             .WithName("decideAdminAttributeCode")
+            .WithSummary("Decode a code (Admin)")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<DecideAttributeCodeResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

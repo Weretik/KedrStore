@@ -9,6 +9,7 @@ internal static class GetArticleCoverEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("articles/{id:long}/cover", Handle)
             .WithName("getArticleCover")
+            .WithSummary("Get the cover picture of an article")
             // The document keeps the response type the controller declared, so the contract stays the same.
             .Produces<FileContentResult>(StatusCodes.Status200OK, "image/webp")
             .ProducesProblem(StatusCodes.Status404NotFound);

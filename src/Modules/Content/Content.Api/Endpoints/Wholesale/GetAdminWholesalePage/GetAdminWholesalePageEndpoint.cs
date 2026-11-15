@@ -11,6 +11,7 @@ internal static class GetAdminWholesalePageEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminWholesalePage")
+            .WithSummary("Get both languages for editing")
             .Produces<AdminWholesalePageResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

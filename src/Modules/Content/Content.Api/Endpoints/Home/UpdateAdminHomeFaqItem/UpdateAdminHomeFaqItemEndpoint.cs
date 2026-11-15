@@ -11,6 +11,7 @@ internal static class UpdateAdminHomeFaqItemEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("faq/{id:long}", Handle)
             .WithName("updateAdminHomeFaqItem")
+            .WithSummary("Replace the texts of a question")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

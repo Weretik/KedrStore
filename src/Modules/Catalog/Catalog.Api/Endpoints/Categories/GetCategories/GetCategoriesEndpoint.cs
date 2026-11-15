@@ -9,6 +9,8 @@ internal static class GetCategoriesEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("categories", Handle)
+            .WithName("getCategoryTree")
+            .WithSummary("Get the localized category navigation tree")
             .Produces<IReadOnlyList<CategoryResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

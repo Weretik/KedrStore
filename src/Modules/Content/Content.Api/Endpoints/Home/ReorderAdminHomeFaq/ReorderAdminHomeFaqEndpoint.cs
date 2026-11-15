@@ -11,6 +11,7 @@ internal static class ReorderAdminHomeFaqEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("faq/order", Handle)
             .WithName("reorderAdminHomeFaq")
+            .WithSummary("Save the order of all questions")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);

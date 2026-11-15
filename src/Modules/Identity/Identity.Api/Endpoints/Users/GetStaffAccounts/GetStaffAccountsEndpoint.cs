@@ -11,6 +11,7 @@ internal static class GetStaffAccountsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getStaffAccounts")
+            .WithSummary("List administrators, SEO specialists, and managers")
             .Produces<IReadOnlyList<StaffAccountResponse>>()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden);

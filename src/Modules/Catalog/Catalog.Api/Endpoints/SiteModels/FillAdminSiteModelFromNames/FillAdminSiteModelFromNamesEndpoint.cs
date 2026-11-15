@@ -9,6 +9,7 @@ internal static class FillAdminSiteModelFromNamesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{id:int}/fill-from-names", Handle)
             .WithName("fillAdminSiteModelFromNames")
+            .WithSummary("«Заповнити з назв»")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

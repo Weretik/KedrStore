@@ -9,6 +9,7 @@ internal static class GetAdminProductBySlugEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("by-slug/{productSlug}", Handle)
             .WithName("getAdminProductBySlug")
+            .WithSummary("Get one admin product by slug")
             .Produces<AdminProductDetailsDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

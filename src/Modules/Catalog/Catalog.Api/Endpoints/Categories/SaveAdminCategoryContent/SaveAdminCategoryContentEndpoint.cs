@@ -10,6 +10,8 @@ internal static class SaveAdminCategoryContentEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/content/{lang}", Handle)
+            .WithName("saveAdminCategoryContent")
+            .WithSummary("Replace the SEO text and FAQ of a category in one language")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCategoryContentItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

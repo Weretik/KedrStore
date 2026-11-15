@@ -8,6 +8,7 @@ internal static class GetOrderByIdEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{orderId:long}", Handle)
             .WithName("getAdminOrderById")
+            .WithSummary("Get one persisted manager order")
             .Produces<GetAdminOrderDetailResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

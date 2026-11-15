@@ -8,6 +8,7 @@ internal static class GetMyWorkReportEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("report", Handle)
             .WithName("getMyWorkReport")
+            .WithSummary("The caller's own report")
             .Produces<WorkReportDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

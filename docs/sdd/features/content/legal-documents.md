@@ -48,4 +48,4 @@ Tables `content."LegalDocumentVersions"` and `content."LegalDocumentTexts"`; see
 ## Related sources
 
 - [Specification](../../specs/content/004-legal-documents/README.md)
-- [Contract](../../contracts/content/documents.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

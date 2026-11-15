@@ -9,6 +9,7 @@ internal static class GetMediaFilesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminMediaFiles")
+            .WithSummary("A page of files by name")
             .Produces<MediaFilePage>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

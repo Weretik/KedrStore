@@ -9,6 +9,7 @@ internal static class RenameAdminProductGroupEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}", Handle)
             .WithName("renameAdminProductGroup")
+            .WithSummary("Rename a group")
             .Produces<AdminProductGroupDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

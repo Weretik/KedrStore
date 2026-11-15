@@ -8,6 +8,7 @@ internal static class RetryOrderSyncEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{orderId:long}/sync/retry", Handle)
             .WithName("retryAdminOrderSync")
+            .WithSummary("Schedule a failed order for another 1C delivery cycle")
             .Produces<RetryAdminOrderSyncResponse>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

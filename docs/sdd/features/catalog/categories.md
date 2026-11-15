@@ -67,4 +67,4 @@ Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualif
 
 ## Related sources
 
-[Contract](../../contracts/catalog/category-read.openapi.yaml) · [Stable URLs and category content SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md) · [Category read SDD](../../specs/catalog/002-category-read-api/README.md) · [Category metadata SDD](../../specs/catalog/001-category-presentation-metadata/README.md).
+[Contract](../../contracts/openapi.json) · [Stable URLs and category content SDD](../../specs/catalog/005-stable-urls-and-category-content/README.md) · [Category read SDD](../../specs/catalog/002-category-read-api/README.md) · [Category metadata SDD](../../specs/catalog/001-category-presentation-metadata/README.md).

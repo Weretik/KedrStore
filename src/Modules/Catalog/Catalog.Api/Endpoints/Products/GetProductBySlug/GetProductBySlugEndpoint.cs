@@ -8,6 +8,8 @@ internal static class GetProductBySlugEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("product/{productSlug}", Handle)
+            .WithName("getPublicProductBySlug")
+            .WithSummary("Get a public product by slug")
             .Produces<ProductBySlugDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<CatalogRedirect>(StatusCodes.Status404NotFound);

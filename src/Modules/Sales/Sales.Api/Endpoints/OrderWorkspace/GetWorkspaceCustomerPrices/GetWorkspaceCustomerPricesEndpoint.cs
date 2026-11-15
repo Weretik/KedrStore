@@ -9,7 +9,8 @@ internal static class GetWorkspaceCustomerPricesEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("customer-prices", Handle)
-            .WithName("getAdminWorkspaceCustomerPrices");
+            .WithName("getAdminWorkspaceCustomerPrices")
+            .WithSummary("Read a customer's unit prices for products, ignoring stock");
 
     private static async Task<IResult> Handle(
         [FromBody] WorkspaceCustomerPricesRequest request, ISender sender, HttpContext http,

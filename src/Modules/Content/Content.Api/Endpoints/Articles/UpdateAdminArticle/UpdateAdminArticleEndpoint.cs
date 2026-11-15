@@ -11,6 +11,7 @@ internal static class UpdateAdminArticleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:long}", Handle)
             .WithName("updateAdminArticle")
+            .WithSummary("Replace an article's slug, date, publication flag, and both texts")
             .Produces<AdminArticleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

@@ -11,6 +11,7 @@ internal static class CreateAdminLegalDocumentDraftEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{kind}/versions", Handle)
             .WithName("createAdminLegalDocumentDraft")
+            .WithSummary("Start a draft")
             .Produces<LegalDocumentVersionResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

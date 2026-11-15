@@ -9,6 +9,7 @@ internal static class GetMediaFolderTreeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminMediaFolders")
+            .WithSummary("All folders with file counts")
             .Produces<MediaFolderTree>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

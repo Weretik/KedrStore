@@ -12,6 +12,7 @@ internal static class UpdateMediaFolderEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:long}", Handle)
             .WithName("updateAdminMediaFolder")
+            .WithSummary("Rename a folder and set its parent")
             .Produces<MediaFolderItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

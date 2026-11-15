@@ -39,8 +39,7 @@ flowchart LR
 
 - [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input. Filter `FullyQualifiedName~QuickOrder`.
 - [QuickOrderTelegramCaptionTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTelegramCaptionTests.cs): HTML escaping, order id, Kyiv time, file name.
-- [OpenApiSnapshotTests](../../../../tests/IntegrationTests/Platform/Api/OpenApiSnapshotTests.cs): the contract did not change when the order moved from Catalog.
 
 ## Related sources
 
-[Contract](../../contracts/sales/quick-orders.openapi.yaml) · [Outbox](../../architecture/platform/building-blocks/infrastructure.md) · [Sales orders](admin-orders.md).
+[Contract](../../contracts/openapi.json) · [Outbox](../../architecture/platform/building-blocks/infrastructure.md) · [Sales orders](admin-orders.md).

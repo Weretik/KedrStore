@@ -9,6 +9,7 @@ internal static class UploadMyAvatarEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("avatar", Handle)
             .WithName("uploadMyAvatar")
+            .WithSummary("Upload the own avatar")
             .AsAvatarUpload()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden);

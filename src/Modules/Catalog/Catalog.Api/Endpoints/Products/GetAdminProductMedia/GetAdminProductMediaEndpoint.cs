@@ -10,6 +10,7 @@ internal static class GetAdminProductMediaEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}/media", Handle)
             .WithName("getAdminProductMedia")
+            .WithSummary("Get the photos and the scheme linked to a product")
             .RequireAuthorization(PolicyNames.CanManageMedia)
             .Produces<ProductMediaDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

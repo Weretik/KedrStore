@@ -11,6 +11,7 @@ internal static class ListAdminPageSeoEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("listAdminPageSeo")
+            .WithSummary("List every site page with its texts")
             .Produces<IReadOnlyList<AdminPageSeoResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

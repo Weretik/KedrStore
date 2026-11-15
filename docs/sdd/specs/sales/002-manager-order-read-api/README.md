@@ -19,7 +19,7 @@
 - [Infrastructure](design/infrastructure.md)
 - [Модель даних](data-model.md)
 - [Контракт API](contracts/api-contract.md)
-- [Версіонований OpenAPI](../../../contracts/sales/manager-order-read.openapi.yaml)
+- [Версіонований OpenAPI](../../../contracts/openapi.json)
 
 ## Планування та постачання
 
@@ -31,7 +31,7 @@
 ## Пов'язана документація
 
 - [Замовлення адміністратора та синхронізація з 1С](../001-admin-order-one-c-sync/README.md)
-- [Чинний агрегований контракт API](../../../contracts/openapi.yaml)
+- [Чинний агрегований контракт API](../../../contracts/openapi.json)
 - [Відповідальність модуля Sales](../../../architecture/overview/modules.md)
 
 ## Історія змін

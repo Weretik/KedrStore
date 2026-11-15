@@ -11,6 +11,7 @@ internal static class GrantStaffAccessEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{userId:guid}/staff-access", Handle)
             .WithName("grantStaffAccess")
+            .WithSummary("Give an existing account a staff role and a password")
             .Produces<StaffAccountResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

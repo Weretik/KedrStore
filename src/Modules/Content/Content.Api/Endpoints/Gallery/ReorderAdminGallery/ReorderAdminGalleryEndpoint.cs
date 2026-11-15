@@ -11,6 +11,7 @@ internal static class ReorderAdminGalleryEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("order", Handle)
             .WithName("reorderAdminGallery")
+            .WithSummary("Save the order of all cards")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);

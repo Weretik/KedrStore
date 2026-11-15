@@ -12,6 +12,7 @@ internal static class GetAdminSiteShowcaseEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("showcase", Handle)
             .WithName("getAdminSiteShowcase")
+            .WithSummary("«Вітрина сайту» - models with their on-site products, variant values, and problems")
             .Produces<SiteShowcaseListDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

@@ -8,6 +8,7 @@ internal static class ChangeStaffRoleEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/role", Handle)
             .WithName("changeStaffRole")
+            .WithSummary("Change a staff account's role")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

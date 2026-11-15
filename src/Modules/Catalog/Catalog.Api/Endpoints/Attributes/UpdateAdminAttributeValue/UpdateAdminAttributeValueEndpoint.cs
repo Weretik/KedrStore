@@ -10,6 +10,7 @@ internal static class UpdateAdminAttributeValueEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/values/{valueId:int}", Handle)
             .WithName("updateAdminAttributeValue")
+            .WithSummary("Edit a value (Admin)")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCatalogAttributeDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

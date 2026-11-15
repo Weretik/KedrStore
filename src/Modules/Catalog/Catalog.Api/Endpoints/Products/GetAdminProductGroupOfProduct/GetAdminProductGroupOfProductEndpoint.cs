@@ -9,6 +9,7 @@ internal static class GetAdminProductGroupOfProductEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}/group", Handle)
             .WithName("getAdminProductGroupOfProduct")
+            .WithSummary("Get the group of a product")
             .Produces<AdminProductGroupMembershipDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

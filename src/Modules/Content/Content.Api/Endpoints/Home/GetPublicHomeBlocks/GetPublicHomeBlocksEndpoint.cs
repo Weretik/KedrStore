@@ -11,6 +11,7 @@ internal static class GetPublicHomeBlocksEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/home", Handle)
             .WithName("getPublicHomeBlocks")
+            .WithSummary("Get the home page FAQ and brands in one language")
             .Produces<PublicHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

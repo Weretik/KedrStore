@@ -11,6 +11,7 @@ internal static class GetWorkspaceOverviewEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("overview", Handle)
             .WithName("getAdminWorkspaceOverview")
+            .WithSummary("Orders today, drafts, 1C problems and the newest orders")
             .Produces<WorkspaceOverview>();
 
     /// <summary>Counts and short lists for the admin «Огляд»; «today» is the current Kyiv day.</summary>

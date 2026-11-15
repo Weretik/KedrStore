@@ -9,6 +9,7 @@ internal static class GetAdminCategoryAttributeFiltersEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("category-filters/{categoryId:int}", Handle)
             .WithName("getAdminCategoryAttributeFilters")
+            .WithSummary("«Фільтри категорій» of one category")
             .Produces<List<AdminCategoryAttributeFilterDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden)
             .ProducesProblem(StatusCodes.Status404NotFound);

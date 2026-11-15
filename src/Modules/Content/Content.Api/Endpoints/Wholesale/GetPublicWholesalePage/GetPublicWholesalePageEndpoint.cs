@@ -11,6 +11,7 @@ internal static class GetPublicWholesalePageEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/wholesale", Handle)
             .WithName("getPublicWholesalePage")
+            .WithSummary("Get the page texts in one language")
             .Produces<PublicWholesalePageResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

@@ -9,6 +9,7 @@ internal static class RestoreAdminProductAttributeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("attributes/{attributeId:int}/manual", Handle)
             .WithName("restoreAdminProductAttribute")
+            .WithSummary("«Повернути автоматичне»")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

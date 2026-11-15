@@ -11,6 +11,7 @@ internal static class GetAdminSiteSeoSettingsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminSiteSeoSettings")
+            .WithSummary("Read the settings for editing")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

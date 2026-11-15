@@ -9,6 +9,7 @@ internal static class GetMyWorkTasksEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("tasks", Handle)
             .WithName("getMyWorkTasks")
+            .WithSummary("The caller's board")
             .Produces<IReadOnlyList<WorkTaskDto>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

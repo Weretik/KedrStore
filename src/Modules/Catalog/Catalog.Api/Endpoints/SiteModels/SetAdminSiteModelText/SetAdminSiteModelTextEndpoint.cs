@@ -9,6 +9,7 @@ internal static class SetAdminSiteModelTextEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/texts/{language}", Handle)
             .WithName("setAdminSiteModelText")
+            .WithSummary("Save the model's texts in one language")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

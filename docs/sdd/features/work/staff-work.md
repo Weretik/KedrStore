@@ -55,7 +55,7 @@ flowchart LR
 
 ## Data
 
-[Work: tasks and activity](../../architecture/data-model/work-tasks.md). Contract: [work.openapi.yaml](../../contracts/work/work.openapi.yaml).
+[Work: tasks and activity](../../architecture/data-model/work-tasks.md). Contract: [OpenAPI](../../contracts/openapi.json).
 
 ## Tests
 

@@ -51,4 +51,4 @@ Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filte
 
 ## Related sources
 
-[Contract](../../contracts/catalog/public-site-models.openapi.yaml) · [Catalog attributes and admin models](attributes.md) · [Spec 007](../../specs/catalog/007-site-models/README.md).
+[Contract](../../contracts/openapi.json) · [Catalog attributes and admin models](attributes.md) · [Spec 007](../../specs/catalog/007-site-models/README.md).

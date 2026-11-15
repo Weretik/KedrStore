@@ -11,6 +11,7 @@ internal static class UpdateAdminCompanyRequisitesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("", Handle)
             .WithName("updateAdminCompanyRequisites")
+            .WithSummary("Replace all company requisites")
             .Produces<CompanyRequisitesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

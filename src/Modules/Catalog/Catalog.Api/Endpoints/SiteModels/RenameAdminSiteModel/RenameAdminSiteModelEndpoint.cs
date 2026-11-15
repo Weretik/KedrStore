@@ -9,6 +9,7 @@ internal static class RenameAdminSiteModelEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}", Handle)
             .WithName("renameAdminSiteModel")
+            .WithSummary("Rename a model")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

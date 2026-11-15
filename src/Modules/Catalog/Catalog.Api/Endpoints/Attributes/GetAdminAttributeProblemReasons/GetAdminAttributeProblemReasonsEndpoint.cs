@@ -9,6 +9,7 @@ internal static class GetAdminAttributeProblemReasonsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("problem-reasons", Handle)
             .WithName("getAdminAttributeProblemReasons")
+            .WithSummary("Review reasons of on-site products, most frequent first")
             .Produces<List<AdminProblemReasonDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

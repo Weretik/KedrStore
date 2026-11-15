@@ -12,6 +12,7 @@ internal static class UploadAdminAttributeSwatchEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("swatches", Handle)
             .WithName("uploadAdminAttributeSwatch")
+            .WithSummary("Upload a color or decor picture for a value (Admin)")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .WithMetadata(
                 new RequestSizeLimitAttribute(SwatchRequestLimit),

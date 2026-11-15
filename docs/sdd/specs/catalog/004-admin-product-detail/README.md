@@ -4,7 +4,7 @@
 
 ## Goal and boundaries
 
-Provide a read-only API for one product for the Admin details page. The existing [public endpoint by slug](../../../contracts/catalog/products.openapi.yaml) returns a name in only one language and omits some Admin flags; the new route returns both names, scheme, and state without depending on whether the product is available in the public catalog. Editing, deletion, changes to 1C import, database schema, and image URL checks are out of scope.
+Provide a read-only API for one product for the Admin details page. The existing [public endpoint by slug](../../../contracts/openapi.json) returns a name in only one language and omits some Admin flags; the new route returns both names, scheme, and state without depending on whether the product is available in the public catalog. Editing, deletion, changes to 1C import, database schema, and image URL checks are out of scope.
 
 ## Rules
 
@@ -32,7 +32,7 @@ Provide a read-only API for one product for the Admin details page. The existing
 | Access | Current explicit anonymous access on `AdminProductsController`; no new authorization scheme in this increment |
 | Idempotency | Safe GET; no key required |
 
-The operation and schema were added to the [module OpenAPI](../../../contracts/catalog/products.openapi.yaml), and its route `$ref` to [aggregated OpenAPI](../../../contracts/openapi.yaml). The contract is additive; current list DTOs and public product DTO do not change. A public URL example using the slug belongs to frontend site configuration/routing, not the backend response.
+The operation and schema were added to the [module OpenAPI](../../../contracts/openapi.json), and its route `$ref` to [aggregated OpenAPI](../../../contracts/openapi.json). The contract is additive; current list DTOs and public product DTO do not change. A public URL example using the slug belongs to frontend site configuration/routing, not the backend response.
 
 ## Design and data
 

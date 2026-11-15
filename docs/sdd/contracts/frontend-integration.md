@@ -1,10 +1,10 @@
 # Frontend integration with the KedrStore API
 
-The versioned OpenAPI entry point is [openapi.yaml](openapi.yaml). Generate types and clients from this file; do not copy DTOs from backend source code.
+The versioned OpenAPI entry point is [openapi.json](openapi.json). Generate types and clients from this file; do not copy DTOs from backend source code.
 
 ## Authentication
 
-Each client signs in its own way; see the [session contract](identity/session.openapi.yaml).
+Each client signs in its own way; see the session operations in [openapi.json](openapi.json).
 
 **Admin and storefront (browser).** Call `POST /api/auth/cookie/login` with `credentials: 'include'`. The API sets the HttpOnly session cookie `__Host-kedr.session` and the readable `kedr.csrf` cookie; no token reaches JavaScript. Send every request with `credentials: 'include'`. Every request that is not `GET`, `HEAD`, or `OPTIONS` must carry `X-CSRF-Token` equal to the current `kedr.csrf` cookie, otherwise `400`. `GET /api/auth/session/me` returns the user and reissues a missing CSRF cookie. Sign out with `POST /api/auth/cookie/logout`.
 

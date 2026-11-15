@@ -7,7 +7,8 @@ internal static class DeleteWorkspaceDraftEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("drafts/{draftId:long}", Handle)
-            .WithName("deleteAdminOrderDraft");
+            .WithName("deleteAdminOrderDraft")
+            .WithSummary("Delete one draft and its lines");
 
     // A missing If-Match binds as empty; the validator answers 400.
     private static async Task<IResult> Handle(

@@ -33,7 +33,7 @@ A new module `Content` (Domain, Application, Infrastructure, Api) under the [mod
 
 ## Design
 
-Contract: [articles.openapi.yaml](../../../contracts/content/articles.openapi.yaml). Feature card: [Site articles](../../../features/content/articles.md). Data: [Content articles](../../../architecture/data-model/content-articles.md).
+Contract: [OpenAPI](../../../contracts/openapi.json). Feature card: [Site articles](../../../features/content/articles.md). Data: [Content articles](../../../architecture/data-model/content-articles.md).
 
 Covers are stored in PostgreSQL (`bytea`, tens of KB each) instead of the CDN: no new FTP account is needed and the cover version makes caching safe. The seed reads WebP covers embedded in `Content.Infrastructure`.
 

@@ -11,6 +11,7 @@ internal static class GetPublicGalleryEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/gallery", Handle)
             .WithName("getPublicGallery")
+            .WithSummary("Get the site gallery in one language")
             .Produces<IReadOnlyList<PublicGalleryItemResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

@@ -8,6 +8,7 @@ internal static class SearchStaffCandidatesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("candidates", Handle)
             .WithName("searchStaffCandidates")
+            .WithSummary("Find existing accounts without staff access")
             .Produces<IReadOnlyList<StaffCandidateResponse>>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

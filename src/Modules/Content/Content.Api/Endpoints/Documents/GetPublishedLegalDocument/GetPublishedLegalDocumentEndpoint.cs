@@ -11,6 +11,7 @@ internal static class GetPublishedLegalDocumentEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{lang}/documents/{kind}", Handle)
             .WithName("getPublishedLegalDocument")
+            .WithSummary("Get the published edition of a document")
             .Produces<PublishedLegalDocumentResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

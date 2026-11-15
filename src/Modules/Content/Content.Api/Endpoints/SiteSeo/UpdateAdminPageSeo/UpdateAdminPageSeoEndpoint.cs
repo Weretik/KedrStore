@@ -11,6 +11,7 @@ internal static class UpdateAdminPageSeoEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{page}", Handle)
             .WithName("updateAdminPageSeo")
+            .WithSummary("Replace the texts of one page")
             .Produces<AdminPageSeoResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

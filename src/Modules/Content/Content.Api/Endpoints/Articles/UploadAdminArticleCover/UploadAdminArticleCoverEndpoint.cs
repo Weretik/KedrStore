@@ -14,6 +14,7 @@ internal static class UploadAdminArticleCoverEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("covers", Handle)
             .WithName("uploadAdminArticleCover")
+            .WithSummary("Upload a cover picture before saving the article")
             .WithMetadata(
                 new RequestSizeLimitAttribute(CoverRequestLimit),
                 new RequestFormLimitsAttribute { MultipartBodyLengthLimit = CoverRequestLimit })

@@ -9,6 +9,7 @@ internal static class UpdateMediaFileEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:long}", Handle)
             .WithName("updateAdminMediaFile")
+            .WithSummary("Rename a file and set its folder")
             .Produces<MediaFileItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

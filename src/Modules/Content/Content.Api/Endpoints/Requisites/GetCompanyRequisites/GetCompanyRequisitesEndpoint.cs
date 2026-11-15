@@ -11,6 +11,7 @@ internal static class GetCompanyRequisitesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getCompanyRequisites")
+            .WithSummary("Get the company requisites")
             .Produces<CompanyRequisitesResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

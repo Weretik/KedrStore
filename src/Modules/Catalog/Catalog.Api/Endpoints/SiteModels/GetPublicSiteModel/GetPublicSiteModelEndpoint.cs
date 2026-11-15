@@ -9,6 +9,7 @@ internal static class GetPublicSiteModelEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("model/{modelSlug}", Handle)
             .WithName("getPublicSiteModel")
+            .WithSummary("The model page")
             .Produces<PublicSiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<PublicSiteModelAddressDto>(StatusCodes.Status404NotFound);

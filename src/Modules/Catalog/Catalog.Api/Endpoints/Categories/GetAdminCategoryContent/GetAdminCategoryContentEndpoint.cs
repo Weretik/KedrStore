@@ -9,6 +9,8 @@ internal static class GetAdminCategoryContentEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("{id:int}/content", Handle)
+            .WithName("getAdminCategoryContent")
+            .WithSummary("Get the SEO text and FAQ of a category in every language")
             .Produces<AdminCategoryContentResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

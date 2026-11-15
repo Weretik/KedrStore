@@ -9,6 +9,7 @@ internal static class ChangeMyPasswordEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("password", Handle)
             .WithName("changeMyPassword")
+            .WithSummary("Change the own password (administrators)")
             .RequireAuthorization(PolicyNames.RequireAdminRole)
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)

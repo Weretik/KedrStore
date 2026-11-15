@@ -38,4 +38,4 @@ Table `content."PageSeo"`; see the [database map](../../architecture/data-model/
 ## Related sources
 
 - [Specification](../../specs/content/010-page-seo/README.md)
-- [Contract](../../contracts/content/page-seo.openapi.yaml)
+- [Contract](../../contracts/openapi.json)

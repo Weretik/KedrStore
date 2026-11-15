@@ -11,6 +11,7 @@ internal static class UpdateAdminSiteSeoSettingsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("", Handle)
             .WithName("updateAdminSiteSeoSettings")
+            .WithSummary("Replace all settings")
             .Produces<AdminSiteSeoSettingsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

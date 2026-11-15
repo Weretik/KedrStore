@@ -125,7 +125,7 @@ src/Modules/Catalog/
     └── Migrations/*_CatalogProductGroups.cs  # new tables only
 ```
 
-Contract: [product-groups.openapi.yaml](../../../contracts/catalog/product-groups.openapi.yaml). The import job ends with the group build, so the existing Cloud Run jobs `catalog-attributes-import-dry-run` and `-apply` also build the groups.
+Contract: [OpenAPI](../../../contracts/openapi.json). The import job ends with the group build, so the existing Cloud Run jobs `catalog-attributes-import-dry-run` and `-apply` also build the groups.
 
 ## Code (phase 3, backend)
 
@@ -143,7 +143,7 @@ src/Modules/Catalog/
 └── Catalog.Infrastructure/Migrations/*_CatalogAttributesAdmin.cs  # 5 nullable columns, 1 FK
 ```
 
-Contract: [attributes.openapi.yaml](../../../contracts/catalog/attributes.openapi.yaml); `problemsOnly`, `problemReason`, and the row fields in [products.openapi.yaml](../../../contracts/catalog/products.openapi.yaml); counts in [admin-overview.openapi.yaml](../../../contracts/catalog/admin-overview.openapi.yaml).
+Contract: [OpenAPI](../../../contracts/openapi.json); `problemsOnly`, `problemReason`, and the row fields in [OpenAPI](../../../contracts/openapi.json); counts in [OpenAPI](../../../contracts/openapi.json).
 
 ## Code (phase 4)
 

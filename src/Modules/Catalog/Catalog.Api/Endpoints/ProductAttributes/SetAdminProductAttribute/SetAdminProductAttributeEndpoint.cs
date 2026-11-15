@@ -9,6 +9,7 @@ internal static class SetAdminProductAttributeEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("attributes/{attributeId:int}", Handle)
             .WithName("setAdminProductAttribute")
+            .WithSummary("Set the values of one attribute by hand")
             .Produces<AdminProductAttributesDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

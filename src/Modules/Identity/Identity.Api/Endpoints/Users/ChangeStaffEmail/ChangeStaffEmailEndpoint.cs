@@ -8,6 +8,7 @@ internal static class ChangeStaffEmailEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/email", Handle)
             .WithName("changeStaffEmail")
+            .WithSummary("Change a manager's sign-in email")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)

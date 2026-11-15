@@ -9,6 +9,7 @@ internal static class SetAdminProductGroupMainEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/main", Handle)
             .WithName("setAdminProductGroupMain")
+            .WithSummary("Choose the main product («Зробити головним»)")
             .Produces<AdminProductGroupDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

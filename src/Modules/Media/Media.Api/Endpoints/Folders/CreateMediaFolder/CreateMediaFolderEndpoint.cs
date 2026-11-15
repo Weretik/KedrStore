@@ -12,6 +12,7 @@ internal static class CreateMediaFolderEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminMediaFolder")
+            .WithSummary("Create a folder")
             .Produces<MediaFolderItem>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);

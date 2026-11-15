@@ -9,6 +9,7 @@ internal static class SetMyWorkTaskStepEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("tasks/{id:long}/steps/{index:int}", Handle)
             .WithName("setMyWorkTaskStep")
+            .WithSummary("Tick or untick one step of an own task")
             .Produces<WorkTaskDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);

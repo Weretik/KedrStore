@@ -11,6 +11,7 @@ internal static class GetAdminGalleryEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminGallery")
+            .WithSummary("List the gallery cards with previews")
             .Produces<IReadOnlyList<AdminGalleryItemResponse>>();
 
     private static async Task<IResult> Handle(ISender sender, HttpContext http, CancellationToken cancellationToken)

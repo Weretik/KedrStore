@@ -9,6 +9,7 @@ internal static class CreateAdminSiteModelEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
             .WithName("createAdminSiteModel")
+            .WithSummary("Create a model («Нова модель»)")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden);

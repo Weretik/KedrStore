@@ -8,6 +8,7 @@ internal static class DeleteAdminLegalDocumentDraftEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("versions/{id:long}", Handle)
             .WithName("deleteAdminLegalDocumentDraft")
+            .WithSummary("Delete a draft")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);

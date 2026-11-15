@@ -11,6 +11,7 @@ internal static class CookieLoginEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("login", Handle)
             .WithName("loginCookieSession")
+            .WithSummary("Sign a browser in with the session cookie")
             .AllowAnonymous()
             .RequireRateLimiting("AuthLogin")
             .Produces<SessionMeResponse>()

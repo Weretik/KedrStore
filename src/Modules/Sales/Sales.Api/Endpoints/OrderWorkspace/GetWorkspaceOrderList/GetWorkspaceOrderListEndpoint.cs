@@ -7,7 +7,8 @@ internal static class GetWorkspaceOrderListEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("orders", Handle)
-            .WithName("getAdminWorkspaceOrders");
+            .WithName("getAdminWorkspaceOrders")
+            .WithSummary("Search persisted Admin orders");
 
     private static async Task<IResult> Handle(
         ISender sender, HttpContext http,

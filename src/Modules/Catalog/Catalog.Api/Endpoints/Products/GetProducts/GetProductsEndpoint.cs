@@ -9,8 +9,12 @@ internal static class GetProductsEndpoint
     /// <summary>Maps the whole catalog list and the list of one category (with its subcategories).</summary>
     public static void Map(RouteGroupBuilder group)
     {
-        Describe(group.MapGet("products", HandleAll));
-        Describe(group.MapGet("{categorySlug}/products", HandleCategory));
+        Describe(group.MapGet("products", HandleAll)
+            .WithName("getPublicProducts")
+            .WithSummary("List public products"));
+        Describe(group.MapGet("{categorySlug}/products", HandleCategory)
+            .WithName("getPublicProductsByCategorySlug")
+            .WithSummary("List public products in a category"));
     }
 
     private static void Describe(RouteHandlerBuilder endpoint) =>

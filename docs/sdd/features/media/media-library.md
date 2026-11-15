@@ -65,6 +65,6 @@ Tables `media."MediaFolders"` and `media."MediaFiles"`; see the [database map](.
 ## Related sources
 
 - [Specification](../../specs/media/001-media-library/README.md)
-- [Contract](../../contracts/media/media.openapi.yaml)
+- [Contract](../../contracts/openapi.json)
 - [CDN sync runbook](../../operations/jobs/media-cdn-sync-runbook.md)
 - Used by [product photos and schemes](../catalog/product-media.md) through `Media.Contracts` (`IMediaFileDirectory`, `IMediaFileChangeListener`); replace and delete call the listeners after the save.

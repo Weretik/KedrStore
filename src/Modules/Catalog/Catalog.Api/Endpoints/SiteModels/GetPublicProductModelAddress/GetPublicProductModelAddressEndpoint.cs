@@ -10,6 +10,7 @@ internal static class GetPublicProductModelAddressEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("product/{productSlug}/model", Handle)
             .WithName("getPublicProductModelAddress")
+            .WithSummary("The model address of an old product address")
             .Produces<PublicSiteModelAddressDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<CatalogRedirect>(StatusCodes.Status404NotFound);

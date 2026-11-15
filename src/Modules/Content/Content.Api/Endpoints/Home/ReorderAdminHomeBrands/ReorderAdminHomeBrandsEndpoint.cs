@@ -11,6 +11,7 @@ internal static class ReorderAdminHomeBrandsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("brands/order", Handle)
             .WithName("reorderAdminHomeBrands")
+            .WithSummary("Save the order of all brands")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status409Conflict);

@@ -11,6 +11,7 @@ internal static class PreviewAdminGalleryYoutubeVideoEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("youtube-preview", Handle)
             .WithName("previewAdminGalleryYoutubeVideo")
+            .WithSummary("Resolve a pasted YouTube link before adding it")
             .Produces<YoutubePreviewResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

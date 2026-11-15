@@ -10,6 +10,7 @@ internal static class GetMobileCatalogSnapshotEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getMobileCatalogSnapshot")
+            .WithSummary("Products, prices, categories and price types for offline work")
             .Produces<CatalogSnapshotResponse>()
             .Produces(StatusCodes.Status304NotModified)
             .ProducesProblem(StatusCodes.Status401Unauthorized)

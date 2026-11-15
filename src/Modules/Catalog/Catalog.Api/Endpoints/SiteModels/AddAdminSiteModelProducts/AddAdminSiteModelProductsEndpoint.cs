@@ -9,6 +9,7 @@ internal static class AddAdminSiteModelProductsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{id:int}/products", Handle)
             .WithName("addAdminSiteModelProducts")
+            .WithSummary("Add products to a model")
             .Produces<SiteModelDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

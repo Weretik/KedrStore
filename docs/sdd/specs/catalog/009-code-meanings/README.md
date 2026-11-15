@@ -31,7 +31,7 @@ New table `CatalogAttributeAliasMeanings` (`Id`, `AliasId`, `CategoryId` nullabl
 | Read meanings (CM-05) | `Catalog.Application/Features/Attributes/Common/CodeMeaningReader.cs`, `UnresolvedCodeReader.cs`, `GetCodeProducts/` |
 | Decide (CM-01, CM-02) | `Catalog.Application/Features/Attributes/DecideCode/` |
 | Apply (CM-03, CM-04) | `Catalog.Application/Attributes/Import/CodeMeanings.cs`, `Attributes/Recognition/RecognitionRow.cs` (`FoundCodes`), `ProductNameRecognition.Lexical.cs`, `Jobs/Attributes/RecognizeCatalogAttributesJob.cs` |
-| Contract | `Catalog.Contracts/Attributes/CatalogAttributeDtos.cs`, [attributes.openapi.yaml](../../../contracts/catalog/attributes.openapi.yaml) |
+| Contract | `Catalog.Contracts/Attributes/CatalogAttributeDtos.cs`, [OpenAPI](../../../contracts/openapi.json) |
 
 ## Scenarios and evidence
 

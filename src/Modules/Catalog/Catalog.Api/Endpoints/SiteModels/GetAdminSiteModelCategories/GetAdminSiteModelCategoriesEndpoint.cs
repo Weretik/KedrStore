@@ -9,6 +9,7 @@ internal static class GetAdminSiteModelCategoriesEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("categories", Handle)
             .WithName("getAdminSiteModelCategories")
+            .WithSummary("Category tree with models and problems, for «Моделі» and «Вітрина сайту»")
             .Produces<List<SiteModelCategoryDto>>()
             .ProducesProblem(StatusCodes.Status403Forbidden);
 

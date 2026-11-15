@@ -11,6 +11,7 @@ internal static class GetAdminCompanyContactsEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
             .WithName("getAdminCompanyContacts")
+            .WithSummary("Get the company contacts for editing")
             .Produces<AdminCompanyContactsResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 

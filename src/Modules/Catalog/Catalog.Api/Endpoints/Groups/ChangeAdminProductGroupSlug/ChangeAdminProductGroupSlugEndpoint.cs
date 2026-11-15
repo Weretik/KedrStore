@@ -10,6 +10,7 @@ internal static class ChangeAdminProductGroupSlugEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/slug", Handle)
             .WithName("changeAdminProductGroupSlug")
+            .WithSummary("Change a group slug")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<ChangeSlugResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

@@ -9,6 +9,7 @@ internal static class SetAdminProductGroupOfProductEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{id:int}/group", Handle)
             .WithName("setAdminProductGroupOfProduct")
+            .WithSummary("Move a product to a group, out of groups, or back to automatic grouping")
             .Produces<AdminProductGroupMembershipDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status403Forbidden)

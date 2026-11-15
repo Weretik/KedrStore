@@ -11,6 +11,7 @@ internal static class MoveLegacyAdminArticleCoversEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("covers/move-legacy", Handle)
             .WithName("moveLegacyAdminArticleCovers")
+            .WithSummary("Move covers saved before Content 008 to the CDN")
             .Produces<LegacyArticleCoversMovedResponse>()
             .Produces(StatusCodes.Status503ServiceUnavailable);
 

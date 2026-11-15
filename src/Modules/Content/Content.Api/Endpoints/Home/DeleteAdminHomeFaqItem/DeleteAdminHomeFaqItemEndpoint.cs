@@ -11,6 +11,7 @@ internal static class DeleteAdminHomeFaqItemEndpoint
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapDelete("faq/{id:long}", Handle)
             .WithName("deleteAdminHomeFaqItem")
+            .WithSummary("Remove a question")
             .Produces<AdminHomeBlocksResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 
