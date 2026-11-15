@@ -9,12 +9,16 @@ namespace BuildingBlocks.Infrastructure.Outbox.Persistence;
 /// </summary>
 public sealed class OutboxWriter(OutboxMessageTypes types, TimeProvider clock)
 {
+    /// <param name="id">
+    /// A message id the caller already has, when the message stands for one business fact that must be stored once (a
+    /// quick order is stored under its order id, so the primary key rejects a repeat). Otherwise a new id.
+    /// </param>
     /// <returns>The message id, for the attempt right after the commit.</returns>
-    public Guid Add(DbContext dbContext, IOutboxMessage message)
+    public Guid Add(DbContext dbContext, IOutboxMessage message, Guid? id = null)
     {
         var type = types.Of(message);
         var payload = JsonSerializer.Serialize(message, type.MessageType, OutboxMessageType.Json);
-        var row = OutboxMessage.Create(Guid.CreateVersion7(), type.Name, payload, clock.GetUtcNow());
+        var row = OutboxMessage.Create(id ?? Guid.CreateVersion7(), type.Name, payload, clock.GetUtcNow());
         dbContext.Set<OutboxMessage>().Add(row);
         return row.Id;
     }

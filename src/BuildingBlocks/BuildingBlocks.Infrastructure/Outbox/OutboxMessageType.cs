@@ -16,6 +16,11 @@ public sealed class OutboxMessageType(
 
     public Type MessageType { get; } = messageType;
 
+    /// <summary>A stored payload read back, for a module that looks up its own message (a repeated request).</summary>
+    public static TMessage? ReadPayload<TMessage>(string payload)
+        where TMessage : IOutboxMessage
+        => JsonSerializer.Deserialize<TMessage>(payload, Json);
+
     internal Task HandleAsync(IServiceProvider services, string payload, Guid messageId, CancellationToken cancellationToken)
         => handle(services, payload, messageId, cancellationToken);
 

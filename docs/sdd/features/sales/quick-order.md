@@ -1,12 +1,14 @@
 # Site quick order
 
-**Static code check:** 2026-11-14. **Module:** Sales. **Spec:** [platform 006, R-007](../../specs/platform/006-transactional-outbox/README.md).
+**Static code check:** 2026-11-15. **Module:** Sales. **Spec:** [platform 006, R-007](../../specs/platform/006-transactional-outbox/README.md).
 
 Public `POST /api/orders`: a buyer without an account sends a name, a phone and cart lines. The order is stored as an outbox message and sent to the managers' Telegram chat as an Excel file. Anonymous, rate-limited (`QuickOrder`: 60 per 10 minutes per calling address).
 
 ## Structure and relationships
 
 [QuickOrdersEndpoints](../../../../src/Modules/Sales/Sales.Api/Endpoints/QuickOrders/QuickOrdersEndpoints.cs) maps the request to `PlaceQuickOrderCommand`. [PlaceQuickOrderValidator](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderValidator.cs) checks it (400 with field errors `FirstName`, `Phone`, `Lines`). [PlaceQuickOrderHandler](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/Commands/PlaceQuickOrder/PlaceQuickOrderHandler.cs) saves a `QuickOrderPlaced` message in `sales."OutboxMessages"` and tries to send it once after the commit. The buyer gets 200 with the order id even when Telegram is down: the row waits for the next outbox dispatch, which retries it (1, 5, 15, 30, 60 minutes, then hourly; failed after 10 attempts). Until the scheduled dispatch runs (spec 006, TS-004), a failed row waits in the table.
+
+**Repeats ([idempotency rules](../../standards/idempotency-rules.md)).** The site sends an optional `Idempotency-Key` made once per order attempt and reuses it when it sends the same order again (a second press, a retry after a timeout). The key becomes the order id and the outbox message id, so the outbox primary key rejects a second copy: a repeat, also one that loses the race, answers 200 with the first order id and sends nothing to Telegram again; the same key with other data answers 409 (problem `conflict`, detail «Це замовлення вже надіслано з іншими даними. Оновіть сторінку.»). Repeats are recognised while the row is kept (30 days). Without the header every request is a new order.
 
 The quick order is not a Sales [Order](../../../../src/Modules/Sales/Sales.Domain/Orders/Order.cs) and is not sent to 1C; managers work it from the Excel file. Processed rows, with the phone number, are deleted after 30 days.
 
@@ -16,10 +18,10 @@ The quick order is not a Sales [Order](../../../../src/Modules/Sales/Sales.Domai
 src/Modules/Sales/
 ├── Sales.Api/Endpoints/QuickOrders/                      # route, tag Order, request/response records (OpenAPI names)
 ├── Sales.Application/Features/QuickOrders/
-│   ├── Commands/PlaceQuickOrder/                         # command, validator, handler
+│   ├── Commands/PlaceQuickOrder/                         # command, validator, handler, errors (idempotency conflict)
 │   └── Messages/                                         # QuickOrderPlaced (outbox type "sales.quick-order-placed"), QuickOrderLine
 ├── Sales.Application/Abstractions/QuickOrders/IQuickOrderStore.cs
-└── Sales.Infrastructure/QuickOrders/                     # store (outbox write), Excel file, Telegram caption and sender
+└── Sales.Infrastructure/QuickOrders/                     # store (outbox write under the order id, find a repeat), Excel file, Telegram caption and sender
 ```
 
 ## Structure diagram
@@ -37,7 +39,8 @@ flowchart LR
 
 ## Tests
 
-- [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input. Filter `FullyQualifiedName~QuickOrder`.
+- [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input, a repeat and two parallel copies with one `Idempotency-Key` store and send one order, the same key with other lines answers 409. Filter `FullyQualifiedName~QuickOrder`.
+- [PlaceQuickOrderRepeatTests](../../../../tests/UnitTests/Sales/QuickOrders/PlaceQuickOrderRepeatTests.cs): the key is the order id, a repeat returns it without saving or sending, other data is a conflict, the loser of a race answers with the winner.
 - [QuickOrderTelegramCaptionTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTelegramCaptionTests.cs): HTML escaping, order id, Kyiv time, file name.
 - [OpenApiSnapshotTests](../../../../tests/IntegrationTests/Platform/Api/OpenApiSnapshotTests.cs): the contract did not change when the order moved from Catalog.
 

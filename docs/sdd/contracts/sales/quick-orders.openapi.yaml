@@ -7,7 +7,17 @@ paths:
       summary: Create a quick order
       tags: [Orders]
       security: []
-      description: Creates a quick order. This endpoint is currently anonymous and does not implement an Idempotency-Key contract; disable duplicate submission in the frontend.
+      description: >-
+        Creates a quick order (anonymous). Send an Idempotency-Key made once per order attempt and reuse it when the
+        same order is sent again (a second press, a retry after a timeout): the repeat answers 200 with the first
+        order id and nothing is sent to Telegram again. The key becomes the order id. The same key with other data
+        answers 409 (problem code `conflict` with a Ukrainian detail). Without the header every request is a new order.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string, format: uuid }
+          description: One key per order attempt; kept while the stored order is kept (outbox retention, 30 days).
       requestBody:
         required: true
         content:
@@ -16,7 +26,7 @@ paths:
       responses:
         '200': { description: Created order, content: { application/json: { schema: { $ref: '#/components/schemas/QuickOrderResponse' } } } }
         '400': { description: Input validation failed }
-        '409': { description: Business conflict, content: { application/json: { schema: { type: array, items: { type: string } } } } }
+        '409': { description: The Idempotency-Key was already used with other data (code conflict), content: { application/problem+json: { schema: { $ref: '../problem.openapi.yaml#/components/schemas/Problem' } } } }
         '429': { description: Quick order flood limit exceeded (60 per 10 minutes per calling address; the public site calls from its server) }
 components:
   schemas:
