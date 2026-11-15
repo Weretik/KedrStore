@@ -94,7 +94,7 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/admin/site-models", out var siteModels));
         Assert.True(siteModels.TryGetProperty("get", out var siteModelsGet));
         AssertOperationId(siteModelsGet, "getAdminSiteModels");
-        AssertOperationHasQueryParameter(siteModelsGet, "Problem");
+        AssertOperationHasQueryParameter(siteModelsGet, "problem");
         Assert.True(siteModels.TryGetProperty("post", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/health", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/showcase", out _));
@@ -123,9 +123,9 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
 
         Assert.False(paths.TryGetProperty("/api/admin/products/missing-photos", out _));
         Assert.True(adminProducts.TryGetProperty("get", out var adminProductsGet));
-        AssertOperationHasQueryParameter(adminProductsGet, "WithoutPhoto");
-        AssertOperationHasQueryParameter(adminProductsGet, "ProblemsOnly");
-        AssertOperationHasQueryParameter(adminProductsGet, "ProblemReason");
+        AssertOperationHasQueryParameter(adminProductsGet, "withoutPhoto");
+        AssertOperationHasQueryParameter(adminProductsGet, "problemsOnly");
+        AssertOperationHasQueryParameter(adminProductsGet, "problemReason");
 
         Assert.True(paths.TryGetProperty("/api/admin/products/{id}/media", out var productMedia));
         Assert.True(productMedia.TryGetProperty("get", out var productMediaGet));
