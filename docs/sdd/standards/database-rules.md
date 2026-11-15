@@ -48,7 +48,7 @@ Each rule says **what** to do, **where** in the code it applies, and **how to ch
 - **What.** A text search box behaves the same everywhere:
   1. Trim the input and split it on whitespace into words.
   2. For each word add one condition `EF.Functions.ILike(column, "%" + Escape(word) + "%", "\\")`; the conditions are joined with AND (each word must match), and one word may match any of the searched columns (OR across columns inside the word).
-  3. Escape `%`, `_` and `\` in the word with one shared `LikePattern.Escape` helper per module.
+  3. Escape `%`, `_` and `\` in the word with the shared `SearchWords` helper (`SearchWords.Patterns` splits and escapes, `SearchWords.Escape` escapes one value).
   4. Every searched column has a trigram index: `HasIndex(x => x.Column).HasMethod("gin").HasOperators("gin_trgm_ops")`, with `modelBuilder.HasPostgresExtension("pg_trgm")` in the owning `DbContext`.
   5. Normalize text the same way when you store it and when you search it if the language needs it (apostrophes `'` and `’`, `ё`/`е`). Keep the normalization in one domain function.
 - **Never.** `ToLower().Contains(...)`, `ToUpper().Contains(...)`, or `string.Contains` in SQL: the database cannot use an index for them and reads every row. Never search in C# after loading the table.
@@ -173,22 +173,17 @@ Renaming or dropping a column, or making it `NOT NULL` without a default, in the
 
 - EF Core model mapping lives in Infrastructure (`Persistence/<Aggregate>/`); Domain entities hold no persistence logic. Lookup and seed data change only through the seeders the migration job runs, not through hidden runtime writes.
 - Migrations: `Host.Jobs --job=migrate` (`src/Bootstrapper/Host.Jobs/DatabaseMigrationJob.cs`) runs every module's migrations, then the seeders. The deploy workflow (`.github/workflows/deploy-cloudrun.yml`, step «Run database migrations») runs it as the Cloud Run Job `database-migrate` with one task and no retries, waits, and only then deploys `Host.Api`. `Host.Api` never migrates. Details and data jobs after a migration: [operations](../operations/data/migrations-and-seeding.md). Check a new migration against an empty test database and describe rollout and rollback in its SDD.
-- Search helpers: Catalog `LikePattern.Escape` (`Catalog.Application/Shared/LikePattern.cs`), Sales `WorkspaceQueryTools.EscapeLike`. `pg_trgm` is declared by `CatalogDbContext`; product search uses `ProductListProjections.SearchTextUk/SearchTextRu` and `Products.Name` trigram indexes.
-- Concurrency already in place: `xmin` on `OneCOrderSyncs` and `AppRefreshSessions`, `Version` tokens on `ScheduledTasks` and `OrderDrafts`, `FOR UPDATE SKIP LOCKED` in the shared outbox, unique idempotency keys for orders and drafts.
+- Search helper: `SearchWords` (`src/BuildingBlocks/BuildingBlocks.Application/Text/SearchWords.cs`), used by every module. `pg_trgm` is declared by the Catalog, Sales, Media and Identity contexts. Trigram indexes: `ProductListProjections.SearchTextUk/SearchTextRu`, `Products.Name`, `CatalogProductGroups.Name`, `Counterparties` `Id`/`Name`/`Phone`, `Orders.OrderNumber`, `OrderDrafts.Title`, `MediaFiles.FileName`, `AspNetUsers` `Email`/`FullName`. When a column has two indexes, name both in `HasIndex(..., "Name")`, or EF merges them.
+- Concurrency already in place: `xmin` on `OneCOrderSyncs` and `AppRefreshSessions`, `Version` tokens on `ScheduledTasks` and `OrderDrafts`, `FOR UPDATE SKIP LOCKED` in the shared outbox, unique idempotency keys for orders and drafts with `UniqueViolation.Is` (`BuildingBlocks.Infrastructure/Persistence`) catching the race, `pg_advisory_xact_lock` in the product list rebuild, and the scheduler's `catalog` group that keeps catalog tasks from running at once. Repositories derive from `UnitOfWorkRepositoryBase` and never save.
 - The product list projection (`ProductListProjections`) is rebuilt by 1C tasks and by «Перебудувати список товарів»; rules 2.4, 3.2 and 4 (advisory lock) apply to it.
 
 ## Known deviations
 
-Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table.
+Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table. Closed on 2026-11-15: the product list rebuild (one locked transaction, diff), the 1C price sync (load once, save once), auto-saving repositories (`UnitOfWorkRepositoryBase` + `RepositorySaveTests`), per-word trigram search, order list indexes, the double-submitted order, the public model catalogue cache, and `lock_timeout` in the migrator.
 
 | Rule | Where | Status | Plan |
 | --- | --- | --- | --- |
-| 3.2, 2.4, 4 | `Catalog.Infrastructure/Persistence/Products/ProductListProjectionRebuilder.cs`: delete-all and re-insert in two commits, no lock against a parallel rebuild | open | One transaction with an advisory lock, then diff upsert |
-| 1.3, 3.1 | `Catalog.Application/Features/OneCSync/Jobs/SyncOneCPricesJob.cs`: two queries and an auto-saving `AddAsync` per price | open | Load once, save once |
-| 3.1 | Repositories built on Ardalis `RepositoryBase` save inside `Add*/Update*/Delete*` (`ProductGroupBuilder`, `RecognizedProductWriter`, `DecideAttributeCodeHandler`, `SetProductAttributeHandler`, `SetSiteModelAxesHandler` and others commit more than once) | open | Repositories that only mark changes; architecture test |
-| 2.1 | Search without trigram index or word split: `CustomerReadService`, `GetMediaFilesHandler`, `StaffAccountService`, `GetProductGroupsHandler`, workspace order and draft readers; in-memory search in `GetSiteModelsHandler`, `GetSiteShowcaseHandler` | open | Per-word `ILIKE` + `gin_trgm_ops` indexes |
-| 2.2, 2.3 | `Orders` has no index for date-sorted lists; `IX_ProductListProjections_CategoryId` and `IX_Products_CategoryId` are covered by composite indexes | open | Migration after production index statistics |
-| 4 | `CreateOrderHandler`: a parallel repeat with the same idempotency key gets 500 instead of the created order | open | Catch the unique violation and replay |
-| 1.4 | `PublicModelCatalogReader` and `SiteModelStateReader` load the whole catalog per request | open | `HybridCache` for the public catalog |
+| 3.1 | New rows whose database id the next step needs are saved before that step: `CreateProductGroupHandler`, `CreateSiteModelHandler`, `CreateCatalogAttributeHandler`, `ProductGroupBuilder` (new groups), `SyncCdnMediaJob` (new folders), the attribute import steps | open | A per-command transaction (module transaction port or pipeline behaviour), or ids made before saving |
+| 2.3 | `IX_ProductListProjections_CategoryId` and `IX_Products_CategoryId` look covered by composite indexes | waiting for production statistics | Drop after `pg_stat_user_indexes` confirms (query in 2.3) |
+| 1.4 | `SiteModelStateReader` loads the whole catalog for each admin model page | open | Acceptable for a few staff users; revisit if the admin pages slow down |
 | 4 | Admin edit forms (articles, SEO, categories, models, attributes) have no row version | open | `xmin` + 409, together with kedr-web |
-| 5.2, 5.3 | No written expand/contract rule or `lock_timeout` in the migration job before this document | open | `lock_timeout` in the migration job |
