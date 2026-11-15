@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Text;
 using Sales.Application.Abstractions.Workspace;
 using static Sales.Infrastructure.Orders.WorkspaceQueryTools;
 using Sales.Application.Abstractions.Orders;
@@ -23,12 +24,13 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
             query = query.Where(x => x.draft.CreatedAtUtc >= fromUtc);
         if (createdToUtcExclusive is { } toUtc)
             query = query.Where(x => x.draft.CreatedAtUtc < toUtc);
+        // Database rules 2.1: every word must match; trigram indexes serve ILIKE on these columns.
         foreach (var term in Terms(searchTerm))
         {
-            var pattern = "%" + EscapeLike(term) + "%";
+            var pattern = "%" + SearchWords.Escape(term) + "%";
             var numericId = long.TryParse(term, out var parsedId) ? parsedId : -1;
-            query = query.Where(x => EF.Functions.ILike(x.draft.Title, pattern, "\\") ||
-                                     EF.Functions.ILike(x.customer.Name, pattern, "\\") ||
+            query = query.Where(x => EF.Functions.ILike(x.draft.Title, pattern, SearchWords.EscapeCharacter) ||
+                                     EF.Functions.ILike(x.customer.Name, pattern, SearchWords.EscapeCharacter) ||
                                      x.draft.Id == OrderDraftId.FromStorage(numericId));
         }
         var count = await query.LongCountAsync(ct);

@@ -30,6 +30,19 @@ public sealed class CounterpartyConfiguration : IEntityTypeConfiguration<Counter
             .IsRequired();
 
         builder.HasIndex(counterparty => counterparty.Email);
+        // Database rules 2.1: the admin customer search runs ILIKE per word on these columns.
+        builder.HasIndex(counterparty => counterparty.Id)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_Counterparties_Id_trgm");
+        builder.HasIndex(counterparty => counterparty.Name)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_Counterparties_Name_trgm");
+        builder.HasIndex(counterparty => counterparty.Phone)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_Counterparties_Phone_trgm");
         builder.HasIndex(counterparty => counterparty.IdentityUserId)
             .IsUnique();
         builder.HasIndex(counterparty => counterparty.DefaultPriceTypeId);

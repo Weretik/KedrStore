@@ -20,6 +20,10 @@ internal sealed class OrderDraftConfiguration : IEntityTypeConfiguration<OrderDr
         builder.Property(draft => draft.UpdatedAtUtc).IsRequired();
         builder.HasIndex(draft => new { draft.CounterpartyId, draft.UpdatedAtUtc, draft.Id });
         builder.HasIndex(draft => new { draft.UpdatedAtUtc, draft.Id });
+        builder.HasIndex(draft => draft.Title)
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_OrderDrafts_Title_trgm");
         builder.HasOne<Counterparty>().WithMany()
             .HasForeignKey(draft => draft.CounterpartyId)
             .OnDelete(DeleteBehavior.Restrict).IsRequired();

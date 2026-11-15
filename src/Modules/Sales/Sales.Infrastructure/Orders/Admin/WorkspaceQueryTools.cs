@@ -10,7 +10,4 @@ internal static class WorkspaceQueryTools
 
     internal static IEnumerable<string> Terms(string? search)
         => (search ?? "").Split((char[]?)null, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-    internal static string EscapeLike(string term)
-        => term.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 }
