@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Observability\BuildingBlocks.Observability.csproj" />
       <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Sales\Sales.Domain\Sales.Domain.csproj" />
       <ProjectReference Include="..\..\src\Modules\Sales\Sales.Application\Sales.Application.csproj" />

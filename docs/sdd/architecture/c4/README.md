@@ -1,6 +1,6 @@
 # C4 diagrams
 
-**Checked against code:** 2026-11-15 (`src/`, `.github/workflows/deploy-cloudrun.yml`, project references, kedr-web `apps/`).
+**Checked against code:** 2026-11-16 (`src/`, `.github/workflows/deploy-cloudrun.yml`, project references, kedr-web `apps/`).
 
 Three levels of the [C4 model](https://c4model.com): who uses the system and what it talks to (context), which deployable parts it has (containers), and what is inside the API (components). The diagrams are Mermaid and render on GitHub. Why each part looks the way it does is in the [ADRs](../decisions/README.md).
 
@@ -19,7 +19,7 @@ flowchart TB
     onec["<b>1C</b><br/>[External system]<br/>Source of products, prices, stock, customers"]
     cdn["<b>CDN cdn.express</b><br/>[External system]<br/>Stores and serves pictures"]
     telegram["<b>Telegram</b><br/>[External system]<br/>Managers' chat for quick orders and alerts"]
-    gcp["<b>Google Cloud</b><br/>[External system]<br/>Cloud Run, Scheduler, Secret Manager"]
+    gcp["<b>Google Cloud</b><br/>[External system]<br/>Cloud Run, Scheduler, Secret Manager,<br/>Cloud Logging and Cloud Trace"]
 
     buyer -->|"Browses catalog, sends quick orders (HTTPS)"| kedr
     manager -->|"Uses the manager app and admin"| kedr
@@ -52,6 +52,7 @@ flowchart TB
         scheduler["<b>kedr-tick</b><br/>[Cloud Scheduler]<br/>Every 5 minutes, OIDC"]
         db[("<b>PostgreSQL</b><br/>[Database]<br/>One schema per module")]
         secrets["<b>Secret Manager</b>"]
+        observability["<b>Cloud Logging + Cloud Trace</b><br/>JSON logs with trace id, OTLP traces"]
     end
 
     onec["<b>1C</b><br/>[External, SOAP]"]
@@ -76,6 +77,7 @@ flowchart TB
     jobs -->|"Catalog and customer import"| onec
     api -->|"Asks the site to refresh"| site
     api -.-> secrets
+    api -.->|"Console JSON logs; traces (OTLP/HTTP, ADR-0014)"| observability
     jobs -.-> secrets
 ```
 
