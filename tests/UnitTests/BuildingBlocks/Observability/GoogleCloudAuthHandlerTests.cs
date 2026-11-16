@@ -17,6 +17,18 @@ public sealed class GoogleCloudAuthHandlerTests
         Assert.Equal("token-1", inner.Authorization?.Parameter);
     }
 
+    [Fact]
+    public void SynchronousRequest_CarriesTheToken_TooBecauseTheOtlpExporterSendsSynchronously()
+    {
+        var inner = new RecordingHandler();
+        using var client = new HttpClient(new GoogleCloudAuthHandler(_ => Task.FromResult("token-2")) { InnerHandler = inner });
+
+        client.Send(new HttpRequestMessage(HttpMethod.Post, "https://telemetry.googleapis.com/v1/traces") { Content = new ByteArrayContent([]) });
+
+        Assert.Equal("Bearer", inner.Authorization?.Scheme);
+        Assert.Equal("token-2", inner.Authorization?.Parameter);
+    }
+
     private sealed class RecordingHandler : HttpMessageHandler
     {
         public System.Net.Http.Headers.AuthenticationHeaderValue? Authorization { get; private set; }
@@ -25,6 +37,12 @@ public sealed class GoogleCloudAuthHandlerTests
         {
             Authorization = request.Headers.Authorization;
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+        }
+
+        protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Authorization = request.Headers.Authorization;
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
     }
 }
