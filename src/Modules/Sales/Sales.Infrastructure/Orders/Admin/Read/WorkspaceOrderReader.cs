@@ -15,11 +15,10 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         string sort, int page, int pageSize, CancellationToken ct)
     {
         var query =
-            from order in db.Orders.AsNoTracking()
-            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on order.CounterpartyId equals customer.Id
-            join sync in db.OneCOrderSyncs.AsNoTracking() on order.Id equals sync.OrderId
-            where counterpartyId == null || order.CounterpartyId == counterpartyId
-            select new { order, customer, sync };
+            from row in db.OrdersWithOneCMessage()
+            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on row.Order.CounterpartyId equals customer.Id
+            where counterpartyId == null || row.Order.CounterpartyId == counterpartyId
+            select new { order = row.Order, customer, message = row.Message };
         if (createdFromUtc is { } fromUtc)
             query = query.Where(x => x.order.CreatedAt >= fromUtc);
         if (createdToUtcExclusive is { } toUtc)
@@ -47,12 +46,22 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, "The validator allows only known sorts.")
         };
         var rows = await query.Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(x => new WorkspaceOrderListItem(x.order.Id.Value, x.order.OrderNumber,
-                x.order.CounterpartyId, x.customer.Name, x.order.CreatedAt,
-                x.order.Lines.Count, x.order.Lines.Sum(y => y.Amount), x.sync.Status.ToString(),
-                x.order.Lines.Sum(y => y.PriceAdjustment * y.Quantity)))
+            .Select(x => new
+            {
+                x.order.Id, x.order.OrderNumber, x.order.CounterpartyId, CustomerName = x.customer.Name,
+                x.order.CreatedAt, LineCount = x.order.Lines.Count, Total = x.order.Lines.Sum(y => y.Amount),
+                Adjustment = x.order.Lines.Sum(y => y.PriceAdjustment * y.Quantity),
+                x.order.OneCDocumentNumber, x.order.OneCRejection, x.message
+            })
             .ToListAsync(ct);
-        return new WorkspacePage<WorkspaceOrderListItem>(PageInfo(page, pageSize, count), rows);
+        var items = rows.Select(x =>
+        {
+            var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.message);
+            return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId, x.CustomerName,
+                x.CreatedAt, x.LineCount, x.Total, oneC.Status.ToString(), x.Adjustment,
+                oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
+        }).ToList();
+        return new WorkspacePage<WorkspaceOrderListItem>(PageInfo(page, pageSize, count), items);
     }
 
     public async Task<WorkspaceOrderDetail?> GetOrderAsync(long orderId, CancellationToken ct)
@@ -60,18 +69,19 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         if (orderId < 1) return null;
         var id = OrderId.FromStorage(orderId);
         var row = await (
-            from order in db.Orders.AsNoTracking()
-            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on order.CounterpartyId equals customer.Id
-            join sync in db.OneCOrderSyncs.AsNoTracking() on order.Id equals sync.OrderId
-            where order.Id == id
-            select new { order, customer, sync }).SingleOrDefaultAsync(ct);
+            from x in db.OrdersWithOneCMessage()
+            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on x.Order.CounterpartyId equals customer.Id
+            where x.Order.Id == id
+            select new { order = x.Order, customer, message = x.Message }).SingleOrDefaultAsync(ct);
         if (row is null) return null;
         var stored = await db.OrderLines.AsNoTracking()
             .Where(x => EF.Property<OrderId>(x, "OrderId") == id)
             .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId, x.ProductName, x.Quantity, x.Amount, x.PriceAdjustment))
             .ToArrayAsync(ct);
+        var oneC = OrderOneCQueries.OneC(row.order.OneCDocumentNumber, row.order.OneCRejection, row.message);
         return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId,
             row.customer.Name, row.order.CreatedAt, row.order.Comment, stored,
-            stored.Sum(x => x.Amount), row.sync.Status.ToString(), row.sync.OneCDocumentNumber);
+            stored.Sum(x => x.Amount), oneC.Status.ToString(), row.order.OneCDocumentNumber,
+            oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
     }
 }

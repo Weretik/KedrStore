@@ -11,7 +11,8 @@ namespace Sales.Infrastructure.QuickOrders;
 internal sealed class QuickOrderTelegramSender(ITelegramBotClient bot, IOptions<TelegramOptions> options)
     : IOutboxMessageHandler<QuickOrderPlaced>
 {
-    public async Task HandleAsync(QuickOrderPlaced message, Guid messageId, CancellationToken cancellationToken)
+    public async Task<OutboxHandlingResult> HandleAsync(
+        QuickOrderPlaced message, Guid messageId, CancellationToken cancellationToken)
     {
         var bytes = QuickOrderExcelFile.Build(message);
         await using var stream = new MemoryStream(bytes);
@@ -22,5 +23,6 @@ internal sealed class QuickOrderTelegramSender(ITelegramBotClient bot, IOptions<
             caption: QuickOrderTelegramCaption.Build(message),
             parseMode: ParseMode.Html,
             cancellationToken: cancellationToken);
+        return OutboxHandlingResult.Delivered;
     }
 }

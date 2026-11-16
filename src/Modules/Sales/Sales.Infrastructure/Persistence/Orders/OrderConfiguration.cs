@@ -35,6 +35,12 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired();
         builder.Property(order => order.Comment).HasMaxLength(1_000);
 
+        // Platform spec 006, R-010 and R-011: the key of the order's 1C outbox message and the 1C answer.
+        builder.Property(order => order.OneCMessageId).IsRequired();
+        builder.HasIndex(order => order.OneCMessageId).IsUnique();
+        builder.Property(order => order.OneCDocumentNumber).HasMaxLength(Order.OneCDocumentNumberMaxLength);
+        builder.Property(order => order.OneCRejection).HasMaxLength(Order.OneCRejectionMaxLength);
+
         builder.HasOne<Counterparty>()
             .WithMany()
             .HasForeignKey(order => order.CounterpartyId)

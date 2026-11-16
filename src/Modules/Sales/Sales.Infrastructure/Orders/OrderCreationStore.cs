@@ -1,38 +1,51 @@
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
 using BuildingBlocks.Infrastructure.Persistence;
 using Sales.Application.Abstractions.Persistence;
+using Sales.Application.Features.Orders.OneCDelivery.Messages;
 using Sales.Infrastructure.Persistence;
-using Sales.Infrastructure.Persistence.Customers;
-using Sales.Infrastructure.Persistence.OrderDrafts;
-using Sales.Infrastructure.Persistence.Orders;
 using Sales.Domain.Orders.ValueObjects;
 using Sales.Infrastructure.Persistence.Orders.Idempotency;
 
 namespace Sales.Infrastructure.Orders;
 
-internal sealed class OrderCreationStore(SalesDbContext dbContext) : IOrderCreationStore
+internal sealed class OrderCreationStore(SalesDbContext dbContext, OutboxWriter outbox, TimeProvider clock)
+    : IOrderCreationStore
 {
     public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken)
         => dbContext.Counterparties.AnyAsync(counterparty => counterparty.Id == counterpartyId && !counterparty.IsDeleted, cancellationToken);
 
-    public Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken)
-        => (from record in dbContext.OrderIdempotencyRecords.AsNoTracking()
-            join order in dbContext.Orders.AsNoTracking() on record.OrderId equals order.Id
-            join synchronization in dbContext.OneCOrderSyncs.AsNoTracking() on order.Id equals synchronization.OrderId
-            where record.Operation == operation && record.IdempotencyKey == idempotencyKey
-            select new CreateOrderIdempotencyRecord(
-                record.Operation, record.IdempotencyKey, record.RequestHash, record.OrderId,
-                order.OrderNumber, synchronization.Status, record.CreatedAtUtc, record.ExpiresAtUtc))
+    public async Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken)
+    {
+        var row = await (
+                from record in dbContext.OrderIdempotencyRecords.AsNoTracking()
+                join order in dbContext.OrdersWithOneCMessage() on record.OrderId equals order.Order.Id
+                where record.Operation == operation && record.IdempotencyKey == idempotencyKey
+                select new
+                {
+                    Record = record,
+                    order.Order.OrderNumber,
+                    order.Order.OneCDocumentNumber,
+                    order.Order.OneCRejection,
+                    order.Message
+                })
             .SingleOrDefaultAsync(cancellationToken);
+
+        return row is null
+            ? null
+            : new CreateOrderIdempotencyRecord(row.Record.Operation, row.Record.IdempotencyKey, row.Record.RequestHash,
+                row.Record.OrderId, row.OrderNumber,
+                OrderOneCQueries.OneC(row.OneCDocumentNumber, row.OneCRejection, row.Message).Status,
+                row.Record.CreatedAtUtc, row.Record.ExpiresAtUtc);
+    }
 
     public async Task<bool> PersistAsync(
         Order order,
-        Func<OrderId, OneCOrderSync> synchronizationFactory,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
         CancellationToken cancellationToken)
     {
         try
         {
-            await PersistInTransactionAsync(order, synchronizationFactory, idempotencyRecordFactory, cancellationToken);
+            await PersistInTransactionAsync(order, idempotencyRecordFactory, cancellationToken);
             return true;
         }
         catch (DbUpdateException error) when (UniqueViolation.Is(error))
@@ -44,19 +57,22 @@ internal sealed class OrderCreationStore(SalesDbContext dbContext) : IOrderCreat
 
     private async Task PersistInTransactionAsync(
         Order order,
-        Func<OrderId, OneCOrderSync> synchronizationFactory,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
         CancellationToken cancellationToken)
     {
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        // The 24-hour idempotency records were cleared by the old 1C job; each new order clears the expired ones now.
+        await dbContext.OrderIdempotencyRecords
+            .Where(record => record.ExpiresAtUtc <= clock.GetUtcNow())
+            .ExecuteDeleteAsync(cancellationToken);
         await dbContext.Orders.AddAsync(order, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         order.AssignOrderNumber($"SO-{order.CreatedAt:yyyyMMdd}-{order.Id.Value}");
 
-        var synchronization = synchronizationFactory(order.Id);
         var idempotency = idempotencyRecordFactory(order.Id);
-        await dbContext.OneCOrderSyncs.AddAsync(synchronization, cancellationToken);
+        // Platform spec 006, R-010: the 1C delivery is stored with the order; the scheduled dispatch sends it.
+        outbox.Add(dbContext, new OrderPlaced(order.Id.Value), order.OneCMessageId);
         await dbContext.OrderIdempotencyRecords.AddAsync(new OrderIdempotencyRecord
         {
             Operation = idempotency.Operation,

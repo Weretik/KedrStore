@@ -41,6 +41,15 @@ public static partial class OutboxRegistration
         return services;
     }
 
+    /// <summary>Adds the handler that runs when a message of this type gives up (platform spec 006, R-009).</summary>
+    public static IServiceCollection AddOutboxGiveUpHandler<TMessage, THandler>(this IServiceCollection services)
+        where TMessage : IOutboxMessage
+        where THandler : class, IOutboxGiveUpHandler<TMessage>
+    {
+        services.AddScoped<IOutboxGiveUpHandler<TMessage>, THandler>();
+        return services;
+    }
+
     private static void AddOutboxCore(this IServiceCollection services)
     {
         services.TryAddSingleton(TimeProvider.System);

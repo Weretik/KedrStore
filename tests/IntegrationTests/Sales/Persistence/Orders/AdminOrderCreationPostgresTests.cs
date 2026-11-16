@@ -106,10 +106,10 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
             return Task.FromResult<CreateOrderIdempotencyRecord?>(null);
         }
 
-        public Task<bool> PersistAsync(Order order, Func<OrderId, OneCOrderSync> synchronizationFactory,
+        public Task<bool> PersistAsync(Order order,
             Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
             CancellationToken cancellationToken)
-            => inner.PersistAsync(order, synchronizationFactory, idempotencyRecordFactory, cancellationToken);
+            => inner.PersistAsync(order, idempotencyRecordFactory, cancellationToken);
     }
 
     private ServiceProvider BuildProvider()
@@ -131,7 +131,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.OrderDrafts.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();

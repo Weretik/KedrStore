@@ -17,8 +17,6 @@ public sealed class OneCCounterpartiesSyncService(
     {
         logger.LogInformation("SyncOneCCounterpartiesJob started");
 
-        await staleRemoval.DrainIdentityDeletionsAsync(cancellationToken);
-
         var counterparties = await oneCClient.GetCounterpartiesAsync(cancellationToken);
         if (counterparties.Count == 0)
         {
@@ -172,8 +170,8 @@ public sealed class OneCCounterpartiesSyncService(
             logger.LogWarning("1C returned a counterparty with no ID. Deletion was skipped for this run.");
 
         await salesDbContext.SaveChangesAsync(cancellationToken);
+        // The removed customers' Identity users are deleted by the outbox dispatch (platform spec 006, R-014).
         deleted = await staleRemoval.RemoveAsync(staleCounterparties, cancellationToken);
-        await staleRemoval.DrainIdentityDeletionsAsync(cancellationToken);
 
         logger.LogInformation(
             "SyncOneCCounterpartiesJob finished. Imported: {Imported}, Updated: {Updated}, Restored: {Restored}, Deleted: {Deleted}, Skipped: {Skipped}, Unchanged: {Unchanged}",

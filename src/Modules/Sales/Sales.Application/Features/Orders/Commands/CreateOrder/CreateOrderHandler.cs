@@ -55,7 +55,6 @@ public sealed class CreateOrderHandler(
 
         var persisted = await orderCreationStore.PersistAsync(
             order,
-            orderId => OneCOrderSync.Create(orderId, now),
             orderId => new CreateOrderIdempotencyRecord(
                 Operation, idempotencyKey, requestHash, orderId, order.OrderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)),
             cancellationToken);

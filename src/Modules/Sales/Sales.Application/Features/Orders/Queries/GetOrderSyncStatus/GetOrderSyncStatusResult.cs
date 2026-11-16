@@ -1,4 +1,3 @@
-using Sales.Domain.Orders;
 
 namespace Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
 

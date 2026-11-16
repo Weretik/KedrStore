@@ -1,4 +1,3 @@
-using Sales.Domain.Orders;
 namespace Sales.Application.Abstractions.Orders.Sync;
 
 public sealed record OrderSyncRetryStoreResult(

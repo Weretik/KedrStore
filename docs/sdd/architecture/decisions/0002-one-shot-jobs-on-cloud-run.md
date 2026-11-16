@@ -14,7 +14,7 @@
 
 ## Decision
 
-- `Host.Jobs` is a console host that runs exactly one command and exits: `--job=migrate`, `--job=full`, `--job=prices`, `--job=stocks`, `--job=sales-customers-full`, `--job=sync-one-c-orders`, `--job=media-cdn-sync` and others.
+- `Host.Jobs` is a console host that runs exactly one command and exits: `--job=migrate`, `--job=full`, `--job=prices`, `--job=stocks`, `--job=sales-customers-full`, `--job=media-cdn-sync` and others.
 - Each command is a Cloud Run Job. Cloud Scheduler starts each job on its own schedule.
 - The deploy pipeline runs the migration job first and deploys the new API only if it succeeds. The API never migrates on startup.
 - The order sync job runs one task with parallelism 1 and no platform retries; the job itself tracks attempts, keeps the 1C document number, and sends a Telegram alert when an order cannot be delivered.

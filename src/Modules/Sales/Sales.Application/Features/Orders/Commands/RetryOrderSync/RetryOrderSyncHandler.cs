@@ -24,7 +24,7 @@ public sealed class RetryOrderSyncHandler(IOrderSyncRetryStore store)
             OrderSyncRetryStoreOutcome.Scheduled => Result.Success(new RetryOrderSyncResult(
                 result.OrderId,
                 result.OrderNumber!,
-                OneCOrderSyncStatus.RetryScheduled)),
+                OneCOrderSyncStatus.Pending)),
             OrderSyncRetryStoreOutcome.NotFound => Result.NotFound(),
             OrderSyncRetryStoreOutcome.InvalidStatus => Result.Conflict(
                 $"Повторна відправка недоступна для статусу {result.PreviousStatus}."),

@@ -1,6 +1,10 @@
 using Ardalis.Result;
 using Identity.Contracts.Users;
 using IntegrationTests.TestSupport.Database;
+using IntegrationTests.TestSupport.Sales;
+using Microsoft.Extensions.DependencyInjection;
+using Sales.Infrastructure.Customers;
+using Sales.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sales.Application.Abstractions.Integrations.OneC;
@@ -14,58 +18,87 @@ namespace IntegrationTests.Sales.Persistence.Customers;
 public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture postgres)
 {
     [SkippableFact]
-    public async Task FullSnapshot_RemovesStaleCustomerWithOrderAndDraft_AndRetriesIdentityDeletion()
+    public async Task FullSnapshot_RemovesStaleCustomerWithOrderAndDraft_AndTheOutboxDeletesItsIdentityUser()
     {
-        postgres.SkipIfUnavailable();
-        await using var db = postgres.CreateContext();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"PendingCounterpartyIdentityDeletions\"");
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
-        await db.Orders.ExecuteDeleteAsync();
-        await db.OrderDrafts.ExecuteDeleteAsync();
-        await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
-        await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
-
+        await using var sales = await SalesOutboxHarness.CreateAsync(postgres);
         var staleUserId = Guid.NewGuid();
         var retainedUserId = Guid.NewGuid();
         var now = DateTimeOffset.UtcNow;
-        db.Counterparties.AddRange(
-            Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now).Value,
-            Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now).Value);
-        db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
-            [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
-        db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
-            [OrderDraftLine.Create("101", 1)], now));
-        await db.SaveChangesAsync();
+        await sales.InScopeAsync(async services =>
+        {
+            var db = services.GetRequiredService<SalesDbContext>();
+            db.Counterparties.AddRange(
+                Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now).Value,
+                Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now).Value);
+            db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
+                [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
+            db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
+                [OrderDraftLine.Create("101", 1)], now));
+            return await db.SaveChangesAsync();
+        });
+        sales.Identity.FailuresLeft = 1;
 
-        var identity = new FakeIdentity();
-        var oneC = new FakeOneC();
-        var remover = new StaleCounterpartyRemoval(db, identity,
-            NullLogger<StaleCounterpartyRemoval>.Instance);
-        var sync = new OneCCounterpartiesSyncService(oneC, db, identity, remover,
-            new CounterpartyContactNormalizer(), NullLogger<OneCCounterpartiesSyncService>.Instance);
-
-        var first = await sync.RunAsync(CancellationToken.None);
+        var first = await RunSyncAsync(sales);
         Assert.Equal(1, first.Deleted);
-        Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == "stale-cp"));
-        Assert.True(await db.Counterparties.AnyAsync(item => item.Id == "retained-cp"));
-        Assert.Empty(await db.Orders.ToArrayAsync());
-        Assert.Empty(await db.OrderDrafts.ToArrayAsync());
-        Assert.Equal(1, await PendingCountAsync(db));
+        await sales.InScopeAsync(async services =>
+        {
+            var db = services.GetRequiredService<SalesDbContext>();
+            Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == "stale-cp"));
+            Assert.True(await db.Counterparties.AnyAsync(item => item.Id == "retained-cp"));
+            Assert.Empty(await db.Orders.ToArrayAsync());
+            Assert.Empty(await db.OrderDrafts.ToArrayAsync());
+            return true;
+        });
 
-        var second = await sync.RunAsync(CancellationToken.None);
-        Assert.Equal(0, second.Imported);
+        // Platform spec 006, R-014: the first deletion fails, the outbox retries it.
+        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        Assert.Empty(sales.Identity.Deleted);
+        Assert.Equal(1, Assert.Single(await sales.MessagesAsync(CounterpartyRemoved.TypeName)).Attempts);
+
+        sales.Clock.Advance(TimeSpan.FromMinutes(1));
+        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        Assert.Equal([staleUserId], sales.Identity.Deleted);
+
+        var second = await RunSyncAsync(sales);
         Assert.Equal(0, second.Deleted);
         Assert.Equal(1, second.Unchanged);
-        Assert.Equal(0, await PendingCountAsync(db));
-        Assert.Equal(2, identity.DeleteCalls);
+        Assert.Single(await sales.MessagesAsync(CounterpartyRemoved.TypeName));
     }
 
-    private static Task<int> PendingCountAsync(global::Sales.Infrastructure.Persistence.SalesDbContext db)
-        => db.Database.SqlQueryRaw<int>(
-            "SELECT COUNT(*)::integer AS \"Value\" FROM \"PendingCounterpartyIdentityDeletions\"")
-            .SingleAsync();
+    [SkippableFact]
+    public async Task IdentityUser_LinkedToAnotherCustomerBeforeTheMessageRuns_IsKept()
+    {
+        await using var sales = await SalesOutboxHarness.CreateAsync(postgres);
+        var sharedUserId = Guid.NewGuid();
+        await sales.InScopeAsync(async services =>
+        {
+            var db = services.GetRequiredService<SalesDbContext>();
+            db.Counterparties.Add(
+                Counterparty.Create("stale-cp", sharedUserId, "Stale", "stale@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+            return await db.SaveChangesAsync();
+        });
+
+        await RunSyncAsync(sales);
+        await sales.InScopeAsync(async services =>
+        {
+            var db = services.GetRequiredService<SalesDbContext>();
+            db.Counterparties.Add(
+                Counterparty.Create("relinked-cp", sharedUserId, "Relinked", "relinked@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+            return await db.SaveChangesAsync();
+        });
+        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+
+        Assert.Empty(sales.Identity.Deleted);
+        Assert.NotNull(Assert.Single(await sales.MessagesAsync(CounterpartyRemoved.TypeName)).ProcessedAtUtc);
+    }
+
+    private static Task<CounterpartiesSyncResult> RunSyncAsync(SalesOutboxHarness sales)
+        => sales.InScopeAsync(services => new OneCCounterpartiesSyncService(new FakeOneC(),
+                services.GetRequiredService<SalesDbContext>(),
+                services.GetRequiredService<IImportedCounterpartyIdentityProvisioningService>(),
+                services.GetRequiredService<StaleCounterpartyRemoval>(),
+                new CounterpartyContactNormalizer(), NullLogger<OneCCounterpartiesSyncService>.Instance)
+            .RunAsync(CancellationToken.None));
 
     private sealed class FakeOneC : ISalesOneCReadClient
     {
@@ -76,21 +109,5 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         public Task<IReadOnlyList<OneCCounterpartyCategoryPriceTypeDto>> GetCounterpartyCategoryPriceTypesAsync(
             CancellationToken cancellationToken)
             => Task.FromResult<IReadOnlyList<OneCCounterpartyCategoryPriceTypeDto>>([]);
-    }
-
-    private sealed class FakeIdentity : IImportedCounterpartyIdentityProvisioningService
-    {
-        public int DeleteCalls { get; private set; }
-
-        public Task<Result<Guid>> EnsureUserAsync(ImportedCounterpartyIdentityUserData userData,
-            Guid? existingIdentityUserId, CancellationToken cancellationToken)
-            => Task.FromResult(Result.Success(existingIdentityUserId ?? Guid.NewGuid()));
-
-        public Task<Result> DeleteUserAsync(Guid identityUserId, string counterpartyId,
-            CancellationToken cancellationToken)
-        {
-            DeleteCalls++;
-            return Task.FromResult(DeleteCalls == 1 ? Result.Error("temporary") : Result.Success());
-        }
     }
 }

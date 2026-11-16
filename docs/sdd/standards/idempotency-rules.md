@@ -69,7 +69,7 @@ Write them first (Red → Green), next to the use case's other tests:
 
 ## KedrStore specifics
 
-- **Wire format:** the `Idempotency-Key` header (UUID) on every keyed endpoint. Admin and mobile orders and drafts use the idempotency records `sales."OrderIdempotencyRecords"` (unique (`Operation`, `IdempotencyKey`), `RequestHash`, `ExpiresAtUtc`; the 1C order sync run removes expired ones) and `sales."OrderDraftIdempotencyRecords"` (unique key, `RequestHash`; one row per draft, kept) and answer 409 `idempotency_conflict` for the same key with other data. The site quick order answers that case with the generic 409 problem (`conflict`, Ukrainian detail) and uses the key as the order id and the outbox message id (the primary key is the guard; repeats are recognised for the 30-day outbox retention).
+- **Wire format:** the `Idempotency-Key` header (UUID) on every keyed endpoint. Admin and mobile orders and drafts use the idempotency records `sales."OrderIdempotencyRecords"` (unique (`Operation`, `IdempotencyKey`), `RequestHash`, `ExpiresAtUtc`; each order create removes expired ones) and `sales."OrderDraftIdempotencyRecords"` (unique key, `RequestHash`; one row per draft, kept) and answer 409 `idempotency_conflict` for the same key with other data. The site quick order answers that case with the generic 409 problem (`conflict`, Ukrainian detail) and uses the key as the order id and the outbox message id (the primary key is the guard; repeats are recognised for the 30-day outbox retention).
 - **Race guard helper:** `UniqueViolation.Is` (`BuildingBlocks.Infrastructure/Persistence`).
 - **Outbox:** `ModuleOutbox` locks rows with `FOR UPDATE SKIP LOCKED`, runs the handler and marks the row in one transaction; a handler is called again only when that transaction did not commit.
 
@@ -79,9 +79,10 @@ Write them first (Red → Green), next to the use case's other tests:
 | --- | --- | --- |
 | `POST /api/admin/orders`, `POST /api/admin/order-workspace/orders`, `.../drafts` (admin and mobile «Кедр Менеджер») | Same key → the first order or draft; other data → 409 | Protected (idempotency records). Admin and mobile send the key; the mobile outbox stores it with the queue entry |
 | `POST /api/orders` (site quick order) | Same key → the first order id, no second Telegram file | Protected since this change; the Next.js site sends the key |
-| 1C order sync (`SyncOneCOrdersService`) | A stale `Sent` record is resent with the same `OrderNumber`, which 1C treats as the same document | Protected (state machine with `xmin`, duplicate-safe number) |
-| 1C dead-letter notification | Claimed per record, marked notified | Protected (state check) |
-| `POST /api/admin/orders/{orderId}/sync/retry` | Moves a failed sync back to pending; a repeat on a pending record is 409 | Protected (state check) |
+| Outbox: `SendOrderToOneCHandler` (order to 1C) | Returns at once when the order already has the 1C answer; a transport retry resends the same `OrderNumber`, which 1C treats as the same document | Protected (state check, duplicate-safe number, outbox row locked with `FOR UPDATE SKIP LOCKED`) |
+| Outbox: `OrderOneCDeliveryFailedHandler` (Telegram alert) | Queued once in the same transaction that gives up; sent once per row | Accepted risk, as for the quick order (Telegram has no dedupe key) |
+| Outbox: `RemovedCounterpartyIdentityDeleter` | A user already gone counts as deleted; a user linked again is kept | Protected (state check) |
+| `POST /api/admin/orders/{orderId}/sync/retry` | Puts the same outbox row back in the queue; a repeat on a waiting order is 409 | Protected (state check, conditional update of the row) |
 | Outbox: `QuickOrderTelegramSender` | Sent once per row; a crash between the send and the commit can send one duplicate file | Accepted risk (Telegram has no dedupe key) |
 | Scheduler tick, «Запустити зараз» | Claims tasks with a `Version` token; «run now» sets a flag | Protected (row version, catalog group, advisory lock in the rebuild) |
 | 1C catalog, price, and counterparty syncs | Upsert by 1C codes in steps | Protected (upsert, rerunnable steps) |

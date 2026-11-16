@@ -71,8 +71,9 @@ flowchart TB
     api --> db
     jobs --> db
     api --> cdn
-    api -->|"Outbox: quick orders"| telegram
-    jobs -->|"Import and order sync"| onec
+    api -->|"Outbox: quick orders, orders that never reached 1C"| telegram
+    api -->|"Outbox: manager orders"| onec
+    jobs -->|"Catalog and customer import"| onec
     api -->|"Asks the site to refresh"| site
     api -.-> secrets
     jobs -.-> secrets

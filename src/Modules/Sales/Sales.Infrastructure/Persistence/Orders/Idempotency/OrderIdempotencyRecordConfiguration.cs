@@ -23,6 +23,8 @@ internal sealed class OrderIdempotencyRecordConfiguration : IEntityTypeConfigura
 
         builder.HasIndex(record => new { record.Operation, record.IdempotencyKey }).IsUnique();
         builder.HasIndex(record => record.OrderId).IsUnique();
+        // Each new order removes the expired records (platform spec 006, stage 2).
+        builder.HasIndex(record => record.ExpiresAtUtc);
 
         builder.HasOne<Order>()
             .WithOne()

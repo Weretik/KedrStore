@@ -1,4 +1,3 @@
-using Sales.Domain.Orders;
 using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Application.Abstractions.Persistence;

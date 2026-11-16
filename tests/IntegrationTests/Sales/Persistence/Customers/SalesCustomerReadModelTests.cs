@@ -217,7 +217,8 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
     {
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.OrderDrafts.ExecuteDeleteAsync();

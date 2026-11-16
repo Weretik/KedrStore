@@ -41,10 +41,9 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
     {
         await using var db = postgres.CreateContext();
         await db.OrderDrafts.ExecuteDeleteAsync();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"PendingCounterpartyIdentityDeletions\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
@@ -55,8 +54,6 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
         var order = Order.Create("SO-ADJ-1", CounterpartyId, null,
             [OrderLine.Create("101", "Товар 101", 2, 300m, -50m).Value, OrderLine.Create("102", "Товар 102", 3, 330m, 10m).Value], now).Value;
         db.Orders.Add(order);
-        await db.SaveChangesAsync();
-        db.OneCOrderSyncs.Add(OneCOrderSync.Create(order.Id, now));
         await db.SaveChangesAsync();
         return order.Id.Value;
     }

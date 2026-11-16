@@ -6,6 +6,7 @@ using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Queries.GetOrderById;
 using Sales.Application.Features.Orders.Queries.GetOrderList;
 using Sales.Domain.Customers;
+using Sales.Application.Abstractions.Orders.Sync;
 using Sales.Domain.Orders;
 using Sales.Infrastructure.DependencyInjection;
 namespace IntegrationTests.Sales.Persistence.Orders;
@@ -86,9 +87,8 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         {
             var counterparty = await db.Counterparties.SingleAsync();
             counterparty.MarkAsDeleted(createdAt.AddHours(1));
-            var sync = await db.OneCOrderSyncs.SingleAsync();
-            sync.StartAttempt(createdAt.AddMinutes(1), "private-payload-hash");
-            sync.Accept(createdAt.AddMinutes(2), "1C-123", "private-response-body");
+            var order = await db.Orders.SingleAsync();
+            Assert.True(order.AcceptByOneC("1C-123", createdAt.AddMinutes(2)).IsSuccess);
             await db.SaveChangesAsync();
         }
 
@@ -103,15 +103,9 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         Assert.Equal([10m, 25m], result.Value.Lines.Select(line => line.Amount));
         Assert.Equal(35m, result.Value.TotalAmount);
         Assert.Equal("1C-123", result.Value.Sync.OneCDocumentNumber);
+        Assert.Equal(OneCOrderSyncStatus.Accepted, result.Value.Sync.Status);
         Assert.DoesNotContain(typeof(OrderDetailDto).GetProperties(), property =>
-            property.Name.Contains("Error", StringComparison.OrdinalIgnoreCase) ||
-            property.Name.Contains("Response", StringComparison.OrdinalIgnoreCase) ||
-            property.Name.Contains("Attempt", StringComparison.OrdinalIgnoreCase));
-
-        await using var verificationDb = postgres.CreateContext();
-        var synchronization = await verificationDb.OneCOrderSyncs.SingleAsync();
-        Assert.Equal(1, synchronization.AttemptCount);
-        Assert.Equal("private-response-body", synchronization.OneCResponseBody);
+            property.Name.Contains("Response", StringComparison.OrdinalIgnoreCase));
     }
 
     [SkippableFact]
@@ -145,7 +139,9 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
     private async Task ResetDatabaseAsync()
     {
         await using var db = postgres.CreateContext();
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.OrderDrafts.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
@@ -172,8 +168,6 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         var order = Order.Create(orderNumber, counterpartyId, "Manager note", lines, createdAt).Value;
         db.Counterparties.Add(counterparty);
         db.Orders.Add(order);
-        await db.SaveChangesAsync();
-        db.OneCOrderSyncs.Add(OneCOrderSync.Create(order.Id, createdAt));
         await db.SaveChangesAsync();
         return order.Id.Value;
     }

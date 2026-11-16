@@ -20,12 +20,9 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     public DbSet<OrderLine> OrderLines => Set<OrderLine>();
     public DbSet<OrderDraft> OrderDrafts => Set<OrderDraft>();
     public DbSet<OrderDraftLine> OrderDraftLines => Set<OrderDraftLine>();
-    public DbSet<OneCOrderSync> OneCOrderSyncs => Set<OneCOrderSync>();
     internal DbSet<OrderIdempotencyRecord> OrderIdempotencyRecords => Set<OrderIdempotencyRecord>();
     internal DbSet<OrderSyncRetryAudit> OrderSyncRetryAudits => Set<OrderSyncRetryAudit>();
     internal DbSet<OrderDraftIdempotencyRecord> OrderDraftIdempotencyRecords => Set<OrderDraftIdempotencyRecord>();
-    internal DbSet<PendingCounterpartyIdentityDeletion> PendingCounterpartyIdentityDeletions =>
-        Set<PendingCounterpartyIdentityDeletion>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

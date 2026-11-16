@@ -120,10 +120,9 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         await using var db = postgres.CreateContext();
         await db.OrderDrafts.ExecuteDeleteAsync();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"PendingCounterpartyIdentityDeletions\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
-        await db.OneCOrderSyncs.ExecuteDeleteAsync();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();

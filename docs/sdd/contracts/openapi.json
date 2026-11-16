@@ -9209,7 +9209,7 @@
           "AdminOrders"
         ],
         "summary": "Schedule a failed order for another 1C delivery cycle",
-        "description": "Allowed only for BusinessError and DeadLetter. The request records an audit entry and changes the state to RetryScheduled; it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).",
+        "description": "Allowed only for BusinessError and DeadLetter. The request records an audit entry and puts the order back in the outbox queue (state Pending, attempts from zero); it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).",
         "operationId": "retryAdminOrderSync",
         "parameters": [
           {
@@ -18617,7 +18617,11 @@
           "lines",
           "totalAmount",
           "syncStatus",
-          "oneCDocumentNumber"
+          "oneCDocumentNumber",
+          "syncError",
+          "syncAttempts",
+          "syncLastAttemptAtUtc",
+          "syncNextAttemptAtUtc"
         ],
         "type": "object",
         "properties": {
@@ -18662,6 +18666,30 @@
               "null",
               "string"
             ]
+          },
+          "syncError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "syncAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "syncLastAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "syncNextAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -18675,7 +18703,11 @@
           "lineCount",
           "totalAmount",
           "syncStatus",
-          "adjustmentAmount"
+          "adjustmentAmount",
+          "syncError",
+          "syncAttempts",
+          "syncLastAttemptAtUtc",
+          "syncNextAttemptAtUtc"
         ],
         "type": "object",
         "properties": {
@@ -18710,6 +18742,30 @@
           "adjustmentAmount": {
             "type": "number",
             "format": "double"
+          },
+          "syncError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "syncAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "syncLastAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "syncNextAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },

@@ -5,7 +5,6 @@ namespace Sales.Infrastructure.Persistence.Orders.SyncRetries;
 internal sealed class OrderSyncRetryAudit
 {
     public long Id { get; set; }
-    public OneCOrderSyncId OneCOrderSyncId { get; set; }
     public OrderId OrderId { get; set; }
     public string OrderNumber { get; set; } = null!;
     public string PreviousStatus { get; set; } = null!;
