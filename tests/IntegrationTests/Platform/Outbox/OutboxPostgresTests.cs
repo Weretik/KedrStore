@@ -312,7 +312,7 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
 
         public IOutboxDispatcher Dispatcher => Services.GetRequiredService<IOutboxDispatcher>();
 
-        public async Task<Guid> StoreAsync(PingMessage message)
+        public async Task<Guid> StoreAsync(IOutboxMessage message)
         {
             await using var scope = Services.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
