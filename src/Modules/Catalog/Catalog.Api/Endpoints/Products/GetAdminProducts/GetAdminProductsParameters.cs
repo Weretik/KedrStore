@@ -9,6 +9,7 @@ public sealed record GetAdminProductsParameters
     public string? CategorySlug { get; init; }
     public int? CategoryId { get; init; }
     public bool? InStock { get; init; }
+    public bool? HasStock { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
     public bool? ExportToSite { get; init; }
@@ -31,6 +32,7 @@ public sealed record GetAdminProductsParameters
             CategorySlug = CategorySlug,
             CategoryId = CategoryId,
             InStock = InStock,
+            HasStock = HasStock,
             IsSale = IsSale,
             IsNew = IsNew,
             ExportToSite = ExportToSite,

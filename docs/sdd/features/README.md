@@ -9,7 +9,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Catalog categories](catalog/categories.md) — public list and details by slug, plus separate admin reads.
 - [Public products](catalog/public-products.md) — anonymous lists by language/category and details by slug.
 - [Public site models](catalog/public-site-models.md) — anonymous model cards with filters, search, the model page, and old product addresses (spec 007 stage 5).
-- [Admin products](catalog/admin-products.md) — paged lists with server filters (including `withoutPhoto`), full list, and product details by slug.
+- [Admin products](catalog/admin-products.md) — paged lists with server filters (including `withoutPhoto` and `hasStock`), full list, and product details by slug.
 - [Product photos and schemes](catalog/product-media.md) — photos in order and a scheme linked from the media library, auto-link in the CDN sync run.
 - [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
 - [Catalog attributes](catalog/attributes.md) — attribute dictionary, product attribute values, review state, the CSV import, and variant groups with their admin API, and the site models (spec 007) with theirs.

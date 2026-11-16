@@ -9,6 +9,8 @@ public sealed record GetAdminProductsRequest
     public int? CategoryId { get; init; }
 
     public bool? InStock { get; init; }
+    /// <summary><c>true</c> lists products with an actual 1C stock above zero, <c>false</c> those with none.</summary>
+    public bool? HasStock { get; init; }
     public bool? IsSale { get; init; }
     public bool? IsNew { get; init; }
     public bool? ExportToSite { get; init; }

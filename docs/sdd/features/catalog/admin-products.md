@@ -6,7 +6,7 @@ Paged and full product lists, Admin product details by slug, deleted products, a
 
 ## Structure and relationships
 
-[AdminProducts endpoints](../../../../src/Modules/Catalog/Catalog.Api/Endpoints/Products/ProductsEndpoints.cs) dispatches reads to the [list handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductList/GetAdminProductListHandler.cs) or [details handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductBySlug/GetAdminProductBySlugHandler.cs). Lists apply server-side filters and search before counting and paging; boolean parameters distinguish missing, `true`, and `false`. `withoutPhoto=true` keeps rows whose cached photo is empty. Details combine the projection, Product, and category by slug, returning both names, scheme, and flags. HTTP product changes are not implemented here.
+[AdminProducts endpoints](../../../../src/Modules/Catalog/Catalog.Api/Endpoints/Products/ProductsEndpoints.cs) dispatches reads to the [list handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductList/GetAdminProductListHandler.cs) or [details handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Products/Queries/GetAdminProductBySlug/GetAdminProductBySlugHandler.cs). Lists apply server-side filters and search before counting and paging; boolean parameters distinguish missing, `true`, and `false`. `withoutPhoto=true` keeps rows whose cached photo is empty. `hasStock` filters by the actual 1C stock on Product (`true`: above zero, `false`: zero); it differs from `inStock`, the projection's site rule (hardware counts as in stock only above 2). Details combine the projection, Product, and category by slug, returning both names, scheme, and flags. HTTP product changes are not implemented here.
 
 Both paged Admin lists return `categoryName` from the category's Ukrainian short name, accept `categoryId` including all descendants, and sort `CategoryAsc/CategoryDesc` before paging. The [tree traversal helper](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Shared/Tree/CategoryTreeIds.cs) stops cycles with a visited-ID set. `GET /api/categories` provides the complete ordered lookup for the Admin selector. Changes are specified in the [category SDD](../../specs/catalog/admin-product-list/category-table-2026-10-19.md).
 
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Tests
 
-[ApiContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ApiContractTests.cs) · [ProductMediaApiTests.cs](../../../../tests/IntegrationTests/Catalog/ProductMedia/ProductMediaApiTests.cs) (`withoutPhoto`) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs)
+[ApiContractTests.cs](../../../../tests/IntegrationTests/Platform/Api/ApiContractTests.cs) · [ProductMediaApiTests.cs](../../../../tests/IntegrationTests/Catalog/ProductMedia/ProductMediaApiTests.cs) (`withoutPhoto`, `hasStock`) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs)
 
 Focused run: `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~CatalogStableUrlsApiTests|FullyQualifiedName~ProductMediaApiTests"`.
 
