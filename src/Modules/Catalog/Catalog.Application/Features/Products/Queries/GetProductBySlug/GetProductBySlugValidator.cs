@@ -10,7 +10,7 @@ public sealed class GetProductBySlugValidator : AbstractValidator<GetProductBySl
         When(x => x.Request is not null, () =>
         {
             RuleFor(x => x.Request.Slug).LookupSlug();
-            RuleFor(x => x.Request.PriceTypeId).GreaterThan(0).WithMessage("Некоректний тип ціни.");
+            RuleFor(x => x.Request.PriceTypeId).GreaterThan(0).When(x => x.Request.PriceTypeId is not null).WithMessage("Некоректний тип ціни.");
             RuleFor(x => x.Request.Lang).SupportedLanguage();
         });
     }

@@ -26,6 +26,11 @@ public sealed class PublicCatalogValidatorsTests
     }
 
     [Fact]
+    public void ProductBySlug_AcceptsNoPriceType()
+        => Assert.True(new GetProductBySlugValidator().Validate(
+            new GetProductBySlugQuery(new GetProductBySlugRequest("zamok-a", null, "uk"))).IsValid);
+
+    [Fact]
     public void SiteModel_RejectsATooLongSlug()
         => Assert.False(new GetPublicSiteModelValidator().Validate(new GetPublicSiteModelQuery("uk", new string('a', 201))).IsValid);
 
