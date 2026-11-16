@@ -14,5 +14,8 @@ public static class OrderErrors
     public static DomainError OrderNumberRequired() => new("sales.order.order_number_required", "Потрібен номер замовлення.", Field: "OrderNumber");
     public static DomainError OrderNumberTooLong() => new("sales.order.order_number_too_long", $"Номер замовлення — не більше {Order.OrderNumberMaxLength} символів.", Field: "OrderNumber");
     public static DomainError IdempotencyKeyRequired() => new("sales.order.idempotency_key_required", "Потрібен ключ повтору запиту.", Field: "IdempotencyKey");
+    public static DomainError OneCDocumentNumberRequired() => new("sales.order.one_c_document_number_required", "1С не повернула номер документа.");
+    public static DomainError OneCDocumentNumberChanged() => new("sales.order.one_c_document_number_changed", "1С повернула інший номер документа для вже прийнятого замовлення.");
+    public static DomainError AlreadyAcceptedByOneC() => new("sales.order.already_accepted_by_one_c", "Замовлення вже прийнято в 1С.");
     public static DomainError RequestHashRequired() => new("sales.order.request_hash_required", "Потрібен відбиток запиту.");
 }

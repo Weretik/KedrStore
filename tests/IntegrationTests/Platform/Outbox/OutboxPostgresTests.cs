@@ -64,6 +64,7 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
         Assert.Equal(1, failed.Attempts);
         Assert.Equal(Start.AddMinutes(1), failed.NextAttemptAtUtc);
         Assert.Equal("Telegram is down", failed.LastError);
+        Assert.Equal(Start, failed.LastAttemptAtUtc);
 
         await outbox.Dispatcher.DispatchDueAsync(CancellationToken.None);
         Assert.Empty(outbox.Handler.Received);
@@ -94,6 +95,59 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
         Assert.NotNull(stored.FailedAtUtc);
         Assert.Null(stored.ProcessedAtUtc);
         Assert.Equal(OutboxRetrySchedule.MaximumAttempts, outbox.Handler.Calls);
+        Assert.Equal([messageId], outbox.GiveUps.Received.Select(x => x.MessageId));
+        Assert.Equal(OutboxRetrySchedule.MaximumAttempts, outbox.GiveUps.Received.Single().Attempts);
+    }
+
+    [SkippableFact]
+    public async Task Handler_AskingToRetryLater_DoesNotSpendAnAttempt()
+    {
+        await using var outbox = await CreateAsync();
+        outbox.Handler.RetryAtUtc = Start.AddHours(9);
+
+        var messageId = await outbox.StoreAsync(new PingMessage("night"));
+        var report = await outbox.Dispatcher.DispatchDueAsync(CancellationToken.None);
+
+        var stored = await outbox.LoadAsync(messageId);
+        Assert.Equal(OutboxDispatchReport.Empty, report);
+        Assert.Equal(0, stored.Attempts);
+        Assert.Null(stored.LastAttemptAtUtc);
+        Assert.Equal(Start.AddHours(9), stored.NextAttemptAtUtc);
+        Assert.Null(stored.ProcessedAtUtc);
+    }
+
+    [SkippableFact]
+    public async Task Requeue_PutsAFailedMessageBack_Once()
+    {
+        await using var outbox = await CreateAsync();
+        outbox.Handler.FailuresLeft = int.MaxValue;
+        var messageId = await outbox.StoreAsync(new PingMessage("again"));
+        for (var attempt = 0; attempt < OutboxRetrySchedule.MaximumAttempts; attempt++)
+        {
+            await outbox.Dispatcher.DispatchDueAsync(CancellationToken.None);
+            outbox.Clock.Advance(TimeSpan.FromHours(1));
+        }
+
+        Assert.True(await outbox.RequeueAsync(new PingMessage("again"), messageId));
+        Assert.False(await outbox.RequeueAsync(new PingMessage("again"), messageId));
+
+        var stored = await outbox.LoadAsync(messageId);
+        Assert.Equal(0, stored.Attempts);
+        Assert.Null(stored.FailedAtUtc);
+        Assert.Null(stored.LastError);
+        Assert.Equal(outbox.Clock.GetUtcNow(), stored.NextAttemptAtUtc);
+    }
+
+    [SkippableFact]
+    public async Task Requeue_StoresTheMessageAgain_WhenRetentionRemovedIt()
+    {
+        await using var outbox = await CreateAsync();
+        var messageId = Guid.CreateVersion7();
+
+        Assert.True(await outbox.RequeueAsync(new PingMessage("gone"), messageId));
+        await outbox.Dispatcher.DispatchDueAsync(CancellationToken.None);
+
+        Assert.Equal(["gone"], outbox.Handler.Received);
     }
 
     [SkippableFact]
@@ -133,16 +187,19 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
 
         var clock = new ManualClock(Start);
         var handler = new PingHandler();
+        var giveUps = new PingGiveUps();
         var services = new ServiceCollection()
             .AddLogging()
             .AddSingleton<TimeProvider>(clock)
             .AddSingleton(handler)
+            .AddSingleton(giveUps)
             .AddDbContext<SalesDbContext>(options => options.UseNpgsql(postgres.ConnectionString))
             .AddOutbox<SalesDbContext>(SalesDbContext.Schema)
             .AddOutboxHandler<PingMessage, PingHandlerAdapter>("test.ping")
+            .AddOutboxGiveUpHandler<PingMessage, PingGiveUpAdapter>()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-        return new OutboxScenario(services, clock, handler);
+        return new OutboxScenario(services, clock, handler, giveUps);
     }
 
     private sealed record PingMessage(string Text) : IOutboxMessage;
@@ -155,6 +212,8 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
 
         public TimeSpan Delay { get; set; }
 
+        public DateTimeOffset? RetryAtUtc { get; set; }
+
         public int Calls { get; private set; }
 
         public IReadOnlyList<string> Received
@@ -162,8 +221,10 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
             get { lock (_received) return _received.ToArray(); }
         }
 
-        public async Task HandleAsync(PingMessage message)
+        public async Task<OutboxHandlingResult> HandleAsync(PingMessage message)
         {
+            if (RetryAtUtc is { } retryAtUtc)
+                return OutboxHandlingResult.RetryAt(retryAtUtc);
             Calls++;
             if (Delay > TimeSpan.Zero)
                 await Task.Delay(Delay);
@@ -174,13 +235,28 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
             }
 
             lock (_received) _received.Add(message.Text);
+            return OutboxHandlingResult.Delivered;
         }
     }
 
     private sealed class PingHandlerAdapter(PingHandler handler) : IOutboxMessageHandler<PingMessage>
     {
-        public Task HandleAsync(PingMessage message, Guid messageId, CancellationToken cancellationToken)
+        public Task<OutboxHandlingResult> HandleAsync(PingMessage message, Guid messageId, CancellationToken cancellationToken)
             => handler.HandleAsync(message);
+    }
+
+    private sealed class PingGiveUps
+    {
+        public List<OutboxGiveUp> Received { get; } = [];
+    }
+
+    private sealed class PingGiveUpAdapter(PingGiveUps giveUps) : IOutboxGiveUpHandler<PingMessage>
+    {
+        public Task HandleGiveUpAsync(PingMessage message, OutboxGiveUp giveUp, CancellationToken cancellationToken)
+        {
+            giveUps.Received.Add(giveUp);
+            return Task.CompletedTask;
+        }
     }
 
     private sealed class ManualClock(DateTimeOffset now) : TimeProvider
@@ -192,8 +268,11 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
         public void Advance(TimeSpan by) => _now += by;
     }
 
-    private sealed class OutboxScenario(ServiceProvider services, ManualClock clock, PingHandler handler) : IAsyncDisposable
+    private sealed class OutboxScenario(ServiceProvider services, ManualClock clock, PingHandler handler, PingGiveUps giveUps)
+        : IAsyncDisposable
     {
+        public PingGiveUps GiveUps { get; } = giveUps;
+
         public ServiceProvider Services { get; } = services;
 
         public ManualClock Clock { get; } = clock;
@@ -209,6 +288,16 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
             var id = scope.ServiceProvider.GetRequiredService<OutboxWriter>().Add(dbContext, message);
             await dbContext.SaveChangesAsync();
             return id;
+        }
+
+        public async Task<bool> RequeueAsync(PingMessage message, Guid id)
+        {
+            await using var scope = Services.CreateAsyncScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
+            var requeued = await scope.ServiceProvider.GetRequiredService<OutboxWriter>()
+                .RequeueAsync(dbContext, message, id, CancellationToken.None);
+            await dbContext.SaveChangesAsync();
+            return requeued;
         }
 
         public async Task<OutboxMessage> LoadAsync(Guid id)

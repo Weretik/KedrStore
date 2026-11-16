@@ -21,7 +21,7 @@ public static class ScheduledTaskCatalog
     public static IReadOnlyList<ScheduledTaskDefinition> Tasks { get; } =
     [
         new(K.Outbox, "Досилання повідомлень",
-            "Повторює те, що не пішло з першого разу: швидкі замовлення з сайту в 1С і повідомлення в Telegram.",
+            "Надсилає замовлення з адмінки й застосунку в 1С, швидкі замовлення з сайту й повідомлення в Telegram, видаляє акаунти вилучених клієнтів і повторює те, що не пішло з першого разу.",
             TaskSchedule.Interval(5).Value, MaxMinutes: 5, Editable: false, RunsInTick: true),
         new(K.Stocks, "Залишки з 1С", "Оновлює залишки товарів з 1С: дверей, фурнітури й Cosmos.",
             TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(7, 0), new TimeOnly(13, 0)), JobTaskMaxMinutes,
@@ -35,9 +35,6 @@ public static class ScheduledTaskCatalog
             EnabledByDefault: false, Group: CatalogGroup),
         new(K.Customers, "Клієнти з 1С", "Оновлює клієнтів і їхні типи цін з 1С.",
             TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(4, 0)), JobTaskMaxMinutes, EnabledByDefault: false),
-        new(K.Orders, "Замовлення в 1С",
-            "Повторно надсилає в 1С замовлення з адмінки, які не пройшли з першого разу, і повідомляє в Telegram про ті, що не пройшли зовсім.",
-            TaskSchedule.Interval(10).Value, JobTaskMaxMinutes, EnabledByDefault: false),
         new(K.Media, "Фото з CDN",
             "Додає нові фото з CDN у «Фото», привʼязує їх до товарів і розкладає по папках категорій.",
             TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(5, 0)), JobTaskMaxMinutes,

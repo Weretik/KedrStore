@@ -37,6 +37,9 @@ namespace Sales.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("FailedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("LastError")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -152,104 +155,6 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("CounterpartyCategoryPriceTypes", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Domain.Orders.OneCOrderSync", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTimeOffset?>("AcceptedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("AttemptCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("DeadLetterNotificationAttemptCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset?>("DeadLetterNotificationExhaustedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset?>("DeadLetterNotificationLastAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DeadLetterNotificationLastError")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<DateTimeOffset?>("DeadLetterNotificationNextAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset?>("DeadLetterNotifiedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastErrorCode")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("LastErrorMessage")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<int?>("LastHttpStatus")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("NextAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("OneCDocumentNumber")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("OneCRequestPayloadHash")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("OneCResponseBody")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<uint>("xmin")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.HasIndex("Status", "NextAttemptAtUtc");
-
-                    b.ToTable("OneCOrderSyncs", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_OneCOrderSyncs_Status", "\"Status\" IN ('Pending', 'Sent', 'Accepted', 'BusinessError', 'TransportError', 'RetryScheduled', 'DeadLetter')");
-                        });
-                });
-
             modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
                 {
                     b.Property<long>("Id")
@@ -273,6 +178,23 @@ namespace Sales.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTimeOffset?>("OneCAcceptedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OneCDocumentNumber")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("OneCMessageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("OneCRejectedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OneCRejection")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<string>("OrderNumber")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -282,6 +204,9 @@ namespace Sales.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OneCMessageId")
+                        .IsUnique();
 
                     b.HasIndex("CreatedAt", "Id")
                         .HasDatabaseName("IX_Orders_CreatedAt_Id");
@@ -422,40 +347,6 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderLines", (string)null);
                 });
 
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Customers.PendingCounterpartyIdentityDeletion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CounterpartyId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("IdentityUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset?>("LastAttemptAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastError")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdentityUserId");
-
-                    b.HasIndex("CounterpartyId", "IdentityUserId")
-                        .IsUnique();
-
-                    b.ToTable("PendingCounterpartyIdentityDeletions", (string)null);
-                });
-
             modelBuilder.Entity("Sales.Infrastructure.Persistence.OrderDrafts.OrderDraftIdempotencyRecord", b =>
                 {
                     b.Property<long>("Id")
@@ -524,6 +415,8 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExpiresAtUtc");
+
                     b.HasIndex("OrderId")
                         .IsUnique();
 
@@ -540,9 +433,6 @@ namespace Sales.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("OneCOrderSyncId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("OrderId")
                         .HasColumnType("bigint");
@@ -583,22 +473,11 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OneCOrderSyncId");
-
                     b.HasIndex("OrderId");
 
                     b.HasIndex("RequestedAtUtc");
 
                     b.ToTable("OrderSyncRetryAudits", (string)null);
-                });
-
-            modelBuilder.Entity("Sales.Domain.Orders.OneCOrderSync", b =>
-                {
-                    b.HasOne("Sales.Domain.Orders.Order", null)
-                        .WithOne()
-                        .HasForeignKey("Sales.Domain.Orders.OneCOrderSync", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
@@ -651,15 +530,6 @@ namespace Sales.Infrastructure.Migrations
                     b.HasOne("Sales.Domain.Orders.Order", null)
                         .WithOne()
                         .HasForeignKey("Sales.Infrastructure.Persistence.Orders.Idempotency.OrderIdempotencyRecord", "OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.SyncRetries.OrderSyncRetryAudit", b =>
-                {
-                    b.HasOne("Sales.Domain.Orders.OneCOrderSync", null)
-                        .WithMany()
-                        .HasForeignKey("OneCOrderSyncId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

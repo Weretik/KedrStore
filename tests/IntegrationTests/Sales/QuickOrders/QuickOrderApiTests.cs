@@ -207,10 +207,10 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
 
     private sealed class FakeTelegramHandler(FakeTelegram telegram) : IOutboxMessageHandler<QuickOrderPlaced>
     {
-        public Task HandleAsync(QuickOrderPlaced message, Guid messageId, CancellationToken cancellationToken)
+        public Task<OutboxHandlingResult> HandleAsync(QuickOrderPlaced message, Guid messageId, CancellationToken cancellationToken)
         {
             telegram.Send(message);
-            return Task.CompletedTask;
+            return Task.FromResult(OutboxHandlingResult.Delivered);
         }
     }
 

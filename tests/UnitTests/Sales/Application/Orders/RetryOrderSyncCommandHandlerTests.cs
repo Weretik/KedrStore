@@ -1,3 +1,4 @@
+using Sales.Application.Abstractions.Orders.Sync;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Features.Orders.Commands.RetryOrderSync;
 using Sales.Domain.Orders;
@@ -21,14 +22,13 @@ public sealed class RetryOrderSyncCommandHandlerTests
             CancellationToken.None);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal(OneCOrderSyncStatus.RetryScheduled, result.Value.SyncStatus);
+        Assert.Equal(OneCOrderSyncStatus.Pending, result.Value.SyncStatus);
         Assert.Equal("Reference data corrected", store.Reason);
         Assert.Equal("manager-1", store.RequestedBy);
     }
 
     [Theory]
     [InlineData(OneCOrderSyncStatus.Pending)]
-    [InlineData(OneCOrderSyncStatus.Sent)]
     [InlineData(OneCOrderSyncStatus.Accepted)]
     [InlineData(OneCOrderSyncStatus.RetryScheduled)]
     public async Task Handle_ReturnsConflictWhenCurrentStatusCannotBeRetried(OneCOrderSyncStatus status)

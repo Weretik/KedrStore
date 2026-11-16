@@ -13,7 +13,6 @@ public static class ScheduledTaskRunners
         new PricesTaskRunner(),
         new CatalogTaskRunner(),
         new CustomersTaskRunner(),
-        new OrdersTaskRunner(),
         new MediaTaskRunner(),
         new FullSyncTaskRunner(),
         new ProductListTaskRunner(),

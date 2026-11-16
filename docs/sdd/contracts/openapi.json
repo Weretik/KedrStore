@@ -18617,7 +18617,11 @@
           "lines",
           "totalAmount",
           "syncStatus",
-          "oneCDocumentNumber"
+          "oneCDocumentNumber",
+          "syncError",
+          "syncAttempts",
+          "syncLastAttemptAtUtc",
+          "syncNextAttemptAtUtc"
         ],
         "type": "object",
         "properties": {
@@ -18662,6 +18666,30 @@
               "null",
               "string"
             ]
+          },
+          "syncError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "syncAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "syncLastAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "syncNextAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -18675,7 +18703,11 @@
           "lineCount",
           "totalAmount",
           "syncStatus",
-          "adjustmentAmount"
+          "adjustmentAmount",
+          "syncError",
+          "syncAttempts",
+          "syncLastAttemptAtUtc",
+          "syncNextAttemptAtUtc"
         ],
         "type": "object",
         "properties": {
@@ -18710,6 +18742,30 @@
           "adjustmentAmount": {
             "type": "number",
             "format": "double"
+          },
+          "syncError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "syncAttempts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "syncLastAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "syncNextAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },

@@ -12,10 +12,6 @@ internal sealed class OrderSyncRetryAuditConfiguration : IEntityTypeConfiguratio
 
         builder.HasKey(audit => audit.Id);
         builder.Property(audit => audit.Id).ValueGeneratedOnAdd();
-        builder.Property(audit => audit.OneCOrderSyncId)
-            .HasConversion(id => id.Value, value => OneCOrderSyncId.FromStorage(value))
-            .HasColumnType("bigint")
-            .IsRequired();
         builder.Property(audit => audit.OrderId)
             .HasConversion(id => id.Value, value => OrderId.FromStorage(value))
             .HasColumnType("bigint")
@@ -29,9 +25,5 @@ internal sealed class OrderSyncRetryAuditConfiguration : IEntityTypeConfiguratio
 
         builder.HasIndex(audit => audit.OrderId);
         builder.HasIndex(audit => audit.RequestedAtUtc);
-        builder.HasOne<OneCOrderSync>()
-            .WithMany()
-            .HasForeignKey(audit => audit.OneCOrderSyncId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

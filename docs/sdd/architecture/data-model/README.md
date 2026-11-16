@@ -21,14 +21,13 @@ KedrStore PostgreSQL
     │   │   └── PriceType                  # price types
     │   └── List projection
     │       └── ProductListProjections     # denormalized product reads
-    ├── Sales / SalesDbContext — 10 tables
+    ├── Sales / SalesDbContext — 9 tables
     │   ├── Customers
     │   │   ├── Counterparties             # counterparties
     │   │   └── CounterpartyCategoryPriceTypes # price type by category
     │   └── Orders and 1C
     │       ├── Orders                     # orders
     │       ├── OrderLines                 # order lines
-    │       ├── OneCOrderSyncs             # 1C sync state
     │       ├── OrderIdempotencyRecords   # duplicate request protection
     │       ├── OrderSyncRetryAudits      # retry audit
     │       ├── OrderDrafts               # saved drafts without order number
@@ -48,7 +47,7 @@ KedrStore PostgreSQL
     │   └── __EFMigrationsHistory         # applied EF migration history
 └── schema sales
     └── Sales / SalesDbContext — 1 table
-        └── OutboxMessages                # messages sent after the commit (platform spec 006)
+        └── OutboxMessages                # messages sent after the commit: orders to 1C, Telegram, Identity deletions (platform spec 006)
 └── schema content
     └── Content / ContentDbContext — 8 tables
         ├── Articles                      # slug, date, publication flag, cover version

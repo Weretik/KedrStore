@@ -26,8 +26,8 @@ public sealed class OutboxRetryScheduleTests
     [Fact]
     public void MessageTypes_RefuseTheSameNameTwice()
     {
-        var first = new OutboxMessageType("sales.ping", typeof(PingMessage), (_, _, _, _) => Task.CompletedTask);
-        var second = new OutboxMessageType("sales.ping", typeof(OtherMessage), (_, _, _, _) => Task.CompletedTask);
+        var first = new OutboxMessageType("sales.ping", typeof(PingMessage), (_, _, _, _) => Task.FromResult(OutboxHandlingResult.Delivered), (_, _, _, _) => Task.CompletedTask);
+        var second = new OutboxMessageType("sales.ping", typeof(OtherMessage), (_, _, _, _) => Task.FromResult(OutboxHandlingResult.Delivered), (_, _, _, _) => Task.CompletedTask);
 
         Assert.Throws<InvalidOperationException>(() => new OutboxMessageTypes([first, second]));
     }

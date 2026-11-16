@@ -21,7 +21,6 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=<name>
 | `counterparties` | — | Sales counterparties |
 | `counterparty-category-price-types` | — | Sales customer pricing rules |
 | `sales-customers-full` | — | Counterparties first, then pricing rules |
-| `sync-one-c-orders` | — | One ready-to-run batch of saved Sales manager orders |
 | `tasks` | `--tasks=<key>:<runId>,...` | Tasks of «Фонові задачі» the scheduler tick claimed, one after another; only the tick starts it (Cloud Run job `kedr-tasks`), a run id unknown to the database is skipped ([runbook](background-tasks.md)) |
 
 Example:
@@ -32,7 +31,7 @@ dotnet run --project src/Bootstrapper/Host.Jobs/Host.Jobs.csproj -- --job=stocks
 
 Repeat `--rootId` for multiple roots. Exit code `0` and `[SUCCESS] Job finished OK` mean no exception occurred; separately check the number of imported records. Exit code `1` means a job, argument, or execution error; code `2` means a required `--rootId` is missing. For `migrate`, verify the result using the [migration guide](../data/migrations-and-seeding.md).
 
-See the [Sales/1C runbook](sales-one-c-runbook.md#manager-order-delivery) for order delivery prerequisites, result interpretation, stopping, and dead-letter handling.
+Orders to 1C are not a Host.Jobs command: they go through the Sales outbox ([Sales/1C runbook](sales-one-c-runbook.md#manager-order-delivery)).
 
 ## Manual 1C write smoke test
 

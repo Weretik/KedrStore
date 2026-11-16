@@ -12,6 +12,7 @@ using Sales.Application.Abstractions.Persistence;
 using Sales.Application.Features.Orders.Queries.GetOrderSyncStatus;
 using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Domain.Orders;
+using Sales.Application.Abstractions.Orders.Sync;
 
 using IntegrationTests.TestSupport.Api;
 using Sales.Application.Abstractions.Orders.Sync;
@@ -36,7 +37,7 @@ public sealed class AdminOrderApiTests
         Assert.Equal("SO-TEST-0001", body.RootElement.GetProperty("orderNumber").GetString());
         Assert.Equal("Pending", body.RootElement.GetProperty("syncStatus").GetString());
         Assert.Equal(0, state.OneCCallCount);
-        Assert.Equal(OneCOrderSyncStatus.Pending, state.LastSynchronization?.Status);
+        Assert.True(state.Persisted);
     }
 
     [Fact]
@@ -152,9 +153,9 @@ public sealed class AdminOrderApiTests
 
         Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
         using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        Assert.Equal("RetryScheduled", body.RootElement.GetProperty("syncStatus").GetString());
+        Assert.Equal("Pending", body.RootElement.GetProperty("syncStatus").GetString());
         Assert.Equal("The 1C reference data was corrected", state.RetryReason);
-        Assert.Equal(OneCOrderSyncStatus.RetryScheduled, state.RetryStatus);
+        Assert.Equal(OneCOrderSyncStatus.Pending, state.RetryStatus);
         Assert.Equal(0, state.OneCCallCount);
     }
 
@@ -244,7 +245,7 @@ public sealed class AdminOrderApiTests
     {
         public Dictionary<string, CreateOrderIdempotencyRecord> IdempotencyRecords { get; } = new(StringComparer.Ordinal);
         public Dictionary<long, GetOrderSyncStatusResult> SyncStatuses { get; } = [];
-        public OneCOrderSync? LastSynchronization { get; set; }
+        public bool Persisted { get; set; }
         public int OneCCallCount { get; set; }
         public OneCOrderSyncStatus RetryStatus { get; set; } = OneCOrderSyncStatus.BusinessError;
         public string? RetryReason { get; set; }
@@ -260,19 +261,14 @@ public sealed class AdminOrderApiTests
 
         public Task<bool> PersistAsync(
             Order order,
-            Func<OrderId, OneCOrderSync> synchronizationFactory,
             Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
             CancellationToken cancellationToken)
         {
             typeof(Order).GetProperty("Id", BindingFlags.Instance | BindingFlags.Public)!
                 .SetValue(order, OrderId.Create(42));
-            state.LastSynchronization = synchronizationFactory(order.Id);
+            state.Persisted = true;
             state.SyncStatuses[order.Id.Value] = new GetOrderSyncStatusResult(
-                order.Id.Value,
-                order.OrderNumber,
-                state.LastSynchronization.Status,
-                state.LastSynchronization.OneCDocumentNumber,
-                state.LastSynchronization.AcceptedAtUtc);
+                order.Id.Value, order.OrderNumber, OneCOrderSyncStatus.Pending, null, null);
             var record = idempotencyRecordFactory(order.Id);
             state.IdempotencyRecords[record.IdempotencyKey] = record;
             return Task.FromResult(true);
@@ -329,7 +325,7 @@ public sealed class AdminOrderApiTests
             }
 
             state.RetryReason = reason;
-            state.RetryStatus = OneCOrderSyncStatus.RetryScheduled;
+            state.RetryStatus = OneCOrderSyncStatus.Pending;
             return Task.FromResult(new OrderSyncRetryStoreResult(
                 OrderSyncRetryStoreOutcome.Scheduled,
                 orderId,

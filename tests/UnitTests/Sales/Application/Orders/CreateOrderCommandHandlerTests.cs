@@ -1,3 +1,4 @@
+using Sales.Application.Abstractions.Orders.Sync;
 using System.Reflection;
 using Ardalis.Result;
 using Sales.Application.Abstractions.Catalog;
@@ -109,7 +110,7 @@ public sealed class CreateOrderCommandHandlerTests
         public CreateOrderIdempotencyRecord? LastIdempotency { get; private set; }
         public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken) => Task.FromResult(CounterpartyExists);
         public Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken) => Task.FromResult(Existing);
-        public Task<bool> PersistAsync(Order order, Func<OrderId, OneCOrderSync> synchronizationFactory, Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory, CancellationToken cancellationToken)
+        public Task<bool> PersistAsync(Order order, Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory, CancellationToken cancellationToken)
         {
             if (ThrowOnPersist)
                 throw new InvalidOperationException("Simulated transaction failure.");

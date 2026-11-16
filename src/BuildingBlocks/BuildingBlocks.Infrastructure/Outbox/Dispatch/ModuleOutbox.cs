@@ -58,28 +58,63 @@ internal sealed class ModuleOutbox<TContext>(
         DateTimeOffset nowUtc,
         CancellationToken cancellationToken)
     {
+        var type = types.Find(message.Type);
+        OutboxHandlingResult result;
         try
         {
-            var type = types.Find(message.Type)
-                ?? throw new InvalidOperationException($"Outbox message type '{message.Type}' has no handler.");
-            await type.HandleAsync(services, message.Payload, message.Id, cancellationToken);
-            message.MarkProcessed(nowUtc);
-            return new OutboxDispatchReport(1, 0, 0);
+            result = type is null
+                ? OutboxHandlingResult.Failed($"Outbox message type '{message.Type}' has no handler.")
+                : await type.HandleAsync(services, message.Payload, message.Id, cancellationToken);
         }
         catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
         {
-            if (message.MarkAttemptFailed(nowUtc, exception.Message))
-            {
-                logger.LogError(exception,
-                    "Outbox message {MessageId} of type {MessageType} in {Schema} failed after {Attempts} attempts and will not be retried.",
-                    message.Id, message.Type, schema, message.Attempts);
-                return new OutboxDispatchReport(0, 0, 1);
-            }
+            logger.LogWarning(exception, "Outbox message {MessageId} of type {MessageType} in {Schema} threw.",
+                message.Id, message.Type, schema);
+            result = OutboxHandlingResult.Failed(exception.Message);
+        }
 
-            logger.LogWarning(exception,
-                "Outbox message {MessageId} of type {MessageType} in {Schema} failed attempt {Attempts}; next attempt at {NextAttemptAtUtc}.",
-                message.Id, message.Type, schema, message.Attempts, message.NextAttemptAtUtc);
+        switch (result.Outcome)
+        {
+            case OutboxHandlingOutcome.Delivered:
+                message.MarkProcessed(nowUtc);
+                return new OutboxDispatchReport(1, 0, 0);
+            case OutboxHandlingOutcome.RetryAt:
+                message.Postpone(result.RetryAtUtc!.Value);
+                return OutboxDispatchReport.Empty;
+        }
+
+        if (!message.MarkAttemptFailed(nowUtc, result.Error!))
+        {
+            logger.LogWarning(
+                "Outbox message {MessageId} of type {MessageType} in {Schema} failed attempt {Attempts}: {Error}; next attempt at {NextAttemptAtUtc}.",
+                message.Id, message.Type, schema, message.Attempts, message.LastError, message.NextAttemptAtUtc);
             return new OutboxDispatchReport(0, 1, 0);
+        }
+
+        logger.LogError(
+            "Outbox message {MessageId} of type {MessageType} in {Schema} failed after {Attempts} attempts and will not be retried: {Error}.",
+            message.Id, message.Type, schema, message.Attempts, message.LastError);
+        if (type is not null)
+            await GiveUpAsync(services, type, message, cancellationToken);
+        return new OutboxDispatchReport(0, 0, 1);
+    }
+
+    /// <summary>R-009: the module's give-up handler; its failure never undoes the give-up.</summary>
+    private async Task GiveUpAsync(
+        IServiceProvider services,
+        OutboxMessageType type,
+        OutboxMessage message,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await type.GiveUpAsync(services, message.Payload,
+                new OutboxGiveUp(message.Id, message.Attempts, message.LastError), cancellationToken);
+        }
+        catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            logger.LogError(exception, "Give-up handler of outbox message {MessageId} of type {MessageType} failed.",
+                message.Id, message.Type);
         }
     }
 

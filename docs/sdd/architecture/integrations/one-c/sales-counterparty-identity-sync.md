@@ -39,7 +39,7 @@ OneCCounterpartiesSyncService
 3. Rejects rows with empty ID/name, non-positive default price type, or invalid/missing email; logs the skip reason.
 4. Normalizes email and optional phone through `CounterpartyContactNormalizer`.
 5. Creates or finds an Identity user, then creates, updates, or restores the Sales counterparty.
-6. Treats local counterparties missing from a valid non-empty source response as stale: removes their category price rules and Sales records, then requests deletion of the Identity user.
+6. Treats local counterparties missing from a valid non-empty source response as stale: removes their category price rules and Sales records and, in the same transaction, queues a `CounterpartyRemoved` outbox message that deletes the Identity user.
 
 It also prevents linking one `IdentityUserId` to two different counterparties in one local state.
 
@@ -61,7 +61,7 @@ For a new user, the service sets username/email/full name, `EmailConfirmed`, and
 
 - This is more than a read import: `counterparties` or `sales-customers-full` can create, update, restore, or delete both customer data and login accounts.
 - An email match can link an existing Identity user to an imported counterparty. Treat imported 1C email as authoritative only after data quality is confirmed.
-- Sales changes are saved before stale Identity users are deleted. If Identity deletion fails, the Sales deletion remains and a warning is logged; investigate the orphaned account manually.
+- Sales changes and the outbox message are saved together; the outbox tick deletes the Identity user and retries on its schedule (1, 5, 15, 30, 60 minutes, then hourly, 10 attempts). A user linked to another customer meanwhile is kept. After the last failed attempt the row stays failed in `sales."OutboxMessages"` with its error; investigate the account manually.
 - The flow spans Sales and Identity contexts and is not one cross-context transaction. Do not add side effects that assume atomic rollback without separate design.
 - Category price-type rules are skipped when the counterparty is absent from Sales or the category/price type is missing from Catalog. If lookup data changed, sync Catalog before `sales-customers-full`.
 

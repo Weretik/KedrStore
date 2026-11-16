@@ -13,7 +13,9 @@ using Sales.Application.Features.QuickOrders.Messages;
 using Sales.Application.Abstractions.Workspace.Orders;
 using Sales.Application.Abstractions.Workspace.Drafts;
 using Sales.Infrastructure.Integrations.OneC.Counterparties;
-using Sales.Infrastructure.Integrations.OneC.Orders;
+using Sales.Application.Features.Orders.OneCDelivery.GiveUp;
+using Sales.Application.Features.Orders.OneCDelivery.Messages;
+using Sales.Application.Features.Orders.OneCDelivery.Send;
 using Sales.Application.Abstractions.Orders.Sync;
 using Sales.Application.Abstractions.Workspace.Overview;
 using Sales.Application.Abstractions.Workspace.Pricing;
@@ -33,12 +35,18 @@ public static class SalesInfrastructure
         services.Configure<CatalogPricingOptions>(
             configuration.GetSection(CatalogPricingOptions.SectionName));
 
-        services.AddOneCOrderSyncConfiguration(configuration);
+        services.AddOneCSendingWindow(configuration);
 
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
         services.AddOutbox<SalesDbContext>(SalesDbContext.Schema);
         services.AddScoped<IQuickOrderStore, QuickOrderStore>();
         services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);
+        // Platform spec 006, stage 2: orders to 1C, their give-up signal, and the removed customers' Identity users.
+        services.AddScoped<IOrderOneCDeliveryStore, OrderOneCDeliveryStore>();
+        services.AddOutboxHandler<OrderPlaced, SendOrderToOneCHandler>(OrderPlaced.TypeName);
+        services.AddOutboxGiveUpHandler<OrderPlaced, OrderOneCGiveUpHandler>();
+        services.AddOutboxHandler<OrderOneCDeliveryFailed, OrderOneCDeliveryFailedHandler>(OrderOneCDeliveryFailed.TypeName);
+        services.AddOutboxHandler<CounterpartyRemoved, RemovedCounterpartyIdentityDeleter>(CounterpartyRemoved.TypeName);
         services.AddScoped<IReadSalesDbContext>(sp => sp.GetRequiredService<SalesDbContext>());
         services.AddScoped(typeof(ISalesRepository<>), typeof(SalesEfRepository<>));
         services.AddScoped<IOrderCreationStore, OrderCreationStore>();
@@ -71,9 +79,6 @@ public static class SalesInfrastructure
         services.AddScoped<SyncOneCCounterpartiesJob>();
         services.AddScoped<SyncOneCCounterpartyCategoryPriceTypesJob>();
         services.AddScoped<SyncOneCSalesCustomersFullJob>();
-        services.AddScoped<SyncOneCOrdersService>();
-        services.AddScoped<SyncOneCOrdersJob>();
-        services.AddScoped<DeadLetterNotificationService>();
         if (includeCatalogReadServices)
         {
             services.AddScoped<IPricePolicyProvider, DefaultPricePolicyProvider>();

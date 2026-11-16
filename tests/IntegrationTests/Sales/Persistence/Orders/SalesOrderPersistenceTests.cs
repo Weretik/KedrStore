@@ -12,17 +12,15 @@ public sealed class SalesOrderPersistenceTests
     {
         using var dbContext = CreateDbContext();
         var order = RequireEntity<Order>(dbContext);
-        var sync = RequireEntity<OneCOrderSync>(dbContext);
         var line = RequireEntity<OrderLine>(dbContext);
 
         Assert.Contains(order.GetIndexes(), index =>
             index.Properties.Select(property => property.Name).SequenceEqual([nameof(Order.OrderNumber)]) &&
             index.IsUnique);
 
-        var syncForeignKey = sync.GetForeignKeys().Single(foreignKey =>
-            foreignKey.PrincipalEntityType.ClrType == typeof(Order));
-        Assert.True(syncForeignKey.IsUnique);
-        Assert.Equal(DeleteBehavior.Cascade, syncForeignKey.DeleteBehavior);
+        Assert.Contains(order.GetIndexes(), index =>
+            index.Properties.Select(property => property.Name).SequenceEqual([nameof(Order.OneCMessageId)]) &&
+            index.IsUnique);
 
         var lineForeignKey = line.GetForeignKeys().Single(foreignKey =>
             foreignKey.PrincipalEntityType.ClrType == typeof(Order));
@@ -33,25 +31,21 @@ public sealed class SalesOrderPersistenceTests
             foreignKey.PrincipalEntityType.ClrType == typeof(Counterparty));
         Assert.Equal(DeleteBehavior.Restrict, counterpartyForeignKey.DeleteBehavior);
 
-        var documentNumber = sync.FindProperty(nameof(OneCOrderSync.OneCDocumentNumber));
+        var documentNumber = order.FindProperty(nameof(Order.OneCDocumentNumber));
         Assert.NotNull(documentNumber);
         Assert.True(documentNumber!.IsNullable);
-        Assert.Equal(128, documentNumber.GetMaxLength());
+        Assert.Equal(Order.OneCDocumentNumberMaxLength, documentNumber.GetMaxLength());
 
-        var concurrencyToken = sync.FindProperty("xmin");
-        Assert.NotNull(concurrencyToken);
-        Assert.True(concurrencyToken!.IsConcurrencyToken);
-        Assert.Equal(ValueGenerated.OnAddOrUpdate, concurrencyToken.ValueGenerated);
+        var rejection = order.FindProperty(nameof(Order.OneCRejection));
+        Assert.NotNull(rejection);
+        Assert.Equal(Order.OneCRejectionMaxLength, rejection!.GetMaxLength());
     }
 
     [Fact]
-    public void SalesModel_MapsDueRecordIndexAndOrderMigration()
+    public void SalesModel_KeepsOrderMigrations()
     {
         using var dbContext = CreateDbContext();
-        var sync = RequireEntity<OneCOrderSync>(dbContext);
 
-        Assert.Contains(sync.GetIndexes(), index => index.Properties.Select(property => property.Name)
-            .SequenceEqual([nameof(OneCOrderSync.Status), nameof(OneCOrderSync.NextAttemptAtUtc)]));
         Assert.Contains(
             dbContext.Database.GetMigrations(),
             migration => migration.EndsWith("_AddSalesOrdersAndOneCOrderSync", StringComparison.Ordinal));
@@ -61,6 +55,9 @@ public sealed class SalesOrderPersistenceTests
         Assert.Contains(
             dbContext.Database.GetMigrations(),
             migration => migration.EndsWith("_AddOrderSyncRetryAudit", StringComparison.Ordinal));
+        Assert.Contains(
+            dbContext.Database.GetMigrations(),
+            migration => migration.EndsWith("_MoveOneCOrdersToOutbox", StringComparison.Ordinal));
     }
 
     private static SalesDbContext CreateDbContext()

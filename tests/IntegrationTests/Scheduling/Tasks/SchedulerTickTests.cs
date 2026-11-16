@@ -56,11 +56,11 @@ public sealed class SchedulerTickTests
         using var harness = new SchedulingTestHarness();
         var daily = TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(9, 0));
         await EnableAsync(harness, ScheduledTaskKeys.Stocks, daily, harness.Time.GetUtcNow().AddMinutes(-1));
-        await EnableAsync(harness, ScheduledTaskKeys.Orders, daily, harness.Time.GetUtcNow().AddDays(1));
+        await EnableAsync(harness, ScheduledTaskKeys.Customers, daily, harness.Time.GetUtcNow().AddDays(1));
         await harness.TickAsync();
         var stocks = harness.Launcher.Launches.Single().Single();
         await EnableAsync(harness, ScheduledTaskKeys.Prices, daily, harness.Time.GetUtcNow());
-        await EnableAsync(harness, ScheduledTaskKeys.Orders, daily, harness.Time.GetUtcNow());
+        await EnableAsync(harness, ScheduledTaskKeys.Customers, daily, harness.Time.GetUtcNow());
 
         harness.Time.Advance(TimeSpan.FromMinutes(5));
         var whileStocksRuns = await harness.TickAsync();
@@ -68,7 +68,7 @@ public sealed class SchedulerTickTests
         harness.Time.Advance(TimeSpan.FromMinutes(5));
         var afterStocks = await harness.TickAsync();
 
-        Assert.Equal([ScheduledTaskKeys.Orders], whileStocksRuns.Started);
+        Assert.Equal([ScheduledTaskKeys.Customers], whileStocksRuns.Started);
         Assert.Equal([ScheduledTaskKeys.Prices], afterStocks.Started);
     }
 

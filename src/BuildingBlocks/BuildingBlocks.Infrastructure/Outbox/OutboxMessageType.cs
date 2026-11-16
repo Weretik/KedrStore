@@ -8,7 +8,8 @@ namespace BuildingBlocks.Infrastructure.Outbox;
 public sealed class OutboxMessageType(
     string name,
     Type messageType,
-    Func<IServiceProvider, string, Guid, CancellationToken, Task> handle)
+    Func<IServiceProvider, string, Guid, CancellationToken, Task<OutboxHandlingResult>> handle,
+    Func<IServiceProvider, string, OutboxGiveUp, CancellationToken, Task> runGiveUp)
 {
     internal static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
@@ -21,16 +22,30 @@ public sealed class OutboxMessageType(
         where TMessage : IOutboxMessage
         => JsonSerializer.Deserialize<TMessage>(payload, Json);
 
-    internal Task HandleAsync(IServiceProvider services, string payload, Guid messageId, CancellationToken cancellationToken)
+    internal Task<OutboxHandlingResult> HandleAsync(
+        IServiceProvider services,
+        string payload,
+        Guid messageId,
+        CancellationToken cancellationToken)
         => handle(services, payload, messageId, cancellationToken);
+
+    /// <summary>Runs the module's give-up handler of this type, when it registered one (R-009).</summary>
+    internal Task GiveUpAsync(IServiceProvider services, string payload, OutboxGiveUp giveUp, CancellationToken cancellationToken)
+        => runGiveUp(services, payload, giveUp, cancellationToken);
 
     internal static OutboxMessageType For<TMessage>(string name)
         where TMessage : IOutboxMessage
-        => new(name, typeof(TMessage), (services, payload, messageId, cancellationToken) =>
-        {
-            var message = JsonSerializer.Deserialize<TMessage>(payload, Json)
-                ?? throw new InvalidOperationException($"Outbox message {messageId} has an empty payload.");
-            return services.GetRequiredService<IOutboxMessageHandler<TMessage>>()
-                .HandleAsync(message, messageId, cancellationToken);
-        });
+        => new(name, typeof(TMessage),
+            (services, payload, messageId, cancellationToken) =>
+                services.GetRequiredService<IOutboxMessageHandler<TMessage>>()
+                    .HandleAsync(Read<TMessage>(payload, messageId), messageId, cancellationToken),
+            (services, payload, giveUp, cancellationToken) =>
+                services.GetService<IOutboxGiveUpHandler<TMessage>>() is { } handler
+                    ? handler.HandleGiveUpAsync(Read<TMessage>(payload, giveUp.MessageId), giveUp, cancellationToken)
+                    : Task.CompletedTask);
+
+    private static TMessage Read<TMessage>(string payload, Guid messageId)
+        where TMessage : IOutboxMessage
+        => JsonSerializer.Deserialize<TMessage>(payload, Json)
+           ?? throw new InvalidOperationException($"Outbox message {messageId} has an empty payload.");
 }

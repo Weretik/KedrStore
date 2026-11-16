@@ -1,10 +1,10 @@
-using IntegrationTests.TestSupport.Sales;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sales.Application.Abstractions.Orders;
+using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Infrastructure.Persistence;
 using Sales.Infrastructure.DependencyInjection;
@@ -32,12 +32,13 @@ public sealed class WorkspaceOverviewReaderTests
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
 
-        var yesterday = await OrderSyncScenario.SeedOrderAsync(db, TodayFrom.AddHours(-3), "1");
-        yesterday.StartAttempt(TodayFrom.AddHours(-2), "hash");
-        yesterday.MarkBusinessError(TodayFrom.AddHours(-2), "Counterparty not found");
-        var accepted = await OrderSyncScenario.SeedOrderAsync(db, TodayFrom.AddHours(1), "2");
-        accepted.Accept(TodayFrom.AddHours(2), "DOC-2");
-        await OrderSyncScenario.SeedOrderAsync(db, TodayFrom.AddHours(3), "3");
+        db.Counterparties.Add(Counterparty.Create("cp-1", Guid.NewGuid(), "Клієнт", "cp-1@example.com", null, 1,
+            TodayFrom.AddDays(-1)).Value);
+        var yesterday = AddOrder(db, TodayFrom.AddHours(-3), "1");
+        yesterday.RejectByOneC("Counterparty not found", TodayFrom.AddHours(-2));
+        var accepted = AddOrder(db, TodayFrom.AddHours(1), "2");
+        Assert.True(accepted.AcceptByOneC("DOC-2", TodayFrom.AddHours(2)).IsSuccess);
+        AddOrder(db, TodayFrom.AddHours(3), "3");
         db.OrderDrafts.Add(OrderDraft.Create("Чернетка", null, "cp-1", [OrderDraftLine.Create("p-1", 1)], TodayFrom));
         await db.SaveChangesAsync();
 
@@ -53,5 +54,13 @@ public sealed class WorkspaceOverviewReaderTests
         Assert.Equal("Counterparty not found", problem.ErrorMessage);
         Assert.Equal(["SO-3", "SO-2", "SO-1"], overview.LatestOrders.Select(order => order.OrderNumber));
         Assert.Equal(10m, overview.LatestOrders[0].TotalAmount);
+    }
+
+    private static Order AddOrder(SalesDbContext db, DateTimeOffset createdAt, string suffix)
+    {
+        var order = Order.Create($"SO-{suffix}", "cp-1", null,
+            [OrderLine.Create("p-1", "Ручка", 1, 10m).Value], createdAt).Value;
+        db.Orders.Add(order);
+        return order;
     }
 }

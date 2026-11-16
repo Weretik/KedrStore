@@ -1,4 +1,5 @@
-using Identity.Contracts.Users;
+using BuildingBlocks.Infrastructure.Outbox.Persistence;
+using Sales.Infrastructure.Customers;
 using Sales.Domain.Customers;
 using Sales.Infrastructure.Persistence.Customers;
 using Sales.Infrastructure.Persistence.OrderDrafts;
@@ -7,7 +8,7 @@ namespace Sales.Infrastructure.Integrations.OneC.Counterparties;
 
 public sealed class StaleCounterpartyRemoval(
     SalesDbContext db,
-    IImportedCounterpartyIdentityProvisioningService identityProvisioning,
+    OutboxWriter outbox,
     ILogger<StaleCounterpartyRemoval> logger)
 {
     internal async Task<int> RemoveAsync(Counterparty[] stale, CancellationToken ct)
@@ -25,7 +26,7 @@ public sealed class StaleCounterpartyRemoval(
             .Where(item => orderIds.Contains(item.OrderId)).ToArrayAsync(ct);
 
         // These records use Restrict FKs. Remove them before Orders so the
-        // database can cascade OrderLines and OneCOrderSyncs safely.
+        // database can cascade OrderLines safely.
         db.OrderSyncRetryAudits.RemoveRange(retryAudits);
         db.OrderIdempotencyRecords.RemoveRange(idempotency);
         await db.SaveChangesAsync(ct);
@@ -37,64 +38,14 @@ public sealed class StaleCounterpartyRemoval(
         db.OrderDrafts.RemoveRange(drafts);
         db.CounterpartyCategoryPriceTypes.RemoveRange(rules);
         db.Counterparties.RemoveRange(stale);
-        var pending = await db.PendingCounterpartyIdentityDeletions
-            .Where(item => staleIds.Contains(item.CounterpartyId)).ToArrayAsync(ct);
-        db.PendingCounterpartyIdentityDeletions.AddRange(stale
-            .Where(item => pending.All(record => record.CounterpartyId != item.Id ||
-                record.IdentityUserId != item.IdentityUserId))
-            .Select(item =>
-            new PendingCounterpartyIdentityDeletion
-            {
-                CounterpartyId = item.Id,
-                IdentityUserId = item.IdentityUserId,
-                CreatedAtUtc = DateTimeOffset.UtcNow
-            }));
+        // Platform spec 006, R-014: the Identity users go with the customers, through the outbox.
+        foreach (var customer in stale)
+            outbox.Add(db, new CounterpartyRemoved(customer.Id, customer.IdentityUserId));
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 
         logger.LogInformation("Removed {CounterpartyCount} stale counterparties, {OrderCount} orders and {DraftCount} drafts locally.",
             stale.Length, orders.Length, drafts.Length);
         return stale.Length;
-    }
-
-    internal async Task DrainIdentityDeletionsAsync(CancellationToken ct)
-    {
-        var pending = await db.PendingCounterpartyIdentityDeletions
-            .OrderBy(item => item.CreatedAtUtc).ToArrayAsync(ct);
-        foreach (var item in pending)
-        {
-            if (await db.Counterparties.IgnoreQueryFilters()
-                    .AnyAsync(customer => customer.IdentityUserId == item.IdentityUserId, ct))
-            {
-                db.PendingCounterpartyIdentityDeletions.Remove(item);
-                await db.SaveChangesAsync(ct);
-                continue;
-            }
-
-            try
-            {
-                var result = await identityProvisioning.DeleteUserAsync(
-                    item.IdentityUserId, item.CounterpartyId, ct);
-                if (result.IsSuccess)
-                {
-                    db.PendingCounterpartyIdentityDeletions.Remove(item);
-                }
-                else
-                {
-                    item.LastAttemptAtUtc = DateTimeOffset.UtcNow;
-                    var reason = string.Join(", ", result.Errors);
-                    item.LastError = reason.Length > 500 ? reason[..500] : reason;
-                    logger.LogWarning("Identity deletion remains pending for counterparty {CounterpartyId}.", item.CounterpartyId);
-                }
-                await db.SaveChangesAsync(ct);
-            }
-            catch (Exception error) when (error is not OperationCanceledException)
-            {
-                item.LastAttemptAtUtc = DateTimeOffset.UtcNow;
-                item.LastError = error.GetType().Name;
-                await db.SaveChangesAsync(ct);
-                logger.LogWarning(error, "Identity deletion remains pending for counterparty {CounterpartyId}.", item.CounterpartyId);
-            }
-        }
     }
 }

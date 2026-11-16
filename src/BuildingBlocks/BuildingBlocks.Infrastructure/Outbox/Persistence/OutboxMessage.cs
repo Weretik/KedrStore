@@ -32,6 +32,9 @@ public sealed class OutboxMessage
 
     public string? LastError { get; private set; }
 
+    /// <summary>When the last real attempt ran; a <see cref="Postpone"/> is not an attempt.</summary>
+    public DateTimeOffset? LastAttemptAtUtc { get; private set; }
+
     internal static OutboxMessage Create(Guid id, string type, string payload, DateTimeOffset nowUtc) => new()
     {
         Id = id,
@@ -44,14 +47,19 @@ public sealed class OutboxMessage
     internal void MarkProcessed(DateTimeOffset nowUtc)
     {
         Attempts++;
+        LastAttemptAtUtc = nowUtc;
         ProcessedAtUtc = nowUtc;
         LastError = null;
     }
+
+    /// <summary>The handler could not try now (R-008): the message waits until then, without spending an attempt.</summary>
+    internal void Postpone(DateTimeOffset retryAtUtc) => NextAttemptAtUtc = retryAtUtc;
 
     /// <summary>Records a failed attempt; returns true when it was the last one.</summary>
     internal bool MarkAttemptFailed(DateTimeOffset nowUtc, string error)
     {
         Attempts++;
+        LastAttemptAtUtc = nowUtc;
         LastError = error.Length <= MaximumErrorLength ? error : error[..MaximumErrorLength];
 
         if (OutboxRetrySchedule.IsExhausted(Attempts))

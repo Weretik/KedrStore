@@ -59,7 +59,6 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
             return created.Error!;
         var order = created.Value;
         var persisted = await orderStore.PersistAsync(order,
-            id => OneCOrderSync.Create(id, now),
             id => new CreateOrderIdempotencyRecord(OrderOperation, key, hash, id,
                 order.OrderNumber, OneCOrderSyncStatus.Pending, now, now.AddHours(24)), ct);
         if (!persisted)

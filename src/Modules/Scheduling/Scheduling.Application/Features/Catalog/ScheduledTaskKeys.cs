@@ -8,7 +8,6 @@ public static class ScheduledTaskKeys
     public const string Prices = "prices";
     public const string Catalog = "catalog";
     public const string Customers = "customers";
-    public const string Orders = "orders";
     public const string Media = "media";
     public const string FullSync = "full-sync";
     public const string ProductList = "product-list";

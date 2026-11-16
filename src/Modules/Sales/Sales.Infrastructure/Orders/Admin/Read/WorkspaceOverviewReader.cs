@@ -11,30 +11,52 @@ internal sealed class WorkspaceOverviewReader(SalesDbContext db) : IWorkspaceOve
     public async Task<WorkspaceOverview> GetAsync(DateTimeOffset todayFromUtc, CancellationToken ct)
     {
         var orders =
-            from order in db.Orders.AsNoTracking()
-            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on order.CounterpartyId equals customer.Id
-            join sync in db.OneCOrderSyncs.AsNoTracking() on order.Id equals sync.OrderId
-            select new { order, customer, sync };
-        var problems = orders.Where(x =>
-            x.sync.Status == OneCOrderSyncStatus.BusinessError || x.sync.Status == OneCOrderSyncStatus.DeadLetter);
+            from row in db.OrdersWithOneCMessage()
+            join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on row.Order.CounterpartyId equals customer.Id
+            select new { row, customer };
+        var problems = db.OrdersWithOneCMessage().Where(OrderOneCQueries.IsProblem)
+            .Join(db.Counterparties.IgnoreQueryFilters().AsNoTracking(), row => row.Order.CounterpartyId,
+                customer => customer.Id, (row, customer) => new { row, customer });
 
         var ordersToday = await db.Orders.AsNoTracking().CountAsync(order => order.CreatedAt >= todayFromUtc, ct);
         var draftCount = await db.OrderDrafts.AsNoTracking().CountAsync(ct);
         var problemCount = await problems.CountAsync(ct);
-        var problemRows = await problems
-            .OrderByDescending(x => x.order.CreatedAt).ThenByDescending(x => x.order.Id)
-            .Take(WorkspaceOverview.ListSize)
-            .Select(x => new WorkspaceSyncProblem(x.order.Id.Value, x.order.OrderNumber, x.customer.Name,
-                x.order.CreatedAt, x.sync.Status.ToString(), x.sync.LastErrorMessage))
-            .ToListAsync(ct);
-        var latest = await orders
-            .OrderByDescending(x => x.order.CreatedAt).ThenByDescending(x => x.order.Id)
-            .Take(WorkspaceOverview.ListSize)
-            .Select(x => new WorkspaceOrderListItem(x.order.Id.Value, x.order.OrderNumber,
-                x.order.CounterpartyId, x.customer.Name, x.order.CreatedAt,
-                x.order.Lines.Count, x.order.Lines.Sum(y => y.Amount), x.sync.Status.ToString(),
-                x.order.Lines.Sum(y => y.PriceAdjustment * y.Quantity)))
-            .ToListAsync(ct);
+        var problemRows = (await problems
+                .OrderByDescending(x => x.row.Order.CreatedAt).ThenByDescending(x => x.row.Order.Id)
+                .Take(WorkspaceOverview.ListSize)
+                .Select(x => new
+                {
+                    x.row.Order.Id, x.row.Order.OrderNumber, x.customer.Name, x.row.Order.CreatedAt,
+                    x.row.Order.OneCDocumentNumber, x.row.Order.OneCRejection, x.row.Message
+                })
+                .ToListAsync(ct))
+            .Select(x =>
+            {
+                var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.Message);
+                return new WorkspaceSyncProblem(x.Id.Value, x.OrderNumber, x.Name, x.CreatedAt,
+                    oneC.Status.ToString(), oneC.Error);
+            })
+            .ToList();
+        var latest = (await orders
+                .OrderByDescending(x => x.row.Order.CreatedAt).ThenByDescending(x => x.row.Order.Id)
+                .Take(WorkspaceOverview.ListSize)
+                .Select(x => new
+                {
+                    x.row.Order.Id, x.row.Order.OrderNumber, x.row.Order.CounterpartyId, x.customer.Name,
+                    x.row.Order.CreatedAt, LineCount = x.row.Order.Lines.Count,
+                    Total = x.row.Order.Lines.Sum(y => y.Amount),
+                    Adjustment = x.row.Order.Lines.Sum(y => y.PriceAdjustment * y.Quantity),
+                    x.row.Order.OneCDocumentNumber, x.row.Order.OneCRejection, x.row.Message
+                })
+                .ToListAsync(ct))
+            .Select(x =>
+            {
+                var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.Message);
+                return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId, x.Name, x.CreatedAt,
+                    x.LineCount, x.Total, oneC.Status.ToString(), x.Adjustment,
+                    oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
+            })
+            .ToList();
 
         return new WorkspaceOverview(ordersToday, draftCount, problemCount, problemRows, latest);
     }
