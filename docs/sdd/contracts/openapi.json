@@ -9209,7 +9209,7 @@
           "AdminOrders"
         ],
         "summary": "Schedule a failed order for another 1C delivery cycle",
-        "description": "Allowed only for BusinessError and DeadLetter. The request records an audit entry and changes the state to RetryScheduled; it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).",
+        "description": "Allowed only for BusinessError and DeadLetter. The request records an audit entry and puts the order back in the outbox queue (state Pending, attempts from zero); it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).",
         "operationId": "retryAdminOrderSync",
         "parameters": [
           {
