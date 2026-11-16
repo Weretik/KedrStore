@@ -1,11 +1,15 @@
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Category;
+using Catalog.Contracts.Pricing;
 
 namespace Catalog.Application.Features.Products.Queries.GetProductBySlug;
 
 /// <summary>Public product page: current or former slug resolves; a deleted product points to its category (R-018).</summary>
-public class GetProductBySlugHandler(IReadCatalogDbContext catalogDbContext, ISlugService slugService)
+public class GetProductBySlugHandler(
+    IReadCatalogDbContext catalogDbContext,
+    ISlugService slugService,
+    IOptionsSnapshot<CatalogPricingOptions> pricingOptions)
     : IQueryHandler<GetProductBySlugQuery, Result<CatalogLookup<ProductBySlugDto>>>
 {
     public async ValueTask<Result<CatalogLookup<ProductBySlugDto>>> Handle(GetProductBySlugQuery query,
@@ -27,7 +31,8 @@ public class GetProductBySlugHandler(IReadCatalogDbContext catalogDbContext, ISl
                 catalogDbContext.Categories.AsNoTracking(),
                 catalogDbContext.ProductTranslations.AsNoTracking(),
                 productId.Value,
-                request)
+                request,
+                pricingOptions.Value.RetailPriceTypeId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (result is null)

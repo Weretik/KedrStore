@@ -10,14 +10,14 @@ internal static class GetProductBySlugEndpoint
         group.MapGet("product/{productSlug}", Handle)
             .WithName("getPublicProductBySlug")
             .WithSummary("Get a public product by slug")
-            .WithDescription("A former slug returns 200 with `productSlug` set to the current slug, so the client can redirect permanently. A product of a deleted category is not public.")
+            .WithDescription("A former slug returns 200 with `productSlug` set to the current slug, so the client can redirect permanently. A product of a deleted category is not public. Without `priceTypeId` the price is the retail one, the same as in the catalog lists.")
             .Produces<ProductBySlugDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .Produces<CatalogRedirect>(StatusCodes.Status404NotFound);
 
     private static async Task<IResult> Handle(
         [FromRoute] string lang, [FromRoute] string productSlug, ISender sender, HttpContext http,
-        [FromQuery] int priceTypeId = 11, CancellationToken cancellationToken = default)
+        [FromQuery] int? priceTypeId = null, CancellationToken cancellationToken = default)
     {
         var request = new GetProductBySlugRequest(productSlug, priceTypeId, lang);
         var query = new GetProductBySlugQuery(request);

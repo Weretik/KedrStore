@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using NodaMoney;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -170,6 +171,23 @@ public sealed class CatalogStableUrlsApiTests
 
         using var list = await client.GetAsync("/api/catalog/uk/nemaie/products");
         Assert.Equal(HttpStatusCode.NotFound, list.StatusCode);
+    }
+
+    [Fact]
+    public async Task PublicProduct_ShowsTheRetailPriceOfTheLists_UnlessAPriceTypeIsAsked()
+    {
+        await using var db = Seed();
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.From(20), PriceTypeId.From(11), new Money(90m, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.From(20), PriceTypeId.From(12), new Money(100m, "UAH")).Value);
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        using var retail = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a"));
+        using var asked = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a?priceTypeId=11"));
+
+        Assert.Equal(100m, retail.RootElement.GetProperty("price").GetDecimal());
+        Assert.Equal(90m, asked.RootElement.GetProperty("price").GetDecimal());
     }
 
     private static CatalogDbContext Seed()

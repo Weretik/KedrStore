@@ -8,7 +8,8 @@ public static class ProductFiltersAndJoinPriceExtensions
         IQueryable<ProductCategory> categoriesQuery,
         IQueryable<ProductTranslation> translationsQuery,
         int productId,
-        GetProductBySlugRequest request)
+        GetProductBySlugRequest request,
+        int retailPriceTypeId)
     {
         var language = NormalizeLanguage(request.Lang);
         translationsQuery = translationsQuery.Where(t => t.Language == language);
@@ -30,7 +31,7 @@ public static class ProductFiltersAndJoinPriceExtensions
             (query, category) => new { query.product, query.translation, category }
         );
 
-        var priceTypeId = PriceTypeId.From(request.PriceTypeId);
+        var priceTypeId = PriceTypeId.From(request.PriceTypeId ?? retailPriceTypeId);
         var filteredPrices  = pricesQuery.Where(pr => pr.PriceTypeId == priceTypeId);
 
         var withCategoryAndPrice = withCategory.LeftJoin(
