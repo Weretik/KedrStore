@@ -31,6 +31,7 @@ public static class SchedulingInfrastructure
         services.Configure<CloudRunJobOptions>(configuration.GetSection(CloudRunJobOptions.Section));
         services.AddHttpClient<ITaskJobLauncher, CloudRunTaskJobLauncher>(client => client.Timeout = TimeSpan.FromSeconds(30));
         services.AddScoped<ITickWork, OutboxTickWork>();
+        services.AddScoped<ITickWork, OneCOrdersTickWork>();
         return services;
     }
 }

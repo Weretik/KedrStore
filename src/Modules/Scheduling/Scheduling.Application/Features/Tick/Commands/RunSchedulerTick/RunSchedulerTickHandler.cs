@@ -37,7 +37,10 @@ public sealed class RunSchedulerTickHandler(
         foreach (var work in inlineWork)
         {
             var row = rows.FirstOrDefault(x => x.Definition.Key == work.TaskKey && x.Definition.RunsInTick);
-            if (row is null || !row.Task.Enabled) continue;
+            if (row is null) continue;
+            // The general outbox runs with every tick while on; an editable task of the tick follows its own schedule and «Запустити зараз».
+            var now = clock.GetUtcNow();
+            if (row.Definition.Editable ? !row.Task.IsDue(now) : !row.Task.Enabled) continue;
             try
             {
                 var summary = await work.RunAsync(cancellationToken);

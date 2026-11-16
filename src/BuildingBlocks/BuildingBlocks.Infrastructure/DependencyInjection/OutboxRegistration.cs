@@ -31,12 +31,14 @@ public static partial class OutboxRegistration
     }
 
     /// <param name="name">The stored type name; keep it when the message class is renamed.</param>
-    public static IServiceCollection AddOutboxHandler<TMessage, THandler>(this IServiceCollection services, string name)
+    /// <param name="lane">A lane from <see cref="OutboxLanes"/> when the type has its own background task; else the general one.</param>
+    public static IServiceCollection AddOutboxHandler<TMessage, THandler>(this IServiceCollection services, string name,
+        string? lane = null)
         where TMessage : IOutboxMessage
         where THandler : class, IOutboxMessageHandler<TMessage>
     {
         services.AddOutboxCore();
-        services.AddSingleton(OutboxMessageType.For<TMessage>(name));
+        services.AddSingleton(OutboxMessageType.For<TMessage>(name, lane));
         services.AddScoped<IOutboxMessageHandler<TMessage>, THandler>();
         return services;
     }

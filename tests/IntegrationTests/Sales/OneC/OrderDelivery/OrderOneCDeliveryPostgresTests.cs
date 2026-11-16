@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Outbox;
 using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 using IntegrationTests.TestSupport.Database;
 using IntegrationTests.TestSupport.Sales;
@@ -40,7 +41,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         var orderId = await CreateOrderAsync(sales);
         sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.Accepted("DOC-1", null));
 
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
 
         var detail = await DetailAsync(sales, orderId);
         Assert.Equal("Accepted", detail.SyncStatus);
@@ -57,9 +58,9 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         var orderId = await CreateOrderAsync(sales);
         sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.BusinessError("Клієнта не знайдено"));
 
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
         sales.Clock.Advance(TimeSpan.FromHours(1));
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
 
         var row = await ListedAsync(sales, orderId);
         Assert.Equal("BusinessError", row.SyncStatus);
@@ -73,7 +74,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         await using var sales = await SalesOutboxHarness.CreateAsync(postgres);
         var orderId = await CreateOrderAsync(sales);
 
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
 
         var row = await ListedAsync(sales, orderId);
         Assert.Equal("RetryScheduled", row.SyncStatus);
@@ -119,7 +120,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
             .SqlQueryRaw<int>("""SELECT COUNT(*)::integer AS "Value" FROM "OrderSyncRetryAudits" """).SingleAsync()));
 
         sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.Accepted("DOC-9", null));
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
         Assert.Equal("Accepted", (await ListedAsync(sales, orderId)).SyncStatus);
     }
 
@@ -129,7 +130,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         await using var sales = await SalesOutboxHarness.CreateAsync(postgres);
         var refused = await CreateOrderAsync(sales);
         sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.BusinessError("Немає ціни"));
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
         var waiting = await CreateOrderAsync(sales, "cp-2");
 
         Assert.Equal(OrderSyncRetryStoreOutcome.Scheduled, (await RetryAsync(sales, refused)).Outcome);
@@ -140,11 +141,18 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         Assert.Null(row.SyncError);
     }
 
+    /// <summary>The order lane is sent by its own task, the rest (give-up signals) by the general one.</summary>
+    private static async Task DispatchAllAsync(SalesOutboxHarness sales)
+    {
+        await sales.Dispatcher.DispatchLaneAsync(OutboxLanes.OneCOrders, CancellationToken.None);
+        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+    }
+
     private static async Task FailEveryAttemptAsync(SalesOutboxHarness sales)
     {
         for (var attempt = 0; attempt < OutboxRetrySchedule.MaximumAttempts; attempt++)
         {
-            await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+            await DispatchAllAsync(sales);
             // Stay inside the sending window: an hour passes, then back to noon of the next day when needed.
             sales.Clock.Advance(TimeSpan.FromHours(1));
             if (attempt % 6 == 5)
@@ -152,7 +160,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         }
 
         // The Telegram signal stored by the give-up goes out with the next dispatch.
-        await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
+        await DispatchAllAsync(sales);
     }
 
     private static Task<OrderSyncRetryStoreResult> RetryAsync(SalesOutboxHarness sales, long orderId)

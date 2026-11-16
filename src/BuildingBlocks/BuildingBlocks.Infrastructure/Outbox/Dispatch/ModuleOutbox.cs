@@ -22,6 +22,7 @@ internal sealed class ModuleOutbox<TContext>(
 
     public async Task<OutboxDispatchReport> ProcessAsync(
         IReadOnlyCollection<Guid>? messageIds,
+        string? lane,
         CancellationToken cancellationToken)
     {
         await using var scope = scopes.CreateAsyncScope();
@@ -29,7 +30,7 @@ internal sealed class ModuleOutbox<TContext>(
         var nowUtc = clock.GetUtcNow();
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-        var messages = await LockDue(dbContext, nowUtc, messageIds).ToListAsync(cancellationToken);
+        var messages = await LockDue(dbContext, nowUtc, messageIds, lane).ToListAsync(cancellationToken);
         if (messages.Count == 0)
             return OutboxDispatchReport.Empty;
 
@@ -121,18 +122,21 @@ internal sealed class ModuleOutbox<TContext>(
     private IQueryable<OutboxMessage> LockDue(
         TContext dbContext,
         DateTimeOffset nowUtc,
-        IReadOnlyCollection<Guid>? messageIds)
+        IReadOnlyCollection<Guid>? messageIds,
+        string? lane)
     {
         var onlyGiven = messageIds is null ? string.Empty : """ AND "Id" = ANY(@ids)""";
+        // A lane takes only its types; the general task takes everything else, so a message has exactly one sender.
+        var byLane = lane is null ? """ AND "Type" <> ALL(@lane)""" : """ AND "Type" = ANY(@lane)""";
         var sql = $"""
             SELECT * FROM "{schema}"."{OutboxModelBuilderExtensions.TableName}"
-            WHERE "ProcessedAtUtc" IS NULL AND "FailedAtUtc" IS NULL AND "NextAttemptAtUtc" <= @now{onlyGiven}
+            WHERE "ProcessedAtUtc" IS NULL AND "FailedAtUtc" IS NULL AND "NextAttemptAtUtc" <= @now{onlyGiven}{byLane}
             ORDER BY "NextAttemptAtUtc"
             LIMIT {BatchSize}
             FOR UPDATE SKIP LOCKED
             """;
 
-        var parameters = new List<object> { new NpgsqlParameter("now", nowUtc) };
+        var parameters = new List<object> { new NpgsqlParameter("now", nowUtc), new NpgsqlParameter("lane", types.LaneNames(lane)) };
         if (messageIds is not null)
             parameters.Add(new NpgsqlParameter("ids", messageIds.ToArray()));
 

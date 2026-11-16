@@ -138,6 +138,9 @@ public sealed class PlaceQuickOrderRepeatTests
 
         public Task<OutboxDispatchReport> DispatchDueAsync(CancellationToken cancellationToken) =>
             Task.FromResult(OutboxDispatchReport.Empty);
+
+        public Task<OutboxDispatchReport> DispatchLaneAsync(string lane, CancellationToken cancellationToken) =>
+            Task.FromResult(OutboxDispatchReport.Empty);
     }
 
     private sealed class FixedClock : TimeProvider

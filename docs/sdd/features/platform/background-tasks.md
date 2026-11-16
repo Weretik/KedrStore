@@ -2,7 +2,7 @@
 
 **Static code check:** 2026-11-14. **Module:** Scheduling. **Spec:** [platform/007](../../specs/platform/007-background-tasks/README.md). **Contract:** [OpenAPI](../../contracts/openapi.json).
 
-One Cloud Scheduler entry calls the tick every five minutes; the tick sends the outbox and starts every due task in one execution of the Cloud Run Job `kedr-tasks`. The list of tasks is code; an Admin changes only the schedule, the on/off switch and the next run, sees the last success and the last failure with its reason, and presses «Запустити зараз». Stocks (07:00 and 13:00) and prices (Monday 06:00) are separate tasks.
+One Cloud Scheduler entry calls the tick every five minutes; the tick sends the outbox and starts every due task in one execution of the Cloud Run Job `kedr-tasks`. The list of tasks is code; an Admin changes only the schedule, the on/off switch and the next run, sees the last success and the last failure with its reason, and presses «Запустити зараз». Stocks (07:00 and 13:00) and prices (Monday 06:00) are separate tasks. Orders to 1C are a task of their own, «Відправка замовлень в 1С» (`one-c-orders`, every 5 minutes): the type is registered in the outbox lane `OutboxLanes.OneCOrders`, so the general «Досилання повідомлень» never sends it and the attempt right after the commit skips it; [OneCOrdersTickWork](../../../../src/Modules/Scheduling/Scheduling.Infrastructure/Integrations/Outbox/OneCOrdersTickWork.cs) sends it inside the tick on its own editable schedule, and while it is off or manual the orders wait in the outbox.
 
 ## Structure and relationships
 
