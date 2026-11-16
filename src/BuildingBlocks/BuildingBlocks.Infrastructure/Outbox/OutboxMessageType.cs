@@ -9,13 +9,17 @@ public sealed class OutboxMessageType(
     string name,
     Type messageType,
     Func<IServiceProvider, string, Guid, CancellationToken, Task<OutboxHandlingResult>> handle,
-    Func<IServiceProvider, string, OutboxGiveUp, CancellationToken, Task> runGiveUp)
+    Func<IServiceProvider, string, OutboxGiveUp, CancellationToken, Task> runGiveUp,
+    string? lane = null)
 {
     internal static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     public string Name { get; } = name;
 
     public Type MessageType { get; } = messageType;
+
+    /// <summary>The lane whose own task sends this type; null for the general outbox task.</summary>
+    public string? Lane { get; } = lane;
 
     /// <summary>A stored payload read back, for a module that looks up its own message (a repeated request).</summary>
     public static TMessage? ReadPayload<TMessage>(string payload)
@@ -33,7 +37,7 @@ public sealed class OutboxMessageType(
     internal Task GiveUpAsync(IServiceProvider services, string payload, OutboxGiveUp giveUp, CancellationToken cancellationToken)
         => runGiveUp(services, payload, giveUp, cancellationToken);
 
-    internal static OutboxMessageType For<TMessage>(string name)
+    internal static OutboxMessageType For<TMessage>(string name, string? lane)
         where TMessage : IOutboxMessage
         => new(name, typeof(TMessage),
             (services, payload, messageId, cancellationToken) =>
@@ -42,7 +46,8 @@ public sealed class OutboxMessageType(
             (services, payload, giveUp, cancellationToken) =>
                 services.GetService<IOutboxGiveUpHandler<TMessage>>() is { } handler
                     ? handler.HandleGiveUpAsync(Read<TMessage>(payload, giveUp.MessageId), giveUp, cancellationToken)
-                    : Task.CompletedTask);
+                    : Task.CompletedTask,
+            lane);
 
     private static TMessage Read<TMessage>(string payload, Guid messageId)
         where TMessage : IOutboxMessage

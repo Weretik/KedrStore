@@ -24,4 +24,8 @@ public sealed class OutboxMessageTypes
                 $"Outbox message {message.GetType().Name} has no handler; register it with AddOutboxHandler.");
 
     public OutboxMessageType? Find(string name) => _byName.GetValueOrDefault(name);
+
+    /// <summary>Stored names of the types of one lane; with no lane, of every type that has a lane (the general task skips those).</summary>
+    public string[] LaneNames(string? lane)
+        => [.. _byName.Values.Where(type => lane is null ? type.Lane is not null : type.Lane == lane).Select(type => type.Name)];
 }

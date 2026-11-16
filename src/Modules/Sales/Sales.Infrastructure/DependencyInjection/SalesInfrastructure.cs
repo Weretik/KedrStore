@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Outbox;
 using Sales.Application.Abstractions.Customers;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Abstractions.Integrations.OneC;
@@ -43,7 +44,7 @@ public static class SalesInfrastructure
         services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);
         // Platform spec 006, stage 2: orders to 1C, their give-up signal, and the removed customers' Identity users.
         services.AddScoped<IOrderOneCDeliveryStore, OrderOneCDeliveryStore>();
-        services.AddOutboxHandler<OrderPlaced, SendOrderToOneCHandler>(OrderPlaced.TypeName);
+        services.AddOutboxHandler<OrderPlaced, SendOrderToOneCHandler>(OrderPlaced.TypeName, OutboxLanes.OneCOrders);
         services.AddOutboxGiveUpHandler<OrderPlaced, OrderOneCGiveUpHandler>();
         services.AddOutboxHandler<OrderOneCDeliveryFailed, OrderOneCDeliveryFailedHandler>(OrderOneCDeliveryFailed.TypeName);
         services.AddOutboxHandler<CounterpartyRemoved, RemovedCounterpartyIdentityDeleter>(CounterpartyRemoved.TypeName);

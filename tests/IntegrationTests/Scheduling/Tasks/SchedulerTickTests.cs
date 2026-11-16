@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Scheduling.Application.Features.Catalog;
+using Scheduling.Application.Features.Tasks.Commands.RunScheduledTaskNow;
 using Scheduling.Application.Features.Tasks.Shared;
 using Scheduling.Domain.Runs;
 using Scheduling.Domain.Schedules;
@@ -28,7 +29,7 @@ public sealed class SchedulerTickTests
 
         var tasks = await harness.Db.Tasks.AsNoTracking().ToListAsync();
         Assert.Equivalent(ScheduledTaskCatalog.Tasks.Select(x => x.Key), tasks.Select(x => x.Key));
-        Assert.True(tasks.Where(x => x.Key != ScheduledTaskKeys.Outbox && x.Schedule.Kind != ScheduleKind.Manual).All(x => !x.Enabled));
+        Assert.True(tasks.Where(x => x.Key is not (ScheduledTaskKeys.Outbox or ScheduledTaskKeys.OneCOrders) && x.Schedule.Kind != ScheduleKind.Manual).All(x => !x.Enabled));
         Assert.Empty(harness.Launcher.Launches);
     }
 
@@ -170,6 +171,48 @@ public sealed class SchedulerTickTests
         Assert.Equal("Нічого досилати.", outbox.LastSuccessSummary);
         Assert.Equal("Telegram недоступний", outbox.LastFailureReason);
         Assert.Empty(harness.Launcher.Launches);
+    }
+
+    [Fact]
+    public async Task One_c_orders_run_inside_the_tick_on_their_own_schedule_and_can_be_paused()
+    {
+        using var harness = new SchedulingTestHarness();
+        await harness.TickAsync();
+        Assert.Equal(0, harness.OneCOrders.Calls);
+
+        harness.Time.Advance(TimeSpan.FromMinutes(5));
+        await harness.TickAsync();
+        await harness.TickAsync();
+        Assert.Equal(1, harness.OneCOrders.Calls);
+
+        await using (var db = harness.NewContext())
+        {
+            var task = await db.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.OneCOrders);
+            task.ChangeSchedule(false, task.Schedule, null, "Олена", harness.Time.GetUtcNow());
+            await db.SaveChangesAsync();
+        }
+
+        harness.Time.Advance(TimeSpan.FromMinutes(10));
+        await harness.TickAsync();
+
+        Assert.Equal(1, harness.OneCOrders.Calls);
+        Assert.Empty(harness.Launcher.Launches);
+    }
+
+    [Fact]
+    public async Task One_c_orders_run_once_on_run_now_even_when_paused()
+    {
+        using var harness = new SchedulingTestHarness();
+        await using (var db = harness.NewContext())
+        {
+            await new RunScheduledTaskNowHandler(db, harness.Time)
+                .Handle(new RunScheduledTaskNowCommand(ScheduledTaskKeys.OneCOrders, "Олена"), CancellationToken.None);
+        }
+
+        await harness.TickAsync();
+        await harness.TickAsync();
+
+        Assert.Equal(1, harness.OneCOrders.Calls);
     }
 
     [Fact]

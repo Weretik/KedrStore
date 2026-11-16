@@ -15,7 +15,8 @@ internal sealed class OutboxDispatcher(IEnumerable<IModuleOutbox> modules, ILogg
         {
             try
             {
-                await module.ProcessAsync(messageIds, cancellationToken);
+                // Lane messages wait for their own task, so a paused lane is not bypassed by the attempt after the commit.
+                await module.ProcessAsync(messageIds, lane: null, cancellationToken);
             }
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
             {
@@ -30,9 +31,18 @@ internal sealed class OutboxDispatcher(IEnumerable<IModuleOutbox> modules, ILogg
         var report = OutboxDispatchReport.Empty;
         foreach (var module in modules)
         {
-            report = report.Add(await module.ProcessAsync(messageIds: null, cancellationToken));
+            report = report.Add(await module.ProcessAsync(messageIds: null, lane: null, cancellationToken));
             await module.RemoveProcessedAsync(cancellationToken);
         }
+
+        return report;
+    }
+
+    public async Task<OutboxDispatchReport> DispatchLaneAsync(string lane, CancellationToken cancellationToken)
+    {
+        var report = OutboxDispatchReport.Empty;
+        foreach (var module in modules)
+            report = report.Add(await module.ProcessAsync(messageIds: null, lane, cancellationToken));
 
         return report;
     }

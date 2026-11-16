@@ -179,6 +179,28 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
         Assert.False(await dbContext.Set<OutboxMessage>().AnyAsync(message => message.Id == sentId));
     }
 
+    [SkippableFact]
+    public async Task LaneMessage_WaitsForItsOwnDispatch_AndTheGeneralOnesNeverTouchIt()
+    {
+        await using var outbox = await CreateAsync();
+
+        var laned = await outbox.StoreAsync(new LanedMessage("order"));
+        var general = await outbox.StoreAsync(new PingMessage("telegram"));
+        await outbox.Dispatcher.DispatchAsync([laned, general], CancellationToken.None);
+        await outbox.Dispatcher.DispatchDueAsync(CancellationToken.None);
+
+        Assert.Equal(["telegram"], outbox.Handler.Received);
+        Assert.Null((await outbox.LoadAsync(laned)).ProcessedAtUtc);
+
+        var report = await outbox.Dispatcher.DispatchLaneAsync(TestLane, CancellationToken.None);
+
+        Assert.Equal(new OutboxDispatchReport(1, 0, 0), report);
+        Assert.Equal(["telegram", "order"], outbox.Handler.Received);
+        Assert.NotNull((await outbox.LoadAsync(laned)).ProcessedAtUtc);
+    }
+
+    private const string TestLane = "test-lane";
+
     private async Task<OutboxScenario> CreateAsync()
     {
         postgres.SkipIfUnavailable();
@@ -196,6 +218,7 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
             .AddDbContext<SalesDbContext>(options => options.UseNpgsql(postgres.ConnectionString))
             .AddOutbox<SalesDbContext>(SalesDbContext.Schema)
             .AddOutboxHandler<PingMessage, PingHandlerAdapter>("test.ping")
+            .AddOutboxHandler<LanedMessage, LanedHandlerAdapter>("test.laned", TestLane)
             .AddOutboxGiveUpHandler<PingMessage, PingGiveUpAdapter>()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
@@ -203,6 +226,8 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
     }
 
     private sealed record PingMessage(string Text) : IOutboxMessage;
+
+    private sealed record LanedMessage(string Text) : IOutboxMessage;
 
     private sealed class PingHandler
     {
@@ -243,6 +268,12 @@ public sealed class OutboxPostgresTests(SalesPostgresFixture postgres)
     {
         public Task<OutboxHandlingResult> HandleAsync(PingMessage message, Guid messageId, CancellationToken cancellationToken)
             => handler.HandleAsync(message);
+    }
+
+    private sealed class LanedHandlerAdapter(PingHandler handler) : IOutboxMessageHandler<LanedMessage>
+    {
+        public Task<OutboxHandlingResult> HandleAsync(LanedMessage message, Guid messageId, CancellationToken cancellationToken)
+            => handler.HandleAsync(new PingMessage(message.Text));
     }
 
     private sealed class PingGiveUps

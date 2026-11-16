@@ -24,11 +24,11 @@ internal sealed class FakeLauncher : ITaskJobLauncher
     }
 }
 
-internal sealed class FakeOutboxWork : ITickWork
+internal sealed class FakeOutboxWork(string taskKey = "outbox") : ITickWork
 {
     public int Calls { get; private set; }
     public string? Failure { get; set; }
-    public string TaskKey => "outbox";
+    public string TaskKey => taskKey;
 
     public Task<string> RunAsync(CancellationToken cancellationToken)
     {
@@ -72,6 +72,7 @@ internal sealed class SchedulingTestHarness : IDisposable
     public SchedulingDbContext Db { get; }
     public FakeLauncher Launcher { get; } = new();
     public FakeOutboxWork Outbox { get; } = new();
+    public FakeOutboxWork OneCOrders { get; } = new("one-c-orders");
 
     /// <summary>A second unit of work on the same database, as another tick or the job sees it.</summary>
     public SchedulingDbContext NewContext() =>
@@ -79,7 +80,7 @@ internal sealed class SchedulingTestHarness : IDisposable
             .ReplaceService<IModelCustomizer, SqliteInstantsCustomizer>().Options);
 
     public RunSchedulerTickHandler Tick(SchedulingDbContext? db = null) =>
-        new(db ?? Db, Time, [Outbox], Launcher, NullLogger<RunSchedulerTickHandler>.Instance);
+        new(db ?? Db, Time, [Outbox, OneCOrders], Launcher, NullLogger<RunSchedulerTickHandler>.Instance);
 
     /// <summary>One tick in its own unit of work, as each scheduler call has.</summary>
     public async Task<SchedulerTickResponse> TickAsync()

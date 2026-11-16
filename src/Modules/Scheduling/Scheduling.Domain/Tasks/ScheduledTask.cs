@@ -128,6 +128,8 @@ public sealed class ScheduledTask
         if (succeeded) RecordSuccess(message, now);
         else RecordFailure(message, now);
         NextRunAt = Schedule.NextAfter(now);
+        RunRequestedAt = null;
+        RunRequestedBy = null;
         Version++;
     }
 

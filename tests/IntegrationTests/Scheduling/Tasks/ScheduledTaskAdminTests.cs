@@ -86,6 +86,19 @@ public sealed class ScheduledTaskAdminTests
     }
 
     [Fact]
+    public async Task One_c_orders_schedule_can_be_changed_paused_and_run_now()
+    {
+        using var harness = new SchedulingTestHarness();
+
+        var paused = await UpdateAsync(harness, ScheduledTaskKeys.OneCOrders, new(false, new ScheduleInput("manual")));
+        var run = await RunNowAsync(harness, ScheduledTaskKeys.OneCOrders);
+
+        Assert.True(paused.IsSuccess);
+        Assert.False(paused.Value.Enabled);
+        Assert.True(run.IsSuccess);
+    }
+
+    [Fact]
     public async Task Unknown_task_is_not_found()
     {
         using var harness = new SchedulingTestHarness();

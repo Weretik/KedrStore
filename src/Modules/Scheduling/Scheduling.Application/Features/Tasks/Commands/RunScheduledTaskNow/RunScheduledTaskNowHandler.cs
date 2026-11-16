@@ -15,7 +15,7 @@ public sealed class RunScheduledTaskNowHandler(ISchedulingDbContext db, TimeProv
         var now = clock.GetUtcNow();
         var row = await ScheduledTaskRows.FindAsync(db, command.Key, now, cancellationToken);
         if (row is null) return Result<ScheduledTaskResponse>.NotFound();
-        if (row.Definition.RunsInTick) return RunsInTick.ToResult<ScheduledTaskResponse>();
+        if (row.Definition.RunsInTick && !row.Definition.Editable) return RunsInTick.ToResult<ScheduledTaskResponse>();
 
         var requested = row.Task.RequestRun(command.Actor, now);
         if (requested.IsFailure) return requested.Error!.ToResult<ScheduledTaskResponse>();

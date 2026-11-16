@@ -21,8 +21,11 @@ public static class ScheduledTaskCatalog
     public static IReadOnlyList<ScheduledTaskDefinition> Tasks { get; } =
     [
         new(K.Outbox, "Досилання повідомлень",
-            "Надсилає замовлення з адмінки й застосунку в 1С, швидкі замовлення з сайту й повідомлення в Telegram, видаляє акаунти вилучених клієнтів і повторює те, що не пішло з першого разу.",
+            "Надсилає швидкі замовлення з сайту й повідомлення в Telegram, видаляє акаунти вилучених клієнтів і повторює те, що не пішло з першого разу. Замовлення в 1С йдуть окремою задачею.",
             TaskSchedule.Interval(5).Value, MaxMinutes: 5, Editable: false, RunsInTick: true),
+        new(K.OneCOrders, "Відправка замовлень в 1С",
+            "Надсилає в 1С замовлення з адмінки й застосунку та повторює ті, що не пішли з першого разу. Поки задача вимкнена, замовлення чекають і не потрапляють у 1С.",
+            TaskSchedule.Interval(5).Value, MaxMinutes: 5, RunsInTick: true),
         new(K.Stocks, "Залишки з 1С", "Оновлює залишки товарів з 1С: дверей, фурнітури й Cosmos.",
             TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(7, 0), new TimeOnly(13, 0)), JobTaskMaxMinutes,
             EnabledByDefault: false, Group: CatalogGroup),

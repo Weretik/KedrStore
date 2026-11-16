@@ -1,9 +1,12 @@
+using BuildingBlocks.Application.Outbox;
+
 namespace Scheduling.Application.Features.Catalog;
 
 /// <summary>Stable task keys: rows in the database and the names the job runs (--tasks).</summary>
 public static class ScheduledTaskKeys
 {
     public const string Outbox = "outbox";
+    public const string OneCOrders = OutboxLanes.OneCOrders;
     public const string Stocks = "stocks";
     public const string Prices = "prices";
     public const string Catalog = "catalog";
