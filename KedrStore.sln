@@ -117,6 +117,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduling.Contracts", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduling.Infrastructure", "src\Modules\Scheduling\Scheduling.Infrastructure\Scheduling.Infrastructure.csproj", "{2D381EEF-81EB-432A-B7A3-01B73C43F7DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Observability", "src\BuildingBlocks\BuildingBlocks.Observability\BuildingBlocks.Observability.csproj", "{91D9771F-D73B-45FD-AED8-09913B68ECCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -667,6 +669,18 @@ Global
 		{2D381EEF-81EB-432A-B7A3-01B73C43F7DF}.Release|x64.Build.0 = Release|Any CPU
 		{2D381EEF-81EB-432A-B7A3-01B73C43F7DF}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D381EEF-81EB-432A-B7A3-01B73C43F7DF}.Release|x86.Build.0 = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|x64.Build.0 = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Debug|x86.Build.0 = Debug|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|x64.ActiveCfg = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|x64.Build.0 = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|x86.ActiveCfg = Release|Any CPU
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -727,5 +741,6 @@ Global
 		{EA67FA1B-449E-4F12-9019-98EE6669739D} = {F0F0C51C-F6A5-8ED5-E07B-23BB77F4B418}
 		{B9D439CA-E04E-49A8-BCE9-01A2DE9C31FF} = {F0F0C51C-F6A5-8ED5-E07B-23BB77F4B418}
 		{2D381EEF-81EB-432A-B7A3-01B73C43F7DF} = {F0F0C51C-F6A5-8ED5-E07B-23BB77F4B418}
+		{91D9771F-D73B-45FD-AED8-09913B68ECCF} = {90298CBA-BD6F-3A0A-69D5-97CAD7B05E7E}
 	EndGlobalSection
 EndGlobal

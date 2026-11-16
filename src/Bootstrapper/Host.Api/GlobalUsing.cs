@@ -1,5 +1,6 @@
 ﻿global using BuildingBlocks.Infrastructure.DependencyInjection;
 global using BuildingBlocks.Integrations.OneC.DependencyInjection;
+global using BuildingBlocks.Observability;
 global using Host.Api;
 global using Host.Api.Application;
 global using Host.Api.Http;

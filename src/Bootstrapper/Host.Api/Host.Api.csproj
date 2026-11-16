@@ -25,15 +25,11 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Serilog" />
-        <PackageReference Include="Serilog.AspNetCore" />
-        <PackageReference Include="Serilog.Enrichers.Environment" />
-        <PackageReference Include="Serilog.Enrichers.Process" />
-        <PackageReference Include="Serilog.Settings.Configuration" />
         <PackageReference Include="Scriban" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Observability\BuildingBlocks.Observability.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Integrations.OneC\BuildingBlocks.Integrations.OneC.csproj" />
       <ProjectReference Include="..\..\Modules\Catalog\Catalog.Api\Catalog.Api.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Identity.Api\Identity.Api.csproj" />

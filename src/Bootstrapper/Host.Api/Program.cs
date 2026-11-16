@@ -17,7 +17,7 @@ builder.Host.UseDefaultServiceProvider(options =>
     options.ValidateOnBuild = true;
 });
 
-builder.AddSerilog();
+builder.AddObservability();
 builder.Services.AddHostServices(builder.Configuration);
 builder.Services.WithoutBackgroundWorkForBuildTimeDocument();
 
