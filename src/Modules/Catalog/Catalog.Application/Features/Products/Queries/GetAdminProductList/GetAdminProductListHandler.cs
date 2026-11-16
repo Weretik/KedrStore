@@ -30,6 +30,7 @@ public sealed class GetAdminProductListHandler(IReadCatalogDbContext catalogDbCo
             ? await CategoryTreeIds.ForSelectedTreeAsync(categoriesQuery, categoryId, cancellationToken)
             : null;
         var filtered = ApplyFilters(catalogDbContext.ProductListProjections.AsNoTracking(), categoryIds, query.Request);
+        filtered = ApplyStockFilter(filtered, catalogDbContext.Products.AsNoTracking(), query.Request.HasStock);
         filtered = await AdminProductProblems.FilterAsync(catalogDbContext, filtered, query.Request, cancellationToken);
         var productsQuery = ApplySorting(filtered, categoriesQuery, query.Request.Sort);
 
@@ -125,6 +126,22 @@ public sealed class GetAdminProductListHandler(IReadCatalogDbContext catalogDbCo
             productsQuery = productsQuery.Where(projection => projection.RetailPrice != null && projection.RetailPrice <= request.PriceTo.Value);
 
         return productsQuery;
+    }
+
+    /// <summary>The actual 1C stock lives on Product, not on the list projection, whose <c>InStock</c> is the site rule.</summary>
+    private static IQueryable<ProductListProjection> ApplyStockFilter(
+        IQueryable<ProductListProjection> projectionsQuery,
+        IQueryable<Product> productsQuery,
+        bool? hasStock)
+    {
+        return hasStock switch
+        {
+            true => projectionsQuery.Where(projection =>
+                productsQuery.Any(product => product.Id == projection.ProductId && product.Stock > 0m)),
+            false => projectionsQuery.Where(projection =>
+                productsQuery.Any(product => product.Id == projection.ProductId && product.Stock <= 0m)),
+            _ => projectionsQuery
+        };
     }
 
     private static IQueryable<ProductListProjection> ApplySorting(

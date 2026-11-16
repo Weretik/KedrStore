@@ -107,7 +107,25 @@ public sealed class ProductMediaApiTests
         using var list = JsonDocument.Parse(await manager.GetStringAsync("/api/admin/products?withoutPhoto=true"));
 
         var ids = list.RootElement.GetProperty("value").EnumerateArray().Select(row => row.GetProperty("id").GetInt32());
-        Assert.Equal([732], ids);
+        Assert.Equal([732, 733], ids);
+    }
+
+    [Theory]
+    [InlineData("withoutPhoto=true&hasStock=true", new[] { 732 })]
+    [InlineData("withoutPhoto=true&hasStock=false", new[] { 733 })]
+    [InlineData("hasStock=true", new[] { 731, 732 })]
+    public async Task AdminList_HasStock_FiltersByActualStock(string query, int[] expected)
+    {
+        await using var catalog = SeedCatalog();
+        using var factory = CreateFactory(catalog, new FakeMediaStorage());
+        using var manager = factory.CreateClientWithRole("Manager");
+
+        using var list = JsonDocument.Parse(await manager.GetStringAsync($"/api/admin/products?{query}"));
+
+        var rows = list.RootElement.GetProperty("value").EnumerateArray().ToList();
+        Assert.Equal(expected, rows.Select(row => row.GetProperty("id").GetInt32()));
+        Assert.All(rows, row => Assert.Equal(row.GetProperty("id").GetInt32() == 733 ? 0m : 5m,
+            row.GetProperty("stock").GetDecimal()));
     }
 
     private static async Task<Product> ReloadAsync(CatalogDbContext catalog)
@@ -139,10 +157,13 @@ public sealed class ProductMediaApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), "000005513", "Завіси", "zavisy",
             CategoryPath.From("n10")).Value);
-        foreach (var (id, photo) in new[] { (731, "https://images-kedr.cdn.express/products/731.jpg"), (732, "") })
+        foreach (var (id, photo, stock) in new[]
+                 {
+                     (731, "https://images-kedr.cdn.express/products/731.jpg", 5m), (732, "", 5m), (733, "", 0m)
+                 })
         {
             var product = Product.Create(ProductId.From(id), "000005513", $"Завіса {id}", $"zavisa-{id}",
-                ProductCategoryId.From(10), Now, 5, 1, false, false, true).Value;
+                ProductCategoryId.From(10), Now, stock, 1, false, false, true).Value;
             db.Products.Add(product);
             db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
                 product.ProductSlug, photo, ProductCategoryId.From(10), "zavisy", inStock: true, isSale: false,
