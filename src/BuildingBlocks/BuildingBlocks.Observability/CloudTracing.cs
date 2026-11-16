@@ -23,6 +23,7 @@ public static class CloudTracing
         }
 
         var sampler = CreateSampler(options.TraceSampleRatio);
+        services.AddHostedService<OpenTelemetryErrorLog>();
 
         services.AddOpenTelemetry()
             .ConfigureResource(resource => resource

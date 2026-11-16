@@ -37,6 +37,8 @@ In production every API request is a trace in Cloud Trace, service `kedr-api` (t
 
 **From a trace to its logs.** Cloud Console → Trace → Trace Explorer, filter service `kedr-api` (or status error, or latency above a value), open a trace and choose «View logs».
 
+**No spans from the API.** When the trace has only the Cloud Run spans (`AppServer`, `HTTP load balancer`) and nothing from the service, the export fails. The SDK's own warnings and errors are in the API log under logger `BuildingBlocks.Observability.OpenTelemetryErrorLog` (for example 403 from the Telemetry API); query `jsonPayload.logger="BuildingBlocks.Observability.OpenTelemetryErrorLog"`.
+
 **From the command line** (read-only):
 
 ```bash
