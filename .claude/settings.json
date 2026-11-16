@@ -10,5 +10,11 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "web-frontend@weretik-dev": false,
+    "nextjs-seo-site@weretik-dev": false,
+    "expo-mobile@weretik-dev": false,
+    "ui-design@weretik-dev": false
   }
 }
