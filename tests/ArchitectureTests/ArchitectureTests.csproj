@@ -25,6 +25,10 @@
       <ProjectReference Include="..\..\src\BuildingBlocks\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Catalog\Catalog.Domain\Catalog.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Scheduling\Scheduling.Domain\Scheduling.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Work\Work.Domain\Work.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Media\Media.Domain\Media.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Modules\Content\Content.Domain\Content.Domain.csproj" />
       <ProjectReference Include="..\..\src\Modules\Content\Content.Application\Content.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Media\Media.Application\Media.Application.csproj" />
       <ProjectReference Include="..\..\src\Modules\Work\Work.Application\Work.Application.csproj" />

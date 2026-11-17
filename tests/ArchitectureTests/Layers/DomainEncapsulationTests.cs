@@ -9,7 +9,7 @@ public sealed class DomainEncapsulationTests
     private static readonly string[] DomainAssemblies =
     [
         "BuildingBlocks.Domain", "Catalog.Domain", "Content.Domain", "Identity.Domain", "Media.Domain",
-        "Sales.Domain", "Work.Domain",
+        "Sales.Domain", "Scheduling.Domain", "Work.Domain",
     ];
 
     [Fact]
