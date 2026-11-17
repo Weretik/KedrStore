@@ -6,7 +6,8 @@ internal sealed class CompanyRequisitesChangeConfiguration : IEntityTypeConfigur
     {
         builder.ToTable("CompanyRequisitesChanges");
         builder.HasKey(change => change.Id);
-        builder.Property(change => change.Id).UseIdentityAlwaysColumn();
+        builder.Property(change => change.Id)
+            .HasConversion(id => id.Value, value => CompanyRequisitesChangeId.FromStorage(value)).ValueGeneratedOnAdd().UseIdentityAlwaysColumn();
         builder.Property(change => change.ChangedAt).IsRequired();
         builder.Property(change => change.ChangedByUserId).HasMaxLength(64).IsRequired();
         builder.Property(change => change.ChangedByName)

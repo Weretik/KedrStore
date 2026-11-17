@@ -23,7 +23,7 @@ public sealed partial class CompanyRequisites : IAggregateRoot
     public const int BankNameMaxLength = 120;
     public const int ExtractNumberMaxLength = 30;
 
-    public int Id { get; private set; }
+    public CompanyRequisitesId Id { get; private set; }
     public string LegalName { get; private set; } = null!;
 
     /// <summary>ЄДРПОУ (8 digits) or РНОКПП of a ФОП (10 digits).</summary>
@@ -42,7 +42,7 @@ public sealed partial class CompanyRequisites : IAggregateRoot
 
     public static DomainResult<CompanyRequisites> Create(CompanyRequisitesValues values, DateTimeOffset now)
     {
-        var requisites = new CompanyRequisites { Id = SingletonId };
+        var requisites = new CompanyRequisites { Id = CompanyRequisitesId.Create(SingletonId) };
         var updated = requisites.Update(values, now);
         return updated.IsFailure ? updated.Error! : requisites;
     }

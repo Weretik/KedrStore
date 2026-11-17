@@ -1,3 +1,4 @@
+using Scheduling.Domain.Runs;
 using Ardalis.Result;
 using Microsoft.EntityFrameworkCore;
 using Scheduling.Application.Features.Catalog;
@@ -57,7 +58,7 @@ public sealed class ScheduledTaskAdminTests
         Assert.True(result.Value.Enabled);
         Assert.Equal(new[] { "07:00", "13:00" }, result.Value.Schedule.Times);
         Assert.Equal(KyivTime.ToInstant(new DateTime(2026, 11, 16, 13, 0, 0)), result.Value.NextRunAt);
-        var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
+        var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
         Assert.Equal("Олена", saved.UpdatedBy);
     }
 
@@ -146,12 +147,12 @@ public sealed class ScheduledTaskAdminTests
         var outbox = tasks.Single(x => x.Key == ScheduledTaskKeys.Outbox);
         Assert.Equal(5, outbox.Schedule.EveryMinutes);
         Assert.True(outbox.Enabled);
-        var unchanged = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
+        var unchanged = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Outbox));
         Assert.Equal(TaskSchedule.Interval(1).Value, unchanged.Schedule);
 
         await harness.TickAsync();
 
-        var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
+        var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Outbox));
         Assert.Equal(TaskSchedule.Interval(5).Value, saved.Schedule);
     }
 }

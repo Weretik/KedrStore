@@ -11,8 +11,10 @@ public sealed class ScheduledTaskRunConfiguration : IEntityTypeConfiguration<Sch
     {
         b.ToTable("ScheduledTaskRuns");
         b.HasKey(x => x.Id);
-        b.Property(x => x.Id).ValueGeneratedNever();
-        b.Property(x => x.TaskKey).HasMaxLength(64);
+        b.Property(x => x.Id).ValueGeneratedNever()
+            .HasConversion(x => x.Value, x => ScheduledTaskRunId.FromStorage(x));
+        b.Property(x => x.TaskKey).HasMaxLength(64)
+            .HasConversion(x => x.Value, x => ScheduledTaskKey.FromStorage(x));
         b.Property(x => x.Trigger).HasConversion<string>().HasMaxLength(20);
         b.Property(x => x.Outcome).HasConversion<string>().HasMaxLength(20);
         b.Property(x => x.RequestedBy).HasMaxLength(200);

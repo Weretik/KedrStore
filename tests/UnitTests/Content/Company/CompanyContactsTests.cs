@@ -16,7 +16,7 @@ public sealed class CompanyContactsTests
     {
         var contacts = CompanyContacts.Create(Values(), Now).Value;
 
-        Assert.Equal(CompanyContacts.SingletonId, contacts.Id);
+        Assert.Equal(CompanyContacts.SingletonId, contacts.Id.Value);
         Assert.Equal("sales@classkedr.com.ua", contacts.Email);
         Assert.Equal("Харків", contacts.CityUk);
         Assert.Equal(Now, contacts.UpdatedAt);

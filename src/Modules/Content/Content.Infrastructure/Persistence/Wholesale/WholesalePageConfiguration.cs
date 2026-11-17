@@ -8,7 +8,8 @@ internal sealed class WholesalePageConfiguration : IEntityTypeConfiguration<Whol
         builder.ToTable("WholesalePages", table => table.HasCheckConstraint(
             "CK_WholesalePages_Singleton", $"\"Id\" = {WholesalePage.SingletonId}"));
         builder.HasKey(page => page.Id);
-        builder.Property(page => page.Id).ValueGeneratedNever();
+        builder.Property(page => page.Id)
+            .HasConversion(id => id.Value, value => WholesalePageId.FromStorage(value)).ValueGeneratedNever();
         builder.Property(page => page.UpdatedAt).IsRequired();
         builder.Property(page => page.UpdatedBy).HasMaxLength(EditorName.MaxLength);
         builder.OwnsOne(page => page.Uk, text => Text(text, "Uk"));

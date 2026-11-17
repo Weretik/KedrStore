@@ -18,7 +18,7 @@ public sealed class CompanyRequisitesTests
     {
         var requisites = CompanyRequisites.Create(Values(), Now).Value;
 
-        Assert.Equal(CompanyRequisites.SingletonId, requisites.Id);
+        Assert.Equal(CompanyRequisites.SingletonId, requisites.Id.Value);
         Assert.Equal("ФОП Овчинников Максим Володимирович", requisites.LegalName);
         Assert.Equal(Now, requisites.UpdatedAt);
     }

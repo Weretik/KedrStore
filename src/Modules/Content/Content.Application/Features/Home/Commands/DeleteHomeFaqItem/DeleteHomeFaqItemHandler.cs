@@ -11,7 +11,7 @@ public sealed class DeleteHomeFaqItemHandler(
 {
     public async ValueTask<Result<AdminHomeBlocks>> Handle(DeleteHomeFaqItemCommand command, CancellationToken cancellationToken)
     {
-        var item = await repository.GetByIdAsync(command.Id, cancellationToken);
+        var item = await repository.GetByIdAsync(HomeFaqItemId.FromStorage(command.Id), cancellationToken);
         if (item is null)
             return Result.NotFound();
 

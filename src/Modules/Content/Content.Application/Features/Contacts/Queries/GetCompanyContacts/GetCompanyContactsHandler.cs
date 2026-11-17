@@ -9,7 +9,7 @@ public sealed class GetCompanyContactsHandler(IReadContentDbContext db)
         CancellationToken cancellationToken)
     {
         var contacts = await db.CompanyContacts.AsNoTracking()
-            .FirstOrDefaultAsync(row => row.Id == CompanyContacts.SingletonId, cancellationToken);
+            .FirstOrDefaultAsync(row => row.Id == CompanyContactsId.Create(CompanyContacts.SingletonId), cancellationToken);
         return contacts is null ? Result.NotFound() : Result.Success(CompanyContactsMapper.ToDetails(contacts));
     }
 }

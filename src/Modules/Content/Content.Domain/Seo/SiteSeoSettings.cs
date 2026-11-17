@@ -25,7 +25,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     public const int TagManagerIdMaxLength = 20;
     public const int VerificationMaxLength = 100;
 
-    public int Id { get; private set; }
+    public SiteSeoSettingsId Id { get; private set; }
 
     /// <summary>Google Analytics 4 measurement id, <c>G-XXXXXXXXXX</c>.</summary>
     public string? GoogleAnalyticsId { get; private set; }
@@ -52,7 +52,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     private SiteSeoSettings() { }
 
     /// <summary>The empty row the migration inserts.</summary>
-    public static SiteSeoSettings CreateEmpty(DateTimeOffset now) => new() { Id = SingletonId, UpdatedAt = now };
+    public static SiteSeoSettings CreateEmpty(DateTimeOffset now) => new() { Id = SiteSeoSettingsId.Create(SingletonId), UpdatedAt = now };
 
     public DomainResult Update(SiteSeoSettingsValues values, DateTimeOffset now, string editor)
     {

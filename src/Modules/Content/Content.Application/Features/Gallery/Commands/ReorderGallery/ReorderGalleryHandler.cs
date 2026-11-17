@@ -18,13 +18,13 @@ public sealed class ReorderGalleryHandler(
         CancellationToken cancellationToken)
     {
         var items = await repository.ListAsync(cancellationToken);
-        if (items.Count != command.Ids.Count || items.Any(item => !command.Ids.Contains(item.Id)))
+        if (items.Count != command.Ids.Count || items.Any(item => !command.Ids.Contains(item.Id.Value)))
             return Result.Conflict("Галерея змінилася, оновіть сторінку й спробуйте ще раз.");
 
         var now = clock.GetUtcNow();
         var byId = items.ToDictionary(item => item.Id);
         for (var position = 0; position < command.Ids.Count; position++)
-            byId[command.Ids[position]].MoveTo(position, now);
+            byId[GalleryItemId.FromStorage(command.Ids[position])].MoveTo(position, now);
         await repository.UpdateRangeAsync(items, cancellationToken);
         await repository.SaveChangesAsync(cancellationToken);
         return Result.Success(await GalleryAdminList.LoadAsync(db, images, cancellationToken));

@@ -36,7 +36,7 @@ internal static class CompanyRequisitesMapper
         input.LegalName, input.Code, input.RegistrationExtractNumber, input.Iban, input.BankName, input.BankCode);
 
     public static CompanyRequisitesChangeDetails ToDetails(CompanyRequisitesChange change) => new(
-        change.Id, change.ChangedAt, change.ChangedByName,
+        change.Id.Value, change.ChangedAt, change.ChangedByName,
         change.Changes.Select(item => new RequisitesFieldChangeDetails(
             ToCamelCase(item.Field), item.OldValue, item.NewValue)).ToList());
 

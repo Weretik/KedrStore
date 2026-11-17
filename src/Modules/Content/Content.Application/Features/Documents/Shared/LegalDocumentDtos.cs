@@ -24,11 +24,11 @@ internal static class LegalDocumentMapper
 {
     public static string StatusName(LegalDocumentStatus status) => status.ToString().ToLowerInvariant();
 
-    public static LegalDocumentVersionSummary ToSummary(LegalDocumentVersion version) => new(version.Id,
+    public static LegalDocumentVersionSummary ToSummary(LegalDocumentVersion version) => new(version.Id.Value,
         StatusName(version.Status), version.Number, version.EffectiveFrom, version.UpdatedAt, version.UpdatedBy,
         version.PublishedAt, version.PublishedBy);
 
-    public static LegalDocumentVersionDetails ToDetails(LegalDocumentVersion version) => new(version.Id,
+    public static LegalDocumentVersionDetails ToDetails(LegalDocumentVersion version) => new(version.Id.Value,
         LegalDocumentKinds.ToSlug(version.Kind), StatusName(version.Status), version.Number, version.EffectiveFrom, version.UpdatedAt, version.UpdatedBy,
         version.PublishedAt, version.PublishedBy,
         version.Texts.Select(text => new LegalDocumentTextData(text.Language, text.Title, text.BodyHtml)).ToList());

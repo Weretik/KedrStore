@@ -11,7 +11,7 @@ public sealed class DeleteHomeBrandHandler(
 {
     public async ValueTask<Result<AdminHomeBlocks>> Handle(DeleteHomeBrandCommand command, CancellationToken cancellationToken)
     {
-        var item = await repository.GetByIdAsync(command.Id, cancellationToken);
+        var item = await repository.GetByIdAsync(HomeBrandId.FromStorage(command.Id), cancellationToken);
         if (item is null)
             return Result.NotFound();
 

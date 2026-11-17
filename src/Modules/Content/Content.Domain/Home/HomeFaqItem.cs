@@ -9,7 +9,7 @@ public sealed class HomeFaqItem : IAggregateRoot
     public const int QuestionMaxLength = 200;
     public const int AnswerMaxLength = 2000;
 
-    public long Id { get; private set; }
+    public HomeFaqItemId Id { get; private set; }
     public int Position { get; private set; }
     public string QuestionUk { get; private set; } = string.Empty;
     public string QuestionRu { get; private set; } = string.Empty;

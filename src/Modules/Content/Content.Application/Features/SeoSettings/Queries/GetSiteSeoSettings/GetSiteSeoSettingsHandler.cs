@@ -10,7 +10,7 @@ public sealed class GetSiteSeoSettingsHandler(IReadContentDbContext db, IMediaIm
         CancellationToken cancellationToken)
     {
         var settings = await db.SiteSeoSettings.AsNoTracking()
-            .FirstOrDefaultAsync(row => row.Id == SiteSeoSettings.SingletonId, cancellationToken);
+            .FirstOrDefaultAsync(row => row.Id == SiteSeoSettingsId.Create(SiteSeoSettings.SingletonId), cancellationToken);
         return settings is null
             ? Result.NotFound()
             : Result.Success(await SiteSeoSettingsMapper.ToDetailsAsync(settings, images, cancellationToken));

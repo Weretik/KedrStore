@@ -9,7 +9,7 @@ public sealed class GetPublicWholesalePageHandler(IReadContentDbContext db)
         CancellationToken cancellationToken)
     {
         var page = await db.WholesalePages.AsNoTracking()
-            .FirstOrDefaultAsync(row => row.Id == WholesalePage.SingletonId, cancellationToken);
+            .FirstOrDefaultAsync(row => row.Id == WholesalePageId.Create(WholesalePage.SingletonId), cancellationToken);
         return page is null
             ? Result.NotFound()
             : Result.Success(new PublicWholesalePage(

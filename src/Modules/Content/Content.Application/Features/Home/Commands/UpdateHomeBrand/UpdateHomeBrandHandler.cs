@@ -12,7 +12,7 @@ public sealed class UpdateHomeBrandHandler(
 {
     public async ValueTask<Result<AdminHomeBlocks>> Handle(UpdateHomeBrandCommand command, CancellationToken cancellationToken)
     {
-        var brand = await repository.GetByIdAsync(command.Id, cancellationToken);
+        var brand = await repository.GetByIdAsync(HomeBrandId.FromStorage(command.Id), cancellationToken);
         if (brand is null)
             return Result.NotFound();
         if (brand.LogoMediaFileId != command.Brand.LogoMediaFileId &&

@@ -18,7 +18,7 @@ public sealed class UpdateCompanyRequisitesHandler(
     public async ValueTask<Result<CompanyRequisitesDetails>> Handle(UpdateCompanyRequisitesCommand command,
         CancellationToken cancellationToken)
     {
-        var requisites = await requisitesRepository.GetByIdAsync(CompanyRequisites.SingletonId, cancellationToken);
+        var requisites = await requisitesRepository.GetByIdAsync(CompanyRequisitesId.Create(CompanyRequisites.SingletonId), cancellationToken);
         if (requisites is null)
             return Result.NotFound();
 

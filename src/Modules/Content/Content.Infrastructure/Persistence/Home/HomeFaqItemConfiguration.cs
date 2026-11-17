@@ -6,7 +6,8 @@ internal sealed class HomeFaqItemConfiguration : IEntityTypeConfiguration<HomeFa
     {
         builder.ToTable("HomeFaqItems");
         builder.HasKey(item => item.Id);
-        builder.Property(item => item.Id).UseIdentityByDefaultColumn();
+        builder.Property(item => item.Id)
+            .HasConversion(id => id.Value, value => HomeFaqItemId.FromStorage(value)).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
         builder.Property(item => item.QuestionUk).HasMaxLength(HomeFaqItem.QuestionMaxLength).IsRequired();
         builder.Property(item => item.QuestionRu).HasMaxLength(HomeFaqItem.QuestionMaxLength).IsRequired();
         builder.Property(item => item.AnswerUk).HasMaxLength(HomeFaqItem.AnswerMaxLength).IsRequired();

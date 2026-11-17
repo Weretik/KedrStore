@@ -15,7 +15,7 @@ public sealed class ReorderHomeFaqHandler(
     {
         var items = await repository.ListAsync(cancellationToken);
         var now = clock.GetUtcNow();
-        if (!HomeAdminBlocks.TryReorder(items, command.Ids, item => item.Id, (item, position) => item.MoveTo(position, now)))
+        if (!HomeAdminBlocks.TryReorder(items, command.Ids, item => item.Id.Value, (item, position) => item.MoveTo(position, now)))
             return Result.Conflict("Список змінився, оновіть сторінку й спробуйте ще раз.");
 
         await repository.UpdateRangeAsync(items, cancellationToken);

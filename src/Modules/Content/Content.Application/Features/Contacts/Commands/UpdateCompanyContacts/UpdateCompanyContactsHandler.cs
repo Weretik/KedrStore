@@ -14,7 +14,7 @@ public sealed class UpdateCompanyContactsHandler(
     public async ValueTask<Result<CompanyContactsDetails>> Handle(UpdateCompanyContactsCommand command,
         CancellationToken cancellationToken)
     {
-        var contacts = await repository.GetByIdAsync(CompanyContacts.SingletonId, cancellationToken);
+        var contacts = await repository.GetByIdAsync(CompanyContactsId.Create(CompanyContacts.SingletonId), cancellationToken);
         if (contacts is null)
             return Result.NotFound();
 

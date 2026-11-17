@@ -21,7 +21,7 @@ public static class GalleryAdminList
             if (item.MediaFileId is { } fileId)
                 files.TryGetValue(fileId, out file);
             var preview = item.Kind == GalleryItemKind.Video ? YoutubeThumbnails.Url(item.YoutubeId!) : file?.Url;
-            return new AdminGalleryItem(item.Id, item.Kind, item.MediaFileId, item.YoutubeId, item.Position,
+            return new AdminGalleryItem(item.Id.Value, item.Kind, item.MediaFileId, item.YoutubeId, item.Position,
                 item.TitleUk, item.TitleRu, item.CaptionUk, item.CaptionRu, preview, file?.FileName,
                 item.Kind == GalleryItemKind.Photo && file is null, item.UpdatedAt);
         }).ToList();

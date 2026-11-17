@@ -13,7 +13,7 @@ public sealed class GetScheduledTaskRunsHandler(ISchedulingDbContext db)
         CancellationToken cancellationToken)
     {
         if (ScheduledTaskCatalog.Find(query.Key) is null) return Result<IReadOnlyList<ScheduledTaskRunResponse>>.NotFound();
-        var runs = await db.Runs.AsNoTracking().Where(x => x.TaskKey == query.Key)
+        var runs = await db.Runs.AsNoTracking().Where(x => x.TaskKey == ScheduledTaskKey.FromStorage(query.Key))
             .OrderByDescending(x => x.ClaimedAt).Take(Limit).ToListAsync(cancellationToken);
         return Result.Success<IReadOnlyList<ScheduledTaskRunResponse>>(runs.Select(ScheduledTaskMapper.ToResponse).ToArray());
     }
