@@ -58,3 +58,8 @@ Check project names and available filters under `tests/` before running them.
 While implementing a feature, run only automated tests for the changed feature and directly related components and contracts. Choose the narrowest available projects, filters, and commands that test the specific risk. Record commands run, results, and unverified risks.
 
 Run a general module, application, or repository test suite, full `restore` and `build`, broad regression, coverage, or a full audit only at the user's explicit request. An unrequested full run is not a completion condition. If a required focused check is blocked or fails, name the exact command, failure point, and known impact on the result; do not hide unrelated errors.
+
+
+## Agent hooks
+
+The guard hook `.claude/hooks/guard.mjs` (it blocks secret files, force pushes, pushes to the default branch, production migrations and recursive deletes outside build output) has its own tests in `.claude/hooks/guard.test.mjs`. CI runs them with `node --test .claude/hooks/guard.test.mjs`; a change to the hook changes its tests in the same pull request.
