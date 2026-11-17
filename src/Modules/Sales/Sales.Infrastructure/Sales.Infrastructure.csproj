@@ -12,7 +12,6 @@
     <ItemGroup>
     <PackageReference Include="ClosedXML" />
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
-      <PackageReference Include="libphonenumber-csharp" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
