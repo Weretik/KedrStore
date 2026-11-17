@@ -22,6 +22,7 @@ global using Catalog.Contracts.Products.GetList;
 
 // Application namespaces
 global using Catalog.Application.Features.Products.Queries.GetProductList;
+global using Catalog.Application.Features.Products.Shared;
 
 // Services
 global using Ardalis.Result;

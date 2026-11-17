@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using Catalog.Application.Features.Products.Queries.GetPublicProductList;
+using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Features.Slugs.Shared;
 using Catalog.Contracts.Products.GetList;
 using Catalog.Domain.Categories;

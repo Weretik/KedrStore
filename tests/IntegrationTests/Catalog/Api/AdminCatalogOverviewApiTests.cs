@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Products.Shared;
 using System.Net;
 using System.Text.Json;
 using Catalog.Application.Abstractions.Persistence;

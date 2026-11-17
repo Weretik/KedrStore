@@ -2,6 +2,7 @@ using Catalog.Application.Abstractions.Media;
 using Catalog.Application.Features.ProductMedia.Shared;
 using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;
 using Catalog.Application.Features.ProductMedia.Jobs;
+using Catalog.Application.Features.Products.Shared;
 using Catalog.Contracts.Products.Media;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;

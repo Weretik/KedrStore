@@ -1,7 +1,8 @@
 using Catalog.Domain.Categories;
+using Catalog.Application.Features.Products.Shared;
 using Catalog.Domain.Products;
 
-namespace UnitTests.Catalog.Domain;
+namespace UnitTests.Catalog.Application;
 
 /// <summary>A rebuild writes only the list rows whose values changed (database rules 2.4).</summary>
 public sealed class ProductListProjectionSyncTests
