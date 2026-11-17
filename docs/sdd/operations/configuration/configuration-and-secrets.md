@@ -35,4 +35,4 @@ Do not put real passwords, tokens, or production connection strings in `appsetti
 
 ## Cookies and CORS
 
-Refresh authentication uses cookies with credentials, so CORS has an explicit allow-list; wildcard origins are not used. The current refresh cookie has `Secure: true` and `SameSite: None`. In production the API is served on `api.classkedr.com.ua`, the same site as the frontends, and the CSRF cookie is set for the parent domain so the frontends can read it. Test refresh over HTTPS or make an intentional local override that is not carried into a shared environment.
+Refresh authentication uses cookies with credentials, so CORS has an explicit allow-list; wildcard origins are not used. The CSRF cookie has `Secure: true` and `SameSite: Lax`; Lax is enough because the API and the frontends share one site. In production the API is served on `api.classkedr.com.ua`, the same site as the frontends, and the CSRF cookie is set for the parent domain so the frontends can read it. Test refresh over HTTPS or make an intentional local override that is not carried into a shared environment.
