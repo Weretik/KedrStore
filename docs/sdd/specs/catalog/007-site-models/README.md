@@ -1,6 +1,6 @@
 # 007 — Site models and their attributes
 
-**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification), stage 2 (models in the database and the admin API), stage 4 (admin) and stage 5 (public API) implemented 2026-11-05; stages 3 and 6–8 planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification), stage 2 (models in the database and the admin API), stage 4 (admin) and stage 5 (public API) implemented 2026-11-05; stages 4b, 4c, 6 (site pages and filters) and 7 (SEO) implemented 2026-11-06; stage 3 (owner reviews the proposals in «Вітрина сайту») and stage 8 (AI drafts) planned. **Date:** 2026-11-05.
 
 The owner-facing plan with the audit, the screens, and every decision is the Russian document [«Кедр: модели и признаки — новый подход»](https://claude.ai/artifact/3NDXYvcRvtd7hWTTAgx7NT); the screen concept is the canvas [«Кедр: моделі та ознаки»](https://claude.ai/artifact/DYfVE9Kkxc6RGD293mjXNV). This file is the technical summary, the design, and the evidence log. It changes the direction of [spec 006](../006-attributes-variants-filters/README.md): phases 1–4 of 006 stay as they are and are reused; its phase 5 (filters per product) is reworked here into stage 5 (filters per model), and its phases 6–7 move to stages 7–8.
 
@@ -230,11 +230,11 @@ src/Modules/Catalog/
 | 2 | Models in the database, proposals, health, admin API | done 2026-11-05 (migration `CatalogSiteModels`) |
 | 3 | Run the proposals on production (dry run, then on «да») | planned |
 | 4 | Admin (kedr-web): «Товари» back to the 1C list; «Вітрина сайту», «Моделі», model card with SEO, «Ознаки»; «Огляд» lines; «Як це працює» help. Server: showcase and categories lists, `problem=any`, «Не розшифровані коди» count on-site products only (M-01) | done 2026-11-05 (KedrStore #176, kedr-web #65) |
-| 4b | Categories «show on site» mark (migration `CategorySiteVisibility`), showcase by model, category tree, only on-site models and products in «Моделі» | in review |
-| 4c | One «Вітрина сайту» page with tabs and the review queue (canvas variant B); server: honest statuses, showcase `status`, tree counts (R-20) | in review |
+| 4b | Categories «show on site» mark (migration `CategorySiteVisibility`), showcase by model, category tree, only on-site models and products in «Моделі» | done 2026-11-06 (KedrStore #179) |
+| 4c | One «Вітрина сайту» page with tabs and the review queue (canvas variant B); server: honest statuses, showcase `status`, tree counts (R-20) | done 2026-11-06 (KedrStore #180, kedr-web #73) |
 | 5 | Public API: category models with filters (final category only), model page, model search, 301 from product addresses; replaces the reverted spec 006 phase 5 | done 2026-11-05 (no schema change) |
-| 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search; server: `productId` on a one-product card (R-21) | in progress (kedr-web spec site/product/002) |
-| 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | planned |
+| 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search; server: `productId` on a one-product card (R-21) | done 2026-11-06 (KedrStore #183, kedr-web #80) |
+| 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | done 2026-11-06 (kedr-web #81, no backend change): pages only for colour and size values with at least two models; other filters stay `?query` and noindex |
 | 8 | Optional AI drafts for SEO texts and unrecognized attributes (a person confirms) | planned |
 
 ## Evidence (stage 2)
