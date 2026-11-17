@@ -19,6 +19,7 @@ operations/
 - Understand how a push to `master` reaches Cloud Run: [GitHub Actions deploy](deployment/github-actions-deploy.md)
 - Serve the API on its public host: [Cloudflare API proxy](deployment/cloudflare-api-proxy.md)
 - Prepare the database with a separate job: [migrations and seed data](data/migrations-and-seeding.md)
+- Know who backs up the database and how to restore it: [backups and restore](data/backups-and-restore.md)
 - Check the API or reproduce an HTTP request: [diagnostics](diagnostics/health-logs-swagger.md)
 - Run a 1C/import operation: [jobs and runbooks](jobs/README.md)
 

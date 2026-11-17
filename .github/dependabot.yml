@@ -1,0 +1,20 @@
+# Dependency updates (security rules: known vulnerabilities in packages).
+# One grouped pull request per ecosystem a month keeps the review load small;
+# security updates arrive separately as soon as GitHub publishes an advisory.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      nuget-minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ['*']
