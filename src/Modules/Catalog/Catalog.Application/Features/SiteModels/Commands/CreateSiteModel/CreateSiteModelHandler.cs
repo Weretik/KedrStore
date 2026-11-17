@@ -13,11 +13,14 @@ public sealed class CreateSiteModelHandler(
     ISlugService slugs,
     SiteModelChanges changes,
     SiteModelReader reader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<CreateSiteModelCommand, Result<SiteModelDto>>
 {
-    public async ValueTask<Result<SiteModelDto>> Handle(CreateSiteModelCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<SiteModelDto>> Handle(CreateSiteModelCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<SiteModelDto>> HandleInTransactionAsync(CreateSiteModelCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
         var categoryId = ProductCategoryId.From(request.CategoryId);

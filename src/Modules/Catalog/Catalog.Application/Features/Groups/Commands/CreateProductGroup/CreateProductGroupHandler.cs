@@ -13,11 +13,14 @@ public sealed class CreateProductGroupHandler(
     ProductGroupPins pins,
     ProductGroupBuilder builder,
     ProductGroupReader reader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<CreateProductGroupCommand, Result<AdminProductGroupDto>>
 {
-    public async ValueTask<Result<AdminProductGroupDto>> Handle(CreateProductGroupCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<AdminProductGroupDto>> Handle(CreateProductGroupCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<AdminProductGroupDto>> HandleInTransactionAsync(CreateProductGroupCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
         var categoryId = ProductCategoryId.From(request.CategoryId);

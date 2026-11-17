@@ -244,7 +244,7 @@ public sealed class ProductGroupBuilderTests
         var handle = (await db.ProductGroups.AsNoTracking().SingleAsync(group => group.Name == "Ручка")).Id;
 
         var create = new CreateProductGroupHandler(db, new TestRepository<ProductGroup>(db), new SlugService(db),
-            Pins(db), GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
+            Pins(db), GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
         var created = await create.Handle(new CreateProductGroupCommand(new CreateProductGroupRequest
         {
             CategoryId = 10, Name = "Засувки KEDR", ProductIds = [3, 4]
@@ -260,7 +260,7 @@ public sealed class ProductGroupBuilderTests
         Assert.False(wrongCategory.IsSuccess);
 
         var move = new SetProductGroupHandler(db, new TestRepository<ProductGroupMember>(db), Pins(db),
-            GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System);
+            GroupBuilder(db), new ProductGroupReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
         var outOfGroups = await move.Handle(new SetProductGroupCommand(2, new SetProductGroupRequest()),
             CancellationToken.None);
         Assert.True(outOfGroups.Value.IsPinned);

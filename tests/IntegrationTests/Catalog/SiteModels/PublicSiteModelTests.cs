@@ -115,7 +115,7 @@ public sealed class PublicSiteModelTests
                 new SiteModelChanges(db, new TestRepository<ProductGroupAxis>(db),
                     new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
-                state, TimeProvider.System)
+                state, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db))
             .Handle(new AcceptSiteModelsCommand(new AcceptSiteModelsRequest { Ids = [hinges.Value] }),
                 CancellationToken.None);
         Assert.True(accepted.IsSuccess);

@@ -18,11 +18,14 @@ public sealed class AcceptSiteModelsHandler(
     ICurrentUserService currentUser,
     SiteModelChanges changes,
     SiteModelStateReader stateReader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<AcceptSiteModelsCommand, Result<SiteModelHealthDto>>
 {
-    public async ValueTask<Result<SiteModelHealthDto>> Handle(AcceptSiteModelsCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<SiteModelHealthDto>> Handle(AcceptSiteModelsCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<SiteModelHealthDto>> HandleInTransactionAsync(AcceptSiteModelsCommand command, CancellationToken cancellationToken)
     {
         var ids = command.Request.Ids.Select(ProductGroupId.Create).ToList();
         var found = await db.ProductGroups.Where(group => ids.Contains(group.Id)).ToListAsync(cancellationToken);
