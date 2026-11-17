@@ -12,5 +12,5 @@ public sealed class SessionCookieOptions
     public int CsrfCookieTtlDays { get; init; } = 14;
 
     public bool Secure { get; init; } = true;
-    public SameSiteMode SameSite { get; init; } = SameSiteMode.None;
+    public SameSiteMode SameSite { get; init; } = SameSiteMode.Lax;
 }
