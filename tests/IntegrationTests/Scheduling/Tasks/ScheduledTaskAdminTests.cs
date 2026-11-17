@@ -43,6 +43,7 @@ public sealed class ScheduledTaskAdminTests
         Assert.True(tasks.All(x => !string.IsNullOrWhiteSpace(x.Name) && !string.IsNullOrWhiteSpace(x.Description)));
         Assert.False(tasks.Single(x => x.Key == ScheduledTaskKeys.Outbox).Editable);
         Assert.False(tasks.Any(x => x.LastRunFailed || x.Overdue));
+        Assert.Empty(await harness.NewContext().Tasks.ToListAsync());
     }
 
     [Fact]
@@ -145,6 +146,11 @@ public sealed class ScheduledTaskAdminTests
         var outbox = tasks.Single(x => x.Key == ScheduledTaskKeys.Outbox);
         Assert.Equal(5, outbox.Schedule.EveryMinutes);
         Assert.True(outbox.Enabled);
+        var unchanged = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
+        Assert.Equal(TaskSchedule.Interval(1).Value, unchanged.Schedule);
+
+        await harness.TickAsync();
+
         var saved = await harness.NewContext().Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
         Assert.Equal(TaskSchedule.Interval(5).Value, saved.Schedule);
     }

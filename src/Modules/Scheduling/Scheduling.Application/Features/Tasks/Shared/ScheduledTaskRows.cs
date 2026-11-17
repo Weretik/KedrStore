@@ -2,7 +2,7 @@ using Scheduling.Application.Features.Catalog;
 
 namespace Scheduling.Application.Features.Tasks.Shared;
 
-/// <summary>A catalogue task with its row; the row is created with the catalogue defaults when it is missing.</summary>
+/// <summary>A catalogue task with its row; commands create a missing row with the catalogue defaults.</summary>
 public sealed record ScheduledTaskRow(ScheduledTaskDefinition Definition, ScheduledTask Task);
 
 public static class ScheduledTaskRows
@@ -14,6 +14,18 @@ public static class ScheduledTaskRows
         var saved = await db.Tasks.ToDictionaryAsync(x => x.Key, StringComparer.Ordinal, cancellationToken);
         return ScheduledTaskCatalog.Tasks.Select(definition => new ScheduledTaskRow(definition,
             Synced(definition, saved.GetValueOrDefault(definition.Key), now) ?? Create(db, definition, now))).ToArray();
+    }
+
+    /// <summary>
+    /// Every catalogue task for reading only: rows are read without tracking, a missing row is shown with the catalogue
+    /// defaults and a fixed task with the catalogue schedule, and nothing is written (the scheduler tick saves them).
+    /// </summary>
+    public static async Task<IReadOnlyList<ScheduledTaskRow>> ReadAsync(ISchedulingDbContext db, DateTimeOffset now,
+        CancellationToken cancellationToken)
+    {
+        var saved = await db.Tasks.AsNoTracking().ToDictionaryAsync(x => x.Key, StringComparer.Ordinal, cancellationToken);
+        return ScheduledTaskCatalog.Tasks.Select(definition => new ScheduledTaskRow(definition,
+            Synced(definition, saved.GetValueOrDefault(definition.Key), now) ?? Defaults(definition, now))).ToArray();
     }
 
     /// <summary>One catalogue task, or null when the key is unknown.</summary>
@@ -40,8 +52,11 @@ public static class ScheduledTaskRows
 
     private static ScheduledTask Create(ISchedulingDbContext db, ScheduledTaskDefinition definition, DateTimeOffset now)
     {
-        var task = ScheduledTask.Create(definition.Key, definition.DefaultSchedule, definition.EnabledByDefault, now);
+        var task = Defaults(definition, now);
         db.Tasks.Add(task);
         return task;
     }
+
+    private static ScheduledTask Defaults(ScheduledTaskDefinition definition, DateTimeOffset now) =>
+        ScheduledTask.Create(definition.Key, definition.DefaultSchedule, definition.EnabledByDefault, now);
 }
