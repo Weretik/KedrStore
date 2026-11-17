@@ -17,7 +17,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         var query =
             from row in db.OrdersWithOneCMessage()
             join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on row.Order.CounterpartyId equals customer.Id
-            where counterpartyId == null || row.Order.CounterpartyId == counterpartyId
+            where counterpartyId == null || row.Order.CounterpartyId == CounterpartyId.FromStorage(counterpartyId)
             select new { order = row.Order, customer, message = row.Message };
         if (createdFromUtc is { } fromUtc)
             query = query.Where(x => x.order.CreatedAt >= fromUtc);
@@ -57,7 +57,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         var items = rows.Select(x =>
         {
             var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.message);
-            return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId, x.CustomerName,
+            return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId.Value, x.CustomerName,
                 x.CreatedAt, x.LineCount, x.Total, oneC.Status.ToString(), x.Adjustment,
                 oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
         }).ToList();
@@ -79,7 +79,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId, x.ProductName, x.Quantity, x.Amount, x.PriceAdjustment))
             .ToArrayAsync(ct);
         var oneC = OrderOneCQueries.OneC(row.order.OneCDocumentNumber, row.order.OneCRejection, row.message);
-        return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId,
+        return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId.Value,
             row.customer.Name, row.order.CreatedAt, row.order.Comment, stored,
             stored.Sum(x => x.Amount), oneC.Status.ToString(), row.order.OneCDocumentNumber,
             oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);

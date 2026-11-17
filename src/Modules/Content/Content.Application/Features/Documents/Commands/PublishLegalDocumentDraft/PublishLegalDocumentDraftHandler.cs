@@ -17,7 +17,7 @@ public sealed class PublishLegalDocumentDraftHandler(
     public async ValueTask<Result<LegalDocumentVersionDetails>> Handle(PublishLegalDocumentDraftCommand command,
         CancellationToken cancellationToken)
     {
-        var draft = await versions.GetByIdAsync(command.Id, cancellationToken);
+        var draft = await versions.GetByIdAsync(LegalDocumentVersionId.FromStorage(command.Id), cancellationToken);
         if (draft is null)
             return Result.NotFound();
 

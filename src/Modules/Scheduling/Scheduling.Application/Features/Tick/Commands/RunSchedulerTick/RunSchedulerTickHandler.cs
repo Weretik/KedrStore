@@ -27,7 +27,7 @@ public sealed class RunSchedulerTickHandler(
         await DeleteOldRunsAsync(cancellationToken);
 
         return Result.Success(new SchedulerTickResponse(inline,
-            launchError is null ? claimed.Select(x => x.Run.TaskKey).ToArray() : [], launchError));
+            launchError is null ? claimed.Select(x => x.Run.TaskKey.Value).ToArray() : [], launchError));
     }
 
     private async Task<IReadOnlyDictionary<string, string>> RunInlineAsync(IReadOnlyList<ScheduledTaskRow> rows,
@@ -101,7 +101,7 @@ public sealed class RunSchedulerTickHandler(
         string? error;
         try
         {
-            error = await launcher.LaunchAsync(claimed.Select(x => new TaskLaunch(x.Task.Key, x.Run.Id)).ToArray(), cancellationToken);
+            error = await launcher.LaunchAsync(claimed.Select(x => new TaskLaunch(x.Task.Key.Value, x.Run.Id.Value)).ToArray(), cancellationToken);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

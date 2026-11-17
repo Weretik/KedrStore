@@ -12,7 +12,7 @@ internal sealed class OrderCreationStore(SalesDbContext dbContext, OutboxWriter 
     : IOrderCreationStore
 {
     public Task<bool> CounterpartyExistsAsync(string counterpartyId, CancellationToken cancellationToken)
-        => dbContext.Counterparties.AnyAsync(counterparty => counterparty.Id == counterpartyId && !counterparty.IsDeleted, cancellationToken);
+        => dbContext.Counterparties.AnyAsync(counterparty => counterparty.Id == CounterpartyId.FromStorage(counterpartyId) && !counterparty.IsDeleted, cancellationToken);
 
     public async Task<CreateOrderIdempotencyRecord?> FindIdempotencyRecordAsync(string operation, string idempotencyKey, CancellationToken cancellationToken)
     {

@@ -12,7 +12,7 @@ public sealed class DeleteGalleryItemHandler(
     public async ValueTask<Result<IReadOnlyList<AdminGalleryItem>>> Handle(DeleteGalleryItemCommand command,
         CancellationToken cancellationToken)
     {
-        var item = await repository.GetByIdAsync(command.Id, cancellationToken);
+        var item = await repository.GetByIdAsync(GalleryItemId.FromStorage(command.Id), cancellationToken);
         if (item is null)
             return Result.NotFound();
 

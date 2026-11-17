@@ -24,7 +24,7 @@ public sealed partial class CompanyContacts : IAggregateRoot
     public const int UrlMaxLength = 500;
     public const int CityMaxLength = 80;
 
-    public int Id { get; private set; }
+    public CompanyContactsId Id { get; private set; }
 
     /// <summary>Ukrainian number in E.164, for example <c>+380681234567</c>; the site formats it.</summary>
     public string SalesPhone { get; private set; } = null!;
@@ -45,7 +45,7 @@ public sealed partial class CompanyContacts : IAggregateRoot
 
     public static DomainResult<CompanyContacts> Create(CompanyContactsValues values, DateTimeOffset now)
     {
-        var contacts = new CompanyContacts { Id = SingletonId };
+        var contacts = new CompanyContacts { Id = CompanyContactsId.Create(SingletonId) };
         var applied = contacts.Apply(values, now);
         return applied.IsFailure ? applied.Error! : contacts;
     }

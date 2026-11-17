@@ -1,6 +1,6 @@
 namespace Sales.Domain.Customers;
 
-public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, IAuditableEntity, ISoftDelete
+public sealed class Counterparty : BaseAuditableEntity<CounterpartyId>, IAggregateRoot, IAuditableEntity, ISoftDelete
 {
     public const int NameMaxLength = 300;
     public const int EmailMaxLength = 320;
@@ -25,7 +25,7 @@ public sealed class Counterparty : BaseAuditableEntity<string>, IAggregateRoot, 
         if (string.IsNullOrWhiteSpace(id))
             return CounterpartyErrors.IdRequired();
 
-        var counterparty = new Counterparty { Id = id.Trim() };
+        var counterparty = new Counterparty { Id = CounterpartyId.Create(id) };
         var set = counterparty.Set(identityUserId, name, email, phone, defaultPriceTypeId);
         if (set.IsFailure)
             return set.Error!;

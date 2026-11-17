@@ -19,7 +19,7 @@ public sealed class UpdateSiteSeoSettingsHandler(
     public async ValueTask<Result<SiteSeoSettingsDetails>> Handle(UpdateSiteSeoSettingsCommand command,
         CancellationToken cancellationToken)
     {
-        var settings = await repository.GetByIdAsync(SiteSeoSettings.SingletonId, cancellationToken);
+        var settings = await repository.GetByIdAsync(SiteSeoSettingsId.Create(SiteSeoSettings.SingletonId), cancellationToken);
         if (settings is null)
             return Result.NotFound();
         if (RowVersions.IsStale(command.Input.Version, settings.Version))

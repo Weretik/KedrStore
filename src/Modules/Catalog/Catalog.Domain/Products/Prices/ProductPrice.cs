@@ -2,7 +2,7 @@
 
 namespace Catalog.Domain.Products.Prices;
 
-public class ProductPrice : BaseEntity<int>, IAggregateRoot
+public class ProductPrice : BaseEntity<ProductPriceId>, IAggregateRoot
 {
     #region Properties
     public string ProductTypeIdOneC { get; private set; } = null!;

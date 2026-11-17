@@ -5,12 +5,9 @@ namespace Scheduling.Domain.Runs;
 /// <summary>One run of a task: claimed by the tick, started and finished by the job (platform/007 R-04, R-06).</summary>
 public sealed class ScheduledTaskRun : IAggregateRoot
 {
-    private ScheduledTaskRun()
-    {
-        TaskKey = string.Empty;
-    }
+    private ScheduledTaskRun() { }
 
-    internal ScheduledTaskRun(Guid id, string taskKey, RunTrigger trigger, string? requestedBy, DateTimeOffset claimedAt)
+    internal ScheduledTaskRun(ScheduledTaskRunId id, ScheduledTaskKey taskKey, RunTrigger trigger, string? requestedBy, DateTimeOffset claimedAt)
     {
         Id = id;
         TaskKey = taskKey;
@@ -20,8 +17,8 @@ public sealed class ScheduledTaskRun : IAggregateRoot
         Outcome = RunOutcome.Running;
     }
 
-    public Guid Id { get; private set; }
-    public string TaskKey { get; private set; }
+    public ScheduledTaskRunId Id { get; private set; }
+    public ScheduledTaskKey TaskKey { get; private set; }
     public RunTrigger Trigger { get; private set; }
     public string? RequestedBy { get; private set; }
     public DateTimeOffset ClaimedAt { get; private set; }

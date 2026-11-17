@@ -17,7 +17,7 @@ public sealed class SiteSeoSettingsTests
             """<meta name="google-site-verification" content="AbCdEf_123-xyz" />""",
             "<meta name='msvalidate.01' content='0123456789ABCDEF0123456789ABCDEF' />", 42), Now, "seo@kedr");
 
-        Assert.Equal(SiteSeoSettings.SingletonId, settings.Id);
+        Assert.Equal(SiteSeoSettings.SingletonId, settings.Id.Value);
         Assert.Equal("G-AB12CD34EF", settings.GoogleAnalyticsId);
         Assert.Equal("GTM-AB12CD3", settings.GoogleTagManagerId);
         Assert.Equal("AbCdEf_123-xyz", settings.GoogleSiteVerification);

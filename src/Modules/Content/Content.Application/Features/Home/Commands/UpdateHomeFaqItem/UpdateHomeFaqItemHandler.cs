@@ -12,7 +12,7 @@ public sealed class UpdateHomeFaqItemHandler(
 {
     public async ValueTask<Result<AdminHomeBlocks>> Handle(UpdateHomeFaqItemCommand command, CancellationToken cancellationToken)
     {
-        var item = await repository.GetByIdAsync(command.Id, cancellationToken);
+        var item = await repository.GetByIdAsync(HomeFaqItemId.FromStorage(command.Id), cancellationToken);
         if (item is null)
             return Result.NotFound();
 

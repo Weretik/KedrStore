@@ -118,7 +118,7 @@ public sealed class LegalDocumentsApiTests
         using var draft = JsonDocument.Parse(await created.Content.ReadAsStringAsync());
         var id = draft.RootElement.GetProperty("id").GetInt64();
         var publishedId = db.LegalDocumentVersions.AsNoTracking()
-            .Single(v => v.Kind == LegalDocumentKind.DeliveryPayment && v.Status == LegalDocumentStatus.Published).Id;
+            .Single(v => v.Kind == LegalDocumentKind.DeliveryPayment && v.Status == LegalDocumentStatus.Published).Id.Value;
 
         using var deleted = await admin.DeleteAsync($"{Base}/versions/{id}");
         using var deletePublished = await admin.DeleteAsync($"{Base}/versions/{publishedId}");

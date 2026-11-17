@@ -43,8 +43,8 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         await sales.InScopeAsync(async services =>
         {
             var db = services.GetRequiredService<SalesDbContext>();
-            Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == "stale-cp"));
-            Assert.True(await db.Counterparties.AnyAsync(item => item.Id == "retained-cp"));
+            Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == CounterpartyId.FromStorage("stale-cp")));
+            Assert.True(await db.Counterparties.AnyAsync(item => item.Id == CounterpartyId.FromStorage("retained-cp")));
             Assert.Empty(await db.Orders.ToArrayAsync());
             Assert.Empty(await db.OrderDrafts.ToArrayAsync());
             return true;

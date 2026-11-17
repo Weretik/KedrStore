@@ -18,7 +18,7 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
             from draft in db.OrderDrafts.AsNoTracking()
             join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking()
                 on draft.CounterpartyId equals customer.Id
-            where counterpartyId == null || draft.CounterpartyId == counterpartyId
+            where counterpartyId == null || draft.CounterpartyId == CounterpartyId.FromStorage(counterpartyId)
             select new { draft, customer };
         if (createdFromUtc is { } fromUtc)
             query = query.Where(x => x.draft.CreatedAtUtc >= fromUtc);
@@ -46,7 +46,7 @@ internal sealed class WorkspaceDraftReader(SalesDbContext db, WorkspaceDraftDeta
         };
         var rows = await query.Skip((page - 1) * pageSize).Take(pageSize)
             .Select(x => new WorkspaceDraftListItem(x.draft.Id.Value, x.draft.Title,
-                x.draft.CounterpartyId, x.customer.Name, x.draft.UpdatedAtUtc,
+                x.draft.CounterpartyId.Value, x.customer.Name, x.draft.UpdatedAtUtc,
                 x.draft.Lines.Count)).ToListAsync(ct);
         return new WorkspacePage<WorkspaceDraftListItem>(PageInfo(page, pageSize, count), rows);
     }

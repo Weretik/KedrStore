@@ -15,7 +15,7 @@ public sealed class StaleCounterpartyRemoval(
     {
         if (stale.Length == 0) return 0;
 
-        var staleIds = stale.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
+        var staleIds = stale.Select(item => item.Id).ToHashSet();
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
         var orders = await db.Orders.Where(item => staleIds.Contains(item.CounterpartyId)).ToArrayAsync(ct);
@@ -40,7 +40,7 @@ public sealed class StaleCounterpartyRemoval(
         db.Counterparties.RemoveRange(stale);
         // Platform spec 006, R-014: the Identity users go with the customers, through the outbox.
         foreach (var customer in stale)
-            outbox.Add(db, new CounterpartyRemoved(customer.Id, customer.IdentityUserId));
+            outbox.Add(db, new CounterpartyRemoved(customer.Id.Value, customer.IdentityUserId));
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 

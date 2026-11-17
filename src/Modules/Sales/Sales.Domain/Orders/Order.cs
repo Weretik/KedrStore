@@ -1,3 +1,4 @@
+using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Domain.Orders.ValueObjects;
 using Sales.Domain.Orders.Errors;
@@ -14,7 +15,7 @@ public sealed class Order : BaseAuditableEntity<OrderId>, IAggregateRoot, IAudit
     private readonly List<OrderLine> _lines = [];
 
     public string OrderNumber { get; private set; } = null!;
-    public string CounterpartyId { get; private set; } = null!;
+    public CounterpartyId CounterpartyId { get; private set; }
     public string? Comment { get; private set; }
     public IReadOnlyCollection<OrderLine> Lines => _lines.AsReadOnly();
 
@@ -50,7 +51,7 @@ public sealed class Order : BaseAuditableEntity<OrderId>, IAggregateRoot, IAudit
         var order = new Order
         {
             OrderNumber = orderNumber.Trim(),
-            CounterpartyId = counterpartyId.Trim(),
+            CounterpartyId = CounterpartyId.Create(counterpartyId),
             Comment = string.IsNullOrEmpty(normalizedComment) ? null : normalizedComment,
             OneCMessageId = Guid.CreateVersion7(createdAt),
         };

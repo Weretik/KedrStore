@@ -2,7 +2,7 @@ namespace Sales.Domain.Customers;
 
 public sealed class CounterpartyCategoryPriceType
 {
-    public string CounterpartyId { get; private set; } = null!;
+    public CounterpartyId CounterpartyId { get; private set; }
     public int CategoryId { get; private set; }
     public int PriceTypeId { get; private set; }
 
@@ -22,7 +22,7 @@ public sealed class CounterpartyCategoryPriceType
 
         return new CounterpartyCategoryPriceType
         {
-            CounterpartyId = counterpartyId.Trim(),
+            CounterpartyId = CounterpartyId.Create(counterpartyId),
             CategoryId = categoryId,
             PriceTypeId = priceTypeId,
         };

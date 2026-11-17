@@ -14,6 +14,7 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
             .IsUnique();
 
         builder.Property(p => p.Id)
+            .HasConversion(id => id.Value, value => ProductPriceId.FromStorage(value))
             .ValueGeneratedOnAdd();
 
         builder.Property(p => p.ProductId)

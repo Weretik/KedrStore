@@ -12,7 +12,7 @@ public sealed class SalesOrderTests
         var order = Order.Create("SO-20260817-0001", "customer-1", "Urgent", [line], DateTimeOffset.UtcNow).Value;
 
         Assert.Equal("SO-20260817-0001", order.OrderNumber);
-        Assert.Equal("customer-1", order.CounterpartyId);
+        Assert.Equal("customer-1", order.CounterpartyId.Value);
         var savedLine = Assert.Single(order.Lines);
         Assert.Equal("Door handle", savedLine.ProductName);
         Assert.Equal(10, savedLine.Quantity);

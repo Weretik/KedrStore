@@ -12,7 +12,7 @@ public sealed class WholesalePage : IAggregateRoot
     public const int SingletonId = 1;
     public static readonly IReadOnlyList<string> Languages = ["uk", "ru"];
 
-    public int Id { get; private set; }
+    public WholesalePageId Id { get; private set; }
     public WholesalePageText Uk { get; private set; } = null!;
     public WholesalePageText Ru { get; private set; } = null!;
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -24,7 +24,7 @@ public sealed class WholesalePage : IAggregateRoot
 
     public static WholesalePage Create(WholesalePageText uk, WholesalePageText ru, DateTimeOffset now)
     {
-        var page = new WholesalePage { Id = SingletonId };
+        var page = new WholesalePage { Id = WholesalePageId.Create(SingletonId) };
         page.Apply(uk, ru, now);
         return page;
     }

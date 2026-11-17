@@ -40,10 +40,10 @@ public sealed class OneCCounterpartiesSyncService(
 
         var existingCounterparties = await salesDbContext.Counterparties
             .IgnoreQueryFilters()
-            .ToDictionaryAsync(item => item.Id, StringComparer.Ordinal, cancellationToken);
+            .ToDictionaryAsync(item => item.Id.Value, StringComparer.Ordinal, cancellationToken);
         var assignedIdentityUsers = existingCounterparties.Values
             .GroupBy(item => item.IdentityUserId)
-            .ToDictionary(group => group.Key, group => group.First().Id);
+            .ToDictionary(group => group.Key, group => group.First().Id.Value);
 
         var imported = 0;
         var updated = 0;
@@ -163,7 +163,7 @@ public sealed class OneCCounterpartiesSyncService(
         }
 
         var staleCounterparties = sourceIdsComplete
-            ? existingCounterparties.Values.Where(item => !sourceCounterpartyIds.Contains(item.Id)).ToArray()
+            ? existingCounterparties.Values.Where(item => !sourceCounterpartyIds.Contains(item.Id.Value)).ToArray()
             : [];
 
         if (!sourceIdsComplete)

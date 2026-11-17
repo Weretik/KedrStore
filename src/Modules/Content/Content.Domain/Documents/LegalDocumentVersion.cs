@@ -11,7 +11,7 @@ public sealed class LegalDocumentVersion : IAggregateRoot
 
     private readonly List<LegalDocumentText> _texts = [];
 
-    public long Id { get; private set; }
+    public LegalDocumentVersionId Id { get; private set; }
     public LegalDocumentKind Kind { get; private set; }
     public LegalDocumentStatus Status { get; private set; }
 

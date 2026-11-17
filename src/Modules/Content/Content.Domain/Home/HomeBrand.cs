@@ -8,7 +8,7 @@ public sealed class HomeBrand : IAggregateRoot
 {
     public const int NameMaxLength = 100;
 
-    public long Id { get; private set; }
+    public HomeBrandId Id { get; private set; }
     public int Position { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public long LogoMediaFileId { get; private set; }

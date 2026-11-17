@@ -10,7 +10,7 @@ public sealed class CompanyRequisitesChange : IAggregateRoot
 
     private readonly List<RequisitesFieldChange> _changes = [];
 
-    public long Id { get; private set; }
+    public CompanyRequisitesChangeId Id { get; private set; }
     public DateTimeOffset ChangedAt { get; private set; }
     public string ChangedByUserId { get; private set; } = null!;
 

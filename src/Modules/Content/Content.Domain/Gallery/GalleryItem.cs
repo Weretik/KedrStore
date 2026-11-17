@@ -6,7 +6,7 @@ namespace Content.Domain.Gallery;
 /// </summary>
 public sealed class GalleryItem : IAggregateRoot
 {
-    public long Id { get; private set; }
+    public GalleryItemId Id { get; private set; }
     public GalleryItemKind Kind { get; private set; }
 
     /// <summary>Media library file ID; set only for a photo.</summary>
