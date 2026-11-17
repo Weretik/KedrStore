@@ -12,9 +12,6 @@ BuildingBlocks.Infrastructure/
 │   ├── OutboxWriter                         # adds a message in the module's SaveChanges
 │   ├── ModuleOutbox<TContext>, OutboxDispatcher  # IOutboxDispatcher: send after commit, due dispatch, retention
 │   └── OutboxRetrySchedule                  # 1, 5, 15, 30, 60 minutes, then hourly; 10 attempts
-├── DomainEvents/
-│   ├── EfDomainEventContext
-│   └── MediatorDomainEventDispatcher
 ├── Migrations/
 │   ├── IDatabaseMigrator
 │   └── DbMigrator<TContext>
@@ -36,8 +33,6 @@ The transactional outbox is described in [platform spec 006](../../../specs/plat
 
 `AddInfrastructureServices` registers:
 
-- IDomainEventContext as EfDomainEventContext;
-- IDomainEventDispatcher as MediatorDomainEventDispatcher;
 - IHttpContextAccessor;
 - ICurrentUserService as HttpContextCurrentUserService;
 - IPermissionService as ClaimPermissionService;

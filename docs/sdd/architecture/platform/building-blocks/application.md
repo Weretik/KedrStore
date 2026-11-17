@@ -8,15 +8,11 @@ BuildingBlocks.Application/
 │   ├── RequestLoggingBehavior
 │   ├── ExceptionBehavior
 │   ├── PerformanceBehavior + options
-│   ├── ValidationBehavior
-│   └── DomainEventDispatcherBehavior
+│   └── ValidationBehavior
 ├── Contracts/
 │   ├── ICurrentUserService, IPermissionService
 │   ├── ICacheService, IEmailService, IEnvironmentService
 │   └── technical abstractions for modules
-├── Notifications/
-│   ├── IDomainEventContext, IDomainEventDispatcher
-│   └── DomainEventNotification + handler
 ├── Logging/                  generated structured log helpers
 ├── Helpers/PhoneNumberHelper.cs
 └── ApplicationAssemblyMarker.cs
@@ -24,15 +20,11 @@ BuildingBlocks.Application/
 
 ## Pipeline behaviors
 
-The host registers RequestLogging, Exception, Performance, Validation, and DomainEventDispatcher in exactly this order. See [Mediator behaviors](../../runtime/mediator-behaviors.md) for their precise semantics.
-
-## Notifications
-
-`IDomainEventContext` provides entities with accumulated events. `IDomainEventDispatcher` publishes events. `DomainEventNotification` is a Mediator notification wrapper. The default notification handler is intentionally empty; handlers in specific modules can subscribe to this notification/event pattern when needed.
+The host registers RequestLogging, Exception, Performance, and Validation in exactly this order. See [Mediator behaviors](../../runtime/mediator-behaviors.md) for their precise semantics.
 
 ## Logging and helpers
 
-The Logging folder contains stable source-generated Serilog/Microsoft templates for requests, validation, performance, domain events, cancellation, and unhandled failures. Use them through the existing behaviors; do not log raw sensitive request data.
+The Logging folder contains stable source-generated Serilog/Microsoft templates for requests, validation, performance, cancellation, and unhandled failures. Use them through the existing behaviors; do not log raw sensitive request data.
 
 `PhoneNumberHelper` is a shared utility for normalizing and validating phone numbers. Use it instead of duplicating parsing logic.
 

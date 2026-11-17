@@ -42,6 +42,6 @@ Owns identity persistence, roles, authorization policies, session/current-user s
 
 ## BuildingBlocks
 
-BuildingBlocks.Domain contains domain primitives. BuildingBlocks.Application contains Mediator behaviors, result/validation support, and domain-event abstractions. BuildingBlocks.Infrastructure contains shared adapter implementations. This is technical foundation, not a fourth business module.
+BuildingBlocks.Domain contains domain primitives. BuildingBlocks.Application contains Mediator behaviors, and result/validation support. BuildingBlocks.Infrastructure contains shared adapter implementations. This is technical foundation, not a fourth business module.
 
 Before adding or duplicating shared primitives, read the [BuildingBlocks guide](../platform/building-blocks/README.md).

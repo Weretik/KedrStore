@@ -54,9 +54,9 @@ Code that every module uses lives in `src/BuildingBlocks/` (some solutions call 
 
 ```text
 src/BuildingBlocks/
-├── BuildingBlocks.Domain           kernel: Entity, AggregateRoot, IDomainEvent, Result/Error, Money, strongly typed ids, Guard
+├── BuildingBlocks.Domain           kernel: Entity, AggregateRoot, Result/Error, Money, strongly typed ids, Guard
 ├── BuildingBlocks.Application      Mediator pipeline behaviors, ports (ICurrentUser, IClock, ICacheService, INotificationSender), paging, text and phone normalization
-├── BuildingBlocks.Infrastructure   EF base DbContext and interceptors, domain-event dispatch, outbox, logging, caching, notification and other client implementations, migration and seed runners
+├── BuildingBlocks.Infrastructure   EF base DbContext and interceptors, outbox, logging, caching, notification and other client implementations, migration and seed runners
 └── BuildingBlocks.Api              Result→HTTP mapping, problem details, exception and correlation middleware, endpoint conventions
 ```
 

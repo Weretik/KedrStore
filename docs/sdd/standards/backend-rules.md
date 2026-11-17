@@ -25,6 +25,6 @@ Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in
 
 Use specific names such as `CreateOrderCommand`, `GetPublicProductListQuery`, and `GetAdminProductListHandler`. Avoid vague folders or names such as `Common`, `Misc`, `Helper`, `Utils`, and `Manager`. Do not add abstractions without a concrete need.
 
-## Domain events and transactions
+## Transactions
 
-Follow the current domain event lifecycle: `collect → dispatch → clear`. Use cases that change multiple aggregates coordinate a transaction through the existing `IUnitOfWork`.
+The backend has no domain events (removed 2026-11-17; the outbox covers cross-module and outside messages). Use cases that change multiple aggregates coordinate a transaction through the existing `IUnitOfWork`.

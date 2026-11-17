@@ -43,7 +43,7 @@ HTTP
   → CORS, HTTPS, Serilog request logging, rate limiter
   → authentication → authorization
   → Work activity log (admin changes) → endpoint → ISender
-  → request logging → exceptions → performance → validation → domain events
+  → request logging → exceptions → performance → validation
   → handler → Result to HTTP mapping
 ~~~
 

@@ -9,7 +9,6 @@ ISender.Send(...)
   ├── 2. ExceptionBehavior
   ├── 3. PerformanceBehavior
   ├── 4. ValidationBehavior
-  ├── 5. DomainEventDispatcherBehavior
   └── Handler
 ~~~
 
@@ -28,10 +27,6 @@ Measures request duration according to the configured PerformanceBehavior settin
 ## 4. ValidationBehavior
 
 Runs all FluentValidation validators for the request before the handler. For `Result` or `Result<T>` responses, failures become `Result.Invalid`, and the handler is not called. Validators check input contracts, not aggregate state rules.
-
-## 5. DomainEventDispatcherBehavior
-
-Runs after a successful handler. It retrieves accumulated events from `IDomainEventContext`, clears them, and publishes each through `IDomainEventDispatcher`/Mediator. Entities accumulate events; controllers and handlers do not bypass this cycle.
 
 ## Rules for a new behavior
 

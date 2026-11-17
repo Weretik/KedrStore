@@ -1,6 +1,4 @@
 ﻿using BuildingBlocks.Application.Users;
-using BuildingBlocks.Application.Notifications;
-using BuildingBlocks.Infrastructure.DomainEvents;
 using BuildingBlocks.Infrastructure.Notifications;
 using BuildingBlocks.Infrastructure.Users;
 using Microsoft.Extensions.Configuration;
@@ -15,10 +13,6 @@ public static class InfrastructureDependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTelegramServices(configuration);
-
-        // Domain Events
-        services.AddScoped<IDomainEventContext, EfDomainEventContext>();
-        services.AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
 
         // Identity context services
         services.AddHttpContextAccessor();
