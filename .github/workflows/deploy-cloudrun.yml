@@ -33,6 +33,9 @@ jobs:
       - name: Check documentation links
         run: python3 tools/docs/check_doc_links.py
 
+      - name: Check the module and feature maps
+        run: python3 tools/docs/check_module_maps.py
+
       - name: Test the test selection
         run: python3 -m unittest discover -s tools/ci
 

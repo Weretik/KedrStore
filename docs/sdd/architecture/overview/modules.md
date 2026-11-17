@@ -12,13 +12,17 @@ Owns catalog products, categories, price types, translations, the product-list p
 
 ## Sales
 
-Layers: Sales.Api, Sales.Application, Sales.Domain, Sales.Infrastructure.
+Layers: Sales.Api, Sales.Application, Sales.Contracts, Sales.Domain, Sales.Infrastructure.
 
-Owns sales customers and counterparties, pricing policy, and sales integration with Catalog. It consumes Catalog only through `Catalog.Contracts` and Identity through `Identity.Contracts` (counterparty account provisioning).: products, stock, category parents, and prices through `ICatalogSalesReader`, category and price type names through `ICatalogReferenceDataReader`.
+`Sales.Contracts` offers nothing yet; no other module uses Sales.
+
+Owns sales customers and counterparties, pricing policy, manager and site orders, the order workspace, and sending orders to 1C (outbox lane `one-c-orders`) and Telegram. It consumes Catalog only through `Catalog.Contracts` (products, stock, category parents, and prices through `ICatalogSalesReader`; category and price type names through `ICatalogReferenceDataReader`) and Identity through `Identity.Contracts` (counterparty account provisioning).
 
 ## Content
 
-Layers: Content.Api, Content.Application, Content.Domain, Content.Infrastructure.
+Layers: Content.Api, Content.Application, Content.Contracts, Content.Domain, Content.Infrastructure.
+
+`Content.Contracts` offers nothing yet; no other module uses Content.
 
 Owns site content written in the admin: articles, company contacts, requisites, the versioned site documents (offer, privacy, returns, delivery) and the site gallery now, other site texts later. Its tables live in the PostgreSQL schema `content` with their own migration history. Gallery photos are stored as `MediaFileId` values; Content.Infrastructure reads their URLs through `Media.Contracts` (no table, join or foreign key across modules).
 
@@ -30,9 +34,19 @@ Owns the picture library on the CDN: virtual folders, file records with CDN keys
 
 ## Work
 
-Layers: Work.Api, Work.Application, Work.Domain, Work.Infrastructure.
+Layers: Work.Api, Work.Application, Work.Contracts, Work.Domain, Work.Infrastructure.
+
+`Work.Contracts` offers nothing yet; no other module uses Work.
 
 Owns the staff members' own tasks and the automatic log of their admin changes (spec work/001). Its tables live in the PostgreSQL schema `work` with their own migration history; users are Identity user IDs as values. The log is written by `WorkActivityMiddleware` in Work.Api after every successful admin change, so other modules neither reference nor call Work.
+
+## Scheduling
+
+Layers: Scheduling.Api, Scheduling.Application, Scheduling.Contracts, Scheduling.Domain, Scheduling.Infrastructure.
+
+`Scheduling.Contracts` offers `IScheduledTaskRunJournal`, which `Host.Jobs` uses to mark a run started and record its result.
+
+Owns the background tasks «Фонові задачі»: the code list of tasks, their schedules in Kyiv time, the scheduler tick that runs the outbox and starts the Cloud Run Job `kedr-tasks`, and the run journal. Its tables live in the PostgreSQL schema `scheduling`. The task runners themselves are the existing Catalog, Sales and Media jobs in `Host.Jobs`.
 
 ## Identity
 

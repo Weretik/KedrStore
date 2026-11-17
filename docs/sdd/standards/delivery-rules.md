@@ -14,7 +14,7 @@ Keep a feature's current scope and navigation in its `README.md`, requirements i
 4. Complete ready tasks scenario by scenario. Apply Red → Green → Refactor to each testable technical slice.
 5. Verify each completed scenario, then run the relevant regression checks.
 6. Update the specification with evidence, deviations, and residual risks.
-7. After implementing a new feature, add its current structure to the [feature map](../features/README.md) and its index; when changing an existing feature, review and update the description in the same change where needed.
+7. After implementing a new feature, add its current structure to the [feature map](../features/README.md) and its index; when changing an existing feature, review and update the description in the same change where needed. A new or renamed module, host, `Api/Endpoints/<Feature>` folder or feature card updates the [system map](../architecture/overview/system-map.md), the [module map](../architecture/overview/modules.md) (`Layers:` line and what `Contracts` offers), the C4 component diagram and the feature map in the same pull request; `python3 tools/docs/check_module_maps.py` runs in CI and fails otherwise. The maps are how a person or an agent finds a module or feature without searching the whole code.
 
 ## Documentation granularity
 
@@ -38,7 +38,7 @@ Implement a feature in stages (one scenario, task slice, or layer at a time) and
 
 ## Closing checklist
 
-Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the full feature audit against the architecture rules, including the folder axiom, is done and its findings are fixed.
+Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated, and `python3 tools/docs/check_module_maps.py` passes; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the full feature audit against the architecture rules, including the folder axiom, is done and its findings are fixed.
 
 When changing an existing feature, open its card and the code and tests it lists before editing.
 

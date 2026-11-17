@@ -4,7 +4,7 @@ namespace ArchitectureTests.Modules;
 
 /// <summary>
 /// Every business module has the same five projects, and a module reaches another one only through that module's
-/// <c>*.Contracts</c> project.
+/// <c>*.Contracts</c> project; module references never form a cycle, so the context map reads one way.
 /// </summary>
 public sealed class ModuleContractsTests
 {
@@ -39,6 +39,34 @@ public sealed class ModuleContractsTests
     }
 
     [Fact]
+    public void BusinessModules_ListEveryFolderUnderSrcModules()
+    {
+        var onDisk = Directory.GetDirectories(Path.Combine(RepositoryRoot.Find(), "src", "Modules"))
+            .Select(Path.GetFileName).Order(StringComparer.Ordinal).ToArray();
+
+        Assert.Equal(onDisk, BusinessModules.Order(StringComparer.Ordinal).ToArray());
+    }
+
+    [Fact]
+    public void ModuleReferences_FormNoCycle()
+    {
+        var uses = BusinessModules.ToDictionary(module => module, module => Graph.Projects
+            .Where(project => OwnerOf(project.Name) == module)
+            .SelectMany(project => project.References)
+            .Select(OwnerOf)
+            .OfType<string>()
+            .Where(other => other != module)
+            .ToHashSet(StringComparer.Ordinal));
+
+        var cycles = uses.SelectMany(pair => pair.Value
+                .Where(other => Reaches(uses, other, pair.Key, []))
+                .Select(other => $"{pair.Key} -> {other} -> ... -> {pair.Key}"))
+            .ToArray();
+
+        Assert.Empty(cycles);
+    }
+
+    [Fact]
     public void ContractsProjects_DependOnNoOtherProject()
     {
         var violations = Graph.Projects
@@ -48,6 +76,9 @@ public sealed class ModuleContractsTests
 
         Assert.Empty(violations);
     }
+
+    private static bool Reaches(Dictionary<string, HashSet<string>> uses, string from, string target, HashSet<string> seen)
+        => from == target || (seen.Add(from) && uses[from].Any(next => Reaches(uses, next, target, seen)));
 
     private static string? OwnerOf(string projectName)
         => BusinessModules.SingleOrDefault(module => projectName.StartsWith($"{module}.", StringComparison.Ordinal));
