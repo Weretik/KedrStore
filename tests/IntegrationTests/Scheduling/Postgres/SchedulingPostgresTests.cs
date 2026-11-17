@@ -22,15 +22,27 @@ public sealed class SchedulingPostgresTests(SchedulingPostgresFixture postgres)
     private readonly FakeTimeProvider _time = new(SchedulingTestHarness.MondayNine);
 
     [SkippableFact]
-    public async Task Page_creates_the_task_rows_with_Kyiv_next_runs()
+    public async Task Page_reads_without_writing_and_tick_creates_the_task_rows_with_Kyiv_next_runs()
     {
         postgres.SkipIfUnavailable();
         await ResetAsync();
 
-        await using var db = postgres.CreateContext();
-        var tasks = await new GetScheduledTasksHandler(db, _time).Handle(new GetScheduledTasksQuery(), CancellationToken.None);
+        await using (var db = postgres.CreateContext())
+        {
+            var tasks = await new GetScheduledTasksHandler(db, _time).Handle(new GetScheduledTasksQuery(), CancellationToken.None);
+            Assert.True(tasks.IsSuccess);
+            Assert.Equal(ScheduledTaskCatalog.Tasks.Count, tasks.Value.Count);
+        }
 
-        Assert.True(tasks.IsSuccess);
+        Assert.Equal(0, await postgres.CreateContext().Tasks.CountAsync());
+
+        await using (var db = postgres.CreateContext())
+        {
+            var tick = await new RunSchedulerTickHandler(db, _time, [new FakeOutboxWork()], new FakeLauncher(),
+                NullLogger<RunSchedulerTickHandler>.Instance).Handle(new RunSchedulerTickCommand(), CancellationToken.None);
+            Assert.True(tick.IsSuccess);
+        }
+
         Assert.Equal(ScheduledTaskCatalog.Tasks.Count, await postgres.CreateContext().Tasks.CountAsync());
     }
 
