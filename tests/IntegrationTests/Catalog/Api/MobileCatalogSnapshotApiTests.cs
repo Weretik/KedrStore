@@ -141,8 +141,8 @@ public sealed class MobileCatalogSnapshotApiTests
         lockProduct.SetMedia(
             [new ProductMediaFile(1, "https://cdn/20-a.webp"), new ProductMediaFile(2, "https://cdn/20-b.webp")],
             new ProductMediaFile(3, "https://cdn/20-scheme.webp"), Now);
-        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "uk", "Замок український", Now).Value);
-        db.ProductTranslations.Add(ProductTranslation.Create(ProductId.From(20), "ru", "Замок русский", Now).Value);
+        lockProduct.SetTranslation("uk", "Замок український", Now);
+        lockProduct.SetTranslation("ru", "Замок русский", Now);
         AddPrice(db, 20, 12, 150m);
         AddPrice(db, 20, 14, 120m);
 

@@ -9,8 +9,7 @@ using Catalog.Domain.Attributes.ValueObjects;
 namespace Catalog.Application.Features.Attributes.Commands.CreateAttributeValue;
 
 public sealed class CreateAttributeValueHandler(
-    IReadCatalogDbContext db,
-    ICatalogRepository<AttributeValue> values,
+    ICatalogRepository<CatalogAttribute> attributes,
     CatalogAttributeReader reader,
     TimeProvider clock)
     : ICommandHandler<CreateAttributeValueCommand, Result<AdminCatalogAttributeDto>>
@@ -19,33 +18,23 @@ public sealed class CreateAttributeValueHandler(
         CancellationToken cancellationToken)
     {
         var attributeId = AttributeId.Create(command.AttributeId);
-        if (!await db.Attributes.AnyAsync(item => item.Id == attributeId, cancellationToken))
+        var attribute = await attributes.FirstOrDefaultAsync(new AttributeWithValuesSpec(attributeId), cancellationToken);
+        if (attribute is null)
             return Result.NotFound();
 
+        // A typed slug must be free (the attribute refuses a taken one); a slug made from the name gets a number.
         var request = command.Request;
-        var existing = await db.AttributeValues.AsNoTracking()
-            .Where(value => value.AttributeId == attributeId)
-            .Select(value => new { value.Code, value.Slug })
-            .ToListAsync(cancellationToken);
-
         var slug = string.IsNullOrWhiteSpace(request.Slug) ? SlugText.FromName(request.NameUk, "znachennia") : request.Slug.Trim();
-        var usedSlugs = existing.Select(value => value.Slug).ToHashSet(StringComparer.Ordinal);
-        if (!string.IsNullOrWhiteSpace(request.Slug) && usedSlugs.Contains(slug))
-            return AttributeValidation.Invalid("slug", "Ця адреса вже є в іншого значення цієї властивості.", "SlugTaken");
         var unique = slug;
-        for (var number = 2; usedSlugs.Contains(unique); number++)
+        for (var number = 2; string.IsNullOrWhiteSpace(request.Slug) && attribute.IsValueSlugTaken(unique); number++)
             unique = SlugText.WithSuffix(slug, number);
 
         var code = string.IsNullOrWhiteSpace(request.Code) ? unique : request.Code.Trim();
-        if (existing.Any(value => string.Equals(value.Code, code, StringComparison.OrdinalIgnoreCase)))
-            return AttributeValidation.Invalid("code", "Цей код вже є в іншого значення цієї властивості.", "CodeTaken");
-
-        var value = AttributeValue.CreateManual(attributeId, code, request.NameUk, request.NameRu, unique,
-            request.SortOrder, request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow());
+        var value = attribute.AddManualValue(code, request.NameUk, request.NameRu, unique, request.SortOrder,
+            request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow());
         if (value.IsFailure)
             return value.Error!.ToResult<AdminCatalogAttributeDto>();
-        await values.AddAsync(value.Value, cancellationToken);
-        await values.SaveChangesAsync(cancellationToken);
+        await attributes.SaveChangesAsync(cancellationToken);
         return Result.Success((await reader.ReadAsync(attributeId, cancellationToken))!);
     }
 }

@@ -111,7 +111,6 @@ public sealed class AttributeAdminTests
     {
         await using var db = await ImportedAsync();
         var create = new CreateCatalogAttributeHandler(db, new TestRepository<CatalogAttribute>(db),
-            new TestRepository<AttributeValue>(db),
             new CatalogAttributeReader(db, new global::IntegrationTests.Catalog.ProductMedia.FakeProductMediaLibrary()),
             TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
@@ -210,7 +209,7 @@ public sealed class AttributeAdminTests
         Assert.False(Assert.Single(await ColorsAsync(db, 2)).IsConfirmed);
 
         var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
-            new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
+            codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(cp.AliasId,
             new DecideAttributeCodeRequest(await ValueIdAsync(db, "CR"))), CancellationToken.None);

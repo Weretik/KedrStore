@@ -13,8 +13,6 @@ namespace Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
 public sealed class DecideAttributeCodeHandler(
     IReadCatalogDbContext db,
     ICatalogRepository<AttributeAlias> aliases,
-    ICatalogRepository<AttributeAliasCategoryValue> categoryValues,
-    ICatalogRepository<AttributeAliasMeaning> meanings,
     UnresolvedCodeReader reader,
     RecognizeCatalogAttributesJob recognizer,
     TimeProvider clock,
@@ -25,7 +23,8 @@ public sealed class DecideAttributeCodeHandler(
         CancellationToken cancellationToken)
     {
         var aliasId = AttributeAliasId.Create(command.AliasId);
-        var alias = await db.AttributeAliases.FirstOrDefaultAsync(item => item.Id == aliasId, cancellationToken);
+        var alias = await db.AttributeAliases.Include(item => item.CategoryValues).Include(item => item.Meanings)
+            .FirstOrDefaultAsync(item => item.Id == aliasId, cancellationToken);
         if (alias is null)
             return Result.NotFound();
 
@@ -61,16 +60,15 @@ public sealed class DecideAttributeCodeHandler(
         if (request.ApplyToAll)
         {
             alias.Decide(valueId, now);
-            await ReplaceMeaningsAsync(aliasId, [(null, forAll.Others)], forAllProducts: true, now, cancellationToken);
+            alias.ReplaceMeanings(Rows([(null, forAll.Others)]), forAllProducts: true, now);
         }
 
         if (request.Categories is not null)
         {
-            await ReplaceCategoryValuesAsync(aliasId,
-                ownValues.Select(item => (item.CategoryId, item.Decoding.Own)).ToList(), now, cancellationToken);
-            await ReplaceMeaningsAsync(aliasId,
-                ownValues.Select(item => ((ProductCategoryId?)item.CategoryId, item.Decoding.Others)).ToList(),
-                forAllProducts: false, now, cancellationToken);
+            alias.ReplaceCategoryValues(ownValues.Select(item => (item.CategoryId, item.Decoding.Own)).ToList(), now);
+            alias.ReplaceMeanings(
+                Rows(ownValues.Select(item => ((ProductCategoryId?)item.CategoryId, item.Decoding.Others)).ToList()),
+                forAllProducts: false, now);
         }
 
         // A product value stays unconfirmed while any code that leads to it is unconfirmed.
@@ -112,57 +110,12 @@ public sealed class DecideAttributeCodeHandler(
         Decoding decoding)
         => decoding.Own is { } own ? decoding.Others.Prepend((ownAttribute, own)) : decoding.Others;
 
-    /// <summary>
-    /// The code's other meanings become exactly the listed ones: those for all products, or those of every category
-    /// (a category left out loses its own meanings).
-    /// </summary>
-    private async Task ReplaceMeaningsAsync(AttributeAliasId aliasId,
-        IReadOnlyList<(ProductCategoryId? CategoryId, IReadOnlyList<(AttributeId AttributeId, AttributeValueId ValueId)> Pairs)> wanted,
-        bool forAllProducts, DateTimeOffset now, CancellationToken cancellationToken)
-    {
-        var existing = await db.AttributeAliasMeanings
-            .Where(item => item.AliasId == aliasId)
-            .Where(item => forAllProducts ? item.CategoryId == null : item.CategoryId != null)
-            .ToListAsync(cancellationToken);
-        var rows = wanted.SelectMany(scope => scope.Pairs.Select(pair => (scope.CategoryId, pair.AttributeId, pair.ValueId)))
-            .ToList();
-        var removed = existing.Where(item => rows.All(row => row.CategoryId != item.CategoryId
-                                                             || row.AttributeId != item.AttributeId)).ToList();
-        foreach (var item in existing.Except(removed))
-            item.Change(rows.First(row => row.CategoryId == item.CategoryId && row.AttributeId == item.AttributeId).ValueId, now);
-        var created = rows
-            .Where(row => existing.All(item => item.CategoryId != row.CategoryId || item.AttributeId != row.AttributeId))
-            .Select(row => AttributeAliasMeaning.Create(aliasId, row.CategoryId, row.AttributeId, row.ValueId, now))
-            .ToList();
-
-        if (removed.Count > 0)
-            await meanings.DeleteRangeAsync(removed, cancellationToken);
-        if (created.Count > 0)
-            await meanings.AddRangeAsync(created, cancellationToken);
-    }
+    private static List<(ProductCategoryId? CategoryId, AttributeId AttributeId, AttributeValueId ValueId)> Rows(
+        IReadOnlyList<(ProductCategoryId? CategoryId, IReadOnlyList<(AttributeId AttributeId, AttributeValueId ValueId)> Pairs)> scopes)
+        => scopes.SelectMany(scope => scope.Pairs.Select(pair => (scope.CategoryId, pair.AttributeId, pair.ValueId))).ToList();
 
     private sealed record Decoding(
         AttributeValueId? Own, IReadOnlyList<(AttributeId AttributeId, AttributeValueId ValueId)> Others);
-
-    /// <summary>The code's own decodings per category become exactly the listed ones (spec catalog/008).</summary>
-    private async Task ReplaceCategoryValuesAsync(AttributeAliasId aliasId,
-        IReadOnlyList<(ProductCategoryId CategoryId, AttributeValueId? ValueId)> wanted, DateTimeOffset now,
-        CancellationToken cancellationToken)
-    {
-        var existing = await db.AttributeAliasCategoryValues.Where(item => item.AliasId == aliasId)
-            .ToListAsync(cancellationToken);
-        var removed = existing.Where(item => wanted.All(want => want.CategoryId != item.CategoryId)).ToList();
-        foreach (var item in existing.Except(removed))
-            item.Change(wanted.First(want => want.CategoryId == item.CategoryId).ValueId, now);
-        var created = wanted.Where(want => existing.All(item => item.CategoryId != want.CategoryId))
-            .Select(want => AttributeAliasCategoryValue.Create(aliasId, want.CategoryId, want.ValueId, now))
-            .ToList();
-
-        if (removed.Count > 0)
-            await categoryValues.DeleteRangeAsync(removed, cancellationToken);
-        if (created.Count > 0)
-            await categoryValues.AddRangeAsync(created, cancellationToken);
-    }
 
     /// <summary>
     /// The decision reaches the products at once: those whose names contain the code are recognized again. A failure

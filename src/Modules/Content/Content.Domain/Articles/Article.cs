@@ -34,6 +34,8 @@ public sealed partial class Article : IAggregateRoot
     /// <summary>Who saved the last change; empty for articles saved before this was recorded.</summary>
     public string? UpdatedBy { get; private set; }
     public IReadOnlyList<ArticleTranslation> Translations => _translations;
+    /// <summary>Legacy cover bytes; loaded only by the commands that change the cover.</summary>
+    public ArticleCover? LegacyCover { get; private set; }
 
     private Article() { }
 
@@ -89,6 +91,7 @@ public sealed partial class Article : IAggregateRoot
 
         CoverMediaFileId = mediaFileId;
         CoverVersion = null;
+        LegacyCover = null;
         Touch(now, editor);
         return DomainResult.Success();
     }
@@ -100,6 +103,7 @@ public sealed partial class Article : IAggregateRoot
 
         CoverMediaFileId = null;
         CoverVersion = null;
+        LegacyCover = null;
         Touch(now, editor);
     }
 

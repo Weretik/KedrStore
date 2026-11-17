@@ -10,7 +10,7 @@ namespace Catalog.Domain.Groups;
 /// Since spec catalog/007 a group is the site <b>model</b>: one site page with its axes and texts, proposed by
 /// automation and accepted by a person.
 /// </summary>
-public class ProductGroup : IAggregateRoot
+public partial class ProductGroup : IAggregateRoot
 {
     public const int NameMaxLength = 300;
     public const int SlugMaxLength = 100;

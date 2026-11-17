@@ -36,11 +36,7 @@ public sealed class ProductTranslationConfiguration : IEntityTypeConfiguration<P
         builder.HasIndex(x => new { x.Language, x.IsDeleted })
             .HasDatabaseName("IX_ProductTranslations_Language_IsDeleted");
 
-        builder.HasOne<Product>()
-            .WithMany()
-            .HasForeignKey(x => x.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
-
+        // The relationship to Product, the root, is configured in ProductConfiguration.
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

@@ -42,7 +42,7 @@ internal static class AttributeImportTestSupport
 
     public static RecognizedProductWriter Writer(CatalogDbContext db)
         => new(db,
-            new TestRepository<AttributeValue>(db),
+            new TestRepository<CatalogAttribute>(db),
             new TestRepository<ProductAttributeValue>(db),
             new TestRepository<ProductAttributeReview>(db),
             new TestRepository<CategoryAttribute>(db));

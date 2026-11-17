@@ -3,7 +3,7 @@ using Sales.Domain.Orders.ValueObjects;
 
 namespace Sales.Domain.Orders;
 
-public sealed class OrderDraft
+public sealed class OrderDraft : IAggregateRoot
 {
     private readonly List<OrderDraftLine> _lines = [];
     public OrderDraftId Id { get; private set; }

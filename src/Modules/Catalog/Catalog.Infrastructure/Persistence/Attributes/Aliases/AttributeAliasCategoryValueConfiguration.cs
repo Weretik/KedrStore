@@ -13,7 +13,7 @@ public sealed class AttributeAliasCategoryValueConfiguration : IEntityTypeConfig
         builder.Property(x => x.CategoryId).HasConversion(CatalogConverter.ProductCategoryIdConvert);
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
 
-        builder.HasOne<AttributeAlias>().WithMany().HasForeignKey(x => x.AliasId).OnDelete(DeleteBehavior.Cascade);
+        // The relationship to AttributeAlias, the root, is configured in AttributeAliasConfiguration.
         builder.HasOne<ProductCategory>().WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne<AttributeValue>().WithMany().HasForeignKey(x => x.ValueId).OnDelete(DeleteBehavior.Restrict);
 

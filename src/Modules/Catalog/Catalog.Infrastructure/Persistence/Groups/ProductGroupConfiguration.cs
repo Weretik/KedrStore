@@ -24,6 +24,8 @@ public sealed class ProductGroupConfiguration : IEntityTypeConfiguration<Product
 
         builder.HasOne<ProductCategory>().WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Product>().WithMany().HasForeignKey(x => x.MainProductId).OnDelete(DeleteBehavior.SetNull);
+        builder.HasMany(x => x.Axes).WithOne().HasForeignKey(axis => axis.GroupId).OnDelete(DeleteBehavior.Cascade);
+        builder.Navigation(x => x.Axes).UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasIndex(x => x.Slug).IsUnique().HasDatabaseName("UX_CatalogProductGroups_Slug");
         // One automatic group per base name in a category; groups a person created have no key.

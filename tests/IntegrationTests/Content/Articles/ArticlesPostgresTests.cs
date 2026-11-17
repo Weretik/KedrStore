@@ -155,8 +155,7 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         await using (var scope = provider.CreateAsyncScope())
         {
             var deleted = await new DeleteArticleHandler(
-                    scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                    scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>())
+                    scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>())
                 .Handle(new DeleteArticleCommand(created.Value.Id), default);
             Assert.True(deleted.IsSuccess);
         }
@@ -245,7 +244,6 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         await using var scope = provider.CreateAsyncScope();
         return await new MoveLegacyArticleCoversHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 _media,
                 new TestContentEditor(),
                 TimeProvider.System)
@@ -263,7 +261,6 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         await using var scope = provider.CreateAsyncScope();
         return await new CreateArticleHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
                 _media,
                 scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),
@@ -277,7 +274,6 @@ public sealed class ArticlesPostgresTests(ContentPostgresFixture postgres)
         await using var scope = provider.CreateAsyncScope();
         return await new UpdateArticleHandler(
                 scope.ServiceProvider.GetRequiredService<IContentRepository<Article>>(),
-                scope.ServiceProvider.GetRequiredService<IContentRepository<ArticleCover>>(),
                 scope.ServiceProvider.GetRequiredService<IReadContentDbContext>(),
                 _media,
                 scope.ServiceProvider.GetRequiredService<IArticleHtmlSanitizer>(),

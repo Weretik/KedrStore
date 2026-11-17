@@ -6,7 +6,7 @@ namespace Catalog.Domain.Attributes.Aliases;
 /// How an attribute value is written in 1C names (<c>AB</c>, «антична бронза»). An alias without a value is a known
 /// code nobody has decoded yet; products that contain it need review.
 /// </summary>
-public class AttributeAlias : BaseEntity<AttributeAliasId>, IAggregateRoot
+public partial class AttributeAlias : BaseEntity<AttributeAliasId>, IAggregateRoot
 {
     public const int ScopeMaxLength = 64;
     public const int RawValueMaxLength = 160;

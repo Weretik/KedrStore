@@ -15,7 +15,7 @@ public sealed class AttributeAliasMeaningConfiguration : IEntityTypeConfiguratio
         builder.Property(x => x.AttributeId).HasConversion(AttributeIdConverters.AttributeId);
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
 
-        builder.HasOne<AttributeAlias>().WithMany().HasForeignKey(x => x.AliasId).OnDelete(DeleteBehavior.Cascade);
+        // The relationship to AttributeAlias, the root, is configured in AttributeAliasConfiguration.
         builder.HasOne<ProductCategory>().WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Cascade);
         builder.HasOne<CatalogAttribute>().WithMany().HasForeignKey(x => x.AttributeId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<AttributeValue>().WithMany().HasForeignKey(x => x.ValueId).OnDelete(DeleteBehavior.Restrict);

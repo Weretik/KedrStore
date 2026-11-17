@@ -4,7 +4,7 @@ namespace Catalog.Application.Features.OneCSync.Sync.Translations;
 
 /// <summary>Applies Russian product names from the bundled CSV to the products of one import run.</summary>
 public sealed class ProductTranslationImporter(
-    ICatalogRepository<ProductTranslation> translationRepo,
+    ICatalogRepository<Product> productRepo,
     ILogger<ProductTranslationImporter> logger)
 {
     private const string RuLanguage = "ru";
@@ -17,64 +17,33 @@ public sealed class ProductTranslationImporter(
 
         var counters = new ImportCounters { Received = productIds.Count };
         var translationsById = ReadTranslationsFromCsv();
-
-        var existingTranslations = await translationRepo.ListAsync(
-            new ProductTranslationsByProductIdsAndLanguageSpec(productIds, RuLanguage),
-            cancellationToken);
-
-        var existingByProductId = existingTranslations.ToDictionary(x => x.ProductId.Value, x => x);
-        var created = new List<ProductTranslation>();
+        var products = await productRepo.ListAsync(
+            new ProductsWithTranslationByIdsSpec(productIds, RuLanguage), cancellationToken);
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var productId in productIds)
+        foreach (var product in products)
         {
-            var hasTranslation = translationsById.TryGetValue(productId.Value, out var nameRu) &&
-                                 !string.IsNullOrWhiteSpace(nameRu);
-            existingByProductId.TryGetValue(productId.Value, out var existing);
-
-            if (!hasTranslation)
+            if (!translationsById.TryGetValue(product.Id.Value, out var nameRu) || string.IsNullOrWhiteSpace(nameRu))
             {
-                if (existing is { IsDeleted: false })
-                {
-                    existing.MarkAsDeleted(now);
+                if (product.RemoveTranslation(RuLanguage, now))
                     counters.Deleted++;
-                }
                 else
-                {
                     counters.Unchanged++;
-                }
-
                 continue;
             }
 
-            if (existing is null)
-            {
-                var translation = ProductTranslation.Create(productId, RuLanguage, nameRu!, now);
-                if (translation.IsFailure)
-                {
-                    counters.Skipped++;
-                    continue;
-                }
-
-                created.Add(translation.Value);
+            var changed = product.SetTranslation(RuLanguage, nameRu, now);
+            if (changed.IsFailure)
+                counters.Skipped++;
+            else if (changed.Value == TranslationChange.Created)
                 counters.Created++;
-            }
+            else if (changed.Value == TranslationChange.Updated)
+                counters.Updated++;
             else
-            {
-                var applied = existing.Apply(nameRu!, now);
-                if (applied.IsFailure)
-                    counters.Skipped++;
-                else if (applied.Value)
-                    counters.Updated++;
-                else
-                    counters.Unchanged++;
-            }
+                counters.Unchanged++;
         }
 
-        if (created.Count > 0)
-            await translationRepo.AddRangeAsync(created, cancellationToken);
-
-        await translationRepo.SaveChangesAsync(cancellationToken);
+        await productRepo.SaveChangesAsync(cancellationToken);
         counters.Log(logger, "Product translations", RuLanguage);
     }
 

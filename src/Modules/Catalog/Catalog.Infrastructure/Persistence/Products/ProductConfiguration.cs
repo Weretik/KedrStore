@@ -66,6 +66,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             links.HasIndex(link => link.MediaFileId).HasDatabaseName("IX_ProductMedia_MediaFileId");
         });
         builder.Navigation(p => p.MediaLinks).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.HasMany(p => p.Translations).WithOne()
+            .HasForeignKey(translation => translation.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Navigation(p => p.Translations).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Ignore(p => p.Photos);
         builder.Ignore(p => p.Scheme);
 

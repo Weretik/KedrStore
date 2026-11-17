@@ -11,8 +11,5 @@ internal sealed class ArticleCoverConfiguration : IEntityTypeConfiguration<Artic
             .HasColumnType("bigint").ValueGeneratedNever();
         builder.Property(cover => cover.Data).IsRequired();
         builder.Property(cover => cover.ContentType).HasMaxLength(64).IsRequired();
-        builder.HasOne<Article>().WithOne()
-            .HasForeignKey<ArticleCover>(cover => cover.ArticleId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

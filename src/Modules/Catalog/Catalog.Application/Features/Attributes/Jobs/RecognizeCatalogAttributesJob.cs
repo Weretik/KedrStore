@@ -29,7 +29,7 @@ public sealed class RecognizeCatalogAttributesJob(
         var report = new AttributeImportReport { Applied = apply };
         var now = clock.GetUtcNow();
 
-        var attributeByCode = (await db.Attributes.ToListAsync(cancellationToken))
+        var attributeByCode = (await db.Attributes.Include(attribute => attribute.Values).ToListAsync(cancellationToken))
             .ToDictionary(attribute => attribute.Code, StringComparer.Ordinal);
         if (attributeByCode.Count == 0)
         {

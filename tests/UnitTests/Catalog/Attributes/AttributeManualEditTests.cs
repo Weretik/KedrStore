@@ -72,9 +72,10 @@ public sealed class AttributeManualEditTests
     [InlineData(" ", null)]
     public void ValueSwatch_IsNormalized(string input, string? expected)
     {
-        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now).Value;
+        var color = Color();
+        var value = color.AddValue("GR", "Графіт", "hrafit", 1, Now).Value;
 
-        value.EditManually("Графіт", null, 1, input, null, Now);
+        color.EditValue(value.Id, "Графіт", null, 1, input, null, Now);
 
         Assert.Equal((expected, true), (value.SwatchHex, value.IsEditedManually));
     }
@@ -82,9 +83,36 @@ public sealed class AttributeManualEditTests
     [Fact]
     public void ValueSwatch_RejectsANonHexColor()
     {
-        var value = AttributeValue.Create(AttributeId.Create(1), "GR", "Графіт", "hrafit", 1, Now).Value;
+        var color = Color();
+        var value = color.AddValue("GR", "Графіт", "hrafit", 1, Now).Value;
 
-        var error = DomainAssert.Fails(value.EditManually("Графіт", null, 1, "graphite", null, Now));
+        var error = DomainAssert.Fails(color.EditValue(value.Id, "Графіт", null, 1, "graphite", null, Now));
         Assert.Equal("SwatchHex", error.Field);
     }
+
+    [Fact]
+    public void Attribute_RefusesASecondValueWithTheSameCodeOrSlug()
+    {
+        var color = Color();
+        color.AddValue("GR", "Графіт", "hrafit", 1, Now);
+
+        Assert.Equal("Catalog.Attribute.CodeTaken", DomainAssert.Fails(color.AddValue("gr", "Інший", "inshyi", 2, Now)).Code);
+        Assert.Equal("Catalog.Attribute.SlugTaken",
+            DomainAssert.Fails(color.AddManualValue("GR2", "Графіт 2", null, "hrafit", 2, null, null, Now)).Code);
+        Assert.Single(color.Values);
+    }
+
+    [Fact]
+    public void Dictionary_DoesNotChangeAValueAPersonEdited()
+    {
+        var color = Color();
+        var value = color.AddValue("GR", "Графіт", "hrafit", 1, Now).Value;
+        color.EditValue(value.Id, "Графіт темний", null, 1, null, null, Now);
+
+        Assert.False(color.ApplyDictionaryToValue(value, "Графіт", 5, Now).Value);
+        Assert.Equal("Графіт темний", value.NameUk);
+    }
+
+    private static CatalogAttribute Color()
+        => CatalogAttribute.Create("color", "Колір", AttributeKind.Enum, null, "kolir", true, true, 1, Now).Value;
 }

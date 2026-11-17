@@ -5,12 +5,15 @@ internal sealed class ArticleByIdSpec : SingleResultSpecification<Article>
     public ArticleByIdSpec(ArticleId id) => Query.Where(article => article.Id == id);
 }
 
-internal sealed class ArticleCoverSpec : SingleResultSpecification<ArticleCover>
+/// <summary>The article with its legacy cover bytes, for the commands that change the cover.</summary>
+internal sealed class ArticleWithLegacyCoverByIdSpec : SingleResultSpecification<Article>
 {
-    public ArticleCoverSpec(ArticleId id) => Query.Where(cover => cover.ArticleId == id);
+    public ArticleWithLegacyCoverByIdSpec(ArticleId id)
+        => Query.Where(article => article.Id == id).Include(article => article.LegacyCover);
 }
 
 internal sealed class ArticlesWithLegacyCoverSpec : Specification<Article>
 {
-    public ArticlesWithLegacyCoverSpec() => Query.Where(article => article.CoverVersion != null).OrderBy(article => article.Id);
+    public ArticlesWithLegacyCoverSpec()
+        => Query.Where(article => article.CoverVersion != null).Include(article => article.LegacyCover).OrderBy(article => article.Id);
 }

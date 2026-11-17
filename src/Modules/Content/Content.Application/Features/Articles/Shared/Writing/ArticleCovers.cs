@@ -34,11 +34,11 @@ internal static class ArticleCovers
             await ImagesAsync(images, [article.CoverMediaFileId], cancellationToken));
 
     /// <summary>
-    /// Sets or removes the cover by the input; a legacy cover row is deleted once it is no longer used.
+    /// Sets or removes the cover by the input; the article drops its legacy cover bytes once they are no longer used.
     /// 400 when the chosen picture is not in the media library.
     /// </summary>
     public static async Task<DomainError?> ApplyAsync(Article article, ArticleInput input, IMediaImageReader images,
-        IContentRepository<ArticleCover> covers, DateTimeOffset now, string editor, CancellationToken cancellationToken)
+        DateTimeOffset now, string editor, CancellationToken cancellationToken)
     {
         if (input.CoverMediaFileId is { } mediaFileId)
         {
@@ -57,14 +57,7 @@ internal static class ArticleCovers
         {
             article.RemoveCover(now, editor);
         }
-        else
-        {
-            return null;
-        }
 
-        var legacy = await covers.FirstOrDefaultAsync(new ArticleCoverSpec(article.Id), cancellationToken);
-        if (legacy is not null)
-            await covers.DeleteAsync(legacy, cancellationToken);
         return null;
     }
 }

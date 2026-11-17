@@ -64,9 +64,8 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
             var side = CatalogAttribute.Create("side", "Сторона", AttributeKind.Enum, null, "storona", true, true, 1, Now).Value;
             db.Attributes.Add(side);
             await db.SaveChangesAsync();
-            var left = AttributeValue.Create(side.Id, "L", "Ліва", "liva", 1, Now).Value;
-            var right = AttributeValue.Create(side.Id, "R", "Права", "prava", 2, Now).Value;
-            db.AttributeValues.AddRange(left, right);
+            var left = side.AddValue("L", "Ліва", "liva", 1, Now).Value;
+            var right = side.AddValue("R", "Права", "prava", 2, Now).Value;
             var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Завіса KEDR", "zavisa-kedr", Now).Value;
             db.ProductGroups.Add(model);
             db.CategoryAttributes.Add(CategoryAttribute.Create(ProductCategoryId.From(10), side.Id, true, 1, Now));
@@ -74,7 +73,7 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
 
             db.ProductGroupMembers.AddRange(ProductGroupMember.CreatePinned(ProductId.From(801), model.Id, Now),
                 ProductGroupMember.CreatePinned(ProductId.From(802), model.Id, Now));
-            db.ProductGroupAxes.Add(ProductGroupAxis.Create(model.Id, side.Id, 0));
+            model.SetAxes([side.Id]);
             db.ProductAttributeValues.AddRange(
                 ProductAttributeValue.CreateManual(ProductId.From(801), side.Id, 0, left.Id, null, Now).Value,
                 ProductAttributeValue.CreateManual(ProductId.From(802), side.Id, 0, right.Id, null, Now).Value,

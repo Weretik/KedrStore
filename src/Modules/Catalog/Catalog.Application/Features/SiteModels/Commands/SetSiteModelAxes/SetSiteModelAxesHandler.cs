@@ -1,5 +1,6 @@
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.SiteModels.Shared;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.SiteModels;
 using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;
@@ -12,7 +13,7 @@ namespace Catalog.Application.Features.SiteModels.Commands.SetSiteModelAxes;
 /// <summary>Replaces the model's axes with the listed attributes, in that order (R-05). Number attributes are refused.</summary>
 public sealed class SetSiteModelAxesHandler(
     IReadCatalogDbContext db,
-    ICatalogRepository<ProductGroupAxis> axes,
+    ICatalogRepository<ProductGroup> models,
     SiteModelReader reader)
     : ICommandHandler<SetSiteModelAxesCommand, Result<SiteModelDto>>
 {
@@ -20,7 +21,8 @@ public sealed class SetSiteModelAxesHandler(
         CancellationToken cancellationToken)
     {
         var modelId = ProductGroupId.Create(command.ModelId);
-        if (!await db.ProductGroups.AnyAsync(group => group.Id == modelId, cancellationToken))
+        var model = await models.FirstOrDefaultAsync(new ProductGroupsWithAxesSpec([modelId]), cancellationToken);
+        if (model is null)
             return Result.NotFound();
 
         var attributeIds = command.Request.AttributeIds.Select(AttributeId.Create).ToList();
@@ -35,20 +37,8 @@ public sealed class SetSiteModelAxesHandler(
                 $"Attributes not found or numeric: {string.Join(", ", wrong)}.", "AttributeNotFound");
         }
 
-        var existing = await db.ProductGroupAxes.Where(axis => axis.GroupId == modelId).ToListAsync(cancellationToken);
-        var removed = existing.Where(axis => !attributeIds.Contains(axis.AttributeId)).ToList();
-        foreach (var axis in existing.Except(removed))
-            axis.MoveTo(attributeIds.IndexOf(axis.AttributeId));
-        var created = attributeIds.Select((id, index) => (id, index))
-            .Where(item => existing.All(axis => axis.AttributeId != item.id))
-            .Select(item => ProductGroupAxis.Create(modelId, item.id, item.index))
-            .ToList();
-
-        if (removed.Count > 0)
-            await axes.DeleteRangeAsync(removed, cancellationToken);
-        if (created.Count > 0)
-            await axes.AddRangeAsync(created, cancellationToken);
-        await axes.SaveChangesAsync(cancellationToken);
+        if (model.SetAxes(attributeIds))
+            await models.SaveChangesAsync(cancellationToken);
 
         return Result.Success((await reader.ReadAsync(command.ModelId, cancellationToken))!);
     }

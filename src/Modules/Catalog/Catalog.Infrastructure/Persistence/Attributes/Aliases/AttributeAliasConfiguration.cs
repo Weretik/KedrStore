@@ -18,6 +18,10 @@ public sealed class AttributeAliasConfiguration : IEntityTypeConfiguration<Attri
 
         builder.HasOne<CatalogAttribute>().WithMany().HasForeignKey(x => x.AttributeId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<AttributeValue>().WithMany().HasForeignKey(x => x.ValueId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(x => x.CategoryValues).WithOne().HasForeignKey(item => item.AliasId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(x => x.Meanings).WithOne().HasForeignKey(item => item.AliasId).OnDelete(DeleteBehavior.Cascade);
+        builder.Navigation(x => x.CategoryValues).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(x => x.Meanings).UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasIndex(x => new { x.AttributeId, x.Scope, x.RawValue }).IsUnique()
             .HasDatabaseName("UX_CatalogAttributeAliases_Attribute_Scope_Raw");

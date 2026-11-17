@@ -10,7 +10,7 @@ namespace Catalog.Application.Features.SiteModels.Shared.State;
 /// </summary>
 public sealed class SiteModelChanges(
     IReadCatalogDbContext db,
-    ICatalogRepository<ProductGroupAxis> axes,
+    ICatalogRepository<ProductGroup> models,
     ProductGroupPins pins,
     ProductGroupBuilder builder,
     SiteModelStateReader stateReader)
@@ -61,15 +61,15 @@ public sealed class SiteModelChanges(
         CancellationToken cancellationToken)
     {
         var state = await stateReader.ReadAsync(cancellationToken);
-        var created = modelIds.Where(id => state.Models.ContainsKey(id) && !state.SavedAxes[id].Any())
-            .SelectMany(id => state.OfferedAxes(id).Select((attribute, index) =>
-                ProductGroupAxis.Create(id, attribute.Id, index)))
-            .ToList();
-        if (created.Count == 0)
+        var withoutAxes = modelIds.Where(id => state.Models.ContainsKey(id) && !state.SavedAxes[id].Any()).ToList();
+        if (withoutAxes.Count == 0)
             return;
 
-        await axes.AddRangeAsync(created, cancellationToken);
-        await axes.SaveChangesAsync(cancellationToken);
+        var changed = false;
+        foreach (var model in await models.ListAsync(new ProductGroupsWithAxesSpec(withoutAxes), cancellationToken))
+            changed |= model.Axes.Count == 0 && model.SetAxes(state.OfferedAxes(model.Id).Select(attribute => attribute.Id).ToList());
+        if (changed)
+            await models.SaveChangesAsync(cancellationToken);
     }
 
     public Task TidyAsync(CancellationToken cancellationToken) => builder.RunAsync(apply: true, cancellationToken);
