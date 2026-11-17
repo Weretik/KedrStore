@@ -54,7 +54,7 @@ Owns the staff members' own tasks and the automatic log of their admin changes (
 
 Layers: Scheduling.Api, Scheduling.Application, Scheduling.Contracts, Scheduling.Domain, Scheduling.Infrastructure.
 
-Aggregates: `TaskSchedule`. Append-only journal: `ScheduledTaskRun`. `ScheduledTask` is the code list of tasks, not stored.
+Aggregates: `ScheduledTask` (one per task of the code catalogue, with its `TaskSchedule` value). Append-only journal: `ScheduledTaskRun`.
 
 `Scheduling.Contracts` offers `IScheduledTaskRunJournal`, which `Host.Jobs` uses to mark a run started and record its result.
 

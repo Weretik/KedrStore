@@ -8,7 +8,7 @@ namespace Scheduling.Domain.Tasks;
 /// admin changes only the schedule and the on/off switch. Two ticks never start it twice: a claim moves it from
 /// <see cref="TaskState.Idle"/> to <see cref="TaskState.Running"/> and is saved with a concurrency check.
 /// </summary>
-public sealed class ScheduledTask
+public sealed class ScheduledTask : IAggregateRoot
 {
     private ScheduledTask()
     {
