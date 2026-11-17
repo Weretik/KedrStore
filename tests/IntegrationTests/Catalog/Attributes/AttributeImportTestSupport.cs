@@ -53,7 +53,7 @@ internal static class AttributeImportTestSupport
 
     public static ProductGroupBuilder GroupBuilder(CatalogDbContext db)
         => new(db, new TestRepository<ProductGroup>(db), new TestRepository<ProductGroupMember>(db), new SlugService(db),
-            TimeProvider.System);
+            new CatalogTransaction(db), TimeProvider.System);
 
     public static async Task<AttributeImportReport> RunAsync(CatalogDbContext db, string dictionaryJson, string csv,
         bool apply)

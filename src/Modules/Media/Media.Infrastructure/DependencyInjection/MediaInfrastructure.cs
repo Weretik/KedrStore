@@ -24,6 +24,7 @@ public static class MediaInfrastructure
         services.AddDbContext<MediaDbContext>(options => MediaDbContext.Configure(options, connectionString));
         services.AddScoped<IReadMediaDbContext>(sp => sp.GetRequiredService<MediaDbContext>());
         services.AddScoped(typeof(IMediaRepository<>), typeof(MediaEfRepository<>));
+        services.AddScoped<IMediaTransaction, MediaTransaction>();
         services.AddScoped<IMediaFileLookup, MediaFileLookup>();
         services.AddSingleton<IImageInspector, SkiaImageInspector>();
         services.TryAddSingleton(TimeProvider.System);
