@@ -1,3 +1,5 @@
+using BuildingBlocks.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Host.Api.Http.OpenApi;
 using Catalog.Api.DependencyInjection;
 using Content.Api.DependencyInjection;
@@ -68,6 +70,11 @@ app.MapMediaEndpoints();
 app.MapSalesEndpoints();
 app.MapWorkEndpoints();
 app.MapSchedulingEndpoints();
-app.MapHealthChecks("/health").AllowAnonymous();
+// Liveness answers without dependencies; readiness also checks PostgreSQL (operations: diagnostics).
+app.MapHealthChecks("/health", new HealthCheckOptions { Predicate = _ => false }).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains(DatabaseHealthCheck.ReadyTag),
+}).AllowAnonymous();
 
 app.Run();

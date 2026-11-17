@@ -1,6 +1,6 @@
 # Quality targets
 
-Measurable goals for the Kedr production system. They tell when the system is "slow" or "down" before a user does, and they are the thresholds the alerts use. Status: **proposed 2026-11-17, waiting for the owner's confirmation**; change a number only together with its alert.
+Measurable goals for the Kedr production system. They tell when the system is "slow" or "down" before a user does, and they are the thresholds the alerts use. Status: **confirmed by the owner on 2026-11-17**; change a number only together with its alert.
 
 Scale they are set for: a small team of staff users plus the public site, one Cloud Run API instance most of the time, one PostgreSQL database.
 
