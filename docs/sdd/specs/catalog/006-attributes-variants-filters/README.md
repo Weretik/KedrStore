@@ -1,6 +1,6 @@
 # 006 — Catalog attributes, variant groups, filters, and SEO
 
-**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 moved to [spec 007](../007-site-models/README.md) on 2026-11-05 (filters per model, stages 5, 7, and 8). **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** phases 1 (model + import), 2 (groups), 3 (admin), and 4 (.NET parser) implemented 2026-11-05; phases 5–7 moved to [spec 007](../007-site-models/README.md) on 2026-11-05 (filters per model, stages 5, 7, and 8); filters and SEO implemented there on 2026-11-06, only AI drafts (stage 8) remain. **Date:** 2026-11-05.
 
 The owner-facing plan with every decision is the Russian document [«Каталог: атрибути, варіанти, фільтри і SEO — SDD»](https://claude.ai/artifact/5QwjXyutiyQg4FyzhdaPJR). This file is its technical summary and the evidence log. Input files and their description: [docs/catalog-attributes](../../../../catalog-attributes/README.md).
 
