@@ -113,7 +113,7 @@ public sealed class AttributeAdminTests
         var create = new CreateCatalogAttributeHandler(db, new TestRepository<CatalogAttribute>(db),
             new TestRepository<AttributeValue>(db),
             new CatalogAttributeReader(db, new global::IntegrationTests.Catalog.ProductMedia.FakeProductMediaLibrary()),
-            TimeProvider.System);
+            TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         var result = await create.Handle(new CreateCatalogAttributeCommand(new CreateCatalogAttributeRequest(
             "Пакування", null, CreateCatalogAttributeCommand.YesNo, null, null, null, true, false, 100)),
@@ -130,7 +130,7 @@ public sealed class AttributeAdminTests
         await using var db = await ImportedAsync();
         var color = await AttributeIdAsync(db, "color");
         var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
-            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
+            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         // Product 1 becomes chrome like product 2: same color and side → «Однакові варіанти».
         var result = await set.Handle(new SetProductAttributeCommand(1, color,
@@ -148,7 +148,7 @@ public sealed class AttributeAdminTests
         Assert.Equal((AttributeValueSource.Manual, await ValueIdAsync(db, "CR")), (kept.Source, kept.ValueId!.Value.Value));
 
         var restore = new RestoreProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
-            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
+            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
         var restored = await restore.Handle(new RestoreProductAttributeCommand(1, color), CancellationToken.None);
         Assert.True(restored.IsSuccess);
         db.ChangeTracker.Clear();
@@ -163,7 +163,7 @@ public sealed class AttributeAdminTests
     {
         await using var db = await ImportedAsync();
         var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
-            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
+            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         var wrong = await set.Handle(new SetProductAttributeCommand(1, await AttributeIdAsync(db, "color"),
             new SetProductAttributeRequest([new SetProductAttributeValueRequest(await ValueIdAsync(db, "L"), null)])),

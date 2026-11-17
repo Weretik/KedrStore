@@ -19,11 +19,14 @@ public sealed class FillSiteModelFromNamesHandler(
     SiteModelStateReader stateReader,
     SiteModelChanges changes,
     SiteModelReader reader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<FillSiteModelFromNamesCommand, Result<SiteModelDto>>
 {
-    public async ValueTask<Result<SiteModelDto>> Handle(FillSiteModelFromNamesCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<SiteModelDto>> Handle(FillSiteModelFromNamesCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<SiteModelDto>> HandleInTransactionAsync(FillSiteModelFromNamesCommand command, CancellationToken cancellationToken)
     {
         var modelId = ProductGroupId.Create(command.ModelId);
         var state = await stateReader.ReadAsync(cancellationToken);

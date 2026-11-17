@@ -106,6 +106,8 @@ Use `await using var tx = await db.Database.BeginTransactionAsync(ct); ... await
 - an id from the first `SaveChanges` is needed to build the second write (better: let EF fix up the relation in one `SaveChanges`);
 - a lock must be held across reads and writes (section 4.3).
 
+In Catalog a command handler does this through `ICatalogTransaction.RunAsync`: it commits only when the handler returns a success, so a refusal or an exception after the first save leaves nothing behind (`CatalogTransactionPostgresTests`).
+
 Keep a transaction short: no HTTP calls, file uploads, or waiting on users inside it.
 
 ### 3.3 Long jobs
@@ -183,6 +185,6 @@ Found by the database audit of 2026-11-15; each is closed by its own change and 
 
 | Rule | Where | Status | Plan |
 | --- | --- | --- | --- |
-| 3.1 | New rows whose database id the next step needs are saved before that step: `CreateProductGroupHandler`, `CreateSiteModelHandler`, `CreateCatalogAttributeHandler`, `ProductGroupBuilder` (new groups), `SyncCdnMediaJob` (new folders), the attribute import steps | open | A per-command transaction (module transaction port or pipeline behaviour), or ids made before saving |
+| 3.1 | New rows whose database id the next step needs are saved before that step in jobs: `ProductGroupBuilder` run by the import (new groups), `SyncCdnMediaJob` (new folders), the attribute import steps. The Catalog commands that did it (`CreateProductGroup`, `CreateSiteModel`, `CreateCatalogAttribute`, `SetProductGroup`, `AcceptSiteModels`, `FillSiteModelFromNames`, `SetProductAttribute`, `RestoreProductAttribute`) run in one transaction through `ICatalogTransaction` since 2026-11-17 | open | Jobs: section 3.3 (each step re-runs safely); ids made before saving if a job step must become atomic |
 | 1.4 | `SiteModelStateReader` loads the whole catalog for each admin model page | open | Acceptable for a few staff users; revisit if the admin pages slow down |
 | 4 | Admin edit forms (article, page SEO, site SEO settings, category content, site model text, catalog attribute): the API checks the row version, but kedr-web does not send it yet | backend done | kedr-web sends `version` back and reloads the form on 409 |

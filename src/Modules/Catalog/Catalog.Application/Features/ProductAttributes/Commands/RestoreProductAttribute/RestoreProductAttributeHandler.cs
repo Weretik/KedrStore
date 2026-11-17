@@ -14,11 +14,14 @@ public sealed class RestoreProductAttributeHandler(
     ICatalogRepository<ProductAttributeValue> values,
     ProductGroupBuilder groups,
     ProductAttributesReader reader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<RestoreProductAttributeCommand, Result<AdminProductAttributesDto>>
 {
-    public async ValueTask<Result<AdminProductAttributesDto>> Handle(RestoreProductAttributeCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<AdminProductAttributesDto>> Handle(RestoreProductAttributeCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<AdminProductAttributesDto>> HandleInTransactionAsync(RestoreProductAttributeCommand command, CancellationToken cancellationToken)
     {
         var productId = ProductId.From(command.ProductId);
         if (!await db.Products.IgnoreQueryFilters().AnyAsync(product => product.Id == productId, cancellationToken))

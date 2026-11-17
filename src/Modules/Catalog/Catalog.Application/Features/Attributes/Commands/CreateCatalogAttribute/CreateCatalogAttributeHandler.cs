@@ -18,11 +18,14 @@ public sealed class CreateCatalogAttributeHandler(
     ICatalogRepository<CatalogAttribute> attributes,
     ICatalogRepository<AttributeValue> values,
     CatalogAttributeReader reader,
-    TimeProvider clock)
+    TimeProvider clock,
+    ICatalogTransaction transaction)
     : ICommandHandler<CreateCatalogAttributeCommand, Result<AdminCatalogAttributeDto>>
 {
-    public async ValueTask<Result<AdminCatalogAttributeDto>> Handle(CreateCatalogAttributeCommand command,
-        CancellationToken cancellationToken)
+    public async ValueTask<Result<AdminCatalogAttributeDto>> Handle(CreateCatalogAttributeCommand command, CancellationToken cancellationToken)
+        => await transaction.RunAsync(ct => HandleInTransactionAsync(command, ct), cancellationToken);
+
+    private async Task<Result<AdminCatalogAttributeDto>> HandleInTransactionAsync(CreateCatalogAttributeCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
         var existing = await db.Attributes.AsNoTracking()

@@ -138,10 +138,10 @@ public sealed class SiteModelTests
             new ProductGroupPins(db, new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), State);
 
         public AcceptSiteModelsHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
-            Changes, State, TimeProvider.System);
+            Changes, State, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         public CreateSiteModelHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
-            Changes, Reader, TimeProvider.System);
+            Changes, Reader, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         public SetSiteModelAxesHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
 
@@ -149,7 +149,7 @@ public sealed class SiteModelTests
             TimeProvider.System);
 
         public FillSiteModelFromNamesHandler Fill => new(db, new TestRepository<ProductAttributeValue>(db),
-            State, Changes, Reader, TimeProvider.System);
+            State, Changes, Reader, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         public RemoveSiteModelProductHandler Remove => new(db, Changes, Reader, TimeProvider.System);
 

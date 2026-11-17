@@ -190,7 +190,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var otherColor = await db.AttributeValues.AsNoTracking()
             .SingleAsync(value => value.AttributeId == color.Id && value.Code == "AB");
         var set = new SetProductAttributeHandler(db, new TestRepository<ProductAttributeValue>(db),
-            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System);
+            GroupBuilder(db), new ProductAttributesReader(db), TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
         Assert.True((await set.Handle(new SetProductAttributeCommand(60, color.Id.Value,
                 new SetProductAttributeRequest([new SetProductAttributeValueRequest(otherColor.Id.Value, null)])),
             CancellationToken.None)).IsSuccess);

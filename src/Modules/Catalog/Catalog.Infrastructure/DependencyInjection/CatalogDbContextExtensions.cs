@@ -31,6 +31,7 @@ public static class CatalogDbContextExtensions
 
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
         services.AddScoped(typeof(ICatalogReadRepository<>), typeof(CatalogReadEfRepository<>));
+        services.AddScoped<ICatalogTransaction, CatalogTransaction>();
         services.AddScoped<IProductListProjectionRebuilder, ProductListProjectionRebuilder>();
         services.AddScoped<ISlugService, SlugService>();
         services.AddScoped<ProductGroupBuilder>();
