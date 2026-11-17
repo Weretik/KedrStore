@@ -21,6 +21,7 @@ operations/
 - Prepare the database with a separate job: [migrations and seed data](data/migrations-and-seeding.md)
 - Know who backs up the database and how to restore it: [backups and restore](data/backups-and-restore.md)
 - Check the API or reproduce an HTTP request: [diagnostics](diagnostics/health-logs-swagger.md)
+- Know what breaks when PostgreSQL, 1C, Telegram, the CDN or a Google Cloud part fails, and what to do: [dependency failures](diagnostics/dependency-failures.md)
 - Run a 1C/import operation: [jobs and runbooks](jobs/README.md)
 
 Do not record passwords, tokens, full connection strings, or production endpoints here.

@@ -2,7 +2,14 @@
 
 ## Health check
 
-`GET /health` is configured in Host.Api with explicit anonymous access. Check it first to determine whether the host is running and reachable.
+Both endpoints allow anonymous access and are not traced.
+
+| Endpoint | Checks | Answers | Use it for |
+| --- | --- | --- | --- |
+| `GET /health` | Nothing but the process (liveness) | `200 Healthy` while the host answers | Is the host running and reachable |
+| `GET /health/ready` | PostgreSQL: opens a connection with `ConnectionStrings:Default` and runs `SELECT 1` (`DatabaseHealthCheck`) | `200 Healthy`, or `503 Unhealthy` when the database is unreachable | Uptime alerts (`https://api.classkedr.com.ua/health/ready`) and diagnosing "the site is up but nothing loads" |
+
+The reason of a failed check goes only to the log, never to the response. Liveness deliberately ignores the database, so a database outage never makes Cloud Run restart healthy instances.
 
 ## Swagger and OpenAPI
 
