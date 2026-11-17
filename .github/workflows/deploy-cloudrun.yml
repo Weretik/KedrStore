@@ -55,6 +55,17 @@ jobs:
       - name: Restore
         run: dotnet restore KedrStore.sln
 
+      # Security rules: a High or Critical advisory in any NuGet package, direct or transitive, fails the build.
+      - name: Check NuGet packages for known vulnerabilities
+        run: |
+          dotnet list KedrStore.sln package --vulnerable --include-transitive --format json > "$RUNNER_TEMP/vulnerable-packages.json"
+          jq -r '[.projects[]? | .frameworks[]? | (.topLevelPackages[]?, .transitivePackages[]?)
+            | select(.vulnerabilities != null) | . as $p | .vulnerabilities[]
+            | select(.severity == "High" or .severity == "Critical")
+            | "\(.severity): \($p.id) \($p.resolvedVersion) \(.advisoryurl)"] | unique | .[]' "$RUNNER_TEMP/vulnerable-packages.json" > "$RUNNER_TEMP/blocking.txt"
+          if [ -s "$RUNNER_TEMP/blocking.txt" ]; then cat "$RUNNER_TEMP/blocking.txt"; echo "High or critical NuGet advisories found."; exit 1; fi
+          echo "No high or critical NuGet advisories."
+
       - name: Build
         run: dotnet build KedrStore.sln --no-restore --configuration Release
 
