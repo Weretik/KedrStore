@@ -33,5 +33,9 @@ internal sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             text.Property(t => t.BodyHtml).HasMaxLength(ArticleTranslation.BodyHtmlMaxLength).IsRequired();
         });
         builder.Navigation(article => article.Translations).UsePropertyAccessMode(PropertyAccessMode.Field);
+        // The legacy cover is a child in its own table; dropping it from the article deletes the row.
+        builder.HasOne(article => article.LegacyCover).WithOne()
+            .HasForeignKey<ArticleCover>(cover => cover.ArticleId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

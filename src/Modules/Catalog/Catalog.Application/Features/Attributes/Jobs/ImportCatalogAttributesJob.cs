@@ -57,7 +57,7 @@ public sealed class ImportCatalogAttributesJob(
         IReadOnlyList<AttributeDefinition> definitions, bool apply, DateTimeOffset now, AttributeImportReport report,
         CancellationToken cancellationToken)
     {
-        var existing = await db.Attributes.ToListAsync(cancellationToken);
+        var existing = await db.Attributes.Include(attribute => attribute.Values).ToListAsync(cancellationToken);
         var byCode = existing.ToDictionary(attribute => attribute.Code, StringComparer.Ordinal);
         var usedSlugs = existing.Select(attribute => attribute.Slug).ToHashSet(StringComparer.Ordinal);
         var created = new List<CatalogAttribute>();

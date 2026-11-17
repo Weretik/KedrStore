@@ -4,9 +4,10 @@ namespace Catalog.Domain.Groups.Members;
 
 /// <summary>
 /// An attribute that tells the products of a model apart (color, size, side…): a switcher on the model page and a
-/// filter of its category (spec catalog/007). <see cref="Position"/> orders the switchers.
+/// filter of its category (spec catalog/007). <see cref="Position"/> orders the switchers. A child of
+/// <see cref="ProductGroup"/>, changed only through <see cref="ProductGroup.SetAxes"/>.
 /// </summary>
-public class ProductGroupAxis : IAggregateRoot
+public class ProductGroupAxis
 {
     public ProductGroupId GroupId { get; private set; }
     public AttributeId AttributeId { get; private set; }
@@ -14,10 +15,10 @@ public class ProductGroupAxis : IAggregateRoot
 
     private ProductGroupAxis() { }
 
-    public static ProductGroupAxis Create(ProductGroupId groupId, AttributeId attributeId, int position)
+    internal static ProductGroupAxis Create(ProductGroupId groupId, AttributeId attributeId, int position)
         => new() { GroupId = groupId, AttributeId = attributeId, Position = (short)position };
 
-    public bool MoveTo(int position)
+    internal bool MoveTo(int position)
     {
         if (Position == position)
             return false;

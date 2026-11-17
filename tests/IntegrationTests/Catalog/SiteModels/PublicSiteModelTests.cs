@@ -113,7 +113,7 @@ public sealed class PublicSiteModelTests
             .Where(member => member.ProductId == ProductId.From(1)).Select(member => member.GroupId!.Value).SingleAsync();
         var state = new SiteModelStateReader(db);
         var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
-                new SiteModelChanges(db, new TestRepository<ProductGroupAxis>(db),
+                new SiteModelChanges(db, new TestRepository<ProductGroup>(db),
                     new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
                 state, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db))

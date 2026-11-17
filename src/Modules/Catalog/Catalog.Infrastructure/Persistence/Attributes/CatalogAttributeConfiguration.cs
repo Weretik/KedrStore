@@ -19,6 +19,8 @@ public sealed class CatalogAttributeConfiguration : IEntityTypeConfiguration<Cat
         builder.Property(x => x.Unit).HasMaxLength(CatalogAttribute.UnitMaxLength);
         builder.Property(x => x.Slug).HasMaxLength(80).IsRequired();
 
+        builder.HasMany(x => x.Values).WithOne().HasForeignKey(value => value.AttributeId).OnDelete(DeleteBehavior.Restrict);
+        builder.Navigation(x => x.Values).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.HasIndex(x => x.Code).IsUnique().HasDatabaseName("UX_CatalogAttributes_Code");
         builder.HasIndex(x => x.Slug).IsUnique().HasDatabaseName("UX_CatalogAttributes_Slug");
 

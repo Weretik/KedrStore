@@ -37,7 +37,7 @@ internal static class CatalogImportTestSupport
             new TestRepository<Product>(db),
             new TestRepository<ProductCategory>(db),
             new SlugService(db),
-            new ProductTranslationImporter(new TestRepository<ProductTranslation>(db), NullLogger<ProductTranslationImporter>.Instance),
+            new ProductTranslationImporter(new TestRepository<Product>(db), NullLogger<ProductTranslationImporter>.Instance),
             new OptionsSnapshot<RootCategoryId>(Options()),
             new NoopProjectionRebuilder(),
             NullLogger<SyncOneCProductDetailsJob>.Instance);

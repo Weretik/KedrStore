@@ -11,7 +11,6 @@ namespace Content.Application.Features.Articles.Commands.UpdateArticle;
 /// <summary>Replaces the slug, date, publication flag, both texts, and (when sent) the cover of an article.</summary>
 public sealed class UpdateArticleHandler(
     IContentRepository<Article> articles,
-    IContentRepository<ArticleCover> covers,
     IReadContentDbContext db,
     IMediaImageReader images,
     IArticleHtmlSanitizer sanitizer,
@@ -22,7 +21,7 @@ public sealed class UpdateArticleHandler(
     public async ValueTask<Result<AdminArticleDetails>> Handle(UpdateArticleCommand command, CancellationToken cancellationToken)
     {
         var id = ArticleId.Create(command.ArticleId);
-        var article = await articles.FirstOrDefaultAsync(new ArticleByIdSpec(id), cancellationToken);
+        var article = await articles.FirstOrDefaultAsync(new ArticleWithLegacyCoverByIdSpec(id), cancellationToken);
         if (article is null)
             return Result.NotFound();
 
@@ -39,7 +38,7 @@ public sealed class UpdateArticleHandler(
             ArticleTexts.Sanitized(input.Texts, sanitizer), now, editor);
         if (updated.IsFailure)
             return updated.Error!.ToResult<AdminArticleDetails>();
-        var coverError = await ArticleCovers.ApplyAsync(article, input, images, covers, now, editor, cancellationToken);
+        var coverError = await ArticleCovers.ApplyAsync(article, input, images, now, editor, cancellationToken);
         if (coverError is not null)
             return coverError.ToResult<AdminArticleDetails>();
 

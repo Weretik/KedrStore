@@ -6,9 +6,9 @@ namespace Catalog.Domain.Attributes.Aliases;
 /// One more thing a code means besides its own attribute (spec catalog/009): a composite 1C code such as <c>ZCG</c> may
 /// carry a configuration and a colour at once. Products whose names contain the code get <see cref="ValueId"/> of
 /// <see cref="AttributeId"/>. <see cref="CategoryId"/> <c>null</c>: for all products; otherwise only in that category,
-/// where it belongs to the category's own decoding.
+/// where it belongs to the category's own decoding. A child of <see cref="AttributeAlias"/>, changed only through it.
 /// </summary>
-public class AttributeAliasMeaning : IAggregateRoot
+public class AttributeAliasMeaning
 {
     public int Id { get; private set; }
     public AttributeAliasId AliasId { get; private set; }
@@ -19,7 +19,7 @@ public class AttributeAliasMeaning : IAggregateRoot
 
     private AttributeAliasMeaning() { }
 
-    public static AttributeAliasMeaning Create(AttributeAliasId aliasId, ProductCategoryId? categoryId,
+    internal static AttributeAliasMeaning Create(AttributeAliasId aliasId, ProductCategoryId? categoryId,
         AttributeId attributeId, AttributeValueId valueId, DateTimeOffset now)
         => new()
         {
@@ -27,7 +27,7 @@ public class AttributeAliasMeaning : IAggregateRoot
         };
 
     /// <summary>Returns whether the value changed.</summary>
-    public bool Change(AttributeValueId valueId, DateTimeOffset now)
+    internal bool Change(AttributeValueId valueId, DateTimeOffset now)
     {
         if (ValueId == valueId)
             return false;

@@ -134,7 +134,7 @@ public sealed class SiteModelTests
         public SiteModelStateReader State { get; } = new(db);
         public SiteModelReader Reader => new(State);
 
-        public SiteModelChanges Changes => new(db, new TestRepository<ProductGroupAxis>(db),
+        public SiteModelChanges Changes => new(db, new TestRepository<ProductGroup>(db),
             new ProductGroupPins(db, new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), State);
 
         public AcceptSiteModelsHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
@@ -143,7 +143,7 @@ public sealed class SiteModelTests
         public CreateSiteModelHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
             Changes, Reader, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
-        public SetSiteModelAxesHandler SetAxes => new(db, new TestRepository<ProductGroupAxis>(db), Reader);
+        public SetSiteModelAxesHandler SetAxes => new(db, new TestRepository<ProductGroup>(db), Reader);
 
         public SetSiteModelTextHandler SetText => new(db, new TestRepository<ProductGroupText>(db), Reader,
             TimeProvider.System);

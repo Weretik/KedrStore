@@ -14,30 +14,23 @@ namespace Catalog.Application.Features.Attributes.Shared.Import;
 /// </summary>
 public sealed class RecognizedProductWriter(
     IReadCatalogDbContext db,
-    ICatalogRepository<AttributeValue> values,
+    ICatalogRepository<CatalogAttribute> attributes,
     ICatalogRepository<ProductAttributeValue> productValues,
     ICatalogRepository<ProductAttributeReview> reviews,
     ICatalogRepository<CategoryAttribute> categoryAttributes)
 {
     /// <summary>
-    /// Stores attribute values by (attribute code, value code). New ones are created; existing ones take the
-    /// dictionary name and order only when <paramref name="updateExisting"/> (the dictionary import), never when a
-    /// person edited them.
+    /// Stores attribute values by (attribute code, value code) through their attribute, which must be loaded with its
+    /// values. New ones are created; existing ones take the dictionary name and order only when
+    /// <paramref name="updateExisting"/> (the dictionary import), never when a person edited them.
     /// </summary>
     public async Task<Dictionary<(string Attribute, string Code), AttributeValue>> SyncValuesAsync(
         IReadOnlyList<AttributeValueDefinition> definitions, Dictionary<string, CatalogAttribute> attributeByCode,
         bool updateExisting, bool apply, DateTimeOffset now, AttributeImportReport report, CancellationToken cancellationToken)
     {
-        var codeById = attributeByCode.Values.Where(attribute => !attribute.IsTransient())
-            .ToDictionary(attribute => attribute.Id, attribute => attribute.Code);
-        var existing = await db.AttributeValues.ToListAsync(cancellationToken);
-        var byKey = existing
-            .Where(value => codeById.ContainsKey(value.AttributeId))
-            .ToDictionary(value => (codeById[value.AttributeId], value.Code));
-        var slugsByAttribute = byKey.GroupBy(pair => pair.Key.Item1, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.Select(pair => pair.Value.Slug).ToHashSet(StringComparer.Ordinal),
-                StringComparer.Ordinal);
-        var created = new List<AttributeValue>();
+        var byKey = attributeByCode.Values
+            .SelectMany(attribute => attribute.Values.Select(value => (Key: (attribute.Code, value.Code), Value: value)))
+            .ToDictionary(item => item.Key, item => item.Value);
 
         foreach (var definition in definitions)
         {
@@ -52,7 +45,7 @@ public sealed class RecognizedProductWriter(
             {
                 if (updateExisting)
                 {
-                    var applied = value.ApplyDictionary(definition.NameUk, definition.SortOrder, now);
+                    var applied = attribute.ApplyDictionaryToValue(value, definition.NameUk, definition.SortOrder, now);
                     if (applied.IsFailure)
                         report.Errors.Add($"Value {definition.Code}: {applied.Error!.Message}");
                     else
@@ -63,30 +56,23 @@ public sealed class RecognizedProductWriter(
                 continue;
             }
 
-            if (!slugsByAttribute.TryGetValue(definition.AttributeCode, out var usedSlugs))
-                slugsByAttribute[definition.AttributeCode] = usedSlugs = new HashSet<string>(StringComparer.Ordinal);
-
-            var slug = UniqueSlug(SlugText.FromName(definition.NameUk, "znachennia"), usedSlugs);
-            var createdValue = AttributeValue.Create(attribute.Id, definition.Code, definition.NameUk, slug,
-                definition.SortOrder, now);
+            var slug = SlugText.FromName(definition.NameUk, "znachennia");
+            var unique = slug;
+            for (var number = 2; attribute.IsValueSlugTaken(unique); number++)
+                unique = SlugText.WithSuffix(slug, number);
+            var createdValue = attribute.AddValue(definition.Code, definition.NameUk, unique, definition.SortOrder, now);
             if (createdValue.IsFailure)
             {
                 report.Errors.Add($"Value {definition.Code}: {createdValue.Error!.Message}");
                 continue;
             }
 
-            value = createdValue.Value;
-            byKey[key] = value;
-            created.Add(value);
+            byKey[key] = createdValue.Value;
             report.Values.Created++;
         }
 
         if (apply)
-        {
-            if (created.Count > 0)
-                await values.AddRangeAsync(created, cancellationToken);
-            await values.SaveChangesAsync(cancellationToken);
-        }
+            await attributes.SaveChangesAsync(cancellationToken);
 
         return byKey;
     }

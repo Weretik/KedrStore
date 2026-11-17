@@ -14,7 +14,6 @@ namespace Content.Application.Features.Articles.Commands.MoveLegacyArticleCovers
 /// </summary>
 public sealed class MoveLegacyArticleCoversHandler(
     IContentRepository<Article> articles,
-    IContentRepository<ArticleCover> covers,
     IMediaImageWriter writer,
     ICurrentUserService currentUser,
     TimeProvider clock)
@@ -28,7 +27,7 @@ public sealed class MoveLegacyArticleCoversHandler(
         var moved = 0;
         foreach (var article in legacy)
         {
-            var cover = await covers.FirstOrDefaultAsync(new ArticleCoverSpec(article.Id), cancellationToken);
+            var cover = article.LegacyCover;
             if (cover is null)
             {
                 article.RemoveCover(clock.GetUtcNow(), editor);
@@ -41,9 +40,8 @@ public sealed class MoveLegacyArticleCoversHandler(
             if (!stored.IsSuccess)
                 return stored.Map(_ => default(LegacyArticleCoversMoved)!);
 
-            // The uploader returned a saved library file, so its id is always valid.
+            // The uploader returned a saved library file, so its id is always valid; the article drops the bytes.
             article.SetCover(stored.Value.MediaFileId, clock.GetUtcNow(), editor);
-            await covers.DeleteAsync(cover, cancellationToken);
             await articles.SaveChangesAsync(cancellationToken);
             moved++;
         }

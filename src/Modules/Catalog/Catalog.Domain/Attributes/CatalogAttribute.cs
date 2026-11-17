@@ -7,7 +7,7 @@ namespace Catalog.Domain.Attributes;
 /// A product property such as color, size, or side. Loaded from the attribute dictionary; once a person edits it
 /// in the Admin, the dictionary import no longer changes it.
 /// </summary>
-public class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
+public partial class CatalogAttribute : BaseEntity<AttributeId>, IAggregateRoot
 {
     public const int CodeMaxLength = 64;
     public const int NameMaxLength = 120;

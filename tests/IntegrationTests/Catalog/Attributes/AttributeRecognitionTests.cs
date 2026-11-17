@@ -221,7 +221,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.Contains("AL", before);
 
         var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
-            new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
+            codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId, new DecideAttributeCodeRequest(null)),
             CancellationToken.None);
@@ -252,7 +252,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.False(handles.HasOwnValue);
 
         var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
-            new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
+            codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(al.AliasId,
                 new DecideAttributeCodeRequest(null, ApplyToAll: false,
@@ -301,7 +301,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         Assert.Contains("ZCG", await ReviewTextAsync(db, cylinder));
 
         var decide = new DecideAttributeCodeHandler(db, new TestRepository<AttributeAlias>(db),
-            new TestRepository<AttributeAliasCategoryValue>(db), new TestRepository<AttributeAliasMeaning>(db), codes,
+            codes,
             RecognitionJob(db), TimeProvider.System, NullLogger<DecideAttributeCodeHandler>.Instance);
         var result = await decide.Handle(new DecideAttributeCodeCommand(zcg.AliasId,
                 new DecideAttributeCodeRequest(null, Meanings: [new CodeMeaningRequest(color.Id.Value, gold.Id.Value)])),

@@ -1,7 +1,10 @@
 namespace Content.Domain.Articles;
 
-/// <summary>Cover image bytes of one article, kept apart so lists never load them.</summary>
-public sealed class ArticleCover : IAggregateRoot
+/// <summary>
+/// Legacy cover bytes of one article, a child of <see cref="Article"/> kept in its own table so lists never load them.
+/// Only the article removes it, when a library picture replaces the legacy cover or the cover is removed.
+/// </summary>
+public sealed class ArticleCover
 {
     public const int MaxBytes = 1_000_000;
 

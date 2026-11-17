@@ -11,7 +11,6 @@ namespace Content.Application.Features.Articles.Commands.CreateArticle;
 /// <summary>Creates an article with its cover; without a slug one is built from the Ukrainian title.</summary>
 public sealed class CreateArticleHandler(
     IContentRepository<Article> articles,
-    IContentRepository<ArticleCover> covers,
     IReadContentDbContext db,
     IMediaImageReader images,
     IArticleHtmlSanitizer sanitizer,
@@ -40,7 +39,7 @@ public sealed class CreateArticleHandler(
         if (created.IsFailure)
             return created.Error!.ToResult<AdminArticleDetails>();
         var article = created.Value;
-        var coverError = await ArticleCovers.ApplyAsync(article, input, images, covers, now, editor, cancellationToken);
+        var coverError = await ArticleCovers.ApplyAsync(article, input, images, now, editor, cancellationToken);
         if (coverError is not null)
             return coverError.ToResult<AdminArticleDetails>();
 

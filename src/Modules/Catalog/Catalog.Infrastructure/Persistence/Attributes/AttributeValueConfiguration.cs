@@ -17,7 +17,7 @@ public sealed class AttributeValueConfiguration : IEntityTypeConfiguration<Attri
         builder.Property(x => x.Slug).HasMaxLength(80).IsRequired();
         builder.Property(x => x.SwatchHex).HasMaxLength(7);
 
-        builder.HasOne<CatalogAttribute>().WithMany().HasForeignKey(x => x.AttributeId).OnDelete(DeleteBehavior.Restrict);
+        // The relationship to CatalogAttribute, the root, is configured in CatalogAttributeConfiguration.
 
         builder.HasIndex(x => new { x.AttributeId, x.Code }).IsUnique()
             .HasDatabaseName("UX_CatalogAttributeValues_Attribute_Code");

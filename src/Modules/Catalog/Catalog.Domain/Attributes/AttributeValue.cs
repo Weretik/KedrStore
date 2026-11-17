@@ -2,8 +2,11 @@ using Catalog.Domain.Attributes.ValueObjects;
 
 namespace Catalog.Domain.Attributes;
 
-/// <summary>One value of an attribute, for example «Антична бронза» (code AB) of color.</summary>
-public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
+/// <summary>
+/// One value of an attribute, for example «Антична бронза» (code AB) of color. A child of <see cref="CatalogAttribute"/>,
+/// added and changed only through it.
+/// </summary>
+public class AttributeValue : BaseEntity<AttributeValueId>
 {
     public const int CodeMaxLength = 64;
     public const int NameMaxLength = 160;
@@ -24,7 +27,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
 
     private AttributeValue() { }
 
-    public static DomainResult<AttributeValue> Create(AttributeId attributeId, string code, string nameUk, string slug,
+    internal static DomainResult<AttributeValue> Create(AttributeId attributeId, string code, string nameUk, string slug,
         int sortOrder, DateTimeOffset now)
     {
         var checks = new DomainChecks();
@@ -46,7 +49,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
     }
 
     /// <summary>Applies dictionary fields unless a person edited the value. Returns whether anything changed.</summary>
-    public DomainResult<bool> ApplyDictionary(string nameUk, int sortOrder, DateTimeOffset now)
+    internal DomainResult<bool> ApplyDictionary(string nameUk, int sortOrder, DateTimeOffset now)
     {
         if (IsEditedManually)
             return false;
@@ -65,7 +68,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
     }
 
     /// <summary>A person adds a value in «Властивості». It is manual from the start.</summary>
-    public static DomainResult<AttributeValue> CreateManual(AttributeId attributeId, string code, string nameUk,
+    internal static DomainResult<AttributeValue> CreateManual(AttributeId attributeId, string code, string nameUk,
         string? nameRu, string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
     {
         var created = Create(attributeId, code, nameUk, slug, sortOrder, now);
@@ -76,7 +79,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>, IAggregateRoot
     }
 
     /// <summary>A person edits the value; the dictionary import no longer changes it.</summary>
-    public DomainResult EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex,
+    internal DomainResult EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex,
         long? swatchMediaFileId, DateTimeOffset now)
     {
         var checks = new DomainChecks();

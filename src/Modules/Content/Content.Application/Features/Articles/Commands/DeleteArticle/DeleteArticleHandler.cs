@@ -4,8 +4,7 @@ using Content.Application.Features.Articles.Shared.Reading;
 namespace Content.Application.Features.Articles.Commands.DeleteArticle;
 
 public sealed class DeleteArticleHandler(
-    IContentRepository<Article> articles,
-    IContentRepository<ArticleCover> covers)
+    IContentRepository<Article> articles)
     : ICommandHandler<DeleteArticleCommand, Result>
 {
     public async ValueTask<Result> Handle(DeleteArticleCommand command, CancellationToken cancellationToken)
@@ -15,9 +14,7 @@ public sealed class DeleteArticleHandler(
         if (article is null)
             return Result.NotFound();
 
-        var cover = await covers.FirstOrDefaultAsync(new ArticleCoverSpec(id), cancellationToken);
-        if (cover is not null)
-            await covers.DeleteAsync(cover, cancellationToken);
+        // The legacy cover row goes with the article (cascade on the foreign key).
         await articles.DeleteAsync(article, cancellationToken);
         await articles.SaveChangesAsync(cancellationToken);
         return Result.NoContent();

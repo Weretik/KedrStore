@@ -16,7 +16,6 @@ namespace Catalog.Application.Features.Attributes.Commands.CreateCatalogAttribut
 public sealed class CreateCatalogAttributeHandler(
     IReadCatalogDbContext db,
     ICatalogRepository<CatalogAttribute> attributes,
-    ICatalogRepository<AttributeValue> values,
     CatalogAttributeReader reader,
     TimeProvider clock,
     ICatalogTransaction transaction)
@@ -60,13 +59,10 @@ public sealed class CreateCatalogAttributeHandler(
         await attributes.SaveChangesAsync(cancellationToken);
         if (request.Kind == CreateCatalogAttributeCommand.YesNo)
         {
-            // Fixed values that always pass the rules.
-            await values.AddRangeAsync(
-            [
-                AttributeValue.CreateManual(attribute.Id, "yes", "Так", "Да", "tak", 1, null, null, now).Value,
-                AttributeValue.CreateManual(attribute.Id, "no", "Ні", "Нет", "ni", 2, null, null, now).Value
-            ], cancellationToken);
-            await values.SaveChangesAsync(cancellationToken);
+            // Fixed values that always pass the rules; added once the attribute has its id.
+            attribute.AddManualValue("yes", "Так", "Да", "tak", 1, null, null, now);
+            attribute.AddManualValue("no", "Ні", "Нет", "ni", 2, null, null, now);
+            await attributes.SaveChangesAsync(cancellationToken);
         }
 
         return Result.Success((await reader.ReadAsync(attribute.Id, cancellationToken))!);

@@ -2,7 +2,8 @@ using Catalog.Domain.Products.Errors;
 
 namespace Catalog.Domain.Products;
 
-public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
+/// <summary>A product name in one language; a child of <see cref="Product"/>, changed only through it.</summary>
+public class ProductTranslation : BaseAuditableEntity<int>
 {
     public ProductId ProductId { get; private set; }
     public string Language { get; private set; } = null!;
@@ -12,7 +13,7 @@ public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
 
     public const int NameMaxLength = 300;
 
-    public static DomainResult<ProductTranslation> Create(ProductId productId, string language, string name,
+    internal static DomainResult<ProductTranslation> Create(ProductId productId, string language, string name,
         DateTimeOffset createdAt)
     {
         var checks = new DomainChecks();
@@ -28,7 +29,7 @@ public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
         return translation;
     }
 
-    public DomainResult Update(string name, DateTimeOffset updatedAt)
+    internal DomainResult Update(string name, DateTimeOffset updatedAt)
     {
         var checkedName = CheckName(name);
         if (checkedName.IsFailure)
@@ -39,7 +40,7 @@ public class ProductTranslation : BaseAuditableEntity<int>, IAggregateRoot
     }
 
     /// <summary>Sets the name and revives a soft-deleted translation. Returns whether anything changed.</summary>
-    public DomainResult<bool> Apply(string name, DateTimeOffset now)
+    internal DomainResult<bool> Apply(string name, DateTimeOffset now)
     {
         if (!IsDeleted && string.Equals(Name, name?.Trim(), StringComparison.Ordinal))
             return false;
