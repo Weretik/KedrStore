@@ -36,6 +36,9 @@ jobs:
       - name: Check the module and feature maps
         run: python3 tools/docs/check_module_maps.py
 
+      - name: Test the agent guard hook
+        run: node --test .claude/hooks/guard.test.mjs
+
       - name: Test the test selection
         run: python3 -m unittest discover -s tools/ci
 
