@@ -23,7 +23,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         var draft = await db.OrderDrafts.AsNoTracking().Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
 
         Assert.Equal("Draft", draft.Title);
-        Assert.Equal(CounterpartyId, draft.CounterpartyId);
+        Assert.Equal(CounterpartyId, draft.CounterpartyId.Value);
         Assert.Equal(32, draft.Version.Length);
         Assert.Equal([("101", 2, -50.25m), ("102", 1, 0m)],
             draft.Lines.OrderBy(x => x.ProductId).Select(x => (x.ProductId, x.Quantity, x.PriceAdjustment)));

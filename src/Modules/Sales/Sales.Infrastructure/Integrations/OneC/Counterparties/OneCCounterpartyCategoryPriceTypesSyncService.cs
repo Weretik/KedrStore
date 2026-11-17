@@ -29,7 +29,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
 
         var counterparties = await salesDbContext.Counterparties
             .AsNoTracking()
-            .Select(item => item.Id)
+            .Select(item => item.Id.Value)
             .ToHashSetAsync(StringComparer.Ordinal, cancellationToken);
 
         var requestedCategoryIds = deduped
@@ -71,7 +71,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
 
         var existingRules = await salesDbContext.CounterpartyCategoryPriceTypes.ToListAsync(cancellationToken);
         var existingByKey = existingRules.ToDictionary(
-            item => (item.CounterpartyId, item.CategoryId),
+            item => (item.CounterpartyId.Value, item.CategoryId),
             item => item,
             CounterpartyCategoryKeyComparer.Instance);
 
@@ -99,7 +99,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             .ToHashSet(CounterpartyCategoryKeyComparer.Instance);
 
         var toDelete = existingRules
-            .Where(item => !validKeys.Contains((item.CounterpartyId, item.CategoryId)))
+            .Where(item => !validKeys.Contains((item.CounterpartyId.Value, item.CategoryId)))
             .ToList();
 
         if (toDelete.Count > 0)

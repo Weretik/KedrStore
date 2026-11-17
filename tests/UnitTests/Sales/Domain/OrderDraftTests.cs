@@ -14,7 +14,7 @@ public sealed class OrderDraftTests
 
         Assert.Equal("Autumn order", draft.Title);
         Assert.Equal("Keep for later", draft.Note);
-        Assert.Equal("customer-1", draft.CounterpartyId);
+        Assert.Equal("customer-1", draft.CounterpartyId.Value);
         Assert.Single(draft.Lines);
         Assert.False(string.IsNullOrWhiteSpace(draft.Version));
         Assert.Equal(Now, draft.CreatedAtUtc);
@@ -30,7 +30,7 @@ public sealed class OrderDraftTests
         draft.Update("Second", "Note", "customer-2",
             [OrderDraftLine.Create("202", 3)], Now.AddMinutes(1));
 
-        Assert.Equal("customer-2", draft.CounterpartyId);
+        Assert.Equal("customer-2", draft.CounterpartyId.Value);
         Assert.Equal("202", Assert.Single(draft.Lines).ProductId);
         Assert.NotEqual(originalVersion, draft.Version);
         Assert.Equal(Now.AddMinutes(1), draft.UpdatedAtUtc);

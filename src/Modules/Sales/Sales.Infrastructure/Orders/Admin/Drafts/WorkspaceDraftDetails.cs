@@ -12,11 +12,11 @@ internal sealed class WorkspaceDraftDetails(SalesDbContext db, AdminWorkspacePri
         var customer = await db.Counterparties.IgnoreQueryFilters().AsNoTracking()
             .Where(x => x.Id == draft.CounterpartyId).Select(x => x.Name).SingleAsync(ct);
         var quote = await pricing.QuoteAsync(new WorkspaceQuoteRequest(
-            draft.CounterpartyId, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId, x.Quantity, x.PriceAdjustment)).ToArray()), ct);
+            draft.CounterpartyId.Value, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId, x.Quantity, x.PriceAdjustment)).ToArray()), ct);
         if (quote.IsSuccess)
         {
             return new WorkspaceDraftDetail(draft.Id.Value, draft.Version, draft.Title, draft.Note,
-                draft.CounterpartyId, customer, draft.CreatedAtUtc, draft.UpdatedAtUtc,
+                draft.CounterpartyId.Value, customer, draft.CreatedAtUtc, draft.UpdatedAtUtc,
                 quote.Value.Lines.Select(x => new WorkspaceDraftQuotedLine(
                     x.ProductId, x.ProductName, x.Quantity, x.UnitPrice, x.LineAmount, x.PriceAdjustment, x.BaseUnitPrice)).ToArray(),
                 quote.Value.TotalAmount, "Available", null);
@@ -25,7 +25,7 @@ internal sealed class WorkspaceDraftDetails(SalesDbContext db, AdminWorkspacePri
         // A saved draft stays readable when it can no longer be priced; the code says why.
         var lines = await pricing.DescribeDraftLinesAsync(draft.Lines, ct);
         return new WorkspaceDraftDetail(draft.Id.Value, draft.Version, draft.Title, draft.Note,
-            draft.CounterpartyId, customer, draft.CreatedAtUtc, draft.UpdatedAtUtc,
+            draft.CounterpartyId.Value, customer, draft.CreatedAtUtc, draft.UpdatedAtUtc,
             lines, null, "Unavailable", quote.Error!.Code);
     }
 }

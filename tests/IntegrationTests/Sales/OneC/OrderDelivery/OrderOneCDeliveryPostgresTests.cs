@@ -171,7 +171,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         => await sales.InScopeAsync(async services =>
         {
             var db = services.GetRequiredService<SalesDbContext>();
-            if (!await db.Counterparties.AnyAsync(x => x.Id == counterpartyId))
+            if (!await db.Counterparties.AnyAsync(x => x.Id == CounterpartyId.FromStorage(counterpartyId)))
             {
                 db.Counterparties.Add(Counterparty.Create(counterpartyId, Guid.NewGuid(), "Клієнт", $"{counterpartyId}@example.com",
                     null, 1, SalesOutboxHarness.Noon).Value);

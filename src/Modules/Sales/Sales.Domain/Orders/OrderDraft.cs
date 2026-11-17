@@ -1,3 +1,4 @@
+using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Domain.Orders.ValueObjects;
 
@@ -7,7 +8,7 @@ public sealed class OrderDraft : IAggregateRoot
 {
     private readonly List<OrderDraftLine> _lines = [];
     public OrderDraftId Id { get; private set; }
-    public string CounterpartyId { get; private set; } = null!;
+    public CounterpartyId CounterpartyId { get; private set; }
     public string Title { get; private set; } = null!;
     public string? Note { get; private set; }
     public DateTimeOffset CreatedAtUtc { get; private set; }
@@ -51,7 +52,7 @@ public sealed class OrderDraft : IAggregateRoot
             throw new ArgumentException("Draft note is too long.", nameof(note));
         Title = title.Trim();
         Note = normalizedNote;
-        CounterpartyId = counterpartyId.Trim();
+        CounterpartyId = CounterpartyId.Create(counterpartyId);
         _lines.Clear();
         _lines.AddRange(values);
     }

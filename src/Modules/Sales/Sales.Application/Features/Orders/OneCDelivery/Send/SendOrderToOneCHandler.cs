@@ -60,7 +60,7 @@ public sealed class SendOrderToOneCHandler(
     }
 
     private static OneCOrderDeliveryRequest BuildRequest(Order order) => new(
-        order.CounterpartyId,
+        order.CounterpartyId.Value,
         order.OrderNumber,
         order.CreatedAt,
         order.Comment,

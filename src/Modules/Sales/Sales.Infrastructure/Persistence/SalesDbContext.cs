@@ -1,3 +1,4 @@
+using Sales.Infrastructure.Persistence.Customers;
 using BuildingBlocks.Infrastructure.Outbox.Persistence;
 using Sales.Infrastructure.Persistence.Orders.SyncRetries;
 using Sales.Infrastructure.Persistence.Orders.Idempotency;
@@ -27,6 +28,7 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<string>().HaveMaxLength(255);
+        configurationBuilder.Properties<CounterpartyId>().HaveConversion<CounterpartyIdConverter>().HaveMaxLength(255);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
