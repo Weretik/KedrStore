@@ -21,6 +21,9 @@ global using Catalog.Domain.Products.Media;
 global using Catalog.Domain.Products.Prices;
 global using Catalog.Domain.Slugs;
 
+// Catalog.Application read models
+global using Catalog.Application.Features.Products.Shared;
+
 // BuildingBlocks namespaces
 global using BuildingBlocks.Domain.Abstractions;
 

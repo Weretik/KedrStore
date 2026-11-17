@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Features.SiteModels.Shared.Public;
 using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
 using Catalog.Application.Features.OneCSync.Mapping;

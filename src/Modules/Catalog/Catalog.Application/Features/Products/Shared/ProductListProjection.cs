@@ -1,6 +1,7 @@
 using Catalog.Domain.Categories;
+using Catalog.Domain.Products;
 
-namespace Catalog.Domain.Products;
+namespace Catalog.Application.Features.Products.Shared;
 
 public sealed class ProductListProjection
 {

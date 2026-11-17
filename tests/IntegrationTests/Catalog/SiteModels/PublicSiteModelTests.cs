@@ -1,3 +1,4 @@
+using Catalog.Application.Features.Products.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using global::Catalog.Application.Features.Attributes.Shared.Import;

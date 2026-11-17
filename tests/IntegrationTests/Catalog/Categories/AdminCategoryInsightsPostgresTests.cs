@@ -1,4 +1,5 @@
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
+using Catalog.Application.Features.Products.Shared;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
