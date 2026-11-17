@@ -32,7 +32,7 @@ For a new or substantially changed feature, update the [feature map](docs/sdd/fe
 
 - Focused unit test (fast, no Docker): `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~<Name>"`. Feature cards give the filter.
 - Integration test: the same filter on `tests/IntegrationTests/IntegrationTests.csproj`; slow, needs Docker (Testcontainers), skips without it.
-- Documentation: `python3 tools/docs/check_doc_links.py`.
+- Documentation: `python3 tools/docs/check_doc_links.py` and `python3 tools/docs/check_module_maps.py` (every module, host, endpoint folder and feature card is on the [system map](docs/sdd/architecture/overview/system-map.md), [module map](docs/sdd/architecture/overview/modules.md) and [feature map](docs/sdd/features/README.md); a change that adds or renames one updates them in the same PR).
 - OpenAPI contract: `dotnet build src/Bootstrapper/Host.Api/Host.Api.csproj` regenerates `docs/sdd/contracts/openapi.json`; commit it with the endpoint change.
 - Do not build the whole solution or run every test project unless asked; CI does that.
 

@@ -102,6 +102,10 @@ flowchart LR
     end
 
     bb["<b>BuildingBlocks</b><br/>Result mapping, Mediator behaviors,<br/>outbox, shared primitives"]
+    onec["<b>1C</b><br/>[External]"]
+    telegram["<b>Telegram</b><br/>[External]"]
+    cdn["<b>CDN</b><br/>[External]"]
+    cloudrun["<b>Cloud Run Admin API</b><br/>[External]"]
 
     compose --> modules
     sales -->|"Catalog.Contracts"| catalog
@@ -114,9 +118,16 @@ flowchart LR
     work -.->|"Identity.Contracts (policies)"| identity
     scheduling -.->|"Identity.Contracts (policies)"| identity
     compose -->|"Scheduling.Contracts (run journal)"| scheduling
+    media -.->|"Media.Contracts listener: file changes"| catalog
+    onec ==>|"ACL Integrations/OneC: products, prices, stock"| catalog
+    onec ==>|"ACL Integrations/OneC: counterparties"| sales
+    sales ==>|"Outbox lane one-c-orders, ACL Integrations/OneC"| onec
+    sales ==>|"Outbox, ACL Integrations/Telegram"| telegram
+    media ==>|"ACL Integrations/Storage: FTP, HTTPS"| cdn
+    scheduling ==>|"ACL Integrations/CloudRun: starts kedr-tasks"| cloudrun
     modules --> bb
 ```
 
-Solid arrows: a module reads or calls another through its `Contracts`. Dotted: only policy and role names. No module references another module's Application, Domain or Infrastructure; architecture tests enforce it ([ADR-0004](../decisions/0004-contracts-and-business-folders.md)).
+This diagram is the context map. Solid arrows: a module reads or calls another through its `Contracts`. Dotted: only policy and role names, or a `Contracts` listener the other module implements (Media tells Catalog that a file changed). Thick arrows cross the system edge: an anti-corruption layer in the module's `Infrastructure/Integrations/<System>` translates the outside model, and messages out go through the outbox, sent by the scheduler tick. No two modules reference each other's `Contracts`, directly or around a circle (`ModuleContractsTests`). No module references another module's Application, Domain or Infrastructure; architecture tests enforce it ([ADR-0004](../decisions/0004-contracts-and-business-folders.md)).
 
 Inside a module the code follows the [use-case flow](../runtime/use-case-flow.md): endpoint → command or query → Mediator pipeline → handler → aggregate → `DbContext` of the module's schema.
