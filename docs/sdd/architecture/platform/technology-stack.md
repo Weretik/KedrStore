@@ -5,7 +5,7 @@
 | Runtime | .NET 10 / C#; `global.json` sets SDK `10.0.101` with `latestFeature` roll-forward | Follow nullable annotations and configured analyzers. |
 | HTTP | ASP.NET Core Minimal API | Keep endpoints thin and use Mediator. |
 | Mediator | Mediator 3.x | Use request/handler pairs and the existing pipeline. |
-| Mediator pipeline | RequestLogging, Exception, Performance, Validation, DomainEventDispatcher behaviors | Preserve registration order; do not put business rules in behaviors. |
+| Mediator pipeline | RequestLogging, Exception, Performance, and Validation behaviors | Preserve registration order; do not put business rules in behaviors. |
 | Validation | FluentValidation | Keep input validators beside the corresponding use case. |
 | Results | Ardalis.Result | Return `Result` or `Result<T>` and use existing API mapping. |
 | Data | EF Core 10 + Npgsql/PostgreSQL | EF configuration and migrations belong in Infrastructure; migrations run through separate `Host.Jobs --job=migrate`. |

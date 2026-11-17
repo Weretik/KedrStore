@@ -6,7 +6,7 @@
 
 ## Context
 
-The backend has more than 170 use cases across seven modules. Each one needs the same cross-cutting steps: logging, input validation, timing, error handling and domain events. Endpoints used to hold logic of their own, and the same steps were repeated by hand. One developer must be able to open any use case and find the same shape.
+The backend has more than 170 use cases across seven modules. Each one needs the same cross-cutting steps: logging, input validation, timing, and error handling. Endpoints used to hold logic of their own, and the same steps were repeated by hand. One developer must be able to open any use case and find the same shape.
 
 ## Alternatives considered
 
@@ -18,7 +18,7 @@ The backend has more than 170 use cases across seven modules. Each one needs the
 
 - Every use case is a command (changes data) or a query (reads data) with one handler, in `Application/Features/<Feature>/Commands|Queries/<UseCase>/` next to its validator and response.
 - An endpoint maps its own HTTP request type to a separate command or query (a request is never the command), sends it through `Mediator` 3.x and maps the result through the one result mapper ([ADR-0006](0006-result-and-typed-errors.md)).
-- Cross-cutting steps are pipeline behaviors in a fixed order: request logging, exception, performance, validation, domain event dispatch ([mediator behaviors](../runtime/mediator-behaviors.md)).
+- Cross-cutting steps are pipeline behaviors in a fixed order: request logging, exception, performance, and validation ([mediator behaviors](../runtime/mediator-behaviors.md)).
 - A command handler only orders the steps: load, check what needs outside data, call the aggregate's method, one `SaveChanges`, return an id or a DTO.
 
 ## Why

@@ -7,8 +7,7 @@
 1. request logging;
 2. exception handling;
 3. performance measurement;
-4. FluentValidation;
-5. domain event dispatch after a successful handler.
+4. FluentValidation.
 
 All use-case entry points go through Mediator unless an existing module has an explicitly documented exception.
 
@@ -19,10 +18,6 @@ Validators live alongside their use case in `Validators` and check input shape: 
 Domain code checks business invariants and state transitions. Do not duplicate a rule across layers without a deliberate reason for a defensive check.
 
 `ValidationBehavior` converts validation failures to `Ardalis.Result.Invalid` when the response is `Result` or `Result<T>`. Endpoints answer it through `ToHttpResult` as a 400 `ProblemDetails` with `errors`.
-
-## Domain events
-
-Entities accumulate events through `IHasDomainEvents`. The dispatcher behavior collects, clears, and publishes them through Mediator after a successful handler. Follow the `collect → dispatch → clear` cycle; do not publish events directly from controllers.
 
 ## Observability and security
 
