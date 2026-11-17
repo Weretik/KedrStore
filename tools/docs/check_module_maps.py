@@ -2,7 +2,8 @@
 
 Every module in src/Modules has a section in the module map with its real projects, a line in the system map and a
 section in the feature map; every host in src/Bootstrapper is in the system map; every feature folder under
-<Module>.Api/Endpoints is named in a feature card; every feature card is linked from the feature map.
+<Module>.Api/Endpoints is named in a feature card (by its path, a use case or a file in it, or
+drawn under `Endpoints/` in a code tree); every feature card is linked from the feature map.
 """
 import re
 import sys
@@ -22,6 +23,22 @@ def sections(text: str) -> dict[str, str]:
     return {parts[i].strip(): parts[i + 1] for i in range(1, len(parts), 2)}
 
 
+def tree_endpoint_folders(text: str) -> set[str]:
+    """Folder names drawn under an `Endpoints/` line of a code tree in a feature card."""
+    found: set[str] = set()
+    parent_indent = None
+    for line in text.splitlines():
+        indent = len(line) - len(line.lstrip(" │├└─"))
+        if parent_indent is not None and indent > parent_indent:
+            head = line.lstrip(" │├└─").split("#")[0]
+            found.update(m for m in re.findall(r"(\w+)/", head))
+            continue
+        parent_indent = indent if re.search(r"Endpoints/\s*(#|$)", line) else None
+    for group in re.findall(r"Endpoints/\{([^}]*)\}", text):
+        found.update(x.strip() for x in group.split(","))
+    return found
+
+
 def main() -> int:
     errors: list[str] = []
     module_map = sections(MODULE_MAP.read_text(encoding="utf-8"))
@@ -30,10 +47,12 @@ def main() -> int:
     feature_sections = sections(feature_map)
     cards = [p for p in FEATURES.rglob("*.md") if p != FEATURE_MAP]
     card_text = "\n".join(p.read_text(encoding="utf-8") for p in cards)
+    drawn = tree_endpoint_folders(card_text)
 
     for module in sorted(p for p in MODULES.iterdir() if p.is_dir()):
         name = module.name
-        projects = sorted(p.name for p in module.iterdir() if (p / f"{p.name}.csproj").exists())
+        project_dirs = sorted({p.parent for p in module.glob("*/*.csproj")} | {p.parent for p in module.glob("*/*/*.csproj")})
+        projects = sorted(p.name for p in project_dirs)
         section = module_map.get(name)
         if section is None:
             errors.append(f"{MODULE_MAP.relative_to(ROOT)}: no '## {name}' section")
@@ -47,9 +66,10 @@ def main() -> int:
         if name not in feature_sections:
             errors.append(f"{FEATURE_MAP.relative_to(ROOT)}: no '## {name}' section")
 
-        for api in module.glob("*.Api/Endpoints"):
+        for api in (d / "Endpoints" for d in project_dirs if d.name.endswith(".Api") and (d / "Endpoints").is_dir()):
             for feature in sorted(p for p in api.iterdir() if p.is_dir()):
-                if not re.search(rf"Endpoints/{re.escape(feature.name)}\b", card_text):
+                names = [f"Endpoints/{feature.name}"] + [p.stem for p in feature.iterdir()]
+                if feature.name not in drawn and not any(re.search(rf"{re.escape(name)}\b", card_text) for name in names):
                     errors.append(f"{feature.relative_to(ROOT)}: no feature card names this endpoint folder")
 
     for host in sorted(p for p in HOSTS.iterdir() if (p / f"{p.name}.csproj").exists()):
