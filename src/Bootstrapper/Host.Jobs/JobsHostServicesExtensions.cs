@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Caching;
 using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Infrastructure.DependencyInjection;
@@ -18,6 +19,7 @@ public static class JobsHostServicesExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddReadCache();
         services.AddTelegramServices(configuration);
         services.AddCatalogDbContextServices(configuration);
         services.AddCatalogContracts();
