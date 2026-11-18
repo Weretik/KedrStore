@@ -24,9 +24,9 @@ public static class CatalogDbContextExtensions
                                ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
 
         services.AddDbContext<CatalogDbContext>(
-            options => options.UseNpgsql(connectionString),
+            options => options.UseNpgsql(connectionString, HistoryInCatalogSchema),
             optionsLifetime: ServiceLifetime.Singleton);
-        services.AddDbContextFactory<CatalogDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContextFactory<CatalogDbContext>(options => options.UseNpgsql(connectionString, HistoryInCatalogSchema));
         services.AddScoped<IReadCatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 
         services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogEfRepository<>));
@@ -56,4 +56,7 @@ public static class CatalogDbContextExtensions
 
         return services;
     }
+
+    private static void HistoryInCatalogSchema(Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.NpgsqlDbContextOptionsBuilder npgsql)
+        => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", CatalogDbContext.Schema);
 }

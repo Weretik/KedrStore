@@ -43,8 +43,8 @@ internal sealed class SalesOutboxHarness : IAsyncDisposable
         await using (var db = postgres.CreateContext())
         {
             await db.Database.ExecuteSqlRawAsync("""
-                DELETE FROM "OrderSyncRetryAudits";
-                DELETE FROM "OrderIdempotencyRecords";
+                DELETE FROM sales."OrderSyncRetryAudits";
+                DELETE FROM sales."OrderIdempotencyRecords";
                 DELETE FROM sales."OutboxMessages";
                 """);
             await db.Orders.ExecuteDeleteAsync();

@@ -9,10 +9,7 @@ namespace Sales.Infrastructure.Persistence;
 public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     : DbContext(options), IReadSalesDbContext
 {
-    /// <summary>
-    /// The module's own schema. Sales tables are still in <c>public</c>; new tables, starting with the outbox, go here
-    /// (platform spec 006, R-001).
-    /// </summary>
+    /// <summary>The module's own schema: its tables, its outbox and its migration history.</summary>
     public const string Schema = "sales";
 
     public DbSet<Counterparty> Counterparties => Set<Counterparty>();
@@ -36,6 +33,7 @@ public sealed class SalesDbContext(DbContextOptions<SalesDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema(Schema);
         modelBuilder.HasPostgresExtension("pg_trgm");
 
         modelBuilder.ApplyConfigurationsFromAssembly(

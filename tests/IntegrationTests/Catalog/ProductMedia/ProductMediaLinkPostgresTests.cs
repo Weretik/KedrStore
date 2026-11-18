@@ -55,7 +55,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         Assert.Equal((1, 1, 0, 1), (dry.PhotosLinked, dry.SchemesLinked, dry.LinksDropped, dry.ProductsWithoutPhoto));
         await using (var db = postgres.CreateContext())
         {
-            Assert.Equal(0, await db.Database.SqlQueryRaw<int>("""SELECT count(*)::int AS "Value" FROM "ProductMedia" """).SingleAsync());
+            Assert.Equal(0, await db.Database.SqlQueryRaw<int>("""SELECT count(*)::int AS "Value" FROM catalog."ProductMedia" """).SingleAsync());
             Assert.Equal("https://old.test/731.jpg", (await LoadProduct(db, 731)).Photo);
         }
 
@@ -185,7 +185,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
     {
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync(
-            """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+            """TRUNCATE catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy", CategoryPath.Create("n10")).Value);
         foreach (var id in new[] { 731, 732, 733 })
         {
@@ -204,7 +204,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
 
         await db.SaveChangesAsync();
         // Products imported before stage 3 still carry the URLs the 1C mapper built.
-        await db.Database.ExecuteSqlRawAsync("""UPDATE "Products" SET "Photo" = 'https://old.test/' || "Id" || '.jpg'""");
+        await db.Database.ExecuteSqlRawAsync("""UPDATE catalog."Products" SET "Photo" = 'https://old.test/' || "Id" || '.jpg'""");
     }
 
     private ServiceProvider BuildProvider(FakeProductMediaLibrary library)

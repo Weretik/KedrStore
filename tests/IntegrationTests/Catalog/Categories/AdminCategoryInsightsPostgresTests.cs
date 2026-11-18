@@ -34,7 +34,7 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
         await using (var db = postgres.CreateContext())
         {
             await db.Database.ExecuteSqlRawAsync(
-                """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+                """TRUNCATE catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky", CategoryPath.Create("n10")).Value);
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(11), Root, "Завіси", "zavisy", CategoryPath.Create("n11")).Value);
             foreach (var (id, exported) in new[] { (801, true), (802, false) })

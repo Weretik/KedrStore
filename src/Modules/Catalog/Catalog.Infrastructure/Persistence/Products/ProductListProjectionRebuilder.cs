@@ -23,9 +23,9 @@ internal sealed class ProductListProjectionRebuilder(
         await using var catalogDbContext = await catalogDbContextFactory.CreateDbContextAsync(cancellationToken);
         return await catalogDbContext.Database.ExecuteSqlRawAsync(
             """
-            UPDATE "ProductListProjections" AS projection
+            UPDATE catalog."ProductListProjections" AS projection
             SET "Photo" = product."Photo"
-            FROM "Products" AS product
+            FROM catalog."Products" AS product
             WHERE product."Id" = projection."ProductId" AND projection."Photo" <> product."Photo"
             """,
             cancellationToken);

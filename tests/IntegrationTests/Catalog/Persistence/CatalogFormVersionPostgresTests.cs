@@ -83,7 +83,7 @@ public sealed class CatalogFormVersionPostgresTests(CatalogPostgresFixture postg
         int attributeId;
         await using (var seed = postgres.CreateContext())
         {
-            await seed.Database.ExecuteSqlRawAsync("""DELETE FROM "CatalogAttributes" WHERE "Code" = 'version-test';""");
+            await seed.Database.ExecuteSqlRawAsync("""DELETE FROM catalog."CatalogAttributes" WHERE "Code" = 'version-test';""");
             var attribute = CatalogAttribute.Create("version-test", "Колір", AttributeKind.Enum, null, "version-test",
                 isFilterable: false, isVariantAxis: false, sortOrder: 1, DateTimeOffset.UtcNow).Value;
             seed.Attributes.Add(attribute);
@@ -105,7 +105,7 @@ public sealed class CatalogFormVersionPostgresTests(CatalogPostgresFixture postg
     {
         await using var seed = postgres.CreateContext();
         await seed.Database.ExecuteSqlRawAsync(
-            """TRUNCATE "CatalogProductGroups", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+            """TRUNCATE catalog."CatalogProductGroups", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
         seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(CategoryId), "000005520", "Завіси", "zavisy",
             CategoryPath.Create("n20")).Value);
         await seed.SaveChangesAsync();

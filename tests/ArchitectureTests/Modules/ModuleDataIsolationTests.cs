@@ -47,6 +47,20 @@ public sealed class ModuleDataIsolationTests
         Assert.True(violations.Count == 0, string.Join(Environment.NewLine, violations));
     }
 
+    // Database rules: every module keeps its tables in its own schema, never in public.
+    [Theory]
+    [MemberData(nameof(Contexts))]
+    public void EveryTableLivesInAModuleSchema(string module)
+    {
+        using var context = Create(module);
+        var inPublic = context.Model.GetEntityTypes()
+            .Where(entity => entity.GetTableName() is not null && entity.GetSchema() is null or "public")
+            .Select(entity => entity.GetTableName())
+            .ToArray();
+
+        Assert.Empty(inPublic);
+    }
+
     private static bool BelongsTo(Type type, string module)
     {
         var root = type.Namespace?.Split('.')[0];
