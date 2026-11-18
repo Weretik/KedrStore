@@ -60,5 +60,6 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Admin «Огляд» data](platform/admin-overview.md) — orders, catalog and content problems for the admin home page, one read endpoint per module.
 - [Offline app data snapshots](platform/mobile-offline-sync.md) — whole catalog and customers for the offline manager app, with `ETag`/`304` and compression.
 - [Request tracing and log correlation](platform/request-tracing.md) — production requests as traces in Google Cloud Trace, JSON logs linked to them.
+- [Read cache (HybridCache)](platform/read-cache.md) — expensive public reads kept in memory for a short time, dropped by tag after a command; today the category tree.
 
 Planned capabilities from SDDs and technical classes without separate scenarios are not shown here as completed features.

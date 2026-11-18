@@ -25,6 +25,7 @@ For a new ADR, create a separate file with a unique number and short name. Inclu
 | [0013](0013-openapi-generated-from-code.md) | The OpenAPI contract is generated from the code at build | accepted |
 | [0014](0014-opentelemetry-traces-to-cloud-trace.md) | Requests are traced with OpenTelemetry straight to Google Cloud Trace; logs are Cloud Logging JSON with the trace id | accepted |
 | [0015](0015-product-list-read-table.md) | The product lists read from one denormalized read table (CQRS level 2), rebuilt after every change of its sources | accepted |
+| [0016](0016-read-cache-hybridcache.md) | Expensive public reads are cached in memory through one port over HybridCache; commands drop them by tag | accepted |
 
 Frontend decisions live in kedr-web: [workspace ADRs](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/adr/README.md), [Next.js public site](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/site/adr/0001-nextjs-public-site.md) and [offline-first mobile app](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/mobile/adr/0005-offline-first-local-database.md). The whole system is drawn in the [C4 diagrams](../c4/README.md).
 
@@ -49,5 +50,6 @@ Every backend keeps an accepted ADR for each area below. A full architecture aud
 | Main external systems (1C) | 0002 |
 | Public API contract (OpenAPI) | 0013 |
 | Observability (traces, structured logs) | 0014 |
+| Caching | 0016 |
 
 A new decision of this kind (a new module, a new external system, a new way to run work or to deploy) gets an ADR in the same change, and the C4 diagrams are updated with it.

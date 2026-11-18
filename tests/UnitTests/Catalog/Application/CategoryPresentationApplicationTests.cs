@@ -14,6 +14,11 @@ using Catalog.Domain.Slugs;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
 using Catalog.Application.Features.Categories.Shared.Stats;
+using Catalog.Application.Features.Categories.Commands.SetCategorySiteVisibility;
+using Catalog.Application.Features.Categories.Shared.Tree;
+using Catalog.Application.Features.Slugs.Commands.ChangeSlug;
+using Catalog.Contracts.Slugs;
+using UnitTests.BuildingBlocks.Caching;
 
 namespace UnitTests.Catalog.Application;
 
@@ -73,7 +78,7 @@ public sealed class CategoryPresentationApplicationTests
         {
             [900001] = new(2, 10m, 20m),
             [900002] = new(1, 5m, 5m)
-        }), Roots);
+        }), Roots, new MemoReadCache());
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
@@ -99,7 +104,7 @@ public sealed class CategoryPresentationApplicationTests
         var handler = new GetCategoriesHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
         {
             [900001] = new(4, 10m, 20m)
-        }), Roots);
+        }), Roots, new MemoReadCache());
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
@@ -122,11 +127,41 @@ public sealed class CategoryPresentationApplicationTests
         {
             [900001] = new(2, 10m, 20m),
             [920000] = new(5, 1m, 9m)
-        }), Roots);
+        }), Roots, new MemoReadCache());
 
         var result = await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
 
         Assert.Equal([5513], result.Value.Select(node => node.Id));
+    }
+
+    [Fact]
+    public async Task GetCategoriesQuery_RepeatedRead_ComesFromCacheUntilTheTagIsDropped()
+    {
+        var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
+        var repository = (ReadRepositoryProxy)(object)proxy;
+        repository.Categories = [CreateCategory(5513, "n5513", "Root", 0, 0), CreateCategory(900001, "n5513.n900001", "Child", 0, 1)];
+        var cache = new MemoReadCache();
+        var handler = new GetCategoriesHandler(proxy, new FixedStatsReader(new Dictionary<int, CategoryStats>
+        {
+            [900001] = new(1, 1m, 1m)
+        }), Roots, cache);
+
+        await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
+        await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
+        await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null), "ru"), CancellationToken.None);
+        Assert.Equal(2, repository.Reads);
+
+        await cache.InvalidateAsync(CategoryTreeCache.Tag, CancellationToken.None);
+        await handler.Handle(new GetCategoriesQuery(new CategoryFilter(null)), CancellationToken.None);
+        Assert.Equal(3, repository.Reads);
+    }
+
+    [Fact]
+    public void CommandsThatChangeThePublicTree_DropItsCache()
+    {
+        Assert.Equal([CategoryTreeCache.Tag], new SetCategorySiteVisibilityCommand(1, true).InvalidatedCacheTags);
+        Assert.Equal([CategoryTreeCache.Tag], ChangeSlugCommand.ForCategory(1, new ChangeSlugRequest("new-slug")).InvalidatedCacheTags);
+        Assert.Empty(ChangeSlugCommand.ForProduct(1, new ChangeSlugRequest("new-slug")).InvalidatedCacheTags);
     }
 
     private static readonly IOptions<RootCategoryId> Roots = Options.Create(new RootCategoryId
@@ -159,11 +194,15 @@ public sealed class CategoryPresentationApplicationTests
     private class ReadRepositoryProxy : DispatchProxy
     {
         public IReadOnlyList<ProductCategory> Categories { get; set; } = [];
+        public int Reads { get; private set; }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
             if (targetMethod?.Name == "ListAsync")
+            {
+                Reads++;
                 return Task.FromResult(Categories.ToList());
+            }
 
             throw new NotSupportedException($"Unexpected repository call: {targetMethod?.Name}");
         }

@@ -25,6 +25,10 @@ Pass `CancellationToken` through the entire flow. Keep cross-cutting concerns in
 
 Use specific names such as `CreateOrderCommand`, `GetPublicProductListQuery`, and `GetAdminProductListHandler`. Avoid vague folders or names such as `Common`, `Misc`, `Helper`, `Utils`, and `Manager`. Do not add abstractions without a concrete need.
 
+## Caching reads
+
+Cache a read only when it is expensive, the same for every caller, and may be a little stale; write the reason, lifetime and invalidating commands into its spec ([ADR-0016](../architecture/decisions/0016-read-cache-hybridcache.md), [read cache](../features/platform/read-cache.md)). Use the `IReadCache` port with a `ReadCacheEntry`; never `IMemoryCache`, `IDistributedCache` or `HybridCache` outside `BuildingBlocks.Infrastructure/Caching` (an architecture test checks it). Cache only immutable sealed read models marked `[ImmutableObject(true)]`, never aggregates, `Result` objects, per-user data, money, stock or order prices. A command that changes cached data implements `IInvalidatesReadCache`. Invalidation is local to the instance, so keep lifetimes short (minutes).
+
 ## Transactions
 
 The backend has no domain events (removed 2026-11-17; the outbox covers cross-module and outside messages). Use cases that change multiple aggregates coordinate a transaction through the existing `IUnitOfWork`.

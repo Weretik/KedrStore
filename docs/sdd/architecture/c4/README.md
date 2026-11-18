@@ -101,7 +101,7 @@ flowchart LR
         scheduling["<b>Scheduling</b><br/>background tasks, tick"]
     end
 
-    bb["<b>BuildingBlocks</b><br/>Result mapping, Mediator behaviors,<br/>outbox, shared primitives"]
+    bb["<b>BuildingBlocks</b><br/>Result mapping, Mediator behaviors,<br/>outbox, read cache (HybridCache, in memory),<br/>shared primitives"]
     onec["<b>1C</b><br/>[External]"]
     telegram["<b>Telegram</b><br/>[External]"]
     cdn["<b>CDN</b><br/>[External]"]
