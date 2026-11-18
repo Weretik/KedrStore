@@ -53,7 +53,7 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
             "adjusted@example.com", null, PriceTypeId.FromStorage(1), now).Value);
         // 2 × (200 − 50) and 3 × (100 + 10): the stored amounts already include the adjustments.
         var order = Order.Create("SO-ADJ-1", CounterpartyId, null,
-            [OrderLine.Create("101", "Товар 101", 2, 300m, -50m).Value, OrderLine.Create("102", "Товар 102", 3, 330m, 10m).Value], now).Value;
+            [OrderLine.Create(ProductId.Create(101), "Товар 101", 2, 300m, -50m).Value, OrderLine.Create(ProductId.Create(102), "Товар 102", 3, 330m, 10m).Value], now).Value;
         db.Orders.Add(order);
         await db.SaveChangesAsync();
         return order.Id.Value;

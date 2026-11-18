@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Sales.Domain.Orders;
 
@@ -78,5 +79,5 @@ public sealed class OrderOneCResultTests
     }
 
     private static Order NewOrder()
-        => Order.Create("SO-1", "customer-1", null, [OrderLine.Create("p-1", "Ручка", 1, 10m).Value], Now).Value;
+        => Order.Create("SO-1", "customer-1", null, [OrderLine.Create(ProductId.Create(1), "Ручка", 1, 10m).Value], Now).Value;
 }

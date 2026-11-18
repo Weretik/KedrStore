@@ -1,3 +1,4 @@
+using System.Globalization;
 using Sales.Domain.Orders;
 using Sales.Domain.Orders.ValueObjects;
 
@@ -15,7 +16,10 @@ internal sealed class OrderDraftLineConfiguration : IEntityTypeConfiguration<Ord
         builder.Property<OrderDraftId>("DraftId")
             .HasConversion(id => id.Value, value => OrderDraftId.FromStorage(value))
             .HasColumnType("bigint");
-        builder.Property(line => line.ProductId).HasMaxLength(64).IsRequired();
+        builder.Property(line => line.ProductId)
+            .HasConversion(id => id.Value.ToString(CultureInfo.InvariantCulture),
+                value => ProductId.FromStorage(int.Parse(value, CultureInfo.InvariantCulture)))
+            .HasMaxLength(64).IsRequired();
         builder.Property(line => line.Quantity).IsRequired();
         builder.Property(line => line.PriceAdjustment).HasPrecision(18, 2).IsRequired();
         builder.HasIndex("DraftId", nameof(OrderDraftLine.ProductId)).IsUnique();

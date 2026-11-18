@@ -45,7 +45,7 @@ public sealed class OrderDraft : IAggregateRoot
         if (string.IsNullOrWhiteSpace(counterpartyId) || counterpartyId.Trim().Length > 64)
             throw new ArgumentException("Counterparty ID is invalid.", nameof(counterpartyId));
         var values = lines.ToArray();
-        if (values.Length is < 1 or > 100 || values.Select(line => line.ProductId).Distinct(StringComparer.Ordinal).Count() != values.Length)
+        if (values.Length is < 1 or > 100 || values.Select(line => line.ProductId).Distinct().Count() != values.Length)
             throw new ArgumentException("Draft lines must contain 1-100 unique products.", nameof(lines));
         var normalizedNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
         if (normalizedNote?.Length > 2_000)

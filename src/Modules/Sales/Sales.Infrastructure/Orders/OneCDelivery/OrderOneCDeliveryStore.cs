@@ -33,7 +33,7 @@ internal sealed class OrderOneCDeliveryStore(SalesDbContext db, OutboxWriter out
                     customer.Id,
                     customer.Name,
                     Lines = order.Lines.OrderBy(line => line.Id)
-                        .Select(line => new DeadLetterOrderLine(line.ProductId, line.ProductName, line.Quantity, line.Amount))
+                        .Select(line => new DeadLetterOrderLine(line.ProductId.ToString(), line.ProductName, line.Quantity, line.Amount))
                         .ToList()
                 })
             .SingleOrDefaultAsync(cancellationToken);

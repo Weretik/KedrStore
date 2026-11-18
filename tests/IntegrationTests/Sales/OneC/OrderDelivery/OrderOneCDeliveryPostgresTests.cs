@@ -180,7 +180,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
             }
 
             var order = Order.Create("P" + Guid.NewGuid().ToString("N")[..20], counterpartyId, null,
-                [OrderLine.Create("101", "Ручка", 2, 50m).Value], SalesOutboxHarness.Noon).Value;
+                [OrderLine.Create(ProductId.Create(101), "Ручка", 2, 50m).Value], SalesOutboxHarness.Noon).Value;
             var key = Guid.NewGuid().ToString("D");
             Assert.True(await services.GetRequiredService<IOrderCreationStore>().PersistAsync(order,
                 id => new CreateOrderIdempotencyRecord("test", key, "hash", id, order.OrderNumber,

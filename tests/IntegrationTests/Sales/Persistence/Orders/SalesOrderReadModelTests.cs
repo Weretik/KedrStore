@@ -165,7 +165,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
             PriceTypeId.FromStorage(1),
             createdAt).Value;
         var lines = amounts.Select((amount, index) =>
-            OrderLine.Create($"product-{index}", $"Product {index}", index + 1, amount).Value);
+            OrderLine.Create(ProductId.Create(index + 1), $"Product {index}", index + 1, amount).Value);
         var order = Order.Create(orderNumber, counterpartyId, "Manager note", lines, createdAt).Value;
         db.Counterparties.Add(counterparty);
         db.Orders.Add(order);

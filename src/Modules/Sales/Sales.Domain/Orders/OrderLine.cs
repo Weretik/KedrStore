@@ -6,7 +6,7 @@ namespace Sales.Domain.Orders;
 
 public sealed class OrderLine : BaseEntity<OrderLineId>
 {
-    public string ProductId { get; private set; } = null!;
+    public ProductId ProductId { get; private set; }
     public string ProductName { get; private set; } = null!;
     public int Quantity { get; private set; }
     public decimal Amount { get; private set; }
@@ -15,10 +15,10 @@ public sealed class OrderLine : BaseEntity<OrderLineId>
 
     private OrderLine() { }
 
-    public static DomainResult<OrderLine> Create(string productId, string productName, int quantity, decimal amount,
+    public static DomainResult<OrderLine> Create(ProductId productId, string productName, int quantity, decimal amount,
         decimal priceAdjustment = 0m)
     {
-        if (string.IsNullOrWhiteSpace(productId))
+        if (productId.Value <= 0)
             return OrderErrors.ProductIdRequired();
         if (string.IsNullOrWhiteSpace(productName))
             return OrderErrors.ProductNameRequired();
@@ -29,7 +29,7 @@ public sealed class OrderLine : BaseEntity<OrderLineId>
 
         return new OrderLine
         {
-            ProductId = productId.Trim(),
+            ProductId = productId,
             ProductName = productName.Trim(),
             Quantity = quantity,
             Amount = amount,
