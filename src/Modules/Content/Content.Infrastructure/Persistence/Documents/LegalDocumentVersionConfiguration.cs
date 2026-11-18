@@ -6,7 +6,8 @@ internal sealed class LegalDocumentVersionConfiguration : IEntityTypeConfigurati
     {
         builder.ToTable("LegalDocumentVersions");
         builder.HasKey(version => version.Id);
-        builder.Property(version => version.Id).UseIdentityByDefaultColumn();
+        builder.Property(version => version.Id)
+            .HasConversion(id => id.Value, value => LegalDocumentVersionId.FromStorage(value)).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
         builder.Property(version => version.Kind).HasConversion<string>().HasMaxLength(32).IsRequired();
         builder.Property(version => version.Status).HasConversion<string>().HasMaxLength(16).IsRequired();
         builder.Property(version => version.UpdatedAt).IsRequired();

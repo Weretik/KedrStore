@@ -16,16 +16,17 @@ internal sealed class CustomerPriceResolver(SalesDbContext salesDb, ICatalogSale
     internal async Task<DomainResult<IReadOnlyDictionary<int, PricedProduct>>> ResolveAsync(
         string counterpartyId, IReadOnlyCollection<int> ids, CancellationToken ct)
     {
+        var id = CounterpartyId.FromStorage(counterpartyId);
         var customer = await salesDb.Counterparties.AsNoTracking()
-            .Where(x => x.Id == counterpartyId && !x.IsDeleted)
-            .Select(x => new { x.Id, x.DefaultPriceTypeId })
+            .Where(x => x.Id == id && !x.IsDeleted)
+            .Select(x => new { x.Id, DefaultPriceTypeId = x.DefaultPriceTypeId.Value })
             .SingleOrDefaultAsync(ct);
         if (customer is null)
             return WorkspaceErrors.CustomerNotFound();
 
         var rules = (await salesDb.CounterpartyCategoryPriceTypes.AsNoTracking()
-                .Where(x => x.CounterpartyId == counterpartyId)
-                .Select(x => new { x.CategoryId, x.PriceTypeId })
+                .Where(x => x.CounterpartyId == id)
+                .Select(x => new { CategoryId = x.CategoryId.Value, PriceTypeId = x.PriceTypeId.Value })
                 .ToListAsync(ct))
             .GroupBy(x => x.CategoryId)
             .ToDictionary(x => x.Key, x => x.First().PriceTypeId);

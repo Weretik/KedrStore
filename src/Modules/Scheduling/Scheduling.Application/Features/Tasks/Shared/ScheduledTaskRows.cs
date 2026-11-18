@@ -11,7 +11,7 @@ public static class ScheduledTaskRows
     public static async Task<IReadOnlyList<ScheduledTaskRow>> LoadAsync(ISchedulingDbContext db, DateTimeOffset now,
         CancellationToken cancellationToken)
     {
-        var saved = await db.Tasks.ToDictionaryAsync(x => x.Key, StringComparer.Ordinal, cancellationToken);
+        var saved = await db.Tasks.ToDictionaryAsync(x => x.Key.Value, StringComparer.Ordinal, cancellationToken);
         return ScheduledTaskCatalog.Tasks.Select(definition => new ScheduledTaskRow(definition,
             Synced(definition, saved.GetValueOrDefault(definition.Key), now) ?? Create(db, definition, now))).ToArray();
     }
@@ -23,7 +23,7 @@ public static class ScheduledTaskRows
     public static async Task<IReadOnlyList<ScheduledTaskRow>> ReadAsync(ISchedulingDbContext db, DateTimeOffset now,
         CancellationToken cancellationToken)
     {
-        var saved = await db.Tasks.AsNoTracking().ToDictionaryAsync(x => x.Key, StringComparer.Ordinal, cancellationToken);
+        var saved = await db.Tasks.AsNoTracking().ToDictionaryAsync(x => x.Key.Value, StringComparer.Ordinal, cancellationToken);
         return ScheduledTaskCatalog.Tasks.Select(definition => new ScheduledTaskRow(definition,
             Synced(definition, saved.GetValueOrDefault(definition.Key), now) ?? Defaults(definition, now))).ToArray();
     }
@@ -34,8 +34,9 @@ public static class ScheduledTaskRows
     {
         var definition = ScheduledTaskCatalog.Find(key);
         if (definition is null) return null;
-        var task = Synced(definition, db.Tasks.Local.FirstOrDefault(x => x.Key == key)
-                   ?? await db.Tasks.FirstOrDefaultAsync(x => x.Key == key, cancellationToken), now)
+        var taskKey = ScheduledTaskKey.FromStorage(key);
+        var task = Synced(definition, db.Tasks.Local.FirstOrDefault(x => x.Key == taskKey)
+                   ?? await db.Tasks.FirstOrDefaultAsync(x => x.Key == taskKey, cancellationToken), now)
                    ?? Create(db, definition, now);
         return new ScheduledTaskRow(definition, task);
     }

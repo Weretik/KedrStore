@@ -12,25 +12,24 @@ public sealed class ScheduledTask : IAggregateRoot
 {
     private ScheduledTask()
     {
-        Key = string.Empty;
         Schedule = TaskSchedule.Manual;
     }
 
     private ScheduledTask(string key, TaskSchedule schedule, bool enabled, DateTimeOffset now)
     {
-        Key = key;
+        Key = ScheduledTaskKey.Create(key);
         Schedule = schedule;
         Enabled = enabled;
         NextRunAt = schedule.NextAfter(now);
         UpdatedAt = now;
     }
 
-    public string Key { get; private set; }
+    public ScheduledTaskKey Key { get; private set; }
     public bool Enabled { get; private set; }
     public TaskSchedule Schedule { get; private set; }
     public DateTimeOffset? NextRunAt { get; private set; }
     public TaskState State { get; private set; }
-    public Guid? CurrentRunId { get; private set; }
+    public ScheduledTaskRunId? CurrentRunId { get; private set; }
     public DateTimeOffset? RunningSince { get; private set; }
     public DateTimeOffset? RunRequestedAt { get; private set; }
     public string? RunRequestedBy { get; private set; }
@@ -55,7 +54,7 @@ public sealed class ScheduledTask : IAggregateRoot
     public ScheduledTaskRun Claim(DateTimeOffset now)
     {
         if (State == TaskState.Running) throw new InvalidOperationException($"Task {Key} is already running.");
-        var run = new ScheduledTaskRun(Guid.CreateVersion7(now), Key,
+        var run = new ScheduledTaskRun(ScheduledTaskRunId.Create(Guid.CreateVersion7(now)), Key,
             RunRequestedAt is null ? RunTrigger.Schedule : RunTrigger.Manual, RunRequestedBy, now);
         State = TaskState.Running;
         Version++;

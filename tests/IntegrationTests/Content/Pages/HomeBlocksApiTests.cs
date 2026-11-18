@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -23,8 +24,8 @@ public sealed class HomeBlocksApiTests
     public async Task Public_ShowsTheLanguageInOrder_AndHidesABrandWhoseLogoWasDeleted()
     {
         await using var db = Seed();
-        db.HomeBrands.Add(HomeBrand.Create("Leador", 8, 1, Now).Value);
-        db.HomeBrands.Add(HomeBrand.Create("Gone", 999, 2, Now).Value);
+        db.HomeBrands.Add(HomeBrand.Create("Leador", MediaFileId.FromStorage(8), 1, Now).Value);
+        db.HomeBrands.Add(HomeBrand.Create("Gone", MediaFileId.FromStorage(999), 2, Now).Value);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
         using var client = factory.CreateClient();
@@ -125,7 +126,7 @@ public sealed class HomeBlocksApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         db.HomeFaqItems.Add(HomeFaqItem.Create(new HomeFaqTexts("Питання 2", "Вопрос 2", "Відповідь 2", "Ответ 2"), 1, Now).Value);
         db.HomeFaqItems.Add(HomeFaqItem.Create(new HomeFaqTexts("Питання 1", "Вопрос 1", "Відповідь 1", "Ответ 1"), 0, Now).Value);
-        db.HomeBrands.Add(HomeBrand.Create("Korfad", 7, 0, Now).Value);
+        db.HomeBrands.Add(HomeBrand.Create("Korfad", MediaFileId.FromStorage(7), 0, Now).Value);
         db.SaveChanges();
         return db;
     }

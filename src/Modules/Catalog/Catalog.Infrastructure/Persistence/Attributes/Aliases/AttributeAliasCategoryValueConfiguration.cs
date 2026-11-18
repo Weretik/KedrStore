@@ -10,7 +10,7 @@ public sealed class AttributeAliasCategoryValueConfiguration : IEntityTypeConfig
         builder.ToTable("CatalogAttributeAliasCategoryValues");
         builder.HasKey(x => new { x.AliasId, x.CategoryId });
         builder.Property(x => x.AliasId).HasConversion(AttributeIdConverters.AliasId);
-        builder.Property(x => x.CategoryId).HasConversion(CatalogConverter.ProductCategoryIdConvert);
+        builder.Property(x => x.CategoryId);
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
 
         // The relationship to AttributeAlias, the root, is configured in AttributeAliasConfiguration.

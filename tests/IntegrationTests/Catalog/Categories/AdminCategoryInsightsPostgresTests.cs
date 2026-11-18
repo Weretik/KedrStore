@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 using Catalog.Application.Features.Products.Shared;
 using Catalog.Domain.Categories;
@@ -34,23 +35,23 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
         {
             await db.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")).Value);
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Завіси", "zavisy", CategoryPath.From("n11")).Value);
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky", CategoryPath.Create("n10")).Value);
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(11), Root, "Завіси", "zavisy", CategoryPath.Create("n11")).Value);
             foreach (var (id, exported) in new[] { (801, true), (802, false) })
             {
-                var product = Product.Create(ProductId.From(id), Root, $"Замок {id}", $"zamok-{id}",
-                    ProductCategoryId.From(10), Created, 5, 1, false, false, exported).Value;
+                var product = Product.Create(ProductId.Create(id), Root, $"Замок {id}", $"zamok-{id}",
+                    ProductCategoryId.Create(10), Created, 5, 1, false, false, exported).Value;
                 db.Products.Add(product);
                 db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
-                    product.ProductSlug, string.Empty, ProductCategoryId.From(10), "zamky",
+                    product.ProductSlug, string.Empty, ProductCategoryId.Create(10), "zamky",
                     inStock: true, isSale: false, isNew: false, exportToSite: exported, retailPrice: 100));
             }
 
-            var withFaqOnly = CategoryContent.Create(ProductCategoryId.From(10), "ru");
+            var withFaqOnly = CategoryContent.Create(ProductCategoryId.Create(10), "ru");
             withFaqOnly.Replace(null, null, null, null, [("Питання?", "Відповідь.")], "admin", Created);
-            var withTitle = CategoryContent.Create(ProductCategoryId.From(10), "uk");
+            var withTitle = CategoryContent.Create(ProductCategoryId.Create(10), "uk");
             withTitle.Replace("Дверні замки", null, null, null, [], "admin", Created);
-            var cleared = CategoryContent.Create(ProductCategoryId.From(11), "uk");
+            var cleared = CategoryContent.Create(ProductCategoryId.Create(11), "uk");
             cleared.Replace(null, null, null, null, [], "admin", Created);
             db.CategoryContents.AddRange(withFaqOnly, withTitle, cleared);
             await db.SaveChangesAsync();

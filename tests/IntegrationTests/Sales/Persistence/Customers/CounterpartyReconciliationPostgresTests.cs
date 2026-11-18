@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using Identity.Contracts.Users;
 using IntegrationTests.TestSupport.Database;
@@ -30,8 +31,8 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.AddRange(
-                Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now).Value,
-                Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now).Value);
+                Counterparty.Create("stale-cp", UserId.FromStorage(staleUserId), "Stale", "stale@example.com", null, PriceTypeId.FromStorage(1), now).Value,
+                Counterparty.Create("retained-cp", UserId.FromStorage(retainedUserId), "Retained", "retained@example.com", null, PriceTypeId.FromStorage(1), now).Value);
             db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
                 [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
             db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
@@ -45,8 +46,8 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         await sales.InScopeAsync(async services =>
         {
             var db = services.GetRequiredService<SalesDbContext>();
-            Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == "stale-cp"));
-            Assert.True(await db.Counterparties.AnyAsync(item => item.Id == "retained-cp"));
+            Assert.False(await db.Counterparties.IgnoreQueryFilters().AnyAsync(item => item.Id == CounterpartyId.FromStorage("stale-cp")));
+            Assert.True(await db.Counterparties.AnyAsync(item => item.Id == CounterpartyId.FromStorage("retained-cp")));
             Assert.Empty(await db.Orders.ToArrayAsync());
             Assert.Empty(await db.OrderDrafts.ToArrayAsync());
             return true;
@@ -76,7 +77,7 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.Add(
-                Counterparty.Create("stale-cp", sharedUserId, "Stale", "stale@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+                Counterparty.Create("stale-cp", UserId.FromStorage(sharedUserId), "Stale", "stale@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
             return await db.SaveChangesAsync();
         });
 
@@ -85,7 +86,7 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.Add(
-                Counterparty.Create("relinked-cp", sharedUserId, "Relinked", "relinked@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+                Counterparty.Create("relinked-cp", UserId.FromStorage(sharedUserId), "Relinked", "relinked@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
             return await db.SaveChangesAsync();
         });
         await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);

@@ -27,16 +27,17 @@ public sealed class AddGalleryPhotosHandler(
                 "Content.Gallery.MediaFile.NotFound", ValidationSeverity.Error));
         }
 
+        var keys = ids.Select(MediaFileId.FromStorage).ToArray();
         var present = await db.GalleryItems.AsNoTracking()
-            .Where(item => item.MediaFileId != null && ids.Contains(item.MediaFileId.Value))
-            .Select(item => item.MediaFileId!.Value)
+            .Where(item => item.MediaFileId != null && keys.Contains(item.MediaFileId.Value))
+            .Select(item => item.MediaFileId!.Value.Value)
             .ToListAsync(cancellationToken);
         var now = clock.GetUtcNow();
         var position = await GalleryAdminList.NextPositionAsync(db, cancellationToken);
         var added = new List<GalleryItem>();
         foreach (var id in ids.Where(id => !present.Contains(id)))
         {
-            var photo = GalleryItem.CreatePhoto(id, position++, GalleryItemTexts.Empty, now);
+            var photo = GalleryItem.CreatePhoto(MediaFileId.FromStorage(id), position++, GalleryItemTexts.Empty, now);
             if (photo.IsFailure)
                 return photo.Error!.ToResult<IReadOnlyList<AdminGalleryItem>>();
             added.Add(photo.Value);

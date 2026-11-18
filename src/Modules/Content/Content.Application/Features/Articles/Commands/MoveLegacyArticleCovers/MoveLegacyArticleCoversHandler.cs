@@ -41,7 +41,7 @@ public sealed class MoveLegacyArticleCoversHandler(
                 return stored.Map(_ => default(LegacyArticleCoversMoved)!);
 
             // The uploader returned a saved library file, so its id is always valid; the article drops the bytes.
-            article.SetCover(stored.Value.MediaFileId, clock.GetUtcNow(), editor);
+            article.SetCover(MediaFileId.FromStorage(stored.Value.MediaFileId), clock.GetUtcNow(), editor);
             await articles.SaveChangesAsync(cancellationToken);
             moved++;
         }

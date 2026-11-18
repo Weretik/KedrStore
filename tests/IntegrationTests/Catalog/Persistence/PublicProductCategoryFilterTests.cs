@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using Catalog.Application.Features.Products.Queries.GetPublicProductList;
 using Catalog.Application.Features.Products.Shared;
@@ -81,7 +82,7 @@ public sealed class PublicProductCategoryFilterTests
         SeedCategory(db, 1, "parent");
         // Even marked «show on site», the Cosmos import root stays hidden.
         var cosmos = ProductCategory.Create(
-            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")).Value;
+            ProductCategoryId.Create(920000), "Космос", "Космос", "kosmos", CategoryPath.Create("n920000")).Value;
         cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(cosmos);
         SeedProduct(db, 11, 1, "parent");
@@ -117,13 +118,13 @@ public sealed class PublicProductCategoryFilterTests
         var path = parentId switch
         {
             null => CategoryPath.Root(id.ToString()),
-            1 => CategoryPath.From($"n1.n{id}"),
-            2 => CategoryPath.From($"n1.n2.n{id}"),
+            1 => CategoryPath.Create($"n1.n{id}"),
+            2 => CategoryPath.Create($"n1.n2.n{id}"),
             _ => throw new ArgumentOutOfRangeException(nameof(parentId))
         };
         var category = ProductCategory.Create(
-            ProductCategoryId.From(id), "000005513", $"Category {id}", slug, path,
-            parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
+            ProductCategoryId.Create(id), "000005513", $"Category {id}", slug, path,
+            parentId is null ? null : ProductCategoryId.Create(parentId.Value)).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
     }
@@ -132,8 +133,8 @@ public sealed class PublicProductCategoryFilterTests
         CatalogDbContext db, int id, int categoryId, string categorySlug, bool exportToSite = true)
     {
         db.ProductListProjections.Add(ProductListProjection.Create(
-            ProductId.From(id), $"Product {id}", $"Product {id}", $"product-{id}",
-            $"https://example.test/{id}.jpg", ProductCategoryId.From(categoryId), categorySlug,
+            ProductId.Create(id), $"Product {id}", $"Product {id}", $"product-{id}",
+            $"https://example.test/{id}.jpg", ProductCategoryId.Create(categoryId), categorySlug,
             inStock: true, isSale: false, isNew: false, exportToSite, retailPrice: 10));
     }
 }

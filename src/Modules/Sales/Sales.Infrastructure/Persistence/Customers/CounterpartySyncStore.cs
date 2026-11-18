@@ -13,7 +13,7 @@ public sealed class CounterpartySyncStore(
         => await db.Counterparties.IgnoreQueryFilters().ToListAsync(cancellationToken);
 
     public Task<HashSet<string>> CounterpartyIdsAsync(CancellationToken cancellationToken)
-        => db.Counterparties.AsNoTracking().Select(item => item.Id).ToHashSetAsync(StringComparer.Ordinal, cancellationToken);
+        => db.Counterparties.AsNoTracking().Select(item => item.Id.Value).ToHashSetAsync(StringComparer.Ordinal, cancellationToken);
 
     public void Add(Counterparty counterparty) => db.Counterparties.Add(counterparty);
 
@@ -31,7 +31,7 @@ public sealed class CounterpartySyncStore(
     {
         if (stale.Count == 0) return 0;
 
-        var staleIds = stale.Select(item => item.Id).ToHashSet(StringComparer.Ordinal);
+        var staleIds = stale.Select(item => item.Id).ToHashSet();
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
         var orders = await db.Orders.Where(item => staleIds.Contains(item.CounterpartyId)).ToArrayAsync(ct);
@@ -56,7 +56,7 @@ public sealed class CounterpartySyncStore(
         db.Counterparties.RemoveRange(stale);
         // Platform spec 006, R-014: the Identity users go with the customers, through the outbox.
         foreach (var customer in stale)
-            outbox.Add(db, new CounterpartyRemoved(customer.Id, customer.IdentityUserId));
+            outbox.Add(db, new CounterpartyRemoved(customer.Id.Value, customer.IdentityUserId.Value));
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 

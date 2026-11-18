@@ -14,14 +14,15 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
             .IsUnique();
 
         builder.Property(p => p.Id)
+            .HasConversion(id => id.Value, value => ProductPriceId.FromStorage(value))
             .ValueGeneratedOnAdd();
 
         builder.Property(p => p.ProductId)
-            .HasConversion(CatalogConverter.ProductIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(p => p.PriceTypeId)
-            .HasConversion(CatalogConverter.PriceTypeIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(c => c.ProductTypeIdOneC)

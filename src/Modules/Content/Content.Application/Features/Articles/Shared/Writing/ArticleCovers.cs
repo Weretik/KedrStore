@@ -11,19 +11,19 @@ internal static class ArticleCovers
     public const string LibraryFolder = "Статті";
 
     public static async Task<IReadOnlyDictionary<long, MediaImage>> ImagesAsync(IMediaImageReader images,
-        IEnumerable<long?> mediaFileIds, CancellationToken cancellationToken)
+        IEnumerable<MediaFileId?> mediaFileIds, CancellationToken cancellationToken)
     {
-        var ids = mediaFileIds.OfType<long>().Distinct().ToList();
+        var ids = mediaFileIds.OfType<MediaFileId>().Select(id => id.Value).Distinct().ToList();
         return ids.Count == 0
             ? new Dictionary<long, MediaImage>()
             : await images.GetImagesAsync(ids, cancellationToken);
     }
 
     /// <summary>A deleted library file leaves the article without a cover instead of a broken picture.</summary>
-    public static ArticleCoverView View(long? mediaFileId, int? legacyVersion,
+    public static ArticleCoverView View(MediaFileId? mediaFileId, int? legacyVersion,
         IReadOnlyDictionary<long, MediaImage> images)
     {
-        if (mediaFileId is { } id)
+        if (mediaFileId?.Value is { } id)
             return images.TryGetValue(id, out var image) ? new(id, image.Url, null) : new(id, null, null);
         return legacyVersion is { } version ? new(null, null, version) : ArticleCoverView.None;
     }
@@ -42,14 +42,14 @@ internal static class ArticleCovers
     {
         if (input.CoverMediaFileId is { } mediaFileId)
         {
-            if (mediaFileId != article.CoverMediaFileId)
+            if (mediaFileId != article.CoverMediaFileId?.Value)
             {
                 var found = await images.GetImagesAsync([mediaFileId], cancellationToken);
                 if (!found.ContainsKey(mediaFileId))
                     return new DomainError("Content.Article.Cover.NotFound", "Цього зображення вже немає в медіатеці.",
                         Field: "coverMediaFileId");
             }
-            var cover = article.SetCover(mediaFileId, now, editor);
+            var cover = article.SetCover(MediaFileId.FromStorage(mediaFileId), now, editor);
             if (cover.IsFailure)
                 return cover.Error;
         }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using BuildingBlocks.Application.Results;
 using global::Catalog.Application.Features.Attributes.Commands.UpdateCatalogAttribute;
@@ -58,7 +59,7 @@ public sealed class CatalogFormVersionPostgresTests(CatalogPostgresFixture postg
         int modelId;
         await using (var seed = postgres.CreateContext())
         {
-            var group = ProductGroup.CreateManual(ProductCategoryId.From(CategoryId), "Модель", "model-version",
+            var group = ProductGroup.CreateManual(ProductCategoryId.Create(CategoryId), "Модель", "model-version",
                 DateTimeOffset.UtcNow).Value;
             seed.ProductGroups.Add(group);
             await seed.SaveChangesAsync();
@@ -105,8 +106,8 @@ public sealed class CatalogFormVersionPostgresTests(CatalogPostgresFixture postg
         await using var seed = postgres.CreateContext();
         await seed.Database.ExecuteSqlRawAsync(
             """TRUNCATE "CatalogProductGroups", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-        seed.Categories.Add(ProductCategory.Create(ProductCategoryId.From(CategoryId), "000005520", "Завіси", "zavisy",
-            CategoryPath.From("n20")).Value);
+        seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(CategoryId), "000005520", "Завіси", "zavisy",
+            CategoryPath.Create("n20")).Value);
         await seed.SaveChangesAsync();
     }
 

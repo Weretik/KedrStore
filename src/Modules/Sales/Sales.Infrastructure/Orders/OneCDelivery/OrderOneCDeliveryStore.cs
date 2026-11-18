@@ -40,7 +40,7 @@ internal sealed class OrderOneCDeliveryStore(SalesDbContext db, OutboxWriter out
 
         return row is null
             ? null
-            : new DeadLetterNotification(signal.OrderId, row.OrderNumber, row.Id, row.Name, signal.LastError,
+            : new DeadLetterNotification(signal.OrderId, row.OrderNumber, row.Id.Value, row.Name, signal.LastError,
                 signal.Attempts, signal.FailedAtUtc, row.Lines);
     }
 }

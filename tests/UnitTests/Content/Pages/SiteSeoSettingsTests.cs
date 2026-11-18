@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.SeoSettings.Shared;
 using Content.Application.Features.SeoSettings.Commands.UpdateSiteSeoSettings;
@@ -15,14 +16,14 @@ public sealed class SiteSeoSettingsTests
 
         settings.Update(new SiteSeoSettingsValues(" g-ab12cd34ef ", "gtm-ab12cd3",
             """<meta name="google-site-verification" content="AbCdEf_123-xyz" />""",
-            "<meta name='msvalidate.01' content='0123456789ABCDEF0123456789ABCDEF' />", 42), Now, "seo@kedr");
+            "<meta name='msvalidate.01' content='0123456789ABCDEF0123456789ABCDEF' />", MediaFileId.FromStorage(42)), Now, "seo@kedr");
 
-        Assert.Equal(SiteSeoSettings.SingletonId, settings.Id);
+        Assert.Equal(SiteSeoSettings.SingletonId, settings.Id.Value);
         Assert.Equal("G-AB12CD34EF", settings.GoogleAnalyticsId);
         Assert.Equal("GTM-AB12CD3", settings.GoogleTagManagerId);
         Assert.Equal("AbCdEf_123-xyz", settings.GoogleSiteVerification);
         Assert.Equal("0123456789ABCDEF0123456789ABCDEF", settings.BingSiteVerification);
-        Assert.Equal(42, settings.ShareImageMediaFileId);
+        Assert.Equal(42, settings.ShareImageMediaFileId?.Value);
         Assert.Equal("seo@kedr", settings.UpdatedBy);
     }
 
@@ -30,7 +31,7 @@ public sealed class SiteSeoSettingsTests
     public void Update_BlankValuesRemoveTheCodes()
     {
         var settings = SiteSeoSettings.CreateEmpty(Now);
-        settings.Update(new SiteSeoSettingsValues("G-AB12CD34EF", "GTM-AB12CD3", "AbCdEf_123", "BingCode123", 7),
+        settings.Update(new SiteSeoSettingsValues("G-AB12CD34EF", "GTM-AB12CD3", "AbCdEf_123", "BingCode123", MediaFileId.FromStorage(7)),
             Now, "seo");
 
         settings.Update(new SiteSeoSettingsValues(" ", null, "", null, null), Now, "seo");

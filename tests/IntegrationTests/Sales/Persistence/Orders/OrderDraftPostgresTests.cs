@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -23,7 +24,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         var draft = await db.OrderDrafts.AsNoTracking().Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
 
         Assert.Equal("Draft", draft.Title);
-        Assert.Equal(CounterpartyId, draft.CounterpartyId);
+        Assert.Equal(CounterpartyId, draft.CounterpartyId.Value);
         Assert.Equal(32, draft.Version.Length);
         Assert.Equal([("101", 2, -50.25m), ("102", 1, 0m)],
             draft.Lines.OrderBy(x => x.ProductId).Select(x => (x.ProductId, x.Quantity, x.PriceAdjustment)));
@@ -126,8 +127,8 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
-        db.Counterparties.Add(Counterparty.Create(CounterpartyId, Guid.NewGuid(), "Draft customer",
-            "draft@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+        db.Counterparties.Add(Counterparty.Create(CounterpartyId, UserId.FromStorage(Guid.NewGuid()), "Draft customer",
+            "draft@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }
 

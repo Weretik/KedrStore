@@ -14,7 +14,7 @@ public sealed class ProductAttributeReviewConfiguration : IEntityTypeConfigurati
     {
         builder.ToTable("CatalogProductAttributeReviews");
         builder.HasKey(x => x.ProductId);
-        builder.Property(x => x.ProductId).HasConversion(CatalogConverter.ProductIdConvert).ValueGeneratedNever();
+        builder.Property(x => x.ProductId).ValueGeneratedNever();
         builder.Property(x => x.BaseName).HasMaxLength(ProductAttributeReview.BaseNameMaxLength).IsRequired();
         builder.Property(x => x.State).HasColumnType("smallint");
         builder.Property(x => x.AcceptedBy).HasMaxLength(ProductAttributeReview.AcceptedByMaxLength);

@@ -73,7 +73,7 @@ public partial class Product
     /// Rereads link URLs from <paramref name="currentUrls"/> (file ID → URL), drops links to files that no longer
     /// exist, and rewrites the cache (R-34). Returns whether anything changed.
     /// </summary>
-    public bool RefreshMedia(IReadOnlyDictionary<long, string> currentUrls, DateTimeOffset now)
+    public bool RefreshMedia(IReadOnlyDictionary<MediaFileId, string> currentUrls, DateTimeOffset now)
     {
         var changed = _mediaLinks.RemoveAll(link => !currentUrls.ContainsKey(link.MediaFileId)) > 0;
         foreach (var link in _mediaLinks)
@@ -83,14 +83,14 @@ public partial class Product
     }
 
     /// <summary>Points the link to a replaced file at its new URL (R-35).</summary>
-    public bool UpdateMediaUrl(long fileId, string url, DateTimeOffset now)
+    public bool UpdateMediaUrl(MediaFileId fileId, string url, DateTimeOffset now)
     {
         var link = _mediaLinks.FirstOrDefault(item => item.MediaFileId == fileId);
         return CompleteMediaChange(link is not null && link.SetUrl(url), now);
     }
 
     /// <summary>Drops the link to a deleted file; the next photo moves to first place (R-35).</summary>
-    public bool RemoveMediaFile(long fileId, DateTimeOffset now)
+    public bool RemoveMediaFile(MediaFileId fileId, DateTimeOffset now)
         => CompleteMediaChange(_mediaLinks.RemoveAll(link => link.MediaFileId == fileId) > 0, now);
 
     private bool LinkIfNone(ProductMediaFile file, ProductMediaKind kind, DateTimeOffset now)

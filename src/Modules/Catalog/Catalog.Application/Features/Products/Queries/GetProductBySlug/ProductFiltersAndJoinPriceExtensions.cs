@@ -14,7 +14,7 @@ public static class ProductFiltersAndJoinPriceExtensions
         var language = NormalizeLanguage(request.Lang);
         translationsQuery = translationsQuery.Where(t => t.Language == language);
 
-        var id = ProductId.From(productId);
+        var id = ProductId.Create(productId);
         productsQuery = productsQuery.Where(p => p.Id == id);
 
         var withCategoryAndTranslation = productsQuery.LeftJoin(
@@ -31,7 +31,7 @@ public static class ProductFiltersAndJoinPriceExtensions
             (query, category) => new { query.product, query.translation, category }
         );
 
-        var priceTypeId = PriceTypeId.From(request.PriceTypeId ?? retailPriceTypeId);
+        var priceTypeId = PriceTypeId.Create(request.PriceTypeId ?? retailPriceTypeId);
         var filteredPrices  = pricesQuery.Where(pr => pr.PriceTypeId == priceTypeId);
 
         var withCategoryAndPrice = withCategory.LeftJoin(

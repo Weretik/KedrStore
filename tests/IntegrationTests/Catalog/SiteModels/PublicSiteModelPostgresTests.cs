@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using Catalog.Application.Features.SiteModels.Shared.Public;
 using Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModels;
@@ -48,16 +49,16 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
         {
             await db.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-            var category = ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")).Value;
+            var category = ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy", CategoryPath.Create("n10")).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);
             foreach (var id in new[] { 801, 802, 803 })
             {
-                var product = Product.Create(ProductId.From(id), Root, $"Завіса {id}", $"zavisa-{id}",
-                    ProductCategoryId.From(10), Now, 5, 1, false, false, true).Value;
+                var product = Product.Create(ProductId.Create(id), Root, $"Завіса {id}", $"zavisa-{id}",
+                    ProductCategoryId.Create(10), Now, 5, 1, false, false, true).Value;
                 db.Products.Add(product);
                 db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
-                    product.ProductSlug, string.Empty, ProductCategoryId.From(10), "zavisy",
+                    product.ProductSlug, string.Empty, ProductCategoryId.Create(10), "zavisy",
                     inStock: true, isSale: false, isNew: false, exportToSite: true, retailPrice: id));
             }
 
@@ -66,18 +67,18 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
             await db.SaveChangesAsync();
             var left = side.AddValue("L", "Ліва", "liva", 1, Now).Value;
             var right = side.AddValue("R", "Права", "prava", 2, Now).Value;
-            var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Завіса KEDR", "zavisa-kedr", Now).Value;
+            var model = ProductGroup.CreateManual(ProductCategoryId.Create(10), "Завіса KEDR", "zavisa-kedr", Now).Value;
             db.ProductGroups.Add(model);
-            db.CategoryAttributes.Add(CategoryAttribute.Create(ProductCategoryId.From(10), side.Id, true, 1, Now));
+            db.CategoryAttributes.Add(CategoryAttribute.Create(ProductCategoryId.Create(10), side.Id, true, 1, Now));
             await db.SaveChangesAsync();
 
-            db.ProductGroupMembers.AddRange(ProductGroupMember.CreatePinned(ProductId.From(801), model.Id, Now),
-                ProductGroupMember.CreatePinned(ProductId.From(802), model.Id, Now));
+            db.ProductGroupMembers.AddRange(ProductGroupMember.CreatePinned(ProductId.Create(801), model.Id, Now),
+                ProductGroupMember.CreatePinned(ProductId.Create(802), model.Id, Now));
             model.SetAxes([side.Id]);
             db.ProductAttributeValues.AddRange(
-                ProductAttributeValue.CreateManual(ProductId.From(801), side.Id, 0, left.Id, null, Now).Value,
-                ProductAttributeValue.CreateManual(ProductId.From(802), side.Id, 0, right.Id, null, Now).Value,
-                ProductAttributeValue.CreateManual(ProductId.From(803), side.Id, 0, left.Id, null, Now).Value);
+                ProductAttributeValue.CreateManual(ProductId.Create(801), side.Id, 0, left.Id, null, Now).Value,
+                ProductAttributeValue.CreateManual(ProductId.Create(802), side.Id, 0, right.Id, null, Now).Value,
+                ProductAttributeValue.CreateManual(ProductId.Create(803), side.Id, 0, left.Id, null, Now).Value);
             await db.SaveChangesAsync();
         }
 

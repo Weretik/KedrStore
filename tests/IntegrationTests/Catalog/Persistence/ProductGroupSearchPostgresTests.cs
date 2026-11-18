@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Groups.Queries.GetProductGroups;
 using Catalog.Contracts.Groups;
 using Catalog.Domain.Categories;
@@ -19,12 +20,12 @@ public sealed class ProductGroupSearchPostgresTests(CatalogPostgresFixture postg
         {
             await seed.Database.ExecuteSqlRawAsync(
                 """TRUNCATE "CatalogProductGroups", "ProductCategories" CASCADE;""");
-            seed.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), "000005513", "Ручки", "ruchky",
-                CategoryPath.From("n10")).Value);
+            seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), "000005513", "Ручки", "ruchky",
+                CategoryPath.Create("n10")).Value);
             var now = DateTimeOffset.UtcNow;
             foreach (var (name, slug) in new[]
                      { ("Ручка Кедр Модерн", "a"), ("Ручка Модерн", "b"), ("Кедр 50% Класик", "c") })
-                seed.ProductGroups.Add(ProductGroup.CreateManual(ProductCategoryId.From(10), name, slug, now).Value);
+                seed.ProductGroups.Add(ProductGroup.CreateManual(ProductCategoryId.Create(10), name, slug, now).Value);
             await seed.SaveChangesAsync();
         }
 

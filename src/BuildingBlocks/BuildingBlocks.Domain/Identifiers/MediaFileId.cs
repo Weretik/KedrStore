@@ -1,4 +1,4 @@
-namespace Media.Domain.Files;
+namespace BuildingBlocks.Domain.Identifiers;
 
 /// <summary>Database identity of a library file; other modules link to files by this ID.</summary>
 public readonly record struct MediaFileId : IComparable<MediaFileId>
@@ -14,4 +14,6 @@ public readonly record struct MediaFileId : IComparable<MediaFileId>
     public static MediaFileId FromStorage(long value) => new(value);
 
     public int CompareTo(MediaFileId other) => Value.CompareTo(other.Value);
+
+    public override string ToString() => Value.ToString();
 }

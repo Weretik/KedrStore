@@ -9,7 +9,7 @@ public sealed class GetLegalDocumentVersionHandler(IReadContentDbContext db)
         CancellationToken cancellationToken)
     {
         var version = await db.LegalDocumentVersions.AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id == query.Id, cancellationToken);
+            .FirstOrDefaultAsync(v => v.Id == LegalDocumentVersionId.FromStorage(query.Id), cancellationToken);
         return version is null ? Result.NotFound() : Result.Success(LegalDocumentMapper.ToDetails(version));
     }
 }

@@ -17,6 +17,8 @@ public static class TestRoleAuthentication
     public const string SchemeName = "TestRole";
     public const string RoleHeader = "X-Test-Role";
     public const string UserHeader = "X-Test-User";
+    /// <summary>The account id of a client without <see cref="UserHeader"/>; real account ids are Guids.</summary>
+    public const string DefaultUserId = "0b1e4c2a-5d6f-4e7a-8b9c-0d1e2f3a4b5c";
 
     public static IServiceCollection AddTestRoleAuthentication(this IServiceCollection services)
     {
@@ -57,7 +59,7 @@ public static class TestRoleAuthentication
 
             var userId = Request.Headers.TryGetValue(UserHeader, out var user) && !string.IsNullOrWhiteSpace(user)
                 ? user.ToString()
-                : "test-user";
+                : DefaultUserId;
             var identity = new ClaimsIdentity(
                 [new Claim(ClaimTypes.NameIdentifier, userId), new Claim(ClaimTypes.Role, role.ToString())],
                 SchemeName);

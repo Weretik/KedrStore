@@ -14,7 +14,7 @@ public sealed class ProductTranslationConfiguration : IEntityTypeConfiguration<P
             .ValueGeneratedOnAdd();
 
         builder.Property(x => x.ProductId)
-            .HasConversion(CatalogConverter.ProductIdConvert)
+            
             .IsRequired();
 
         builder.Property(x => x.Language)

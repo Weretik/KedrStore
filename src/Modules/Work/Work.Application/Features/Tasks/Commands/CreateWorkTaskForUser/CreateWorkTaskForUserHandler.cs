@@ -14,7 +14,7 @@ public sealed class CreateWorkTaskForUserHandler(
         if (WorkViewer.UserId(user) is not { } admin)
             return Result<WorkTaskDto>.Unauthorized();
 
-        var created = WorkTask.Create(command.OwnerUserId, admin, command.Title, command.Details, command.DueDate,
+        var created = WorkTask.Create(UserId.FromStorage(command.OwnerUserId), admin, command.Title, command.Details, command.DueDate,
             command.Steps, clock.GetUtcNow());
         if (created.IsFailure)
             return created.Error!.ToResult<WorkTaskDto>();

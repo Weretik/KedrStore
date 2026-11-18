@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Content.Domain.Home;
 namespace UnitTests.Content.Pages;
@@ -20,12 +21,12 @@ public sealed class HomeBlocksTests
     [Fact]
     public void Brand_NeedsANameAndALibraryLogo()
     {
-        var brand = HomeBrand.Create(" Korfad ", 12, 0, Now).Value;
+        var brand = HomeBrand.Create(" Korfad ", MediaFileId.FromStorage(12), 0, Now).Value;
 
         Assert.Equal("Korfad", brand.Name);
-        Assert.Equal(12, brand.LogoMediaFileId);
-        DomainAssert.Fails(brand.Update("Korfad", 0, Now));
-        DomainAssert.Fails(brand.Update("", 12, Now));
+        Assert.Equal(12, brand.LogoMediaFileId.Value);
+        DomainAssert.Fails(brand.Update("Korfad", MediaFileId.FromStorage(0), Now));
+        DomainAssert.Fails(brand.Update("", MediaFileId.FromStorage(12), Now));
         DomainAssert.Fails(brand.MoveTo(-1, Now));
     }
 }

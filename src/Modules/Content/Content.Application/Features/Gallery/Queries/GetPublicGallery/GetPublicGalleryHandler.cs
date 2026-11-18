@@ -21,7 +21,7 @@ public sealed class GetPublicGalleryHandler(IReadContentDbContext db, IMediaImag
             })
             .ToListAsync(cancellationToken);
         var files = await images.GetImagesAsync(
-            items.Where(item => item.MediaFileId is not null).Select(item => item.MediaFileId!.Value).ToList(),
+            items.Where(item => item.MediaFileId is not null).Select(item => item.MediaFileId!.Value.Value).ToList(),
             cancellationToken);
 
         var result = new List<PublicGalleryItem>(items.Count);
@@ -29,13 +29,13 @@ public sealed class GetPublicGalleryHandler(IReadContentDbContext db, IMediaImag
         {
             if (item.Kind == GalleryItemKind.Video)
             {
-                result.Add(new PublicGalleryItem(item.Id, item.Kind, item.Title, item.Caption,
+                result.Add(new PublicGalleryItem(item.Id.Value, item.Kind, item.Title, item.Caption,
                     YoutubeThumbnails.Url(item.YoutubeId!), YoutubeThumbnails.Width, YoutubeThumbnails.Height,
                     item.YoutubeId));
             }
-            else if (item.MediaFileId is { } fileId && files.TryGetValue(fileId, out var file))
+            else if (item.MediaFileId is { } fileId && files.TryGetValue(fileId.Value, out var file))
             {
-                result.Add(new PublicGalleryItem(item.Id, item.Kind, item.Title, item.Caption,
+                result.Add(new PublicGalleryItem(item.Id.Value, item.Kind, item.Title, item.Caption,
                     file.Url, file.Width, file.Height, null));
             }
         }

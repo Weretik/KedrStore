@@ -51,7 +51,7 @@ public sealed class RecognizeCatalogAttributesJob(
         var query = db.Products.IgnoreQueryFilters().AsNoTracking();
         if (productIds is not null)
         {
-            var ids = productIds.Select(ProductId.From).ToList();
+            var ids = productIds.Select(ProductId.Create).ToList();
             query = query.Where(product => ids.Contains(product.Id));
         }
 

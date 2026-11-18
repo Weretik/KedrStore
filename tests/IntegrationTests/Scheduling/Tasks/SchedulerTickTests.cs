@@ -14,7 +14,7 @@ public sealed class SchedulerTickTests
     private static async Task EnableAsync(SchedulingTestHarness harness, string key, TaskSchedule schedule, DateTimeOffset nextRunAt)
     {
         var task = (await ScheduledTaskRows.LoadAsync(harness.Db, harness.Time.GetUtcNow(), CancellationToken.None))
-            .Single(x => x.Task.Key == key).Task;
+            .Single(x => x.Task.Key.Value == key).Task;
         Assert.True(task.ChangeSchedule(true, schedule, null, "admin", harness.Time.GetUtcNow()).IsSuccess);
         harness.Db.Entry(task).Property(x => x.NextRunAt).CurrentValue = nextRunAt;
         await harness.Db.SaveChangesAsync();
@@ -28,8 +28,8 @@ public sealed class SchedulerTickTests
         await harness.TickAsync();
 
         var tasks = await harness.Db.Tasks.AsNoTracking().ToListAsync();
-        Assert.Equivalent(ScheduledTaskCatalog.Tasks.Select(x => x.Key), tasks.Select(x => x.Key));
-        Assert.True(tasks.Where(x => x.Key is not (ScheduledTaskKeys.Outbox or ScheduledTaskKeys.OneCOrders) && x.Schedule.Kind != ScheduleKind.Manual).All(x => !x.Enabled));
+        Assert.Equivalent(ScheduledTaskCatalog.Tasks.Select(x => x.Key), tasks.Select(x => x.Key.Value));
+        Assert.True(tasks.Where(x => x.Key.Value is not (ScheduledTaskKeys.Outbox or ScheduledTaskKeys.OneCOrders) && x.Schedule.Kind != ScheduleKind.Manual).All(x => !x.Enabled));
         Assert.Empty(harness.Launcher.Launches);
     }
 
@@ -86,8 +86,8 @@ public sealed class SchedulerTickTests
         await harness.StartAndFinishAsync(launch, true, "Рядків 10: додано 1.");
 
         await using var check = harness.NewContext();
-        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
-        var run = await check.Runs.SingleAsync(x => x.Id == launch.RunId);
+        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
+        var run = await check.Runs.SingleAsync(x => x.Id == ScheduledTaskRunId.FromStorage(launch.RunId));
         Assert.Equal(TaskState.Idle, task.State);
         Assert.Equal("Рядків 10: додано 1.", task.LastSuccessSummary);
         Assert.Equal(KyivTime.ToInstant(new DateTime(2026, 11, 16, 13, 0, 0)), task.NextRunAt);
@@ -105,7 +105,7 @@ public sealed class SchedulerTickTests
         await harness.StartAndFinishAsync(harness.Launcher.Launches.Single().Single(), false, "Таблицю не прочитано.");
 
         await using var check = harness.NewContext();
-        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
+        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
         Assert.Equal("Таблицю не прочитано.", task.LastFailureReason);
         Assert.Equal(harness.Time.GetUtcNow(), task.LastFailureAt);
         Assert.Null(task.LastSuccessAt);
@@ -123,7 +123,7 @@ public sealed class SchedulerTickTests
         var tick = await harness.TickAsync();
 
         await using var check = harness.NewContext();
-        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
+        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
         Assert.Empty(tick.Started);
         Assert.Equal("немає прав", tick.LaunchError);
         Assert.Equal(TaskState.Idle, task.State);
@@ -146,13 +146,13 @@ public sealed class SchedulerTickTests
         harness.Time.Advance(TimeSpan.FromMinutes(ScheduledTaskCatalog.JobTaskMaxMinutes - 1));
         await harness.TickAsync();
         await using (var slow = harness.NewContext())
-            Assert.Equal(TaskState.Running, (await slow.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks)).State);
+            Assert.Equal(TaskState.Running, (await slow.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks))).State);
 
         harness.Time.Advance(TimeSpan.FromMinutes(2));
         await harness.TickAsync();
 
         await using var check = harness.NewContext();
-        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
+        var task = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
         Assert.Equal($"Задача не завершилася за {ScheduledTaskCatalog.JobTaskMaxMinutes} хв.", task.LastFailureReason);
         Assert.Equal(TaskState.Idle, task.State);
     }
@@ -166,7 +166,7 @@ public sealed class SchedulerTickTests
         await harness.TickAsync();
 
         await using var check = harness.NewContext();
-        var outbox = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Outbox);
+        var outbox = await check.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Outbox));
         Assert.Equal(2, harness.Outbox.Calls);
         Assert.Equal("Нічого досилати.", outbox.LastSuccessSummary);
         Assert.Equal("Telegram недоступний", outbox.LastFailureReason);
@@ -187,7 +187,7 @@ public sealed class SchedulerTickTests
 
         await using (var db = harness.NewContext())
         {
-            var task = await db.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.OneCOrders);
+            var task = await db.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.OneCOrders));
             task.ChangeSchedule(false, task.Schedule, null, "Олена", harness.Time.GetUtcNow());
             await db.SaveChangesAsync();
         }
@@ -222,7 +222,7 @@ public sealed class SchedulerTickTests
         await EnableAsync(harness, ScheduledTaskKeys.Stocks, TaskSchedule.DailyAt(TaskSchedule.EveryDay, new TimeOnly(9, 0)),
             harness.Time.GetUtcNow());
         await using var other = harness.NewContext();
-        var seenByOther = await other.Tasks.SingleAsync(x => x.Key == ScheduledTaskKeys.Stocks);
+        var seenByOther = await other.Tasks.SingleAsync(x => x.Key == ScheduledTaskKey.FromStorage(ScheduledTaskKeys.Stocks));
 
         await harness.TickAsync();
         other.Runs.Add(seenByOther.Claim(harness.Time.GetUtcNow()));

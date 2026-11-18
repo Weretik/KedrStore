@@ -9,19 +9,19 @@ public static class HomeAdminBlocks
     {
         var faq = await db.HomeFaqItems.AsNoTracking()
             .OrderBy(item => item.Position).ThenBy(item => item.Id)
-            .Select(item => new AdminHomeFaqItem(item.Id, item.Position, item.QuestionUk, item.QuestionRu,
+            .Select(item => new AdminHomeFaqItem(item.Id.Value, item.Position, item.QuestionUk, item.QuestionRu,
                 item.AnswerUk, item.AnswerRu, item.UpdatedAt))
             .ToListAsync(cancellationToken);
         var brands = await db.HomeBrands.AsNoTracking()
             .OrderBy(brand => brand.Position).ThenBy(brand => brand.Id)
             .ToListAsync(cancellationToken);
-        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId).ToList(),
+        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId.Value).ToList(),
             cancellationToken);
 
         return new AdminHomeBlocks(faq, brands.Select(brand =>
         {
-            logos.TryGetValue(brand.LogoMediaFileId, out var logo);
-            return new AdminHomeBrand(brand.Id, brand.Position, brand.Name, brand.LogoMediaFileId, logo?.Url,
+            logos.TryGetValue(brand.LogoMediaFileId.Value, out var logo);
+            return new AdminHomeBrand(brand.Id.Value, brand.Position, brand.Name, brand.LogoMediaFileId.Value, logo?.Url,
                 logo?.FileName, logo is null, brand.UpdatedAt);
         }).ToList());
     }

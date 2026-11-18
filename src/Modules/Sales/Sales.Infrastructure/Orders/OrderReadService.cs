@@ -15,7 +15,7 @@ internal sealed class OrderReadService(SalesDbContext dbContext) : IOrderReadSer
             from row in dbContext.OrdersWithOneCMessage()
             join counterparty in dbContext.Counterparties.IgnoreQueryFilters().AsNoTracking()
                 on row.Order.CounterpartyId equals counterparty.Id
-            where request.CounterpartyId == null || row.Order.CounterpartyId == request.CounterpartyId
+            where request.CounterpartyId == null || row.Order.CounterpartyId == CounterpartyId.FromStorage(request.CounterpartyId)
             orderby row.Order.CreatedAt descending, row.Order.Id descending
             select new
             {
@@ -36,7 +36,7 @@ internal sealed class OrderReadService(SalesDbContext dbContext) : IOrderReadSer
                 .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync(cancellationToken))
-            .Select(x => new OrderListItemDto(x.Id.Value, x.OrderNumber, x.CounterpartyId, x.Name, x.CreatedAt,
+            .Select(x => new OrderListItemDto(x.Id.Value, x.OrderNumber, x.CounterpartyId.Value, x.Name, x.CreatedAt,
                 x.LineCount, x.Total, OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.Message).Status,
                 x.OneCDocumentNumber))
             .ToList();
@@ -65,7 +65,7 @@ internal sealed class OrderReadService(SalesDbContext dbContext) : IOrderReadSer
                 order.Id.Value,
                 order.OrderNumber,
                 order.CreatedAt,
-                new OrderCounterpartyDto(counterparty.Id, counterparty.Name, counterparty.Phone),
+                new OrderCounterpartyDto(counterparty.Id.Value, counterparty.Name, counterparty.Phone),
                 order.Comment,
                 order.Lines
                     .OrderBy(line => line.Id)

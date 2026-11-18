@@ -52,7 +52,7 @@ internal sealed class WorkspaceOverviewReader(SalesDbContext db) : IWorkspaceOve
             .Select(x =>
             {
                 var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.Message);
-                return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId, x.Name, x.CreatedAt,
+                return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId.Value, x.Name, x.CreatedAt,
                     x.LineCount, x.Total, oneC.Status.ToString(), x.Adjustment,
                     oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
             })

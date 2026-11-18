@@ -19,12 +19,12 @@ internal sealed class CustomerReadService(
         // Database rules 2.1: every word must match; trigram indexes serve ILIKE on these columns.
         foreach (var pattern in SearchWords.Patterns(request.SearchTerm))
             query = query.Where(counterparty =>
-                EF.Functions.ILike(counterparty.Id, pattern, SearchWords.EscapeCharacter) ||
+                EF.Functions.ILike((string)(object)counterparty.Id, pattern, SearchWords.EscapeCharacter) ||
                 EF.Functions.ILike(counterparty.Name, pattern, SearchWords.EscapeCharacter) ||
                 (counterparty.Phone != null && EF.Functions.ILike(counterparty.Phone, pattern, SearchWords.EscapeCharacter)));
 
         foreach (var pattern in SearchWords.Patterns(request.CounterpartyId))
-            query = query.Where(counterparty => EF.Functions.ILike(counterparty.Id, pattern, SearchWords.EscapeCharacter));
+            query = query.Where(counterparty => EF.Functions.ILike((string)(object)counterparty.Id, pattern, SearchWords.EscapeCharacter));
 
         foreach (var pattern in SearchWords.Patterns(request.Name))
             query = query.Where(counterparty => EF.Functions.ILike(counterparty.Name, pattern, SearchWords.EscapeCharacter));
@@ -47,7 +47,7 @@ internal sealed class CustomerReadService(
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(counterparty => new CustomerListItemDto(
-                counterparty.Id,
+                counterparty.Id.Value,
                 counterparty.Name,
                 counterparty.Phone))
             .ToListAsync(cancellationToken);
@@ -66,18 +66,18 @@ internal sealed class CustomerReadService(
     {
         var detail = await dbContext.Counterparties
             .AsNoTracking()
-            .Where(counterparty => counterparty.Id == counterpartyId)
+            .Where(counterparty => counterparty.Id == CounterpartyId.FromStorage(counterpartyId))
             .Select(counterparty => new CustomerDetailDto(
-                counterparty.Id,
+                counterparty.Id.Value,
                 counterparty.Name,
                 counterparty.Phone,
                 counterparty.Email,
-                counterparty.DefaultPriceTypeId,
+                counterparty.DefaultPriceTypeId.Value,
                 dbContext.CounterpartyCategoryPriceTypes
                     .AsNoTracking()
                     .Where(rule => rule.CounterpartyId == counterparty.Id)
                     .OrderBy(rule => rule.CategoryId)
-                    .Select(rule => new CustomerCategoryPriceTypeDto(rule.CategoryId, rule.PriceTypeId))
+                    .Select(rule => new CustomerCategoryPriceTypeDto(rule.CategoryId.Value, rule.PriceTypeId.Value))
                     .ToList()))
             .SingleOrDefaultAsync(cancellationToken);
 

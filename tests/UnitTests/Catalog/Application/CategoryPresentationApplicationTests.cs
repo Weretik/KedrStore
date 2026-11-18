@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Categories.Shared;
 using System.Reflection;
 using Microsoft.Extensions.Options;
@@ -114,7 +115,7 @@ public sealed class CategoryPresentationApplicationTests
         var hardware = CreateCategory(5513, "n5513", "Root", 0, 0);
         var child = CreateCategory(900001, "n5513.n900001", "Child", 0, 1);
         var cosmos = ProductCategory.Create(
-            ProductCategoryId.From(920000), "Космос", "Космос", "kosmos", CategoryPath.From("n920000")).Value;
+            ProductCategoryId.Create(920000), "Космос", "Космос", "kosmos", CategoryPath.Create("n920000")).Value;
         cosmos.SetShownOnSite(true, DateTimeOffset.UtcNow);
         var proxy = DispatchProxy.Create<ICatalogReadRepository<ProductCategory>, ReadRepositoryProxy>();
         ((ReadRepositoryProxy)(object)proxy).Categories = [hardware, child, cosmos];
@@ -146,11 +147,11 @@ public sealed class CategoryPresentationApplicationTests
     private static ProductCategory CreateCategory(int id, string path, string name, int sortOrder, int level)
     {
         var category = ProductCategory.Create(
-            ProductCategoryId.From(id),
+            ProductCategoryId.Create(id),
             "000005513",
             name,
             $"category-{id}",
-            CategoryPath.From(path)).Value;
+            CategoryPath.Create(path)).Value;
         category.UpdatePresentationMetadata($"{name} uk", $"{name} ru", sortOrder, level);
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         return category;

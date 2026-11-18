@@ -29,19 +29,19 @@ public sealed class GetCustomersSnapshotHandler(IReadSalesDbContext salesDbConte
         var rules = (await salesDbContext.CounterpartyCategoryPriceTypes.AsNoTracking()
                 .Select(rule => new { rule.CounterpartyId, rule.CategoryId, rule.PriceTypeId })
                 .ToListAsync(cancellationToken))
-            .ToLookup(rule => rule.CounterpartyId, StringComparer.Ordinal);
+            .ToLookup(rule => rule.CounterpartyId);
 
         var customers = counterparties
             .Select(counterparty => new CustomerSnapshotDto(
-                counterparty.Id,
+                counterparty.Id.Value,
                 counterparty.Name,
                 counterparty.Phone,
                 counterparty.Email,
-                counterparty.DefaultPriceTypeId,
+                counterparty.DefaultPriceTypeId.Value,
                 rules[counterparty.Id]
                     .GroupBy(rule => rule.CategoryId)
                     .OrderBy(group => group.Key)
-                    .Select(group => new CustomerSnapshotPriceRuleDto(group.Key, group.First().PriceTypeId))
+                    .Select(group => new CustomerSnapshotPriceRuleDto(group.Key.Value, group.First().PriceTypeId.Value))
                     .ToList(),
                 Debt: null,
                 Balance: null))

@@ -10,9 +10,9 @@ public sealed class CompanyRequisitesChange : IAggregateRoot
 
     private readonly List<RequisitesFieldChange> _changes = [];
 
-    public long Id { get; private set; }
+    public CompanyRequisitesChangeId Id { get; private set; }
     public DateTimeOffset ChangedAt { get; private set; }
-    public string ChangedByUserId { get; private set; } = null!;
+    public UserId ChangedByUserId { get; private set; }
 
     /// <summary>Email or user name at the time of the change, kept even if the account is renamed.</summary>
     public string ChangedByName { get; private set; } = null!;
@@ -21,7 +21,7 @@ public sealed class CompanyRequisitesChange : IAggregateRoot
     private CompanyRequisitesChange() { }
 
     public static CompanyRequisitesChange Record(IReadOnlyList<RequisitesFieldChange> changes,
-        DateTimeOffset changedAt, string userId, string userName)
+        DateTimeOffset changedAt, UserId userId, string userName)
     {
         // The handler records only a save that changed something, so an empty list is a caller bug.
         if (changes.Count == 0)

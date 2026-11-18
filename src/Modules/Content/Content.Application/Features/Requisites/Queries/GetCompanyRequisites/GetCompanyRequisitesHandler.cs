@@ -9,7 +9,7 @@ public sealed class GetCompanyRequisitesHandler(IReadContentDbContext db)
         CancellationToken cancellationToken)
     {
         var requisites = await db.CompanyRequisites.AsNoTracking()
-            .FirstOrDefaultAsync(row => row.Id == CompanyRequisites.SingletonId, cancellationToken);
+            .FirstOrDefaultAsync(row => row.Id == CompanyRequisitesId.Create(CompanyRequisites.SingletonId), cancellationToken);
         return requisites is null
             ? Result.NotFound()
             : Result.Success(CompanyRequisitesMapper.ToDetails(requisites));

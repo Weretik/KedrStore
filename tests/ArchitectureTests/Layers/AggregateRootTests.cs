@@ -7,7 +7,7 @@ namespace ArchitectureTests.Layers;
 /// Domain model rules (module rules «Domain model (DDD)»): every business module marks its roots with
 /// <see cref="IAggregateRoot"/>; a root is created by a static factory, never by a public constructor; and a root holds
 /// no other root, as a child or as a navigation, so children change only through their root and other aggregates are
-/// referenced by id.
+/// referenced by id; and a root with an <c>Id</c> has its own id type, never a bare number, text or GUID.
 /// </summary>
 public sealed class AggregateRootTests
 {
@@ -49,6 +49,20 @@ public sealed class AggregateRootTests
                 .Where(property => HeldType(property.PropertyType) is { } held && held != root &&
                                    typeof(IAggregateRoot).IsAssignableFrom(held))
                 .Select(property => $"{root.FullName}.{property.Name}"))
+            .Order()
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    [Fact]
+    public void Roots_HaveATypedId()
+    {
+        Type[] bare = [typeof(int), typeof(long), typeof(string), typeof(Guid)];
+        var violations = Roots
+            .Where(root => root.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance) is { } id &&
+                           bare.Contains(id.PropertyType))
+            .Select(root => root.FullName!)
             .Order()
             .ToArray();
 

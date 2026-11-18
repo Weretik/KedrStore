@@ -35,3 +35,4 @@ global using Ardalis.Result;
 global using NodaMoney;
 global using BuildingBlocks.Domain.Results;
 global using BuildingBlocks.Application.Results;
+global using BuildingBlocks.Domain.Identifiers;

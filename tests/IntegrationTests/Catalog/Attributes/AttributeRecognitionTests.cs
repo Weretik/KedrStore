@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Xunit.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -119,9 +120,9 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         foreach (var (path, id) in idByPath.OrderBy(pair => pair.Key.Length))
         {
             var separator = path.LastIndexOf(" > ", StringComparison.Ordinal);
-            ProductCategoryId? parentId = separator < 0 ? null : ProductCategoryId.From(idByPath[path[..separator]]);
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(id), Root, path[(separator < 0 ? 0 : separator + 3)..],
-                $"katehoriia-{id}", CategoryPath.From($"n{id}"), parentId).Value);
+            ProductCategoryId? parentId = separator < 0 ? null : ProductCategoryId.Create(idByPath[path[..separator]]);
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(id), Root, path[(separator < 0 ? 0 : separator + 3)..],
+                $"katehoriia-{id}", CategoryPath.Create($"n{id}"), parentId).Value);
         }
 
         foreach (var row in rows)
@@ -148,7 +149,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
     private static async Task<List<(string Attribute, int? Value, decimal? Number)>> ValuesAsync(CatalogDbContext db,
         int productId)
         => (await db.ProductAttributeValues.AsNoTracking()
-                .Where(value => value.ProductId == ProductId.From(productId))
+                .Where(value => value.ProductId == ProductId.Create(productId))
                 .Join(db.Attributes, value => value.AttributeId, attribute => attribute.Id,
                     (value, attribute) => new { attribute.Code, value.ValueId, value.NumberValue, value.Position })
                 .ToListAsync())
@@ -181,7 +182,7 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
     public async Task NewProduct_GetsParserValues_AndAPersonsValueIsKept()
     {
         await using var db = await ImportedRealCatalogAsync();
-        var original = await db.Products.AsNoTracking().SingleAsync(product => product.Id == ProductId.From(60));
+        var original = await db.Products.AsNoTracking().SingleAsync(product => product.Id == ProductId.Create(60));
         AddProduct(db, 999_001, original.CategoryId.Value, original.Name);
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
@@ -204,10 +205,10 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
         var copy = await ValuesAsync(db, 999_001);
         Assert.NotEmpty(copy);
         Assert.All(await db.ProductAttributeValues.AsNoTracking()
-            .Where(value => value.ProductId == ProductId.From(999_001)).ToListAsync(),
+            .Where(value => value.ProductId == ProductId.Create(999_001)).ToListAsync(),
             value => Assert.Equal(AttributeValueSource.Parser, value.Source));
         Assert.NotNull(await db.ProductAttributeReviews.AsNoTracking()
-            .SingleOrDefaultAsync(review => review.ProductId == ProductId.From(999_001)));
+            .SingleOrDefaultAsync(review => review.ProductId == ProductId.Create(999_001)));
     }
 
     [Fact]
@@ -335,12 +336,12 @@ public sealed class AttributeRecognitionTests(ITestOutputHelper output)
             CancellationToken.None)).IsSuccess);
 
         Task<bool> HasGoldAsync(int productId)
-            => db.ProductAttributeValues.AsNoTracking().AnyAsync(value => value.ProductId == ProductId.From(productId)
+            => db.ProductAttributeValues.AsNoTracking().AnyAsync(value => value.ProductId == ProductId.Create(productId)
                 && value.AttributeId == color.Id && value.ValueId == gold.Id && value.IsConfirmed);
     }
 
     private static async Task<string> ReviewTextAsync(CatalogDbContext db, int productId)
         => string.Join(" | ", (await db.ProductAttributeReviews.AsNoTracking()
-                .SingleAsync(review => review.ProductId == ProductId.From(productId)))
+                .SingleAsync(review => review.ProductId == ProductId.Create(productId)))
             .Reasons.Select(reason => $"{reason.Code}: {reason.Text}"));
 }

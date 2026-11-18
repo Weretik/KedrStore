@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Content.Domain.Gallery;
 namespace UnitTests.Content.Documents;
@@ -55,12 +56,12 @@ public sealed class GalleryItemTests
     [Fact]
     public void CreatePhoto_NeedsAPositiveFileId_AndTextsHaveLimits()
     {
-        var photo = GalleryItem.CreatePhoto(42, 0, GalleryItemTexts.Empty, Now).Value;
+        var photo = GalleryItem.CreatePhoto(MediaFileId.FromStorage(42), 0, GalleryItemTexts.Empty, Now).Value;
 
         Assert.Equal(GalleryItemKind.Photo, photo.Kind);
-        Assert.Equal(42, photo.MediaFileId);
+        Assert.Equal(42, photo.MediaFileId?.Value);
         Assert.Null(photo.YoutubeId);
-        DomainAssert.Fails(GalleryItem.CreatePhoto(0, 0, GalleryItemTexts.Empty, Now));
+        DomainAssert.Fails(GalleryItem.CreatePhoto(MediaFileId.FromStorage(0), 0, GalleryItemTexts.Empty, Now));
         DomainAssert.Fails(GalleryItemTexts.Create(new string('а', GalleryItemTexts.TitleMaxLength + 1), null, null, null));
         DomainAssert.Fails(photo.MoveTo(-1, Now));
     }

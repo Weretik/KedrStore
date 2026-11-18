@@ -8,7 +8,8 @@ internal sealed class GalleryItemConfiguration : IEntityTypeConfiguration<Galler
             $"(\"Kind\" = '{nameof(GalleryItemKind.Photo)}' AND \"MediaFileId\" IS NOT NULL AND \"YoutubeId\" IS NULL) OR " +
             $"(\"Kind\" = '{nameof(GalleryItemKind.Video)}' AND \"YoutubeId\" IS NOT NULL AND \"MediaFileId\" IS NULL)"));
         builder.HasKey(item => item.Id);
-        builder.Property(item => item.Id).UseIdentityByDefaultColumn();
+        builder.Property(item => item.Id)
+            .HasConversion(id => id.Value, value => GalleryItemId.FromStorage(value)).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
         builder.Property(item => item.Kind).HasConversion<string>().HasMaxLength(16).IsRequired();
         // A media file ID is a value from the Media module, not a foreign key (module rules).
         builder.Property(item => item.MediaFileId);

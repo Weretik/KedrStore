@@ -39,10 +39,10 @@ public sealed class SyncOneCCounterpartiesJob(
             .ToArray();
 
         var existingCounterparties = (await store.ListAllWithDeletedAsync(cancellationToken))
-            .ToDictionary(item => item.Id, StringComparer.Ordinal);
+            .ToDictionary(item => item.Id.Value, StringComparer.Ordinal);
         var assignedIdentityUsers = existingCounterparties.Values
-            .GroupBy(item => item.IdentityUserId)
-            .ToDictionary(group => group.Key, group => group.First().Id);
+            .GroupBy(item => item.IdentityUserId.Value)
+            .ToDictionary(group => group.Key, group => group.First().Id.Value);
 
         var imported = 0;
         var updated = 0;
@@ -69,7 +69,7 @@ public sealed class SyncOneCCounterpartiesJob(
                 normalized.CounterpartyId,
                 normalized.Email,
                 normalized.CounterpartyName,
-                existingCounterparty?.IdentityUserId,
+                existingCounterparty?.IdentityUserId.Value,
                 cancellationToken);
 
             if (!identityResult.IsSuccess)
@@ -100,11 +100,11 @@ public sealed class SyncOneCCounterpartiesJob(
             {
                 var created = Counterparty.Create(
                     id: normalized.CounterpartyId,
-                    identityUserId: identityResult.Value,
+                    identityUserId: UserId.FromStorage(identityResult.Value),
                     name: normalized.CounterpartyName,
                     email: normalized.Email,
                     phone: normalized.Phone,
-                    defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                    defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                     createdAt: now);
                 if (created.IsFailure)
                 {
@@ -130,11 +130,11 @@ public sealed class SyncOneCCounterpartiesJob(
                 restored++;
             }
 
-            var fieldsChanged = existingCounterparty.IdentityUserId != identityResult.Value
+            var fieldsChanged = existingCounterparty.IdentityUserId.Value != identityResult.Value
                                 || existingCounterparty.Name != normalized.CounterpartyName
                                 || existingCounterparty.Email != normalized.Email
                                 || existingCounterparty.Phone != normalized.Phone
-                                || existingCounterparty.DefaultPriceTypeId != normalized.DefaultPriceTypeId;
+                                || existingCounterparty.DefaultPriceTypeId.Value != normalized.DefaultPriceTypeId;
             if (!fieldsChanged && !wasDeleted)
             {
                 unchanged++;
@@ -142,11 +142,11 @@ public sealed class SyncOneCCounterpartiesJob(
             }
 
             var changed = existingCounterparty.Update(
-                identityUserId: identityResult.Value,
+                identityUserId: UserId.FromStorage(identityResult.Value),
                 name: normalized.CounterpartyName,
                 email: normalized.Email,
                 phone: normalized.Phone,
-                defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                 updatedAt: now);
             if (changed.IsFailure)
             {
@@ -161,7 +161,7 @@ public sealed class SyncOneCCounterpartiesJob(
         }
 
         var staleCounterparties = sourceIdsComplete
-            ? existingCounterparties.Values.Where(item => !sourceCounterpartyIds.Contains(item.Id)).ToArray()
+            ? existingCounterparties.Values.Where(item => !sourceCounterpartyIds.Contains(item.Id.Value)).ToArray()
             : [];
 
         if (!sourceIdsComplete)

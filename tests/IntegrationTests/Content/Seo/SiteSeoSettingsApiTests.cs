@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -131,7 +132,7 @@ public sealed class SiteSeoSettingsApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
         var settings = SiteSeoSettings.CreateEmpty(DateTimeOffset.UnixEpoch);
         if (shareImageMediaFileId is not null)
-            settings.Update(new SiteSeoSettingsValues(null, null, null, null, shareImageMediaFileId),
+            settings.Update(new SiteSeoSettingsValues(null, null, null, null, shareImageMediaFileId is { } image ? MediaFileId.FromStorage(image) : null),
                 DateTimeOffset.UnixEpoch, "seed");
         db.SiteSeoSettings.Add(settings);
         db.SaveChanges();

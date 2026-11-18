@@ -9,7 +9,7 @@ public sealed record SiteSeoSettingsValues(
     string? GoogleTagManagerId,
     string? GoogleSiteVerification,
     string? BingSiteVerification,
-    long? ShareImageMediaFileId);
+    MediaFileId? ShareImageMediaFileId);
 
 /// <summary>
 /// Site-wide SEO codes that every site page carries: the Google Analytics 4 and Tag Manager ids, the Google Search
@@ -25,7 +25,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     public const int TagManagerIdMaxLength = 20;
     public const int VerificationMaxLength = 100;
 
-    public int Id { get; private set; }
+    public SiteSeoSettingsId Id { get; private set; }
 
     /// <summary>Google Analytics 4 measurement id, <c>G-XXXXXXXXXX</c>.</summary>
     public string? GoogleAnalyticsId { get; private set; }
@@ -40,7 +40,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     public string? BingSiteVerification { get; private set; }
 
     /// <summary>Picture of the media library for link previews; the site keeps its own when empty.</summary>
-    public long? ShareImageMediaFileId { get; private set; }
+    public MediaFileId? ShareImageMediaFileId { get; private set; }
 
     public DateTimeOffset UpdatedAt { get; private set; }
     /// <summary>Row version (PostgreSQL <c>xmin</c>): an admin form sends it back, so a save over newer data answers 409.</summary>
@@ -52,7 +52,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
     private SiteSeoSettings() { }
 
     /// <summary>The empty row the migration inserts.</summary>
-    public static SiteSeoSettings CreateEmpty(DateTimeOffset now) => new() { Id = SingletonId, UpdatedAt = now };
+    public static SiteSeoSettings CreateEmpty(DateTimeOffset now) => new() { Id = SiteSeoSettingsId.Create(SingletonId), UpdatedAt = now };
 
     public DomainResult Update(SiteSeoSettingsValues values, DateTimeOffset now, string editor)
     {
@@ -65,7 +65,7 @@ public sealed partial class SiteSeoSettings : IAggregateRoot
             nameof(GoogleSiteVerification), IsVerification));
         var bingVerification = checks.Take(Checked(NormalizeVerification(values.BingSiteVerification),
             nameof(BingSiteVerification), IsVerification));
-        if (values.ShareImageMediaFileId is <= 0)
+        if (values.ShareImageMediaFileId is { Value: <= 0 })
             checks.Check(SiteSeoSettingsErrors.Invalid(nameof(ShareImageMediaFileId),
                 values.ShareImageMediaFileId.ToString()));
         if (checks.Error is { } error)

@@ -70,7 +70,7 @@ public sealed class GetCategoryBySlugHandler(
     private async Task<CatalogRedirect?> RedirectForDeletedAsync(int categoryId,
         IReadOnlyDictionary<int, ProductCategory> active, CancellationToken cancellationToken)
     {
-        var id = ProductCategoryId.From(categoryId);
+        var id = ProductCategoryId.Create(categoryId);
         var deleted = await catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
             .FirstOrDefaultAsync(category => category.Id == id, cancellationToken);
         if (deleted is null)

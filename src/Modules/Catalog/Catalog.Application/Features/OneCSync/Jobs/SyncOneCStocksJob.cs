@@ -28,7 +28,7 @@ public sealed class SyncOneCStocksJob(
 
         var stockByProductId = stocks
             .ToDictionary(
-                x => ProductId.From(x.Id),
+                x => ProductId.Create(x.Id),
                 x => x.Stock
             );
 

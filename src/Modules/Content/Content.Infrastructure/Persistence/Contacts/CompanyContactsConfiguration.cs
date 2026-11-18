@@ -7,7 +7,8 @@ internal sealed class CompanyContactsConfiguration : IEntityTypeConfiguration<Co
         builder.ToTable("CompanyContacts", table => table.HasCheckConstraint(
             "CK_CompanyContacts_Singleton", $"\"Id\" = {CompanyContacts.SingletonId}"));
         builder.HasKey(contacts => contacts.Id);
-        builder.Property(contacts => contacts.Id).ValueGeneratedNever();
+        builder.Property(contacts => contacts.Id)
+            .HasConversion(id => id.Value, value => CompanyContactsId.FromStorage(value)).ValueGeneratedNever();
         builder.Property(contacts => contacts.SalesPhone).HasMaxLength(13).IsRequired();
         builder.Property(contacts => contacts.Email).HasMaxLength(CompanyContacts.EmailMaxLength).IsRequired();
         builder.Property(contacts => contacts.TelegramUrl).HasMaxLength(CompanyContacts.UrlMaxLength).IsRequired();

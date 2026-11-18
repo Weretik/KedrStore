@@ -12,15 +12,15 @@ public sealed class ProductMediaFileChanges(
     TimeProvider clock)
 {
     public Task ApplyReplacedAsync(long fileId, string url, CancellationToken cancellationToken)
-        => ApplyAsync(fileId, (product, now) => product.UpdateMediaUrl(fileId, url, now), cancellationToken);
+        => ApplyAsync(fileId, (product, now) => product.UpdateMediaUrl(MediaFileId.FromStorage(fileId), url, now), cancellationToken);
 
     public Task ApplyDeletedAsync(long fileId, CancellationToken cancellationToken)
-        => ApplyAsync(fileId, (product, now) => product.RemoveMediaFile(fileId, now), cancellationToken);
+        => ApplyAsync(fileId, (product, now) => product.RemoveMediaFile(MediaFileId.FromStorage(fileId), now), cancellationToken);
 
     private async Task ApplyAsync(long fileId, Func<Product, DateTimeOffset, bool> apply,
         CancellationToken cancellationToken)
     {
-        var linked = await products.ListAsync(new ProductsLinkedToMediaFileSpec(fileId), cancellationToken);
+        var linked = await products.ListAsync(new ProductsLinkedToMediaFileSpec(MediaFileId.FromStorage(fileId)), cancellationToken);
         var now = clock.GetUtcNow();
         var changed = linked.Count(product => apply(product, now));
         if (changed == 0)

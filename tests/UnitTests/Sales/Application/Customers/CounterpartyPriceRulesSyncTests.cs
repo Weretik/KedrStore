@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Sales.Application.Abstractions.Catalog;
 using Sales.Application.Abstractions.Customers;
@@ -14,8 +15,8 @@ public sealed class CounterpartyPriceRulesSyncTests
     public async Task The_sync_changes_adds_and_removes_rules_and_skips_unknown_references()
     {
         var store = new FakeStore(["cp-1"]);
-        store.Rules.Add(CounterpartyCategoryPriceType.Create("cp-1", 10, 1).Value);
-        store.Rules.Add(CounterpartyCategoryPriceType.Create("cp-1", 20, 1).Value);
+        store.Rules.Add(Rule(10, 1));
+        store.Rules.Add(Rule(20, 1));
         var oneC = new FakeOneC([new("cp-1", 10, 2), new("cp-1", 30, 1), new("cp-1", 99, 1), new("cp-unknown", 10, 1)]);
 
         var result = await new SyncOneCCounterpartyCategoryPriceTypesJob(oneC, store, new FakeCatalog(),
@@ -24,18 +25,22 @@ public sealed class CounterpartyPriceRulesSyncTests
 
         Assert.Equal((2, 1, 2), (result.ImportedOrUpdated, result.Deleted, result.Skipped));
         Assert.Equal(new[] { (10, 2), (30, 1) },
-            store.Rules.Select(rule => (rule.CategoryId, rule.PriceTypeId)).OrderBy(rule => rule.CategoryId));
+            store.Rules.Select(rule => (rule.CategoryId.Value, rule.PriceTypeId.Value)).OrderBy(rule => rule.Item1));
         Assert.Equal(1, store.Saves);
     }
 
     [Fact]
     public void A_rule_refuses_a_non_positive_price_type()
     {
-        var rule = CounterpartyCategoryPriceType.Create("cp-1", 10, 1).Value;
+        var rule = Rule(10, 1);
 
-        Assert.True(rule.ChangePriceType(0).IsFailure);
-        Assert.Equal(1, rule.PriceTypeId);
+        Assert.True(rule.ChangePriceType(PriceTypeId.FromStorage(0)).IsFailure);
+        Assert.Equal(1, rule.PriceTypeId.Value);
     }
+
+    private static CounterpartyCategoryPriceType Rule(int categoryId, int priceTypeId)
+        => CounterpartyCategoryPriceType.Create("cp-1", ProductCategoryId.FromStorage(categoryId),
+            PriceTypeId.FromStorage(priceTypeId)).Value;
 
     private sealed class FakeOneC(IReadOnlyList<OneCCounterpartyCategoryPriceTypeDto> rules) : ISalesOneCReadClient
     {

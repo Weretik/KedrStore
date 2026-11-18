@@ -25,7 +25,7 @@ internal static class DeletedAdminProducts
             var term = request.SearchTerm.Trim();
             var pattern = "%" + SearchWords.Escape(term) + "%";
             products = int.TryParse(term, NumberStyles.None, CultureInfo.InvariantCulture, out var id)
-                ? products.Where(product => product.Id == ProductId.From(id))
+                ? products.Where(product => product.Id == ProductId.Create(id))
                 : products.Where(product => EF.Functions.ILike(product.Name, pattern, @"\"));
         }
 

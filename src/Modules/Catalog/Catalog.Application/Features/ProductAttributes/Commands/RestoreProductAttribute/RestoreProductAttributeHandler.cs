@@ -23,7 +23,7 @@ public sealed class RestoreProductAttributeHandler(
 
     private async Task<Result<AdminProductAttributesDto>> HandleInTransactionAsync(RestoreProductAttributeCommand command, CancellationToken cancellationToken)
     {
-        var productId = ProductId.From(command.ProductId);
+        var productId = ProductId.Create(command.ProductId);
         if (!await db.Products.IgnoreQueryFilters().AnyAsync(product => product.Id == productId, cancellationToken))
             return Result.NotFound();
 

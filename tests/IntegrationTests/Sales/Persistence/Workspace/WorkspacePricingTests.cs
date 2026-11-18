@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -55,9 +56,9 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
 
         var now = DateTimeOffset.UtcNow;
         var sales = _scope.ServiceProvider.GetRequiredService<SalesDbContext>();
-        sales.Counterparties.Add(Counterparty.Create(CustomerId, Guid.NewGuid(), "Клієнт", "c@example.com", null, DefaultType, now).Value);
+        sales.Counterparties.Add(Counterparty.Create(CustomerId, UserId.FromStorage(Guid.NewGuid()), "Клієнт", "c@example.com", null, PriceTypeId.FromStorage(DefaultType), now).Value);
         // The rule sits on the parent "Locks" category; products live in its child and grandchild.
-        sales.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create(CustomerId, 10, LocksType).Value);
+        sales.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create(CustomerId, ProductCategoryId.FromStorage(10), PriceTypeId.FromStorage(LocksType)).Value);
         await sales.SaveChangesAsync();
 
         var catalog = _scope.ServiceProvider.GetRequiredService<CatalogDbContext>();
@@ -158,18 +159,18 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
 
     private static void AddCategory(CatalogDbContext db, int id, int? parentId)
     {
-        var path = parentId is null ? CategoryPath.Root(id.ToString()) : CategoryPath.From($"n{parentId}.n{id}");
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(id), "000000001", $"Category {id}", $"category-{id}",
-            path, parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value);
+        var path = parentId is null ? CategoryPath.Root(id.ToString()) : CategoryPath.Create($"n{parentId}.n{id}");
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(id), "000000001", $"Category {id}", $"category-{id}",
+            path, parentId is null ? null : ProductCategoryId.Create(parentId.Value)).Value);
     }
 
     private static void AddProduct(CatalogDbContext db, int id, int categoryId, decimal stock,
         params (int Type, decimal Amount)[] prices)
     {
-        db.Products.Add(Product.Create(ProductId.From(id), "000000001", $"Товар {id}", $"product-{id}",
-            ProductCategoryId.From(categoryId), DateTimeOffset.UtcNow, stock, 1, false, false).Value);
+        db.Products.Add(Product.Create(ProductId.Create(id), "000000001", $"Товар {id}", $"product-{id}",
+            ProductCategoryId.Create(categoryId), DateTimeOffset.UtcNow, stock, 1, false, false).Value);
         foreach (var (type, amount) in prices)
-            db.ProductPrices.Add(ProductPrice.Create("000000001", ProductId.From(id), PriceTypeId.From(type),
+            db.ProductPrices.Add(ProductPrice.Create("000000001", ProductId.Create(id), PriceTypeId.Create(type),
                 new Money(amount, "UAH")).Value);
     }
 }

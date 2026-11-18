@@ -6,7 +6,7 @@ public sealed class DeleteLegalDocumentDraftHandler(IContentRepository<LegalDocu
 {
     public async ValueTask<Result> Handle(DeleteLegalDocumentDraftCommand command, CancellationToken cancellationToken)
     {
-        var version = await versions.GetByIdAsync(command.Id, cancellationToken);
+        var version = await versions.GetByIdAsync(LegalDocumentVersionId.FromStorage(command.Id), cancellationToken);
         if (version is null)
             return Result.NotFound();
         if (!version.IsDraft)

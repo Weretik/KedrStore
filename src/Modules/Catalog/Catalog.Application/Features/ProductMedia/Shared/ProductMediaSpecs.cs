@@ -9,7 +9,7 @@ internal sealed class ProductForMediaSpec : SingleResultSpecification<Product>
 /// <summary>Every product (deleted ones too) that links to the library file, tracked.</summary>
 internal sealed class ProductsLinkedToMediaFileSpec : Specification<Product>
 {
-    public ProductsLinkedToMediaFileSpec(long fileId) => Query
+    public ProductsLinkedToMediaFileSpec(MediaFileId fileId) => Query
         .IgnoreQueryFilters()
         .Where(product => product.MediaLinks.Any(link => link.MediaFileId == fileId));
 }

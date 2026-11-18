@@ -6,11 +6,11 @@ namespace Content.Domain.Gallery;
 /// </summary>
 public sealed class GalleryItem : IAggregateRoot
 {
-    public long Id { get; private set; }
+    public GalleryItemId Id { get; private set; }
     public GalleryItemKind Kind { get; private set; }
 
     /// <summary>Media library file ID; set only for a photo.</summary>
-    public long? MediaFileId { get; private set; }
+    public MediaFileId? MediaFileId { get; private set; }
 
     /// <summary>YouTube video ID; set only for a video.</summary>
     public string? YoutubeId { get; private set; }
@@ -25,11 +25,11 @@ public sealed class GalleryItem : IAggregateRoot
 
     private GalleryItem() { }
 
-    public static DomainResult<GalleryItem> CreatePhoto(long mediaFileId, int position, GalleryItemTexts texts,
+    public static DomainResult<GalleryItem> CreatePhoto(MediaFileId mediaFileId, int position, GalleryItemTexts texts,
         DateTimeOffset now)
     {
-        if (mediaFileId <= 0)
-            return GalleryErrors.MediaFileInvalid(mediaFileId);
+        if (mediaFileId.Value <= 0)
+            return GalleryErrors.MediaFileInvalid(mediaFileId.Value);
         return Create(GalleryItemKind.Photo, mediaFileId, null, position, texts, now);
     }
 
@@ -63,7 +63,7 @@ public sealed class GalleryItem : IAggregateRoot
         return DomainResult.Success();
     }
 
-    private static DomainResult<GalleryItem> Create(GalleryItemKind kind, long? mediaFileId, string? youtubeId,
+    private static DomainResult<GalleryItem> Create(GalleryItemKind kind, MediaFileId? mediaFileId, string? youtubeId,
         int position, GalleryItemTexts texts, DateTimeOffset now)
     {
         if (position < 0)

@@ -70,7 +70,7 @@ public sealed class SyncOneCCounterpartyCategoryPriceTypesJob(
 
         var existingRules = await store.ListPriceRulesAsync(cancellationToken);
         var existingByKey = existingRules.ToDictionary(
-            item => (item.CounterpartyId, item.CategoryId),
+            item => (item.CounterpartyId.Value, item.CategoryId.Value),
             item => item,
             CounterpartyCategoryKeyComparer.Instance);
 
@@ -80,13 +80,14 @@ public sealed class SyncOneCCounterpartyCategoryPriceTypesJob(
             if (existingByKey.TryGetValue(key, out var existing))
             {
                 // validRules hold only positive price types, so the change always succeeds here.
-                existing.ChangePriceType(item.PriceTypeId);
+                existing.ChangePriceType(PriceTypeId.FromStorage(item.PriceTypeId));
                 continue;
             }
 
             // validRules hold only rows that pass the rule's checks, so creation always succeeds here.
             store.AddPriceRule(
-                CounterpartyCategoryPriceType.Create(item.CounterpartyId, item.CategoryId, item.PriceTypeId).Value);
+                CounterpartyCategoryPriceType.Create(item.CounterpartyId, ProductCategoryId.FromStorage(item.CategoryId),
+                    PriceTypeId.FromStorage(item.PriceTypeId)).Value);
         }
 
         var validKeys = validRules
@@ -94,7 +95,7 @@ public sealed class SyncOneCCounterpartyCategoryPriceTypesJob(
             .ToHashSet(CounterpartyCategoryKeyComparer.Instance);
 
         var toDelete = existingRules
-            .Where(item => !validKeys.Contains((item.CounterpartyId, item.CategoryId)))
+            .Where(item => !validKeys.Contains((item.CounterpartyId.Value, item.CategoryId.Value)))
             .ToList();
 
         store.RemovePriceRules(toDelete);

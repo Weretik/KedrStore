@@ -14,7 +14,7 @@ public sealed class UpdateWholesalePageHandler(
     public async ValueTask<Result<AdminWholesalePage>> Handle(UpdateWholesalePageCommand command,
         CancellationToken cancellationToken)
     {
-        var page = await repository.GetByIdAsync(WholesalePage.SingletonId, cancellationToken);
+        var page = await repository.GetByIdAsync(WholesalePageId.Create(WholesalePage.SingletonId), cancellationToken);
         if (page is null)
             return Result.NotFound();
 

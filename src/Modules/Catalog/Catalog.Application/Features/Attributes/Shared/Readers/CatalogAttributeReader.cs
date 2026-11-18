@@ -46,7 +46,7 @@ public sealed class CatalogAttributeReader(IReadCatalogDbContext db, IProductMed
         var productCount = (await ProductCountsAsync(attributeId, cancellationToken)).GetValueOrDefault(attributeId);
 
         var mediaIds = values.Where(value => value.SwatchMediaFileId is not null)
-            .Select(value => value.SwatchMediaFileId!.Value).Distinct().ToList();
+            .Select(value => value.SwatchMediaFileId!.Value.Value).Distinct().ToList();
         var urls = mediaIds.Count == 0
             ? new Dictionary<long, string>()
             : (await media.GetByIdsAsync(mediaIds, cancellationToken)).ToDictionary(file => file.Id, file => file.Url);
@@ -55,8 +55,8 @@ public sealed class CatalogAttributeReader(IReadCatalogDbContext db, IProductMed
             ToListItem(attribute, values.Count, productCount),
             values.Select(value => new AdminAttributeValueDto(
                 value.Id.Value, value.Code, value.NameUk, value.NameRu, value.Slug, value.SortOrder, value.SwatchHex,
-                value.SwatchMediaFileId,
-                value.SwatchMediaFileId is { } mediaId && urls.TryGetValue(mediaId, out var url) ? url : null,
+                value.SwatchMediaFileId?.Value,
+                value.SwatchMediaFileId is { } mediaId && urls.TryGetValue(mediaId.Value, out var url) ? url : null,
                 value.IsEditedManually, valueProducts.GetValueOrDefault(value.Id))).ToList(),
             aliases.Select(alias => new AdminAttributeAliasDto(
                 alias.Id.Value, alias.Scope, alias.RawValue, alias.ValueId?.Value, alias.IsConfirmed, alias.Note,
