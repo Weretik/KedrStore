@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Groups;
 
 namespace Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
@@ -7,4 +9,7 @@ namespace Catalog.Application.Features.Groups.Commands.SetProductGroupMain;
 /// until it is deleted or taken off the site.
 /// </summary>
 public sealed record SetProductGroupMainCommand(int GroupId, SetProductGroupMainRequest Request)
-    : ICommand<Result<AdminProductGroupDto>>;
+    : ICommand<Result<AdminProductGroupDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

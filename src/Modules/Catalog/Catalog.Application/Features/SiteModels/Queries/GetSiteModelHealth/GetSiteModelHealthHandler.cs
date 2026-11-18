@@ -10,5 +10,5 @@ public sealed class GetSiteModelHealthHandler(SiteModelStateReader reader)
 {
     public async ValueTask<Result<SiteModelHealthDto>> Handle(GetSiteModelHealthQuery query,
         CancellationToken cancellationToken)
-        => Result.Success((await reader.ReadAsync(cancellationToken)).Health());
+        => Result.Success((await reader.ReadCatalogAsync(cancellationToken)).Health());
 }

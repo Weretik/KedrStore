@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.AcceptProductReview;
@@ -6,4 +8,7 @@ namespace Catalog.Application.Features.ProductAttributes.Commands.AcceptProductR
 /// «Прийняти як є»: the product stops counting as a problem. Permanent (owner decision 2026-11-05): automation keeps
 /// it accepted, only «Повернути на перевірку» undoes it.
 /// </summary>
-public sealed record AcceptProductReviewCommand(int ProductId) : ICommand<Result<AdminProductAttributesDto>>;
+public sealed record AcceptProductReviewCommand(int ProductId) : ICommand<Result<AdminProductAttributesDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

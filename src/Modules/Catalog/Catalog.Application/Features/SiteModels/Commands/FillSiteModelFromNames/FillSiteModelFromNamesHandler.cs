@@ -29,7 +29,7 @@ public sealed class FillSiteModelFromNamesHandler(
     private async Task<Result<SiteModelDto>> HandleInTransactionAsync(FillSiteModelFromNamesCommand command, CancellationToken cancellationToken)
     {
         var modelId = ProductGroupId.Create(command.ModelId);
-        var state = await stateReader.ReadAsync(cancellationToken);
+        var state = await stateReader.ReadModelsAsync([modelId], cancellationToken);
         if (!state.Models.ContainsKey(modelId))
             return Result.NotFound();
 

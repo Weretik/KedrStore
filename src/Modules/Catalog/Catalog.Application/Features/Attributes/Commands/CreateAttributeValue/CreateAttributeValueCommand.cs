@@ -1,7 +1,12 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.Attributes.Commands.CreateAttributeValue;
 
 /// <summary>Admin adds a value to an attribute's list, for example a new decor.</summary>
 public sealed record CreateAttributeValueCommand(int AttributeId, CreateAttributeValueRequest Request)
-    : ICommand<Result<AdminCatalogAttributeDto>>;
+    : ICommand<Result<AdminCatalogAttributeDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

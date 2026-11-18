@@ -1,3 +1,4 @@
+using IntegrationTests.Platform.Caching;
 using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -112,7 +113,7 @@ public sealed class PublicSiteModelTests
 
         var hinges = await db.ProductGroupMembers.AsNoTracking()
             .Where(member => member.ProductId == ProductId.Create(1)).Select(member => member.GroupId!.Value).SingleAsync();
-        var state = new SiteModelStateReader(db);
+        var state = new SiteModelStateReader(db, NoReadCache.Instance);
         var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroup>(db),
                     new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,

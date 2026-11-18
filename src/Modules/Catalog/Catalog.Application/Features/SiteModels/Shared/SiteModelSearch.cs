@@ -1,4 +1,6 @@
-namespace Catalog.Application.Features.SiteModels.Shared.State;
+using Catalog.Application.Features.SiteModels.Shared.State;
+
+namespace Catalog.Application.Features.SiteModels.Shared;
 
 /// <summary>
 /// The admin model search over the loaded state (database rules 2.1, applied in memory): every word of the search is

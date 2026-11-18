@@ -60,7 +60,7 @@ public sealed class SiteModelChanges(
     public async Task SaveOfferedAxesAsync(IReadOnlyCollection<ProductGroupId> modelIds,
         CancellationToken cancellationToken)
     {
-        var state = await stateReader.ReadAsync(cancellationToken);
+        var state = await stateReader.ReadModelsAsync(modelIds, cancellationToken);
         var withoutAxes = modelIds.Where(id => state.Models.ContainsKey(id) && !state.SavedAxes[id].Any()).ToList();
         if (withoutAxes.Count == 0)
             return;

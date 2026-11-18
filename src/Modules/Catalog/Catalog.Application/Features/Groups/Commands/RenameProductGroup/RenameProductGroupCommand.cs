@@ -1,7 +1,12 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Groups;
 
 namespace Catalog.Application.Features.Groups.Commands.RenameProductGroup;
 
 /// <summary>Renames a group. The slug stays; only an Admin changes it (it is part of the site markup).</summary>
 public sealed record RenameProductGroupCommand(int GroupId, RenameProductGroupRequest Request)
-    : ICommand<Result<AdminProductGroupDto>>;
+    : ICommand<Result<AdminProductGroupDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

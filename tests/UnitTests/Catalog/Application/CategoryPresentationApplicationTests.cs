@@ -1,3 +1,4 @@
+using Catalog.Application.Features.SiteModels.Shared.State;
 using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Categories.Shared;
 using System.Reflection;
@@ -160,9 +161,11 @@ public sealed class CategoryPresentationApplicationTests
     [Fact]
     public void CommandsThatChangeThePublicTree_DropItsCache()
     {
-        Assert.Equal([CategoryTreeCache.Tag], new SetCategorySiteVisibilityCommand(1, true).InvalidatedCacheTags);
+        Assert.Equal([CategoryTreeCache.Tag, SiteModelStateReader.Tag],
+            new SetCategorySiteVisibilityCommand(1, true).InvalidatedCacheTags);
         Assert.Equal([CategoryTreeCache.Tag], ChangeSlugCommand.ForCategory(1, new ChangeSlugRequest("new-slug")).InvalidatedCacheTags);
-        Assert.Empty(ChangeSlugCommand.ForProduct(1, new ChangeSlugRequest("new-slug")).InvalidatedCacheTags);
+        Assert.Equal([SiteModelStateReader.Tag],
+            ChangeSlugCommand.ForProduct(1, new ChangeSlugRequest("new-slug")).InvalidatedCacheTags);
     }
 
     private static readonly IOptions<RootCategoryId> Roots = Options.Create(new RootCategoryId

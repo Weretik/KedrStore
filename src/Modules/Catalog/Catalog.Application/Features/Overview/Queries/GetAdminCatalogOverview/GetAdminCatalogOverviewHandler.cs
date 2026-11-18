@@ -65,7 +65,7 @@ public sealed class GetAdminCatalogOverviewHandler(
             .ToListAsync(cancellationToken);
         var noName = problems.Count(reasons => reasons.Any(reason => reason.Code == AttributeReviewReason.NoName));
 
-        var health = (await siteModels.ReadAsync(cancellationToken)).Health();
+        var health = (await siteModels.ReadCatalogAsync(cancellationToken)).Health();
 
         return Result.Success(new AdminCatalogOverviewResponse(withoutPhoto.Sum(row => row.Count), top, withoutText,
             problems.Count, noName, health));

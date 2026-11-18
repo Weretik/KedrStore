@@ -7,8 +7,11 @@ namespace BuildingBlocks.Infrastructure.Caching;
 
 public static class ReadCacheRegistration
 {
-    /// <summary>Largest answer kept; a bigger one is returned but not cached.</summary>
-    public const int MaximumPayloadBytes = 4 * 1024 * 1024;
+    /// <summary>
+    /// Largest answer kept; a bigger one is returned but not cached (HybridCache logs it). The site models state of the
+    /// whole catalog is the largest entry (a few MB for a few thousand products with their attribute values).
+    /// </summary>
+    public const int MaximumPayloadBytes = 16 * 1024 * 1024;
 
     /// <summary>
     /// Registers <see cref="HybridCache"/> in memory only and <see cref="IReadCache"/> over it (ADR-0016). To add a

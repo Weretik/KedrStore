@@ -1,11 +1,15 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.Attributes.Commands.CreateCatalogAttribute;
 
 /// <summary>Admin adds an attribute of their own; it is manual from the start, so the dictionary import leaves it.</summary>
 public sealed record CreateCatalogAttributeCommand(CreateCatalogAttributeRequest Request)
-    : ICommand<Result<AdminCatalogAttributeDto>>
+    : ICommand<Result<AdminCatalogAttributeDto>>, IInvalidatesReadCache
 {
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+
     public const string YesNo = "yesno";
 
     /// <summary><c>yesno</c> is a list with the values «Так» and «Ні» created at once.</summary>

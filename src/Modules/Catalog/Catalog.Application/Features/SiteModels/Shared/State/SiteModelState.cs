@@ -4,22 +4,23 @@ using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes.ValueObjects;
 using Catalog.Domain.Attributes.Enums;
-using Catalog.Domain.Groups.Members;
+
 namespace Catalog.Application.Features.SiteModels.Shared.State;
 
 /// <summary>
-/// Everything the model pages and the health counts need, read once (the catalog has a few thousand products):
-/// products, models, their axes and texts, and the confirmed attribute values. Problems follow spec catalog/007 R-08
-/// and count only on-site, not deleted products.
+/// What the model pages and the health counts need: products, models, their axes and texts, and the confirmed
+/// attribute values, indexed for lookups. <see cref="SiteModelStateReader"/> builds it from a <see cref="SiteModelSnapshot"/>
+/// of the whole catalog (cached) or of a few models. Problems follow spec catalog/007 R-08 and count only on-site, not
+/// deleted products.
 /// </summary>
 public sealed class SiteModelState
 {
     public required IReadOnlyDictionary<ProductId, SiteModelProductFacts> Products { get; init; }
-    public required IReadOnlyDictionary<ProductGroupId, ProductGroup> Models { get; init; }
+    public required IReadOnlyDictionary<ProductGroupId, SiteModelFacts> Models { get; init; }
     public required ILookup<ProductGroupId, ProductId> MembersByModel { get; init; }
     public required IReadOnlyDictionary<ProductId, ProductGroupId> ModelOfProduct { get; init; }
-    public required ILookup<ProductGroupId, ProductGroupAxis> SavedAxes { get; init; }
-    public required ILookup<ProductGroupId, ProductGroupText> Texts { get; init; }
+    public required ILookup<ProductGroupId, SiteModelAxisFacts> SavedAxes { get; init; }
+    public required ILookup<ProductGroupId, SiteModelTextFacts> Texts { get; init; }
     public required ILookup<ProductId, SiteModelValueFacts> Values { get; init; }
     public required IReadOnlyDictionary<AttributeId, SiteModelAttributeFacts> Attributes { get; init; }
     public required IReadOnlyDictionary<AttributeValueId, string> ValueNames { get; init; }
@@ -168,27 +169,3 @@ public sealed class SiteModelState
     private string Combination(ProductId productId, IReadOnlyList<AttributeId> axes)
         => string.Join('|', axes.Select(axis => Signature(productId, axis)));
 }
-
-public sealed record SiteModelProductFacts(
-    ProductId Id,
-    string Name,
-    string Slug,
-    ProductCategoryId CategoryId,
-    string Photo,
-    decimal? RetailPrice,
-    bool InStock,
-    bool ExportToSite,
-    bool IsDeleted,
-    bool IsCategoryShown)
-{
-    /// <summary>Exported from 1C, not deleted, and its category is shown on the site (R-08, R-18).</summary>
-    public bool IsOnSite => ExportToSite && !IsDeleted && IsCategoryShown;
-    public bool HasPhoto => Photo.Length > 0;
-}
-
-/// <summary>A confirmed attribute value of a product; <c>Number</c> holds a number attribute's value as text.</summary>
-public sealed record SiteModelValueFacts(
-    AttributeId AttributeId, short Position, AttributeValueId? ValueId, string Number, bool IsManual);
-
-public sealed record SiteModelAttributeFacts(
-    AttributeId Id, string Code, string Name, bool IsVariantAxis, int SortOrder, AttributeKind Kind);

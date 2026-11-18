@@ -1,7 +1,12 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.Attributes.Commands.UpdateAttributeValue;
 
 /// <summary>Admin edits a value's names, order, and swatch; the dictionary import then leaves it.</summary>
 public sealed record UpdateAttributeValueCommand(int AttributeId, int ValueId, UpdateAttributeValueRequest Request)
-    : ICommand<Result<AdminCatalogAttributeDto>>;
+    : ICommand<Result<AdminCatalogAttributeDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

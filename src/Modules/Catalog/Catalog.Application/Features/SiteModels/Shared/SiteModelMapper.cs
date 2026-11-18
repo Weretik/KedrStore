@@ -95,7 +95,7 @@ public static class SiteModelMapper
     private static List<ProductId> Visible(SiteModelState state, ProductGroupId modelId)
         => state.OnSiteMembers(modelId).ToList();
 
-    private static string PhotoOf(SiteModelState state, ProductGroup model, IReadOnlyList<ProductId> members)
+    private static string PhotoOf(SiteModelState state, SiteModelFacts model, IReadOnlyList<ProductId> members)
     {
         if (model.MainProductId is { } mainId && members.Contains(mainId) && state.Products[mainId].HasPhoto)
             return state.Products[mainId].Photo;
