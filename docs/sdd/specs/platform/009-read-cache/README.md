@@ -18,7 +18,7 @@ A read that is expensive, the same for every caller, and changes rarely is answe
 ## Rules
 
 - R-01 Caching goes only through `IReadCache` (BuildingBlocks.Application); only `BuildingBlocks.Infrastructure/Caching` uses `HybridCache`, `IMemoryCache` or `IDistributedCache`.
-- R-02 A cached value is an immutable sealed read model with `[ImmutableObject(true)]`; never an aggregate, a `Result`, or per-user data.
+- R-02 A cached value is an immutable sealed read model with `[ImmutableObject(true)]`; never an aggregate or other domain entity (checked by `ArchitectureTests/Application/CachedReadModelTests`), a `Result`, or per-user data.
 - R-03 Every cached read has a `ReadCacheEntry`: stable name, key with every argument that changes the answer, one tag, a lifetime.
 - R-04 Commands that change cached data implement `IInvalidatesReadCache`; the cache is dropped only after success.
 - R-05 Invalidation reaches only the instance that ran the command; other instances and `Host.Jobs` changes show after the lifetime, so lifetimes are short.

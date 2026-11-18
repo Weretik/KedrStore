@@ -1,6 +1,7 @@
 using BuildingBlocks.Application.Caching;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BuildingBlocks.Infrastructure.Caching;
 
@@ -12,12 +13,12 @@ public static class ReadCacheRegistration
     /// <summary>
     /// Registers <see cref="HybridCache"/> in memory only and <see cref="IReadCache"/> over it (ADR-0016). To add a
     /// shared L2 later, register an <c>IDistributedCache</c> (for example <c>AddStackExchangeRedisCache</c>) in the host:
-    /// HybridCache uses it on its own.
+    /// HybridCache uses it on its own. Safe to call more than once.
     /// </summary>
     public static IServiceCollection AddReadCache(this IServiceCollection services)
     {
         services.AddHybridCache(options => options.MaximumPayloadBytes = MaximumPayloadBytes);
-        services.AddSingleton<IReadCache, HybridReadCache>();
+        services.TryAddSingleton<IReadCache, HybridReadCache>();
         return services;
     }
 }
