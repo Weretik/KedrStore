@@ -12,7 +12,7 @@ public sealed class GetProductMediaHandler(ICatalogReadRepository<Product> produ
         CancellationToken cancellationToken)
     {
         var product = await products.FirstOrDefaultAsync(
-            new ProductForMediaSpec(ProductId.From(query.ProductId)), cancellationToken);
+            new ProductForMediaSpec(ProductId.Create(query.ProductId)), cancellationToken);
         if (product is null)
             return Result.NotFound();
 

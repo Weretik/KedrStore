@@ -33,7 +33,7 @@ public class SyncOneCPriceTypesJob(IOneCClient oneC, ICatalogRepository<PriceTyp
 
         foreach (var item in priceTypeDtos)
         {
-            var priceTypeId = PriceTypeId.From(item.PriceTypeId);
+            var priceTypeId = PriceTypeId.Create(item.PriceTypeId);
 
             if (!existingIds.Contains(priceTypeId))
             {

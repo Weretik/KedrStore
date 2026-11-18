@@ -122,6 +122,6 @@ public sealed class ProductMediaTests
     }
 
     private static Product NewProduct()
-        => Product.Create(ProductId.From(731), "R", "Петля", "petlia", ProductCategoryId.From(10),
+        => Product.Create(ProductId.Create(731), "R", "Петля", "petlia", ProductCategoryId.Create(10),
             Created, 0, 1, false, false, true).Value;
 }

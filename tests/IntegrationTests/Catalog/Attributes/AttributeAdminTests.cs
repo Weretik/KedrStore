@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using global::Catalog.Application.Features.Attributes.Shared;
@@ -98,12 +99,12 @@ public sealed class AttributeAdminTests
     {
         var color = AttributeId.Create(await AttributeIdAsync(db, "color"));
         return await db.ProductAttributeValues.AsNoTracking()
-            .Where(value => value.ProductId == ProductId.From(productId) && value.AttributeId == color)
+            .Where(value => value.ProductId == ProductId.Create(productId) && value.AttributeId == color)
             .OrderBy(value => value.Position).ToListAsync();
     }
 
     private static async Task<IReadOnlyList<AttributeReviewReason>> ReasonsAsync(CatalogDbContext db, int productId)
-        => (await db.ProductAttributeReviews.AsNoTracking().SingleAsync(review => review.ProductId == ProductId.From(productId)))
+        => (await db.ProductAttributeReviews.AsNoTracking().SingleAsync(review => review.ProductId == ProductId.Create(productId)))
             .Reasons;
 
     [Fact]
@@ -188,7 +189,7 @@ public sealed class AttributeAdminTests
             (accepted.Value.Review.State, accepted.Value.Review.AcceptedBy));
 
         await RunAsync(db, Dictionary, Rows, apply: true);
-        var review = await db.ProductAttributeReviews.AsNoTracking().SingleAsync(item => item.ProductId == ProductId.From(3));
+        var review = await db.ProductAttributeReviews.AsNoTracking().SingleAsync(item => item.ProductId == ProductId.Create(3));
         Assert.Equal(AttributeReviewState.Accepted, review.State);
 
         var reopen = new ReopenProductReviewHandler(db, new TestRepository<ProductAttributeReview>(db),
@@ -235,13 +236,13 @@ public sealed class AttributeAdminTests
     {
         await using var db = await ImportedAsync();
         // A review reason that names the code, as the recognizer writes it.
-        var mention = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.From(2));
+        var mention = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.Create(2));
         mention.SetSameVariants("Код «CP»", DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         var codes = new UnresolvedCodeReader(db, new CodeMeaningReader(db));
         Assert.Equal(1, Assert.Single(await codes.ListAsync(CancellationToken.None), code => code.RawValue == "CP").ProductCount);
 
-        var product = await db.Products.SingleAsync(item => item.Id == ProductId.From(2));
+        var product = await db.Products.SingleAsync(item => item.Id == ProductId.Create(2));
         product.UpdateFromOneC(product.Name, product.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
 
@@ -253,7 +254,7 @@ public sealed class AttributeAdminTests
     {
         await using var db = await ImportedAsync();
         var reader = new CategoryFilterReader(db);
-        var filters = await reader.ReadAsync(ProductCategoryId.From(10), CancellationToken.None);
+        var filters = await reader.ReadAsync(ProductCategoryId.Create(10), CancellationToken.None);
         var color = Assert.Single(filters!, filter => filter.Code == "color");
         Assert.True(color.IsFilterable);
         Assert.Equal(3, color.ProductCount);
@@ -265,7 +266,7 @@ public sealed class AttributeAdminTests
         Assert.True(result.IsSuccess);
 
         await RunAsync(db, Dictionary, Rows, apply: true);
-        var after = Assert.Single((await reader.ReadAsync(ProductCategoryId.From(10), CancellationToken.None))!,
+        var after = Assert.Single((await reader.ReadAsync(ProductCategoryId.Create(10), CancellationToken.None))!,
             filter => filter.Code == "color");
         Assert.Equal((false, 5, true), (after.IsFilterable, after.SortOrder, after.IsEditedManually));
     }

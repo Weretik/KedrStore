@@ -35,11 +35,11 @@ internal sealed class DefaultPricePolicyProvider(
         var categoryPriceTypes = await salesDbContext.CounterpartyCategoryPriceTypes
             .AsNoTracking()
             .Where(rule => rule.CounterpartyId == counterparty.Id)
-            .Select(rule => new CategoryPriceType(rule.CategoryId, rule.PriceTypeId))
+            .Select(rule => new CategoryPriceType(rule.CategoryId.Value, rule.PriceTypeId.Value))
             .ToArrayAsync(cancellationToken);
 
         return new PricePolicy(
-            DefaultPriceTypeId: counterparty.DefaultPriceTypeId,
+            DefaultPriceTypeId: counterparty.DefaultPriceTypeId.Value,
             CategoryPriceTypes: categoryPriceTypes);
     }
 

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using System.Net;
 using System.Net.Http.Headers;
@@ -132,7 +133,7 @@ public sealed class ProductMediaApiTests
     private static async Task<Product> ReloadAsync(CatalogDbContext catalog)
     {
         catalog.ChangeTracker.Clear();
-        return await catalog.Products.SingleAsync(product => product.Id == ProductId.From(731));
+        return await catalog.Products.SingleAsync(product => product.Id == ProductId.Create(731));
     }
 
     private static async Task<(long Id, string Url)> UploadAsync(HttpClient client, string fileName)
@@ -156,18 +157,18 @@ public sealed class ProductMediaApiTests
     {
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), "000005513", "Завіси", "zavisy",
-            CategoryPath.From("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), "000005513", "Завіси", "zavisy",
+            CategoryPath.Create("n10")).Value);
         foreach (var (id, photo, stock) in new[]
                  {
                      (731, "https://images-kedr.cdn.express/products/731.jpg", 5m), (732, "", 5m), (733, "", 0m)
                  })
         {
-            var product = Product.Create(ProductId.From(id), "000005513", $"Завіса {id}", $"zavisa-{id}",
-                ProductCategoryId.From(10), Now, stock, 1, false, false, true).Value;
+            var product = Product.Create(ProductId.Create(id), "000005513", $"Завіса {id}", $"zavisa-{id}",
+                ProductCategoryId.Create(10), Now, stock, 1, false, false, true).Value;
             db.Products.Add(product);
             db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
-                product.ProductSlug, photo, ProductCategoryId.From(10), "zavisy", inStock: true, isSale: false,
+                product.ProductSlug, photo, ProductCategoryId.Create(10), "zavisy", inStock: true, isSale: false,
                 isNew: false, exportToSite: true, retailPrice: 100));
         }
 

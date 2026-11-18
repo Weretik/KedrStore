@@ -69,11 +69,11 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
     private async Task EnsureCosmosCategoryAsync(CancellationToken cancellationToken)
     {
-        var cosmosCategoryId = ProductCategoryId.From(options.Value.CosmosCategoryId);
+        var cosmosCategoryId = ProductCategoryId.Create(options.Value.CosmosCategoryId);
         var cosmosRootId = options.Value.CosmosRootCategoryId;
         var existing = (await categoryRepo.ListAsync(new CategoriesByRootSpec(cosmosRootId), cancellationToken))
             .FirstOrDefault(category => category.Id == cosmosCategoryId);
-        var path = CategoryPath.From($"n{cosmosCategoryId.Value}");
+        var path = CategoryPath.Create($"n{cosmosCategoryId.Value}");
         var presentation = ResolvePresentation(cosmosRootId, cosmosCategoryId.Value, CosmosName, path);
         var now = DateTimeOffset.UtcNow;
 
@@ -113,8 +113,8 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
         foreach (var item in categoryDtos)
         {
-            ProductCategoryId? parentId = item.ParentId == null ? null : ProductCategoryId.From(item.ParentId.Value);
-            var path = CategoryPath.From(item.Path);
+            ProductCategoryId? parentId = item.ParentId == null ? null : ProductCategoryId.Create(item.ParentId.Value);
+            var path = CategoryPath.Create(item.Path);
             var presentation = ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path);
 
             if (existingById.TryGetValue(item.Id, out var existing))
@@ -139,7 +139,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
             slugs ??= await slugService.LoadAllocatorAsync(CatalogEntityType.Category, cancellationToken);
             var createdCategory = ProductCategory.Create(
-                id: ProductCategoryId.From(item.Id),
+                id: ProductCategoryId.Create(item.Id),
                 productTypeIdOneC: rootCategoryOneCId,
                 name: item.Name,
                 slug: slugs.Allocate(item.Name),

@@ -11,7 +11,7 @@ internal static class CategoryTreeIds
         var categories = await categoriesQuery
             .Select(category => new { category.Id, category.ParentId })
             .ToListAsync(cancellationToken);
-        var selectedId = ProductCategoryId.From(selectedCategoryId);
+        var selectedId = ProductCategoryId.Create(selectedCategoryId);
         if (!categories.Any(category => category.Id == selectedId)) return [];
 
         var childrenByParent = categories

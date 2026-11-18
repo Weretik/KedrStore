@@ -18,7 +18,7 @@ public sealed class ReopenProductReviewHandler(
     public async ValueTask<Result<AdminProductAttributesDto>> Handle(ReopenProductReviewCommand command,
         CancellationToken cancellationToken)
     {
-        var productId = ProductId.From(command.ProductId);
+        var productId = ProductId.Create(command.ProductId);
         var review = await db.ProductAttributeReviews
             .FirstOrDefaultAsync(item => item.ProductId == productId, cancellationToken);
         if (review is null)

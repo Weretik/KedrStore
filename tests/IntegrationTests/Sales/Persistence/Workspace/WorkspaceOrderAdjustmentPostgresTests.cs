@@ -50,7 +50,7 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
         var now = DateTimeOffset.UtcNow;
         db.Counterparties.Add(Counterparty.Create(CounterpartyId, UserId.FromStorage(Guid.NewGuid()), "Adjusted customer",
-            "adjusted@example.com", null, 1, now).Value);
+            "adjusted@example.com", null, PriceTypeId.FromStorage(1), now).Value);
         // 2 × (200 − 50) and 3 × (100 + 10): the stored amounts already include the adjustments.
         var order = Order.Create("SO-ADJ-1", CounterpartyId, null,
             [OrderLine.Create("101", "Товар 101", 2, 300m, -50m).Value, OrderLine.Create("102", "Товар 102", 3, 330m, 10m).Value], now).Value;

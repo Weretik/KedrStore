@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using global::Catalog.Application.Features.Groups.Shared;
 using global::Catalog.Application.Features.Groups.Commands.CreateProductGroup;
@@ -143,7 +144,7 @@ public sealed class ProductGroupBuilderTests
             apply: true);
         Assert.Equal([1, 3], (await MembersAsync(db)).Select(member => member.ProductId.Value));
 
-        var product = await db.Products.SingleAsync(item => item.Id == ProductId.From(3));
+        var product = await db.Products.SingleAsync(item => item.Id == ProductId.Create(3));
         product.MarkDeleted(DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         var report = await GroupBuilder(db).RunAsync(apply: true, CancellationToken.None);
@@ -153,7 +154,7 @@ public sealed class ProductGroupBuilderTests
         Assert.Single(await db.ProductGroups.AsNoTracking().ToListAsync());
         Assert.Equal([1], (await MembersAsync(db)).Select(member => member.ProductId.Value));
 
-        var first = await db.Products.SingleAsync(item => item.Id == ProductId.From(1));
+        var first = await db.Products.SingleAsync(item => item.Id == ProductId.Create(1));
         first.UpdateFromOneC(first.Name, first.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         var offSite = await GroupBuilder(db).RunAsync(apply: true, CancellationToken.None);
@@ -167,9 +168,9 @@ public sealed class ProductGroupBuilderTests
     public async Task MainProduct_PrefersSiteAndStock_AndPersonsChoiceStaysWhileOnSite()
     {
         await using var db = await CatalogAsync((1, 10), (2, 10), (3, 10));
-        var first = await db.Products.SingleAsync(item => item.Id == ProductId.From(1));
+        var first = await db.Products.SingleAsync(item => item.Id == ProductId.Create(1));
         first.UpdateFromOneC(first.Name, first.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
-        (await db.Products.SingleAsync(item => item.Id == ProductId.From(3))).UpdateStock(5);
+        (await db.Products.SingleAsync(item => item.Id == ProductId.Create(3))).UpdateStock(5);
         await db.SaveChangesAsync();
 
         await RunAsync(db, Dictionary, Csv(
@@ -192,7 +193,7 @@ public sealed class ProductGroupBuilderTests
         db.ChangeTracker.Clear();
         Assert.True((await db.ProductGroups.SingleAsync()).IsMainManual);
 
-        var second = await db.Products.SingleAsync(item => item.Id == ProductId.From(2));
+        var second = await db.Products.SingleAsync(item => item.Id == ProductId.Create(2));
         second.UpdateFromOneC(second.Name, second.CategoryId, 1, exportToSite: false, false, false, DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         await GroupBuilder(db).RunAsync(apply: true, CancellationToken.None);
@@ -212,7 +213,7 @@ public sealed class ProductGroupBuilderTests
 
         var report = await RunAsync(db, Dictionary, Csv3("L"), apply: true);
         Assert.Equal(2, report.Groups.ProductsWithSameVariants);
-        var review = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.From(1));
+        var review = await db.ProductAttributeReviews.SingleAsync(item => item.ProductId == ProductId.Create(1));
         var reason = Assert.Single(review.Reasons);
         Assert.Equal(AttributeReviewReason.SameVariants, reason.Code);
         Assert.Contains("#2", reason.Text, StringComparison.Ordinal);
@@ -226,11 +227,11 @@ public sealed class ProductGroupBuilderTests
 
         await RunAsync(db, Dictionary, Csv3("R"), apply: true);
         var fixedReview = await db.ProductAttributeReviews.AsNoTracking()
-            .SingleAsync(item => item.ProductId == ProductId.From(2));
+            .SingleAsync(item => item.ProductId == ProductId.Create(2));
         Assert.Empty(fixedReview.Reasons);
         Assert.Equal(AttributeReviewState.Clear, fixedReview.State);
         var accepted = await db.ProductAttributeReviews.AsNoTracking()
-            .SingleAsync(item => item.ProductId == ProductId.From(1));
+            .SingleAsync(item => item.ProductId == ProductId.Create(1));
         Assert.Equal(AttributeReviewState.Accepted, accepted.State);
     }
 
@@ -270,8 +271,8 @@ public sealed class ProductGroupBuilderTests
         // the pins.
         await RunAsync(db, Dictionary, csv, apply: true);
         var members = await MembersAsync(db);
-        Assert.Contains(members, member => member.ProductId == ProductId.From(1) && member.GroupId == handle);
-        Assert.Contains(members, member => member.ProductId == ProductId.From(2) && member.IsPinned && member.GroupId == null);
+        Assert.Contains(members, member => member.ProductId == ProductId.Create(1) && member.GroupId == handle);
+        Assert.Contains(members, member => member.ProductId == ProductId.Create(2) && member.IsPinned && member.GroupId == null);
         Assert.Equal(2, members.Count(member => member.GroupId == ProductGroupId.Create(created.Value.Id)));
 
         var back = await move.Handle(new SetProductGroupCommand(2, new SetProductGroupRequest { Automatic = true }),

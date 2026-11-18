@@ -10,7 +10,7 @@ public sealed class GetCategoryContentHandler(IReadCatalogDbContext catalogDbCon
     public async ValueTask<Result<AdminCategoryContentResponse>> Handle(GetCategoryContentQuery query,
         CancellationToken cancellationToken)
     {
-        var categoryId = ProductCategoryId.From(query.CategoryId);
+        var categoryId = ProductCategoryId.Create(query.CategoryId);
         if (!await catalogDbContext.Categories.AsNoTracking().AnyAsync(category => category.Id == categoryId, cancellationToken))
             return Result.NotFound();
 

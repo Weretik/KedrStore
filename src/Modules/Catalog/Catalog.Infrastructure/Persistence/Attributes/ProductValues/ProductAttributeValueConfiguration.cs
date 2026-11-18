@@ -9,7 +9,7 @@ public sealed class ProductAttributeValueConfiguration : IEntityTypeConfiguratio
     {
         builder.ToTable("CatalogProductAttributeValues");
         builder.HasKey(x => new { x.ProductId, x.AttributeId, x.Position });
-        builder.Property(x => x.ProductId).HasConversion(CatalogConverter.ProductIdConvert).ValueGeneratedNever();
+        builder.Property(x => x.ProductId).ValueGeneratedNever();
         builder.Property(x => x.AttributeId).HasConversion(AttributeIdConverters.AttributeId).ValueGeneratedNever();
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
         builder.Property(x => x.NumberValue).HasPrecision(18, 3);

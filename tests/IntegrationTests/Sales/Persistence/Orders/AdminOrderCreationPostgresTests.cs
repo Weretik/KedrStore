@@ -147,7 +147,7 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
             "Create order customer",
             "create-order@example.com",
             "+380000000000",
-            1,
+            PriceTypeId.FromStorage(1),
             DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }

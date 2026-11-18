@@ -18,11 +18,11 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
             .ValueGeneratedOnAdd();
 
         builder.Property(p => p.ProductId)
-            .HasConversion(CatalogConverter.ProductIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(p => p.PriceTypeId)
-            .HasConversion(CatalogConverter.PriceTypeIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(c => c.ProductTypeIdOneC)

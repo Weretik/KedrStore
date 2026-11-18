@@ -49,9 +49,9 @@ public sealed class SlugService(IReadCatalogDbContext catalogDbContext) : ISlugS
         var usedAsCurrent = entityType switch
         {
             CatalogEntityType.Product => await catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
-                .AnyAsync(product => product.ProductSlug == slug && product.Id != ProductId.From(entityId), cancellationToken),
+                .AnyAsync(product => product.ProductSlug == slug && product.Id != ProductId.Create(entityId), cancellationToken),
             CatalogEntityType.Category => await catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()
-                .AnyAsync(category => category.Slug == slug && category.Id != ProductCategoryId.From(entityId), cancellationToken),
+                .AnyAsync(category => category.Slug == slug && category.Id != ProductCategoryId.Create(entityId), cancellationToken),
             _ => await catalogDbContext.ProductGroups.AsNoTracking()
                 .AnyAsync(group => group.Slug == slug && group.Id != ProductGroupId.FromStorage(entityId), cancellationToken)
         };

@@ -90,7 +90,7 @@ public sealed class SyncOneCProductDetailsJob(
         string cosmosRootId,
         CancellationToken cancellationToken)
     {
-        var productIds = products.Select(product => ProductId.From(product.Id)).ToArray();
+        var productIds = products.Select(product => ProductId.Create(product.Id)).ToArray();
         var conflicts = await productRepo.ListAsync(
             new ProductsByIdsFromOtherRootsSpec(productIds, cosmosRootId),
             cancellationToken);
@@ -126,7 +126,7 @@ public sealed class SyncOneCProductDetailsJob(
         {
             if (existingById.TryGetValue(item.Id, out var existing))
             {
-                var categoryId = item.CategoryId is { } resolved ? ProductCategoryId.From(resolved) : existing.CategoryId;
+                var categoryId = item.CategoryId is { } resolved ? ProductCategoryId.Create(resolved) : existing.CategoryId;
                 var fromOneC = existing.UpdateFromOneC(item.Name, categoryId,
                     item.QuantityInPack, item.ExportToSite, item.IsNew, item.IsSale, now);
                 if (fromOneC.IsFailure)
@@ -156,11 +156,11 @@ public sealed class SyncOneCProductDetailsJob(
 
             slugs ??= await slugService.LoadAllocatorAsync(CatalogEntityType.Product, cancellationToken);
             var createdProduct = Product.Create(
-                id: ProductId.From(item.Id),
+                id: ProductId.Create(item.Id),
                 productTypeIdOneC: item.ProductTypeIdOneC,
                 name: item.Name,
                 productSlug: slugs.Allocate(item.Name),
-                categoryId: ProductCategoryId.From(newCategoryId),
+                categoryId: ProductCategoryId.Create(newCategoryId),
                 createdDate: now,
                 stock: item.Stock,
                 qtyInPack: item.QuantityInPack,

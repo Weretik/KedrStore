@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 using Catalog.Application.Features.Products.Shared;
 using Catalog.Domain.Products;
@@ -20,8 +21,8 @@ public sealed class ProductListProjectionSyncTests
     {
         var row = Row("Ручка", price: 100m);
 
-        var changed = row.SyncWith(ProductListProjection.Create(ProductId.From(7), "Ручка нова", "Ручка новая",
-            "ruchka-nova", "photo.jpg", ProductCategoryId.From(3), "furnitura", inStock: false, isSale: true,
+        var changed = row.SyncWith(ProductListProjection.Create(ProductId.Create(7), "Ручка нова", "Ручка новая",
+            "ruchka-nova", "photo.jpg", ProductCategoryId.Create(3), "furnitura", inStock: false, isSale: true,
             isNew: true, exportToSite: false, retailPrice: 120m));
 
         Assert.True(changed);
@@ -29,7 +30,7 @@ public sealed class ProductListProjectionSyncTests
         Assert.Equal("Ручка новая", row.NameRu);
         Assert.Equal("ruchka-nova", row.ProductSlug);
         Assert.Equal("photo.jpg", row.Photo);
-        Assert.Equal(ProductCategoryId.From(3), row.CategoryId);
+        Assert.Equal(ProductCategoryId.Create(3), row.CategoryId);
         Assert.Equal("furnitura", row.CategorySlug);
         Assert.False(row.InStock);
         Assert.True(row.IsSale);
@@ -44,14 +45,14 @@ public sealed class ProductListProjectionSyncTests
     public void SyncWith_AnotherProduct_Throws()
     {
         var row = Row("Ручка", price: 100m);
-        var other = ProductListProjection.Create(ProductId.From(8), "Ручка", "Ручка", "ruchka", string.Empty,
-            ProductCategoryId.From(2), "dveri", true, false, false, true, 100m);
+        var other = ProductListProjection.Create(ProductId.Create(8), "Ручка", "Ручка", "ruchka", string.Empty,
+            ProductCategoryId.Create(2), "dveri", true, false, false, true, 100m);
 
         Assert.Throws<ArgumentException>(() => row.SyncWith(other));
     }
 
     private static ProductListProjection Row(string name, decimal? price)
-        => ProductListProjection.Create(ProductId.From(7), name, name, "ruchka", string.Empty,
-            ProductCategoryId.From(2), "dveri", inStock: true, isSale: false, isNew: false, exportToSite: true,
+        => ProductListProjection.Create(ProductId.Create(7), name, name, "ruchka", string.Empty,
+            ProductCategoryId.Create(2), "dveri", inStock: true, isSale: false, isNew: false, exportToSite: true,
             retailPrice: price);
 }

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -27,7 +28,7 @@ public sealed class CategoryImportSoftDeleteTests
         await using var db = CreateContext();
         var oneC = new FakeOneC { Categories = [.. Enumerable.Range(1, 5).Select(Row)] };
         await CategoryJob(db, oneC).RunAsync(Root, CancellationToken.None);
-        var content = CategoryContent.Create(ProductCategoryId.From(905), "uk");
+        var content = CategoryContent.Create(ProductCategoryId.Create(905), "uk");
         content.Replace("Заголовок", null, null, null, [], "admin", DateTimeOffset.UtcNow);
         db.CategoryContents.Add(content);
         await db.SaveChangesAsync();
@@ -35,16 +36,16 @@ public sealed class CategoryImportSoftDeleteTests
         oneC.Categories = [.. Enumerable.Range(1, 4).Select(Row)];
         await CategoryJob(db, oneC).RunAsync(Root, CancellationToken.None);
 
-        var deleted = await db.Categories.IgnoreQueryFilters().SingleAsync(category => category.Id == ProductCategoryId.From(905));
+        var deleted = await db.Categories.IgnoreQueryFilters().SingleAsync(category => category.Id == ProductCategoryId.Create(905));
         Assert.True(deleted.IsDeleted);
         Assert.Equal("katehoriia-5", deleted.Slug);
-        Assert.False(await db.Categories.AnyAsync(category => category.Id == ProductCategoryId.From(905)));
-        Assert.True(await db.CategoryContents.AnyAsync(item => item.CategoryId == ProductCategoryId.From(905)));
+        Assert.False(await db.Categories.AnyAsync(category => category.Id == ProductCategoryId.Create(905)));
+        Assert.True(await db.CategoryContents.AnyAsync(item => item.CategoryId == ProductCategoryId.Create(905)));
 
         oneC.Categories = [.. Enumerable.Range(1, 5).Select(Row)];
         await CategoryJob(db, oneC).RunAsync(Root, CancellationToken.None);
 
-        var restored = await db.Categories.SingleAsync(category => category.Id == ProductCategoryId.From(905));
+        var restored = await db.Categories.SingleAsync(category => category.Id == ProductCategoryId.Create(905));
         Assert.Equal("katehoriia-5", restored.Slug);
     }
 

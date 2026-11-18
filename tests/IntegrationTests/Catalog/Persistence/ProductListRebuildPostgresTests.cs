@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Contracts.Pricing;
 using Catalog.Domain.Categories;
@@ -35,9 +36,9 @@ public sealed class ProductListRebuildPostgresTests(CatalogPostgresFixture postg
 
         await using (var db = postgres.CreateContext())
         {
-            var renamed = await db.Products.SingleAsync(product => product.Id == ProductId.From(2));
-            renamed.UpdateFromOneC("Товар 2 новий", ProductCategoryId.From(10), 1, true, false, false, Now);
-            db.Products.Remove(await db.Products.SingleAsync(product => product.Id == ProductId.From(3)));
+            var renamed = await db.Products.SingleAsync(product => product.Id == ProductId.Create(2));
+            renamed.UpdateFromOneC("Товар 2 новий", ProductCategoryId.Create(10), 1, true, false, false, Now);
+            db.Products.Remove(await db.Products.SingleAsync(product => product.Id == ProductId.Create(3)));
             db.Products.Add(NewProduct(4));
             await db.SaveChangesAsync();
         }
@@ -47,7 +48,7 @@ public sealed class ProductListRebuildPostgresTests(CatalogPostgresFixture postg
         await using var check = postgres.CreateContext();
         var rows = await check.ProductListProjections.AsNoTracking().OrderBy(row => row.ProductId).ToListAsync();
         Assert.Equal([1, 2, 4], rows.Select(row => row.ProductId.Value));
-        Assert.Equal("Товар 2 новий", rows.Single(row => row.ProductId == ProductId.From(2)).NameUk);
+        Assert.Equal("Товар 2 новий", rows.Single(row => row.ProductId == ProductId.Create(2)).NameUk);
         Assert.Equal(unchangedVersionBefore, await RowVersionAsync(1));
     }
 
@@ -68,19 +69,19 @@ public sealed class ProductListRebuildPostgresTests(CatalogPostgresFixture postg
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync(
             """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy",
-            CategoryPath.From("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy",
+            CategoryPath.Create("n10")).Value);
         foreach (var id in productIds)
             db.Products.Add(NewProduct(id));
         await db.SaveChangesAsync();
         foreach (var id in productIds)
-            db.ProductPrices.Add(ProductPrice.Create(Root, ProductId.From(id), PriceTypeId.From(RetailPriceTypeId),
+            db.ProductPrices.Add(ProductPrice.Create(Root, ProductId.Create(id), PriceTypeId.Create(RetailPriceTypeId),
                 new Money(id, "UAH")).Value);
         await db.SaveChangesAsync();
     }
 
     private static Product NewProduct(int id)
-        => Product.Create(ProductId.From(id), Root, $"Товар {id}", $"tovar-{id}", ProductCategoryId.From(10), Now,
+        => Product.Create(ProductId.Create(id), Root, $"Товар {id}", $"tovar-{id}", ProductCategoryId.Create(10), Now,
             5, 1, false, false, true).Value;
 
     private async Task<long> RowVersionAsync(int productId)

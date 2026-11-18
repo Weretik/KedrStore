@@ -9,7 +9,7 @@ public sealed class CategoryAttributeConfiguration : IEntityTypeConfiguration<Ca
     {
         builder.ToTable("CatalogCategoryAttributes");
         builder.HasKey(x => new { x.CategoryId, x.AttributeId });
-        builder.Property(x => x.CategoryId).HasConversion(CatalogConverter.ProductCategoryIdConvert).ValueGeneratedNever();
+        builder.Property(x => x.CategoryId).ValueGeneratedNever();
         builder.Property(x => x.AttributeId).HasConversion(AttributeIdConverters.AttributeId).ValueGeneratedNever();
 
         builder.HasOne<ProductCategory>().WithMany().HasForeignKey(x => x.CategoryId).OnDelete(DeleteBehavior.Cascade);

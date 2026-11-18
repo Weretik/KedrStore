@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -95,9 +96,9 @@ public sealed class ProductCategoryPresentationMetadataTests
 
     private static ProductCategory CreateCategory(string name = "Категорія", string path = "n5513")
         => ProductCategory.Create(
-            ProductCategoryId.From(5513),
+            ProductCategoryId.Create(5513),
             "000005513",
             name,
             "furnitura-5513",
-            CategoryPath.From(path)).Value;
+            CategoryPath.Create(path)).Value;
 }

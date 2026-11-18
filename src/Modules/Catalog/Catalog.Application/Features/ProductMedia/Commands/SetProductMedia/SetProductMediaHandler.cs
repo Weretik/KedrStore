@@ -20,7 +20,7 @@ public sealed class SetProductMediaHandler(
         CancellationToken cancellationToken)
     {
         var product = await products.FirstOrDefaultAsync(
-            new ProductForMediaSpec(ProductId.From(command.ProductId)), cancellationToken);
+            new ProductForMediaSpec(ProductId.Create(command.ProductId)), cancellationToken);
         if (product is null)
             return Result.NotFound();
 

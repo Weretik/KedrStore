@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -40,11 +41,11 @@ public sealed class ProductStockTests
 
     private static Product CreateProduct()
         => Product.Create(
-            ProductId.From(1),
+            ProductId.Create(1),
             "000005513",
             "Product",
             "product-1",
-            ProductCategoryId.From(1),
+            ProductCategoryId.Create(1),
             DateTimeOffset.UtcNow,
             0,
             1,

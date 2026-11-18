@@ -37,11 +37,11 @@ public sealed class GetCustomersSnapshotHandler(IReadSalesDbContext salesDbConte
                 counterparty.Name,
                 counterparty.Phone,
                 counterparty.Email,
-                counterparty.DefaultPriceTypeId,
+                counterparty.DefaultPriceTypeId.Value,
                 rules[counterparty.Id]
                     .GroupBy(rule => rule.CategoryId)
                     .OrderBy(group => group.Key)
-                    .Select(group => new CustomerSnapshotPriceRuleDto(group.Key, group.First().PriceTypeId))
+                    .Select(group => new CustomerSnapshotPriceRuleDto(group.Key.Value, group.First().PriceTypeId.Value))
                     .ToList(),
                 Debt: null,
                 Balance: null))

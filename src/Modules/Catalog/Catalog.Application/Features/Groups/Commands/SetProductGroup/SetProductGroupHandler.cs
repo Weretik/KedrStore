@@ -21,7 +21,7 @@ public sealed class SetProductGroupHandler(
 
     private async Task<Result<AdminProductGroupMembershipDto>> HandleInTransactionAsync(SetProductGroupCommand command, CancellationToken cancellationToken)
     {
-        var productId = ProductId.From(command.ProductId);
+        var productId = ProductId.Create(command.ProductId);
         var product = await db.Products.IgnoreQueryFilters().AsNoTracking()
             .Where(item => item.Id == productId)
             .Select(item => new { item.CategoryId })

@@ -128,7 +128,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
         db.Counterparties.Add(Counterparty.Create(CounterpartyId, UserId.FromStorage(Guid.NewGuid()), "Draft customer",
-            "draft@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+            "draft@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }
 

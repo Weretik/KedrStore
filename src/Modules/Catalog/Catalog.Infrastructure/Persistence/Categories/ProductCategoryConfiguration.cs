@@ -12,7 +12,7 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Id)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(c => c.Name)
@@ -54,7 +54,7 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .IsRequired();
 
         builder.Property(c => c.ParentId)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert);
+            ;
 
         builder.Property(c => c.Path)
             .HasConversion(PathConverter.Convert)
@@ -64,7 +64,7 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
                 new ValueComparer<CategoryPath>(
                     (pathLeft, pathRight) => pathLeft.Value == pathRight.Value,
                     path => StringComparer.Ordinal.GetHashCode(path.Value),
-                    path => CategoryPath.From(path.Value))
+                    path => CategoryPath.Create(path.Value))
             );
 
         builder.HasIndex(c => c.Path)

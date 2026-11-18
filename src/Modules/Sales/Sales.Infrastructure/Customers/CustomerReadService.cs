@@ -72,12 +72,12 @@ internal sealed class CustomerReadService(
                 counterparty.Name,
                 counterparty.Phone,
                 counterparty.Email,
-                counterparty.DefaultPriceTypeId,
+                counterparty.DefaultPriceTypeId.Value,
                 dbContext.CounterpartyCategoryPriceTypes
                     .AsNoTracking()
                     .Where(rule => rule.CounterpartyId == counterparty.Id)
                     .OrderBy(rule => rule.CategoryId)
-                    .Select(rule => new CustomerCategoryPriceTypeDto(rule.CategoryId, rule.PriceTypeId))
+                    .Select(rule => new CustomerCategoryPriceTypeDto(rule.CategoryId.Value, rule.PriceTypeId.Value))
                     .ToList()))
             .SingleOrDefaultAsync(cancellationToken);
 

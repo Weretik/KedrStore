@@ -14,11 +14,11 @@ public sealed class ProductGroupConfiguration : IEntityTypeConfiguration<Product
         builder.ToTable("CatalogProductGroups");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(GroupIdConvert).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
-        builder.Property(x => x.CategoryId).HasConversion(CatalogConverter.ProductCategoryIdConvert);
+        builder.Property(x => x.CategoryId);
         builder.Property(x => x.Name).HasMaxLength(ProductGroup.NameMaxLength).IsRequired();
         builder.Property(x => x.GroupKey).HasMaxLength(ProductGroup.NameMaxLength);
         builder.Property(x => x.Slug).HasMaxLength(ProductGroup.SlugMaxLength).IsRequired();
-        builder.Property(x => x.MainProductId).HasConversion(CatalogConverter.ProductIdConvert);
+        builder.Property(x => x.MainProductId);
         builder.Property(x => x.Status).HasConversion<short>().HasDefaultValue(ProductGroupStatus.Proposed);
         builder.Property(x => x.AcceptedBy).HasMaxLength(ProductGroup.AcceptedByMaxLength);
 
