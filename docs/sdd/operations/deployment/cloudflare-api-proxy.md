@@ -45,13 +45,14 @@ With an empty `TrustedProxy:SharedSecret` the middleware only strips the headers
 
 ## Edge rate limiting
 
-The host limits requests too ([rate limit rules](../../standards/rate-limit-rules.md)), but only after Cloud Run has accepted them. One Cloudflare rate limiting rule on the zone stops a flood earlier. Create it in the Cloudflare dashboard (the rule is zone configuration, not code):
+The host limits requests too ([rate limit rules](../../standards/rate-limit-rules.md)), but only after Cloud Run has accepted them. One Cloudflare rate limiting rule on the zone stops a flood of sign-in attempts earlier. The rule is zone configuration, not code, so it is created in the Cloudflare dashboard. It is created for the classkedr.com.ua zone (`api.classkedr.com.ua` is a custom domain of this zone; the rule covers cookie and mobile sign-in, refresh, sign-out and the current user).
+
+On the Free plan the rule has no `Hostname` field (only `URI Path` and a few others), the period is fixed at 10 seconds, the counter is per IP, and only one rule is available. The zone also holds the public site, and the site has its own `/api/...` paths, so a rule on the whole `/api/` prefix would hit the site. The rule therefore covers only the sign-in paths, which exist on the API alone. Flood protection for the rest of the API is the soft global limit in the host.
 
 1. Open the `classkedr.com.ua` zone → **Security** → **WAF** → **Rate limiting rules** → **Create rule**.
-2. Name: `api flood`. Expression (edit expression): `(http.host eq "api.classkedr.com.ua")`.
-3. Characteristics: **IP**. Requests: `300` per `10 seconds` (about 1800 per minute, above the host's soft global limit of 1200, so this rule only catches a real flood). Action: **Block** for `10 seconds` (the free plan allows these values).
-4. Deploy. Then watch **Security** → **Events** for a day: blocked requests from the site's own address or from the admin office mean the number is too low; raise it.
-5. If the plan allows a second rule, add one for sign-in: `(http.host eq "api.classkedr.com.ua" and http.request.method eq "POST" and http.request.uri.path in {"/api/auth/cookie/login" "/api/auth/mobile/login"})`, `20` requests per `10 seconds`, Block.
+2. Field `URI Path`, operator `starts with`, value `/api/auth/`.
+3. Characteristics: **IP**. Requests: `30` per `10 seconds`. Action: **Block**, duration `10 seconds`.
+4. Deploy. Watch **Security** → **Events** for a day: blocked requests from the office or a shared address mean the number is too low; raise it.
 
 The Worker needs no change. The Cloud Run URL stays reachable directly, which is why the host limits stay on.
 
