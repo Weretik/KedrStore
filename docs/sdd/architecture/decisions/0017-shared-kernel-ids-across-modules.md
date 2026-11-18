@@ -31,7 +31,7 @@ A module may use another module only through its `Contracts` ([ADR-0004](0004-co
 
 ## Consequences
 
-- The move goes in stages, one pull request each. The [module rules](../../standards/module-rules.md#known-deviations) list what is left as a known deviation until the last stage merges.
+- The move goes in stages, one pull request each. The [module rules](../../standards/module-rules.md#known-deviations) listed what was left as a known deviation until the last stage merged.
 - Stage 1 (2026-11-18): `UserId` (an ASP.NET Identity account, `Guid`) and `MediaFileId` (Media, `long`) are kernel types; Media's own copy is gone; user references in Sales (`Counterparty.IdentityUserId`), Work (`WorkTask.OwnerUserId`, `CreatedByUserId`, `WorkActivity.UserId`) and Content (`CompanyRequisitesChange.ChangedByUserId`), and file references in Catalog (product media, attribute swatches) and Content (article covers, gallery photos, brand logos, the share image) use them.
 - Stage 2 (2026-11-18): `ProductId`, `ProductCategoryId` and `PriceTypeId` left Vogen for the kernel (`Create` rejects a code outside 1..max, as the Vogen validation did); Catalog's `CatalogConverter` is gone and `AddKernelIds` maps them; `CategoryPath` is hand-written too, so Vogen is no longer used. Sales customers' default price type and category price rules use them.
-- Next: Sales order and draft lines store `ProductId` instead of text; their column is `varchar`, so the stored values are checked first.
+- Stage 3 (2026-11-18): Sales order and draft lines (`OrderLine.ProductId`, `OrderDraftLine.ProductId`) use the kernel `ProductId`. Their column stays `varchar(64)`: a property converter writes the number as text, so the schema does not change. Before the switch the owner checked production: no stored value was anything but digits. Every cross-module reference now uses a kernel id, and the module rules no longer list a deviation for it.

@@ -18,7 +18,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
-        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 2, -50.25m), OrderDraftLine.Create("102", 1)]);
+        var draftId = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(101), 2, -50.25m), OrderDraftLine.Create(ProductId.Create(102), 1)]);
 
         await using var db = postgres.CreateContext();
         var draft = await db.OrderDrafts.AsNoTracking().Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
@@ -26,7 +26,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         Assert.Equal("Draft", draft.Title);
         Assert.Equal(CounterpartyId, draft.CounterpartyId.Value);
         Assert.Equal(32, draft.Version.Length);
-        Assert.Equal([("101", 2, -50.25m), ("102", 1, 0m)],
+        Assert.Equal([(ProductId.Create(101), 2, -50.25m), (ProductId.Create(102), 1, 0m)],
             draft.Lines.OrderBy(x => x.ProductId).Select(x => (x.ProductId, x.Quantity, x.PriceAdjustment)));
     }
 
@@ -35,23 +35,23 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
-        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 2), OrderDraftLine.Create("102", 1)]);
+        var draftId = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(101), 2), OrderDraftLine.Create(ProductId.Create(102), 1)]);
 
         await using var first = postgres.CreateContext();
         await using var second = postgres.CreateContext();
         var current = await first.OrderDrafts.Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
         var stale = await second.OrderDrafts.Include(x => x.Lines).SingleAsync(x => x.Id == draftId);
 
-        current.Update("Updated", "Note", CounterpartyId, [OrderDraftLine.Create("103", 5)], DateTimeOffset.UtcNow);
+        current.Update("Updated", "Note", CounterpartyId, [OrderDraftLine.Create(ProductId.Create(103), 5)], DateTimeOffset.UtcNow);
         await first.SaveChangesAsync();
-        stale.Update("Stale", null, CounterpartyId, [OrderDraftLine.Create("104", 1)], DateTimeOffset.UtcNow);
+        stale.Update("Stale", null, CounterpartyId, [OrderDraftLine.Create(ProductId.Create(104), 1)], DateTimeOffset.UtcNow);
 
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => second.SaveChangesAsync());
         await using var verification = postgres.CreateContext();
         var persisted = await verification.OrderDrafts.AsNoTracking().Include(x => x.Lines).SingleAsync();
         Assert.Equal("Updated", persisted.Title);
         Assert.Equal(current.Version, persisted.Version);
-        Assert.Equal([("103", 5)], persisted.Lines.Select(x => (x.ProductId, x.Quantity)));
+        Assert.Equal([(ProductId.Create(103), 5)], persisted.Lines.Select(x => (x.ProductId, x.Quantity)));
         Assert.Equal(1, await CountAsync(verification, "OrderDraftLines"));
     }
 
@@ -60,7 +60,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
-        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 2)]);
+        var draftId = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(101), 2)]);
         await InsertIdempotencyRecordAsync(Guid.NewGuid().ToString("D"), draftId.Value);
 
         await using (var db = postgres.CreateContext())
@@ -81,8 +81,8 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
         var key = Guid.NewGuid().ToString("D");
-        var firstDraft = await SeedDraftAsync([OrderDraftLine.Create("101", 1)]);
-        var secondDraft = await SeedDraftAsync([OrderDraftLine.Create("102", 1)]);
+        var firstDraft = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(101), 1)]);
+        var secondDraft = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(102), 1)]);
         await InsertIdempotencyRecordAsync(key, firstDraft.Value);
 
         var error = await Assert.ThrowsAsync<PostgresException>(
@@ -96,12 +96,12 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await ResetDatabaseAsync();
-        var draftId = await SeedDraftAsync([OrderDraftLine.Create("101", 1)]);
+        var draftId = await SeedDraftAsync([OrderDraftLine.Create(ProductId.Create(101), 1)]);
 
         await using (var db = postgres.CreateContext())
         {
             db.OrderDrafts.Add(OrderDraft.Create("Orphan", null, "missing-cp",
-                [OrderDraftLine.Create("101", 1)], DateTimeOffset.UtcNow));
+                [OrderDraftLine.Create(ProductId.Create(101), 1)], DateTimeOffset.UtcNow));
             var orphan = await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
             Assert.Equal(PostgresErrorCodes.ForeignKeyViolation,
                 Assert.IsType<PostgresException>(orphan.InnerException).SqlState);

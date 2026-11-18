@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using BuildingBlocks.Application.Outbox;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -80,7 +81,7 @@ public sealed class SendOrderToOneCHandlerTests
         OneCOrderDeliveryResult answer,
         DateTimeOffset? now = null)
     {
-        var order = Order.Create("SO-7", "customer-1", null, [OrderLine.Create("p-1", "Ручка", 2, 20m).Value], Noon).Value;
+        var order = Order.Create("SO-7", "customer-1", null, [OrderLine.Create(ProductId.Create(1), "Ручка", 2, 20m).Value], Noon).Value;
         var oneC = new FakeOneC(answer);
         var handler = new SendOrderToOneCHandler(new FakeStore(order), oneC,
             new OneCSendingWindow(Options.Create(new OneCSendingWindowOptions())),

@@ -64,7 +64,7 @@ public sealed class SendOrderToOneCHandler(
         order.OrderNumber,
         order.CreatedAt,
         order.Comment,
-        [.. order.Lines.Select(line => new OneCOrderDeliveryLineDto(line.ProductId, line.Quantity, line.Amount))]);
+        [.. order.Lines.Select(line => new OneCOrderDeliveryLineDto(line.ProductId.ToString(), line.Quantity, line.Amount))]);
 
     private static string? Clean(string? diagnostic)
     {

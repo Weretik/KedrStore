@@ -12,7 +12,7 @@ internal sealed class WorkspaceDraftDetails(SalesDbContext db, AdminWorkspacePri
         var customer = await db.Counterparties.IgnoreQueryFilters().AsNoTracking()
             .Where(x => x.Id == draft.CounterpartyId).Select(x => x.Name).SingleAsync(ct);
         var quote = await pricing.QuoteAsync(new WorkspaceQuoteRequest(
-            draft.CounterpartyId.Value, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId, x.Quantity, x.PriceAdjustment)).ToArray()), ct);
+            draft.CounterpartyId.Value, draft.Lines.Select(x => new WorkspaceInputLine(x.ProductId.ToString(), x.Quantity, x.PriceAdjustment)).ToArray()), ct);
         if (quote.IsSuccess)
         {
             return new WorkspaceDraftDetail(draft.Id.Value, draft.Version, draft.Title, draft.Note,

@@ -15,15 +15,12 @@ internal sealed class AdminWorkspacePricing(ICatalogSalesReader catalog, Custome
     internal async Task<IReadOnlyList<WorkspaceDraftQuotedLine>> DescribeDraftLinesAsync(
         IReadOnlyCollection<OrderDraftLine> lines, CancellationToken ct)
     {
-        var ids = lines.Select(x => int.TryParse(x.ProductId, out var id) ? id : -1)
-            .Where(x => x is > 0 and <= 1_000_000_000).Distinct().ToArray();
+        var ids = lines.Select(x => x.ProductId.Value).Distinct().ToArray();
         var products = (await catalog.GetProductsAsync(ids, ct)).ToDictionary(x => x.Id, x => x.Name);
         return lines.Select(x =>
         {
-            string? name = null;
-            if (int.TryParse(x.ProductId, out var id))
-                products.TryGetValue(id, out name);
-            return new WorkspaceDraftQuotedLine(x.ProductId, name, x.Quantity, null, null, x.PriceAdjustment, null);
+            products.TryGetValue(x.ProductId.Value, out var name);
+            return new WorkspaceDraftQuotedLine(x.ProductId.ToString(), name, x.Quantity, null, null, x.PriceAdjustment, null);
         }).ToArray();
     }
 

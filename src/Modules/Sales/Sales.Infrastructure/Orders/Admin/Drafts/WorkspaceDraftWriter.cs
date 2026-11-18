@@ -1,3 +1,4 @@
+using System.Globalization;
 using BuildingBlocks.Infrastructure.Persistence;
 using System.Text.Json;
 using static Sales.Infrastructure.Orders.WorkspaceIdempotency;
@@ -32,7 +33,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
             return quote.Error!;
         var now = DateTimeOffset.UtcNow;
         var draft = OrderDraft.Create(request.Title, request.Note, quote.Value.CounterpartyId,
-            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity, x.PriceAdjustment)), now);
+            request.Lines.Select(x => OrderDraftLine.Create(ProductId.FromStorage(int.Parse(x.ProductId, CultureInfo.InvariantCulture)), x.Quantity, x.PriceAdjustment)), now);
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
         db.OrderDrafts.Add(draft);
         await db.SaveChangesAsync(ct);
@@ -70,7 +71,7 @@ internal sealed class WorkspaceDraftWriter(SalesDbContext db, AdminWorkspacePric
         if (quote.IsFailure)
             return quote.Error!;
         draft.Update(request.Title, request.Note, quote.Value.CounterpartyId,
-            request.Lines.Select(x => OrderDraftLine.Create(x.ProductId, x.Quantity, x.PriceAdjustment)), DateTimeOffset.UtcNow);
+            request.Lines.Select(x => OrderDraftLine.Create(ProductId.FromStorage(int.Parse(x.ProductId, CultureInfo.InvariantCulture)), x.Quantity, x.PriceAdjustment)), DateTimeOffset.UtcNow);
         try { await db.SaveChangesAsync(ct); }
         catch (DbUpdateConcurrencyException)
         {
