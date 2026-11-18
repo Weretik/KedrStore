@@ -9,7 +9,7 @@ namespace Scheduling.Infrastructure.Integrations.CloudRun;
 /// <summary>
 /// Starts one execution of the tasks job through the Cloud Run Admin API (<c>jobs:run</c>) with the arguments
 /// <c>--job=tasks --tasks=key:runId,...</c> (the override replaces the job's own arguments). The API's own service account needs <c>roles/run.jobsExecutorWithOverrides</c> on
-/// that job (platform/007 EN-01).
+/// that job (platform/007 EN-01); the token comes from <see cref="CloudRunCredential"/>.
 /// </summary>
 internal sealed class CloudRunTaskJobLauncher(HttpClient http, IOptions<CloudRunJobOptions> options) : ITaskJobLauncher
 {
@@ -23,7 +23,7 @@ internal sealed class CloudRunTaskJobLauncher(HttpClient http, IOptions<CloudRun
         var job = options.Value;
         if (!job.IsConfigured) return "запуск задач у Google Cloud не налаштований (Scheduler:Job).";
 
-        var credential = (await GoogleCredential.GetApplicationDefaultAsync(cancellationToken)).CreateScoped(Scope);
+        var credential = (await CloudRunCredential.GetAsync(Environment.GetEnvironmentVariable, cancellationToken)).CreateScoped(Scope);
         var token = await ((ITokenAccess)credential).GetAccessTokenForRequestAsync(cancellationToken: cancellationToken);
         var url = $"https://run.googleapis.com/v2/projects/{job.Project}/locations/{job.Region}/jobs/{job.Name}:run";
         using var request = new HttpRequestMessage(HttpMethod.Post, url)
