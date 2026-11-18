@@ -1,3 +1,5 @@
+using Catalog.Application.Shared;
+using BuildingBlocks.Application.Caching;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.OneCSync.Mapping;
@@ -8,23 +10,31 @@ namespace Catalog.Application.Features.Categories.Queries.GetCategories;
 
 /// <summary>
 /// Public tree: each node carries its product count; empty branches and hidden import roots (Cosmos) are omitted
-/// (R-015).
+/// (R-015). The tree is read through <see cref="CategoryTreeCache"/>.
 /// </summary>
 public class GetCategoriesHandler(
     ICatalogReadRepository<ProductCategory> categoryRepository,
     ICategoryStatsReader statsReader,
-    IOptions<RootCategoryId> roots)
+    IOptions<RootCategoryId> roots,
+    IReadCache cache)
     : IQueryHandler<GetCategoriesQuery, Result<IReadOnlyList<CategoryTreeDto>>>
 {
     public async ValueTask<Result<IReadOnlyList<CategoryTreeDto>>> Handle(GetCategoriesQuery query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        var categories = (await categoryRepository.ListAsync(new AllCategoriesSpec(query.Filter.ProductTypeId), cancellationToken))
+        var language = CatalogLanguage.Normalize(query.Lang);
+        var snapshot = await cache.GetOrCreateAsync(
+            CategoryTreeCache.Entry(language, query.Filter.ProductTypeId), token => BuildAsync(query.Filter, language, token), cancellationToken);
+        return Result.Success(snapshot.Roots);
+    }
+
+    private async ValueTask<CategoryTreeSnapshot> BuildAsync(CategoryFilter filter, string language, CancellationToken cancellationToken)
+    {
+        var categories = (await categoryRepository.ListAsync(new AllCategoriesSpec(filter.ProductTypeId), cancellationToken))
             .Where(category => !PublicCatalogScope.IsHidden(category, roots.Value))
             .ToList();
         var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
-        IReadOnlyList<CategoryTreeDto> tree = CategoryTree.Build(categories, query.Lang, stats, hideEmpty: true);
-        return Result.Success(tree);
+        return new CategoryTreeSnapshot(CategoryTree.Build(categories, language, stats, hideEmpty: true));
     }
 }

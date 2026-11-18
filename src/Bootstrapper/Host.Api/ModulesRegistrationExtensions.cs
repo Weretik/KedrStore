@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Caching;
 using BuildingBlocks.Infrastructure.DependencyInjection;
 using BuildingBlocks.Integrations.OneC.DependencyInjection;
 using Catalog.Api.DependencyInjection;
@@ -17,6 +18,7 @@ public static class ModuleRegistrationsExtensions
         IConfiguration configuration)
     {
         services.AddInfrastructureServices(configuration);
+        services.AddReadCache();
         services.AddOneCIntegrationServices();
 
         services.AddIdentityModule(configuration);
