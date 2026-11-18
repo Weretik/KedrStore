@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -25,7 +26,7 @@ public static class SeoSettingsEndpoints
 
         var siteSeoSettings = endpoints.MapGroup("api/content/seo-settings")
             .WithTags("SiteSeoSettings")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetSiteSeoSettingsEndpoint.Map(siteSeoSettings);
 
         return endpoints;

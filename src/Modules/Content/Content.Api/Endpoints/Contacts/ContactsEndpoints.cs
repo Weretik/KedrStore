@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -24,7 +25,7 @@ public static class ContactsEndpoints
 
         var companyContacts = endpoints.MapGroup("api/content/contacts")
             .WithTags("CompanyContacts")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetCompanyContactsEndpoint.Map(companyContacts);
 
         return endpoints;

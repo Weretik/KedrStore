@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Sales.Application.Features.Orders.Commands.RetryOrderSync;
@@ -7,7 +8,7 @@ internal static class RetryOrderSyncEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("{orderId:long}/sync/retry", Handle)
-            .WithName("retryAdminOrderSync")
+            .WithName("retryAdminOrderSync").RequireRateLimiting("HeavyOperation")
             .WithSummary("Schedule a failed order for another 1C delivery cycle")
             .WithDescription("Allowed only for BusinessError and DeadLetter. The request records an audit entry and puts the order back in the outbox queue (state Pending, attempts from zero); it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).")
             .Produces<RetryAdminOrderSyncResponse>(StatusCodes.Status202Accepted)

@@ -52,8 +52,11 @@ A small fix that restores documented behavior needs no SDD, file-role map, or au
 | Database schema, migrations, and seed data | `$backend-database-change` | [Database rules](docs/sdd/standards/database-rules.md) and [data operations](docs/sdd/operations/data/migrations-and-seeding.md) |
 | Queries and N+1, indexes and search, transactions, concurrency, how migrations reach production | — | [Database rules](docs/sdd/standards/database-rules.md): what, where, and how; every audit checks each section and its known deviations |
 | Double submit, retries, outbox and webhook handlers, sync jobs (what a repeat does) | — | [Idempotency rules](docs/sdd/standards/idempotency-rules.md): decision table, `Idempotency-Key` pattern, audit of every write operation |
+| Rate limits: a new public, expensive, or credential endpoint; tuning limits | — | [Rate limit rules](docs/sdd/standards/rate-limit-rules.md): decision per endpoint, policy table, configuration, edge layer |
 | Verify changes / hand off for review | `$backend-change-verification` / `$backend-pr-handoff` | [Testing rules](docs/sdd/standards/testing-rules.md) |
 | Differences between code and documentation | `$backend-docs-sync` | [Standards index](docs/sdd/standards/README.md) and [feature map](docs/sdd/features/README.md) |
+
+**Rate limits:** every endpoint gets a written rate limit decision in its SDD: the global soft limit is enough for a cheap signed-in call; anonymous, upload, import/sync/report/export, credential, and message-sending endpoints name a policy with `RequireRateLimiting` ([rate limit rules](docs/sdd/standards/rate-limit-rules.md)); `RateLimitCoverageTests` enforces it.
 
 **API contract:** `docs/sdd/contracts/openapi.json` is generated from the code on every build and is the only machine-readable contract; never write OpenAPI YAML by hand. Each endpoint carries `WithName` (unique camelCase operation id), `WithSummary`, `Produces<T>` and `ProducesProblem`; CI fails when the committed file differs from the code, and `OpenApiDocumentRulesTests` checks ids, summaries, typed reads and number types. kedr-web downloads this file from `master` and calls the API through a typed `openapi-fetch` client ([contracts](docs/sdd/contracts/README.md), [ADR-0013](docs/sdd/architecture/decisions/0013-openapi-generated-from-code.md)).
 

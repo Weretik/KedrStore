@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -37,7 +38,7 @@ public static class ArticlesEndpoints
 
         var articles = endpoints.MapGroup("api/content")
             .WithTags("Articles")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetArticlesEndpoint.Map(articles);
         GetArticleEndpoint.Map(articles);
         GetArticleCoverEndpoint.Map(articles);

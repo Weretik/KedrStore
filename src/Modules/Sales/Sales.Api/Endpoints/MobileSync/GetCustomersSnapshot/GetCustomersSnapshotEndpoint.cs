@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using BuildingBlocks.Api.Snapshots;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -8,7 +9,7 @@ internal static class GetCustomersSnapshotEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
-            .WithName("getMobileCustomersSnapshot")
+            .WithName("getMobileCustomersSnapshot").RequireRateLimiting("HeavyOperation")
             .WithSummary("Customers and their price rules for offline work")
             .WithDescription("Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted customers are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client accepts it.")
             .Produces<CustomersSnapshotDto>()

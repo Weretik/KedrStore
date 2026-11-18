@@ -43,6 +43,18 @@ With an empty `TrustedProxy:SharedSecret` the middleware only strips the headers
 4. Check `https://api.classkedr.com.ua/health`.
 5. Merge the backend change (deploys `CsrfCookieDomain` and the secret), then switch the frontends' production API URL to `https://api.classkedr.com.ua`.
 
+## Edge rate limiting
+
+The host limits requests too ([rate limit rules](../../standards/rate-limit-rules.md)), but only after Cloud Run has accepted them. One Cloudflare rate limiting rule on the zone stops a flood earlier. Create it in the Cloudflare dashboard (the rule is zone configuration, not code):
+
+1. Open the `classkedr.com.ua` zone → **Security** → **WAF** → **Rate limiting rules** → **Create rule**.
+2. Name: `api flood`. Expression (edit expression): `(http.host eq "api.classkedr.com.ua")`.
+3. Characteristics: **IP**. Requests: `300` per `10 seconds` (about 1800 per minute, above the host's soft global limit of 1200, so this rule only catches a real flood). Action: **Block** for `10 seconds` (the free plan allows these values).
+4. Deploy. Then watch **Security** → **Events** for a day: blocked requests from the site's own address or from the admin office mean the number is too low; raise it.
+5. If the plan allows a second rule, add one for sign-in: `(http.host eq "api.classkedr.com.ua" and http.request.method eq "POST" and http.request.uri.path in {"/api/auth/cookie/login" "/api/auth/mobile/login"})`, `20` requests per `10 seconds`, Block.
+
+The Worker needs no change. The Cloud Run URL stays reachable directly, which is why the host limits stay on.
+
 ## Limits
 
 - The Workers free plan allows 100,000 requests per day.

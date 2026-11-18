@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -35,7 +36,7 @@ public static class DocumentsEndpoints
 
         var legalDocuments = endpoints.MapGroup("api/content")
             .WithTags("LegalDocuments")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetPublishedLegalDocumentEndpoint.Map(legalDocuments);
 
         return endpoints;

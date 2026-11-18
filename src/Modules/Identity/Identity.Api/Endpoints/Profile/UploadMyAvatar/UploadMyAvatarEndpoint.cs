@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Api.Endpoints.Avatars;
 using Identity.Application.Features.Profile.Commands.UploadOwnAvatar;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +9,7 @@ internal static class UploadMyAvatarEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("avatar", Handle)
-            .WithName("uploadMyAvatar")
+            .WithName("uploadMyAvatar").RequireRateLimiting("Upload")
             .WithSummary("Upload the own avatar")
             .WithDescription("JPEG, PNG or WebP, at most 2 MB, at least 128×128 px, at most 24 megapixels. The server stores the centre square as a 256×256 WebP under a new name and deletes the previous file.")
             .AsAvatarUpload()

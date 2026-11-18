@@ -9,7 +9,7 @@ public static class SecurityRegistrationsExtensions
         services.AddForwardedHeadersRegistration();
         services.AddTrustedProxyRegistration(configuration);
         services.AddCorsService(configuration);
-        services.AddRateLimitingServices();
+        services.AddRateLimitingServices(configuration);
         services.AddAuthorizationPolicies();
 
         return services;

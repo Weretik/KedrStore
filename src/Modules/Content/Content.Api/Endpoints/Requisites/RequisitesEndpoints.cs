@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -27,7 +28,7 @@ public static class RequisitesEndpoints
 
         var companyRequisites = endpoints.MapGroup("api/content/requisites")
             .WithTags("CompanyRequisites")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetCompanyRequisitesEndpoint.Map(companyRequisites);
 
         return endpoints;

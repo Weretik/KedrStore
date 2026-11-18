@@ -29,7 +29,7 @@ Can an anonymous caller create this user?
 - [ ] State who calls the endpoint and deliberately mark anonymous endpoints with `AllowAnonymous`.
 - [ ] If users are created or roles assigned, define the feature as an Identity module use case.
 - [ ] Decide whether existing refresh sessions are revoked after a role, password, or account-status change.
-- [ ] Add rate limits and safe errors for anonymous endpoints or endpoints with credentials.
+- [ ] Decide the rate limit with the [rate limit rules](../../../standards/rate-limit-rules.md#the-decision-for-every-new-endpoint): a named policy for anonymous, credential, upload, and heavy endpoints, or write that the global soft limit is enough. Add safe errors for anonymous endpoints or endpoints with credentials.
 - [ ] Include `401 Unauthorized`, `403 Forbidden`, and success cases in the API contract and Swagger verification plan.
 
 ## Manual verification matrix

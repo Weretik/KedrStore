@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Content.Application.Abstractions.Media;
 using Content.Application.Features.Articles.Commands.UploadArticleCover;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +14,7 @@ internal static class UploadAdminArticleCoverEndpoint
 
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("covers", Handle)
-            .WithName("uploadAdminArticleCover")
+            .WithName("uploadAdminArticleCover").RequireRateLimiting("Upload")
             .WithSummary("Upload a cover picture before saving the article")
             .WithDescription("JPEG, PNG, or WebP up to 10 MB, at least 600 px wide. Stored as WebP at most 1600 px wide with the EXIF orientation applied, on the CDN under `articles/` and in the media library folder «Статті» (created when missing). Nothing about an article changes: send `mediaFileId` as `coverMediaFileId` with the create or update.")
             .WithMetadata(

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Media.Application.Features.Files.Commands.UploadMediaFile;
 using Media.Application.Features.Files.Shared;
 using Microsoft.AspNetCore.Builder;
@@ -12,7 +13,7 @@ internal static class UploadMediaFileEndpoint
     // The host's cookie CSRF check covers form posts, so the Minimal API antiforgery check stays off.
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPost("", Handle)
-            .WithName("uploadAdminMediaFile")
+            .WithName("uploadAdminMediaFile").RequireRateLimiting("Upload")
             .WithSummary("Upload a picture")
             .WithDescription("JPEG, PNG, or WebP (checked by content) up to 15 MB, stored unchanged under a new unique CDN key. The display name is the uploaded file name.")
             .WithUploadLimit()

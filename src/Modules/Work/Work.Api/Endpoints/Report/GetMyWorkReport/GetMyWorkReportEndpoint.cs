@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Work.Application.Features.Report.Queries.GetWorkReport;
@@ -7,7 +8,7 @@ internal static class GetMyWorkReportEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("report", Handle)
-            .WithName("getMyWorkReport")
+            .WithName("getMyWorkReport").RequireRateLimiting("HeavyOperation")
             .WithSummary("The caller's own report")
             .Produces<WorkReportDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest);

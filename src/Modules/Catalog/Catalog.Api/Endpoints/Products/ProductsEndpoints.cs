@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -35,7 +36,7 @@ public static class ProductsEndpoints
 
         var products = endpoints.MapGroup("api/catalog/{lang}")
             .WithTags("Products")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetProductsEndpoint.Map(products);
         GetProductBySlugEndpoint.Map(products);
 
