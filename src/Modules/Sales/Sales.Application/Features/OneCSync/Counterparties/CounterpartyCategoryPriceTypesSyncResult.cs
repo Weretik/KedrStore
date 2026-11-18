@@ -1,4 +1,4 @@
-namespace Sales.Infrastructure.Integrations.OneC.Counterparties;
+namespace Sales.Application.Features.OneCSync.Counterparties;
 
 public sealed record CounterpartyCategoryPriceTypesSyncResult(
     int ImportedOrUpdated,

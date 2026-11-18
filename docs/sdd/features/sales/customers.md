@@ -8,13 +8,13 @@ Admin counterparty list and details, local synchronization with the full 1C list
 
 Details retain price type and category IDs and add their Catalog lookup names through batched `ICatalogReferenceDataReader`. If a lookup record is missing, its name field is `null`; the rule is retained.
 
-Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete list in one array. `OneCCounterpartiesSyncService` builds the set of source IDs before validation and Identity provisioning; a present but skipped row is not treated as stale. An empty array or any row without an ID stops deletion for that pass.
+Under the confirmed 1C contract, `GetCounterpartiesAsync` returns the complete list in one array. `SyncOneCCounterpartiesJob` builds the set of source IDs before validation and Identity provisioning; a present but skipped row is not treated as stale. An empty array or any row without an ID stops deletion for that pass.
 
-`StaleCounterpartyRemoval` transactionally deletes local Order/Draft dependencies and adds a `CounterpartyRemoved` message to the shared Sales outbox in the same transaction ([platform spec 006](../../specs/platform/006-transactional-outbox/README.md), R-014). The outbox tick runs `RemovedCounterpartyIdentityDeleter`, which deletes the Identity user through `Identity.Contracts` and retries on the outbox schedule; it does not delete a user linked to a current Counterparty. [CounterpartyReconciliationPostgresTests](../../../../tests/IntegrationTests/Sales/Persistence/Customers/CounterpartyReconciliationPostgresTests.cs) covers the removal, the message, and the kept user.
+`ICounterpartySyncStore.RemoveStaleAsync` (implemented by `CounterpartySyncStore`) transactionally deletes local Order/Draft dependencies and adds a `CounterpartyRemoved` message to the shared Sales outbox in the same transaction ([platform spec 006](../../specs/platform/006-transactional-outbox/README.md), R-014). The outbox tick runs `RemovedCounterpartyIdentityDeleter`, which deletes the Identity user through `Identity.Contracts` and retries on the outbox schedule; it does not delete a user linked to a current Counterparty. [CounterpartyReconciliationPostgresTests](../../../../tests/IntegrationTests/Sales/Persistence/Customers/CounterpartyReconciliationPostgresTests.cs) covers the removal, the message, and the kept user.
 
 ## Structure and relationships
 
-The Minimal API group [CustomersEndpoints](../../../../src/Modules/Sales/Sales.Api/Endpoints/Customers/CustomersEndpoints.cs) (tag `AdminCustomers`, `CanManageOrders`) reads through the [list handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Modules/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync service](../../../../src/Modules/Sales/Sales.Infrastructure/Integrations/OneC/Counterparties/OneCCounterpartiesSyncService.cs) updates it from 1C, and [stale removal](../../../../src/Modules/Sales/Sales.Infrastructure/Integrations/OneC/Counterparties/StaleCounterpartyRemoval.cs) atomically clears Sales dependencies and queues Identity deletion in the outbox.
+The Minimal API group [CustomersEndpoints](../../../../src/Modules/Sales/Sales.Api/Endpoints/Customers/CustomersEndpoints.cs) (tag `AdminCustomers`, `CanManageOrders`) reads through the [list handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerList/GetCustomerListHandler.cs) and [details handler](../../../../src/Modules/Sales/Sales.Application/Features/Customers/Queries/GetCustomerById/GetCustomerByIdHandler.cs). [Counterparty](../../../../src/Modules/Sales/Sales.Domain/Customers/Counterparty.cs) is the domain model; the [sync job](../../../../src/Modules/Sales/Sales.Application/Features/OneCSync/Jobs/SyncOneCCounterpartiesJob.cs) updates it from 1C through the [`ICounterpartySyncStore`](../../../../src/Modules/Sales/Sales.Application/Abstractions/Customers/ICounterpartySyncStore.cs) port, and its [store](../../../../src/Modules/Sales/Sales.Infrastructure/Persistence/Customers/CounterpartySyncStore.cs) atomically clears Sales dependencies and queues Identity deletion in the outbox.
 
 ## Code structure
 
@@ -27,12 +27,17 @@ src/
 │   ├── Sales.Application/Features/Customers/Queries/
 │   │   ├── GetCustomerById/GetCustomerByIdHandler.cs  # use-case handler
 │   │   └── GetCustomerList/GetCustomerListHandler.cs  # use-case handler
+│   ├── Sales.Application/Abstractions/Customers/ICounterpartySyncStore.cs  # port the 1C sync loads and saves through
+│   ├── Sales.Application/Features/OneCSync/
+│   │   ├── Jobs/SyncOneCSalesCustomersFullJob.cs  # «Клієнти з 1С»: counterparties, then category price types
+│   │   ├── Jobs/SyncOneCCounterpartiesJob.cs  # source ID set and upsert
+│   │   ├── Jobs/SyncOneCCounterpartyCategoryPriceTypesJob.cs  # category price types
+│   │   └── Counterparties/  # results and CounterpartyContactNormalizer
 │   ├── Sales.Domain/Customers/Entities/Counterparty.cs  # domain model
 │   └── Sales.Infrastructure/
 │       ├── Customers/CustomerReadService.cs  # search, filters, ordering, count, and paging
 │       ├── Integrations/OneC/SalesOneCReadClient.cs  # full 1C array → Sales DTO
-│       ├── Integrations/OneC/OneCCounterpartiesSyncService.cs  # source ID set and upsert
-│       ├── Integrations/OneC/StaleCounterpartyRemoval.cs  # transactional deletion + CounterpartyRemoved message
+│       ├── Persistence/Customers/CounterpartySyncStore.cs  # the sync port; transactional stale deletion + CounterpartyRemoved message
 │       └── Customers/RemovedCounterpartyIdentityDeleter.cs  # outbox handler: deletes the Identity user
 └── Modules/Identity/
     └── Identity.Infrastructure/Users/ImportedCounterpartyIdentityProvisioningService.cs  # Identity lifecycle
@@ -48,9 +53,9 @@ flowchart LR
     G --> D["Counterparty"]
     C --> D
     E["1C full snapshot"] --> F["SalesOneCReadClient"]
-    F --> I["OneCCounterpartiesSyncService"]
+    F --> I["SyncOneCCounterpartiesJob"]
     I --> D
-    I --> J["StaleCounterpartyRemoval"]
+    I --> J["CounterpartySyncStore (ICounterpartySyncStore)"]
     J --> K["Sales transaction: Orders, Drafts, Counterparty + outbox message"]
     K --> L["Outbox tick: RemovedCounterpartyIdentityDeleter"]
     L --> M["Identity provisioning service"]

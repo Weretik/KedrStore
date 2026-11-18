@@ -12,7 +12,9 @@ using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Infrastructure.Integrations.OneC;
-using Sales.Infrastructure.Integrations.OneC.Counterparties;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.OneCSync.Counterparties;
+using Sales.Application.Features.OneCSync.Jobs;
 namespace IntegrationTests.Sales.Persistence.Customers;
 
 [Collection(SalesPostgresCollection.Name)]
@@ -94,11 +96,10 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
     }
 
     private static Task<CounterpartiesSyncResult> RunSyncAsync(SalesOutboxHarness sales)
-        => sales.InScopeAsync(services => new OneCCounterpartiesSyncService(new FakeOneC(),
-                services.GetRequiredService<SalesDbContext>(),
-                services.GetRequiredService<IImportedCounterpartyIdentityProvisioningService>(),
-                services.GetRequiredService<StaleCounterpartyRemoval>(),
-                new CounterpartyContactNormalizer(), NullLogger<OneCCounterpartiesSyncService>.Instance)
+        => sales.InScopeAsync(services => new SyncOneCCounterpartiesJob(new FakeOneC(),
+                services.GetRequiredService<ICounterpartySyncStore>(),
+                services.GetRequiredService<ICustomerLogins>(),
+                new CounterpartyContactNormalizer(), NullLogger<SyncOneCCounterpartiesJob>.Instance)
             .RunAsync(CancellationToken.None));
 
     private sealed class FakeOneC : ISalesOneCReadClient

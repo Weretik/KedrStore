@@ -7,7 +7,7 @@ Sales import maps a 1C counterparty to two related local records:
 ```text
 1C GetCounterparties
        ↓ SalesOneCReadClient
-OneCCounterpartiesSyncService
+SyncOneCCounterpartiesJob
        ├── Sales.Counterparties (business customer)
        └── IImportedCounterpartyIdentityProvisioningService
                 ↓
@@ -32,7 +32,7 @@ OneCCounterpartiesSyncService
 
 ## Counterparty reconciliation
 
-`OneCCounterpartiesSyncService`:
+`SyncOneCCounterpartiesJob`:
 
 1. Stops without changes if 1C returns no counterparties.
 2. Deduplicates non-empty IDs, keeping the last row for each.
@@ -41,7 +41,7 @@ OneCCounterpartiesSyncService
 5. Creates or finds an Identity user, then creates, updates, or restores the Sales counterparty.
 6. Treats local counterparties missing from a valid non-empty source response as stale: removes their category price rules and Sales records and, in the same transaction, queues a `CounterpartyRemoved` outbox message that deletes the Identity user.
 
-It also prevents linking one `IdentityUserId` to two different counterparties in one local state.
+The job lives in `Sales.Application/Features/OneCSync/Jobs/` and loads and saves through the `ICounterpartySyncStore` port (`Sales.Infrastructure/Persistence/Customers/CounterpartySyncStore.cs`), which also runs the stale removal. It also prevents linking one `IdentityUserId` to two different counterparties in one local state.
 
 ## Identity user creation and update
 

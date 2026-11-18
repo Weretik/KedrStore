@@ -1,14 +1,16 @@
-using Catalog.Contracts.Reference;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Sales.Application.Abstractions.Customers;
 using Sales.Application.Abstractions.Integrations.OneC;
-using Sales.Domain.Customers;
-namespace Sales.Infrastructure.Integrations.OneC.Counterparties;
+using Sales.Application.Features.OneCSync.Counterparties;
 
-public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
+namespace Sales.Application.Features.OneCSync.Jobs;
+
+/// <summary>«Клієнти з 1С», step 2: each counterparty's price type per category.</summary>
+public sealed class SyncOneCCounterpartyCategoryPriceTypesJob(
     ISalesOneCReadClient oneCClient,
-    SalesDbContext salesDbContext,
-    ICatalogReferenceDataReader catalogReferenceDataReader,
-    ILogger<OneCCounterpartyCategoryPriceTypesSyncService> logger)
+    ICounterpartySyncStore store,
+    ICatalogReferenceIds catalogReferenceIds,
+    ILogger<SyncOneCCounterpartyCategoryPriceTypesJob> logger)
 {
     public async Task<CounterpartyCategoryPriceTypesSyncResult> RunAsync(CancellationToken cancellationToken)
     {
@@ -27,10 +29,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             .Select(group => group.Last() with { CounterpartyId = group.Key.CounterpartyId })
             .ToArray();
 
-        var counterparties = await salesDbContext.Counterparties
-            .AsNoTracking()
-            .Select(item => item.Id.Value)
-            .ToHashSetAsync(StringComparer.Ordinal, cancellationToken);
+        var counterparties = await store.CounterpartyIdsAsync(cancellationToken);
 
         var requestedCategoryIds = deduped
             .Where(item => item.CategoryId > 0)
@@ -44,11 +43,11 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             .Distinct()
             .ToArray();
 
-        var validCategoryIds = await catalogReferenceDataReader
-            .GetExistingCategoryIdsAsync(requestedCategoryIds, cancellationToken);
+        var validCategoryIds = await catalogReferenceIds
+            .ExistingCategoryIdsAsync(requestedCategoryIds, cancellationToken);
 
-        var validPriceTypeIds = await catalogReferenceDataReader
-            .GetExistingPriceTypeIdsAsync(requestedPriceTypeIds, cancellationToken);
+        var validPriceTypeIds = await catalogReferenceIds
+            .ExistingPriceTypeIdsAsync(requestedPriceTypeIds, cancellationToken);
 
         var validRules = new List<OneCCounterpartyCategoryPriceTypeDto>(deduped.Length);
         var skipped = 0;
@@ -69,7 +68,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             validRules.Add(item);
         }
 
-        var existingRules = await salesDbContext.CounterpartyCategoryPriceTypes.ToListAsync(cancellationToken);
+        var existingRules = await store.ListPriceRulesAsync(cancellationToken);
         var existingByKey = existingRules.ToDictionary(
             item => (item.CounterpartyId.Value, item.CategoryId.Value),
             item => item,
@@ -80,20 +79,15 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             var key = (item.CounterpartyId, item.CategoryId);
             if (existingByKey.TryGetValue(key, out var existing))
             {
-                if (existing.PriceTypeId.Value != item.PriceTypeId)
-                {
-                    salesDbContext.Entry(existing).Property(rule => rule.PriceTypeId).CurrentValue =
-                        PriceTypeId.FromStorage(item.PriceTypeId);
-                }
-
+                // validRules hold only positive price types, so the change always succeeds here.
+                existing.ChangePriceType(PriceTypeId.FromStorage(item.PriceTypeId));
                 continue;
             }
 
             // validRules hold only rows that pass the rule's checks, so creation always succeeds here.
-            await salesDbContext.CounterpartyCategoryPriceTypes.AddAsync(
+            store.AddPriceRule(
                 CounterpartyCategoryPriceType.Create(item.CounterpartyId, ProductCategoryId.FromStorage(item.CategoryId),
-                    PriceTypeId.FromStorage(item.PriceTypeId)).Value,
-                cancellationToken);
+                    PriceTypeId.FromStorage(item.PriceTypeId)).Value);
         }
 
         var validKeys = validRules
@@ -104,12 +98,8 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             .Where(item => !validKeys.Contains((item.CounterpartyId.Value, item.CategoryId.Value)))
             .ToList();
 
-        if (toDelete.Count > 0)
-        {
-            salesDbContext.CounterpartyCategoryPriceTypes.RemoveRange(toDelete);
-        }
-
-        await salesDbContext.SaveChangesAsync(cancellationToken);
+        store.RemovePriceRules(toDelete);
+        await store.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation(
             "SyncOneCCounterpartyCategoryPriceTypesJob finished. ImportedOrUpdated: {ImportedOrUpdated}, Deleted: {Deleted}, Skipped: {Skipped}",

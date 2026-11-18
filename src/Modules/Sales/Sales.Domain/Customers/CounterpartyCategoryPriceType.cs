@@ -27,4 +27,13 @@ public sealed class CounterpartyCategoryPriceType
             PriceTypeId = priceTypeId,
         };
     }
+
+    public DomainResult ChangePriceType(PriceTypeId priceTypeId)
+    {
+        if (priceTypeId.Value <= 0)
+            return CounterpartyErrors.PriceTypeInvalid(priceTypeId.Value);
+
+        PriceTypeId = priceTypeId;
+        return DomainResult.Success();
+    }
 }

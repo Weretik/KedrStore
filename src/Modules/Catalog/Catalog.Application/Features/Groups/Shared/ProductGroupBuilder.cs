@@ -22,11 +22,27 @@ public sealed class ProductGroupBuilder(
     ICatalogRepository<ProductGroup> groups,
     ICatalogRepository<ProductGroupMember> members,
     ISlugService slugs,
+    ICatalogTransaction transaction,
     TimeProvider clock)
 {
     public const int MaxNamedMatches = 10;
 
+    /// <summary>
+    /// With <paramref name="apply"/> the build is one step (database rules 3.1, 3.3): the new groups are saved first for
+    /// their ids, and the rows and main products after them, in one transaction, so a failure leaves nothing half-built.
+    /// Inside a command's transaction it just joins it.
+    /// </summary>
     public async Task<ProductGroupBuildReport> RunAsync(bool apply, CancellationToken cancellationToken)
+    {
+        if (!apply)
+            return await BuildAsync(apply: false, cancellationToken);
+
+        var built = await transaction.RunAsync(
+            async token => Result.Success(await BuildAsync(apply: true, token)), cancellationToken);
+        return built.Value;
+    }
+
+    private async Task<ProductGroupBuildReport> BuildAsync(bool apply, CancellationToken cancellationToken)
     {
         var report = new ProductGroupBuildReport();
         var now = clock.GetUtcNow();

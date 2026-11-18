@@ -106,7 +106,7 @@ Use `await using var tx = await db.Database.BeginTransactionAsync(ct); ... await
 - an id from the first `SaveChanges` is needed to build the second write (better: let EF fix up the relation in one `SaveChanges`);
 - a lock must be held across reads and writes (section 4.3).
 
-In Catalog a command handler does this through `ICatalogTransaction.RunAsync`: it commits only when the handler returns a success, so a refusal or an exception after the first save leaves nothing behind (`CatalogTransactionPostgresTests`).
+In Catalog a command handler does this through `ICatalogTransaction.RunAsync`, and so does the group build (`ProductGroupBuilder`) when a job runs it; a Media CDN sync batch commits its new folders and files together through `IMediaTransaction`. The Catalog transaction commits only when the handler returns a success, so a refusal or an exception after the first save leaves nothing behind (`CatalogTransactionPostgresTests`).
 
 Keep a transaction short: no HTTP calls, file uploads, or waiting on users inside it.
 
@@ -181,9 +181,8 @@ Renaming or dropping a column, or making it `NOT NULL` without a default, in the
 
 ## Known deviations
 
-Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table. Closed on 2026-11-15: the product list rebuild (one locked transaction, diff), the 1C price sync (load once, save once), auto-saving repositories (`UnitOfWorkRepositoryBase` + `RepositorySaveTests`), per-word trigram search, order list indexes, the double-submitted order, the public model catalogue cache, and `lock_timeout` in the migrator. Closed by kedr-web #111: the six Admin edit forms send `version` back and reload on 409. Rule 2.3: production statistics showed both suspected `CategoryId` indexes in use (13,518 and 1,549 scans), so no index was dropped; the leftover Hangfire tables were dropped by the Scheduling migration `DropLegacyHangfireTables` at the owner's request.
+Found by the database audit of 2026-11-15; each is closed by its own change and removed from this table. Closed on 2026-11-15: the product list rebuild (one locked transaction, diff), the 1C price sync (load once, save once), auto-saving repositories (`UnitOfWorkRepositoryBase` + `RepositorySaveTests`), per-word trigram search, order list indexes, the double-submitted order, the public model catalogue cache, and `lock_timeout` in the migrator. Closed on 2026-11-17: rule 3.1 in jobs (the group build and each Media CDN sync batch are one transaction). Closed by kedr-web #111: the six Admin edit forms send `version` back and reload on 409. Rule 2.3: production statistics showed both suspected `CategoryId` indexes in use (13,518 and 1,549 scans), so no index was dropped; the leftover Hangfire tables were dropped by the Scheduling migration `DropLegacyHangfireTables` at the owner's request.
 
 | Rule | Where | Status | Plan |
 | --- | --- | --- | --- |
-| 3.1 | New rows whose database id the next step needs are saved before that step in jobs: `ProductGroupBuilder` run by the import (new groups), `SyncCdnMediaJob` (new folders), the attribute import steps. The Catalog commands that did it (`CreateProductGroup`, `CreateSiteModel`, `CreateCatalogAttribute`, `SetProductGroup`, `AcceptSiteModels`, `FillSiteModelFromNames`, `SetProductAttribute`, `RestoreProductAttribute`) run in one transaction through `ICatalogTransaction` since 2026-11-17 | open | Jobs: section 3.3 (each step re-runs safely); ids made before saving if a job step must become atomic |
 | 1.4 | `SiteModelStateReader` loads the whole catalog for each admin model page | open | Acceptable for a few staff users; revisit if the admin pages slow down |

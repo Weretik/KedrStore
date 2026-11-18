@@ -1,4 +1,6 @@
-namespace Sales.Infrastructure.Integrations.OneC.Jobs;
+using Microsoft.Extensions.Logging;
+
+namespace Sales.Application.Features.OneCSync.Jobs;
 
 public sealed class SyncOneCSalesCustomersFullJob(
     SyncOneCCounterpartiesJob counterpartiesJob,
