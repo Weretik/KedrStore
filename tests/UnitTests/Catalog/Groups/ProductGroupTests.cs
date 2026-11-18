@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Groups.Shared;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Groups;
@@ -32,19 +33,19 @@ public sealed class ProductGroupTests
     [Fact]
     public void AutomaticMain_DropsThePersonsChoice()
     {
-        var group = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now).Value;
-        group.SetMainManually(ProductId.From(2), Now);
+        var group = ProductGroup.CreateAutomatic(ProductCategoryId.Create(10), "Ручка", "ручка", "ruchka", Now).Value;
+        group.SetMainManually(ProductId.Create(2), Now);
 
         Assert.True(group.IsMainManual);
-        Assert.True(group.SetMainAutomatically(ProductId.From(3), Now));
+        Assert.True(group.SetMainAutomatically(ProductId.Create(3), Now));
         Assert.False(group.IsMainManual);
-        Assert.False(group.SetMainAutomatically(ProductId.From(3), Now));
+        Assert.False(group.SetMainAutomatically(ProductId.Create(3), Now));
     }
 
     [Fact]
     public void PinnedMember_IsNotMovedAutomatically()
     {
-        var member = ProductGroupMember.CreatePinned(ProductId.From(1), null, Now);
+        var member = ProductGroupMember.CreatePinned(ProductId.Create(1), null, Now);
 
         Assert.False(member.MoveAutomatically(ProductGroupId.Create(5), Now));
         member.Unpin(Now);
@@ -55,7 +56,7 @@ public sealed class ProductGroupTests
     [Fact]
     public void SameVariantsReason_SurvivesTheImport_AndClearsBackToNoProblem()
     {
-        var review = ProductAttributeReview.Create(ProductId.From(1), "Ручка", [], Now);
+        var review = ProductAttributeReview.Create(ProductId.Create(1), "Ручка", [], Now);
 
         Assert.True(review.SetSameVariants("#2", Now));
         Assert.Equal(AttributeReviewState.NeedsReview, review.State);

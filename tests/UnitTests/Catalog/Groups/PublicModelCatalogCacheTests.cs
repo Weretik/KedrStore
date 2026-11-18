@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.SiteModels.Shared.Public;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes.ValueObjects;
@@ -45,7 +46,7 @@ public sealed class PublicModelCatalogCacheTests
         Models = [],
         ModelBySlug = new Dictionary<string, PublicModelFacts>(),
         ModelOfProduct = new Dictionary<ProductId, PublicModelFacts>(),
-        Values = Array.Empty<PublicProductValueFacts>().ToLookup(value => ProductId.From(1)),
+        Values = Array.Empty<PublicProductValueFacts>().ToLookup(value => ProductId.Create(1)),
         Attributes = new Dictionary<AttributeId, PublicAttributeFacts>(),
         Dictionary = new Dictionary<AttributeValueId, PublicValueFacts>(),
         Categories = new Dictionary<ProductCategoryId, PublicCategoryFacts>(),

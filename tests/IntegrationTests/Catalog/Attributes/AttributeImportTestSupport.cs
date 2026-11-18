@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Application.Features.Groups.Shared;
 using Catalog.Application.Features.Attributes.Jobs;
@@ -68,14 +69,14 @@ internal static class AttributeImportTestSupport
     /// <summary>A top category, shown on the site (spec catalog/007 R-18).</summary>
     public static void AddCategory(CatalogDbContext db, int id)
     {
-        var category = ProductCategory.Create(ProductCategoryId.From(id), Root, $"Категорія {id}", $"katehoriia-{id}",
-            CategoryPath.From($"n{id}")).Value;
+        var category = ProductCategory.Create(ProductCategoryId.Create(id), Root, $"Категорія {id}", $"katehoriia-{id}",
+            CategoryPath.Create($"n{id}")).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
     }
 
     public static void AddProduct(CatalogDbContext db, int id, int categoryId, string name)
-        => db.Products.Add(Product.Create(ProductId.From(id), Root, name, $"product-{id}", ProductCategoryId.From(categoryId),
+        => db.Products.Add(Product.Create(ProductId.Create(id), Root, name, $"product-{id}", ProductCategoryId.Create(categoryId),
             DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true).Value);
 
     /// <summary>The repository root, where <c>docs/catalog-attributes</c> lives.</summary>

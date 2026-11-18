@@ -175,7 +175,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
             if (!await db.Counterparties.AnyAsync(x => x.Id == CounterpartyId.FromStorage(counterpartyId)))
             {
                 db.Counterparties.Add(Counterparty.Create(counterpartyId, UserId.FromStorage(Guid.NewGuid()), "Клієнт", $"{counterpartyId}@example.com",
-                    null, 1, SalesOutboxHarness.Noon).Value);
+                    null, PriceTypeId.FromStorage(1), SalesOutboxHarness.Noon).Value);
                 await db.SaveChangesAsync();
             }
 

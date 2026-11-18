@@ -32,7 +32,7 @@ public sealed class DecideAttributeCodeHandler(
         var forAll = Split(alias.AttributeId, request.Meanings, request.ValueId);
         var valueId = request.ApplyToAll ? forAll.Own : null;
         var ownValues = (request.Categories ?? [])
-            .Select(item => (CategoryId: ProductCategoryId.From(item.CategoryId),
+            .Select(item => (CategoryId: ProductCategoryId.Create(item.CategoryId),
                 Decoding: Split(alias.AttributeId, item.Meanings, item.ValueId)))
             .ToList();
 

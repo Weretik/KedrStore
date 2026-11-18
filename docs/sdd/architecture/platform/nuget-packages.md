@@ -58,7 +58,6 @@ Kedr runs on Google Cloud Run: there is no in-process job scheduler (Hangfire or
 | `System.ServiceModel.Security` | 6.0.0 | BuildingBlocks.Integrations.OneC | WCF security API for the SOAP client; check concrete use. |
 | `Telegram.Bot` | 22.10.3.3 | BuildingBlocks.Infrastructure | Telegram notifications from BuildingBlocks.Infrastructure; [operational context](../../operations/jobs/sales-one-c-runbook.md). |
 | `Testcontainers.PostgreSql` | 4.16.0 | IntegrationTests | Temporary PostgreSQL for integration tests. |
-| `Vogen` | 8.0.7 | Catalog.Domain | Declared value-object generator for legacy code; [current rule](../../standards/identifier-strategy.md) does not allow new typed IDs through Vogen. |
 | `xunit` | 2.9.3 | ArchitectureTests, IntegrationTests, UnitTests | Test framework. |
 | `xunit.runner.visualstudio` | 4.0.1 | ArchitectureTests, IntegrationTests, UnitTests | Runs xUnit in the test runner. |
 | `Xunit.SkippableFact` | 1.5.85 | IntegrationTests | Explicitly skips a test when a local prerequisite is unavailable. |

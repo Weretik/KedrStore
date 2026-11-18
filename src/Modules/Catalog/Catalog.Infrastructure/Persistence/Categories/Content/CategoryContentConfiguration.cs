@@ -15,7 +15,7 @@ public sealed class CategoryContentConfiguration : IEntityTypeConfiguration<Cate
         builder.Property(x => x.Version).IsRowVersion();
 
         builder.Property(x => x.CategoryId)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(x => x.Language)

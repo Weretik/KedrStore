@@ -13,7 +13,7 @@ internal sealed class CatalogSalesReader(IReadCatalogDbContext catalogDb) : ICat
         if (productIds.Count == 0)
             return [];
 
-        var ids = productIds.Distinct().Select(ProductId.From).ToArray();
+        var ids = productIds.Distinct().Select(ProductId.Create).ToArray();
         var products = await catalogDb.Products.AsNoTracking()
             .Where(x => ids.Contains(x.Id))
             .Select(x => new { x.Id, x.Name, x.CategoryId, x.Stock })
@@ -35,7 +35,7 @@ internal sealed class CatalogSalesReader(IReadCatalogDbContext catalogDb) : ICat
         if (productIds.Count == 0)
             return [];
 
-        var ids = productIds.Distinct().Select(ProductId.From).ToArray();
+        var ids = productIds.Distinct().Select(ProductId.Create).ToArray();
         var prices = await catalogDb.ProductPrices.AsNoTracking()
             .Where(x => ids.Contains(x.ProductId))
             .Select(x => new { x.ProductId, x.PriceTypeId, x.Amount, x.CurrencyIso })

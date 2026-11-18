@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Reflection;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.Categories.Queries.GetAdminCategories;
@@ -64,7 +65,7 @@ public sealed class AdminCategoriesListApplicationTests
     private static ProductCategory CreateCategory(int id, string path, int sortOrder, int level)
     {
         var category = ProductCategory.Create(
-            ProductCategoryId.From(id), "000005513", $"Category {id}", $"category-{id}", CategoryPath.From(path)).Value;
+            ProductCategoryId.Create(id), "000005513", $"Category {id}", $"category-{id}", CategoryPath.Create(path)).Value;
         category.UpdatePresentationMetadata($"Категорія {id}", $"Категория {id}", sortOrder, level);
         return category;
     }

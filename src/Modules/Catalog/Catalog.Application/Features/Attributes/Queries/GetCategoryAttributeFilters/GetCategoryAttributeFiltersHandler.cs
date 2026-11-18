@@ -9,7 +9,7 @@ public sealed class GetCategoryAttributeFiltersHandler(CategoryFilterReader read
 {
     public async ValueTask<Result<List<AdminCategoryAttributeFilterDto>>> Handle(GetCategoryAttributeFiltersQuery query,
         CancellationToken cancellationToken)
-        => await reader.ReadAsync(ProductCategoryId.From(query.CategoryId), cancellationToken) is { } filters
+        => await reader.ReadAsync(ProductCategoryId.Create(query.CategoryId), cancellationToken) is { } filters
             ? Result.Success(filters)
             : Result.NotFound();
 }

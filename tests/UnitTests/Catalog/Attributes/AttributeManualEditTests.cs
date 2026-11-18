@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes;
@@ -26,7 +27,7 @@ public sealed class AttributeManualEditTests
     private static readonly AttributeValueId Gold = AttributeValueId.Create(3);
 
     private static ProductAttributeValue Imported()
-        => ProductAttributeValue.CreateAutomatic(ProductId.From(7), AttributeId.Create(1), 0, Bronze, null, false,
+        => ProductAttributeValue.CreateAutomatic(ProductId.Create(7), AttributeId.Create(1), 0, Bronze, null, false,
             AttributeValueSource.Import, Now);
 
     [Fact]
@@ -50,7 +51,7 @@ public sealed class AttributeManualEditTests
     [Fact]
     public void ManualOnlyValue_HasNothingToRestore()
     {
-        var value = ProductAttributeValue.CreateManual(ProductId.From(7), AttributeId.Create(1), 1, Chrome, null, Now).Value;
+        var value = ProductAttributeValue.CreateManual(ProductId.Create(7), AttributeId.Create(1), 1, Chrome, null, Now).Value;
 
         Assert.Null(value.AutomaticSource);
         Assert.False(value.RestoreAutomatic(Now));

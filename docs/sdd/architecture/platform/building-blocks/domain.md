@@ -12,7 +12,7 @@ BuildingBlocks.Domain/
 ├── Entity/
 │   ├── BaseEntity<TId>
 │   └── BaseAuditableEntity<TId>
-├── Identifiers/                 ids other modules store: UserId, MediaFileId
+├── Identifiers/                 ids other modules store: UserId, MediaFileId, ProductId, ProductCategoryId, PriceTypeId
 └── Results/
     └── DomainResult, DomainResult<T>, DomainChecks
 ~~~

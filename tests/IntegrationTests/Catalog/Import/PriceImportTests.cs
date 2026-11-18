@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.OneCSync.Source.Prices;
 using Catalog.Domain.Categories;
 using Catalog.Domain.PriceTypes;
@@ -55,12 +56,12 @@ public sealed class PriceImportTests
 
     private static void Seed(CatalogDbContext db)
     {
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky",
-            CategoryPath.From("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky",
+            CategoryPath.Create("n10")).Value);
         foreach (var id in new[] { 1, 2 })
         {
-            db.Products.Add(Product.Create(ProductId.From(id), Root, $"Product {id}", $"product-{id}",
-                ProductCategoryId.From(10), DateTimeOffset.UtcNow, 0, 1, false, false, true).Value);
+            db.Products.Add(Product.Create(ProductId.Create(id), Root, $"Product {id}", $"product-{id}",
+                ProductCategoryId.Create(10), DateTimeOffset.UtcNow, 0, 1, false, false, true).Value);
         }
 
         db.ProductPrices.Add(Price(1, Retail, 100));
@@ -69,7 +70,7 @@ public sealed class PriceImportTests
     }
 
     private static ProductPrice Price(int productId, int priceTypeId, decimal amount)
-        => ProductPrice.Create(Root, ProductId.From(productId), PriceTypeId.From(priceTypeId),
+        => ProductPrice.Create(Root, ProductId.Create(productId), PriceTypeId.Create(priceTypeId),
             new Money(amount, "UAH")).Value;
 
     private sealed class SaveCounter : SaveChangesInterceptor

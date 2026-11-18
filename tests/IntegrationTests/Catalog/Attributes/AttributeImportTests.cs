@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Xunit.Abstractions;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes;
@@ -71,7 +72,7 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
         Assert.Equal("kolir", (await db.Attributes.SingleAsync(a => a.Id == colorId)).Slug);
         Assert.Equal("antychna-bronza", (await db.AttributeValues.SingleAsync(v => v.Code == "AB")).Slug);
 
-        var chrome = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.From(2) && v.AttributeId == colorId);
+        var chrome = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.Create(2) && v.AttributeId == colorId);
         Assert.False(chrome.IsConfirmed); // CP → CR was decoded by an assistant, not confirmed by the owner.
         Assert.Equal(AttributeValueSource.Import, chrome.Source);
 
@@ -107,9 +108,9 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
 
         var color = await db.Attributes.SingleAsync(a => a.Code == "color");
         var chromeId = (await db.AttributeValues.SingleAsync(v => v.Code == "CR")).Id;
-        var manual = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.From(1) && v.AttributeId == color.Id);
+        var manual = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.Create(1) && v.AttributeId == color.Id);
         manual.SetManually(chromeId, null, DateTimeOffset.UtcNow);
-        var review = await db.ProductAttributeReviews.SingleAsync(r => r.ProductId == ProductId.From(2));
+        var review = await db.ProductAttributeReviews.SingleAsync(r => r.ProductId == ProductId.Create(2));
         review.Accept("admin@classkedr.com.ua", DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
@@ -123,14 +124,14 @@ public sealed class AttributeImportTests(ITestOutputHelper output)
 
         Assert.Equal(1, report.ProductValues.Skipped);
         Assert.Equal(1, report.ProductValues.Removed);
-        var kept = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.From(1) && v.AttributeId == color.Id);
+        var kept = await db.ProductAttributeValues.SingleAsync(v => v.ProductId == ProductId.Create(1) && v.AttributeId == color.Id);
         Assert.Equal(chromeId, kept.ValueId);
         Assert.Equal(AttributeValueSource.Manual, kept.Source);
         Assert.True(kept.IsLocked);
         var side = await db.Attributes.SingleAsync(a => a.Code == "side");
-        Assert.False(await db.ProductAttributeValues.AnyAsync(v => v.ProductId == ProductId.From(2) && v.AttributeId == side.Id));
+        Assert.False(await db.ProductAttributeValues.AnyAsync(v => v.ProductId == ProductId.Create(2) && v.AttributeId == side.Id));
         Assert.Equal(AttributeReviewState.Accepted,
-            (await db.ProductAttributeReviews.SingleAsync(r => r.ProductId == ProductId.From(2))).State);
+            (await db.ProductAttributeReviews.SingleAsync(r => r.ProductId == ProductId.Create(2))).State);
     }
 
     [Fact]

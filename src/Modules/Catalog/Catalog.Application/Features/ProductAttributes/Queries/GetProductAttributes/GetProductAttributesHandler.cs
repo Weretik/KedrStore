@@ -8,7 +8,7 @@ public sealed class GetProductAttributesHandler(ProductAttributesReader reader)
 {
     public async ValueTask<Result<AdminProductAttributesDto>> Handle(GetProductAttributesQuery query,
         CancellationToken cancellationToken)
-        => await reader.ReadAsync(ProductId.From(query.ProductId), cancellationToken) is { } dto
+        => await reader.ReadAsync(ProductId.Create(query.ProductId), cancellationToken) is { } dto
             ? Result.Success(dto)
             : Result.NotFound();
 }

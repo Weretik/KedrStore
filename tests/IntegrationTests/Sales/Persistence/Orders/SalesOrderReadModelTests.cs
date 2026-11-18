@@ -162,7 +162,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
             counterpartyName,
             $"{counterpartyId}@example.com",
             "+380000000000",
-            1,
+            PriceTypeId.FromStorage(1),
             createdAt).Value;
         var lines = amounts.Select((amount, index) =>
             OrderLine.Create($"product-{index}", $"Product {index}", index + 1, amount).Value);

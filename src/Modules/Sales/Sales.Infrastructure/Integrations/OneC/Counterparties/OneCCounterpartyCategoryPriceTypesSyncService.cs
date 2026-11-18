@@ -71,7 +71,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
 
         var existingRules = await salesDbContext.CounterpartyCategoryPriceTypes.ToListAsync(cancellationToken);
         var existingByKey = existingRules.ToDictionary(
-            item => (item.CounterpartyId.Value, item.CategoryId),
+            item => (item.CounterpartyId.Value, item.CategoryId.Value),
             item => item,
             CounterpartyCategoryKeyComparer.Instance);
 
@@ -80,9 +80,10 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             var key = (item.CounterpartyId, item.CategoryId);
             if (existingByKey.TryGetValue(key, out var existing))
             {
-                if (existing.PriceTypeId != item.PriceTypeId)
+                if (existing.PriceTypeId.Value != item.PriceTypeId)
                 {
-                    salesDbContext.Entry(existing).Property(rule => rule.PriceTypeId).CurrentValue = item.PriceTypeId;
+                    salesDbContext.Entry(existing).Property(rule => rule.PriceTypeId).CurrentValue =
+                        PriceTypeId.FromStorage(item.PriceTypeId);
                 }
 
                 continue;
@@ -90,7 +91,8 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
 
             // validRules hold only rows that pass the rule's checks, so creation always succeeds here.
             await salesDbContext.CounterpartyCategoryPriceTypes.AddAsync(
-                CounterpartyCategoryPriceType.Create(item.CounterpartyId, item.CategoryId, item.PriceTypeId).Value,
+                CounterpartyCategoryPriceType.Create(item.CounterpartyId, ProductCategoryId.FromStorage(item.CategoryId),
+                    PriceTypeId.FromStorage(item.PriceTypeId)).Value,
                 cancellationToken);
         }
 
@@ -99,7 +101,7 @@ public sealed class OneCCounterpartyCategoryPriceTypesSyncService(
             .ToHashSet(CounterpartyCategoryKeyComparer.Instance);
 
         var toDelete = existingRules
-            .Where(item => !validKeys.Contains((item.CounterpartyId.Value, item.CategoryId)))
+            .Where(item => !validKeys.Contains((item.CounterpartyId.Value, item.CategoryId.Value)))
             .ToList();
 
         if (toDelete.Count > 0)

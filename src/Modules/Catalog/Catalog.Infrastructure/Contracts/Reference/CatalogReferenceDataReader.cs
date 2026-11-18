@@ -16,7 +16,7 @@ internal sealed class CatalogReferenceDataReader(IReadCatalogDbContext catalogDb
 
         var requestedIds = categoryIds
             .Distinct()
-            .Select(ProductCategoryId.From)
+            .Select(ProductCategoryId.Create)
             .ToArray();
 
         return await catalogDbContext.Categories
@@ -35,7 +35,7 @@ internal sealed class CatalogReferenceDataReader(IReadCatalogDbContext catalogDb
 
         var requestedIds = priceTypeIds
             .Distinct()
-            .Select(PriceTypeId.From)
+            .Select(PriceTypeId.Create)
             .ToArray();
 
         return await catalogDbContext.PriceTypes
@@ -52,7 +52,7 @@ internal sealed class CatalogReferenceDataReader(IReadCatalogDbContext catalogDb
         if (categoryIds.Count == 0)
             return new Dictionary<int, string>();
 
-        var requestedIds = categoryIds.Distinct().Select(ProductCategoryId.From).ToArray();
+        var requestedIds = categoryIds.Distinct().Select(ProductCategoryId.Create).ToArray();
         return await catalogDbContext.Categories
             .AsNoTracking()
             .Where(item => requestedIds.Contains(item.Id))
@@ -67,7 +67,7 @@ internal sealed class CatalogReferenceDataReader(IReadCatalogDbContext catalogDb
         if (priceTypeIds.Count == 0)
             return new Dictionary<int, string>();
 
-        var requestedIds = priceTypeIds.Distinct().Select(PriceTypeId.From).ToArray();
+        var requestedIds = priceTypeIds.Distinct().Select(PriceTypeId.Create).ToArray();
         return await catalogDbContext.PriceTypes
             .AsNoTracking()
             .Where(item => requestedIds.Contains(item.Id))

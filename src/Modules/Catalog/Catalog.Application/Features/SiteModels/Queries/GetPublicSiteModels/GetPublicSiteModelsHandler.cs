@@ -28,9 +28,9 @@ public sealed class GetPublicSiteModelsHandler(PublicModelCatalogReader reader, 
         {
             var id = await slugService.ResolveAsync(CatalogEntityType.Category,
                 query.CategorySlug.Trim().ToLowerInvariant(), cancellationToken);
-            if (id is null || !catalog.Categories.ContainsKey(ProductCategoryId.From(id.Value)))
+            if (id is null || !catalog.Categories.ContainsKey(ProductCategoryId.Create(id.Value)))
                 return Result.NotFound();
-            categoryId = ProductCategoryId.From(id.Value);
+            categoryId = ProductCategoryId.Create(id.Value);
         }
 
         var isFinal = categoryId is { } selected && catalog.IsFinal(selected);
@@ -122,6 +122,6 @@ public sealed class GetPublicSiteModelsHandler(PublicModelCatalogReader reader, 
     /// <summary>The model address of the on-site product whose 1C code is the whole search.</summary>
     private static PublicSiteModelAddressDto? ExactMatch(PublicModelCatalog catalog, string? search)
         => int.TryParse(search?.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var code) && code is > 0 and <= 1_000_000_000
-            ? catalog.AddressOf(ProductId.From(code))
+            ? catalog.AddressOf(ProductId.Create(code))
             : null;
 }

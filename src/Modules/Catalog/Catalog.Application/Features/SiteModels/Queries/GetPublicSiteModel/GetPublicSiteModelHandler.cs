@@ -31,7 +31,7 @@ public sealed class GetPublicSiteModelHandler(PublicModelCatalogReader reader, I
                     new Dictionary<string, string>())));
 
         if (await slugService.ResolveAsync(CatalogEntityType.Product, slug, cancellationToken) is { } productId
-            && catalog.AddressOf(ProductId.From(productId)) is { } address)
+            && catalog.AddressOf(ProductId.Create(productId)) is { } address)
             return Result.Success(new PublicSiteModelLookup(null, address));
 
         return Result.NotFound();

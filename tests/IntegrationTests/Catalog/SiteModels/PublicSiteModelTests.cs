@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -85,8 +86,8 @@ public sealed class PublicSiteModelTests
         AddCategory(db, Parent);
         foreach (var child in new[] { Final, OtherFinal })
         {
-            var category = ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
-                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent)).Value;
+            var category = ProductCategory.Create(ProductCategoryId.Create(child), Root, $"Категорія {child}",
+                $"katehoriia-{child}", CategoryPath.Create($"n{Parent}.n{child}"), ProductCategoryId.Create(Parent)).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);
         }
@@ -99,9 +100,9 @@ public sealed class PublicSiteModelTests
         foreach (var product in products)
         {
             AddProduct(db, product.Id, product.Category, product.Name);
-            db.ProductListProjections.Add(ProductListProjection.Create(ProductId.From(product.Id), product.Name,
+            db.ProductListProjections.Add(ProductListProjection.Create(ProductId.Create(product.Id), product.Name,
                 product.Name + " (рос.)", $"product-{product.Id}", $"photo-{product.Id}.jpg",
-                ProductCategoryId.From(product.Category), $"katehoriia-{product.Category}", product.InStock,
+                ProductCategoryId.Create(product.Category), $"katehoriia-{product.Category}", product.InStock,
                 isSale: false, isNew: product.Id == 3, exportToSite: product.OnSite, retailPrice: 100m + product.Id));
         }
 
@@ -110,7 +111,7 @@ public sealed class PublicSiteModelTests
             Row(2, "Завіса", "AB", "R"), Row(3, "Ручка", "AB", "L"), Row(4, "Засувка", "AB", "L")) + "\n", apply: true);
 
         var hinges = await db.ProductGroupMembers.AsNoTracking()
-            .Where(member => member.ProductId == ProductId.From(1)).Select(member => member.GroupId!.Value).SingleAsync();
+            .Where(member => member.ProductId == ProductId.Create(1)).Select(member => member.GroupId!.Value).SingleAsync();
         var state = new SiteModelStateReader(db);
         var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroup>(db),

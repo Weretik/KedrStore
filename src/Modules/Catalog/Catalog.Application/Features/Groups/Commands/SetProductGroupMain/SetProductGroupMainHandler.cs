@@ -19,7 +19,7 @@ public sealed class SetProductGroupMainHandler(
         if (group is null)
             return Result.NotFound();
 
-        var productId = ProductId.From(command.Request.ProductId);
+        var productId = ProductId.Create(command.Request.ProductId);
         var isMember = await db.ProductGroupMembers
             .AnyAsync(member => member.ProductId == productId && member.GroupId == group.Id, cancellationToken);
         if (!isMember)

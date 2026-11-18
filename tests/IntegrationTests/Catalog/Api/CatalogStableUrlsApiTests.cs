@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using System.Net;
 using System.Net.Http.Json;
@@ -178,8 +179,8 @@ public sealed class CatalogStableUrlsApiTests
     public async Task PublicProduct_ShowsTheRetailPriceOfTheLists_UnlessAPriceTypeIsAsked()
     {
         await using var db = Seed();
-        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.From(20), PriceTypeId.From(11), new Money(90m, "UAH")).Value);
-        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.From(20), PriceTypeId.From(12), new Money(100m, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(11), new Money(90m, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(12), new Money(100m, "UAH")).Value);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
         using var client = factory.CreateClient();
@@ -215,8 +216,8 @@ public sealed class CatalogStableUrlsApiTests
 
     private static ProductCategory AddCategory(CatalogDbContext db, int id, string name, string slug, string path, int? parentId)
     {
-        var category = ProductCategory.Create(ProductCategoryId.From(id), "000005513", name, slug, CategoryPath.From(path),
-            parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
+        var category = ProductCategory.Create(ProductCategoryId.Create(id), "000005513", name, slug, CategoryPath.Create(path),
+            parentId is null ? null : ProductCategoryId.Create(parentId.Value)).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
         return category;
@@ -224,13 +225,13 @@ public sealed class CatalogStableUrlsApiTests
 
     private static Product AddProduct(CatalogDbContext db, int id, string name, string slug, decimal price)
     {
-        var product = Product.Create(ProductId.From(id), "000005513", name, slug, ProductCategoryId.From(2),
+        var product = Product.Create(ProductId.Create(id), "000005513", name, slug, ProductCategoryId.Create(2),
             Now, 5, 1, false, false, true).Value;
         db.Products.Add(product);
         if (id != 22)
         {
             db.ProductListProjections.Add(ProductListProjection.Create(product.Id, name, name, slug, product.Photo,
-                ProductCategoryId.From(2), "zamky", inStock: true, isSale: false, isNew: false, exportToSite: true, retailPrice: price));
+                ProductCategoryId.Create(2), "zamky", inStock: true, isSale: false, isNew: false, exportToSite: true, retailPrice: price));
         }
 
         return product;

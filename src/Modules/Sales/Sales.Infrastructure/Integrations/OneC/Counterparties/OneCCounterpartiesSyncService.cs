@@ -106,7 +106,7 @@ public sealed class OneCCounterpartiesSyncService(
                     name: normalized.CounterpartyName,
                     email: normalized.Email,
                     phone: normalized.Phone,
-                    defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                    defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                     createdAt: now);
                 if (created.IsFailure)
                 {
@@ -136,7 +136,7 @@ public sealed class OneCCounterpartiesSyncService(
                                 || existingCounterparty.Name != normalized.CounterpartyName
                                 || existingCounterparty.Email != normalized.Email
                                 || existingCounterparty.Phone != normalized.Phone
-                                || existingCounterparty.DefaultPriceTypeId != normalized.DefaultPriceTypeId;
+                                || existingCounterparty.DefaultPriceTypeId.Value != normalized.DefaultPriceTypeId;
             if (!fieldsChanged && !wasDeleted)
             {
                 unchanged++;
@@ -148,7 +148,7 @@ public sealed class OneCCounterpartiesSyncService(
                 name: normalized.CounterpartyName,
                 email: normalized.Email,
                 phone: normalized.Phone,
-                defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                 updatedAt: now);
             if (changed.IsFailure)
             {

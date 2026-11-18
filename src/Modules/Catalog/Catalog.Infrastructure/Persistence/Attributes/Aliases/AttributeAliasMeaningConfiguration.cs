@@ -11,7 +11,7 @@ public sealed class AttributeAliasMeaningConfiguration : IEntityTypeConfiguratio
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd().UseIdentityByDefaultColumn();
         builder.Property(x => x.AliasId).HasConversion(AttributeIdConverters.AliasId);
-        builder.Property(x => x.CategoryId).HasConversion(CatalogConverter.ProductCategoryIdConvert);
+        builder.Property(x => x.CategoryId);
         builder.Property(x => x.AttributeId).HasConversion(AttributeIdConverters.AttributeId);
         builder.Property(x => x.ValueId).HasConversion(AttributeIdConverters.ValueId);
 

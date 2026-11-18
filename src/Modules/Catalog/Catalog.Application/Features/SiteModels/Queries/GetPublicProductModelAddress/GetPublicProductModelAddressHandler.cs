@@ -28,7 +28,7 @@ public sealed class GetPublicProductModelAddressHandler(
         if (id is null)
             return Result.NotFound();
 
-        var productId = ProductId.From(id.Value);
+        var productId = ProductId.Create(id.Value);
         var catalog = await reader.ReadAsync(cancellationToken);
         if (catalog.AddressOf(productId) is { } address)
             return Result.Success(CatalogLookup<PublicSiteModelAddressDto>.Found(address));

@@ -41,14 +41,14 @@ public sealed class SalesCustomerReferenceNamesTests
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
         var now = DateTimeOffset.UtcNow;
-        db.Counterparties.Add(Counterparty.Create("customer-1", UserId.FromStorage(Guid.NewGuid()), "Клієнт", "test@example.com", null, 1, now).Value);
+        db.Counterparties.Add(Counterparty.Create("customer-1", UserId.FromStorage(Guid.NewGuid()), "Клієнт", "test@example.com", null, PriceTypeId.FromStorage(1), now).Value);
         db.Counterparties.AddRange(
-            Counterparty.Create("match-2", UserId.FromStorage(Guid.NewGuid()), "Alpha Two", "two@example.com", "+38022", 1, now).Value,
-            Counterparty.Create("match-1", UserId.FromStorage(Guid.NewGuid()), "Alpha One", "one@example.com", "+38011", 1, now).Value,
-            Counterparty.Create("other", UserId.FromStorage(Guid.NewGuid()), "Bravo", "other@example.com", "+38033", 1, now).Value);
+            Counterparty.Create("match-2", UserId.FromStorage(Guid.NewGuid()), "Alpha Two", "two@example.com", "+38022", PriceTypeId.FromStorage(1), now).Value,
+            Counterparty.Create("match-1", UserId.FromStorage(Guid.NewGuid()), "Alpha One", "one@example.com", "+38011", PriceTypeId.FromStorage(1), now).Value,
+            Counterparty.Create("other", UserId.FromStorage(Guid.NewGuid()), "Bravo", "other@example.com", "+38033", PriceTypeId.FromStorage(1), now).Value);
         db.CounterpartyCategoryPriceTypes.AddRange(
-            CounterpartyCategoryPriceType.Create("customer-1", 5513, 7).Value,
-            CounterpartyCategoryPriceType.Create("customer-1", 9999, 99).Value);
+            CounterpartyCategoryPriceType.Create("customer-1", ProductCategoryId.FromStorage(5513), PriceTypeId.FromStorage(7)).Value,
+            CounterpartyCategoryPriceType.Create("customer-1", ProductCategoryId.FromStorage(9999), PriceTypeId.FromStorage(99)).Value);
         await db.SaveChangesAsync();
 
         var result = await scope.ServiceProvider.GetRequiredService<ICustomerReadService>()

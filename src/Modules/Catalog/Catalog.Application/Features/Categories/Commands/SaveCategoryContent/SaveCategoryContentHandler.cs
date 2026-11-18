@@ -15,7 +15,7 @@ public sealed class SaveCategoryContentHandler(
     public async ValueTask<Result<AdminCategoryContentItem>> Handle(SaveCategoryContentCommand command,
         CancellationToken cancellationToken)
     {
-        var categoryId = ProductCategoryId.From(command.CategoryId);
+        var categoryId = ProductCategoryId.Create(command.CategoryId);
         if (!await catalogDbContext.Categories.AsNoTracking().AnyAsync(category => category.Id == categoryId, cancellationToken))
             return Result.NotFound();
 

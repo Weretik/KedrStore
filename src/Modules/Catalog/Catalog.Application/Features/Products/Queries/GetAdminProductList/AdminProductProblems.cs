@@ -43,7 +43,7 @@ internal static class AdminProductProblems
         if (rows.Count == 0)
             return rows;
 
-        var ids = rows.Select(row => ProductId.From(row.Id)).ToArray();
+        var ids = rows.Select(row => ProductId.Create(row.Id)).ToArray();
         var groups = await (from member in db.ProductGroupMembers.AsNoTracking()
                             from productGroup in db.ProductGroups.AsNoTracking()
                             where member.GroupId == productGroup.Id && ids.Contains(member.ProductId)

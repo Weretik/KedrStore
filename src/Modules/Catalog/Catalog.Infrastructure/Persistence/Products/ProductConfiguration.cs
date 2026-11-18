@@ -13,7 +13,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Id)
-            .HasConversion(CatalogConverter.ProductIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(p => p.Name)
@@ -25,7 +25,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
 
         builder.Property(p => p.CategoryId)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert);
+            ;
 
         builder.HasIndex(p => p.CategoryId);
         builder.Property(p => p.ProductSlug)
@@ -56,7 +56,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         {
             links.ToTable("ProductMedia");
             links.WithOwner().HasForeignKey("ProductId");
-            links.Property<ProductId>("ProductId").HasConversion(CatalogConverter.ProductIdConvert);
+            links.Property<ProductId>("ProductId");
             links.HasKey("ProductId", nameof(ProductMediaLink.MediaFileId));
             links.Property(link => link.MediaFileId).ValueGeneratedNever();
             links.Property(link => link.Kind).HasConversion<int>().IsRequired();

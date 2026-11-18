@@ -8,7 +8,7 @@ public sealed class GetProductGroupForProductHandler(ProductGroupReader reader)
 {
     public async ValueTask<Result<AdminProductGroupMembershipDto>> Handle(GetProductGroupForProductQuery query,
         CancellationToken cancellationToken)
-        => await reader.ReadForProductAsync(ProductId.From(query.ProductId), cancellationToken) is { } membership
+        => await reader.ReadForProductAsync(ProductId.Create(query.ProductId), cancellationToken) is { } membership
             ? Result.Success(membership)
             : Result.NotFound();
 }

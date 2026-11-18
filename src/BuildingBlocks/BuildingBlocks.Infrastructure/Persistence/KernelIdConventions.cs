@@ -14,6 +14,9 @@ public static class KernelIdConventions
     {
         configurationBuilder.Properties<UserId>().HaveConversion<UserIdConverter>();
         configurationBuilder.Properties<MediaFileId>().HaveConversion<MediaFileIdConverter>();
+        configurationBuilder.Properties<ProductId>().HaveConversion<ProductIdConverter>();
+        configurationBuilder.Properties<ProductCategoryId>().HaveConversion<ProductCategoryIdConverter>();
+        configurationBuilder.Properties<PriceTypeId>().HaveConversion<PriceTypeIdConverter>();
         return configurationBuilder;
     }
 
@@ -21,4 +24,13 @@ public static class KernelIdConventions
 
     private sealed class MediaFileIdConverter()
         : ValueConverter<MediaFileId, long>(id => id.Value, value => MediaFileId.FromStorage(value));
+
+    private sealed class ProductIdConverter()
+        : ValueConverter<ProductId, int>(id => id.Value, value => ProductId.FromStorage(value));
+
+    private sealed class ProductCategoryIdConverter()
+        : ValueConverter<ProductCategoryId, int>(id => id.Value, value => ProductCategoryId.FromStorage(value));
+
+    private sealed class PriceTypeIdConverter()
+        : ValueConverter<PriceTypeId, int>(id => id.Value, value => PriceTypeId.FromStorage(value));
 }

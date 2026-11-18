@@ -76,7 +76,7 @@ string OrderNumber; // unique, immutable, not the PK
 
 For every new or changed Domain entity, its ID and Domain foreign keys must use a typed value-object/readonly-struct wrapper around the chosen scalar. Do not add `BaseAuditableEntity<long>`, `BaseEntity<Guid>`, or raw scalar FKs to Domain. This prevents accidental use of another ID in APIs while retaining efficient database columns and indexes.
 
-Do not use Vogen for new IDs in this project. Declare typed IDs as explicit regular C# `readonly record struct` types so creation, validation, and EF conversion remain visible in code. Existing legacy Vogen usage is out of feature scope unless a separate migration explicitly removes it.
+Do not use Vogen in this project; the last Vogen ids were rewritten on 2026-11-18. Declare typed IDs as explicit regular C# `readonly record struct` types so creation, validation, and EF conversion remain visible in code. An id that another module stores lives in the shared kernel ([ADR-0017](../architecture/decisions/0017-shared-kernel-ids-across-modules.md)).
 
 Raw scalar IDs are allowed only in internal Infrastructure persistence records that do not cross the Domain boundary, such as an EF idempotency table. Map typed Domain IDs to scalar EF columns through value converters.
 
