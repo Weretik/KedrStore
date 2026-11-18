@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using BuildingBlocks.Application.Outbox;
 using BuildingBlocks.Infrastructure.Outbox.Dispatch;
 using IntegrationTests.TestSupport.Database;
@@ -173,7 +174,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
             var db = services.GetRequiredService<SalesDbContext>();
             if (!await db.Counterparties.AnyAsync(x => x.Id == CounterpartyId.FromStorage(counterpartyId)))
             {
-                db.Counterparties.Add(Counterparty.Create(counterpartyId, Guid.NewGuid(), "Клієнт", $"{counterpartyId}@example.com",
+                db.Counterparties.Add(Counterparty.Create(counterpartyId, UserId.FromStorage(Guid.NewGuid()), "Клієнт", $"{counterpartyId}@example.com",
                     null, 1, SalesOutboxHarness.Noon).Value);
                 await db.SaveChangesAsync();
             }

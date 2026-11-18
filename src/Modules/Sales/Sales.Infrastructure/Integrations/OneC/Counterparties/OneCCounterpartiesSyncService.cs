@@ -42,7 +42,7 @@ public sealed class OneCCounterpartiesSyncService(
             .IgnoreQueryFilters()
             .ToDictionaryAsync(item => item.Id.Value, StringComparer.Ordinal, cancellationToken);
         var assignedIdentityUsers = existingCounterparties.Values
-            .GroupBy(item => item.IdentityUserId)
+            .GroupBy(item => item.IdentityUserId.Value)
             .ToDictionary(group => group.Key, group => group.First().Id.Value);
 
         var imported = 0;
@@ -71,7 +71,7 @@ public sealed class OneCCounterpartiesSyncService(
                     normalized.CounterpartyId,
                     normalized.Email,
                     normalized.CounterpartyName),
-                existingCounterparty?.IdentityUserId,
+                existingCounterparty?.IdentityUserId.Value,
                 cancellationToken);
 
             if (!identityResult.IsSuccess)
@@ -102,7 +102,7 @@ public sealed class OneCCounterpartiesSyncService(
             {
                 var created = Counterparty.Create(
                     id: normalized.CounterpartyId,
-                    identityUserId: identityResult.Value,
+                    identityUserId: UserId.FromStorage(identityResult.Value),
                     name: normalized.CounterpartyName,
                     email: normalized.Email,
                     phone: normalized.Phone,
@@ -132,7 +132,7 @@ public sealed class OneCCounterpartiesSyncService(
                 restored++;
             }
 
-            var fieldsChanged = existingCounterparty.IdentityUserId != identityResult.Value
+            var fieldsChanged = existingCounterparty.IdentityUserId.Value != identityResult.Value
                                 || existingCounterparty.Name != normalized.CounterpartyName
                                 || existingCounterparty.Email != normalized.Email
                                 || existingCounterparty.Phone != normalized.Phone
@@ -144,7 +144,7 @@ public sealed class OneCCounterpartiesSyncService(
             }
 
             var changed = existingCounterparty.Update(
-                identityUserId: identityResult.Value,
+                identityUserId: UserId.FromStorage(identityResult.Value),
                 name: normalized.CounterpartyName,
                 email: normalized.Email,
                 phone: normalized.Phone,

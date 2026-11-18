@@ -93,7 +93,7 @@ public sealed class CatalogStableUrlsApiTests
         Assert.DoesNotContain("javascript", body);
         Assert.Contains("<strong>жирний</strong>", body);
         Assert.Contains("href=\"/uk/zamky\"", body);
-        Assert.Equal("test-user", saved.RootElement.GetProperty("updatedBy").GetString());
+        Assert.Equal(TestRoleAuthentication.DefaultUserId, saved.RootElement.GetProperty("updatedBy").GetString());
 
         using var read = await manager.GetAsync("/api/categories/2/content");
         Assert.Equal(HttpStatusCode.OK, read.StatusCode);

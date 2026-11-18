@@ -71,7 +71,7 @@ public sealed class CompanyRequisitesApiTests
 
         using var history = JsonDocument.Parse(await admin.GetStringAsync("/api/admin/content/requisites/history"));
         var entry = Assert.Single(history.RootElement.EnumerateArray());
-        Assert.Equal("test-user", entry.GetProperty("changedBy").GetString());
+        Assert.Equal(TestRoleAuthentication.DefaultUserId, entry.GetProperty("changedBy").GetString());
         var change = Assert.Single(entry.GetProperty("changes").EnumerateArray());
         Assert.Equal("legalName", change.GetProperty("field").GetString());
         Assert.Equal("ФОП Овчинников Максим Володимирович", change.GetProperty("oldValue").GetString());

@@ -14,7 +14,7 @@ public sealed record WorkActivityDto(
 {
     public static WorkActivityDto From(WorkActivity activity) => new(
         activity.Id.Value,
-        activity.UserId,
+        activity.UserId.Value,
         activity.UserEmail,
         activity.Area,
         activity.Operation,

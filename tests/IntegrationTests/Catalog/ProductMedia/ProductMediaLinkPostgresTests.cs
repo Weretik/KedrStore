@@ -115,7 +115,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         await using (var db = postgres.CreateContext())
         {
             var product = await LoadProduct(db, 731);
-            Assert.Equal([(a.Id, 0)], product.Photos.Select(link => (link.MediaFileId, link.Position)));
+            Assert.Equal([(a.Id, 0)], product.Photos.Select(link => (link.MediaFileId.Value, link.Position)));
             Assert.Equal(a.Url, product.Photo);
             Assert.Equal(c.Url, product.Sсheme);
             Assert.Equal(a.Url, await ProjectionPhoto(db, 731));

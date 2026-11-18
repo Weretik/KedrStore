@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Contracts.Reference;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -235,7 +236,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         await using var db = postgres.CreateContext();
         var customer = Counterparty.Create(
             id,
-            Guid.NewGuid(),
+            UserId.FromStorage(Guid.NewGuid()),
             name,
             $"{id}@example.com",
             phone,
@@ -256,7 +257,7 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
             var id = $"customer-read-{index:D3}";
             db.Counterparties.Add(Counterparty.Create(
                 id,
-                Guid.NewGuid(),
+                UserId.FromStorage(Guid.NewGuid()),
                 $"Customer {index:D3}",
                 $"{id}@example.com",
                 null,

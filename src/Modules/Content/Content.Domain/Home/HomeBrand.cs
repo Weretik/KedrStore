@@ -11,13 +11,13 @@ public sealed class HomeBrand : IAggregateRoot
     public HomeBrandId Id { get; private set; }
     public int Position { get; private set; }
     public string Name { get; private set; } = string.Empty;
-    public long LogoMediaFileId { get; private set; }
+    public MediaFileId LogoMediaFileId { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
     private HomeBrand() { }
 
-    public static DomainResult<HomeBrand> Create(string name, long logoMediaFileId, int position, DateTimeOffset now)
+    public static DomainResult<HomeBrand> Create(string name, MediaFileId logoMediaFileId, int position, DateTimeOffset now)
     {
         var checkedPosition = HomeGuard.Position(position);
         if (checkedPosition.IsFailure)
@@ -28,10 +28,10 @@ public sealed class HomeBrand : IAggregateRoot
         return updated.IsSuccess ? brand : updated.Error!;
     }
 
-    public DomainResult Update(string name, long logoMediaFileId, DateTimeOffset now)
+    public DomainResult Update(string name, MediaFileId logoMediaFileId, DateTimeOffset now)
     {
-        if (logoMediaFileId <= 0)
-            return HomeErrors.MediaFileInvalid(logoMediaFileId);
+        if (logoMediaFileId.Value <= 0)
+            return HomeErrors.MediaFileInvalid(logoMediaFileId.Value);
         var checkedName = HomeGuard.Text(name, nameof(Name), NameMaxLength);
         if (checkedName.IsFailure)
             return checkedName;

@@ -15,11 +15,11 @@ public sealed class UpdateHomeBrandHandler(
         var brand = await repository.GetByIdAsync(HomeBrandId.FromStorage(command.Id), cancellationToken);
         if (brand is null)
             return Result.NotFound();
-        if (brand.LogoMediaFileId != command.Brand.LogoMediaFileId &&
+        if (brand.LogoMediaFileId.Value != command.Brand.LogoMediaFileId &&
             await HomeAdminBlocks.CheckLogoAsync(images, command.Brand.LogoMediaFileId, cancellationToken) is { } invalid)
             return Result.Invalid(invalid);
 
-        var updated = brand.Update(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId, clock.GetUtcNow());
+        var updated = brand.Update(command.Brand.Name ?? string.Empty, MediaFileId.FromStorage(command.Brand.LogoMediaFileId), clock.GetUtcNow());
         if (updated.IsFailure)
             return updated.Error!.ToResult<AdminHomeBlocks>();
         await repository.UpdateAsync(brand, cancellationToken);

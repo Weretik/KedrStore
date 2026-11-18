@@ -23,7 +23,7 @@ public sealed class UpdateAttributeValueHandler(
 
         var request = command.Request;
         var edited = attribute.EditValue(AttributeValueId.Create(command.ValueId), request.NameUk, request.NameRu,
-            request.SortOrder, request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow());
+            request.SortOrder, request.SwatchHex, request.SwatchMediaFileId is { } swatch ? MediaFileId.FromStorage(swatch) : null, clock.GetUtcNow());
         if (edited.IsFailure)
             return edited.Error!.ToResult<AdminCatalogAttributeDto>();
         await attributes.SaveChangesAsync(cancellationToken);

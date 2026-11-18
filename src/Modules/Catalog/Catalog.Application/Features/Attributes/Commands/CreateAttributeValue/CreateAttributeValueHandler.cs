@@ -31,7 +31,7 @@ public sealed class CreateAttributeValueHandler(
 
         var code = string.IsNullOrWhiteSpace(request.Code) ? unique : request.Code.Trim();
         var value = attribute.AddManualValue(code, request.NameUk, request.NameRu, unique, request.SortOrder,
-            request.SwatchHex, request.SwatchMediaFileId, clock.GetUtcNow());
+            request.SwatchHex, request.SwatchMediaFileId is { } swatch ? MediaFileId.FromStorage(swatch) : null, clock.GetUtcNow());
         if (value.IsFailure)
             return value.Error!.ToResult<AdminCatalogAttributeDto>();
         await attributes.SaveChangesAsync(cancellationToken);

@@ -15,13 +15,13 @@ public static class HomeAdminBlocks
         var brands = await db.HomeBrands.AsNoTracking()
             .OrderBy(brand => brand.Position).ThenBy(brand => brand.Id)
             .ToListAsync(cancellationToken);
-        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId).ToList(),
+        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId.Value).ToList(),
             cancellationToken);
 
         return new AdminHomeBlocks(faq, brands.Select(brand =>
         {
-            logos.TryGetValue(brand.LogoMediaFileId, out var logo);
-            return new AdminHomeBrand(brand.Id.Value, brand.Position, brand.Name, brand.LogoMediaFileId, logo?.Url,
+            logos.TryGetValue(brand.LogoMediaFileId.Value, out var logo);
+            return new AdminHomeBrand(brand.Id.Value, brand.Position, brand.Name, brand.LogoMediaFileId.Value, logo?.Url,
                 logo?.FileName, logo is null, brand.UpdatedAt);
         }).ToList());
     }

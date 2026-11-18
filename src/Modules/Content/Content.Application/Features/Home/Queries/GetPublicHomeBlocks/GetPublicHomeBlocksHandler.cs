@@ -20,14 +20,14 @@ public sealed class GetPublicHomeBlocksHandler(IReadContentDbContext db, IMediaI
             .OrderBy(brand => brand.Position).ThenBy(brand => brand.Id)
             .Select(brand => new { brand.Name, brand.LogoMediaFileId })
             .ToListAsync(cancellationToken);
-        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId).ToList(),
+        var logos = await images.GetImagesAsync(brands.Select(brand => brand.LogoMediaFileId.Value).ToList(),
             cancellationToken);
 
         var visible = brands
-            .Where(brand => logos.ContainsKey(brand.LogoMediaFileId))
+            .Where(brand => logos.ContainsKey(brand.LogoMediaFileId.Value))
             .Select(brand =>
             {
-                var logo = logos[brand.LogoMediaFileId];
+                var logo = logos[brand.LogoMediaFileId.Value];
                 return new PublicHomeBrand(brand.Name, logo.Url, logo.Width, logo.Height);
             })
             .ToList();

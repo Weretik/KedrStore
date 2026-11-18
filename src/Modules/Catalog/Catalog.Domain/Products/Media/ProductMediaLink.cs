@@ -8,7 +8,7 @@ public sealed class ProductMediaLink
 {
     public const int UrlMaxLength = 1000;
 
-    public long MediaFileId { get; private set; }
+    public MediaFileId MediaFileId { get; private set; }
     public ProductMediaKind Kind { get; private set; }
     public int Position { get; private set; }
     public string Url { get; private set; } = null!;
@@ -18,7 +18,7 @@ public sealed class ProductMediaLink
     internal static ProductMediaLink Create(ProductMediaFile file, ProductMediaKind kind, int position)
     {
         // Files and their URLs come from the media library, never typed by a person.
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(file.Id, nameof(file));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(file.Id.Value, nameof(file));
 
         var link = new ProductMediaLink { MediaFileId = file.Id };
         link.Place(kind, position);

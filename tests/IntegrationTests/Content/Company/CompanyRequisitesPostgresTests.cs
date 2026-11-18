@@ -100,7 +100,7 @@ public sealed class CompanyRequisitesPostgresTests(ContentPostgresFixture postgr
 
     private sealed class AdminUser : ICurrentUserService
     {
-        public string UserId => "1";
+        public string UserId => "6f9619ff-8b86-d011-b42d-00c04fc964ff";
         public bool IsAuthenticated => true;
         public string UserName => "admin";
         public string Email => "admin@classkedr.com.ua";

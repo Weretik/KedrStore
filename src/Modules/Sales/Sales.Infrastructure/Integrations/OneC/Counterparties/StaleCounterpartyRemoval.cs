@@ -40,7 +40,7 @@ public sealed class StaleCounterpartyRemoval(
         db.Counterparties.RemoveRange(stale);
         // Platform spec 006, R-014: the Identity users go with the customers, through the outbox.
         foreach (var customer in stale)
-            outbox.Add(db, new CounterpartyRemoved(customer.Id.Value, customer.IdentityUserId));
+            outbox.Add(db, new CounterpartyRemoved(customer.Id.Value, customer.IdentityUserId.Value));
         await db.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);
 

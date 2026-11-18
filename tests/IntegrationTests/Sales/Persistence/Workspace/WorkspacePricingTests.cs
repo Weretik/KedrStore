@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -55,7 +56,7 @@ public sealed class WorkspacePricingTests : IAsyncLifetime
 
         var now = DateTimeOffset.UtcNow;
         var sales = _scope.ServiceProvider.GetRequiredService<SalesDbContext>();
-        sales.Counterparties.Add(Counterparty.Create(CustomerId, Guid.NewGuid(), "Клієнт", "c@example.com", null, DefaultType, now).Value);
+        sales.Counterparties.Add(Counterparty.Create(CustomerId, UserId.FromStorage(Guid.NewGuid()), "Клієнт", "c@example.com", null, DefaultType, now).Value);
         // The rule sits on the parent "Locks" category; products live in its child and grandchild.
         sales.CounterpartyCategoryPriceTypes.Add(CounterpartyCategoryPriceType.Create(CustomerId, 10, LocksType).Value);
         await sales.SaveChangesAsync();

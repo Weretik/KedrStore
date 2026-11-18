@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +49,7 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
         var now = DateTimeOffset.UtcNow;
-        db.Counterparties.Add(Counterparty.Create(CounterpartyId, Guid.NewGuid(), "Adjusted customer",
+        db.Counterparties.Add(Counterparty.Create(CounterpartyId, UserId.FromStorage(Guid.NewGuid()), "Adjusted customer",
             "adjusted@example.com", null, 1, now).Value);
         // 2 × (200 − 50) and 3 × (100 + 10): the stored amounts already include the adjustments.
         var order = Order.Create("SO-ADJ-1", CounterpartyId, null,
