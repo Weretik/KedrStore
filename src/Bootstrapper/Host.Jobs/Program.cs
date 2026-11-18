@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Sales.Infrastructure.Integrations.OneC.Jobs;
+using Sales.Application.Features.OneCSync.Jobs;
 
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
 

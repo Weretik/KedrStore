@@ -12,6 +12,7 @@ BuildingBlocks.Domain/
 ├── Entity/
 │   ├── BaseEntity<TId>
 │   └── BaseAuditableEntity<TId>
+├── Identifiers/                 ids other modules store: UserId, MediaFileId, ProductId, ProductCategoryId, PriceTypeId
 └── Results/
     └── DomainResult, DomainResult<T>, DomainChecks
 ~~~
@@ -24,6 +25,7 @@ BuildingBlocks.Domain/
 - A business rule returns `DomainResult` or `DomainResult<T>`; `DomainChecks` collects several field checks and keeps the first error. The handler turns a failure into its use-case result with `ToResult()` from `BuildingBlocks.Application.Results`.
 - Exceptions in Domain only report programming errors (`Argument*Exception`, `InvalidOperationException`); `ThrowIfFailure()` marks a check whose input the code built itself. `DomainErrorHandlingTests` enforces this.
 - `IAggregateRoot` marks aggregate roots.
+- `Identifiers/` holds the ids that more than one module stores ([ADR-0017](../../decisions/0017-shared-kernel-ids-across-modules.md)); `BuildingBlocks.Infrastructure` maps them with `AddKernelIds()`. An id used only inside its module stays beside its root.
 
 ## Usage
 

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 
 namespace UnitTests.Catalog.Domain;
@@ -67,6 +68,6 @@ public sealed class CategorySiteVisibilityTests
     }
 
     private static ProductCategory Category(int id, string path, int? parentId = null)
-        => ProductCategory.Create(ProductCategoryId.From(id), $"{id:D9}", $"Категорія {id}", $"category-{id}",
-            CategoryPath.From(path), parentId is { } parent ? ProductCategoryId.From(parent) : null).Value;
+        => ProductCategory.Create(ProductCategoryId.Create(id), $"{id:D9}", $"Категорія {id}", $"category-{id}",
+            CategoryPath.Create(path), parentId is { } parent ? ProductCategoryId.Create(parent) : null).Value;
 }

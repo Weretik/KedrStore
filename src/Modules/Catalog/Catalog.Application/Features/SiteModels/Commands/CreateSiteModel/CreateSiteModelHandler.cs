@@ -23,14 +23,14 @@ public sealed class CreateSiteModelHandler(
     private async Task<Result<SiteModelDto>> HandleInTransactionAsync(CreateSiteModelCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
-        var categoryId = ProductCategoryId.From(request.CategoryId);
+        var categoryId = ProductCategoryId.Create(request.CategoryId);
         if (!await changes.IsFinalCategoryAsync(categoryId, cancellationToken))
         {
             return SiteModelValidation.Invalid("categoryId",
                 "Модель може бути лише в кінцевій категорії (без підкатегорій).", "CategoryNotFinal");
         }
 
-        var productIds = request.ProductIds.Select(ProductId.From).ToList();
+        var productIds = request.ProductIds.Select(ProductId.Create).ToList();
         if (await changes.CheckProductsAsync(categoryId, productIds, null, cancellationToken) is { } error)
             return error;
 

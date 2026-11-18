@@ -23,7 +23,7 @@ internal static class SalesProductFilters
         if (request.CategoryId is not null)
         {
             productsQuery = ApplyCategory(
-                productsQuery, categoriesQuery, ProductCategoryId.From(request.CategoryId.Value));
+                productsQuery, categoriesQuery, ProductCategoryId.Create(request.CategoryId.Value));
         }
 
         if (request.InStock == true)
@@ -56,7 +56,7 @@ internal static class SalesProductFilters
         if (!int.TryParse(term, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) || id <= 0)
             return nameQuery;
 
-        var productId = ProductId.From(id);
+        var productId = ProductId.Create(id);
         return productsQuery.Where(x => x.Id == productId || nameQuery.Any(p => p.Id == x.Id));
     }
 

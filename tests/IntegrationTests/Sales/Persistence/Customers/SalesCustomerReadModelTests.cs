@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Contracts.Reference;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -133,8 +134,8 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         await using (var db = postgres.CreateContext())
         {
             db.CounterpartyCategoryPriceTypes.AddRange(
-                CounterpartyCategoryPriceType.Create("customer-detail", 20, 202).Value,
-                CounterpartyCategoryPriceType.Create("customer-detail", 10, 101).Value);
+                CounterpartyCategoryPriceType.Create("customer-detail", ProductCategoryId.FromStorage(20), PriceTypeId.FromStorage(202)).Value,
+                CounterpartyCategoryPriceType.Create("customer-detail", ProductCategoryId.FromStorage(10), PriceTypeId.FromStorage(101)).Value);
             await db.SaveChangesAsync();
         }
 
@@ -235,11 +236,11 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
         await using var db = postgres.CreateContext();
         var customer = Counterparty.Create(
             id,
-            Guid.NewGuid(),
+            UserId.FromStorage(Guid.NewGuid()),
             name,
             $"{id}@example.com",
             phone,
-            1,
+            PriceTypeId.FromStorage(1),
             now).Value;
         if (deleted)
             customer.MarkAsDeleted(now.AddMinutes(1));
@@ -256,11 +257,11 @@ public sealed class SalesCustomerReadModelTests(SalesPostgresFixture postgres)
             var id = $"customer-read-{index:D3}";
             db.Counterparties.Add(Counterparty.Create(
                 id,
-                Guid.NewGuid(),
+                UserId.FromStorage(Guid.NewGuid()),
                 $"Customer {index:D3}",
                 $"{id}@example.com",
                 null,
-                1,
+                PriceTypeId.FromStorage(1),
                 now).Value);
         }
 

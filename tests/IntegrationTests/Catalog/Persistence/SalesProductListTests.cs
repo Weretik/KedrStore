@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Queries.GetProductList;
 using Catalog.Application.Features.OneCSync.Mapping;
 using Catalog.Contracts.Pricing;
@@ -86,10 +87,10 @@ public sealed class SalesProductListTests
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
 
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(1), Root, "Root", "root", CategoryPath.Root("1")).Value);
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(2), Root, "Child", "child",
-            CategoryPath.From("n1.n2"), ProductCategoryId.From(1)).Value);
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(3), Root, "Other", "other", CategoryPath.Root("3")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(1), Root, "Root", "root", CategoryPath.Root("1")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(2), Root, "Child", "child",
+            CategoryPath.Create("n1.n2"), ProductCategoryId.Create(1)).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(3), Root, "Other", "other", CategoryPath.Root("3")).Value);
 
         AddProduct(db, 11, 1, retail: 10);
         AddProduct(db, 12, 2, retail: 9, wholesale: 6);
@@ -101,14 +102,14 @@ public sealed class SalesProductListTests
 
     private static void AddProduct(CatalogDbContext db, int id, int categoryId, decimal retail, decimal? wholesale = null)
     {
-        var productId = ProductId.From(id);
+        var productId = ProductId.Create(id);
         db.Products.Add(Product.Create(productId, Root, $"Product {id}", $"product-{id}",
-            ProductCategoryId.From(categoryId), DateTimeOffset.UnixEpoch, stock: 5, qtyInPack: 1,
+            ProductCategoryId.Create(categoryId), DateTimeOffset.UnixEpoch, stock: 5, qtyInPack: 1,
             isNew: false, isSale: false).Value);
-        db.ProductPrices.Add(ProductPrice.Create(Root, productId, PriceTypeId.From(Retail), new Money(retail, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create(Root, productId, PriceTypeId.Create(Retail), new Money(retail, "UAH")).Value);
         if (wholesale is not null)
         {
-            db.ProductPrices.Add(ProductPrice.Create(Root, productId, PriceTypeId.From(Wholesale),
+            db.ProductPrices.Add(ProductPrice.Create(Root, productId, PriceTypeId.Create(Wholesale),
                 new Money(wholesale.Value, "UAH")).Value);
         }
     }

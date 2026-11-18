@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -21,9 +22,9 @@ public sealed class ProductMediaTests
 {
     private static readonly DateTimeOffset Created = new(2026, 11, 4, 0, 0, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset Later = Created.AddHours(1);
-    private static readonly ProductMediaFile A = new(1, "https://cdn.test/a.jpg");
-    private static readonly ProductMediaFile B = new(2, "https://cdn.test/b.jpg");
-    private static readonly ProductMediaFile C = new(3, "https://cdn.test/c.jpg");
+    private static readonly ProductMediaFile A = new(MediaFileId.FromStorage(1), "https://cdn.test/a.jpg");
+    private static readonly ProductMediaFile B = new(MediaFileId.FromStorage(2), "https://cdn.test/b.jpg");
+    private static readonly ProductMediaFile C = new(MediaFileId.FromStorage(3), "https://cdn.test/c.jpg");
 
     [Fact]
     public void NewProduct_HasNoMedia_AndEmptyCache()
@@ -42,8 +43,8 @@ public sealed class ProductMediaTests
 
         Assert.True(product.SetMedia([B, A], C, Later).Value);
 
-        Assert.Equal([2L, 1L], product.Photos.Select(link => link.MediaFileId));
-        Assert.Equal(3, product.Scheme!.MediaFileId);
+        Assert.Equal([2L, 1L], product.Photos.Select(link => link.MediaFileId.Value));
+        Assert.Equal(3, product.Scheme!.MediaFileId.Value);
         Assert.Equal(B.Url, product.Photo);
         Assert.Equal(C.Url, product.Sсheme);
         Assert.Equal(Later, product.UpdatedAt);
@@ -73,7 +74,7 @@ public sealed class ProductMediaTests
         DomainAssert.Fails(product.SetMedia([A, A], null, Later));
         DomainAssert.Fails(product.SetMedia([A], A, Later));
         var many = Enumerable.Range(1, Product.MaximumPhotos + 1)
-            .Select(id => new ProductMediaFile(id, $"https://cdn.test/{id}.jpg")).ToArray();
+            .Select(id => new ProductMediaFile(MediaFileId.FromStorage(id), $"https://cdn.test/{id}.jpg")).ToArray();
         DomainAssert.Fails(product.SetMedia(many, null, Later));
     }
 
@@ -113,7 +114,7 @@ public sealed class ProductMediaTests
         var product = NewProduct();
         product.SetMedia([A, B], C, Later);
 
-        Assert.True(product.RefreshMedia(new Dictionary<long, string> { [B.Id] = "https://cdn.test/b2.jpg" }, Later));
+        Assert.True(product.RefreshMedia(new Dictionary<MediaFileId, string> { [B.Id] = "https://cdn.test/b2.jpg" }, Later));
 
         Assert.Equal("https://cdn.test/b2.jpg", Assert.Single(product.MediaLinks).Url);
         Assert.Equal("https://cdn.test/b2.jpg", product.Photo);
@@ -121,6 +122,6 @@ public sealed class ProductMediaTests
     }
 
     private static Product NewProduct()
-        => Product.Create(ProductId.From(731), "R", "Петля", "petlia", ProductCategoryId.From(10),
+        => Product.Create(ProductId.Create(731), "R", "Петля", "petlia", ProductCategoryId.Create(10),
             Created, 0, 1, false, false, true).Value;
 }

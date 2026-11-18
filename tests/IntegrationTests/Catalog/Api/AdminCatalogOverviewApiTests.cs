@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using System.Net;
 using System.Text.Json;
@@ -89,8 +90,8 @@ public sealed class AdminCatalogOverviewApiTests
 
     private static ProductCategory AddCategory(CatalogDbContext db, int id, string name, string slug, string path, int? parentId)
     {
-        var category = ProductCategory.Create(ProductCategoryId.From(id), "000005513", name, slug, CategoryPath.From(path),
-            parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
+        var category = ProductCategory.Create(ProductCategoryId.Create(id), "000005513", name, slug, CategoryPath.Create(path),
+            parentId is null ? null : ProductCategoryId.Create(parentId.Value)).Value;
         category.SetShownOnSite(true, DateTimeOffset.UtcNow);
         db.Categories.Add(category);
         return category;
@@ -98,7 +99,7 @@ public sealed class AdminCatalogOverviewApiTests
 
     private static void AddText(CatalogDbContext db, int categoryId, string language)
     {
-        var content = CategoryContent.Create(ProductCategoryId.From(categoryId), language);
+        var content = CategoryContent.Create(ProductCategoryId.Create(categoryId), language);
         content.Replace(null, null, null, "<p>Текст</p>", [], "seed", Now);
         db.CategoryContents.Add(content);
     }
@@ -106,8 +107,8 @@ public sealed class AdminCatalogOverviewApiTests
     private static void AddProduct(CatalogDbContext db, int id, int categoryId, string photo, bool onSite)
     {
         var slug = $"tovar-{id}";
-        db.ProductListProjections.Add(ProductListProjection.Create(ProductId.From(id), slug, slug, slug, photo,
-            ProductCategoryId.From(categoryId), "kategoriia", inStock: true, isSale: false, isNew: false,
+        db.ProductListProjections.Add(ProductListProjection.Create(ProductId.Create(id), slug, slug, slug, photo,
+            ProductCategoryId.Create(categoryId), "kategoriia", inStock: true, isSale: false, isNew: false,
             exportToSite: onSite, retailPrice: 100m));
     }
 

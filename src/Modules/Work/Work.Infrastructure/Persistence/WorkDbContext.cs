@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Persistence;
 namespace Work.Infrastructure.Persistence;
 
 /// <summary>Staff tasks and the activity log in their own PostgreSQL schema with their own migration history.</summary>
@@ -9,6 +10,9 @@ public sealed class WorkDbContext(DbContextOptions<WorkDbContext> options)
 
     public DbSet<WorkTask> WorkTasks => Set<WorkTask>();
     public DbSet<WorkActivity> WorkActivities => Set<WorkActivity>();
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
+        configurationBuilder.AddKernelIds();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

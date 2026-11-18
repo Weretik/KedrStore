@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
@@ -142,11 +143,11 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
         await using var db = postgres.CreateContext();
         db.Counterparties.Add(Counterparty.Create(
             counterpartyId,
-            Guid.NewGuid(),
+            UserId.FromStorage(Guid.NewGuid()),
             "Create order customer",
             "create-order@example.com",
             "+380000000000",
-            1,
+            PriceTypeId.FromStorage(1),
             DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }

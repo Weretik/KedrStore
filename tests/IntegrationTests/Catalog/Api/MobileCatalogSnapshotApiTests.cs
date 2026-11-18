@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -86,8 +87,8 @@ public sealed class MobileCatalogSnapshotApiTests
         Assert.Equal(HttpStatusCode.NotModified, notModified.StatusCode);
         Assert.Empty(await notModified.Content.ReadAsByteArrayAsync());
 
-        var price = db.ProductPrices.Single(p => p.ProductId == ProductId.From(20) && p.PriceTypeId == PriceTypeId.From(12));
-        price.Update(ProductId.From(20), PriceTypeId.From(12), new Money(175m, "UAH"));
+        var price = db.ProductPrices.Single(p => p.ProductId == ProductId.Create(20) && p.PriceTypeId == PriceTypeId.Create(12));
+        price.Update(ProductId.Create(20), PriceTypeId.Create(12), new Money(175m, "UAH"));
         db.SaveChanges();
 
         using var changed = new HttpRequestMessage(HttpMethod.Get, Route);
@@ -131,16 +132,16 @@ public sealed class MobileCatalogSnapshotApiTests
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
 
-        db.PriceTypes.Add(PriceType.Create(PriceTypeId.From(12), "Роздрібна"));
-        db.PriceTypes.Add(PriceType.Create(PriceTypeId.From(14), "Оптова"));
+        db.PriceTypes.Add(PriceType.Create(PriceTypeId.Create(12), "Роздрібна"));
+        db.PriceTypes.Add(PriceType.Create(PriceTypeId.Create(14), "Оптова"));
         AddCategory(db, 1, "Фурнітура", "n1", null);
         AddCategory(db, 2, "Замки", "n1.n2", 1);
         AddCategory(db, 3, "Старий розділ", "n1.n3", 1).MarkDeleted(Now);
 
         var lockProduct = AddProduct(db, 20, 2, stock: 5);
         lockProduct.SetMedia(
-            [new ProductMediaFile(1, "https://cdn/20-a.webp"), new ProductMediaFile(2, "https://cdn/20-b.webp")],
-            new ProductMediaFile(3, "https://cdn/20-scheme.webp"), Now);
+            [new ProductMediaFile(MediaFileId.FromStorage(1), "https://cdn/20-a.webp"), new ProductMediaFile(MediaFileId.FromStorage(2), "https://cdn/20-b.webp")],
+            new ProductMediaFile(MediaFileId.FromStorage(3), "https://cdn/20-scheme.webp"), Now);
         lockProduct.SetTranslation("uk", "Замок український", Now);
         lockProduct.SetTranslation("ru", "Замок русский", Now);
         AddPrice(db, 20, 12, 150m);
@@ -158,22 +159,22 @@ public sealed class MobileCatalogSnapshotApiTests
 
     private static ProductCategory AddCategory(CatalogDbContext db, int id, string name, string path, int? parentId)
     {
-        var category = ProductCategory.Create(ProductCategoryId.From(id), Hardware, name, $"category-{id}",
-            CategoryPath.From(path), parentId is null ? null : ProductCategoryId.From(parentId.Value)).Value;
+        var category = ProductCategory.Create(ProductCategoryId.Create(id), Hardware, name, $"category-{id}",
+            CategoryPath.Create(path), parentId is null ? null : ProductCategoryId.Create(parentId.Value)).Value;
         db.Categories.Add(category);
         return category;
     }
 
     private static Product AddProduct(CatalogDbContext db, int id, int categoryId, decimal stock)
     {
-        var product = Product.Create(ProductId.From(id), Hardware, $"Товар {id}", $"tovar-{id}",
-            ProductCategoryId.From(categoryId), Now, stock, qtyInPack: 1, isNew: false, isSale: false).Value;
+        var product = Product.Create(ProductId.Create(id), Hardware, $"Товар {id}", $"tovar-{id}",
+            ProductCategoryId.Create(categoryId), Now, stock, qtyInPack: 1, isNew: false, isSale: false).Value;
         db.Products.Add(product);
         return product;
     }
 
     private static void AddPrice(CatalogDbContext db, int productId, int priceTypeId, decimal amount)
-        => db.ProductPrices.Add(ProductPrice.Create(Hardware, ProductId.From(productId), PriceTypeId.From(priceTypeId),
+        => db.ProductPrices.Add(ProductPrice.Create(Hardware, ProductId.Create(productId), PriceTypeId.Create(priceTypeId),
             new Money(amount, "UAH")).Value);
 
     private static WebApplicationFactory<Program> CreateFactory(CatalogDbContext db)

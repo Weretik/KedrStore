@@ -119,7 +119,7 @@ public sealed class RecognizedProductWriter(
                 continue;
             }
 
-            var productId = ProductId.From(recognized.ProductId);
+            var productId = ProductId.Create(recognized.ProductId);
             var current = existingValues[recognized.ProductId]
                 .ToDictionary(value => (value.AttributeId, (int)value.Position));
             var wanted = new HashSet<(AttributeId, int)>();

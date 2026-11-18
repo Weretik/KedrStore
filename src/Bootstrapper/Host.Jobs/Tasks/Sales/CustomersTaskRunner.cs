@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Sales.Infrastructure.Integrations.OneC.Jobs;
+using Sales.Application.Features.OneCSync.Jobs;
 using Scheduling.Application.Features.Catalog;
 
 namespace Host.Jobs.Tasks.Sales;

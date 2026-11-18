@@ -14,6 +14,7 @@ public sealed class SyncCdnMediaJob(
     IMediaRepository<MediaFolder> folders,
     IMediaRepository<MediaFile> files,
     IReadMediaDbContext db,
+    IMediaTransaction transaction,
     IOptions<MediaCdnSyncOptions> options,
     TimeProvider clock,
     ILogger<SyncCdnMediaJob> logger)
@@ -71,31 +72,42 @@ public sealed class SyncCdnMediaJob(
             .ToListAsync(cancellationToken);
         var folderIds = existing.ToDictionary(folder => FolderKey(folder.ParentId, folder.Name), folder => folder.Id);
 
+        // Each batch is one step (database rules 3.3): its new folders and files are committed together, and a
+        // failed batch leaves nothing behind, so the next run registers it again.
         foreach (var batch in items.Chunk(Math.Max(1, _options.BatchSize)))
         {
-            var created = new List<MediaFile>(batch.Length);
-            foreach (var item in batch)
-            {
-                var folderId = await EnsureFolderAsync(FolderPathOf(item.Key), folderIds, now, cancellationToken);
-                if (folderId.IsFailure)
-                {
-                    Skip(item.Key, folderId.Error!);
-                    continue;
-                }
-
-                var content = new MediaFileContent(item.Key, MediaContentTypes.FromKey(item.Key)!, item.SizeBytes, null, null);
-                var file = MediaFile.Create(folderId.Value, Path.GetFileName(item.Key), content, now);
-                if (file.IsFailure)
-                {
-                    Skip(item.Key, file.Error!);
-                    continue;
-                }
-
-                created.Add(file.Value);
-            }
-            await files.AddRangeAsync(created, cancellationToken);
-            await files.SaveChangesAsync(cancellationToken);
+            var batchFolders = new Dictionary<string, MediaFolderId>(folderIds, StringComparer.Ordinal);
+            await transaction.RunAsync(token => RegisterBatchAsync(batch, batchFolders, now, token), cancellationToken);
+            foreach (var (key, id) in batchFolders)
+                folderIds[key] = id;
         }
+    }
+
+    private async Task RegisterBatchAsync(IReadOnlyList<StoredMediaObject> batch, Dictionary<string, MediaFolderId> folderIds,
+        DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var created = new List<MediaFile>(batch.Count);
+        foreach (var item in batch)
+        {
+            var folderId = await EnsureFolderAsync(FolderPathOf(item.Key), folderIds, now, cancellationToken);
+            if (folderId.IsFailure)
+            {
+                Skip(item.Key, folderId.Error!);
+                continue;
+            }
+
+            var content = new MediaFileContent(item.Key, MediaContentTypes.FromKey(item.Key)!, item.SizeBytes, null, null);
+            var file = MediaFile.Create(folderId.Value, Path.GetFileName(item.Key), content, now);
+            if (file.IsFailure)
+            {
+                Skip(item.Key, file.Error!);
+                continue;
+            }
+
+            created.Add(file.Value);
+        }
+        await files.AddRangeAsync(created, cancellationToken);
+        await files.SaveChangesAsync(cancellationToken);
     }
 
     private void Skip(string key, DomainError error)
@@ -114,7 +126,8 @@ public sealed class SyncCdnMediaJob(
                 if (created.IsFailure)
                     return created.Error!;
 
-                // A new folder is saved at once: its id comes from the database and its children need it.
+                // A new folder is saved at once inside the batch transaction: its id comes from the database and its
+                // children need it.
                 var folder = await folders.AddAsync(created.Value, cancellationToken);
                 await folders.SaveChangesAsync(cancellationToken);
                 id = folder.Id;

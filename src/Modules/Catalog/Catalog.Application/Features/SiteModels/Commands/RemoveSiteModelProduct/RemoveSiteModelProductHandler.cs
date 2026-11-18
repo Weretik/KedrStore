@@ -22,7 +22,7 @@ public sealed class RemoveSiteModelProductHandler(
         CancellationToken cancellationToken)
     {
         var modelId = ProductGroupId.Create(command.ModelId);
-        var productId = ProductId.From(command.ProductId);
+        var productId = ProductId.Create(command.ProductId);
         if (!await db.ProductGroupMembers.AnyAsync(member => member.ProductId == productId && member.GroupId == modelId,
                 cancellationToken))
             return Result.NotFound();

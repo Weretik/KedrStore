@@ -19,25 +19,25 @@ internal static class SalesProductPricing
     {
         var language = CatalogLanguage.Normalize(request.Lang);
         var localizedTranslations = translationsQuery.Where(t => t.Language == language);
-        var defaultPriceTypeId = PriceTypeId.From(request.PriceTypeId ?? retailPriceTypeId);
+        var defaultPriceTypeId = PriceTypeId.Create(request.PriceTypeId ?? retailPriceTypeId);
         var priceTypeRules = NormalizeRules(request.PriceTypeRules);
 
         IQueryable<SalesProductRow>? rows = null;
 
         foreach (var rule in priceTypeRules)
         {
-            var categoryId = ProductCategoryId.From(rule.CategoryId);
+            var categoryId = ProductCategoryId.Create(rule.CategoryId);
             var categoryRows = JoinWithPriceType(
                 productsQuery.Where(product => product.CategoryId == categoryId),
                 pricesQuery,
                 localizedTranslations,
-                PriceTypeId.From(rule.PriceTypeId),
+                PriceTypeId.Create(rule.PriceTypeId),
                 hardwareRootCategoryId);
 
             rows = rows is null ? categoryRows : rows.Concat(categoryRows);
         }
 
-        var ruleCategoryIds = priceTypeRules.Select(rule => ProductCategoryId.From(rule.CategoryId)).ToArray();
+        var ruleCategoryIds = priceTypeRules.Select(rule => ProductCategoryId.Create(rule.CategoryId)).ToArray();
         var defaultProducts = ruleCategoryIds.Length == 0
             ? productsQuery
             : productsQuery.Where(product => !ruleCategoryIds.Contains(product.CategoryId));

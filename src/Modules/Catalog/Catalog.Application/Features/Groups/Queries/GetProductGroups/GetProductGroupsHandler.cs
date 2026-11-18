@@ -12,7 +12,7 @@ public sealed class GetProductGroupsHandler(IReadCatalogDbContext db)
     {
         var groups = db.ProductGroups.AsNoTracking();
         if (query.Request.CategoryId is { } categoryId)
-            groups = groups.Where(group => group.CategoryId == ProductCategoryId.From(categoryId));
+            groups = groups.Where(group => group.CategoryId == ProductCategoryId.Create(categoryId));
 
         // Database rules 2.1: every word must match; a trigram index serves ILIKE on the name.
         foreach (var pattern in SearchWords.Patterns(query.Request.Search))

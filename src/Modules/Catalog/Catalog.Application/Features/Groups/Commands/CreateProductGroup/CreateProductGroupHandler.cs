@@ -23,11 +23,11 @@ public sealed class CreateProductGroupHandler(
     private async Task<Result<AdminProductGroupDto>> HandleInTransactionAsync(CreateProductGroupCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
-        var categoryId = ProductCategoryId.From(request.CategoryId);
+        var categoryId = ProductCategoryId.Create(request.CategoryId);
         if (!await db.Categories.AnyAsync(category => category.Id == categoryId, cancellationToken))
             return ProductGroupValidation.Invalid("categoryId", "Категорію не знайдено.", "CategoryNotFound");
 
-        var productIds = request.ProductIds.Select(ProductId.From).ToList();
+        var productIds = request.ProductIds.Select(ProductId.Create).ToList();
         var inCategory = await db.Products
             .Where(product => productIds.Contains(product.Id) && product.CategoryId == categoryId)
             .Select(product => product.Id)

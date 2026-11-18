@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -54,9 +55,9 @@ public sealed class ProductImportSoftDeleteTests
     {
         await using var db = CreateContext();
         Seed(db, productCount: 2);
-        var linked = await db.Products.SingleAsync(product => product.Id == ProductId.From(1));
-        linked.SetMedia([new ProductMediaFile(10, "https://images-kedr.cdn.express/products/1.jpg")],
-            new ProductMediaFile(11, "https://images-kedr.cdn.express/product-scheme/s1.jpg"), DateTimeOffset.UtcNow);
+        var linked = await db.Products.SingleAsync(product => product.Id == ProductId.Create(1));
+        linked.SetMedia([new ProductMediaFile(MediaFileId.FromStorage(10), "https://images-kedr.cdn.express/products/1.jpg")],
+            new ProductMediaFile(MediaFileId.FromStorage(11), "https://images-kedr.cdn.express/product-scheme/s1.jpg"), DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         var oneC = new FakeOneC { Products = [Row(1, "Замки", "Нова назва"), Row(2, "Замки"), Row(100, "Замки")] };
 
@@ -81,7 +82,7 @@ public sealed class ProductImportSoftDeleteTests
         oneC.Products = [.. Enumerable.Range(1, 10).Select(id => Row(id, "Замки"))];
         await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
 
-        var restored = await db.Products.SingleAsync(product => product.Id == ProductId.From(10));
+        var restored = await db.Products.SingleAsync(product => product.Id == ProductId.Create(10));
         Assert.False(restored.IsDeleted);
         Assert.Null(restored.DeletedAt);
         Assert.Equal("product-10", restored.ProductSlug);
@@ -97,7 +98,7 @@ public sealed class ProductImportSoftDeleteTests
         await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
 
         Assert.Equal(10, await db.Products.CountAsync());
-        Assert.Equal("Змінена назва 1", (await db.Products.SingleAsync(product => product.Id == ProductId.From(1))).Name);
+        Assert.Equal("Змінена назва 1", (await db.Products.SingleAsync(product => product.Id == ProductId.Create(1))).Name);
     }
 
     [Fact]
@@ -107,12 +108,12 @@ public sealed class ProductImportSoftDeleteTests
         Seed(db, productCount: 3);
         var oneC = new FakeOneC { Products = [.. Enumerable.Range(1, 3).Select(id => Row(id, "Замки", "Новий " + id))] };
         await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
-        var firstUpdatedAt = (await db.Products.SingleAsync(product => product.Id == ProductId.From(1))).UpdatedAt;
+        var firstUpdatedAt = (await db.Products.SingleAsync(product => product.Id == ProductId.Create(1))).UpdatedAt;
 
         await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
 
         Assert.NotNull(firstUpdatedAt);
-        Assert.Equal(firstUpdatedAt, (await db.Products.SingleAsync(product => product.Id == ProductId.From(1))).UpdatedAt);
+        Assert.Equal(firstUpdatedAt, (await db.Products.SingleAsync(product => product.Id == ProductId.Create(1))).UpdatedAt);
     }
 
     [Fact]
@@ -126,17 +127,17 @@ public sealed class ProductImportSoftDeleteTests
 
         await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
 
-        Assert.Equal("zamok-2", (await db.Products.SingleAsync(product => product.Id == ProductId.From(200))).ProductSlug);
+        Assert.Equal("zamok-2", (await db.Products.SingleAsync(product => product.Id == ProductId.Create(200))).ProductSlug);
     }
 
     private static void Seed(CatalogDbContext db, int productCount)
     {
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Замки", "zamky", CategoryPath.From("n10")).Value);
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Ручки", "ruchky", CategoryPath.From("n11")).Value);
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(12), Root, "ручки", "ruchky-2", CategoryPath.From("n12")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky", CategoryPath.Create("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(11), Root, "Ручки", "ruchky", CategoryPath.Create("n11")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(12), Root, "ручки", "ruchky-2", CategoryPath.Create("n12")).Value);
         for (var id = 1; id <= productCount; id++)
         {
-            db.Products.Add(Product.Create(ProductId.From(id), Root, $"Product {id}", $"product-{id}", ProductCategoryId.From(10),
+            db.Products.Add(Product.Create(ProductId.Create(id), Root, $"Product {id}", $"product-{id}", ProductCategoryId.Create(10),
                 DateTimeOffset.UtcNow.AddDays(-1), 0, 1, false, false, true).Value);
         }
 

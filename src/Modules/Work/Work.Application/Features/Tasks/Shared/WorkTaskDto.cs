@@ -22,8 +22,8 @@ public sealed record WorkTaskDto(
     /// <param name="today">Kyiv day the overdue mark is computed for.</param>
     public static WorkTaskDto From(WorkTask task, DateOnly today) => new(
         task.Id.Value,
-        task.OwnerUserId,
-        task.CreatedByUserId,
+        task.OwnerUserId.Value,
+        task.CreatedByUserId.Value,
         task.IsCreatedByOwner,
         task.Title,
         task.Details,

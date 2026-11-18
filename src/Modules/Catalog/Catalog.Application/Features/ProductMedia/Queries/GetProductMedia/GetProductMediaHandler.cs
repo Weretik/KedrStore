@@ -12,12 +12,12 @@ public sealed class GetProductMediaHandler(ICatalogReadRepository<Product> produ
         CancellationToken cancellationToken)
     {
         var product = await products.FirstOrDefaultAsync(
-            new ProductForMediaSpec(ProductId.From(query.ProductId)), cancellationToken);
+            new ProductForMediaSpec(ProductId.Create(query.ProductId)), cancellationToken);
         if (product is null)
             return Result.NotFound();
 
         var files = await library.GetByIdsAsync(
-            product.MediaLinks.Select(link => link.MediaFileId).ToArray(), cancellationToken);
+            product.MediaLinks.Select(link => link.MediaFileId.Value).ToArray(), cancellationToken);
         return Result.Success(ProductMediaMapper.ToDto(product, files));
     }
 }

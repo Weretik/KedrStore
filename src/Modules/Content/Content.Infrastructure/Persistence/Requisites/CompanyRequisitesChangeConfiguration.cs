@@ -9,7 +9,10 @@ internal sealed class CompanyRequisitesChangeConfiguration : IEntityTypeConfigur
         builder.Property(change => change.Id)
             .HasConversion(id => id.Value, value => CompanyRequisitesChangeId.FromStorage(value)).ValueGeneratedOnAdd().UseIdentityAlwaysColumn();
         builder.Property(change => change.ChangedAt).IsRequired();
-        builder.Property(change => change.ChangedByUserId).HasMaxLength(64).IsRequired();
+        // The column predates the kernel UserId and keeps the text form of the Guid.
+        builder.Property(change => change.ChangedByUserId)
+            .HasConversion(id => id.Value.ToString(), value => UserId.FromStorage(Guid.Parse(value)))
+            .HasMaxLength(64).IsRequired();
         builder.Property(change => change.ChangedByName)
             .HasMaxLength(CompanyRequisitesChange.UserNameMaxLength).IsRequired();
         builder.HasIndex(change => change.ChangedAt);

@@ -27,7 +27,7 @@ public sealed class AddSiteModelProductsHandler(
         if (categoryId is null)
             return Result.NotFound();
 
-        var productIds = command.Request.ProductIds.Select(ProductId.From).ToList();
+        var productIds = command.Request.ProductIds.Select(ProductId.Create).ToList();
         if (await changes.CheckProductsAsync(categoryId.Value, productIds, modelId, cancellationToken) is { } error)
             return error;
 

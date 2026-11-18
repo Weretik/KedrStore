@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Attributes.Shared.Import;
 using Catalog.Domain.Attributes;
 using Catalog.Domain.Attributes;
@@ -54,7 +55,7 @@ public sealed class AttributeImportFilesTests
     public void AcceptedReview_StaysAccepted_UntilReopened()
     {
         var now = DateTimeOffset.UtcNow;
-        var review = ProductAttributeReview.Create(ProductId.From(1), "Ручка", [new("unresolved_color", null)], now);
+        var review = ProductAttributeReview.Create(ProductId.Create(1), "Ручка", [new("unresolved_color", null)], now);
         review.Accept("admin@classkedr.com.ua", now);
 
         review.ApplyAutomatic("Ручка", [new("unresolved_color", null), new("no_name", null)], now);
@@ -68,7 +69,7 @@ public sealed class AttributeImportFilesTests
     public void ManualValue_IsNotChangedByAutomaticSources()
     {
         var now = DateTimeOffset.UtcNow;
-        var value = ProductAttributeValue.CreateManual(ProductId.From(1), AttributeId.Create(1), 0,
+        var value = ProductAttributeValue.CreateManual(ProductId.Create(1), AttributeId.Create(1), 0,
             AttributeValueId.Create(5), null, now).Value;
 
         Assert.False(value.ApplyAutomatic(AttributeValueId.Create(6), null, true, AttributeValueSource.Parser, now));

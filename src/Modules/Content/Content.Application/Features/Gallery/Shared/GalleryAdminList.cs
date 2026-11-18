@@ -12,16 +12,16 @@ public static class GalleryAdminList
             .OrderBy(item => item.Position).ThenBy(item => item.Id)
             .ToListAsync(cancellationToken);
         var files = await images.GetImagesAsync(
-            items.Where(item => item.MediaFileId is not null).Select(item => item.MediaFileId!.Value).ToList(),
+            items.Where(item => item.MediaFileId is not null).Select(item => item.MediaFileId!.Value.Value).ToList(),
             cancellationToken);
 
         return items.Select(item =>
         {
             MediaImage? file = null;
             if (item.MediaFileId is { } fileId)
-                files.TryGetValue(fileId, out file);
+                files.TryGetValue(fileId.Value, out file);
             var preview = item.Kind == GalleryItemKind.Video ? YoutubeThumbnails.Url(item.YoutubeId!) : file?.Url;
-            return new AdminGalleryItem(item.Id.Value, item.Kind, item.MediaFileId, item.YoutubeId, item.Position,
+            return new AdminGalleryItem(item.Id.Value, item.Kind, item.MediaFileId?.Value, item.YoutubeId, item.Position,
                 item.TitleUk, item.TitleRu, item.CaptionUk, item.CaptionRu, preview, file?.FileName,
                 item.Kind == GalleryItemKind.Photo && file is null, item.UpdatedAt);
         }).ToList();

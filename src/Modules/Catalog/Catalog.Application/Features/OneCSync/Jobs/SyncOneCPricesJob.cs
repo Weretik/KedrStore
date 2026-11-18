@@ -35,7 +35,7 @@ public sealed class SyncOneCPricesJob(
             .Select(g => g.Last())
             .ToList();
 
-        var productIds = deduped.Select(x => ProductId.From(x.ProductId)).Distinct().ToArray();
+        var productIds = deduped.Select(x => ProductId.Create(x.ProductId)).Distinct().ToArray();
         // Tracked on purpose: the prices found here are updated or removed and saved below.
         var existing = await db.ProductPrices
             .Where(price => productIds.Contains(price.ProductId))
@@ -58,7 +58,7 @@ public sealed class SyncOneCPricesJob(
         string productTypeIdOneC)
     {
         var keepKeys = priceDtos
-            .Select(x => (ProductId.From(x.ProductId), PriceTypeId.From(x.PriceTypeId)))
+            .Select(x => (ProductId.Create(x.ProductId), PriceTypeId.Create(x.PriceTypeId)))
             .ToHashSet();
 
         var toDelete = existing
@@ -84,10 +84,10 @@ public sealed class SyncOneCPricesJob(
         var (added, changed) = (0, 0);
         foreach (var item in priceDtos)
         {
-            var productId = ProductId.From(item.ProductId);
+            var productId = ProductId.Create(item.ProductId);
             if (!knownProducts.Contains(productId)) continue;
 
-            var priceTypeId = PriceTypeId.From(item.PriceTypeId);
+            var priceTypeId = PriceTypeId.Create(item.PriceTypeId);
             var priceValue = new Money(item.Price, item.Currency);
 
             if (existing.TryGetValue((productId, priceTypeId), out var price))

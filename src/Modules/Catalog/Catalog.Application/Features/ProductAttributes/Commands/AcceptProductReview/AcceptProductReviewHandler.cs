@@ -20,7 +20,7 @@ public sealed class AcceptProductReviewHandler(
     public async ValueTask<Result<AdminProductAttributesDto>> Handle(AcceptProductReviewCommand command,
         CancellationToken cancellationToken)
     {
-        var productId = ProductId.From(command.ProductId);
+        var productId = ProductId.Create(command.ProductId);
         var review = await db.ProductAttributeReviews
             .FirstOrDefaultAsync(item => item.ProductId == productId, cancellationToken);
         if (review is null)

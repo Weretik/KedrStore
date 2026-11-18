@@ -53,7 +53,7 @@ internal sealed class ProductListProjectionRebuilder(
 
     private async Task RebuildInTransactionAsync(CatalogDbContext catalogDbContext, CancellationToken cancellationToken)
     {
-        var retailPriceTypeId = PriceTypeId.From(pricingOptions.Value.RetailPriceTypeId);
+        var retailPriceTypeId = PriceTypeId.Create(pricingOptions.Value.RetailPriceTypeId);
         var hardwareRootCategoryId = rootCategoryOptions.Value.HardwareRootCategoryId;
 
         logger.LogInformation("Product list projection rebuild started.");

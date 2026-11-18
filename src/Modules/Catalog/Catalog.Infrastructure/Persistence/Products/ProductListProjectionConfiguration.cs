@@ -11,7 +11,7 @@ public sealed class ProductListProjectionConfiguration : IEntityTypeConfiguratio
         builder.HasKey(projection => projection.ProductId);
 
         builder.Property(projection => projection.ProductId)
-            .HasConversion(CatalogConverter.ProductIdConvert)
+            
             .ValueGeneratedNever();
 
         builder.Property(projection => projection.NameUk)
@@ -31,7 +31,7 @@ public sealed class ProductListProjectionConfiguration : IEntityTypeConfiguratio
             .IsRequired();
 
         builder.Property(projection => projection.CategoryId)
-            .HasConversion(CatalogConverter.ProductCategoryIdConvert)
+            
             .IsRequired();
 
         builder.Property(projection => projection.CategorySlug)

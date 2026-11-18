@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using Identity.Contracts.Users;
 using IntegrationTests.TestSupport.Database;
@@ -11,7 +12,9 @@ using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Domain.Customers;
 using Sales.Domain.Orders;
 using Sales.Infrastructure.Integrations.OneC;
-using Sales.Infrastructure.Integrations.OneC.Counterparties;
+using Sales.Application.Abstractions.Customers;
+using Sales.Application.Features.OneCSync.Counterparties;
+using Sales.Application.Features.OneCSync.Jobs;
 namespace IntegrationTests.Sales.Persistence.Customers;
 
 [Collection(SalesPostgresCollection.Name)]
@@ -28,8 +31,8 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.AddRange(
-                Counterparty.Create("stale-cp", staleUserId, "Stale", "stale@example.com", null, 1, now).Value,
-                Counterparty.Create("retained-cp", retainedUserId, "Retained", "retained@example.com", null, 1, now).Value);
+                Counterparty.Create("stale-cp", UserId.FromStorage(staleUserId), "Stale", "stale@example.com", null, PriceTypeId.FromStorage(1), now).Value,
+                Counterparty.Create("retained-cp", UserId.FromStorage(retainedUserId), "Retained", "retained@example.com", null, PriceTypeId.FromStorage(1), now).Value);
             db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
                 [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
             db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
@@ -74,7 +77,7 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.Add(
-                Counterparty.Create("stale-cp", sharedUserId, "Stale", "stale@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+                Counterparty.Create("stale-cp", UserId.FromStorage(sharedUserId), "Stale", "stale@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
             return await db.SaveChangesAsync();
         });
 
@@ -83,7 +86,7 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
         {
             var db = services.GetRequiredService<SalesDbContext>();
             db.Counterparties.Add(
-                Counterparty.Create("relinked-cp", sharedUserId, "Relinked", "relinked@example.com", null, 1, DateTimeOffset.UtcNow).Value);
+                Counterparty.Create("relinked-cp", UserId.FromStorage(sharedUserId), "Relinked", "relinked@example.com", null, PriceTypeId.FromStorage(1), DateTimeOffset.UtcNow).Value);
             return await db.SaveChangesAsync();
         });
         await sales.Dispatcher.DispatchDueAsync(CancellationToken.None);
@@ -93,11 +96,10 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
     }
 
     private static Task<CounterpartiesSyncResult> RunSyncAsync(SalesOutboxHarness sales)
-        => sales.InScopeAsync(services => new OneCCounterpartiesSyncService(new FakeOneC(),
-                services.GetRequiredService<SalesDbContext>(),
-                services.GetRequiredService<IImportedCounterpartyIdentityProvisioningService>(),
-                services.GetRequiredService<StaleCounterpartyRemoval>(),
-                new CounterpartyContactNormalizer(), NullLogger<OneCCounterpartiesSyncService>.Instance)
+        => sales.InScopeAsync(services => new SyncOneCCounterpartiesJob(new FakeOneC(),
+                services.GetRequiredService<ICounterpartySyncStore>(),
+                services.GetRequiredService<ICustomerLogins>(),
+                new CounterpartyContactNormalizer(), NullLogger<SyncOneCCounterpartiesJob>.Instance)
             .RunAsync(CancellationToken.None));
 
     private sealed class FakeOneC : ISalesOneCReadClient

@@ -21,7 +21,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>
     /// <summary>Swatch color <c>#RRGGBB</c> for the site filter; empty means a text chip.</summary>
     public string? SwatchHex { get; private set; }
     /// <summary>Media-library picture of a decor texture for the filter swatch; used instead of a color.</summary>
-    public long? SwatchMediaFileId { get; private set; }
+    public MediaFileId? SwatchMediaFileId { get; private set; }
     public bool IsEditedManually { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
@@ -69,7 +69,7 @@ public class AttributeValue : BaseEntity<AttributeValueId>
 
     /// <summary>A person adds a value in «Властивості». It is manual from the start.</summary>
     internal static DomainResult<AttributeValue> CreateManual(AttributeId attributeId, string code, string nameUk,
-        string? nameRu, string slug, int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
+        string? nameRu, string slug, int sortOrder, string? swatchHex, MediaFileId? swatchMediaFileId, DateTimeOffset now)
     {
         var created = Create(attributeId, code, nameUk, slug, sortOrder, now);
         if (created.IsFailure)
@@ -80,13 +80,13 @@ public class AttributeValue : BaseEntity<AttributeValueId>
 
     /// <summary>A person edits the value; the dictionary import no longer changes it.</summary>
     internal DomainResult EditManually(string nameUk, string? nameRu, int sortOrder, string? swatchHex,
-        long? swatchMediaFileId, DateTimeOffset now)
+        MediaFileId? swatchMediaFileId, DateTimeOffset now)
     {
         var checks = new DomainChecks();
         var checkedNameUk = checks.Take(AttributeText.Required(nameUk, NameMaxLength, nameof(NameUk)));
         var checkedNameRu = checks.Take(AttributeText.Optional(nameRu, NameMaxLength, nameof(NameRu)));
         var checkedHex = checks.Take(AttributeText.SwatchHex(swatchHex));
-        if (swatchMediaFileId is <= 0)
+        if (swatchMediaFileId is { Value: <= 0 })
             checks.Check(AttributeErrors.SwatchMediaInvalid());
         if (checks.Error is { } error)
             return error;

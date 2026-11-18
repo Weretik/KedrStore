@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Abstractions.Media;
 using Catalog.Application.Features.ProductMedia.Shared;
 using Catalog.Application.Features.ProductMedia.Commands.SetProductMedia;
@@ -115,7 +116,7 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         await using (var db = postgres.CreateContext())
         {
             var product = await LoadProduct(db, 731);
-            Assert.Equal([(a.Id, 0)], product.Photos.Select(link => (link.MediaFileId, link.Position)));
+            Assert.Equal([(a.Id, 0)], product.Photos.Select(link => (link.MediaFileId.Value, link.Position)));
             Assert.Equal(a.Url, product.Photo);
             Assert.Equal(c.Url, product.Sсheme);
             Assert.Equal(a.Url, await ProjectionPhoto(db, 731));
@@ -129,10 +130,10 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
         await SeedAsync();
         await using (var db = postgres.CreateContext())
         {
-            db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(11), Root, "Петлі", "petli",
-                CategoryPath.From("n10.n11"), ProductCategoryId.From(10)).Value);
-            db.Products.Add(Product.Create(ProductId.From(734), Root, "Петля 734", "petlia-734",
-                ProductCategoryId.From(11), Created, 5, 1, false, false, true).Value);
+            db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(11), Root, "Петлі", "petli",
+                CategoryPath.Create("n10.n11"), ProductCategoryId.Create(10)).Value);
+            db.Products.Add(Product.Create(ProductId.Create(734), Root, "Петля 734", "petlia-734",
+                ProductCategoryId.Create(11), Created, 5, 1, false, false, true).Value);
             await db.SaveChangesAsync();
         }
 
@@ -174,29 +175,29 @@ public sealed class ProductMediaLinkPostgresTests(CatalogPostgresFixture postgre
     }
 
     private static Task<Product> LoadProduct(CatalogDbContext db, int id)
-        => db.Products.IgnoreQueryFilters().AsNoTracking().SingleAsync(product => product.Id == ProductId.From(id));
+        => db.Products.IgnoreQueryFilters().AsNoTracking().SingleAsync(product => product.Id == ProductId.Create(id));
 
     private static Task<string> ProjectionPhoto(CatalogDbContext db, int id)
         => db.ProductListProjections.AsNoTracking()
-            .Where(row => row.ProductId == ProductId.From(id)).Select(row => row.Photo).SingleAsync();
+            .Where(row => row.ProductId == ProductId.Create(id)).Select(row => row.Photo).SingleAsync();
 
     private async Task SeedAsync()
     {
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync(
             """TRUNCATE "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-        db.Categories.Add(ProductCategory.Create(ProductCategoryId.From(10), Root, "Завіси", "zavisy", CategoryPath.From("n10")).Value);
+        db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy", CategoryPath.Create("n10")).Value);
         foreach (var id in new[] { 731, 732, 733 })
         {
-            var product = Product.Create(ProductId.From(id), Root, $"Завіса {id}",
-                $"zavisa-{id}", ProductCategoryId.From(10), Created, 5, 1, false, false, true).Value;
+            var product = Product.Create(ProductId.Create(id), Root, $"Завіса {id}",
+                $"zavisa-{id}", ProductCategoryId.Create(10), Created, 5, 1, false, false, true).Value;
             if (id == 733)
                 product.MarkDeleted(Created);
             db.Products.Add(product);
             if (id != 733)
             {
                 db.ProductListProjections.Add(ProductListProjection.Create(product.Id, product.Name, product.Name,
-                    product.ProductSlug, $"https://old.test/{id}.jpg", ProductCategoryId.From(10), "zavisy",
+                    product.ProductSlug, $"https://old.test/{id}.jpg", ProductCategoryId.Create(10), "zavisy",
                     inStock: true, isSale: false, isNew: false, exportToSite: true, retailPrice: 100));
             }
         }

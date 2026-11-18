@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -24,8 +25,8 @@ public sealed class GalleryApiTests
     public async Task Public_ShowsVideosAndPhotosInOrder_AndSkipsADeletedFile()
     {
         await using var db = Seed();
-        db.GalleryItems.Add(GalleryItem.CreatePhoto(7, 1, GalleryItemTexts.Create("Фото", "Фото ру", null, null).Value, Now).Value);
-        db.GalleryItems.Add(GalleryItem.CreatePhoto(999, 2, GalleryItemTexts.Empty, Now).Value);
+        db.GalleryItems.Add(GalleryItem.CreatePhoto(MediaFileId.FromStorage(7), 1, GalleryItemTexts.Create("Фото", "Фото ру", null, null).Value, Now).Value);
+        db.GalleryItems.Add(GalleryItem.CreatePhoto(MediaFileId.FromStorage(999), 2, GalleryItemTexts.Empty, Now).Value);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
         using var client = factory.CreateClient();

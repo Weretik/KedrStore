@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Catalog.Domain.Groups;
 using Catalog.Domain.Attributes;
@@ -21,7 +22,7 @@ public sealed class SiteModelDomainTests
     [Fact]
     public void Accept_PinsTheProposal_AndDropsItsKey_Once()
     {
-        var model = ProductGroup.CreateAutomatic(ProductCategoryId.From(10), "Ручка", "ручка", "ruchka", Now).Value;
+        var model = ProductGroup.CreateAutomatic(ProductCategoryId.Create(10), "Ручка", "ручка", "ruchka", Now).Value;
         Assert.Equal(ProductGroupStatus.Proposed, model.Status);
 
         Assert.True(model.Accept("manager@example.com", Now));
@@ -36,7 +37,7 @@ public sealed class SiteModelDomainTests
     [Fact]
     public void ManualModel_IsAcceptedAtOnce()
     {
-        var model = ProductGroup.CreateManual(ProductCategoryId.From(10), "Ручка KEDR", "ruchka-kedr", Now).Value;
+        var model = ProductGroup.CreateManual(ProductCategoryId.Create(10), "Ручка KEDR", "ruchka-kedr", Now).Value;
 
         Assert.True(model.IsAccepted);
     }

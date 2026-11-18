@@ -66,7 +66,6 @@
     <PackageVersion Include="System.ServiceModel.Security" Version="6.0.0" />
     <PackageVersion Include="Telegram.Bot" Version="22.10.3.3" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
-    <PackageVersion Include="Vogen" Version="8.0.7" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
     <PackageVersion Include="Xunit.SkippableFact" Version="1.5.85" />

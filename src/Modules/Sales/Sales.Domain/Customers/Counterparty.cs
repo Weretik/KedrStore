@@ -5,21 +5,21 @@ public sealed class Counterparty : BaseAuditableEntity<CounterpartyId>, IAggrega
     public const int NameMaxLength = 300;
     public const int EmailMaxLength = 320;
 
-    public Guid IdentityUserId { get; private set; }
+    public UserId IdentityUserId { get; private set; }
     public string Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
     public string? Phone { get; private set; }
-    public int DefaultPriceTypeId { get; private set; }
+    public PriceTypeId DefaultPriceTypeId { get; private set; }
 
     private Counterparty() { }
 
     public static DomainResult<Counterparty> Create(
         string id,
-        Guid identityUserId,
+        UserId identityUserId,
         string name,
         string email,
         string? phone,
-        int defaultPriceTypeId,
+        PriceTypeId defaultPriceTypeId,
         DateTimeOffset createdAt)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -35,11 +35,11 @@ public sealed class Counterparty : BaseAuditableEntity<CounterpartyId>, IAggrega
     }
 
     public DomainResult Update(
-        Guid identityUserId,
+        UserId identityUserId,
         string name,
         string email,
         string? phone,
-        int defaultPriceTypeId,
+        PriceTypeId defaultPriceTypeId,
         DateTimeOffset updatedAt)
     {
         var set = Set(identityUserId, name, email, phone, defaultPriceTypeId);
@@ -59,10 +59,10 @@ public sealed class Counterparty : BaseAuditableEntity<CounterpartyId>, IAggrega
         MarkAsUpdated(updatedAt);
     }
 
-    private DomainResult Set(Guid identityUserId, string name, string email, string? phone, int defaultPriceTypeId)
+    private DomainResult Set(UserId identityUserId, string name, string email, string? phone, PriceTypeId defaultPriceTypeId)
     {
-        if (identityUserId == Guid.Empty)
-            return CounterpartyErrors.IdentityUserIdInvalid(identityUserId);
+        if (identityUserId.Value == Guid.Empty)
+            return CounterpartyErrors.IdentityUserIdInvalid(identityUserId.Value);
         if (string.IsNullOrWhiteSpace(name))
             return CounterpartyErrors.NameRequired();
         var trimmedName = name.Trim();
@@ -73,8 +73,8 @@ public sealed class Counterparty : BaseAuditableEntity<CounterpartyId>, IAggrega
         var trimmedEmail = email.Trim();
         if (trimmedEmail.Length > EmailMaxLength)
             return CounterpartyErrors.EmailTooLong(trimmedEmail.Length);
-        if (defaultPriceTypeId <= 0)
-            return CounterpartyErrors.PriceTypeInvalid(defaultPriceTypeId);
+        if (defaultPriceTypeId.Value <= 0)
+            return CounterpartyErrors.PriceTypeInvalid(defaultPriceTypeId.Value);
 
         IdentityUserId = identityUserId;
         Name = trimmedName;

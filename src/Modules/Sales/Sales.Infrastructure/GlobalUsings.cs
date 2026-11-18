@@ -36,3 +36,4 @@ global using Sales.Infrastructure.Persistence;
 global using Sales.Infrastructure.Pricing;
 global using BuildingBlocks.Domain.Results;
 global using Sales.Application.Abstractions.Orders.Sync;
+global using BuildingBlocks.Domain.Identifiers;

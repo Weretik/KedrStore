@@ -54,7 +54,7 @@ public class GetProductBySlugHandler(
     /// <summary>Slug of the active category of a deleted product, or <c>null</c>.</summary>
     private async Task<CatalogRedirect?> RedirectForAsync(int productId, CancellationToken cancellationToken)
     {
-        var id = ProductId.From(productId);
+        var id = ProductId.Create(productId);
         var categorySlug = await (
                 from product in catalogDbContext.Products.IgnoreQueryFilters().AsNoTracking()
                 join category in catalogDbContext.Categories.AsNoTracking() on product.CategoryId equals category.Id

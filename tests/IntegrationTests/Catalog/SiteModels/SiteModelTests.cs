@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using BuildingBlocks.Application.Users;
@@ -109,8 +110,8 @@ public sealed class SiteModelTests
         AddCategory(db, Parent);
         foreach (var child in new[] { Final, OtherFinal })
         {
-            var category = ProductCategory.Create(ProductCategoryId.From(child), Root, $"Категорія {child}",
-                $"katehoriia-{child}", CategoryPath.From($"n{Parent}.n{child}"), ProductCategoryId.From(Parent)).Value;
+            var category = ProductCategory.Create(ProductCategoryId.Create(child), Root, $"Категорія {child}",
+                $"katehoriia-{child}", CategoryPath.Create($"n{Parent}.n{child}"), ProductCategoryId.Create(Parent)).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);
         }
@@ -120,7 +121,7 @@ public sealed class SiteModelTests
 
         foreach (var id in offSite ?? [])
         {
-            var product = await db.Products.SingleAsync(item => item.Id == ProductId.From(id));
+            var product = await db.Products.SingleAsync(item => item.Id == ProductId.Create(id));
             product.UpdateFromOneC(product.Name, product.CategoryId, 1, exportToSite: false, false, false,
                 DateTimeOffset.UtcNow);
         }
@@ -176,7 +177,7 @@ public sealed class SiteModelTests
 
     private static async Task<ProductGroup> ModelOfAsync(CatalogDbContext db, int productId)
     {
-        var member = await db.ProductGroupMembers.AsNoTracking().SingleAsync(row => row.ProductId == ProductId.From(productId));
+        var member = await db.ProductGroupMembers.AsNoTracking().SingleAsync(row => row.ProductId == ProductId.Create(productId));
         return await db.ProductGroups.AsNoTracking().SingleAsync(group => group.Id == member.GroupId);
     }
 
@@ -201,7 +202,7 @@ public sealed class SiteModelTests
         Assert.All(models, model => Assert.Equal(ProductGroupStatus.Proposed, model.Status));
         Assert.Equal([1, 2], await ProductsOfAsync(db, models[0].Id));
         Assert.Equal([3], await ProductsOfAsync(db, models[1].Id));
-        Assert.False(await db.ProductGroupMembers.AnyAsync(row => row.ProductId == ProductId.From(4)));
+        Assert.False(await db.ProductGroupMembers.AnyAsync(row => row.ProductId == ProductId.Create(4)));
 
         var second = await RunAsync(db, Dictionary, csv, apply: true);
         Assert.Equal(0, second.Groups.Groups.Created + second.Groups.Groups.Updated + second.Groups.Groups.Removed);
@@ -343,7 +344,7 @@ public sealed class SiteModelTests
         var chrome = await db.AttributeValues.AsNoTracking()
             .SingleAsync(value => value.AttributeId == color.Id && value.Code == "CR");
         var row = await db.ProductAttributeValues
-            .SingleAsync(value => value.ProductId == ProductId.From(2) && value.AttributeId == color.Id);
+            .SingleAsync(value => value.ProductId == ProductId.Create(2) && value.AttributeId == color.Id);
         row.SetManually(chrome.Id, null, DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();
@@ -431,7 +432,7 @@ public sealed class SiteModelTests
         await using var db = await CatalogAsync([1, 2, 3], inOtherCategory: [3]);
         await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "AB", "R"),
             Row(3, "Ручка", "AB", "L")), apply: true);
-        var other = await db.Categories.SingleAsync(category => category.Id == ProductCategoryId.From(OtherFinal));
+        var other = await db.Categories.SingleAsync(category => category.Id == ProductCategoryId.Create(OtherFinal));
         other.SetShownOnSite(false, DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         db.ChangeTracker.Clear();

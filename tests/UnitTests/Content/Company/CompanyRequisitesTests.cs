@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.Requisites.Shared;
 using Content.Application.Features.Requisites.Commands.UpdateCompanyRequisites;
@@ -73,7 +74,7 @@ public sealed class CompanyRequisitesTests
 
     [Fact]
     public void Record_NeedsAtLeastOneChange()
-        => Assert.Throws<ArgumentException>(() => CompanyRequisitesChange.Record([], Now, "1", "admin@kedr"));
+        => Assert.Throws<ArgumentException>(() => CompanyRequisitesChange.Record([], Now, UserId.Create(Guid.NewGuid()), "admin@kedr"));
 
     [Fact]
     public void Validator_NamesEachInvalidField()

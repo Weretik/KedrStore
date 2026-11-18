@@ -17,7 +17,7 @@ public sealed class SetCategoryAttributeFiltersHandler(
     public async ValueTask<Result<List<AdminCategoryAttributeFilterDto>>> Handle(
         SetCategoryAttributeFiltersCommand command, CancellationToken cancellationToken)
     {
-        var categoryId = ProductCategoryId.From(command.CategoryId);
+        var categoryId = ProductCategoryId.Create(command.CategoryId);
         if (!await db.Categories.AnyAsync(category => category.Id == categoryId, cancellationToken))
             return Result.NotFound();
 

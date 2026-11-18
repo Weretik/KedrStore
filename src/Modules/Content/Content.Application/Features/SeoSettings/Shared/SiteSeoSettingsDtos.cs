@@ -32,14 +32,14 @@ internal static class SiteSeoSettingsMapper
 {
     public static SiteSeoSettingsValues ToValues(SiteSeoSettingsInput input) => new(
         input.GoogleAnalyticsId, input.GoogleTagManagerId, input.GoogleSiteVerification, input.BingSiteVerification,
-        input.ShareImageMediaFileId);
+        input.ShareImageMediaFileId is { } image ? MediaFileId.FromStorage(image) : null);
 
     /// <summary>The settings with their picture looked up in the media library.</summary>
     public static async Task<SiteSeoSettingsDetails> ToDetailsAsync(SiteSeoSettings settings,
         IMediaImageReader images, CancellationToken cancellationToken)
     {
         SiteShareImage? shareImage = null;
-        if (settings.ShareImageMediaFileId is { } id)
+        if (settings.ShareImageMediaFileId?.Value is { } id)
         {
             var files = await images.GetImagesAsync([id], cancellationToken);
             shareImage = files.TryGetValue(id, out var image)

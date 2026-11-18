@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using global::Catalog.Domain.Categories;
 using global::Catalog.Domain.Groups;
@@ -65,7 +66,7 @@ public sealed class CatalogTransactionPostgresTests(CatalogPostgresFixture postg
     }
 
     private static ProductGroup Group(string name, string slug)
-        => ProductGroup.CreateManual(ProductCategoryId.From(CategoryId), name, slug, DateTimeOffset.UtcNow).Value;
+        => ProductGroup.CreateManual(ProductCategoryId.Create(CategoryId), name, slug, DateTimeOffset.UtcNow).Value;
 
     private async Task<List<string>> GroupNamesAsync()
     {
@@ -79,8 +80,8 @@ public sealed class CatalogTransactionPostgresTests(CatalogPostgresFixture postg
         await using var seed = postgres.CreateContext();
         await seed.Database.ExecuteSqlRawAsync(
             """TRUNCATE "CatalogProductGroups", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
-        seed.Categories.Add(ProductCategory.Create(ProductCategoryId.From(CategoryId), "000005530", "Ручки", "ruchky",
-            CategoryPath.From("n30")).Value);
+        seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(CategoryId), "000005530", "Ручки", "ruchky",
+            CategoryPath.Create("n30")).Value);
         await seed.SaveChangesAsync();
     }
 }

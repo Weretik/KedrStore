@@ -14,8 +14,8 @@ public sealed class WorkTask : IAggregateRoot
     private readonly List<WorkTaskStep> _steps = [];
 
     public WorkTaskId Id { get; private set; }
-    public Guid OwnerUserId { get; private set; }
-    public Guid CreatedByUserId { get; private set; }
+    public UserId OwnerUserId { get; private set; }
+    public UserId CreatedByUserId { get; private set; }
     public string Title { get; private set; } = null!;
     public string? Details { get; private set; }
     public WorkTaskStatus Status { get; private set; }
@@ -31,15 +31,15 @@ public sealed class WorkTask : IAggregateRoot
     private WorkTask() { }
 
     public static DomainResult<WorkTask> Create(
-        Guid ownerUserId,
-        Guid createdByUserId,
+        UserId ownerUserId,
+        UserId createdByUserId,
         string title,
         string? details,
         DateOnly? dueDate,
         IReadOnlyList<WorkTaskStepInput>? steps,
         DateTimeOffset now)
     {
-        if (ownerUserId == Guid.Empty || createdByUserId == Guid.Empty)
+        if (ownerUserId.Value == Guid.Empty || createdByUserId.Value == Guid.Empty)
             return WorkErrors.UserRequired();
 
         var task = new WorkTask

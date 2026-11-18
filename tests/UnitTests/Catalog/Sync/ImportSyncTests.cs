@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Features.OneCSync.Source;
@@ -87,5 +88,5 @@ public sealed class ImportSyncTests
     }
 
     private static ProductCategory Category(int id, string path)
-        => ProductCategory.Create(ProductCategoryId.From(id), "R", $"Category {id}", $"category-{id}", CategoryPath.From(path)).Value;
+        => ProductCategory.Create(ProductCategoryId.Create(id), "R", $"Category {id}", $"category-{id}", CategoryPath.Create(path)).Value;
 }

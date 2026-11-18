@@ -1,17 +1,17 @@
-using Ardalis.Result;
-using Identity.Contracts.Users;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Sales.Application.Abstractions.Customers;
 using Sales.Application.Abstractions.Integrations.OneC;
-using Sales.Domain.Customers;
-namespace Sales.Infrastructure.Integrations.OneC.Counterparties;
+using Sales.Application.Features.OneCSync.Counterparties;
 
-public sealed class OneCCounterpartiesSyncService(
+namespace Sales.Application.Features.OneCSync.Jobs;
+
+/// <summary>«Клієнти з 1С», step 1: the full counterparty snapshot from 1C, with stale customers removed.</summary>
+public sealed class SyncOneCCounterpartiesJob(
     ISalesOneCReadClient oneCClient,
-    SalesDbContext salesDbContext,
-    IImportedCounterpartyIdentityProvisioningService identityProvisioningService,
-    StaleCounterpartyRemoval staleRemoval,
+    ICounterpartySyncStore store,
+    ICustomerLogins customerLogins,
     CounterpartyContactNormalizer contactNormalizer,
-    ILogger<OneCCounterpartiesSyncService> logger)
+    ILogger<SyncOneCCounterpartiesJob> logger)
 {
     public async Task<CounterpartiesSyncResult> RunAsync(CancellationToken cancellationToken)
     {
@@ -38,11 +38,10 @@ public sealed class OneCCounterpartiesSyncService(
             .Select(group => group.Last() with { CounterpartyId = group.Key })
             .ToArray();
 
-        var existingCounterparties = await salesDbContext.Counterparties
-            .IgnoreQueryFilters()
-            .ToDictionaryAsync(item => item.Id.Value, StringComparer.Ordinal, cancellationToken);
+        var existingCounterparties = (await store.ListAllWithDeletedAsync(cancellationToken))
+            .ToDictionary(item => item.Id.Value, StringComparer.Ordinal);
         var assignedIdentityUsers = existingCounterparties.Values
-            .GroupBy(item => item.IdentityUserId)
+            .GroupBy(item => item.IdentityUserId.Value)
             .ToDictionary(group => group.Key, group => group.First().Id.Value);
 
         var imported = 0;
@@ -66,12 +65,11 @@ public sealed class OneCCounterpartiesSyncService(
 
             existingCounterparties.TryGetValue(normalized.CounterpartyId, out var existingCounterparty);
 
-            var identityResult = await identityProvisioningService.EnsureUserAsync(
-                new ImportedCounterpartyIdentityUserData(
-                    normalized.CounterpartyId,
-                    normalized.Email,
-                    normalized.CounterpartyName),
-                existingCounterparty?.IdentityUserId,
+            var identityResult = await customerLogins.EnsureAsync(
+                normalized.CounterpartyId,
+                normalized.Email,
+                normalized.CounterpartyName,
+                existingCounterparty?.IdentityUserId.Value,
                 cancellationToken);
 
             if (!identityResult.IsSuccess)
@@ -102,11 +100,11 @@ public sealed class OneCCounterpartiesSyncService(
             {
                 var created = Counterparty.Create(
                     id: normalized.CounterpartyId,
-                    identityUserId: identityResult.Value,
+                    identityUserId: UserId.FromStorage(identityResult.Value),
                     name: normalized.CounterpartyName,
                     email: normalized.Email,
                     phone: normalized.Phone,
-                    defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                    defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                     createdAt: now);
                 if (created.IsFailure)
                 {
@@ -118,7 +116,7 @@ public sealed class OneCCounterpartiesSyncService(
 
                 var counterparty = created.Value;
 
-                await salesDbContext.Counterparties.AddAsync(counterparty, cancellationToken);
+                store.Add(counterparty);
                 existingCounterparties[normalized.CounterpartyId] = counterparty;
                 assignedIdentityUsers[identityResult.Value] = normalized.CounterpartyId;
                 imported++;
@@ -132,11 +130,11 @@ public sealed class OneCCounterpartiesSyncService(
                 restored++;
             }
 
-            var fieldsChanged = existingCounterparty.IdentityUserId != identityResult.Value
+            var fieldsChanged = existingCounterparty.IdentityUserId.Value != identityResult.Value
                                 || existingCounterparty.Name != normalized.CounterpartyName
                                 || existingCounterparty.Email != normalized.Email
                                 || existingCounterparty.Phone != normalized.Phone
-                                || existingCounterparty.DefaultPriceTypeId != normalized.DefaultPriceTypeId;
+                                || existingCounterparty.DefaultPriceTypeId.Value != normalized.DefaultPriceTypeId;
             if (!fieldsChanged && !wasDeleted)
             {
                 unchanged++;
@@ -144,11 +142,11 @@ public sealed class OneCCounterpartiesSyncService(
             }
 
             var changed = existingCounterparty.Update(
-                identityUserId: identityResult.Value,
+                identityUserId: UserId.FromStorage(identityResult.Value),
                 name: normalized.CounterpartyName,
                 email: normalized.Email,
                 phone: normalized.Phone,
-                defaultPriceTypeId: normalized.DefaultPriceTypeId,
+                defaultPriceTypeId: PriceTypeId.FromStorage(normalized.DefaultPriceTypeId),
                 updatedAt: now);
             if (changed.IsFailure)
             {
@@ -169,9 +167,9 @@ public sealed class OneCCounterpartiesSyncService(
         if (!sourceIdsComplete)
             logger.LogWarning("1C returned a counterparty with no ID. Deletion was skipped for this run.");
 
-        await salesDbContext.SaveChangesAsync(cancellationToken);
+        await store.SaveChangesAsync(cancellationToken);
         // The removed customers' Identity users are deleted by the outbox dispatch (platform spec 006, R-014).
-        deleted = await staleRemoval.RemoveAsync(staleCounterparties, cancellationToken);
+        deleted = await store.RemoveStaleAsync(staleCounterparties, cancellationToken);
 
         logger.LogInformation(
             "SyncOneCCounterpartiesJob finished. Imported: {Imported}, Updated: {Updated}, Restored: {Restored}, Deleted: {Deleted}, Skipped: {Skipped}, Unchanged: {Unchanged}",

@@ -50,7 +50,7 @@ public sealed class ChangeSlugHandler(
     {
         if (entityType == CatalogEntityType.Product)
         {
-            var product = await productRepo.GetByIdAsync(ProductId.From(id), cancellationToken);
+            var product = await productRepo.GetByIdAsync(ProductId.Create(id), cancellationToken);
             return product is null ? null : new Target(product.Name, product.ProductSlug, product.ChangeSlug);
         }
 
@@ -60,7 +60,7 @@ public sealed class ChangeSlugHandler(
             return group is null ? null : new Target(group.Name, group.Slug, group.ChangeSlug);
         }
 
-        var category = await categoryRepo.GetByIdAsync(ProductCategoryId.From(id), cancellationToken);
+        var category = await categoryRepo.GetByIdAsync(ProductCategoryId.Create(id), cancellationToken);
         return category is null ? null : new Target(category.Name, category.Slug, category.ChangeSlug);
     }
 
@@ -87,9 +87,9 @@ public sealed class ChangeSlugHandler(
 
         var projections = catalogDbContext.ProductListProjections;
         return entityType == CatalogEntityType.Product
-            ? projections.Where(row => row.ProductId == ProductId.From(id))
+            ? projections.Where(row => row.ProductId == ProductId.Create(id))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.ProductSlug, slug), cancellationToken)
-            : projections.Where(row => row.CategoryId == ProductCategoryId.From(id))
+            : projections.Where(row => row.CategoryId == ProductCategoryId.Create(id))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(row => row.CategorySlug, slug), cancellationToken);
     }
 

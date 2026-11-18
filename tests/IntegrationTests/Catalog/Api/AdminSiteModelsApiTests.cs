@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Application.Features.Products.Shared;
 using System.Net;
 using System.Net.Http.Json;
@@ -42,8 +43,8 @@ public sealed class AdminSiteModelsApiTests
         {
             AddProduct(db, id, 10, $"Ручка {id}");
             var slug = $"tovar-{id}";
-            db.ProductListProjections.Add(ProductListProjection.Create(ProductId.From(id), slug, slug, slug, "",
-                ProductCategoryId.From(10), "kategoriia-10", inStock: true, isSale: false, isNew: false,
+            db.ProductListProjections.Add(ProductListProjection.Create(ProductId.Create(id), slug, slug, slug, "",
+                ProductCategoryId.Create(10), "kategoriia-10", inStock: true, isSale: false, isNew: false,
                 exportToSite: true, retailPrice: 100m + id));
         }
 
