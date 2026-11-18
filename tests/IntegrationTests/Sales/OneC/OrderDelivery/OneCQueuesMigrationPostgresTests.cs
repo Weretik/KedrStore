@@ -33,7 +33,7 @@ public sealed class OneCQueuesMigrationPostgresTests(SalesPostgresFixture postgr
             await migrator.MigrateAsync();
 
             var orders = await db.Database.SqlQueryRaw<OrderRow>("""
-                SELECT "OrderNumber", "OneCDocumentNumber", "OneCRejection", "OneCMessageId" FROM "Orders" ORDER BY "Id"
+                SELECT "OrderNumber", "OneCDocumentNumber", "OneCRejection", "OneCMessageId" FROM sales."Orders" ORDER BY "Id"
                 """).ToListAsync();
             Assert.Equal(["DOC-1", null, null, null, null], orders.Select(x => x.OneCDocumentNumber));
             Assert.Equal([null, "Немає ціни", null, null, null], orders.Select(x => x.OneCRejection));
@@ -42,7 +42,7 @@ public sealed class OneCQueuesMigrationPostgresTests(SalesPostgresFixture postgr
             var messages = await db.Database.SqlQueryRaw<MessageRow>("""
                 SELECT m."Type", m."Attempts", m."LastError", m."FailedAtUtc" IS NOT NULL AS "Failed",
                        o."OrderNumber" AS "OrderNumber"
-                FROM sales."OutboxMessages" m LEFT JOIN "Orders" o ON o."OneCMessageId" = m."Id"
+                FROM sales."OutboxMessages" m LEFT JOIN sales."Orders" o ON o."OneCMessageId" = m."Id"
                 ORDER BY m."Type", o."OrderNumber"
                 """).ToListAsync();
             Assert.Equal(

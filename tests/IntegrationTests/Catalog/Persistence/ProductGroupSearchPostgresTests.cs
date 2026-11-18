@@ -19,7 +19,7 @@ public sealed class ProductGroupSearchPostgresTests(CatalogPostgresFixture postg
         await using (var seed = postgres.CreateContext())
         {
             await seed.Database.ExecuteSqlRawAsync(
-                """TRUNCATE "CatalogProductGroups", "ProductCategories" CASCADE;""");
+                """TRUNCATE catalog."CatalogProductGroups", catalog."ProductCategories" CASCADE;""");
             seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), "000005513", "Ручки", "ruchky",
                 CategoryPath.Create("n10")).Value);
             var now = DateTimeOffset.UtcNow;

@@ -48,7 +48,7 @@ public sealed class PublicSiteModelPostgresTests(CatalogPostgresFixture postgres
         await using (var db = postgres.CreateContext())
         {
             await db.Database.ExecuteSqlRawAsync(
-                """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+                """TRUNCATE catalog."CatalogProductGroups", catalog."CatalogAttributes", catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
             var category = ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy", CategoryPath.Create("n10")).Value;
             category.SetShownOnSite(true, DateTimeOffset.UtcNow);
             db.Categories.Add(category);

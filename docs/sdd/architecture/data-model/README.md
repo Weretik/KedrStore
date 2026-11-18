@@ -1,53 +1,69 @@
 # KedrStore database map
 
-**Checked:** 2026-11-04 against the four EF Core `DbContext` types, configurations, and snapshots under `src/`. This is the model structure in the repository, not confirmation that migrations have been applied in a particular environment.
+**Checked:** 2026-11-18 against the EF Core `DbContext` types, configurations, and snapshots under `src/`. This is the model structure in the repository, not confirmation that migrations have been applied in a particular environment.
 
-Catalog, Sales, and Identity contexts use tables without an explicitly configured PostgreSQL schema. Therefore the model does not define separate schemas for them: their table names use the connection's default schema. With a standard `search_path`, that is `public`; the settings of any deployed database were not checked here.
+Every module keeps its tables and its migration history in its own schema; nothing lives in `public` (architecture test `ModuleDataIsolationTests.EveryTableLivesInAModuleSchema`). Catalog, Sales, and Identity moved there on 2026-11-18; `public."__EFMigrationsHistory"` keeps their old history rows for one release so a rollback still finds them.
 
 ```text
 KedrStore PostgreSQL
-└── default schema (usually public)
-    ├── Catalog / CatalogDbContext — 10 tables
-    │   ├── Categories
-    │   │   ├── ProductCategories          # category tree, slug, names, soft delete
-    │   │   ├── CategoryContents           # SEO text per category and language
-    │   │   ├── CategoryFaqItems           # FAQ of one content row
-    │   │   └── CatalogSlugHistory         # former product and category slugs
-    │   ├── Products and prices
-    │   │   ├── Products                   # product and CategoryId, photo/scheme cache
-    │   │   ├── ProductMedia               # photo and scheme links to media files
-    │   │   ├── ProductPrices              # product prices
-    │   │   ├── ProductTranslations        # localized names
-    │   │   └── PriceType                  # price types
-    │   └── List projection
-    │       └── ProductListProjections     # denormalized product reads
-    ├── Sales / SalesDbContext — 9 tables
-    │   ├── Customers
-    │   │   ├── Counterparties             # counterparties
-    │   │   └── CounterpartyCategoryPriceTypes # price type by category
-    │   └── Orders and 1C
-    │       ├── Orders                     # orders
-    │       ├── OrderLines                 # order lines
-    │       ├── OrderIdempotencyRecords   # duplicate request protection
-    │       ├── OrderSyncRetryAudits      # retry audit
-    │       ├── OrderDrafts               # saved drafts without order number
-    │       ├── OrderDraftLines           # draft lines
-    │       └── OrderDraftIdempotencyRecords # duplicate draft creation protection
-    ├── Identity / AppIdentityDbContext — 8 tables
-    │   └── Access and sessions
-    │       ├── AspNetUsers               # users
-    │       ├── AspNetRoles               # roles
-    │       ├── AspNetUserRoles           # role assignments
-    │       ├── AspNetUserClaims          # user claims
-    │       ├── AspNetRoleClaims          # role claims
-    │       ├── AspNetUserLogins          # external logins
-    │       ├── AspNetUserTokens          # tokens
-    │       └── AppRefreshSessions       # refresh sessions
-    ├── infrastructure table
-    │   └── __EFMigrationsHistory         # applied EF migration history
+└── schema catalog
+    └── Catalog / CatalogDbContext — 22 tables
+        ├── Categories
+        │   ├── ProductCategories          # category tree, slug, names, soft delete
+        │   ├── CategoryContents           # SEO text per category and language
+        │   ├── CategoryFaqItems           # FAQ of one content row
+        │   └── CatalogSlugHistory         # former product and category slugs
+        ├── Products and prices
+        │   ├── Products                   # product and CategoryId, photo/scheme cache
+        │   ├── ProductMedia               # photo and scheme links to media files
+        │   ├── ProductPrices              # product prices
+        │   ├── ProductTranslations        # localized names
+        │   └── PriceType                  # price types
+        ├── Attributes
+        │   ├── CatalogAttributes          # attribute definitions
+        │   ├── CatalogAttributeValues     # allowed values
+        │   ├── CatalogCategoryAttributes  # attributes of a category
+        │   ├── CatalogProductAttributeValues # a product's values
+        │   ├── CatalogProductAttributeReviews # values waiting for review
+        │   ├── CatalogAttributeAliases    # import aliases
+        │   ├── CatalogAttributeAliasMeanings # what an alias means
+        │   └── CatalogAttributeAliasCategoryValues # alias meaning per category
+        ├── Models (product groups)
+        │   ├── CatalogProductGroups       # a model
+        │   ├── CatalogProductGroupTexts   # localized model texts
+        │   ├── CatalogProductGroupAxes    # axes that tell members apart
+        │   └── CatalogProductGroupMembers # products of a model
+        ├── List projection
+        │   └── ProductListProjections     # denormalized product reads
+        └── __EFMigrationsHistory          # Catalog migration history
 └── schema sales
-    └── Sales / SalesDbContext — 1 table
-        └── OutboxMessages                # messages sent after the commit: orders to 1C, Telegram, Identity deletions (platform spec 006)
+    └── Sales / SalesDbContext — 10 tables
+        ├── Customers
+        │   ├── Counterparties             # counterparties
+        │   └── CounterpartyCategoryPriceTypes # price type by category
+        ├── Orders and 1C
+        │   ├── Orders                     # orders
+        │   ├── OrderLines                 # order lines
+        │   ├── OrderIdempotencyRecords    # duplicate request protection
+        │   ├── OrderSyncRetryAudits       # retry audit
+        │   ├── OrderDrafts                # saved drafts without order number
+        │   ├── OrderDraftLines            # draft lines
+        │   └── OrderDraftIdempotencyRecords # duplicate draft creation protection
+        ├── OutboxMessages                 # messages sent after the commit: orders to 1C, Telegram, Identity deletions (platform spec 006)
+        └── __EFMigrationsHistory          # Sales migration history
+└── schema identity
+    └── Identity / AppIdentityDbContext — 9 tables
+        ├── Access and sessions
+        │   ├── AspNetUsers                # users
+        │   ├── AspNetRoles                # roles
+        │   ├── AspNetUserRoles            # role assignments
+        │   ├── AspNetUserClaims           # user claims
+        │   ├── AspNetRoleClaims           # role claims
+        │   ├── AspNetUserLogins           # external logins
+        │   ├── AspNetUserTokens           # tokens
+        │   ├── AppRefreshSessions         # refresh sessions
+        │   └── DataProtectionKeys         # ASP.NET Data Protection keys
+        └── __EFMigrationsHistory          # Identity migration history
 └── schema content
     └── Content / ContentDbContext — 8 tables
         ├── Articles                      # slug, date, publication flag, cover version

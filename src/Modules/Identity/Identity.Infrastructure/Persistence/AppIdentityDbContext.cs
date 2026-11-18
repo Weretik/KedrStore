@@ -9,12 +9,16 @@ public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options
     : IdentityDbContext<AppUser, AppRole, Guid, IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>,
         IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options), IDataProtectionKeyContext
 {
+    /// <summary>The module's own schema: its tables and its migration history.</summary>
+    public const string Schema = "identity";
+
     public DbSet<AppRefreshSession> RefreshSessions => Set<AppRefreshSession>();
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.HasDefaultSchema(Schema);
         builder.HasPostgresExtension("pg_trgm");
         builder.ApplyConfigurationsFromAssembly(
             typeof(AppIdentityDbContext).Assembly,

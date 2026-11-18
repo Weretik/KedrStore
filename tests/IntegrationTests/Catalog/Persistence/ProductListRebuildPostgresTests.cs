@@ -68,7 +68,7 @@ public sealed class ProductListRebuildPostgresTests(CatalogPostgresFixture postg
     {
         await using var db = postgres.CreateContext();
         await db.Database.ExecuteSqlRawAsync(
-            """TRUNCATE "CatalogProductGroups", "CatalogAttributes", "ProductMedia", "ProductListProjections", "ProductPrices", "ProductTranslations", "Products", "CatalogSlugHistory", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+            """TRUNCATE catalog."CatalogProductGroups", catalog."CatalogAttributes", catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Завіси", "zavisy",
             CategoryPath.Create("n10")).Value);
         foreach (var id in productIds)
@@ -88,7 +88,7 @@ public sealed class ProductListRebuildPostgresTests(CatalogPostgresFixture postg
     {
         await using var db = postgres.CreateContext();
         return await db.Database.SqlQuery<long>(
-                $"""SELECT xmin::text::bigint AS "Value" FROM "ProductListProjections" WHERE "ProductId" = {productId}""")
+                $"""SELECT xmin::text::bigint AS "Value" FROM catalog."ProductListProjections" WHERE "ProductId" = {productId}""")
             .SingleAsync();
     }
 

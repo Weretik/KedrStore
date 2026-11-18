@@ -118,7 +118,7 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         Assert.Equal(OrderSyncRetryStoreOutcome.InvalidStatus, second.Outcome);
         Assert.Equal("Pending", (await ListedAsync(sales, orderId)).SyncStatus);
         Assert.Equal(1, await sales.InScopeAsync(services => services.GetRequiredService<SalesDbContext>().Database
-            .SqlQueryRaw<int>("""SELECT COUNT(*)::integer AS "Value" FROM "OrderSyncRetryAudits" """).SingleAsync()));
+            .SqlQueryRaw<int>("""SELECT COUNT(*)::integer AS "Value" FROM sales."OrderSyncRetryAudits" """).SingleAsync()));
 
         sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.Accepted("DOC-9", null));
         await DispatchAllAsync(sales);

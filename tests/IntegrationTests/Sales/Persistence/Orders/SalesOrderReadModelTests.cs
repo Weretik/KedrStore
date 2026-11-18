@@ -140,8 +140,8 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
     private async Task ResetDatabaseAsync()
     {
         await using var db = postgres.CreateContext();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderSyncRetryAudits\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderIdempotencyRecords\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.OrderDrafts.ExecuteDeleteAsync();

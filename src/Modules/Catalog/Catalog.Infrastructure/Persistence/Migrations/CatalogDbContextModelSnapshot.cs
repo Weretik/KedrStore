@@ -17,12 +17,103 @@ namespace Catalog.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("catalog")
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "ltree");
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Catalog.Application.Features.Products.Shared.ProductListProjection", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CategorySlug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("ExportToSite")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("InStock")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsNew")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NameRu")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("NameUk")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ProductSlug")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal?>("RetailPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("SearchTextRu")
+                        .IsRequired()
+                        .HasMaxLength(700)
+                        .HasColumnType("character varying(700)");
+
+                    b.Property<string>("SearchTextUk")
+                        .IsRequired()
+                        .HasMaxLength(700)
+                        .HasColumnType("character varying(700)");
+
+                    b.HasKey("ProductId");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("IX_ProductListProjections_CategoryId");
+
+                    b.HasIndex("CategorySlug")
+                        .HasDatabaseName("IX_ProductListProjections_CategorySlug");
+
+                    b.HasIndex("RetailPrice")
+                        .HasDatabaseName("IX_ProductListProjections_RetailPrice");
+
+                    b.HasIndex("SearchTextRu")
+                        .HasDatabaseName("IX_ProductListProjections_SearchTextRu_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextRu"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextRu"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("SearchTextUk")
+                        .HasDatabaseName("IX_ProductListProjections_SearchTextUk_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextUk"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextUk"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("CategoryId", "InStock", "IsSale", "IsNew")
+                        .HasDatabaseName("IX_ProductListProjections_ListFilters");
+
+                    b.ToTable("ProductListProjections", "catalog");
+                });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAlias", b =>
                 {
@@ -69,7 +160,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_CatalogAttributeAliases_Attribute_Scope_Raw");
 
-                    b.ToTable("CatalogAttributeAliases", (string)null);
+                    b.ToTable("CatalogAttributeAliases", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAliasCategoryValue", b =>
@@ -94,7 +185,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("ValueId")
                         .HasDatabaseName("IX_CatalogAttributeAliasCategoryValues_ValueId");
 
-                    b.ToTable("CatalogAttributeAliasCategoryValues", (string)null);
+                    b.ToTable("CatalogAttributeAliasCategoryValues", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAliasMeaning", b =>
@@ -137,7 +228,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("AliasId", "CategoryId", "AttributeId"), false);
 
-                    b.ToTable("CatalogAttributeAliasMeanings", (string)null);
+                    b.ToTable("CatalogAttributeAliasMeanings", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.AttributeValue", b =>
@@ -196,7 +287,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_CatalogAttributeValues_Attribute_Slug");
 
-                    b.ToTable("CatalogAttributeValues", (string)null);
+                    b.ToTable("CatalogAttributeValues", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.CatalogAttribute", b =>
@@ -264,7 +355,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_CatalogAttributes_Slug");
 
-                    b.ToTable("CatalogAttributes", (string)null);
+                    b.ToTable("CatalogAttributes", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.CategoryAttribute", b =>
@@ -291,7 +382,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("AttributeId");
 
-                    b.ToTable("CatalogCategoryAttributes", (string)null);
+                    b.ToTable("CatalogCategoryAttributes", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.ProductValues.ProductAttributeReview", b =>
@@ -329,7 +420,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("State")
                         .HasDatabaseName("IX_CatalogProductAttributeReviews_State");
 
-                    b.ToTable("CatalogProductAttributeReviews", (string)null);
+                    b.ToTable("CatalogProductAttributeReviews", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.ProductValues.ProductAttributeValue", b =>
@@ -384,7 +475,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("AttributeId", "ValueId")
                         .HasDatabaseName("IX_CatalogProductAttributeValues_Attribute_Value");
 
-                    b.ToTable("CatalogProductAttributeValues", (string)null);
+                    b.ToTable("CatalogProductAttributeValues", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Categories.Content.CategoryContent", b =>
@@ -429,7 +520,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     b.HasKey("CategoryId", "Language");
 
-                    b.ToTable("CategoryContents", (string)null);
+                    b.ToTable("CategoryContents", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Categories.ProductCategory", b =>
@@ -505,7 +596,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("ParentId", "SortOrder", "Id")
                         .HasDatabaseName("IX_ProductCategories_ParentId_SortOrder_Id");
 
-                    b.ToTable("ProductCategories", (string)null);
+                    b.ToTable("ProductCategories", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Groups.Members.ProductGroupAxis", b =>
@@ -524,7 +615,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("AttributeId")
                         .HasDatabaseName("IX_CatalogProductGroupAxes_AttributeId");
 
-                    b.ToTable("CatalogProductGroupAxes", (string)null);
+                    b.ToTable("CatalogProductGroupAxes", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Groups.Members.ProductGroupMember", b =>
@@ -546,7 +637,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("GroupId")
                         .HasDatabaseName("IX_CatalogProductGroupMembers_GroupId");
 
-                    b.ToTable("CatalogProductGroupMembers", (string)null);
+                    b.ToTable("CatalogProductGroupMembers", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Groups.ProductGroup", b =>
@@ -617,7 +708,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "IX_CatalogProductGroups_Name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "IX_CatalogProductGroups_Name_trgm"), new[] { "gin_trgm_ops" });
 
-                    b.ToTable("CatalogProductGroups", (string)null);
+                    b.ToTable("CatalogProductGroups", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Groups.ProductGroupText", b =>
@@ -660,7 +751,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     b.HasKey("GroupId", "Language");
 
-                    b.ToTable("CatalogProductGroupTexts", (string)null);
+                    b.ToTable("CatalogProductGroupTexts", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.PriceTypes.PriceType", b =>
@@ -675,7 +766,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceType", (string)null);
+                    b.ToTable("PriceType", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Products.Prices.ProductPrice", b =>
@@ -715,7 +806,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId", "PriceTypeId")
                         .IsUnique();
 
-                    b.ToTable("ProductPrices", (string)null);
+                    b.ToTable("ProductPrices", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Products.Product", b =>
@@ -808,97 +899,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("CategoryId", "IsDeleted", "IsSale", "IsNew")
                         .HasDatabaseName("IX_Products_ListFilters");
 
-                    b.ToTable("Products", (string)null);
-                });
-
-            modelBuilder.Entity("Catalog.Domain.Products.ProductListProjection", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CategorySlug")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("ExportToSite")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("InStock")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsNew")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsSale")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("NameRu")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("NameUk")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("Photo")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("ProductSlug")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<decimal?>("RetailPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.Property<string>("SearchTextRu")
-                        .IsRequired()
-                        .HasMaxLength(700)
-                        .HasColumnType("character varying(700)");
-
-                    b.Property<string>("SearchTextUk")
-                        .IsRequired()
-                        .HasMaxLength(700)
-                        .HasColumnType("character varying(700)");
-
-                    b.HasKey("ProductId");
-
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("IX_ProductListProjections_CategoryId");
-
-                    b.HasIndex("CategorySlug")
-                        .HasDatabaseName("IX_ProductListProjections_CategorySlug");
-
-                    b.HasIndex("RetailPrice")
-                        .HasDatabaseName("IX_ProductListProjections_RetailPrice");
-
-                    b.HasIndex("SearchTextRu")
-                        .HasDatabaseName("IX_ProductListProjections_SearchTextRu_trgm");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextRu"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextRu"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("SearchTextUk")
-                        .HasDatabaseName("IX_ProductListProjections_SearchTextUk_trgm");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchTextUk"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("SearchTextUk"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("CategoryId", "InStock", "IsSale", "IsNew")
-                        .HasDatabaseName("IX_ProductListProjections_ListFilters");
-
-                    b.ToTable("ProductListProjections", (string)null);
+                    b.ToTable("Products", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Products.ProductTranslation", b =>
@@ -945,7 +946,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId", "Language")
                         .IsUnique();
 
-                    b.ToTable("ProductTranslations", (string)null);
+                    b.ToTable("ProductTranslations", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Slugs.SlugHistoryEntry", b =>
@@ -968,7 +969,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.HasIndex("EntityType", "EntityId")
                         .HasDatabaseName("IX_CatalogSlugHistory_EntityType_EntityId");
 
-                    b.ToTable("CatalogSlugHistory", (string)null);
+                    b.ToTable("CatalogSlugHistory", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAlias", b =>
@@ -988,7 +989,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAliasCategoryValue", b =>
                 {
                     b.HasOne("Catalog.Domain.Attributes.Aliases.AttributeAlias", null)
-                        .WithMany()
+                        .WithMany("CategoryValues")
                         .HasForeignKey("AliasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1008,7 +1009,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAliasMeaning", b =>
                 {
                     b.HasOne("Catalog.Domain.Attributes.Aliases.AttributeAlias", null)
-                        .WithMany()
+                        .WithMany("Meanings")
                         .HasForeignKey("AliasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1034,7 +1035,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Catalog.Domain.Attributes.AttributeValue", b =>
                 {
                     b.HasOne("Catalog.Domain.Attributes.CatalogAttribute", null)
-                        .WithMany()
+                        .WithMany("Values")
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1132,7 +1133,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                             b1.HasIndex("CategoryId", "Language", "SortOrder")
                                 .HasDatabaseName("IX_CategoryFaqItems_Content_SortOrder");
 
-                            b1.ToTable("CategoryFaqItems", (string)null);
+                            b1.ToTable("CategoryFaqItems", "catalog");
 
                             b1.WithOwner()
                                 .HasForeignKey("CategoryId", "Language");
@@ -1150,7 +1151,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Catalog.Domain.Groups.ProductGroup", null)
-                        .WithMany()
+                        .WithMany("Axes")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1234,7 +1235,7 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                             b1.HasIndex("MediaFileId")
                                 .HasDatabaseName("IX_ProductMedia_MediaFileId");
 
-                            b1.ToTable("ProductMedia", (string)null);
+                            b1.ToTable("ProductMedia", "catalog");
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
@@ -1246,10 +1247,32 @@ namespace Catalog.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Catalog.Domain.Products.ProductTranslation", b =>
                 {
                     b.HasOne("Catalog.Domain.Products.Product", null)
-                        .WithMany()
+                        .WithMany("Translations")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Attributes.Aliases.AttributeAlias", b =>
+                {
+                    b.Navigation("CategoryValues");
+
+                    b.Navigation("Meanings");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Attributes.CatalogAttribute", b =>
+                {
+                    b.Navigation("Values");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Groups.ProductGroup", b =>
+                {
+                    b.Navigation("Axes");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Products.Product", b =>
+                {
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

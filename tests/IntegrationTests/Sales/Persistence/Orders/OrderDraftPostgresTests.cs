@@ -110,7 +110,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await using var connection = new NpgsqlConnection(postgres.ConnectionString);
         await connection.OpenAsync();
         await using var duplicate = new NpgsqlCommand(
-            "INSERT INTO \"OrderDraftLines\" (\"DraftId\", \"ProductId\", \"Quantity\") VALUES (@draft, '101', 1)",
+            "INSERT INTO sales.\"OrderDraftLines\" (\"DraftId\", \"ProductId\", \"Quantity\") VALUES (@draft, '101', 1)",
             connection);
         duplicate.Parameters.AddWithValue("draft", draftId.Value);
         var error = await Assert.ThrowsAsync<PostgresException>(() => duplicate.ExecuteNonQueryAsync());
@@ -121,8 +121,8 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     {
         await using var db = postgres.CreateContext();
         await db.OrderDrafts.ExecuteDeleteAsync();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderSyncRetryAudits\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderIdempotencyRecords\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
@@ -147,7 +147,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await using var connection = new NpgsqlConnection(postgres.ConnectionString);
         await connection.OpenAsync();
         await using var command = new NpgsqlCommand(
-            "INSERT INTO \"OrderDraftIdempotencyRecords\" (\"IdempotencyKey\", \"RequestHash\", \"DraftId\", \"CreatedAtUtc\") " +
+            "INSERT INTO sales.\"OrderDraftIdempotencyRecords\" (\"IdempotencyKey\", \"RequestHash\", \"DraftId\", \"CreatedAtUtc\") " +
             "VALUES (@key, 'hash', @draft, now())",
             connection);
         command.Parameters.AddWithValue("key", key);
@@ -158,9 +158,9 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
     private static Task<int> CountAsync(SalesDbContext db, string table)
         => db.Database.SqlQueryRaw<int>(table switch
         {
-            "OrderDrafts" => "SELECT COUNT(*)::integer AS \"Value\" FROM \"OrderDrafts\"",
-            "OrderDraftLines" => "SELECT COUNT(*)::integer AS \"Value\" FROM \"OrderDraftLines\"",
-            "OrderDraftIdempotencyRecords" => "SELECT COUNT(*)::integer AS \"Value\" FROM \"OrderDraftIdempotencyRecords\"",
+            "OrderDrafts" => "SELECT COUNT(*)::integer AS \"Value\" FROM sales.\"OrderDrafts\"",
+            "OrderDraftLines" => "SELECT COUNT(*)::integer AS \"Value\" FROM sales.\"OrderDraftLines\"",
+            "OrderDraftIdempotencyRecords" => "SELECT COUNT(*)::integer AS \"Value\" FROM sales.\"OrderDraftIdempotencyRecords\"",
             _ => throw new ArgumentOutOfRangeException(nameof(table))
         }).SingleAsync();
 }

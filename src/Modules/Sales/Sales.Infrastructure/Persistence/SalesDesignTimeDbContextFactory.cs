@@ -6,6 +6,7 @@ public sealed class SalesDesignTimeDbContextFactory : IDesignTimeDbContextFactor
 {
     public SalesDbContext CreateDbContext(string[] args)
         => new(new DbContextOptionsBuilder<SalesDbContext>()
-            .UseNpgsql("Host=localhost;Database=kedr_design_time;Username=design_time;Password=not-used")
+            .UseNpgsql("Host=localhost;Database=kedr_design_time;Username=design_time;Password=not-used",
+                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", SalesDbContext.Schema))
             .Options);
 }

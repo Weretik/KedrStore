@@ -17,6 +17,9 @@ namespace Catalog.Infrastructure.Persistence;
 public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     : DbContext(options), IReadCatalogDbContext
 {
+    /// <summary>The module's own schema: its tables and its migration history.</summary>
+    public const string Schema = "catalog";
+
     public DbSet<ProductCategory> Categories => Set<ProductCategory>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductPrice> ProductPrices => Set<ProductPrice>();
@@ -48,6 +51,7 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema(Schema);
 
         modelBuilder.HasPostgresExtension("ltree");
         modelBuilder.HasPostgresExtension("pg_trgm");

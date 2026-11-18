@@ -38,7 +38,8 @@ public static class SalesInfrastructure
 
         services.AddOneCSendingWindow(configuration);
 
-        services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString,
+            npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", SalesDbContext.Schema)));
         services.AddOutbox<SalesDbContext>(SalesDbContext.Schema);
         services.AddScoped<IQuickOrderStore, QuickOrderStore>();
         services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);

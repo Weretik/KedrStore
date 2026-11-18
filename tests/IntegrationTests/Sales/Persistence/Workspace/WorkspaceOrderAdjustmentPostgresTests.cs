@@ -42,8 +42,8 @@ public sealed class WorkspaceOrderAdjustmentPostgresTests(SalesPostgresFixture p
     {
         await using var db = postgres.CreateContext();
         await db.OrderDrafts.ExecuteDeleteAsync();
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderSyncRetryAudits\"");
-        await db.Database.ExecuteSqlRawAsync("DELETE FROM \"OrderIdempotencyRecords\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderSyncRetryAudits\"");
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OrderIdempotencyRecords\"");
         await db.Database.ExecuteSqlRawAsync("DELETE FROM sales.\"OutboxMessages\"");
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();

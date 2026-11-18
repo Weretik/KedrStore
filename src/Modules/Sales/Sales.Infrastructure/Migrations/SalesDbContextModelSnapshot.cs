@@ -17,6 +17,7 @@ namespace Sales.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("sales")
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -131,7 +132,7 @@ namespace Sales.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Phone"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Phone"), new[] { "gin_trgm_ops" });
 
-                    b.ToTable("Counterparties", (string)null);
+                    b.ToTable("Counterparties", "sales");
                 });
 
             modelBuilder.Entity("Sales.Domain.Customers.CounterpartyCategoryPriceType", b =>
@@ -152,7 +153,7 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasIndex("PriceTypeId");
 
-                    b.ToTable("CounterpartyCategoryPriceTypes", (string)null);
+                    b.ToTable("CounterpartyCategoryPriceTypes", "sales");
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.Order", b =>
@@ -222,7 +223,7 @@ namespace Sales.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "OrderNumber" }, "IX_Orders_OrderNumber_trgm"), new[] { "gin_trgm_ops" });
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders", "sales");
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.OrderDraft", b =>
@@ -271,7 +272,7 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasIndex("CounterpartyId", "UpdatedAtUtc", "Id");
 
-                    b.ToTable("OrderDrafts", (string)null);
+                    b.ToTable("OrderDrafts", "sales");
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.OrderDraftLine", b =>
@@ -302,7 +303,7 @@ namespace Sales.Infrastructure.Migrations
                     b.HasIndex("DraftId", "ProductId")
                         .IsUnique();
 
-                    b.ToTable("OrderDraftLines", null, t =>
+                    b.ToTable("OrderDraftLines", "sales", t =>
                         {
                             t.HasCheckConstraint("CK_OrderDraftLines_Quantity", "\"Quantity\" > 0");
                         });
@@ -344,7 +345,7 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderLines", (string)null);
+                    b.ToTable("OrderLines", "sales");
                 });
 
             modelBuilder.Entity("Sales.Infrastructure.Persistence.OrderDrafts.OrderDraftIdempotencyRecord", b =>
@@ -378,7 +379,7 @@ namespace Sales.Infrastructure.Migrations
                     b.HasIndex("IdempotencyKey")
                         .IsUnique();
 
-                    b.ToTable("OrderDraftIdempotencyRecords", (string)null);
+                    b.ToTable("OrderDraftIdempotencyRecords", "sales");
                 });
 
             modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.Idempotency.OrderIdempotencyRecord", b =>
@@ -423,7 +424,7 @@ namespace Sales.Infrastructure.Migrations
                     b.HasIndex("Operation", "IdempotencyKey")
                         .IsUnique();
 
-                    b.ToTable("OrderIdempotencyRecords", (string)null);
+                    b.ToTable("OrderIdempotencyRecords", "sales");
                 });
 
             modelBuilder.Entity("Sales.Infrastructure.Persistence.Orders.SyncRetries.OrderSyncRetryAudit", b =>
@@ -477,7 +478,7 @@ namespace Sales.Infrastructure.Migrations
 
                     b.HasIndex("RequestedAtUtc");
 
-                    b.ToTable("OrderSyncRetryAudits", (string)null);
+                    b.ToTable("OrderSyncRetryAudits", "sales");
                 });
 
             modelBuilder.Entity("Sales.Domain.Orders.Order", b =>

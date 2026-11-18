@@ -79,7 +79,7 @@ public sealed class CatalogTransactionPostgresTests(CatalogPostgresFixture postg
     {
         await using var seed = postgres.CreateContext();
         await seed.Database.ExecuteSqlRawAsync(
-            """TRUNCATE "CatalogProductGroups", "CategoryFaqItems", "CategoryContents", "ProductCategories" CASCADE;""");
+            """TRUNCATE catalog."CatalogProductGroups", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
         seed.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(CategoryId), "000005530", "Ручки", "ruchky",
             CategoryPath.Create("n30")).Value);
         await seed.SaveChangesAsync();
