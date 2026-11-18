@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.SetProductAttribute;
@@ -7,4 +9,7 @@ namespace Catalog.Application.Features.ProductAttributes.Commands.SetProductAttr
 /// the 1C sync no longer change them until «Повернути автоматичне».
 /// </summary>
 public sealed record SetProductAttributeCommand(int ProductId, int AttributeId, SetProductAttributeRequest Request)
-    : ICommand<Result<AdminProductAttributesDto>>;
+    : ICommand<Result<AdminProductAttributesDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

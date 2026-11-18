@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Groups;
 
 namespace Catalog.Application.Features.Groups.Commands.SetProductGroup;
@@ -7,4 +9,7 @@ namespace Catalog.Application.Features.Groups.Commands.SetProductGroup;
 /// moves it again until a person returns it to automatic grouping. The target group must be in the product's category.
 /// </summary>
 public sealed record SetProductGroupCommand(int ProductId, SetProductGroupRequest Request)
-    : ICommand<Result<AdminProductGroupMembershipDto>>;
+    : ICommand<Result<AdminProductGroupMembershipDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

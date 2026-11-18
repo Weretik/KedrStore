@@ -41,7 +41,7 @@ public sealed class AcceptSiteModelsHandler(
         var by = ReviewerName.Of(currentUser);
         var accepted = found.Where(model => model.Accept(by, now)).Select(model => model.Id).ToList();
         if (accepted.Count == 0)
-            return Result.Success((await stateReader.ReadAsync(cancellationToken)).Health());
+            return Result.Success((await stateReader.ReadFreshCatalogAsync(cancellationToken)).Health());
 
         await models.SaveChangesAsync(cancellationToken);
         var members = await db.ProductGroupMembers
@@ -52,6 +52,6 @@ public sealed class AcceptSiteModelsHandler(
             await changes.PinAsync(model.Select(member => member.ProductId).ToList(), model.Key, now, cancellationToken);
         await changes.TidyAsync(cancellationToken);
 
-        return Result.Success((await stateReader.ReadAsync(cancellationToken)).Health());
+        return Result.Success((await stateReader.ReadFreshCatalogAsync(cancellationToken)).Health());
     }
 }

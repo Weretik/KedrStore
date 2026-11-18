@@ -30,6 +30,30 @@ public sealed partial class ReadCacheTests
         Assert.Empty(violations);
     }
 
+    /// <summary>
+    /// The cached site models state (<c>SiteModelStateReader.Tag</c>) shows products, models, attributes and categories,
+    /// so every Catalog command drops it, except those that change nothing it shows.
+    /// </summary>
+    [Fact]
+    public void EveryCatalogCommand_DropsTheSiteModelsState()
+    {
+        string[] changeNothingItShows =
+        [
+            "UploadAttributeSwatchCommand.cs", // stores a picture file; the state holds no swatch
+            "SaveCategoryContentCommand.cs", // SEO texts of a category; the state holds its names only
+        ];
+        var root = RepositoryRoot.Find();
+        var features = Path.Combine(root, "src", "Modules", "Catalog", "Catalog.Application", "Features");
+        var violations = Directory.EnumerateFiles(features, "*Command.cs", SearchOption.AllDirectories)
+            .Where(path => !changeNothingItShows.Contains(Path.GetFileName(path)))
+            .Where(path => !File.ReadAllText(path).Contains("SiteModelStateReader.Tag", StringComparison.Ordinal))
+            .Select(path => Path.GetRelativePath(root, path))
+            .Order()
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
     [GeneratedRegex(@"\b(IMemoryCache|IDistributedCache|HybridCache|AddMemoryCache|AddDistributedMemoryCache)\b|Microsoft\.Extensions\.Caching")]
     private static partial Regex CacheLibrary();
 }

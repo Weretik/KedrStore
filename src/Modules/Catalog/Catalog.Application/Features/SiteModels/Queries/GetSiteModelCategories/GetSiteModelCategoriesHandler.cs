@@ -15,7 +15,7 @@ public sealed class GetSiteModelCategoriesHandler(SiteModelStateReader reader)
     public async ValueTask<Result<List<SiteModelCategoryDto>>> Handle(GetSiteModelCategoriesQuery query,
         CancellationToken cancellationToken)
     {
-        var state = await reader.ReadAsync(cancellationToken);
+        var state = await reader.ReadCatalogAsync(cancellationToken);
         var counts = new Dictionary<ProductCategoryId, Counts>();
 
         void AddUp(ProductCategoryId categoryId, Func<Counts, Counts> change)

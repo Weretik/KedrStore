@@ -16,7 +16,7 @@ public sealed class GetSiteModelsHandler(SiteModelStateReader reader)
         CancellationToken cancellationToken)
     {
         var request = query.Request;
-        var state = await reader.ReadAsync(cancellationToken);
+        var state = await reader.ReadCatalogAsync(cancellationToken);
         var search = request.Search?.Trim();
 
         var rows = state.Models.Values

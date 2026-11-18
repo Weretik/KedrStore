@@ -17,18 +17,18 @@ public sealed class GetSiteShowcaseHandler(SiteModelStateReader reader)
         CancellationToken cancellationToken)
     {
         var request = query.Request;
-        var state = await reader.ReadAsync(cancellationToken);
+        var state = await reader.ReadCatalogAsync(cancellationToken);
         var search = request.Search?.Trim();
         var variantAttributes = state.Attributes.Values.Where(attribute => attribute.IsVariantAxis)
             .OrderBy(attribute => attribute.SortOrder).ThenBy(attribute => attribute.Code, StringComparer.Ordinal)
             .ToList();
 
         var modelRows = state.Models.Values
-            .Select(model => (Model: (ProductGroup?)model, CategoryId: model.CategoryId, Name: model.Name,
+            .Select(model => (Model: (SiteModelFacts?)model, CategoryId: model.CategoryId, Name: model.Name,
                 Products: state.OnSiteMembers(model.Id).ToList()));
         var loneRows = state.Products.Values
             .Where(product => product.IsOnSite && !state.ModelOfProduct.ContainsKey(product.Id))
-            .Select(product => (Model: (ProductGroup?)null, product.CategoryId, product.Name,
+            .Select(product => (Model: (SiteModelFacts?)null, product.CategoryId, product.Name,
                 Products: new List<ProductId> { product.Id }));
 
         var rows = modelRows.Concat(loneRows)
@@ -48,14 +48,14 @@ public sealed class GetSiteShowcaseHandler(SiteModelStateReader reader)
         return Result.Success(new SiteShowcaseListDto(page, rows.Count, request.Page, request.PageSize));
     }
 
-    private static string StatusOf(ProductGroup? model)
+    private static string StatusOf(SiteModelFacts? model)
         => model is null ? GetSiteShowcaseQuery.NoModelStatus : SiteModelState.StatusText(model.Status);
 
     private static bool Matches(SiteModelState state, string name, IReadOnlyList<ProductId> products, string search)
         => SiteModelSearch.Matches(state, name, products, search);
 
     private static SiteShowcaseRowDto ToRow(SiteModelState state, IReadOnlyList<SiteModelAttributeFacts> variantAttributes,
-        ProductGroup? model, ProductCategoryId categoryId, string name, IReadOnlyList<ProductId> productIds)
+        SiteModelFacts? model, ProductCategoryId categoryId, string name, IReadOnlyList<ProductId> productIds)
     {
         var modelDto = model is null
             ? null

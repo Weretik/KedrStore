@@ -1,9 +1,13 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.SiteModels;
 
 namespace Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 
 /// <summary>Accepts the listed models; returns the health counts after it.</summary>
-public sealed record AcceptSiteModelsCommand(AcceptSiteModelsRequest Request) : ICommand<Result<SiteModelHealthDto>>
+public sealed record AcceptSiteModelsCommand(AcceptSiteModelsRequest Request) : ICommand<Result<SiteModelHealthDto>>, IInvalidatesReadCache
 {
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+
     public const int MaxModels = 500;
 }

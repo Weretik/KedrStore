@@ -1,3 +1,4 @@
+using IntegrationTests.Platform.Caching;
 using BuildingBlocks.Domain.Identifiers;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
@@ -132,7 +133,7 @@ public sealed class SiteModelTests
 
     private sealed class Handlers(CatalogDbContext db)
     {
-        public SiteModelStateReader State { get; } = new(db);
+        public SiteModelStateReader State { get; } = new(db, NoReadCache.Instance);
         public SiteModelReader Reader => new(State);
 
         public SiteModelChanges Changes => new(db, new TestRepository<ProductGroup>(db),

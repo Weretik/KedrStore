@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
@@ -8,4 +10,7 @@ namespace Catalog.Application.Features.Attributes.Commands.DecideAttributeCode;
 /// recognition run.
 /// </summary>
 public sealed record DecideAttributeCodeCommand(int AliasId, DecideAttributeCodeRequest Request)
-    : ICommand<Result<DecideAttributeCodeResponse>>;
+    : ICommand<Result<DecideAttributeCodeResponse>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}

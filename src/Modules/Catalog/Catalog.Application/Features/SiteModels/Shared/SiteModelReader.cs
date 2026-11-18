@@ -9,8 +9,8 @@ public sealed class SiteModelReader(SiteModelStateReader stateReader)
 {
     public async Task<SiteModelDto?> ReadAsync(int modelId, CancellationToken cancellationToken)
     {
-        var state = await stateReader.ReadAsync(cancellationToken);
         var id = ProductGroupId.Create(modelId);
+        var state = await stateReader.ReadModelsAsync([id], cancellationToken);
         return state.Models.ContainsKey(id) ? SiteModelMapper.ToDetail(state, id) : null;
     }
 }

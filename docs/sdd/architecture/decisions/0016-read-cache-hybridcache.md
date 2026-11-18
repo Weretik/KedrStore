@@ -24,13 +24,15 @@ The API runs on Cloud Run, which may start several instances; the 1C import runs
 - **L1 only today.** No `IDistributedCache` is registered, so HybridCache keeps answers in the memory of the instance. To add a shared L2 later, register one in the host (for example `AddStackExchangeRedisCache`); HybridCache picks it up and no query or command changes.
 - **Only queries cache, only read models.** A query handler wraps its expensive read in `IReadCache`; the cached value is an immutable, sealed read model marked `[ImmutableObject(true)]` (HybridCache then hands out the same instance instead of copying it). Aggregates, other domain entities, `Result` objects and per-user data are never cached; `CachedReadModelTests` fails when an entity is reachable from a cached type. Domain knows nothing about caching.
 - **Commands drop the cache by tag.** A command whose data a cached read shows implements `IInvalidatesReadCache`; `ReadCacheInvalidationBehavior` drops its tags after the command succeeds. A write outside Mediator calls `IReadCache.InvalidateAsync`.
-- **Where it is used now:** only the public category tree ([spec platform/009](../../specs/platform/009-read-cache/README.md)), 2 minutes, tag `catalog:category-tree`, dropped by the «show on site» mark and a category slug change.
+- **Where it is used now:**
+  - the public category tree ([spec platform/009](../../specs/platform/009-read-cache/README.md)), 2 minutes, tag `catalog:category-tree`, dropped by the «show on site» mark and a category slug change;
+  - the admin site models state of the whole catalog (`SiteModelStateReader`, added 2026-11-18 to close database rule 1.4): «Моделі», «Вітрина сайту», its category tree and «Огляд» rank and count every on-site product, so they share one snapshot for 1 minute, tag `catalog:site-models`, dropped by every Catalog command except the swatch upload and category SEO texts (`ReadCacheTests.EveryCatalogCommand_DropsTheSiteModelsState`). One model and the model commands read only their models, uncached. The cached value is `SiteModelSnapshot` (plain rows, serializable); each request indexes it in memory.
 - Only `BuildingBlocks.Infrastructure/Caching` may use `HybridCache`, `IMemoryCache` or `IDistributedCache`; `ReadCacheTests` enforces it.
 
 ## Consequences
 
 - Invalidation is local: a command drops the tag on the instance that ran it. Other API instances, and changes made by `Host.Jobs` (the 1C import), show after the entry's lifetime. So every cached read has a short lifetime chosen for what a stale answer costs, and money, stock, orders and prices in an order are never cached.
-- Memory: each entry lives in the instance; answers larger than 4 MB are not cached.
+- Memory: each entry lives in the instance; answers larger than 16 MB are not cached (raised from 4 MB on 2026-11-18 for the site models state of the whole catalog).
 - A new cached read needs a reason recorded in its spec (cost, callers, how stale it may be), a tag, and the commands that drop it.
 
 ## Sources and checks

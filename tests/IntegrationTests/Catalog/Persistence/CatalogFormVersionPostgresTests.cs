@@ -1,3 +1,4 @@
+using IntegrationTests.Platform.Caching;
 using BuildingBlocks.Domain.Identifiers;
 using Ardalis.Result;
 using BuildingBlocks.Application.Results;
@@ -125,7 +126,7 @@ public sealed class CatalogFormVersionPostgresTests(CatalogPostgresFixture postg
     {
         await using var db = postgres.CreateContext();
         return await new SetSiteModelTextHandler(db, new TestRepository<ProductGroupText>(db),
-                new SiteModelReader(new SiteModelStateReader(db)), TimeProvider.System)
+                new SiteModelReader(new SiteModelStateReader(db, NoReadCache.Instance)), TimeProvider.System)
             .Handle(new SetSiteModelTextCommand(modelId, "uk",
                 new SetSiteModelTextRequest { ShortDescription = description, Version = version }),
                 CancellationToken.None);

@@ -1,3 +1,5 @@
+using BuildingBlocks.Application.Caching;
+using Catalog.Application.Features.SiteModels.Shared.State;
 using Catalog.Contracts.Attributes;
 
 namespace Catalog.Application.Features.ProductAttributes.Commands.RestoreProductAttribute;
@@ -7,4 +9,7 @@ namespace Catalog.Application.Features.ProductAttributes.Commands.RestoreProduct
 /// Positions automation never had disappear; new automatic positions come with the next recognition run.
 /// </summary>
 public sealed record RestoreProductAttributeCommand(int ProductId, int AttributeId)
-    : ICommand<Result<AdminProductAttributesDto>>;
+    : ICommand<Result<AdminProductAttributesDto>>, IInvalidatesReadCache
+{
+    public IReadOnlyCollection<string> InvalidatedCacheTags => [SiteModelStateReader.Tag];
+}
