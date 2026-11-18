@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Sales.Application.Abstractions.Persistence;
 using Sales.Domain.Orders;
@@ -48,7 +49,7 @@ internal sealed class WorkspaceOrderCreator(SalesDbContext db, AdminWorkspacePri
         var lines = new List<OrderLine>(quote.Lines.Count);
         foreach (var line in quote.Lines)
         {
-            var orderLine = OrderLine.Create(line.ProductId, line.ProductName, line.Quantity, line.LineAmount, line.PriceAdjustment);
+            var orderLine = OrderLine.Create(ProductId.FromStorage(int.Parse(line.ProductId, CultureInfo.InvariantCulture)), line.ProductName, line.Quantity, line.LineAmount, line.PriceAdjustment);
             if (orderLine.IsFailure)
                 return orderLine.Error!;
             lines.Add(orderLine.Value);

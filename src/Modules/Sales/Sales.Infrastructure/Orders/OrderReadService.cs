@@ -70,7 +70,7 @@ internal sealed class OrderReadService(SalesDbContext dbContext) : IOrderReadSer
                 order.Lines
                     .OrderBy(line => line.Id)
                     .Select(line => new OrderLineDto(
-                        line.ProductId,
+                        line.ProductId.ToString(),
                         line.ProductName,
                         line.Quantity,
                         line.Amount))

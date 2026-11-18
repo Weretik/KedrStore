@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Sales.Domain.Orders;
 
@@ -8,7 +9,7 @@ public sealed class SalesOrderTests
     [Fact]
     public void Create_CreatesImmutableOrderWithHistoricalLineSnapshot()
     {
-        var line = OrderLine.Create("000123", "Door handle", 10, 1_250m).Value;
+        var line = OrderLine.Create(ProductId.Create(123), "Door handle", 10, 1_250m).Value;
         var order = Order.Create("SO-20260817-0001", "customer-1", "Urgent", [line], DateTimeOffset.UtcNow).Value;
 
         Assert.Equal("SO-20260817-0001", order.OrderNumber);
@@ -28,19 +29,19 @@ public sealed class SalesOrderTests
     }
 
     [Theory]
-    [InlineData("", "Name", 1, 10)]
-    [InlineData("product", "", 1, 10)]
-    [InlineData("product", "Name", 0, 10)]
-    [InlineData("product", "Name", 1, -0.01)]
-    public void CreateLine_RejectsInvalidValues(string productId, string name, int quantity, decimal amount)
+    [InlineData(0, "Name", 1, 10)]
+    [InlineData(1, "", 1, 10)]
+    [InlineData(1, "Name", 0, 10)]
+    [InlineData(1, "Name", 1, -0.01)]
+    public void CreateLine_RejectsInvalidValues(int productId, string name, int quantity, decimal amount)
     {
-        DomainAssert.Fails(OrderLine.Create(productId, name, quantity, amount));
+        DomainAssert.Fails(OrderLine.Create(ProductId.FromStorage(productId), name, quantity, amount));
     }
 
     [Fact]
     public void Create_RejectsOrderNumberLongerThan32Characters()
     {
-        var exception = DomainAssert.Fails(Order.Create(new string('A', 33), "customer-1", null, [OrderLine.Create("p", "Name", 1, 1m).Value], DateTimeOffset.UtcNow));
+        var exception = DomainAssert.Fails(Order.Create(new string('A', 33), "customer-1", null, [OrderLine.Create(ProductId.Create(1), "Name", 1, 1m).Value], DateTimeOffset.UtcNow));
 
         Assert.Equal("sales.order.order_number_too_long", exception.Code);
     }

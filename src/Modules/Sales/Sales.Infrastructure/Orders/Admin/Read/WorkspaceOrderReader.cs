@@ -76,7 +76,7 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         if (row is null) return null;
         var stored = await db.OrderLines.AsNoTracking()
             .Where(x => EF.Property<OrderId>(x, "OrderId") == id)
-            .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId, x.ProductName, x.Quantity, x.Amount, x.PriceAdjustment))
+            .OrderBy(x => x.Id).Select(x => new WorkspaceStoredLine(x.ProductId.ToString(), x.ProductName, x.Quantity, x.Amount, x.PriceAdjustment))
             .ToArrayAsync(ct);
         var oneC = OrderOneCQueries.OneC(row.order.OneCDocumentNumber, row.order.OneCRejection, row.message);
         return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId.Value,

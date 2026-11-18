@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Sales.Domain.Orders;
 
 namespace UnitTests.Sales.Domain;
@@ -10,7 +11,7 @@ public sealed class OrderDraftTests
     public void Create_HasIndependentDraftIdentityAndNoOrderNumber()
     {
         var draft = OrderDraft.Create("  Autumn order ", " Keep for later ", "customer-1",
-            [OrderDraftLine.Create("101", 2)], Now);
+            [OrderDraftLine.Create(ProductId.Create(101), 2)], Now);
 
         Assert.Equal("Autumn order", draft.Title);
         Assert.Equal("Keep for later", draft.Note);
@@ -24,14 +25,14 @@ public sealed class OrderDraftTests
     public void Update_ReplacesLinesAndAdvancesVersion()
     {
         var draft = OrderDraft.Create("First", null, "customer-1",
-            [OrderDraftLine.Create("101", 2)], Now);
+            [OrderDraftLine.Create(ProductId.Create(101), 2)], Now);
         var originalVersion = draft.Version;
 
         draft.Update("Second", "Note", "customer-2",
-            [OrderDraftLine.Create("202", 3)], Now.AddMinutes(1));
+            [OrderDraftLine.Create(ProductId.Create(202), 3)], Now.AddMinutes(1));
 
         Assert.Equal("customer-2", draft.CounterpartyId.Value);
-        Assert.Equal("202", Assert.Single(draft.Lines).ProductId);
+        Assert.Equal(ProductId.Create(202), Assert.Single(draft.Lines).ProductId);
         Assert.NotEqual(originalVersion, draft.Version);
         Assert.Equal(Now.AddMinutes(1), draft.UpdatedAtUtc);
     }
@@ -40,14 +41,14 @@ public sealed class OrderDraftTests
     public void Create_RejectsDuplicateProducts()
     {
         Assert.Throws<ArgumentException>(() => OrderDraft.Create("Name", null, "customer-1",
-            [OrderDraftLine.Create("101", 1), OrderDraftLine.Create("101", 2)], Now));
+            [OrderDraftLine.Create(ProductId.Create(101), 1), OrderDraftLine.Create(ProductId.Create(101), 2)], Now));
     }
 
     [Theory]
-    [InlineData("", 1)]
-    [InlineData("101", 0)]
-    public void CreateLine_RejectsInvalidProductOrQuantity(string productId, int quantity)
+    [InlineData(0, 1)]
+    [InlineData(101, 0)]
+    public void CreateLine_RejectsInvalidProductOrQuantity(int productId, int quantity)
     {
-        Assert.ThrowsAny<ArgumentException>(() => OrderDraftLine.Create(productId, quantity));
+        Assert.ThrowsAny<ArgumentException>(() => OrderDraftLine.Create(ProductId.FromStorage(productId), quantity));
     }
 }

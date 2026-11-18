@@ -34,9 +34,9 @@ public sealed class CounterpartyReconciliationPostgresTests(SalesPostgresFixture
                 Counterparty.Create("stale-cp", UserId.FromStorage(staleUserId), "Stale", "stale@example.com", null, PriceTypeId.FromStorage(1), now).Value,
                 Counterparty.Create("retained-cp", UserId.FromStorage(retainedUserId), "Retained", "retained@example.com", null, PriceTypeId.FromStorage(1), now).Value);
             db.Orders.Add(Order.Create("P" + Guid.NewGuid().ToString("N")[..20], "stale-cp", null,
-                [OrderLine.Create("101", "Door", 1, 25m).Value], now).Value);
+                [OrderLine.Create(ProductId.Create(101), "Door", 1, 25m).Value], now).Value);
             db.OrderDrafts.Add(OrderDraft.Create("Draft", null, "stale-cp",
-                [OrderDraftLine.Create("101", 1)], now));
+                [OrderDraftLine.Create(ProductId.Create(101), 1)], now));
             return await db.SaveChangesAsync();
         });
         sales.Identity.FailuresLeft = 1;

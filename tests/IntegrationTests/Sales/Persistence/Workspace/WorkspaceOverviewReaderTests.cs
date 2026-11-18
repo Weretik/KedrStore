@@ -40,7 +40,7 @@ public sealed class WorkspaceOverviewReaderTests
         var accepted = AddOrder(db, TodayFrom.AddHours(1), "2");
         Assert.True(accepted.AcceptByOneC("DOC-2", TodayFrom.AddHours(2)).IsSuccess);
         AddOrder(db, TodayFrom.AddHours(3), "3");
-        db.OrderDrafts.Add(OrderDraft.Create("Чернетка", null, "cp-1", [OrderDraftLine.Create("p-1", 1)], TodayFrom));
+        db.OrderDrafts.Add(OrderDraft.Create("Чернетка", null, "cp-1", [OrderDraftLine.Create(ProductId.Create(1), 1)], TodayFrom));
         await db.SaveChangesAsync();
 
         var overview = await scope.ServiceProvider.GetRequiredService<IWorkspaceOverviewReader>()
@@ -60,7 +60,7 @@ public sealed class WorkspaceOverviewReaderTests
     private static Order AddOrder(SalesDbContext db, DateTimeOffset createdAt, string suffix)
     {
         var order = Order.Create($"SO-{suffix}", "cp-1", null,
-            [OrderLine.Create("p-1", "Ручка", 1, 10m).Value], createdAt).Value;
+            [OrderLine.Create(ProductId.Create(1), "Ручка", 1, 10m).Value], createdAt).Value;
         db.Orders.Add(order);
         return order;
     }

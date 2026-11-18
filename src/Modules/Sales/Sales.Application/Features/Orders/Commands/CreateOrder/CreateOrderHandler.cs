@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -42,7 +43,10 @@ public sealed class CreateOrderHandler(
         var lines = new List<OrderLine>(command.Request.Lines.Count);
         foreach (var line in command.Request.Lines)
         {
-            var created = OrderLine.Create(line.ProductId, products[line.ProductId].Name, line.Quantity, line.Amount);
+            if (!products.TryGetValue(line.ProductId, out var product))
+                return Result.Invalid(new ValidationError("lines", "Деяких товарів немає в каталозі."));
+            var productId = ProductId.FromStorage(int.Parse(product.ProductId, CultureInfo.InvariantCulture));
+            var created = OrderLine.Create(productId, product.Name, line.Quantity, line.Amount);
             if (created.IsFailure)
                 return created.Error!.ToResult<CreateOrderResult>();
             lines.Add(created.Value);
