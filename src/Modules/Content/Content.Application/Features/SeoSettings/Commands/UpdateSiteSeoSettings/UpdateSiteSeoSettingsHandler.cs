@@ -26,7 +26,7 @@ public sealed class UpdateSiteSeoSettingsHandler(
             return RowVersions.Changed<SiteSeoSettingsDetails>();
 
         if (command.Input.ShareImageMediaFileId is { } imageId
-            && imageId != settings.ShareImageMediaFileId
+            && imageId != settings.ShareImageMediaFileId?.Value
             && !(await images.GetImagesAsync([imageId], cancellationToken)).ContainsKey(imageId))
         {
             return Result.Invalid(new ValidationError("shareImageMediaFileId",

@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
 using Catalog.Domain.PriceTypes;
@@ -55,8 +56,8 @@ public sealed class ProductImportSoftDeleteTests
         await using var db = CreateContext();
         Seed(db, productCount: 2);
         var linked = await db.Products.SingleAsync(product => product.Id == ProductId.From(1));
-        linked.SetMedia([new ProductMediaFile(10, "https://images-kedr.cdn.express/products/1.jpg")],
-            new ProductMediaFile(11, "https://images-kedr.cdn.express/product-scheme/s1.jpg"), DateTimeOffset.UtcNow);
+        linked.SetMedia([new ProductMediaFile(MediaFileId.FromStorage(10), "https://images-kedr.cdn.express/products/1.jpg")],
+            new ProductMediaFile(MediaFileId.FromStorage(11), "https://images-kedr.cdn.express/product-scheme/s1.jpg"), DateTimeOffset.UtcNow);
         await db.SaveChangesAsync();
         var oneC = new FakeOneC { Products = [Row(1, "Замки", "Нова назва"), Row(2, "Замки"), Row(100, "Замки")] };
 

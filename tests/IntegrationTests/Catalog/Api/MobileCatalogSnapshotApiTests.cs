@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -139,8 +140,8 @@ public sealed class MobileCatalogSnapshotApiTests
 
         var lockProduct = AddProduct(db, 20, 2, stock: 5);
         lockProduct.SetMedia(
-            [new ProductMediaFile(1, "https://cdn/20-a.webp"), new ProductMediaFile(2, "https://cdn/20-b.webp")],
-            new ProductMediaFile(3, "https://cdn/20-scheme.webp"), Now);
+            [new ProductMediaFile(MediaFileId.FromStorage(1), "https://cdn/20-a.webp"), new ProductMediaFile(MediaFileId.FromStorage(2), "https://cdn/20-b.webp")],
+            new ProductMediaFile(MediaFileId.FromStorage(3), "https://cdn/20-scheme.webp"), Now);
         lockProduct.SetTranslation("uk", "Замок український", Now);
         lockProduct.SetTranslation("ru", "Замок русский", Now);
         AddPrice(db, 20, 12, 150m);

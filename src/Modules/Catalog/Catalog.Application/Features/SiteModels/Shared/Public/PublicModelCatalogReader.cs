@@ -165,13 +165,13 @@ public sealed class PublicModelCatalogReader(
                 value.SwatchMediaFileId
             })
             .ToListAsync(cancellationToken);
-        var mediaIds = rows.Select(row => row.SwatchMediaFileId).OfType<long>().Distinct().ToList();
+        var mediaIds = rows.Select(row => row.SwatchMediaFileId).OfType<MediaFileId>().Select(id => id.Value).Distinct().ToList();
         var textures = mediaIds.Count == 0
             ? new Dictionary<long, string>()
             : (await media.GetByIdsAsync(mediaIds, cancellationToken)).ToDictionary(file => file.Id, file => file.Url);
 
         return rows.ToDictionary(row => row.Id, row => new PublicValueFacts(row.Id, row.AttributeId, row.Slug,
             row.NameUk, row.NameRu, row.SortOrder, row.SwatchHex,
-            row.SwatchMediaFileId is { } mediaId ? textures.GetValueOrDefault(mediaId) : null));
+            row.SwatchMediaFileId is { } mediaId ? textures.GetValueOrDefault(mediaId.Value) : null));
     }
 }

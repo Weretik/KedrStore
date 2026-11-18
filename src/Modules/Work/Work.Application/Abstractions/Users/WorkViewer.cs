@@ -6,6 +6,6 @@ namespace Work.Application.Abstractions.Users;
 public static class WorkViewer
 {
     /// <summary>The user ID from the session, or <c>null</c> when it is missing or not a Guid.</summary>
-    public static Guid? UserId(ICurrentUserService user) =>
-        Guid.TryParse(user.UserId, out var id) && id != Guid.Empty ? id : null;
+    public static UserId? UserId(ICurrentUserService user) =>
+        Guid.TryParse(user.UserId, out var id) && id != Guid.Empty ? BuildingBlocks.Domain.Identifiers.UserId.Create(id) : null;
 }

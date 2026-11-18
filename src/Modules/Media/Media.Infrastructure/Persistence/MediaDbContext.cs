@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Persistence;
 namespace Media.Infrastructure.Persistence;
 
 /// <summary>The media library in its own PostgreSQL schema with its own migration history.</summary>
@@ -9,6 +10,9 @@ public sealed class MediaDbContext(DbContextOptions<MediaDbContext> options)
 
     public DbSet<MediaFolder> MediaFolders => Set<MediaFolder>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
+        configurationBuilder.AddKernelIds();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

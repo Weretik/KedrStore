@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -157,7 +158,7 @@ public sealed class SalesOrderReadModelTests(SalesPostgresFixture postgres)
         await using var db = postgres.CreateContext();
         var counterparty = Counterparty.Create(
             counterpartyId,
-            Guid.NewGuid(),
+            UserId.FromStorage(Guid.NewGuid()),
             counterpartyName,
             $"{counterpartyId}@example.com",
             "+380000000000",

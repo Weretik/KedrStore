@@ -10,3 +10,4 @@ global using Work.Domain.Activity;
 global using Work.Domain.Tasks;
 global using Work.Infrastructure.Persistence;
 global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Domain.Identifiers;

@@ -94,7 +94,7 @@ public sealed class ProductMediaApiTests
 
         Assert.Equal(HttpStatusCode.NoContent, (await admin.DeleteAsync($"/api/admin/media/files/{b.Id}")).StatusCode);
         var product = await ReloadAsync(catalog);
-        Assert.Equal([a.Id], product.Photos.Select(link => link.MediaFileId));
+        Assert.Equal([a.Id], product.Photos.Select(link => link.MediaFileId.Value));
         Assert.Equal(a.Url, product.Photo);
     }
 

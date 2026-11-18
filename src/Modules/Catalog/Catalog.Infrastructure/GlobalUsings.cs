@@ -30,3 +30,4 @@ global using Ardalis.Specification;
 global using Ardalis.Specification.EntityFrameworkCore;
 global using Mediator;
 global using BuildingBlocks.Domain.Results;
+global using BuildingBlocks.Domain.Identifiers;

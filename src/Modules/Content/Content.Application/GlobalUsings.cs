@@ -16,3 +16,4 @@ global using Content.Domain.Wholesale;
 global using BuildingBlocks.Domain.Abstractions;
 global using BuildingBlocks.Domain.Results;
 global using BuildingBlocks.Application.Results;
+global using BuildingBlocks.Domain.Identifiers;

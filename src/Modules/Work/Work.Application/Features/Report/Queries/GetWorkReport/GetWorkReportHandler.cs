@@ -11,7 +11,7 @@ public sealed class GetWorkReportHandler(IReadWorkDbContext db, ICurrentUserServ
 
     public async ValueTask<Result<WorkReportDto>> Handle(GetWorkReportQuery query, CancellationToken cancellationToken)
     {
-        var userId = query.UserId ?? WorkViewer.UserId(user);
+        var userId = (query.UserId is { } requested ? UserId.FromStorage(requested) : (UserId?)null) ?? WorkViewer.UserId(user);
         if (userId is not { } owner)
             return Result<WorkReportDto>.Unauthorized();
 
@@ -35,7 +35,7 @@ public sealed class GetWorkReportHandler(IReadWorkDbContext db, ICurrentUserServ
 
         var today = WorkCalendar.Today(clock);
         return Result.Success(new WorkReportDto(
-            owner,
+            owner.Value,
             query.From,
             query.To,
             done.Select(task => WorkTaskDto.From(task, today)).ToList(),

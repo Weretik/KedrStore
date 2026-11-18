@@ -25,10 +25,10 @@ public sealed partial class LinkProductMediaJob(
         var now = clock.GetUtcNow();
         var changed = new HashSet<ProductId>();
 
-        var linkedIds = all.SelectMany(product => product.MediaLinks).Select(link => link.MediaFileId)
+        var linkedIds = all.SelectMany(product => product.MediaLinks).Select(link => link.MediaFileId.Value)
             .Distinct().ToArray();
         var currentUrls = (await library.GetByIdsAsync(linkedIds, cancellationToken))
-            .ToDictionary(file => file.Id, file => file.Url);
+            .ToDictionary(file => MediaFileId.FromStorage(file.Id), file => file.Url);
 
         var dropped = 0;
         foreach (var product in all)
@@ -45,14 +45,14 @@ public sealed partial class LinkProductMediaJob(
         foreach (var product in all.Where(product => !product.IsDeleted))
         {
             if (photos.TryGetValue(product.Id.Value, out var photo) &&
-                product.LinkPhotoIfNone(new ProductMediaFile(photo.Id, photo.Url), now))
+                product.LinkPhotoIfNone(new ProductMediaFile(MediaFileId.FromStorage(photo.Id), photo.Url), now))
             {
                 photosLinked++;
                 changed.Add(product.Id);
             }
 
             if (schemes.TryGetValue(product.Id.Value, out var scheme) &&
-                product.LinkSchemeIfNone(new ProductMediaFile(scheme.Id, scheme.Url), now))
+                product.LinkSchemeIfNone(new ProductMediaFile(MediaFileId.FromStorage(scheme.Id), scheme.Url), now))
             {
                 schemesLinked++;
                 changed.Add(product.Id);

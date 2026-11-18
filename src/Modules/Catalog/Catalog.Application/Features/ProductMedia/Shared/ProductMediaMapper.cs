@@ -13,7 +13,7 @@ internal static class ProductMediaMapper
     {
         var names = files.ToDictionary(file => file.Id, file => file.FileName);
         ProductMediaItemDto ToItem(ProductMediaLink link)
-            => new(link.MediaFileId, link.Url, names.GetValueOrDefault(link.MediaFileId) ?? string.Empty);
+            => new(link.MediaFileId.Value, link.Url, names.GetValueOrDefault(link.MediaFileId.Value) ?? string.Empty);
 
         return new ProductMediaDto(
             product.Id.Value,

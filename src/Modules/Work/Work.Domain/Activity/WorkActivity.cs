@@ -15,7 +15,7 @@ public sealed class WorkActivity : IAggregateRoot
     public static readonly TimeSpan MergeWindow = TimeSpan.FromMinutes(10);
 
     public WorkActivityId Id { get; private set; }
-    public Guid UserId { get; private set; }
+    public UserId UserId { get; private set; }
     public string UserEmail { get; private set; } = string.Empty;
     public string Area { get; private set; } = null!;
     public string Operation { get; private set; } = null!;
@@ -27,10 +27,10 @@ public sealed class WorkActivity : IAggregateRoot
 
     private WorkActivity() { }
 
-    public static DomainResult<WorkActivity> Record(Guid userId, string? userEmail, string area, string operation,
+    public static DomainResult<WorkActivity> Record(UserId userId, string? userEmail, string area, string operation,
         string method, string? target, DateTimeOffset now)
     {
-        if (userId == Guid.Empty)
+        if (userId.Value == Guid.Empty)
             return WorkErrors.UserRequired();
         if (string.IsNullOrWhiteSpace(area))
             return WorkErrors.Required(nameof(Area));

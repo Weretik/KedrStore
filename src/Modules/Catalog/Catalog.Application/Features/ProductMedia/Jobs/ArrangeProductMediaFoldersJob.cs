@@ -53,7 +53,7 @@ public sealed class ArrangeProductMediaFoldersJob(
                 .Where(link => link.Kind == kind && known.Contains(link.CategoryId))
                 .GroupBy(link => link.MediaFileId)
                 .Select(group => group.MinBy(link => link.ProductId)!)
-                .Select(link => new ProductMediaFolderPlacement(link.MediaFileId, link.CategoryId))
+                .Select(link => new ProductMediaFolderPlacement(link.MediaFileId.Value, link.CategoryId))
                 .ToArray();
             return library.ArrangeFoldersAsync(directory, nodes, placements, dryRun, cancellationToken);
         }

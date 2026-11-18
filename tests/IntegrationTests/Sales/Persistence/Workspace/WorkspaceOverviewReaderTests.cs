@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +33,7 @@ public sealed class WorkspaceOverviewReaderTests
         await using var scope = provider.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<SalesDbContext>();
 
-        db.Counterparties.Add(Counterparty.Create("cp-1", Guid.NewGuid(), "Клієнт", "cp-1@example.com", null, 1,
+        db.Counterparties.Add(Counterparty.Create("cp-1", UserId.FromStorage(Guid.NewGuid()), "Клієнт", "cp-1@example.com", null, 1,
             TodayFrom.AddDays(-1)).Value);
         var yesterday = AddOrder(db, TodayFrom.AddHours(-3), "1");
         yesterday.RejectByOneC("Counterparty not found", TodayFrom.AddHours(-2));

@@ -30,10 +30,12 @@ public sealed class UpdateCompanyRequisitesHandler(
         if (changes.Count == 0)
             return Result.Success(CompanyRequisitesMapper.ToDetails(requisites));
 
+        if (!Guid.TryParse(currentUser.UserId, out var editorId) || editorId == Guid.Empty)
+            return Result.Unauthorized();
         var userName = ContentEditor.Name(currentUser);
         // One SaveChanges writes the new values and their log entry together.
         await changesRepository.AddAsync(
-            CompanyRequisitesChange.Record(changes, now, currentUser.UserId, userName), cancellationToken);
+            CompanyRequisitesChange.Record(changes, now, UserId.Create(editorId), userName), cancellationToken);
         await changesRepository.SaveChangesAsync(cancellationToken);
         return Result.Success(CompanyRequisitesMapper.ToDetails(requisites));
     }

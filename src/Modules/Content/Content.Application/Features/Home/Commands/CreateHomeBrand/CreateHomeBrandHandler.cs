@@ -16,7 +16,7 @@ public sealed class CreateHomeBrandHandler(
             return Result.Invalid(invalid);
 
         var position = await HomeAdminBlocks.NextBrandPositionAsync(db, cancellationToken);
-        var brand = HomeBrand.Create(command.Brand.Name ?? string.Empty, command.Brand.LogoMediaFileId, position,
+        var brand = HomeBrand.Create(command.Brand.Name ?? string.Empty, MediaFileId.FromStorage(command.Brand.LogoMediaFileId), position,
             clock.GetUtcNow());
         if (brand.IsFailure)
             return brand.Error!.ToResult<AdminHomeBlocks>();

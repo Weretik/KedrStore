@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Work.Domain.Tasks;
 
@@ -5,7 +6,7 @@ namespace UnitTests.Work;
 
 public sealed class WorkTaskTests
 {
-    private static readonly Guid Owner = Guid.NewGuid();
+    private static readonly UserId Owner = UserId.Create(Guid.NewGuid());
     private static readonly DateTimeOffset Now = new(2026, 11, 6, 10, 0, 0, TimeSpan.Zero);
 
     [Fact]
@@ -23,7 +24,7 @@ public sealed class WorkTaskTests
     public void Create_Rejects_Empty_Title_And_Missing_Owner()
     {
         DomainAssert.Fails(WorkTask.Create(Owner, Owner, "   ", null, null, null, Now));
-        DomainAssert.Fails(WorkTask.Create(Guid.Empty, Owner, "Задача", null, null, null, Now));
+        DomainAssert.Fails(WorkTask.Create(UserId.FromStorage(Guid.Empty), Owner, "Задача", null, null, null, Now));
         DomainAssert.Fails(WorkTask.Create(Owner, Owner, new string('a', WorkTask.TitleMaxLength + 1), null, null, null, Now));
     }
 
@@ -50,7 +51,7 @@ public sealed class WorkTaskTests
     [Fact]
     public void ChangeStatus_Done_To_Done_Keeps_Completion_Time()
     {
-        var task = WorkTask.Create(Owner, Guid.NewGuid(), "Від адміністратора", null, null, null, Now).Value;
+        var task = WorkTask.Create(Owner, UserId.Create(Guid.NewGuid()), "Від адміністратора", null, null, null, Now).Value;
         task.ChangeStatus(WorkTaskStatus.Done, "Готово", Now.AddHours(1));
         task.ChangeStatus(WorkTaskStatus.Done, "Уточнено", Now.AddHours(2));
 

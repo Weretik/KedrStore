@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Work.Api.Endpoints.Activity;
@@ -7,10 +8,10 @@ namespace UnitTests.Work;
 
 public sealed class WorkActivityTests
 {
-    private static readonly Guid User = Guid.NewGuid();
+    private static readonly UserId User = UserId.Create(Guid.NewGuid());
     private static readonly DateTimeOffset Now = new(2026, 11, 6, 10, 0, 0, TimeSpan.Zero);
 
-    private static WorkActivity Entry(DateTimeOffset at, string target = "id=12, lang=uk", Guid? user = null) =>
+    private static WorkActivity Entry(DateTimeOffset at, string target = "id=12, lang=uk", UserId? user = null) =>
         WorkActivity.Record(user ?? User, "seo@kedr.ua", "Categories", "UpdateContent", "put", target, at).Value;
 
     [Fact]
@@ -34,7 +35,7 @@ public sealed class WorkActivityTests
 
         Assert.False(first.CanMerge(Entry(Now.AddMinutes(11))));
         Assert.False(first.CanMerge(Entry(Now.AddMinutes(1), "id=13, lang=uk")));
-        Assert.False(first.CanMerge(Entry(Now.AddMinutes(1), user: Guid.NewGuid())));
+        Assert.False(first.CanMerge(Entry(Now.AddMinutes(1), user: UserId.Create(Guid.NewGuid()))));
     }
 
     [Fact]

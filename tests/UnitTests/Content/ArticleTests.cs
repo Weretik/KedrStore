@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using UnitTests.BuildingBlocks.Results;
 using Content.Application.Features.Articles.Commands.CreateArticle;
 using Content.Application.Features.Articles.Commands.UpdateArticle;
@@ -55,10 +56,10 @@ public sealed class ArticleTests
         var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;
         Assert.Null(article.CoverMediaFileId);
 
-        article.SetCover(42, Now, Editor);
-        Assert.Equal(42, article.CoverMediaFileId);
+        article.SetCover(MediaFileId.FromStorage(42), Now, Editor);
+        Assert.Equal(42, article.CoverMediaFileId?.Value);
         Assert.Null(article.CoverVersion);
-        DomainAssert.Fails(article.SetCover(0, Now, Editor));
+        DomainAssert.Fails(article.SetCover(MediaFileId.FromStorage(0), Now, Editor));
 
         article.RemoveCover(Now, "");
         Assert.Null(article.CoverMediaFileId);
@@ -69,9 +70,9 @@ public sealed class ArticleTests
     public void Cover_SameFileAgainChangesNothing()
     {
         var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;
-        article.SetCover(42, Now, Editor);
+        article.SetCover(MediaFileId.FromStorage(42), Now, Editor);
 
-        article.SetCover(42, Now.AddDays(1), "other@classkedr.com.ua");
+        article.SetCover(MediaFileId.FromStorage(42), Now.AddDays(1), "other@classkedr.com.ua");
 
         Assert.Equal(Now, article.UpdatedAt);
         Assert.Equal(Editor, article.UpdatedBy);

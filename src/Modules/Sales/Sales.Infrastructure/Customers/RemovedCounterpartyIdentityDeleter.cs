@@ -17,7 +17,7 @@ internal sealed class RemovedCounterpartyIdentityDeleter(
         CancellationToken cancellationToken)
     {
         if (await db.Counterparties.IgnoreQueryFilters().AsNoTracking()
-                .AnyAsync(customer => customer.IdentityUserId == message.IdentityUserId, cancellationToken))
+                .AnyAsync(customer => customer.IdentityUserId == UserId.FromStorage(message.IdentityUserId), cancellationToken))
             return OutboxHandlingResult.Delivered;
 
         var deleted = await identity.DeleteUserAsync(message.IdentityUserId, message.CounterpartyId, cancellationToken);

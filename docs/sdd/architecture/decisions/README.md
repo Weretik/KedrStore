@@ -25,6 +25,7 @@ For a new ADR, create a separate file with a unique number and short name. Inclu
 | [0013](0013-openapi-generated-from-code.md) | The OpenAPI contract is generated from the code at build | accepted |
 | [0014](0014-opentelemetry-traces-to-cloud-trace.md) | Requests are traced with OpenTelemetry straight to Google Cloud Trace; logs are Cloud Logging JSON with the trace id | accepted |
 | [0015](0015-product-list-read-table.md) | The product lists read from one denormalized read table (CQRS level 2), rebuilt after every change of its sources | accepted |
+| [0017](0017-shared-kernel-ids-across-modules.md) | Ids that other modules store live in the shared kernel (`BuildingBlocks.Domain/Identifiers/`) | accepted |
 
 Frontend decisions live in kedr-web: [workspace ADRs](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/adr/README.md), [Next.js public site](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/site/adr/0001-nextjs-public-site.md) and [offline-first mobile app](https://github.com/Weretik/kedr-web/blob/main/docs/architecture/mobile/adr/0005-offline-first-local-database.md). The whole system is drawn in the [C4 diagrams](../c4/README.md).
 
@@ -35,7 +36,7 @@ Every backend keeps an accepted ADR for each area below. A full architecture aud
 | Area | ADR here |
 | --- | --- |
 | Architecture style and module boundaries, data ownership (schema per module) | 0001, 0004 |
-| Communication between modules | 0004 |
+| Communication between modules | 0004, 0017 |
 | Use-case shape (CQRS, mediator, endpoints) | 0005, 0015 (read table for product lists) |
 | Errors and validation | 0006 |
 | Authentication and authorization | 0007 |

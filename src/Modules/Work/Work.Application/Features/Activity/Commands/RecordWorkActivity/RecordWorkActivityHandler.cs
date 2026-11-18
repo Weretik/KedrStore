@@ -6,7 +6,7 @@ public sealed class RecordWorkActivityHandler(
 {
     public async ValueTask<Result> Handle(RecordWorkActivityCommand command, CancellationToken cancellationToken)
     {
-        var recorded = WorkActivity.Record(command.UserId, command.UserEmail, command.Area, command.Operation,
+        var recorded = WorkActivity.Record(UserId.FromStorage(command.UserId), command.UserEmail, command.Area, command.Operation,
             command.Method, command.Target, clock.GetUtcNow());
         if (recorded.IsFailure)
             return recorded.Error!.ToResult();

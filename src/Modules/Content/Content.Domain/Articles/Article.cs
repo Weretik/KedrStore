@@ -26,7 +26,7 @@ public sealed partial class Article : IAggregateRoot
     public int? CoverVersion { get; private set; }
 
     /// <summary>The cover picture in the media library (CDN folder <c>articles</c>); <c>null</c> without one.</summary>
-    public long? CoverMediaFileId { get; private set; }
+    public MediaFileId? CoverMediaFileId { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -82,9 +82,9 @@ public sealed partial class Article : IAggregateRoot
     public ArticleTranslation Text(string language) => _translations.Single(t => t.Language == language);
 
     /// <summary>Uses a media-library picture as the cover; a legacy cover stops being used.</summary>
-    public DomainResult SetCover(long mediaFileId, DateTimeOffset now, string editor)
+    public DomainResult SetCover(MediaFileId mediaFileId, DateTimeOffset now, string editor)
     {
-        if (mediaFileId <= 0)
+        if (mediaFileId.Value <= 0)
             return ArticleErrors.CoverInvalid();
         if (CoverMediaFileId == mediaFileId && CoverVersion is null)
             return DomainResult.Success();

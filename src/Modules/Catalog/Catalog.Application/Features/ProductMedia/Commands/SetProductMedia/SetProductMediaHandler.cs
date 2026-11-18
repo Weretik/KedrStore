@@ -35,7 +35,7 @@ public sealed class SetProductMediaHandler(
                 "Catalog.Product.Media.FileNotFound", ValidationSeverity.Error));
         }
 
-        ProductMediaFile ToFile(long id) => new(id, files[id].Url);
+        ProductMediaFile ToFile(long id) => new(MediaFileId.FromStorage(id), files[id].Url);
         var changed = product.SetMedia(
             request.PhotoIds.Select(ToFile).ToArray(),
             request.SchemeId is { } scheme ? ToFile(scheme) : null,

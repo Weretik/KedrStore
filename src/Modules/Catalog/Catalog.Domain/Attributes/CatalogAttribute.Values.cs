@@ -33,7 +33,7 @@ public partial class CatalogAttribute
 
     /// <summary>A person adds a value in «Властивості»; it is manual from the start.</summary>
     public DomainResult<AttributeValue> AddManualValue(string code, string nameUk, string? nameRu, string slug,
-        int sortOrder, string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
+        int sortOrder, string? swatchHex, MediaFileId? swatchMediaFileId, DateTimeOffset now)
     {
         if (CheckNewValue(code, slug) is { } taken)
             return taken;
@@ -46,7 +46,7 @@ public partial class CatalogAttribute
 
     /// <summary>A person edits a value; the dictionary import no longer changes it.</summary>
     public DomainResult EditValue(AttributeValueId valueId, string nameUk, string? nameRu, int sortOrder,
-        string? swatchHex, long? swatchMediaFileId, DateTimeOffset now)
+        string? swatchHex, MediaFileId? swatchMediaFileId, DateTimeOffset now)
     {
         var value = _values.FirstOrDefault(item => item.Id == valueId);
         return value is null

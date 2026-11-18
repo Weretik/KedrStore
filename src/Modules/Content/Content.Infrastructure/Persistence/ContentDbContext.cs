@@ -1,3 +1,4 @@
+using BuildingBlocks.Infrastructure.Persistence;
 namespace Content.Infrastructure.Persistence;
 
 /// <summary>Site content (articles, company contacts and requisites, legal documents, gallery, home page FAQ and brands, the page «Співпраця», page search texts, site SEO codes) in its own PostgreSQL schema with its own migration history.</summary>
@@ -19,6 +20,9 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options)
     public DbSet<WholesalePage> WholesalePages => Set<WholesalePage>();
     public DbSet<PageSeo> PageSeo => Set<PageSeo>();
     public DbSet<SiteSeoSettings> SiteSeoSettings => Set<SiteSeoSettings>();
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder) =>
+        configurationBuilder.AddKernelIds();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

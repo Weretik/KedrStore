@@ -19,7 +19,7 @@ internal sealed class DefaultPricePolicyProvider(
     {
         var counterparty = await salesDbContext.Counterparties
             .AsNoTracking()
-            .Where(x => x.IdentityUserId == identityUserId)
+            .Where(x => x.IdentityUserId == UserId.FromStorage(identityUserId))
             .Select(x => new
             {
                 x.Id,

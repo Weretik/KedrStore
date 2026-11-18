@@ -14,3 +14,4 @@ global using Sales.Domain.Customers;
 global using BuildingBlocks.Domain.Results;
 global using BuildingBlocks.Application.Results;
 global using Sales.Application.Abstractions.Orders.Sync;
+global using BuildingBlocks.Domain.Identifiers;

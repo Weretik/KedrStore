@@ -1,3 +1,4 @@
+using BuildingBlocks.Domain.Identifiers;
 using IntegrationTests.TestSupport.Database;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -126,7 +127,7 @@ public sealed class OrderDraftPostgresTests(SalesPostgresFixture postgres)
         await db.Orders.ExecuteDeleteAsync();
         await db.CounterpartyCategoryPriceTypes.ExecuteDeleteAsync();
         await db.Counterparties.IgnoreQueryFilters().ExecuteDeleteAsync();
-        db.Counterparties.Add(Counterparty.Create(CounterpartyId, Guid.NewGuid(), "Draft customer",
+        db.Counterparties.Add(Counterparty.Create(CounterpartyId, UserId.FromStorage(Guid.NewGuid()), "Draft customer",
             "draft@example.com", null, 1, DateTimeOffset.UtcNow).Value);
         await db.SaveChangesAsync();
     }
