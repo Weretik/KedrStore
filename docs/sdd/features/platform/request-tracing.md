@@ -8,7 +8,7 @@ In production every API request becomes a trace in Google Cloud Trace (server sp
 
 - [ObservabilityRegistrationExtensions](../../../../src/BuildingBlocks/BuildingBlocks.Observability/ObservabilityRegistrationExtensions.cs) — `builder.AddObservability()` in [Program.cs](../../../../src/Bootstrapper/Host.Api/Program.cs): Serilog from the `Serilog` section, console sink (JSON or text), then tracing.
 - [CloudTracing](../../../../src/BuildingBlocks/BuildingBlocks.Observability/CloudTracing.cs) — OpenTelemetry resource (`service.name`, `gcp.project_id`), ratio sampler by trace id, ASP.NET Core (no `/health`), HttpClient and Npgsql instrumentation, OTLP/HTTP exporter to `telemetry.googleapis.com`.
-- [GoogleCloudAuthHandler](../../../../src/BuildingBlocks/BuildingBlocks.Observability/GoogleCloudAuthHandler.cs) — bearer token of the Cloud Run runtime account for the exporter.
+- [GoogleCloudAuthHandler](../../../../src/BuildingBlocks/BuildingBlocks.Observability/GoogleCloudAuthHandler.cs) — bearer token of the Cloud Run runtime account for the exporter; on Cloud Run the metadata server's credential is built directly, because the Application Default Credentials ping runs on the throttled export thread and caches a miss for the whole process.
 - [CloudLoggingJsonFormatter](../../../../src/BuildingBlocks/BuildingBlocks.Observability/CloudLoggingJsonFormatter.cs) — `severity`, `message`, `time`, `logging.googleapis.com/trace`, `logging.googleapis.com/spanId`, `logger`, properties, `stack_trace`.
 - Settings: `Observability` in [appsettings.json](../../../../src/Bootstrapper/Host.Api/appsettings.json) (`ServiceName` `kedr-api`, `TraceSampleRatio`), project id in [appsettings.Production.json](../../../../src/Bootstrapper/Host.Api/appsettings.Production.json).
 

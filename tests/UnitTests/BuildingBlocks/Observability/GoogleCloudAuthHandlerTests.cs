@@ -29,6 +29,23 @@ public sealed class GoogleCloudAuthHandlerTests
         Assert.Equal("token-2", inner.Authorization?.Parameter);
     }
 
+    [Theory]
+    [InlineData("K_SERVICE", "kedr-api")]
+    [InlineData("CLOUD_RUN_JOB", "kedr-jobs")]
+    public async Task OnCloudRun_TheCredentialIsTheMetadataServers_WithoutTheCachedPing(string variable, string value)
+    {
+        var credential = await GoogleCloudAuthHandler.RuntimeCredentialAsync(name => name == variable ? value : null);
+
+        Assert.IsType<Google.Apis.Auth.OAuth2.ComputeCredential>(credential.UnderlyingCredential);
+    }
+
+    [Fact]
+    public void OutsideCloudRun_ApplicationDefaultCredentialsAreUsed()
+    {
+        Assert.False(GoogleCloudAuthHandler.IsCloudRun(_ => null));
+        Assert.False(GoogleCloudAuthHandler.IsCloudRun(_ => " "));
+    }
+
     private sealed class RecordingHandler : HttpMessageHandler
     {
         public System.Net.Http.Headers.AuthenticationHeaderValue? Authorization { get; private set; }

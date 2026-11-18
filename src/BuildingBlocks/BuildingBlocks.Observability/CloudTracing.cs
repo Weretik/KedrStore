@@ -43,7 +43,7 @@ public static class CloudTracing
                     exporter.Endpoint = TelemetryApiTraces;
                     exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
                     exporter.HttpClientFactory = () => new HttpClient(
-                        GoogleCloudAuthHandler.FromApplicationDefaultCredentials()
+                        GoogleCloudAuthHandler.FromRuntimeCredentials()
                             .WithInner(new SocketsHttpHandler()));
                 }));
     }
