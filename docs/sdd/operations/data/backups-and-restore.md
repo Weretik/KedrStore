@@ -6,7 +6,7 @@ The production PostgreSQL database of Kedr is a managed database on the adm.tool
 | --- | --- |
 | Who takes backups | The hosting, automatically (confirmed by the owner, 2026-11-17) |
 | Where they are | adm.tools control panel → the database → «Резервні копії» |
-| How often and how long they are kept | Set by the hosting plan; check the panel. The [quality targets](../../architecture/overview/quality-targets.md) assume at least one backup a day |
+| How often and how long they are kept | Once a day, kept for 2 months (read in the panel by the owner, 2026-11-19). This meets the RPO of the [quality targets](../../architecture/overview/quality-targets.md) |
 | Who can restore | The owner, from the control panel |
 
 ## Before a risky operation
