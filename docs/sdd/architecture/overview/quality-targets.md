@@ -56,7 +56,7 @@ The catalogue tasks are off by default in the code; a target counts only once it
 
 | Target | Value | Status | Current | Measured by |
 | --- | --- | --- | --- | --- |
-| Data loss (RPO) | At most 24 hours of data, the age of the latest hosting backup | confirmed | Backup frequency and retention not yet read from the panel | [Backups and restore](../../operations/data/backups-and-restore.md) |
+| Data loss (RPO) | At most 24 hours of data, the age of the latest hosting backup | confirmed | Met by design: a backup every day, kept 2 months (owner, 2026-11-19); the age of the latest backup is not alerted | [Backups and restore](../../operations/data/backups-and-restore.md) |
 | Recovery time (RTO) | Service back within 4 hours after the database is lost | confirmed | Never timed: no restore drill yet | Restore procedure in the same document |
 
 ## Cost
@@ -72,7 +72,7 @@ Found on 2026-11-19. Each is open until the target has a current value and an al
 1. **No baseline.** No row has a measured current value, so nobody can say today whether a target is met.
 2. **Alerts are named, not verified.** «API 5xx», «Job failed», the P95 alert and the uptime check are named here and in [dependency failures](../../operations/diagnostics/dependency-failures.md), but no list of the real alert policies is kept, and the read-only account `claude-readonly` (Logs Viewer, Cloud Trace User) cannot list them or read Cloud Monitoring metrics.
 3. **No dashboard** shows P95, P99 and the error share against these targets.
-4. **Backups unverified.** The backup frequency and retention are not recorded and a restore was never timed, so RPO and RTO are assumptions.
+4. **Restore never tried.** Backups run daily and are kept 2 months (owner, 2026-11-19), but a restore was never timed, so RTO is an assumption.
 5. **No budget alert** and no monthly cost figure.
 6. **Core Web Vitals and app crashes** of the public site and the manager app were never checked against a target.
 
@@ -84,7 +84,7 @@ Read-only steps; none changes the system. The owner runs the console steps; an a
 2. **Latency and peak from request logs** (works with the current role): read 30 days of `resource.type="cloud_run_revision" AND resource.labels.service_name="api"` with `--format="csv(timestamp,httpRequest.requestMethod,httpRequest.latency,httpRequest.status)"`, then compute P95 and P99 for `GET` and for other methods, the 5xx share per 15 minutes, and the busiest minute. Write the four numbers and the date into **Current**.
 3. **Alerts.** In Cloud Monitoring → Alerting, list the policies. Create the missing ones from the thresholds above: uptime check on `/health/ready`, 5xx share over 1% for 15 minutes, P95 of `GET` over 1 s for 15 minutes, failed job. Name them as this document does and send them to the owner.
 4. **Data volume.** In the adm.tools database console, read-only: `SELECT pg_size_pretty(pg_database_size(current_database()));`, `SELECT schemaname, relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 15;`, and the number of rows in `sales."Orders"` created per day over the last 90 days.
-5. **Backups.** In the adm.tools panel, read how often backups run and how long they are kept; write it into [backups and restore](../../operations/data/backups-and-restore.md). Once a quarter restore the latest backup into a new database and time it: that time is the current RTO.
+5. **Backups.** Frequency and retention are recorded (daily, 2 months). Once a quarter restore the latest backup into a new database and time it: that time is the current RTO.
 6. **Site and app.** Search Console → «Core Web Vitals» for mobile and desktop; Google Play Console → Android vitals for crash-free sessions.
 7. **Cost.** Google Cloud Billing → Reports for the last three months, plus the other providers' invoices; the owner sets the budget and creates the budget alert.
 
