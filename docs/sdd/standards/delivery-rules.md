@@ -9,7 +9,7 @@ For a local internal fix that restores already documented behavior without chang
 Keep a feature's current scope and navigation in its `README.md`, requirements in the current specification, evidence in the corresponding tasks, and traceability as brief links and statuses. Preserve earlier revisions as history; do not copy current status into them or open them without a specific need.
 
 1. Define the goal, scope, business rules, and acceptance scenarios with stable `R-*` and `SC-*` IDs.
-2. Resolve ambiguous examples, then agree on design, data model, risks, and contracts only where they add value. Before implementation, add a compact planned map of key files by scenario and layer to the SDD: exact path, one role, existing or planned status, and a decision about splitting any affected overloaded files.
+2. Resolve ambiguous examples, then agree on design, data model, risks, and contracts only where they add value. For every new endpoint, record the [rate limit decision](rate-limit-rules.md#the-decision-for-every-new-endpoint) (global is enough, or the named policy and why). Before implementation, add a compact planned map of key files by scenario and layer to the SDD: exact path, one role, existing or planned status, and a decision about splitting any affected overloaded files.
 3. Link each scenario to technical tasks and a test level in the traceability matrix. Use `TS-*` for implementation tasks and `EN-*` for shared technical prerequisites.
 4. Complete ready tasks scenario by scenario. Apply Red → Green → Refactor to each testable technical slice.
 5. Verify each completed scenario, then run the relevant regression checks.
@@ -38,7 +38,7 @@ Implement a feature in stages (one scenario, task slice, or layer at a time) and
 
 ## Closing checklist
 
-Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated, and `python3 tools/docs/check_module_maps.py` passes; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; architecture documentation is updated when a module is added or its boundaries change; the full feature audit against the architecture rules, including the folder axiom, is done and its findings are fixed.
+Before reporting a feature complete, check each item that applies: the feature card and [feature map](../features/README.md) row are created or updated, and `python3 tools/docs/check_module_maps.py` passes; the [specification index](../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract is updated and the consumer handoff is noted; every client input has a FluentValidation validator; every new endpoint has its rate limit decision and, where it names a policy, the policy is in the [table](rate-limit-rules.md#the-limits); architecture documentation is updated when a module is added or its boundaries change; the full feature audit against the architecture rules, including the folder axiom, is done and its findings are fixed.
 
 When changing an existing feature, open its card and the code and tests it lists before editing.
 

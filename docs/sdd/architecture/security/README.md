@@ -16,6 +16,7 @@ security/
 - Endpoint protection, authorization policy, or role: [authorization](authorization/README.md)
 - User creation, registration, or invitations: [users](users/README.md)
 - Planning a feature with permissions: [checklist](planning/access-control-checklist.md)
+- Abuse protection and request limits: [rate limit rules](../../standards/rate-limit-rules.md)
 
 ## Responsibilities
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -52,7 +53,7 @@ public static class SiteModelsEndpoints
 
         var siteModels = endpoints.MapGroup("api/catalog/{lang}")
             .WithTags("SiteModels")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetPublicSiteModelsEndpoint.Map(siteModels);
         GetPublicCategorySiteModelsEndpoint.Map(siteModels);
         GetPublicSiteModelEndpoint.Map(siteModels);

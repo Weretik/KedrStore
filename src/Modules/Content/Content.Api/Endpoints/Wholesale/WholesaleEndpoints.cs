@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -24,7 +25,7 @@ public static class WholesaleEndpoints
 
         var wholesalePage = endpoints.MapGroup("api/content")
             .WithTags("WholesalePage")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetPublicWholesalePageEndpoint.Map(wholesalePage);
 
         return endpoints;

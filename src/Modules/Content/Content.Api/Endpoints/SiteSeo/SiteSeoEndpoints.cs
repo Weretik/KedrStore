@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -25,7 +26,7 @@ public static class SiteSeoEndpoints
 
         var pageSeo = endpoints.MapGroup("api/content")
             .WithTags("PageSeo")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         ListPublicPageSeoEndpoint.Map(pageSeo);
 
         return endpoints;

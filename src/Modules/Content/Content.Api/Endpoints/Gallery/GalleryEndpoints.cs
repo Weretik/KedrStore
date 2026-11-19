@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -35,7 +36,7 @@ public static class GalleryEndpoints
 
         var gallery = endpoints.MapGroup("api/content")
             .WithTags("Gallery")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetPublicGalleryEndpoint.Map(gallery);
 
         return endpoints;

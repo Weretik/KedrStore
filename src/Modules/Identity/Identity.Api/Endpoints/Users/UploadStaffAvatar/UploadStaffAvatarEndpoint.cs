@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Api.Endpoints.Avatars;
 using Identity.Application.Features.Users.Commands.UploadStaffAvatar;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +9,7 @@ internal static class UploadStaffAvatarEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapPut("{userId:guid}/avatar", Handle)
-            .WithName("uploadStaffAvatar")
+            .WithName("uploadStaffAvatar").RequireRateLimiting("Upload")
             .WithSummary("Upload a manager's avatar")
             .WithDescription("Manager and Seo accounts only. Same limits as `uploadMyAvatar`.")
             .AsAvatarUpload()

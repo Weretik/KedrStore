@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using BuildingBlocks.Api.Snapshots;
 using Catalog.Application.Features.MobileSync.Queries.GetCatalogSnapshot;
 using Catalog.Contracts.MobileSync;
@@ -9,7 +10,7 @@ internal static class GetMobileCatalogSnapshotEndpoint
 {
     public static RouteHandlerBuilder Map(RouteGroupBuilder group) =>
         group.MapGet("", Handle)
-            .WithName("getMobileCatalogSnapshot")
+            .WithName("getMobileCatalogSnapshot").RequireRateLimiting("HeavyOperation")
             .WithSummary("Products, prices, categories and price types for offline work")
             .WithDescription("Requires `CanManageOrders` (Manager, Seo, or Admin); the app sends its bearer token. Deleted products and categories are left out. Responses carry a strong `ETag` (the same value as `version`) and are gzip or Brotli compressed when the client accepts it.")
             .Produces<CatalogSnapshotResponse>()

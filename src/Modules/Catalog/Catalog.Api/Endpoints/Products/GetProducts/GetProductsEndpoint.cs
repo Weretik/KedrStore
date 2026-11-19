@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Catalog.Application.Features.Products.Queries.GetPublicProductList;
 using Catalog.Contracts.Products.GetList;
 using Microsoft.AspNetCore.Builder;
@@ -10,11 +11,11 @@ internal static class GetProductsEndpoint
     public static void Map(RouteGroupBuilder group)
     {
         Describe(group.MapGet("products", HandleAll)
-            .WithName("getPublicProducts")
+            .WithName("getPublicProducts").RequireRateLimiting("PublicSearch")
             .WithSummary("List public products")
             .WithDescription("When `categoryId` is supplied, the page contains public products of that category and of every descendant category at any depth; sibling branches are excluded. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. An unknown valid `categoryId` returns `200` with an empty page and `totalRecords = 0`."));
         Describe(group.MapGet("{categorySlug}/products", HandleCategory)
-            .WithName("getPublicProductsByCategorySlug")
+            .WithName("getPublicProductsByCategorySlug").RequireRateLimiting("PublicSearch")
             .WithSummary("List public products in a category")
             .WithDescription("Returns public products of the category selected by `categorySlug` and of every descendant category at any depth; sibling branches are excluded. When `categoryId` is also supplied, it takes precedence over the slug. The category subtree and all other filters are applied before `pagedInfo.totalRecords`, sorting, and paging. A former category slug selects its category. An unknown or deleted category slug returns `404`; an unknown `categoryId` returns `200` with an empty page."));
     }

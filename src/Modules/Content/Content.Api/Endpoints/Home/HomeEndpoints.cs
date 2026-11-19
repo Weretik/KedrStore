@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Identity.Contracts.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -39,7 +40,7 @@ public static class HomeEndpoints
 
         var homeBlocks = endpoints.MapGroup("api/content")
             .WithTags("HomeBlocks")
-            .AllowAnonymous();
+            .AllowAnonymous().RequireRateLimiting("PublicRead");
         GetPublicHomeBlocksEndpoint.Map(homeBlocks);
 
         return endpoints;
