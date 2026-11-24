@@ -12,11 +12,13 @@ public static class SearchWords
 
     /// <summary>One <c>%word%</c> pattern per word of <paramref name="text"/>; empty for blank text.</summary>
     public static IReadOnlyList<string> Patterns(string? text) =>
+        Words(text).Select(word => "%" + Escape(word) + "%").ToArray();
+
+    /// <summary>The words of <paramref name="text"/> split on white space; empty for blank text.</summary>
+    public static IReadOnlyList<string> Words(string? text) =>
         string.IsNullOrWhiteSpace(text)
             ? []
-            : text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(word => "%" + Escape(word) + "%")
-                .ToArray();
+            : text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     /// <summary>Escapes <c>\</c>, <c>%</c> and <c>_</c> so the text matches literally.</summary>
     public static string Escape(string text) => text

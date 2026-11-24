@@ -12,4 +12,11 @@ public readonly record struct QuickOrderId
         : new QuickOrderId(value);
 
     public static QuickOrderId New(DateTimeOffset now) => new(Guid.CreateVersion7(now));
+
+    /// <summary>A bound of an id range in a search (the empty id included); never the id of an order.</summary>
+    public static QuickOrderId Bound(Guid value) => new(value);
+
+    public static bool operator >=(QuickOrderId left, QuickOrderId right) => left.Value.CompareTo(right.Value) >= 0;
+
+    public static bool operator <=(QuickOrderId left, QuickOrderId right) => left.Value.CompareTo(right.Value) <= 0;
 }

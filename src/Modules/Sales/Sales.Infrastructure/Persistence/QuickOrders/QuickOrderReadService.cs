@@ -15,11 +15,25 @@ internal sealed class QuickOrderReadService(SalesDbContext dbContext) : IQuickOr
     {
         var query = dbContext.Set<QuickOrder>().AsNoTracking();
 
-        // Database rules 2.1: every word must match the name or the phone; trigram indexes serve both.
-        foreach (var pattern in SearchWords.Patterns(request.Search))
-            query = query.Where(order =>
-                EF.Functions.ILike(order.FirstName, pattern, SearchWords.EscapeCharacter) ||
-                EF.Functions.ILike(order.Phone, pattern, SearchWords.EscapeCharacter));
+        // Database rules 2.1: every word must match the name or the phone; trigram indexes serve both. A word that is an
+        // order number (or a whole id) also matches the ids it names, as a range on the primary key (spec 009, R-012).
+        foreach (var word in SearchWords.Words(request.Search))
+        {
+            var pattern = "%" + SearchWords.Escape(word) + "%";
+            if (QuickOrderNumberSearch.RangeOf(word) is var (fromValue, toValue))
+            {
+                var from = QuickOrderId.Bound(fromValue);
+                var to = QuickOrderId.Bound(toValue);
+                query = query.Where(order =>
+                    EF.Functions.ILike(order.FirstName, pattern, SearchWords.EscapeCharacter) ||
+                    EF.Functions.ILike(order.Phone, pattern, SearchWords.EscapeCharacter) ||
+                    (order.Id >= from && order.Id <= to));
+            }
+            else
+                query = query.Where(order =>
+                    EF.Functions.ILike(order.FirstName, pattern, SearchWords.EscapeCharacter) ||
+                    EF.Functions.ILike(order.Phone, pattern, SearchWords.EscapeCharacter));
+        }
 
         // The same condition as the partial index IX_QuickOrders_Problem.
         if (request.Delivery == QuickOrderListRequest.ProblemDelivery)
