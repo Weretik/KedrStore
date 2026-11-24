@@ -22,18 +22,19 @@ public sealed class QuickOrderTelegramCaptionTests
     }
 
     [Fact]
-    public void Caption_ShowsTheOrderId_AndTheKyivTimeOfTheOrder()
+    public void Caption_ShowsTheOrderNumber_AndTheKyivTimeOfTheOrder()
     {
         var caption = QuickOrderTelegramCaption.Build(Order);
 
-        Assert.Contains("🆔 <b>019A8B1C</b> <code>019a8b1c-2d3e-7f40-8a5b-6c7d8e9f0a1b</code>", caption);
+        Assert.Contains("🆔 <b>№ 019A8B1C</b>", caption);
+        Assert.DoesNotContain("019a8b1c-2d3e-7f40-8a5b-6c7d8e9f0a1b", caption);
         Assert.Contains("📅 14.11.2026 12:05", caption);
     }
 
     [Fact]
-    public void ExcelFile_IsNamedByTheOrderId()
+    public void ExcelFile_IsNamedByTheOrderNumber()
     {
-        Assert.Equal("order_019a8b1c2d3e7f408a5b6c7d8e9f0a1b.xlsx", QuickOrderExcelFile.NameOf(Order));
+        Assert.Equal("order_019A8B1C.xlsx", QuickOrderExcelFile.NameOf(Order));
         Assert.NotEmpty(QuickOrderExcelFile.Build(Order));
     }
 }

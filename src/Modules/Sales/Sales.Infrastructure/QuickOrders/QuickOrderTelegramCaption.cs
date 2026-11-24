@@ -18,7 +18,7 @@ public static class QuickOrderTelegramCaption
         string[] parts =
         [
             "<b>Нове замовлення</b>",
-            $"🆔 <b>{QuickOrderNumberSearch.NumberOf(order.OrderId)}</b> <code>{order.OrderId}</code>",
+            $"🆔 <b>№ {QuickOrderNumberSearch.NumberOf(order.OrderId)}</b>",
             $"👨‍💼 {WebUtility.HtmlEncode(order.FirstName)}",
             $"📲 <code>{WebUtility.HtmlEncode(order.Phone)}</code>",
             $"📅 {placedAt:dd.MM.yyyy HH:mm}",
