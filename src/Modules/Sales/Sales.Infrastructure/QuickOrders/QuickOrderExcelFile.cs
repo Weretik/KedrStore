@@ -1,12 +1,14 @@
 using ClosedXML.Excel;
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Application.Features.QuickOrders.Queries.GetQuickOrderList;
 
 namespace Sales.Infrastructure.QuickOrders;
 
 /// <summary>The Excel file of a quick order: customer, lines with sums, and the total.</summary>
 public static class QuickOrderExcelFile
 {
-    public static string NameOf(QuickOrderPlaced order) => $"order_{order.OrderId:N}.xlsx";
+    /// <summary>Named by the order number people see (spec 009, R-012), e.g. <c>order_52992220.xlsx</c>.</summary>
+    public static string NameOf(QuickOrderPlaced order) => $"order_{QuickOrderNumberSearch.NumberOf(order.OrderId)}.xlsx";
 
     public static byte[] Build(QuickOrderPlaced order)
     {
@@ -14,7 +16,7 @@ public static class QuickOrderExcelFile
         var sheet = workbook.Worksheets.Add("Order");
 
         sheet.Cell("B1").Value = "Заявка:";
-        sheet.Cell("C1").Value = order.OrderId.ToString();
+        sheet.Cell("C1").Value = QuickOrderNumberSearch.NumberOf(order.OrderId);
 
         sheet.Cell("B2").Value = "Ім’я:";
         sheet.Cell("C2").Value = order.FirstName;
