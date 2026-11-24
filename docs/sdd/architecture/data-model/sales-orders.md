@@ -1,6 +1,6 @@
 # Sales — orders and 1C: data
 
-**Source:** [Sales snapshot](../../../../src/Modules/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Modules/Sales/Sales.Infrastructure/Persistence/), checked 2026-11-16. [Back to database map](README.md) · [orders feature](../../features/sales/admin-orders.md).
+**Source:** [Sales snapshot](../../../../src/Modules/Sales/Sales.Infrastructure/Migrations/SalesDbContextModelSnapshot.cs) and [configurations](../../../../src/Modules/Sales/Sales.Infrastructure/Persistence/), checked 2026-11-24. [Back to database map](README.md) · [orders feature](../../features/sales/admin-orders.md).
 
 | Table | PK | Purpose and important fields |
 | --- | --- | --- |
@@ -24,3 +24,20 @@ erDiagram
 ```
 
 `OrderLines.ProductId` references a Catalog product by ID without a physical FK in the Sales snapshot. `Orders.OneCMessageId` points to the outbox row without a physical FK, because the outbox deletes processed rows after 30 days. See [customer data](sales-customers.md) for `Counterparties`.
+
+## Site orders
+
+[Spec sales/009](../../specs/sales/009-site-orders-in-admin/README.md) · [site quick order feature](../../features/sales/quick-order.md).
+
+| Table | PK | Purpose and important fields |
+| --- | --- | --- |
+| `QuickOrders` | `Id` (uuid, the site's `Idempotency-Key`) | An order sent from the site: `FirstName`, `Phone` (personal data, kept like Sales orders, never logged), `PlacedAtUtc`, `Total` (copy of the cart, not a charge); Telegram delivery `TelegramSentAtUtc`, `TelegramLastAttemptAtUtc`, `TelegramLastError`, `TelegramFailedAtUtc` (outbox gave up); `xmin` row version for the resend. Indexes: `IX_QuickOrders_PlacedAtUtc_Id` (list), trigram `IX_QuickOrders_FirstName_trgm` and `IX_QuickOrders_Phone_trgm` (search), partial `IX_QuickOrders_Problem` (not delivered with an error or given up). |
+| `QuickOrderItems` | `Id` | Cart lines: `QuickOrderId` (FK, cascade), `ProductId` (text the site sent, no Catalog reference), `Title`, `UnitPrice`, `Quantity`. |
+
+```mermaid
+erDiagram
+    QuickOrders ||--|{ QuickOrderItems : "QuickOrderId FK"
+    QuickOrders ||--o| OutboxMessages : "same Id (type sales.quick-order-placed)"
+```
+
+The order's Telegram outbox message has the order's id, without a physical FK because the outbox deletes processed rows after 30 days; the order stays. Migration `AddQuickOrders` copied the site orders that existed only in the outbox at release time.

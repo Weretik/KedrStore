@@ -10,12 +10,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Domain.QuickOrders;
 using Sales.Infrastructure.Persistence;
 using BuildingBlocks.Infrastructure.Outbox.Persistence;
 
 namespace IntegrationTests.Sales.QuickOrders;
 
-/// <summary>Platform spec 006, R-007: the site quick order is stored in the Sales outbox and sent from there.</summary>
+/// <summary>
+/// Platform spec 006, R-007 and spec sales/009: the site quick order is stored with its Telegram outbox message and sent
+/// from there.
+/// </summary>
 [Collection(SalesPostgresCollection.Name)]
 public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
 {
@@ -42,6 +46,12 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         var row = Assert.Single(await scenario.RowsAsync());
         Assert.Equal(QuickOrderPlaced.TypeName, row.Type);
         Assert.Equal(Start, row.ProcessedAtUtc);
+
+        // Spec sales/009, R-001: the order itself is kept with its lines and total.
+        var order = Assert.Single(await scenario.OrdersAsync());
+        Assert.Equal(orderId, order.Id.Value);
+        Assert.Equal(251.00m, order.Total);
+        Assert.Equal(2, Assert.Single(order.Items).Quantity);
     }
 
     [SkippableFact]
@@ -106,6 +116,7 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         }
 
         Assert.Single(await scenario.RowsAsync());
+        Assert.Single(await scenario.OrdersAsync());
         Assert.Single(scenario.Telegram.Sent);
     }
 
@@ -140,6 +151,7 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         Assert.True(problem.RootElement.GetProperty("errors").TryGetProperty(field, out _));
         Assert.Empty(await scenario.RowsAsync());
+        Assert.Empty(await scenario.OrdersAsync());
         Assert.Empty(scenario.Telegram.Sent);
     }
 
@@ -165,7 +177,10 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
     {
         postgres.SkipIfUnavailable();
         await using (var cleanup = postgres.CreateContext())
+        {
             await cleanup.Set<OutboxMessage>().ExecuteDeleteAsync();
+            await cleanup.Set<QuickOrder>().ExecuteDeleteAsync();
+        }
 
         var clock = new ManualClock(Start);
         var telegram = new FakeTelegram();
@@ -237,6 +252,12 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         {
             await using SalesDbContext dbContext = postgres.CreateContext();
             return await dbContext.Set<OutboxMessage>().AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<QuickOrder>> OrdersAsync()
+        {
+            await using SalesDbContext dbContext = postgres.CreateContext();
+            return await dbContext.Set<QuickOrder>().AsNoTracking().Include(order => order.Items).ToListAsync();
         }
 
         public ValueTask DisposeAsync() => Factory.DisposeAsync();
