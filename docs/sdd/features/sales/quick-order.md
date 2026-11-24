@@ -14,7 +14,7 @@ Public `POST /api/orders`: a buyer without an account sends a name, a phone and 
 
 | Endpoint | operationId | What it does | Rate limit |
 | --- | --- | --- | --- |
-| `GET /api/admin/quick-orders?page&pageSize&search&delivery` | `getAdminQuickOrders` | Page newest first; `search` matches every word against name or phone; `delivery=problem` keeps orders not delivered with an error or given up | global |
+| `GET /api/admin/quick-orders?page&pageSize&search&delivery` | `getAdminQuickOrders` | Page newest first; `search` matches every word against name or phone, and a word that is an order number (the first 8 hex digits of the id, shown on the site, in Telegram and in the Admin) or a whole id against the id as a range on the primary key; `delivery=problem` keeps orders not delivered with an error or given up | global |
 | `GET /api/admin/quick-orders/{orderId}` | `getAdminQuickOrderById` | Buyer, lines with amounts, total, delivery state; 404 when unknown | global |
 | `POST /api/admin/quick-orders/{orderId}/telegram-resend` | `resendAdminQuickOrderToTelegram` | Only a `failed` order: puts its outbox message back in the queue with attempts from zero (`OutboxWriter.RequeueAsync`) and clears the failure in one transaction, 202; `sent` → 409 `already_sent`, still retrying → 409 `delivery_in_progress`; a parallel resend loses on `xmin` → 409 | `HeavyOperation` |
 
@@ -65,9 +65,10 @@ flowchart LR
 - [QuickOrderTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTests.cs): factory errors, trimmed buyer, total, delivery state transitions, resend only after give-up, repeat comparison.
 - [PlaceQuickOrderRepeatTests](../../../../tests/UnitTests/Sales/QuickOrders/PlaceQuickOrderRepeatTests.cs): the key is the order id, the order and its message are saved together, a cancelled request still saves and sends, a repeat returns the id without saving or sending, other data is a conflict, the loser of a race answers with the winner.
 - [ResendQuickOrderToTelegramTests](../../../../tests/UnitTests/Sales/QuickOrders/ResendQuickOrderToTelegramTests.cs): failed → queued once, sent → 409, unknown → 404, a lost row version → 409.
+- [QuickOrderNumberSearchTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderNumberSearchTests.cs): the number of an id, the id range of a number or a whole id, other words.
 - [QuickOrderTelegramCaptionTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTelegramCaptionTests.cs): HTML escaping, order id, Kyiv time, file name.
 - [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input, repeats and parallel copies store one order, the same key with other lines answers 409.
-- [QuickOrderAdminApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderAdminApiTests.cs): the real sender over a fake Telegram API — sent order listed with lines; a refused order shows the reason, becomes `failed` after ten attempts, is resent once and then delivered; search by name and phone; 404 and 400; 401/403 without the orders policy.
+- [QuickOrderAdminApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderAdminApiTests.cs): the real sender over a fake Telegram API — sent order listed with lines; a refused order shows the reason, becomes `failed` after ten attempts, is resent once and then delivered; search by name, phone, order number and whole id; 404 and 400; 401/403 without the orders policy.
 - Filter `FullyQualifiedName~QuickOrder` (unit and integration).
 
 ## Related sources

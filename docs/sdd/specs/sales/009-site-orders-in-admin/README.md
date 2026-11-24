@@ -26,6 +26,7 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 - **R-009.** The three Admin endpoints require policy `CanManageOrders` (Manager, Seo, Admin; Customer gets 403, anonymous 401).
 - **R-010.** Site orders made before this release are copied once from `sales."OutboxMessages"` rows of type `sales.quick-order-placed` (the last 30 days) with their delivery state.
 - **R-011.** Name and phone are personal data: they are never written to logs; the log line of a placed or resent order carries only the order id, the line count and the total.
+- **R-012.** (2026-11-24, owner request) The order number people see is the first 8 hex digits of the order id in upper case (`QuickOrderNumberSearch.NumberOf`): the site shows it after sending, Telegram puts it in bold, the Admin shows it instead of the whole id. A list search word that is such a number (optionally with `№` or `#`), or a whole id, also matches the orders whose id starts with it, as a range on the primary key; the word still matches name and phone too, so a phone fragment of 8 digits keeps working. The site sends a random `Idempotency-Key`, so numbers of site orders differ; an order placed without a key gets a time-ordered id, and two such orders in the same minute can share a number (the search then shows both).
 
 ## Scenarios
 
@@ -41,6 +42,7 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 | **SC-008** | Customer role → 403 and anonymous → 401 on all three Admin endpoints. |
 | **SC-009** | The migration copies existing quick-order outbox rows: a processed row becomes `sent`, a failed row `failed` with its error, a waiting row `pending`; running the copy again adds nothing. |
 | **SC-010** | Domain: `Create` rejects no lines, an empty name or phone, a quantity ≤ 0 and a negative price with typed errors; the total is the sum of the lines; `RequestTelegramResend` works only from failed. |
+| **SC-011** | Search by the order number, by `№` + number in lower case, and by the whole id finds exactly that order. |
 
 ## Design
 

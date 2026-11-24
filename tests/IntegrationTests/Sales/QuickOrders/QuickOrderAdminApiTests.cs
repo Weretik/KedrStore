@@ -106,6 +106,25 @@ public sealed class QuickOrderAdminApiTests(SalesPostgresFixture postgres)
     }
 
     [SkippableFact]
+    public async Task Search_FindsByTheOrderNumberOrTheWholeId()
+    {
+        await using var scenario = await CreateAsync();
+        using var site = scenario.Factory.CreateClient();
+        // The site sends a random key per order, and the key becomes the id, so the numbers differ.
+        var irynaId = await PlaceAsync(site, "Ірина", "+380954315238", Guid.NewGuid());
+        await PlaceAsync(site, "Петро", "+380671112233", Guid.NewGuid());
+        using var admin = scenario.Factory.CreateClientWithRole("Manager");
+        var number = irynaId.ToString("N")[..8].ToUpperInvariant();
+
+        using var byNumber = await JsonOf(await admin.GetAsync($"/api/admin/quick-orders?search={number}"));
+        using var bySign = await JsonOf(await admin.GetAsync($"/api/admin/quick-orders?search=%E2%84%96{number.ToLowerInvariant()}"));
+        using var byId = await JsonOf(await admin.GetAsync($"/api/admin/quick-orders?search={irynaId}"));
+
+        foreach (var found in new[] { byNumber, bySign, byId })
+            Assert.Equal(irynaId, Assert.Single(found.RootElement.GetProperty("value").EnumerateArray()).GetProperty("orderId").GetGuid());
+    }
+
+    [SkippableFact]
     public async Task UnknownOrder_IsNotFound_AndABadFilterIs400()
     {
         await using var scenario = await CreateAsync();
@@ -140,10 +159,16 @@ public sealed class QuickOrderAdminApiTests(SalesPostgresFixture postgres)
         }
     }
 
-    private static async Task<Guid> PlaceAsync(HttpClient site, string firstName, string phone)
+    private static async Task<Guid> PlaceAsync(HttpClient site, string firstName, string phone, Guid? idempotencyKey = null)
     {
         var json = $$"""{"firstName":"{{firstName}}","phone":"{{phone}}","lines":[{"productId":"101","title":"Ручка Кедр","unitPrice":125.50,"quantity":2}]}""";
-        using var response = await site.PostAsync("/api/orders", new StringContent(json, Encoding.UTF8, "application/json"));
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/orders")
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json"),
+        };
+        if (idempotencyKey is { } key)
+            request.Headers.Add("Idempotency-Key", key.ToString());
+        using var response = await site.SendAsync(request);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using var body = await JsonOf(response);
         return body.RootElement.GetProperty("orderId").GetGuid();

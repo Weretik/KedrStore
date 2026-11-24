@@ -9,7 +9,7 @@ public sealed record GetAdminQuickOrdersRequest
     [FromQuery(Name = "pageSize")]
     public int? PageSize { get; init; }
 
-    /// <summary>Words of a buyer's name or phone.</summary>
+    /// <summary>Words of a buyer's name or phone, or an order number (52992220) or a whole order id.</summary>
     [FromQuery(Name = "search")]
     public string? Search { get; init; }
 

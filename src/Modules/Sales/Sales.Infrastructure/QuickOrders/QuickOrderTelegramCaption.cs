@@ -1,5 +1,6 @@
 using System.Net;
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Application.Features.QuickOrders.Queries.GetQuickOrderList;
 
 namespace Sales.Infrastructure.QuickOrders;
 
@@ -17,7 +18,7 @@ public static class QuickOrderTelegramCaption
         string[] parts =
         [
             "<b>Нове замовлення</b>",
-            $"🆔 <b>{order.OrderId.ToString("N")[..8].ToUpperInvariant()}</b> <code>{order.OrderId}</code>",
+            $"🆔 <b>{QuickOrderNumberSearch.NumberOf(order.OrderId)}</b> <code>{order.OrderId}</code>",
             $"👨‍💼 {WebUtility.HtmlEncode(order.FirstName)}",
             $"📲 <code>{WebUtility.HtmlEncode(order.Phone)}</code>",
             $"📅 {placedAt:dd.MM.yyyy HH:mm}",
