@@ -348,6 +348,103 @@ namespace Sales.Infrastructure.Migrations
                     b.ToTable("OrderLines", "sales");
                 });
 
+            modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset>("PlacedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("TelegramFailedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("TelegramLastAttemptAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TelegramLastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset?>("TelegramSentAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlacedAtUtc", "Id")
+                        .HasDatabaseName("IX_QuickOrders_PlacedAtUtc_Id");
+
+                    b.HasIndex(new[] { "FirstName" }, "IX_QuickOrders_FirstName_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "FirstName" }, "IX_QuickOrders_FirstName_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "FirstName" }, "IX_QuickOrders_FirstName_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "Phone" }, "IX_QuickOrders_Phone_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Phone" }, "IX_QuickOrders_Phone_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Phone" }, "IX_QuickOrders_Phone_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "PlacedAtUtc", "Id" }, "IX_QuickOrders_Problem")
+                        .HasFilter("\"TelegramSentAtUtc\" IS NULL AND (\"TelegramLastError\" IS NOT NULL OR \"TelegramFailedAtUtc\" IS NOT NULL)");
+
+                    b.ToTable("QuickOrders", "sales");
+                });
+
+            modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrderItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("QuickOrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuickOrderId");
+
+                    b.ToTable("QuickOrderItems", "sales");
+                });
+
             modelBuilder.Entity("Sales.Infrastructure.Persistence.OrderDrafts.OrderDraftIdempotencyRecord", b =>
                 {
                     b.Property<long>("Id")
@@ -517,6 +614,15 @@ namespace Sales.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrderItem", b =>
+                {
+                    b.HasOne("Sales.Domain.QuickOrders.QuickOrder", null)
+                        .WithMany("Items")
+                        .HasForeignKey("QuickOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sales.Infrastructure.Persistence.OrderDrafts.OrderDraftIdempotencyRecord", b =>
                 {
                     b.HasOne("Sales.Domain.Orders.OrderDraft", null)
@@ -543,6 +649,11 @@ namespace Sales.Infrastructure.Migrations
             modelBuilder.Entity("Sales.Domain.Orders.OrderDraft", b =>
                 {
                     b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrder", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

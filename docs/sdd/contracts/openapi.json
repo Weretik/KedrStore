@@ -9910,6 +9910,186 @@
         }
       }
     },
+    "/api/admin/quick-orders": {
+      "get": {
+        "tags": [
+          "AdminQuickOrders"
+        ],
+        "summary": "Browse orders sent from the site",
+        "description": "Newest first. Search by the words of a name or phone; delivery=problem keeps the orders Telegram has not got. Policy CanManageOrders.",
+        "operationId": "getAdminQuickOrders",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "delivery",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfListOfGetAdminQuickOrderListItemResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quick-orders/{orderId}": {
+      "get": {
+        "tags": [
+          "AdminQuickOrders"
+        ],
+        "summary": "Get one order sent from the site",
+        "description": "The buyer, the cart lines and how the delivery to Telegram went. Policy CanManageOrders.",
+        "operationId": "getAdminQuickOrderById",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminQuickOrderDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/quick-orders/{orderId}/telegram-resend": {
+      "post": {
+        "tags": [
+          "AdminQuickOrders"
+        ],
+        "summary": "Send a site order to Telegram again after its delivery failed",
+        "description": "Allowed only when the delivery failed (telegramStatus failed): the order goes back in the outbox queue with attempts from zero; Telegram is not called in the request. A sent order answers 409 already_sent, an order still being sent 409 delivery_in_progress, so a repeat sends nothing twice. Policy CanManageOrders.",
+        "operationId": "resendAdminQuickOrderToTelegram",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendAdminQuickOrderToTelegramResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/work/tasks": {
       "get": {
         "tags": [
@@ -14280,6 +14460,146 @@
           }
         }
       },
+      "GetAdminQuickOrderDetailResponse": {
+        "required": [
+          "orderId",
+          "placedAtUtc",
+          "firstName",
+          "phone",
+          "total",
+          "telegramStatus",
+          "telegramSentAtUtc",
+          "telegramLastAttemptAtUtc",
+          "telegramLastError",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          },
+          "telegramStatus": {
+            "type": "string"
+          },
+          "telegramSentAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "telegramLastAttemptAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "telegramLastError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetAdminQuickOrderItemResponse"
+            }
+          }
+        }
+      },
+      "GetAdminQuickOrderItemResponse": {
+        "required": [
+          "productId",
+          "title",
+          "unitPrice",
+          "quantity",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "unitPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "GetAdminQuickOrderListItemResponse": {
+        "required": [
+          "orderId",
+          "placedAtUtc",
+          "firstName",
+          "phone",
+          "lineCount",
+          "total",
+          "telegramStatus",
+          "telegramLastError"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "placedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "lineCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          },
+          "telegramStatus": {
+            "type": "string"
+          },
+          "telegramLastError": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "GrantStaffAccessRequest": {
         "required": [
           "fullName",
@@ -15034,6 +15354,76 @@
             ],
             "items": {
               "$ref": "#/components/schemas/GetAdminOrderListItemResponse"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResultStatus"
+          },
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "successMessage": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "correlationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "location": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "validationErrors": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "PagedResultOfListOfGetAdminQuickOrderListItemResponse": {
+        "required": [
+          "pagedInfo",
+          "value",
+          "status",
+          "isSuccess",
+          "successMessage",
+          "correlationId",
+          "location",
+          "errors",
+          "validationErrors"
+        ],
+        "type": "object",
+        "properties": {
+          "pagedInfo": {
+            "$ref": "#/components/schemas/PagedInfo"
+          },
+          "value": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/GetAdminQuickOrderListItemResponse"
             }
           },
           "status": {
@@ -16200,6 +16590,22 @@
             "type": "string"
           },
           "newValue": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendAdminQuickOrderToTelegramResponse": {
+        "required": [
+          "orderId",
+          "telegramStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "telegramStatus": {
             "type": "string"
           }
         }
@@ -19316,6 +19722,9 @@
     },
     {
       "name": "Order"
+    },
+    {
+      "name": "AdminQuickOrders"
     },
     {
       "name": "WorkTasks"

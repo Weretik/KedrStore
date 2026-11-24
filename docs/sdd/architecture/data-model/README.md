@@ -37,7 +37,7 @@ KedrStore PostgreSQL
         │   └── ProductListProjections     # denormalized product reads
         └── __EFMigrationsHistory          # Catalog migration history
 └── schema sales
-    └── Sales / SalesDbContext — 10 tables
+    └── Sales / SalesDbContext — 12 tables
         ├── Customers
         │   ├── Counterparties             # counterparties
         │   └── CounterpartyCategoryPriceTypes # price type by category
@@ -49,6 +49,9 @@ KedrStore PostgreSQL
         │   ├── OrderDrafts                # saved drafts without order number
         │   ├── OrderDraftLines            # draft lines
         │   └── OrderDraftIdempotencyRecords # duplicate draft creation protection
+        ├── Site orders
+        │   ├── QuickOrders                # orders from the site and their Telegram delivery state
+        │   └── QuickOrderItems            # their cart lines
         ├── OutboxMessages                 # messages sent after the commit: orders to 1C, Telegram, Identity deletions (platform spec 006)
         └── __EFMigrationsHistory          # Sales migration history
 └── schema identity
@@ -102,6 +105,7 @@ KedrStore PostgreSQL
 | Product photos and schemes | [Products and prices](catalog-products.md) | [Product photos and schemes](../../features/catalog/product-media.md) |
 | Counterparties and their prices | [Customers](sales-customers.md) | [Customers and counterparties](../../features/sales/customers.md) |
 | Orders, drafts, and sync | [Orders](sales-orders.md) | [Manager orders](../../features/sales/admin-orders.md), [Admin workspace](../../features/sales/admin-order-workspace.md) |
+| Site orders and their Telegram delivery | [Orders](sales-orders.md#site-orders) | [Site quick order](../../features/sales/quick-order.md) |
 | Users and sessions | [Access and sessions](identity-access.md) | [User session](../../features/identity/session.md) |
 | Site articles, company contacts, requisites, documents, gallery, home page blocks, the page «Співпраця» and search texts of the site pages | [Content](content-articles.md) | [Site articles](../../features/content/articles.md), [Company contacts](../../features/content/company-contacts.md), [Company requisites](../../features/content/company-requisites.md), [Site documents](../../features/content/legal-documents.md), [Site gallery](../../features/content/gallery.md), [Home page FAQ and brands](../../features/content/home-blocks.md), [Page «Співпраця»](../../features/content/wholesale-page.md), [Search texts of the site pages](../../features/content/page-seo.md) |
 | Library folders and CDN files | [Media](media-library.md) | [Media library](../../features/media/media-library.md) |

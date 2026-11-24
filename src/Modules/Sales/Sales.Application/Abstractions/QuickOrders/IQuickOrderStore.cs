@@ -1,14 +1,19 @@
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Domain.QuickOrders;
 
 namespace Sales.Application.Abstractions.QuickOrders;
 
-/// <summary>Quick orders are outbox messages whose message id is the order id.</summary>
+/// <summary>Site orders and their Telegram outbox messages, written together in one transaction (spec sales/009).</summary>
 public interface IQuickOrderStore
 {
-    /// <summary>The stored order with this id, while its outbox message is kept (outbox retention).</summary>
-    Task<QuickOrderPlaced?> FindAsync(Guid orderId, CancellationToken cancellationToken);
+    /// <summary>The stored order with this id, tracked for a change.</summary>
+    Task<QuickOrder?> FindAsync(QuickOrderId id, CancellationToken cancellationToken);
 
-    /// <summary>Saves the order as an outbox message under its order id, in one transaction.</summary>
+    /// <summary>Stores a new order and its outbox message under the order id in one save.</summary>
     /// <returns>False when an order with this id is already stored (a repeat that lost the race).</returns>
-    Task<bool> TrySaveAsync(QuickOrderPlaced order, CancellationToken cancellationToken);
+    Task<bool> TryAddAsync(QuickOrder order, QuickOrderPlaced message, CancellationToken cancellationToken);
+
+    /// <summary>Saves the resend transition of a tracked order with a new outbox message in one save.</summary>
+    /// <returns>False when the order changed meanwhile (another resend or a delivery).</returns>
+    Task<bool> TrySaveResendAsync(QuickOrder order, QuickOrderPlaced message, CancellationToken cancellationToken);
 }

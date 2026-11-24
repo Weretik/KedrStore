@@ -1,3 +1,5 @@
+using Sales.Domain.QuickOrders;
+
 namespace Sales.Application.Features.QuickOrders.Commands.PlaceQuickOrder;
 
 public sealed class PlaceQuickOrderValidator : AbstractValidator<PlaceQuickOrderCommand>
@@ -8,12 +10,12 @@ public sealed class PlaceQuickOrderValidator : AbstractValidator<PlaceQuickOrder
 
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Вкажіть ім’я.")
-            .MaximumLength(30).WithMessage("Ім’я надто довге (не більше 30 символів).")
+            .MaximumLength(QuickOrder.FirstNameMaxLength).WithMessage("Ім’я надто довге (не більше 30 символів).")
             .WithName("Ім’я");
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Вкажіть номер телефону.")
-            .MaximumLength(20).WithMessage("Номер телефону надто довгий.")
+            .MaximumLength(QuickOrder.PhoneMaxLength).WithMessage("Номер телефону надто довгий.")
             .WithName("Телефон");
 
         RuleFor(x => x.Lines)
@@ -27,10 +29,16 @@ public sealed class PlaceQuickOrderValidator : AbstractValidator<PlaceQuickOrder
         RuleForEach(x => x.Lines).ChildRules(line =>
         {
             line.RuleFor(x => x.ProductId)
-                .NotEmpty().WithMessage("Некоректний товар.");
+                .NotEmpty().WithMessage("Некоректний товар.")
+                .MaximumLength(QuickOrderItem.ProductIdMaxLength).WithMessage("Некоректний товар.");
 
             line.RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Вкажіть назву товару.");
+                .NotEmpty().WithMessage("Вкажіть назву товару.")
+                .MaximumLength(QuickOrderItem.TitleMaxLength).WithMessage("Назва товару надто довга.");
+
+            line.RuleFor(x => x.UnitPrice)
+                .GreaterThanOrEqualTo(0m).WithMessage("Ціна не може бути від'ємною.")
+                .WithName("Ціна");
 
             line.RuleFor(x => x.Quantity)
                 .GreaterThan(0).WithMessage("Кількість має бути більшою за 0.")

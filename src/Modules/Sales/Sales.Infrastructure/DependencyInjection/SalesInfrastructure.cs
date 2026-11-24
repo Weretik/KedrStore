@@ -12,6 +12,7 @@ using Sales.Infrastructure.Orders;
 using Sales.Infrastructure.QuickOrders;
 using Sales.Application.Abstractions.QuickOrders;
 using Sales.Application.Features.QuickOrders.Messages;
+using Sales.Infrastructure.Persistence.QuickOrders;
 using Sales.Application.Abstractions.Workspace.Orders;
 using Sales.Application.Abstractions.Workspace.Drafts;
 using Sales.Application.Features.Orders.OneCDelivery.GiveUp;
@@ -41,8 +42,11 @@ public static class SalesInfrastructure
         services.AddDbContext<SalesDbContext>(options => options.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", SalesDbContext.Schema)));
         services.AddOutbox<SalesDbContext>(SalesDbContext.Schema);
+        // Spec sales/009: site orders, their Telegram delivery and give-up, and the Admin reads.
         services.AddScoped<IQuickOrderStore, QuickOrderStore>();
+        services.AddScoped<IQuickOrderReadService, QuickOrderReadService>();
         services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);
+        services.AddOutboxGiveUpHandler<QuickOrderPlaced, QuickOrderTelegramGiveUpHandler>();
         // Platform spec 006, stage 2: orders to 1C, their give-up signal, and the removed customers' Identity users.
         services.AddScoped<IOrderOneCDeliveryStore, OrderOneCDeliveryStore>();
         services.AddOutboxHandler<OrderPlaced, SendOrderToOneCHandler>(OrderPlaced.TypeName, OutboxLanes.OneCOrders);
