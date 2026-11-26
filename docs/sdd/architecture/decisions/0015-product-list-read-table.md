@@ -6,7 +6,7 @@
 
 ## Context
 
-The public catalogue, its search, the sales catalogue and the admin product list show the same row for every product: Ukrainian and Russian names, slug, photo, category slug, stock flag, sale and new flags, «show on the site», and the retail price (price type 12). These values live in five tables of the Catalog module (`Products`, `ProductTranslations`, `ProductPrices`, `Categories`, product media). Each list filters by category and flags, searches the names with `ILIKE` on `pg_trgm` indexes, sorts by name or price and pages in SQL.
+The public catalogue, its search, the sales catalogue and the admin product list show the same row for every product: Ukrainian and Russian names, slug, photo, category slug, stock flag, sale and new flags, «show on the site», and the retail price (`Catalog:Pricing:RetailPriceTypeId`: price type 12, type 11 «Розница халтмаг 30%» since 2026-11-26, spec catalog/010). These values live in five tables of the Catalog module (`Products`, `ProductTranslations`, `ProductPrices`, `Categories`, product media). Each list filters by category and flags, searches the names with `ILIKE` on `pg_trgm` indexes, sorts by name or price and pages in SQL.
 
 The rest of the backend is CQRS level 1: commands change aggregates, queries read the same tables straight into DTOs ([module rules, Domain model](../../standards/module-rules.md#domain-model-ddd)). The checklist allows level 2, a separate read table, only for a concrete list that a level-1 query cannot serve well.
 

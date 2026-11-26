@@ -11,7 +11,7 @@ internal static class SetAdminCategorySiteNamesEndpoint
         group.MapPut("{id:int}/site-names", Handle)
             .WithName("setAdminCategorySiteNames")
             .WithSummary("Set the Ukrainian and Russian site names of a category")
-            .WithDescription("Spec catalog/010 R-02. The names win over the 1C name and the configured short name on the site, in breadcrumbs, and in titles; the 1C sync never changes them. A blank name goes back to the name from 1C at once. Repeating the same request is safe.")
+            .WithDescription("Spec catalog/011 R-02. The names win over the 1C name and the configured short name on the site, in breadcrumbs, and in titles; the 1C sync never changes them. A blank name goes back to the name from 1C at once. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCategoryResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)

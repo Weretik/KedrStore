@@ -3,7 +3,7 @@ using Catalog.Domain.Categories;
 
 namespace UnitTests.Catalog.Domain;
 
-/// <summary>Spec catalog/010: «Закрити від пошуку», the admin's site names, and the link-preview picture.</summary>
+/// <summary>Spec catalog/011: «Закрити від пошуку», the admin's site names, and the link-preview picture.</summary>
 public sealed class CategorySearchSettingsTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 26, 10, 0, 0, TimeSpan.Zero);

@@ -179,14 +179,14 @@ public sealed class CatalogStableUrlsApiTests
     public async Task PublicProduct_ShowsTheRetailPriceOfTheLists_UnlessAPriceTypeIsAsked()
     {
         await using var db = Seed();
-        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(11), new Money(90m, "UAH")).Value);
-        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(12), new Money(100m, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(12), new Money(90m, "UAH")).Value);
+        db.ProductPrices.Add(ProductPrice.Create("000005513", ProductId.Create(20), PriceTypeId.Create(11), new Money(100m, "UAH")).Value);
         await db.SaveChangesAsync();
         using var factory = CreateFactory(db);
         using var client = factory.CreateClient();
 
         using var retail = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a"));
-        using var asked = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a?priceTypeId=11"));
+        using var asked = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a?priceTypeId=12"));
 
         Assert.Equal(100m, retail.RootElement.GetProperty("price").GetDecimal());
         Assert.Equal(90m, asked.RootElement.GetProperty("price").GetDecimal());

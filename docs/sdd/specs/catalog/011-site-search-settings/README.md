@@ -1,4 +1,4 @@
-# Catalog 010: category search settings for the site
+# Catalog 011: category search settings for the site
 
 **Status:** implemented 2026-11-26. **Owner module:** Catalog. **Feature cards:** [Catalog categories](../../../features/catalog/categories.md), [Public site models](../../../features/catalog/public-site-models.md).
 

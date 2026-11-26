@@ -61,7 +61,7 @@ public sealed class PublicModelCatalog
     }
 
     /// <summary>
-    /// When an accepted model or one of its texts last changed, for the sitemap's <c>lastmod</c> (spec catalog/010
+    /// When an accepted model or one of its texts last changed, for the sitemap's <c>lastmod</c> (spec catalog/011
     /// R-04); <c>null</c> for a product shown as a model of its own.
     /// </summary>
     public DateTimeOffset? UpdatedAtOf(PublicModelFacts model)

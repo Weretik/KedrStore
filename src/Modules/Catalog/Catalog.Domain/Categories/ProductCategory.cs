@@ -23,14 +23,14 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     public bool IsShownOnSite { get; private set; }
 
     /// <summary>
-    /// Names an admin wrote for the site (spec catalog/010 R-02). They win over the 1C name and the configured short
+    /// Names an admin wrote for the site (spec catalog/011 R-02). They win over the 1C name and the configured short
     /// name: <see cref="ShortNameUk"/> and <see cref="ShortNameRu"/> always hold the name the site shows.
     /// </summary>
     public string? SiteNameUk { get; private set; }
     public string? SiteNameRu { get; private set; }
 
     /// <summary>
-    /// Whether search engines must not index the category and its products (spec catalog/010 R-01): the site still shows
+    /// Whether search engines must not index the category and its products (spec catalog/011 R-01): the site still shows
     /// them, with <c>noindex</c> and outside the sitemap. An admin owns it; a new 1C category takes its parent's value.
     /// </summary>
     public bool IsClosedFromSearch { get; private set; }

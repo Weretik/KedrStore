@@ -1,7 +1,7 @@
 namespace Catalog.Domain.Categories;
 
 /// <summary>
-/// Spreads «Закрити від пошуку» over the category tree (spec catalog/010 R-01): closing or opening a category does the
+/// Spreads «Закрити від пошуку» over the category tree (spec catalog/011 R-01): closing or opening a category does the
 /// same to every subcategory, deleted ones included, so a branch keeps one value when 1C restores a category.
 /// </summary>
 public static class CategorySearchClosing

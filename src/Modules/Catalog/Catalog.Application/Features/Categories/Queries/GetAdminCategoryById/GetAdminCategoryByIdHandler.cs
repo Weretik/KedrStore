@@ -6,7 +6,7 @@ using Catalog.Application.Features.Categories.Shared.Tree;
 
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategoryById;
 
-/// <summary>One category for the admin, with the CDN address of its link-preview picture (spec catalog/010 R-03).</summary>
+/// <summary>One category for the admin, with the CDN address of its link-preview picture (spec catalog/011 R-03).</summary>
 public sealed class GetAdminCategoryByIdHandler(
     ICatalogReadRepository<ProductCategory> repository,
     IProductMediaLibrary media)

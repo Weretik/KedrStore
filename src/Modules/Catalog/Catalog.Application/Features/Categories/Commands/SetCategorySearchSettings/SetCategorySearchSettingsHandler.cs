@@ -7,7 +7,7 @@ namespace Catalog.Application.Features.Categories.Commands.SetCategorySearchSett
 
 /// <summary>
 /// Closes or opens a category for search engines with every subcategory (<see cref="CategorySearchClosing"/>) and sets
-/// its link-preview picture (spec catalog/010 R-01, R-03). A newly chosen picture must be in the media library.
+/// its link-preview picture (spec catalog/011 R-01, R-03). A newly chosen picture must be in the media library.
 /// </summary>
 public sealed class SetCategorySearchSettingsHandler(
     ICatalogRepository<ProductCategory> repository,

@@ -8,7 +8,7 @@ Since [stable URLs](../../specs/catalog/005-stable-urls-and-category-content/REA
 
 Since [site models](../../specs/catalog/007-site-models/README.md) (migration `CategorySiteVisibility`): `IsShownOnSite` (boolean, default `false`), the Admin «show on site» mark; the migration sets it for every row of the hardware root `000005513`.
 
-Since [site search settings](../../specs/catalog/010-site-search-settings/README.md) (migration `CategorySearchSettings`): `SiteNameUk` and `SiteNameRu` (varchar 100, nullable), the admin's site names that win over 1C (`ShortNameUk`/`ShortNameRu` then hold them); `IsClosedFromSearch` (boolean, default `false`), «Закрити від пошуку»; `ShareImageMediaFileId` (bigint, nullable), a media-library file by plain value, read through `Media.Contracts`.
+Since [site search settings](../../specs/catalog/011-site-search-settings/README.md) (migration `CategorySearchSettings`): `SiteNameUk` and `SiteNameRu` (varchar 100, nullable), the admin's site names that win over 1C (`ShortNameUk`/`ShortNameRu` then hold them); `IsClosedFromSearch` (boolean, default `false`), «Закрити від пошуку»; `ShareImageMediaFileId` (bigint, nullable), a media-library file by plain value, read through `Media.Contracts`.
 
 | Table | Key | Purpose |
 | --- | --- | --- |

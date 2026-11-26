@@ -172,7 +172,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
     /// <summary>
     /// A new category takes its parent's «show on site» value (a new top category is shown only in the hardware root,
-    /// spec catalog/007 R-18) and its parent's «Закрити від пошуку» (spec catalog/010 R-01). Parents come first by path,
+    /// spec catalog/007 R-18) and its parent's «Закрити від пошуку» (spec catalog/011 R-01). Parents come first by path,
     /// so a new child of a new parent sees the parent's values.
     /// </summary>
     private static void InheritSiteVisibility(IReadOnlyList<ProductCategory> created,

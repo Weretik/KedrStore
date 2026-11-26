@@ -23,4 +23,8 @@ public static class ProductPriceErrors
     public static DomainError CurrencyCodeInvalid() =>
         new("Catalog.ProductPrice.Currency.Code.Invalid", "Код валюти: три літери ISO, наприклад UAH.",
             Field: "Currency");
+
+    public static DomainError LockedFromOneC() =>
+        DomainError.Conflict("Catalog.ProductPrice.LockedFromOneC",
+            "Ціну завантажено з файлу, тому 1С її не змінює.");
 }

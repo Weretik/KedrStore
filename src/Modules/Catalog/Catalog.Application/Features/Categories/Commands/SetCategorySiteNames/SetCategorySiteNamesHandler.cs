@@ -7,7 +7,7 @@ using Catalog.Contracts.Category;
 namespace Catalog.Application.Features.Categories.Commands.SetCategorySiteNames;
 
 /// <summary>
-/// Saves the admin's Ukrainian and Russian site names of a category (spec catalog/010 R-02). They win over 1C; a
+/// Saves the admin's Ukrainian and Russian site names of a category (spec catalog/011 R-02). They win over 1C; a
 /// blank one goes back at once to the name 1C and the configuration give, so the site never waits for the next sync.
 /// </summary>
 public sealed class SetCategorySiteNamesHandler(

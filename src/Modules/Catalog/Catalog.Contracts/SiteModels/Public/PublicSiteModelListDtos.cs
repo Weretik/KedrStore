@@ -34,7 +34,7 @@ public sealed record PublicSiteModelCardDto(
     IReadOnlyList<PublicSiteModelSwatchDto> Colors,
     int? ProductId)
 {
-    /// <summary>When the accepted model or its texts last changed (spec catalog/010 R-04); <c>null</c> for a product of its own.</summary>
+    /// <summary>When the accepted model or its texts last changed (spec catalog/011 R-04); <c>null</c> for a product of its own.</summary>
     public DateTimeOffset? UpdatedAt { get; init; }
 }
 

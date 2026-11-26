@@ -10,7 +10,7 @@ public sealed record CategoryResponse(
     IReadOnlyList<CategoryResponse> Children,
     int ProductCount)
 {
-    /// <summary>«Закрити від пошуку» (spec catalog/010 R-01): the site gives the page <c>noindex</c> and leaves it out of the sitemap.</summary>
+    /// <summary>«Закрити від пошуку» (spec catalog/011 R-01): the site gives the page <c>noindex</c> and leaves it out of the sitemap.</summary>
     public bool IsClosedFromSearch { get; init; }
     /// <summary>When an admin or 1C last changed the category itself; the sitemap's <c>lastmod</c> (R-04).</summary>
     public DateTimeOffset? UpdatedAt { get; init; }
@@ -32,7 +32,7 @@ public sealed record CategoryDetailsResponse(
     decimal? MaxPrice,
     CategoryContentResponse? Content)
 {
-    /// <summary>«Закрити від пошуку» (spec catalog/010 R-01): the page and its products get <c>noindex</c>.</summary>
+    /// <summary>«Закрити від пошуку» (spec catalog/011 R-01): the page and its products get <c>noindex</c>.</summary>
     public bool IsClosedFromSearch { get; init; }
     /// <summary>CDN address of the link-preview picture; <c>null</c> keeps the site's own (R-03).</summary>
     public string? ShareImageUrl { get; init; }
@@ -56,7 +56,7 @@ public sealed record AdminCategoryResponse(
     int? ProductCount = null,
     IReadOnlyList<string>? FilledContentLanguages = null)
 {
-    /// <summary>Names an admin wrote for the site; they win over 1C (spec catalog/010 R-02). Empty when not written.</summary>
+    /// <summary>Names an admin wrote for the site; they win over 1C (spec catalog/011 R-02). Empty when not written.</summary>
     public string? SiteNameUk { get; init; }
     public string? SiteNameRu { get; init; }
     /// <summary>«Закрити від пошуку»: the site shows the category and its products with <c>noindex</c> (R-01).</summary>
@@ -107,14 +107,14 @@ public sealed record SaveCategoryContentRequest(
 public sealed record CategorySiteVisibilityResponse(int Id, bool IsShownOnSite, int ChangedCount);
 
 /// <summary>
-/// The admin's site names of a category (spec catalog/010 R-02); a blank one goes back to the name from 1C and the
+/// The admin's site names of a category (spec catalog/011 R-02); a blank one goes back to the name from 1C and the
 /// configuration.
 /// </summary>
 public sealed record SetCategorySiteNamesRequest(string? NameUk, string? NameRu);
 
 /// <summary>
 /// «Закрити від пошуку» for the category and every subcategory, and the link-preview picture of the category page
-/// (spec catalog/010 R-01, R-03). <c>ShareImageMediaFileId</c> <c>null</c> removes the picture.
+/// (spec catalog/011 R-01, R-03). <c>ShareImageMediaFileId</c> <c>null</c> removes the picture.
 /// </summary>
 public sealed record SetCategorySearchSettingsRequest
 {

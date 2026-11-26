@@ -19,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace IntegrationTests.Catalog.Categories;
 
 /// <summary>
-/// Spec catalog/010 over HTTP on an in-memory catalog: «Закрити від пошуку» with subcategories, the admin's site names,
+/// Spec catalog/011 over HTTP on an in-memory catalog: «Закрити від пошуку» with subcategories, the admin's site names,
 /// and the link-preview picture, as the admin saves them and the public site reads them.
 /// </summary>
 public sealed class CategorySearchSettingsApiTests

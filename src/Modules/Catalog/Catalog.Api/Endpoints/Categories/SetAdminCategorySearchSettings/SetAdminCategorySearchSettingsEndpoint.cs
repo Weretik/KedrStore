@@ -11,7 +11,7 @@ internal static class SetAdminCategorySearchSettingsEndpoint
         group.MapPut("{id:int}/search-settings", Handle)
             .WithName("setAdminCategorySearchSettings")
             .WithSummary("Close a category from search engines and set its link-preview picture")
-            .WithDescription("Spec catalog/010 R-01, R-03. Closing or opening applies to every subcategory too; the site keeps showing a closed category and its products, with noindex and outside the sitemap. A new 1C category takes its parent's mark. The picture is a media-library file; null removes it and the site keeps its own. Repeating the same request is safe.")
+            .WithDescription("Spec catalog/011 R-01, R-03. Closing or opening applies to every subcategory too; the site keeps showing a closed category and its products, with noindex and outside the sitemap. A new 1C category takes its parent's mark. The picture is a media-library file; null removes it and the site keeps its own. Repeating the same request is safe.")
             .RequireAuthorization(PolicyNames.CanManageSiteCatalog)
             .Produces<AdminCategoryResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
