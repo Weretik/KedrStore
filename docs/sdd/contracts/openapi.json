@@ -832,6 +832,76 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Create a category by hand",
+        "description": "Spec catalog/012 MC-01, MC-02. Under any active category without site models, or at the top without parentId. It takes the parent's «show on site» (unless isShownOnSite is sent) and «closed from search»; the 1C sync never deletes or moves it. The same Ukrainian name under the same parent answers 409.",
+        "operationId": "createAdminCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/categories/{id}": {
@@ -876,6 +946,71 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Delete an empty category made by hand",
+        "description": "Spec catalog/012 MC-04. Only a category made by hand (400 for a 1C one) and only without subcategories, site models, or products (409). It moves to «Видалені».",
+        "operationId": "deleteAdminCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1307,6 +1442,221 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}/parent": {
+      "put": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Put a category under another one",
+        "description": "Spec catalog/012 MC-03, MC-09. Any category, from 1C or made by hand, goes under an active category without site models, or to the top without parentId; its subcategories go with it. The 1C sync keeps the place. A move under itself or its subcategory answers 400. Repeating the same request is safe.",
+        "operationId": "moveAdminCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}/order": {
+      "put": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Move a category up or down among its neighbours",
+        "description": "Spec catalog/012 MC-10: direction «up» or «down». The neighbours get the order by hand, and the 1C sync keeps it. At the edge nothing changes.",
+        "operationId": "reorderAdminCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}/site-models": {
+      "post": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Put site models into a category",
+        "description": "Spec catalog/012 MC-07, spec 007 R-22. 1–200 models into a final category in one transaction; a proposed model is accepted first. A parent category answers 400, an unknown model 404. Repeating the same request is safe.",
+        "operationId": "addAdminCategorySiteModels",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCategorySiteModelsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -11130,6 +11480,21 @@
           }
         }
       },
+      "AddCategorySiteModelsRequest": {
+        "required": [
+          "modelIds"
+        ],
+        "type": "object",
+        "properties": {
+          "modelIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "AddGalleryPhotosRequest": {
         "required": [
           "mediaFileIds"
@@ -11780,7 +12145,8 @@
           "siteNameRu",
           "isClosedFromSearch",
           "shareImageMediaFileId",
-          "shareImageUrl"
+          "shareImageUrl",
+          "isManual"
         ],
         "type": "object",
         "properties": {
@@ -11874,6 +12240,9 @@
               "null",
               "string"
             ]
+          },
+          "isManual": {
+            "type": "boolean"
           }
         }
       },
@@ -14355,6 +14724,36 @@
           }
         }
       },
+      "CreateCategoryRequest": {
+        "required": [
+          "nameUk",
+          "nameRu",
+          "parentId",
+          "isShownOnSite"
+        ],
+        "type": "object",
+        "properties": {
+          "nameUk": {
+            "type": "string"
+          },
+          "nameRu": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "isShownOnSite": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
       "CreateOrderLineRequest": {
         "required": [
           "productId",
@@ -15641,6 +16040,21 @@
           },
           "refreshToken": {
             "type": "string"
+          }
+        }
+      },
+      "MoveCategoryRequest": {
+        "required": [
+          "parentId"
+        ],
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -17137,6 +17551,17 @@
         "type": "object",
         "properties": {
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ReorderCategoryRequest": {
+        "required": [
+          "direction"
+        ],
+        "type": "object",
+        "properties": {
+          "direction": {
             "type": "string"
           }
         }

@@ -115,12 +115,13 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
         {
             ProductCategoryId? parentId = item.ParentId == null ? null : ProductCategoryId.Create(item.ParentId.Value);
             var path = CategoryPath.Create(item.Path);
-            var presentation = ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path);
-
             if (existingById.TryGetValue(item.Id, out var existing))
             {
                 var fromOneC = existing.UpdateFromOneC(item.Name, path, parentId, now);
-                var shown = fromOneC.IsSuccess ? ApplyPresentation(existing, presentation) : fromOneC;
+                // The level comes from where the category sits now: a place set by hand wins over 1C (spec 012 MC-09).
+                var shown = fromOneC.IsSuccess
+                    ? ApplyPresentation(existing, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, existing.Path))
+                    : fromOneC;
                 if (shown.IsFailure)
                 {
                     logger.LogWarning("Skipping category {CategoryId} from 1C: {Error}", item.Id, shown.Error!.Message);
@@ -146,7 +147,7 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
                 path: path,
                 parentId: parentId);
             var presented = createdCategory.IsSuccess
-                ? ApplyPresentation(createdCategory.Value, presentation)
+                ? ApplyPresentation(createdCategory.Value, ResolvePresentation(rootCategoryOneCId, item.Id, item.Name, path))
                 : createdCategory.Error!;
             if (presented.IsFailure)
             {
@@ -163,6 +164,11 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
 
         if (allowDeletion)
             MarkMissingDeleted(existingById.Values, categoryDtos, rootCategoryOneCId, counters, now);
+
+        // Paths follow the parents: a category moved by hand, a new 1C category under it, and a manual category under
+        // a 1C parent that 1C moved all sit where their parent is now (spec catalog/012 MC-05, MC-09).
+        var tree = await categoryRepo.ListAsync(new WholeCategoryTreeSpec(), cancellationToken);
+        CategoryTreePlacement.Rebuild([.. tree, .. created], now);
 
         if (created.Count > 0)
             await categoryRepo.AddRangeAsync(created, cancellationToken);
@@ -193,7 +199,8 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
     {
         // Root and manual groups are part of categoryDtos, so they are never missing.
         var receivedIds = categoryDtos.Select(category => category.Id).ToHashSet();
-        var active = existing.Where(category => !category.IsDeleted).ToList();
+        // A category made by hand is never in 1C and never deleted by the sync (spec catalog/012 MC-05).
+        var active = existing.Where(category => !category.IsDeleted && !category.IsManual).ToList();
         var missing = active.Where(category => !receivedIds.Contains(category.Id.Value)).ToList();
 
         if (!MassDeletionGuard.Allows(active.Count, missing.Count))
@@ -229,4 +236,10 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
             presentation.ShortNameRu,
             presentation.SortOrder,
             presentation.Level);
+
+    /// <summary>Every category, deleted ones included, tracked, for rebuilding the paths.</summary>
+    private sealed class WholeCategoryTreeSpec : Specification<ProductCategory>
+    {
+        public WholeCategoryTreeSpec() => Query.IgnoreQueryFilters();
+    }
 }

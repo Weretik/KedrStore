@@ -15,7 +15,7 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
 
-namespace UnitTests.Catalog.Domain;
+namespace UnitTests.Catalog.Domain.Categories;
 
 public sealed class ProductCategoryPresentationMetadataTests
 {

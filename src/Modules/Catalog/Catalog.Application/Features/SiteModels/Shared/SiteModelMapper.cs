@@ -16,7 +16,7 @@ public static class SiteModelMapper
         var onSite = members.Where(state.IsOnSite).ToList();
         var photo = PhotoOf(state, model, onSite.Count > 0 ? onSite : members);
         return new SiteModelListItemDto(model.Id.Value, model.CategoryId.Value,
-            state.CategoryNames.GetValueOrDefault(model.CategoryId) ?? string.Empty, model.Name, model.Slug,
+            state.CategoryPathOf(model.CategoryId), model.Name, model.Slug,
             SiteModelState.StatusText(model.Status), members.Count, onSite.Count,
             onSite.Select(id => state.Products[id].RetailPrice).Where(price => price is not null).Min(),
             photo, state.AxesOf(modelId).Select(axis => axis.Attribute.Name).ToList(), state.ModelProblems(modelId),
@@ -56,7 +56,7 @@ public static class SiteModelMapper
         }).ToList();
 
         return new SiteModelDto(model.Id.Value, model.CategoryId.Value,
-            state.CategoryNames.GetValueOrDefault(model.CategoryId) ?? string.Empty, model.Name, model.Slug,
+            state.CategoryPathOf(model.CategoryId), model.Name, model.Slug,
             SiteModelState.StatusText(model.Status), model.AcceptedAt, model.AcceptedBy, model.MainProductId?.Value,
             axes.Select(axis => new SiteModelAxisDto(axis.Attribute.Id.Value, axis.Attribute.Code, axis.Attribute.Name,
                 SiteModelState.DisplayOf(axis.Attribute), axis.IsSaved)).ToList(),

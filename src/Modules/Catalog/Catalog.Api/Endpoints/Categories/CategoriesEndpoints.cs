@@ -14,6 +14,7 @@ using Catalog.Api.Endpoints.Categories.GetAdminCategories;
 using Catalog.Api.Endpoints.Categories.SaveAdminCategoryContent;
 using Catalog.Api.Endpoints.Categories.SetAdminCategorySearchSettings;
 using Catalog.Api.Endpoints.Categories.SetAdminCategorySiteNames;
+using Catalog.Api.Endpoints.CategoryPlacement;
 
 namespace Catalog.Api.Endpoints.Categories;
 
@@ -33,6 +34,7 @@ public static class CategoriesEndpoints
         SetAdminCategorySearchSettingsEndpoint.Map(adminCategories);
         GetAdminCategoryContentEndpoint.Map(adminCategories);
         SaveAdminCategoryContentEndpoint.Map(adminCategories);
+        CategoryPlacementEndpoints.Map(adminCategories);
 
         var categories = endpoints.MapGroup("api/catalog/{lang}")
             .WithTags("Categories")
