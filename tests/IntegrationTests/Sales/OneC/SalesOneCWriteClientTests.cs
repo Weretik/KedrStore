@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.ServiceModel;
 using BuildingBlocks.Integrations.OneC.Generated;
 using Microsoft.Extensions.Logging;
 using Sales.Application.Abstractions.Integrations.OneC;
@@ -108,6 +109,21 @@ public sealed class SalesOneCWriteClientTests
 
         Assert.Equal(OneCOrderDeliveryOutcome.TransportError, result.Outcome);
         Assert.Equal("HttpRequestException", result.Diagnostic);
+    }
+
+    [Fact]
+    public async Task SendOrderAsync_KeepsTheSoapFaultReasonInTheDiagnostic_ButNotInTheLogs()
+    {
+        var sender = new FakeSiteRequestSender(_ => throw new FaultException("Не найден тип цен контрагента"));
+        using var loggerProvider = new LogCollector();
+        var client = CreateClient(sender, loggerProvider);
+
+        var result = await client.SendOrderAsync(CreateRequest(), CancellationToken.None);
+
+        Assert.Equal(OneCOrderDeliveryOutcome.TransportError, result.Outcome);
+        Assert.Equal("FaultException: Не найден тип цен контрагента", result.Diagnostic);
+        Assert.Contains("FaultException", loggerProvider.Messages);
+        Assert.DoesNotContain("Не найден", loggerProvider.Messages);
     }
 
     private static SalesOneCWriteClient CreateClient(FakeSiteRequestSender sender, LogCollector loggerProvider)
