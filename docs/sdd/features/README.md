@@ -35,6 +35,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Page «Співпраця»](content/wholesale-page.md) — the wholesale offer texts in uk/ru: hero, company, three steps, questions.
 - [Search texts of the site pages](content/page-seo.md) — optional uk/ru search title and description of eleven site pages; the site keeps its own otherwise.
 - [Site SEO settings](content/site-seo-settings.md) — Google Analytics, Tag Manager, Search Console and Bing codes and the link-preview picture every site page carries.
+- [Site redirects](content/site-redirects.md) — «Переадресації»: old address → new address, which the site answers with a 301; Manager, Seo and Admin edit.
 - [Refresh the site now](content/site-refresh.md) — «Оновити сайт зараз»: asks the public site to drop its cached content and catalog.
 
 ## Media
@@ -61,6 +62,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Admin «Огляд» data](platform/admin-overview.md) — orders, catalog and content problems for the admin home page, one read endpoint per module.
 - [Offline app data snapshots](platform/mobile-offline-sync.md) — whole catalog and customers for the offline manager app, with `ETag`/`304` and compression.
 - [Request tracing and log correlation](platform/request-tracing.md) — production requests as traces in Google Cloud Trace, JSON logs linked to them.
+- [«SEO-огляд» data](platform/seo-review.md) — category, model and article pages whose search texts need work, one read endpoint per module.
 - [Read cache (HybridCache)](platform/read-cache.md) — expensive public reads kept in memory for a short time, dropped by tag after a command; today the category tree.
 
 Planned capabilities from SDDs and technical classes without separate scenarios are not shown here as completed features.

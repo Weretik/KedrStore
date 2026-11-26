@@ -20,6 +20,8 @@ public static class ContentInfrastructure
         services.AddDbContext<ContentDbContext>(options => ContentDbContext.Configure(options, connectionString));
         services.AddScoped<IReadContentDbContext>(sp => sp.GetRequiredService<ContentDbContext>());
         services.AddScoped(typeof(IContentRepository<>), typeof(ContentEfRepository<>));
+        services.AddScoped<IContentUniqueSave, ContentUniqueSave>();
+        services.AddScoped<ISiteRedirectSearch, Persistence.Seo.SiteRedirectSearch>();
         services.AddSingleton<IArticleHtmlSanitizer, ArticleHtmlSanitizer>();
         services.AddSingleton<ICoverImageProcessor, CoverImageProcessor>();
         services.AddScoped<IMediaImageReader, MediaImageReader>();
