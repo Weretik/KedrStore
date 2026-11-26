@@ -41,6 +41,6 @@ public sealed class QuickOrderOneCCommentTests
             new DateTimeOffset(2026, 11, 26, 10, 15, 0, TimeSpan.Zero),
             new string('к', QuickOrder.CommentMaxLength)).Value;
 
-        Assert.True(QuickOrderOneCComment.Build(order).Length <= Sales.Domain.Orders.Order.CommentMaxLength);
+        Assert.True(QuickOrderOneCComment.Build(order).Length <= global::Sales.Domain.Orders.Order.CommentMaxLength);
     }
 }
