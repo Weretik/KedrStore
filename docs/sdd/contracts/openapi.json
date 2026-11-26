@@ -15682,6 +15682,7 @@
           "scheme",
           "photos",
           "stock",
+          "inStock",
           "categoryName",
           "categorySlug",
           "quantityInPack",
@@ -15716,6 +15717,9 @@
           "stock": {
             "type": "number",
             "format": "double"
+          },
+          "inStock": {
+            "type": "boolean"
           },
           "categoryName": {
             "type": "string"

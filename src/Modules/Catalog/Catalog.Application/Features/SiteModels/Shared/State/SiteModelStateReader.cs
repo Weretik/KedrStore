@@ -63,21 +63,22 @@ public sealed class SiteModelStateReader(IReadCatalogDbContext db, IReadCache ca
             .ToListAsync(cancellationToken);
         var memberIds = members.Select(member => member.ProductId).ToList();
 
-        var prices = await db.ProductListProjections.AsNoTracking()
+        // The list projection is the one source of price and availability (hardware needs more than 2 in stock).
+        var listed = await db.ProductListProjections.AsNoTracking()
             .Where(projection => modelIds == null || memberIds.Contains(projection.ProductId))
-            .Select(projection => new { projection.ProductId, projection.RetailPrice })
-            .ToDictionaryAsync(projection => projection.ProductId, projection => projection.RetailPrice,
-                cancellationToken);
+            .Select(projection => new { projection.ProductId, projection.RetailPrice, projection.InStock })
+            .ToDictionaryAsync(projection => projection.ProductId, cancellationToken);
         var products = (await db.Products.IgnoreQueryFilters().AsNoTracking()
                 .Where(product => modelIds == null || memberIds.Contains(product.Id))
                 .Select(product => new
                 {
-                    product.Id, product.Name, product.ProductSlug, product.CategoryId, product.Photo, product.Stock,
+                    product.Id, product.Name, product.ProductSlug, product.CategoryId, product.Photo,
                     product.ExportToSite, product.IsDeleted
                 })
                 .ToListAsync(cancellationToken))
             .Select(product => new SiteModelSnapshot.ProductRow(product.Id.Value, product.Name, product.ProductSlug,
-                product.CategoryId.Value, product.Photo, prices.GetValueOrDefault(product.Id), product.Stock > 0,
+                product.CategoryId.Value, product.Photo, listed.GetValueOrDefault(product.Id)?.RetailPrice,
+                listed.GetValueOrDefault(product.Id)?.InStock == true,
                 product.ExportToSite, product.IsDeleted))
             .ToList();
 
