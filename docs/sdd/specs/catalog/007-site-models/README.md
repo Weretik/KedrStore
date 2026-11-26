@@ -246,6 +246,8 @@ Owner requests 2026-11-26 in the thread «Улучшить UX страницы �
 
 `ProductGroup.ChangeCategory(categoryId, now)` returns whether it changed. The command `ChangeSiteModelCategory` (`PUT api/admin/site-models/{id}/category`, body `categoryId`, answer `SiteModelDto`, operation `changeAdminSiteModelCategory`) checks the final category, accepts a proposed model through `SiteModelChanges.AcceptAsync` (shared with «Прийняти»), changes the category, and saves in one transaction; it drops the site models read cache. `SiteModelState.PlacementOf` gives a product's category by R-24; `PublicModelCatalogReader` reads every exported product and keeps an accepted model's members when the model's category is public.
 
+Audit: [code-audit/stage-9-audit.md](code-audit/stage-9-audit.md).
+
 ### Files (stage 9)
 
 ```text

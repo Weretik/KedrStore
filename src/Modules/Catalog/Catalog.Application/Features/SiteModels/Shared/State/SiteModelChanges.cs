@@ -30,7 +30,7 @@ public sealed class SiteModelChanges(
         if (missing.Count > 0)
         {
             return SiteModelValidation.Invalid("productIds",
-                $"Products not found: {string.Join(", ", missing)}.", "ProductNotFound");
+                $"Товарів не знайдено: {string.Join(", ", missing)}.", "ProductNotFound");
         }
 
         var taken = await db.ProductGroupMembers
@@ -42,7 +42,7 @@ public sealed class SiteModelChanges(
         if (taken.Count > 0)
         {
             return SiteModelValidation.Invalid("productIds",
-                "Products already in another model: " +
+                "Товари вже в іншій моделі: " +
                 string.Join(", ", taken.Select(row => $"{row.ProductId.Value} («{row.Name}»)")) + ".",
                 "ProductInAnotherModel");
         }
