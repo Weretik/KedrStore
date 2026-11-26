@@ -11,6 +11,7 @@ internal sealed class FakeQuickOrderStore : IQuickOrderStore
 
     public List<QuickOrder> Saved { get; } = [];
     public List<QuickOrderPlaced> Messages { get; } = [];
+    public List<QuickOrderToOneC> OneCMessages { get; } = [];
     public List<CancellationToken> SaveTokens { get; } = [];
 
     /// <summary>An order with the same id that another request stores between our check and our save.</summary>
@@ -26,7 +27,8 @@ internal sealed class FakeQuickOrderStore : IQuickOrderStore
         return Task.FromResult(found);
     }
 
-    public Task<bool> TryAddAsync(QuickOrder order, QuickOrderPlaced message, CancellationToken cancellationToken)
+    public Task<bool> TryAddAsync(
+        QuickOrder order, QuickOrderPlaced message, QuickOrderToOneC oneCMessage, CancellationToken cancellationToken)
     {
         SaveTokens.Add(cancellationToken);
         if (RaceWinner is not null)
@@ -37,6 +39,7 @@ internal sealed class FakeQuickOrderStore : IQuickOrderStore
 
         Saved.Add(order);
         Messages.Add(message);
+        OneCMessages.Add(oneCMessage);
         return Task.FromResult(true);
     }
 

@@ -358,6 +358,12 @@ namespace Sales.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<long?>("OneCOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("OneCOrderMessageId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -390,6 +396,8 @@ namespace Sales.Infrastructure.Migrations
                         .HasColumnName("xmin");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OneCOrderId");
 
                     b.HasIndex("PlacedAtUtc", "Id")
                         .HasDatabaseName("IX_QuickOrders_PlacedAtUtc_Id");
@@ -612,6 +620,14 @@ namespace Sales.Infrastructure.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrder", b =>
+                {
+                    b.HasOne("Sales.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OneCOrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Sales.Domain.QuickOrders.QuickOrderItem", b =>

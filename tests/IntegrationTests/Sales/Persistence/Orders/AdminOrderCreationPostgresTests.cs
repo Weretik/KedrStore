@@ -111,6 +111,9 @@ public sealed class AdminOrderCreationPostgresTests(SalesPostgresFixture postgre
             Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
             CancellationToken cancellationToken)
             => inner.PersistAsync(order, idempotencyRecordFactory, cancellationToken);
+
+        public Task AddFromOutboxAsync(Order order, CancellationToken cancellationToken)
+            => inner.AddFromOutboxAsync(order, cancellationToken);
     }
 
     private ServiceProvider BuildProvider()

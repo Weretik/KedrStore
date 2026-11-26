@@ -1,4 +1,6 @@
 
+using Sales.Domain.Orders.ValueObjects;
+
 namespace Sales.Domain.QuickOrders;
 
 /// <summary>
@@ -29,6 +31,15 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
     /// <summary>Set when the outbox gave up; only then may a person send the order again.</summary>
     public DateTimeOffset? TelegramFailedAtUtc { get; private set; }
 
+    /// <summary>
+    /// The outbox message that turns this order into a 1C order (spec sales/009, R-010); stable across retries. Null
+    /// for orders placed before site orders went to 1C: they are never sent.
+    /// </summary>
+    public Guid? OneCOrderMessageId { get; private set; }
+
+    /// <summary>The order made from this one for 1C; set once, so a repeated message makes no second order.</summary>
+    public OrderId? OneCOrderId { get; private set; }
+
     public QuickOrderTelegramStatus TelegramStatus => TelegramSentAtUtc is not null
         ? QuickOrderTelegramStatus.Sent
         : TelegramFailedAtUtc is not null ? QuickOrderTelegramStatus.Failed : QuickOrderTelegramStatus.Pending;
@@ -53,6 +64,7 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
             Phone = phone.Trim(),
             PlacedAtUtc = placedAtUtc,
             Total = orderItems.Sum(item => item.Amount),
+            OneCOrderMessageId = Guid.CreateVersion7(placedAtUtc),
         };
         order._items.AddRange(orderItems);
         return order;
@@ -64,6 +76,16 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
         && Phone == other.Phone
         && _items.Count == other._items.Count
         && _items.Zip(other._items).All(pair => pair.First.SameAs(pair.Second));
+
+    /// <summary>The 1C order made from this one is stored (R-010); a second, different order is refused.</summary>
+    public DomainResult LinkOneCOrder(OrderId orderId)
+    {
+        if (OneCOrderId is { } linked && linked != orderId)
+            return QuickOrderErrors.OneCOrderAlreadyLinked();
+
+        OneCOrderId = orderId;
+        return DomainResult.Success();
+    }
 
     /// <summary>Telegram has the order. A later attempt (a repeat delivery) changes nothing.</summary>
     public void MarkSentToTelegram(DateTimeOffset now)

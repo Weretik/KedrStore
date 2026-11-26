@@ -122,5 +122,7 @@ public sealed class CreateOrderCommandHandlerTests
             Persisted = true;
             return Task.FromResult(true);
         }
+
+        public Task AddFromOutboxAsync(Order order, CancellationToken cancellationToken) => throw new NotSupportedException();
     }
 }

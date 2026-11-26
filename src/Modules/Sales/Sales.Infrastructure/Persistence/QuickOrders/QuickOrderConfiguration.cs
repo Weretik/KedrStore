@@ -1,3 +1,5 @@
+using Sales.Domain.Orders;
+using Sales.Domain.Orders.ValueObjects;
 using Sales.Domain.QuickOrders;
 
 namespace Sales.Infrastructure.Persistence.QuickOrders;
@@ -23,6 +25,17 @@ public sealed class QuickOrderConfiguration : IEntityTypeConfiguration<QuickOrde
         builder.Property(order => order.Total).HasPrecision(18, 2).IsRequired();
         builder.Property(order => order.TelegramLastError).HasMaxLength(QuickOrder.TelegramErrorMaxLength);
         builder.Ignore(order => order.TelegramStatus);
+
+        // Spec sales/009, R-010: the key of the 1C outbox message and the 1C order made from the site order. An order
+        // removed with its customer leaves the site order without the link.
+        builder.Property(order => order.OneCOrderMessageId);
+        builder.Property(order => order.OneCOrderId)
+            .HasConversion(id => id!.Value.Value, value => OrderId.FromStorage(value))
+            .HasColumnType("bigint");
+        builder.HasOne<Order>()
+            .WithMany()
+            .HasForeignKey(order => order.OneCOrderId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // PostgreSQL xmin: two parallel resends or a resend racing a delivery make one change (database rules 4).
         builder.Property<uint>("xmin").IsRowVersion();

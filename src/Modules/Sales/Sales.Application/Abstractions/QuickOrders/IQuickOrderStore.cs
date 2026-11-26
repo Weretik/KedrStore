@@ -9,9 +9,13 @@ public interface IQuickOrderStore
     /// <summary>The stored order with this id, tracked for a change.</summary>
     Task<QuickOrder?> FindAsync(QuickOrderId id, CancellationToken cancellationToken);
 
-    /// <summary>Stores a new order and its outbox message under the order id in one save.</summary>
+    /// <summary>
+    /// Stores a new order with its Telegram message (under the order id) and its 1C message (under
+    /// <see cref="QuickOrder.OneCOrderMessageId"/>) in one save.
+    /// </summary>
     /// <returns>False when an order with this id is already stored (a repeat that lost the race).</returns>
-    Task<bool> TryAddAsync(QuickOrder order, QuickOrderPlaced message, CancellationToken cancellationToken);
+    Task<bool> TryAddAsync(
+        QuickOrder order, QuickOrderPlaced message, QuickOrderToOneC oneCMessage, CancellationToken cancellationToken);
 
     /// <summary>Saves the resend transition of a tracked order with a new outbox message in one save.</summary>
     /// <returns>False when the order changed meanwhile (another resend or a delivery).</returns>

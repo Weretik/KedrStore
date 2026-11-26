@@ -20,6 +20,10 @@ public static class QuickOrderErrors
     public static DomainError AlreadySent() => DomainError.Conflict("already_sent", "Замовлення вже надіслано в Telegram.");
     public static DomainError DeliveryInProgress() =>
         DomainError.Conflict("delivery_in_progress", "Замовлення ще відправляється в Telegram. Спробуйте пізніше.");
+    public static DomainError ProductNotInCatalog(string productId) =>
+        new("sales.quick_order.product_not_in_catalog", $"Товару {productId} немає в каталозі.", Field: "ProductId");
+    public static DomainError OneCOrderAlreadyLinked() =>
+        DomainError.Conflict("one_c_order_already_linked", "Для цього замовлення вже створено замовлення для 1С.");
     public static DomainError ChangedMeanwhile() =>
         DomainError.Conflict("concurrency_conflict", "Стан замовлення змінився. Оновіть сторінку й спробуйте ще раз.");
 }

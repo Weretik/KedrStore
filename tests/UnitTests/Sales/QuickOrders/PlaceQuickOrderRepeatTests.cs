@@ -35,7 +35,10 @@ public sealed class PlaceQuickOrderRepeatTests
         var message = Assert.Single(store.Messages);
         Assert.Equal(Key, message.OrderId);
         Assert.Equal(Line, Assert.Single(message.Lines));
-        Assert.Equal(Key, Assert.Single(Assert.Single(outbox.Dispatched)));
+        // R-010: the same save stores the message that makes the 1C order; both are tried at once.
+        Assert.Equal(Key, Assert.Single(store.OneCMessages).QuickOrderId);
+        Assert.NotNull(order.OneCOrderMessageId);
+        Assert.Equal([Key, order.OneCOrderMessageId!.Value], Assert.Single(outbox.Dispatched));
     }
 
     [Fact]

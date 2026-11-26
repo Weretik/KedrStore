@@ -1,6 +1,6 @@
 # Site quick order and «Замовлення з сайту»
 
-**Static code check:** 2026-11-24. **Module:** Sales. **Specs:** [sales 009 — site orders in the Admin](../../specs/sales/009-site-orders-in-admin/README.md), [platform 006, R-007](../../specs/platform/006-transactional-outbox/README.md).
+**Static code check:** 2026-11-26. **Module:** Sales. **Specs:** [sales 009 — site orders in the Admin](../../specs/sales/009-site-orders-in-admin/README.md), [platform 006, R-007](../../specs/platform/006-transactional-outbox/README.md).
 
 Public `POST /api/orders`: a buyer without an account sends a name, a phone and cart lines. The order is kept in `sales."QuickOrders"` together with a Telegram outbox message in one save, and sent to the managers' Telegram chat as an Excel file. People see the order by its number, the first 8 hex digits of the id (`№ 52992220`): on the site after sending, in the Telegram caption, in the file name `order_52992220.xlsx` and its «Заявка» cell, and in the Admin, where search finds it. Anonymous, rate-limited (`QuickOrder`: 60 per 10 minutes per calling address). The Admin page «Замовлення з сайту» lists the orders, opens one, shows when Telegram has not got it and why, and sends a failed one again.
 
@@ -24,7 +24,7 @@ Public `POST /api/orders`: a buyer without an account sends a name, a phone and 
 
 **Data.** Tables `QuickOrders` and `QuickOrderItems` in schema `sales` ([data map](../../architecture/data-model/sales-orders.md#site-orders)). Name and phone are personal data: kept with the order like Sales orders, never written to logs (log lines carry the order id, line count, total, and for a resend the staff user id). Processed outbox rows are still deleted after 30 days; the order stays. Migration `AddQuickOrders` copied the orders that existed only in the outbox at release.
 
-The quick order is not a Sales [Order](../../../../src/Modules/Sales/Sales.Domain/Orders/Order.cs) and is not sent to 1C; managers work it from the Excel file and the Admin page.
+**To 1C (spec 009, R-013).** The same save stores a second outbox message [QuickOrderToOneC](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/Messages/QuickOrderToOneC.cs) under `QuickOrder.OneCOrderMessageId`. [CreateOneCOrderFromQuickOrderHandler](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/ToOneC/CreateOneCOrderFromQuickOrderHandler.cs) makes an ordinary Sales [Order](../../../../src/Modules/Sales/Sales.Domain/Orders/Order.cs) on the counterparty from `Sales:SiteOrders:CounterpartyId` ([SiteOrderOneCOptions](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/ToOneC/SiteOrderOneCOptions.cs), default `000001588` «РОЗНИЦА ХАЛТУРИНА»): the site lines at the buyer's prices, comment from [QuickOrderOneCComment](../../../../src/Modules/Sales/Sales.Application/Features/QuickOrders/ToOneC/QuickOrderOneCComment.cs) (`Сайт № 52992220, Іван, +380…, 26.11.2026 12:15`, Kyiv time). `IOrderCreationStore.AddFromOutboxAsync` saves it inside the dispatch transaction to get its number (`SO-yyyyMMdd-id`) and adds its `OrderPlaced` message; the site order keeps the link `OneCOrderId` (`LinkOneCOrder`, set once), so a repeated message makes nothing. From there it is an [admin order](admin-orders.md): sent to 1C in the 1C lane and sending window, visible in «Замовлення» with its 1C status. A missing counterparty or a non-numeric product id fails the attempt; the outbox retries and gives up after ten. Site orders placed before 2026-11-26 have no message and are not sent.
 
 ## Code structure
 
@@ -36,7 +36,8 @@ src/Modules/Sales/
 │   ├── Commands/PlaceQuickOrder/                         # command, validator, handler
 │   ├── Commands/ResendQuickOrderToTelegram/              # command, validator, handler, result
 │   ├── Queries/GetQuickOrderList/ and GetQuickOrderById/ # queries, validators, handlers, DTOs
-│   └── Messages/                                         # QuickOrderPlaced (outbox type "sales.quick-order-placed"), QuickOrderLine, its give-up handler
+│   ├── Messages/                                         # QuickOrderPlaced (outbox type "sales.quick-order-placed"), QuickOrderLine, its give-up handler; QuickOrderToOneC ("sales.quick-order-to-1c")
+│   └── ToOneC/                                           # handler that makes the 1C order, comment, options (counterparty)
 ├── Sales.Infrastructure/Persistence/QuickOrders/         # EF configurations, store, read service
 ├── Sales.Infrastructure/QuickOrders/                     # Excel file, Telegram caption and sender
 └── Sales.Api/Endpoints/QuickOrders/                      # route groups; PlaceQuickOrder/, GetQuickOrderList/, GetQuickOrderById/, ResendQuickOrderToTelegram/
@@ -58,6 +59,10 @@ flowchart LR
     D -->|"10th failure"| H["QuickOrderTelegramGiveUpHandler"] -->|"failed"| C
     I["Admin «Замовлення з сайту»"] -->|"list, detail"| C
     I -->|"resend failed"| M
+    D --> J["CreateOneCOrderFromQuickOrderHandler"]
+    J -->|"Order on 000001588 + OrderPlaced"| K[("sales.Orders")]
+    J -->|"OneCOrderId"| C
+    K -->|"1C lane"| L["SendOrderToOneCHandler → 1C"]
 ```
 
 ## Tests
@@ -69,6 +74,8 @@ flowchart LR
 - [QuickOrderTelegramCaptionTests](../../../../tests/UnitTests/Sales/QuickOrders/QuickOrderTelegramCaptionTests.cs): HTML escaping, order id, Kyiv time, file name.
 - [QuickOrderApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderApiTests.cs): sent at once while Telegram works, stored and sent by the next dispatch while it is down, 400 and no row for invalid input, repeats and parallel copies store one order, the same key with other lines answers 409.
 - [QuickOrderAdminApiTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderAdminApiTests.cs): the real sender over a fake Telegram API — sent order listed with lines; a refused order shows the reason, becomes `failed` after ten attempts, is resent once and then delivered; search by name, phone, order number and whole id; 404 and 400; 401/403 without the orders policy.
+- [CreateOneCOrderFromQuickOrderTests](../../../../tests/UnitTests/Sales/QuickOrders/ToOneC/CreateOneCOrderFromQuickOrderTests.cs) and [QuickOrderOneCCommentTests](../../../../tests/UnitTests/Sales/QuickOrders/ToOneC/QuickOrderOneCCommentTests.cs): order on the retail counterparty with lines, amounts and comment, link, no second order on a repeat, missing counterparty or non-numeric product fails the attempt.
+- [QuickOrderToOneCPostgresTests](../../../../tests/IntegrationTests/Sales/QuickOrders/QuickOrderToOneCPostgresTests.cs): on PostgreSQL, the Telegram and 1C messages in one batch make one linked order that the 1C lane sends; without the counterparty nothing is made.
 - Filter `FullyQualifiedName~QuickOrder` (unit and integration).
 
 ## Related sources

@@ -55,6 +55,32 @@ internal sealed class OrderCreationStore(SalesDbContext dbContext, OutboxWriter 
         }
     }
 
+    public async Task AddFromOutboxAsync(Order order, CancellationToken cancellationToken)
+    {
+        // Inside the dispatch transaction EF Core saves under a savepoint, so a failed save leaves the batch usable.
+        await dbContext.Orders.AddAsync(order, cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            dbContext.Entry(order).State = EntityState.Detached;
+            foreach (var line in order.Lines)
+                dbContext.Entry(line).State = EntityState.Detached;
+            throw;
+        }
+
+        AssignNumberAndQueue(order);
+    }
+
+    private void AssignNumberAndQueue(Order order)
+    {
+        order.AssignOrderNumber($"SO-{order.CreatedAt:yyyyMMdd}-{order.Id.Value}");
+        // Platform spec 006, R-010: the 1C delivery is stored with the order; the scheduled dispatch sends it.
+        outbox.Add(dbContext, new OrderPlaced(order.Id.Value), order.OneCMessageId);
+    }
+
     private async Task PersistInTransactionAsync(
         Order order,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
@@ -68,11 +94,9 @@ internal sealed class OrderCreationStore(SalesDbContext dbContext, OutboxWriter 
         await dbContext.Orders.AddAsync(order, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        order.AssignOrderNumber($"SO-{order.CreatedAt:yyyyMMdd}-{order.Id.Value}");
+        AssignNumberAndQueue(order);
 
         var idempotency = idempotencyRecordFactory(order.Id);
-        // Platform spec 006, R-010: the 1C delivery is stored with the order; the scheduled dispatch sends it.
-        outbox.Add(dbContext, new OrderPlaced(order.Id.Value), order.OneCMessageId);
         await dbContext.OrderIdempotencyRecords.AddAsync(new OrderIdempotencyRecord
         {
             Operation = idempotency.Operation,
