@@ -1,10 +1,6 @@
 # Public site models
 
-<<<<<<< HEAD
 **Static code check:** 2026-11-26 (spec 007 stage 9, spec 010). **Module:** Catalog.
-=======
-**Static code check:** 2026-11-26 (spec 007 stage 9). **Module:** Catalog.
->>>>>>> origin/claude/project-thread-d2jeza
 
 Anonymous reads the new public site is built from: model cards of a category with attribute filters, the search, the model page, and the model address of an old product address. Decisions and scenarios are in [spec 007](../../specs/catalog/007-site-models/README.md) (M-04, M-09–M-12).
 
