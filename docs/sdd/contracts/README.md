@@ -21,7 +21,7 @@ Every error is `application/problem+json` with `code`, `detail` and `traceId` (t
 - Record decisions a person must read (scope, consumers, compatibility, security, errors, idempotency, deployment order) in the feature's `contracts/api-contract.md`.
 - Write the API test first (`tests/IntegrationTests/<Module>/Api/`), then the endpoint; the regenerated `openapi.json` shows the contract change in review.
 - A breaking change (removed or renamed path, parameter or field, changed type) needs a migration path for the frontends and the mobile app, which may run an old version.
-- In the PR say that kedr-web must sync the contract; its daily job also opens the sync PR on its own.
+- In the PR say that kedr-web must sync the contract. The branch does not wait for the daily job or for `contracts:drift` to fail and does not ask the owner: after the backend PR merges, the kedr-web branch updates from `master` and runs `npm run contracts:sync` itself. Order: merge backend → sync the contract in kedr-web → merge frontend.
 
 ## Frontend handoff
 
