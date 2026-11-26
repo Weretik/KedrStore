@@ -14384,8 +14384,7 @@
         "required": [
           "firstName",
           "phone",
-          "lines",
-          "comment"
+          "lines"
         ],
         "type": "object",
         "properties": {
