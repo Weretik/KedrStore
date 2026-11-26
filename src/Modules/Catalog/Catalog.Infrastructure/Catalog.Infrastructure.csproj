@@ -22,6 +22,7 @@
     <ItemGroup>
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
       <PackageReference Include="HtmlSanitizer" />
+      <PackageReference Include="ClosedXML" />
     </ItemGroup>
 
 </Project>

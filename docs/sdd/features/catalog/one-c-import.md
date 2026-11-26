@@ -15,6 +15,8 @@ The [category job](../../../../src/Modules/Catalog/Catalog.Application/Features/
 - a returning row is restored with its old slug;
 - a slug is created once, for new rows only, through [SlugService](../../../../src/Modules/Catalog/Catalog.Application/Features/Slugs/Shared/SlugService.cs), and is never rewritten by the import.
 
+The price job leaves alone the prices the owner's Excel file locked (`ProductPrice.LockedFromOneCAt`, [retail prices from a file](retail-price-file.md)): it neither changes nor removes them and logs how many it kept.
+
 Products find their category by name through [CategoryNameMap](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/Categories/CategoryNameMap.cs): a missing or ambiguous name keeps the current category (or skips a new product) and is reported in one warning. Each phase logs its duration and counters through [ImportCounters](../../../../src/Modules/Catalog/Catalog.Application/Features/OneCSync/Sync/ImportCounters.cs). The projection rebuild leaves out products of deleted categories.
 
 ## Code structure

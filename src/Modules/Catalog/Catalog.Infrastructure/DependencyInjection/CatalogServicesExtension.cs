@@ -3,6 +3,8 @@ using Catalog.Contracts.Sales;
 using Catalog.Infrastructure.Contracts.Sales;
 using Catalog.Application.Abstractions.Integrations;
 using Catalog.Infrastructure.Integrations.Html;
+using Catalog.Infrastructure.Integrations.Excel;
+using Catalog.Application.Abstractions.Files;
 using Catalog.Infrastructure.Contracts.Products;
 using Catalog.Infrastructure.Contracts.Reference;
 using Catalog.Application.Abstractions.Media;
@@ -21,6 +23,7 @@ public static class CatalogServicesExtension
     {
         services.AddScoped<ICatalogProductListReader, CatalogProductListReader>();
         services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
+        services.AddSingleton<IRetailPriceSheetReader, ClosedXmlRetailPriceSheetReader>();
         services.AddCatalogContracts();
         services.AddProductMediaServices();
 

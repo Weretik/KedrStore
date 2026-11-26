@@ -3014,6 +3014,170 @@
         }
       }
     },
+    "/api/admin/retail-prices": {
+      "get": {
+        "tags": [
+          "AdminRetailPrices"
+        ],
+        "summary": "Get the retail price type and how many of its prices the price file keeps from 1C",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin). The retail price type is the one the site shows (`Catalog:Pricing:RetailPriceTypeId`); its name is the price column the file must have.",
+        "operationId": "getAdminRetailPriceStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetailPriceStatusDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/retail-prices/import": {
+      "post": {
+        "tags": [
+          "AdminRetailPrices"
+        ],
+        "summary": "Set the site's retail prices from the 1C price list in Excel",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin). Multipart `file` (.xlsx up to 10 MB) with a header row holding «Код» and the retail price type's name; only that price type changes, by product code. `protectFromOneC` (default true) keeps the prices from the file from the 1C sync; false gives them back to it. The product list is rebuilt before the answer. 409 when a 1C sync changed the same prices meanwhile.",
+        "operationId": "importAdminRetailPrices",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "$ref": "#/components/schemas/IFormFile"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "protectFromOneC": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetailPriceImportResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/retail-prices/unlock": {
+      "post": {
+        "tags": [
+          "AdminRetailPrices"
+        ],
+        "summary": "Give the retail prices from the price file back to the 1C sync",
+        "description": "Policy CanManageProducts (Manager, Seo, and Admin). Removes the lock from every retail price; the amounts stay until the next 1C price sync. A repeat changes nothing. 409 when a 1C sync changed the same prices meanwhile.",
+        "operationId": "unlockAdminRetailPrices",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetailPriceStatusDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/site-models": {
       "get": {
         "tags": [
@@ -16713,6 +16877,80 @@
         ],
         "type": "integer"
       },
+      "RetailPriceImportResultDto": {
+        "required": [
+          "changed",
+          "unchanged",
+          "notFoundCount",
+          "notFoundCodes",
+          "withoutPriceCount",
+          "withoutPriceCodes",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "changed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unchanged": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notFoundCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notFoundCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "withoutPriceCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withoutPriceCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/RetailPriceStatusDto"
+          }
+        }
+      },
+      "RetailPriceStatusDto": {
+        "required": [
+          "priceTypeId",
+          "priceTypeName",
+          "lockedCount",
+          "lastLockedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "priceTypeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "priceTypeName": {
+            "type": "string"
+          },
+          "lockedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastLockedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "RetryAdminOrderSyncRequest": {
         "type": "object",
         "properties": {
@@ -19718,6 +19956,9 @@
     },
     {
       "name": "Products"
+    },
+    {
+      "name": "AdminRetailPrices"
     },
     {
       "name": "AdminSiteModels"

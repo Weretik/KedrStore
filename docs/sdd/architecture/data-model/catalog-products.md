@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | `Products` | `Id` | Product: `CategoryId` (FK), `ProductSlug` (unique, stable), `Name`, `Photo` and `Sсheme` (cache of the first photo and the scheme URL, empty string without them), publication flags, soft delete (`IsDeleted`, `DeletedAt`). |
 | `ProductMedia` | `ProductId`, `MediaFileId` | Link to a media library file, owned by the product: `Kind` (1 photo, 2 scheme), `Position` (photo order from 0), `Url` (copy refreshed by the CDN sync run). Index on `MediaFileId`. |
-| `ProductPrices` | `Id` | Price: `ProductId` (FK), `PriceTypeId`, `Amount`, `CurrencyIso`, `ProductTypeIdOneC`. |
+| `ProductPrices` | `Id` | Price: `ProductId` (FK), `PriceTypeId`, `Amount`, `CurrencyIso`, `ProductTypeIdOneC`; `LockedFromOneCAt` (set while the owner's price file keeps the price from the 1C sync, [spec 010](../../specs/catalog/010-retail-prices-from-file/README.md)); `xmin` row version against a race with the sync. Unique (`ProductId`, `PriceTypeId`). |
 | `ProductTranslations` | `Id` | Translation: `ProductId` (FK), `Language`, `Name`. |
 | `PriceType` | `Id` | Price type lookup: `PriceTypeName`; physical table name is singular. |
 | `CatalogAttributes` | `Id` (identity) | Attribute: `Code` (unique), `NameUk`, `Kind` (1 list, 2 number, 3 size), `Unit`, `Slug` (unique, filter URL part), `IsFilterable`, `IsVariantAxis`, `SortOrder`, `IsEditedManually`. |

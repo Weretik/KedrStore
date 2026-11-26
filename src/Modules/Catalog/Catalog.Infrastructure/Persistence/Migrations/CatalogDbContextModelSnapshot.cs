@@ -790,6 +790,9 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .HasColumnName("Currency")
                         .IsFixedLength();
 
+                    b.Property<DateTimeOffset?>("LockedFromOneCAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("PriceTypeId")
                         .HasColumnType("integer");
 
@@ -800,6 +803,12 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

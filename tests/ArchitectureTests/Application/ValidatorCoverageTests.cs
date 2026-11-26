@@ -6,7 +6,7 @@ namespace ArchitectureTests.Application;
 
 /// <summary>
 /// Every command or query that carries client input has a FluentValidation validator in its module, so the server
-/// checks input itself whatever the client did. Messages without input or with only flags need none.
+/// checks input itself whatever the client did. Messages without input or with only flags need none; the cache tags a command drops are not input.
 /// </summary>
 public sealed class ValidatorCoverageTests
 {
@@ -49,6 +49,7 @@ public sealed class ValidatorCoverageTests
 
     private static bool HasInput(Type type)
         => type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(property => property.Name != "EqualityContract")
+            // The cache tags a command drops are fixed by the code, not sent by the client.
+            .Where(property => property.Name is not ("EqualityContract" or "InvalidatedCacheTags"))
             .Any(property => property.PropertyType != typeof(bool) && property.PropertyType != typeof(bool?));
 }
