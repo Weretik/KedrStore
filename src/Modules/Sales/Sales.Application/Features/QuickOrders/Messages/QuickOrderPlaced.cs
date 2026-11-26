@@ -13,7 +13,8 @@ public sealed record QuickOrderPlaced(
     string FirstName,
     string Phone,
     IReadOnlyList<QuickOrderLine> Lines,
-    DateTimeOffset PlacedAtUtc) : IOutboxMessage
+    DateTimeOffset PlacedAtUtc,
+    string? Comment = null) : IOutboxMessage
 {
     /// <summary>The stored type name; keep it when the record is renamed.</summary>
     public const string TypeName = "sales.quick-order-placed";
@@ -23,5 +24,6 @@ public sealed record QuickOrderPlaced(
         order.FirstName,
         order.Phone,
         order.Items.Select(item => new QuickOrderLine(item.ProductId, item.Title, item.UnitPrice, item.Quantity)).ToList(),
-        order.PlacedAtUtc);
+        order.PlacedAtUtc,
+        order.Comment);
 }

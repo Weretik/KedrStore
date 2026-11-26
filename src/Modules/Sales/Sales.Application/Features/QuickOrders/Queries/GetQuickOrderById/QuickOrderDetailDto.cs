@@ -12,4 +12,5 @@ public sealed record QuickOrderDetailDto(
     DateTimeOffset? TelegramSentAtUtc,
     DateTimeOffset? TelegramLastAttemptAtUtc,
     string? TelegramLastError,
-    IReadOnlyList<QuickOrderItemDto> Items);
+    IReadOnlyList<QuickOrderItemDto> Items,
+    string? Comment = null);

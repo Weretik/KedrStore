@@ -86,7 +86,8 @@ internal sealed class QuickOrderReadService(SalesDbContext dbContext) : IQuickOr
                     .OrderBy(item => item.Id)
                     .Select(item => new QuickOrderItemDto(
                         item.ProductId, item.Title, item.UnitPrice, item.Quantity, item.UnitPrice * item.Quantity))
-                    .ToList()))
+                    .ToList(),
+                order.Comment))
             .SingleOrDefaultAsync(cancellationToken);
     }
 }

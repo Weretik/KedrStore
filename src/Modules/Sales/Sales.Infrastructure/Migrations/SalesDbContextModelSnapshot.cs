@@ -353,6 +353,10 @@ namespace Sales.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Comment")
+                        .HasMaxLength(800)
+                        .HasColumnType("character varying(800)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(30)

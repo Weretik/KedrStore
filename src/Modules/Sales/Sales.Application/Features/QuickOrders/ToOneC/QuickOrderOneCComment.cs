@@ -5,7 +5,7 @@ namespace Sales.Application.Features.QuickOrders.ToOneC;
 
 /// <summary>
 /// The comment of the 1C order made from a site order (spec sales/009, R-010): the order number the buyer saw, the
-/// buyer's name and phone, and when it was placed, Kyiv time.
+/// buyer's name and phone, when it was placed (Kyiv time) and the buyer's comment when there is one.
 /// </summary>
 public static class QuickOrderOneCComment
 {
@@ -14,6 +14,7 @@ public static class QuickOrderOneCComment
     public static string Build(QuickOrder order)
     {
         var placedAt = TimeZoneInfo.ConvertTime(order.PlacedAtUtc, Kyiv);
-        return $"Сайт № {QuickOrderNumberSearch.NumberOf(order.Id.Value)}, {order.FirstName}, {order.Phone}, {placedAt:dd.MM.yyyy HH:mm}";
+        var text = $"Сайт № {QuickOrderNumberSearch.NumberOf(order.Id.Value)}, {order.FirstName}, {order.Phone}, {placedAt:dd.MM.yyyy HH:mm}";
+        return order.Comment is null ? text : $"{text}. Коментар покупця: {order.Comment}";
     }
 }

@@ -4,4 +4,5 @@ namespace Sales.Api.Endpoints.QuickOrders.PlaceQuickOrder;
 public sealed record CreateOrderRequest(
     string FirstName,
     string Phone,
-    IReadOnlyList<CreateOrderLineRequest> Lines);
+    IReadOnlyList<CreateOrderLineRequest> Lines,
+    string? Comment = null);

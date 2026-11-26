@@ -15,7 +15,7 @@ public static class QuickOrderTelegramCaption
     public static string Build(QuickOrderPlaced order)
     {
         var placedAt = TimeZoneInfo.ConvertTime(order.PlacedAtUtc, Kyiv);
-        string[] parts =
+        List<string> parts =
         [
             "<b>Нове замовлення</b>",
             $"🆔 <b>№ {QuickOrderNumberSearch.NumberOf(order.OrderId)}</b>",
@@ -23,6 +23,9 @@ public static class QuickOrderTelegramCaption
             $"📲 <code>{WebUtility.HtmlEncode(order.Phone)}</code>",
             $"📅 {placedAt:dd.MM.yyyy HH:mm}",
         ];
+
+        if (order.Comment is not null)
+            parts.Add($"💬 {WebUtility.HtmlEncode(order.Comment)}");
 
         return string.Join(Environment.NewLine, parts);
     }

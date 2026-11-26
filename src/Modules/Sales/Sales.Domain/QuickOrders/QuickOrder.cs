@@ -11,12 +11,18 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
 {
     public const int FirstNameMaxLength = 30;
     public const int PhoneMaxLength = 20;
+    /// <summary>Below the 1C order comment limit, so the order line with the buyer's comment always fits (R-010).</summary>
+    public const int CommentMaxLength = 800;
     public const int TelegramErrorMaxLength = 1_000;
 
     private readonly List<QuickOrderItem> _items = [];
 
     public string FirstName { get; private set; } = null!;
     public string Phone { get; private set; } = null!;
+
+    /// <summary>What the buyer wrote for the managers; trimmed, null when empty. It goes to Telegram and the 1C order comment.</summary>
+    public string? Comment { get; private set; }
+
     public DateTimeOffset PlacedAtUtc { get; private set; }
 
     /// <summary>Σ unit price × quantity as the buyer saw it; a copy for the managers, not a charge.</summary>
@@ -47,7 +53,8 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
     private QuickOrder() { }
 
     public static DomainResult<QuickOrder> Create(
-        QuickOrderId id, string firstName, string phone, IEnumerable<QuickOrderItem> items, DateTimeOffset placedAtUtc)
+        QuickOrderId id, string firstName, string phone, IEnumerable<QuickOrderItem> items, DateTimeOffset placedAtUtc,
+        string? comment = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             return QuickOrderErrors.FirstNameRequired();
@@ -56,12 +63,16 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
         var orderItems = items.ToList();
         if (orderItems.Count == 0)
             return QuickOrderErrors.ItemsRequired();
+        var trimmedComment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
+        if (trimmedComment is { Length: > CommentMaxLength })
+            return QuickOrderErrors.CommentTooLong();
 
         var order = new QuickOrder
         {
             Id = id,
             FirstName = firstName.Trim(),
             Phone = phone.Trim(),
+            Comment = trimmedComment,
             PlacedAtUtc = placedAtUtc,
             Total = orderItems.Sum(item => item.Amount),
             OneCOrderMessageId = Guid.CreateVersion7(placedAtUtc),
@@ -74,6 +85,7 @@ public sealed class QuickOrder : BaseEntity<QuickOrderId>, IAggregateRoot
     public bool SameAs(QuickOrder other) =>
         FirstName == other.FirstName
         && Phone == other.Phone
+        && Comment == other.Comment
         && _items.Count == other._items.Count
         && _items.Zip(other._items).All(pair => pair.First.SameAs(pair.Second));
 

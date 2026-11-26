@@ -135,6 +135,38 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         Assert.Single(scenario.Telegram.Sent);
     }
 
+    [SkippableFact]
+    public async Task QuickOrder_WithAComment_KeepsItAndSendsItToTelegram()
+    {
+        await using var scenario = await CreateAsync();
+        using var client = scenario.Factory.CreateClient();
+
+        using var response = await client.PostAsync(
+            "/api/orders",
+            Body("""{"firstName":"Іван","phone":"+380670000000","comment":" Дзвонити після 15:00 ","lines":[{"productId":"101","title":"Ручка Кедр","unitPrice":125.50,"quantity":2}]}"""));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Дзвонити після 15:00", Assert.Single(await scenario.OrdersAsync()).Comment);
+        Assert.Equal("Дзвонити після 15:00", Assert.Single(scenario.Telegram.Sent).Comment);
+    }
+
+    [SkippableFact]
+    public async Task QuickOrder_WithATooLongComment_Answers400_AndStoresNothing()
+    {
+        await using var scenario = await CreateAsync();
+        using var client = scenario.Factory.CreateClient();
+        var comment = new string('к', QuickOrder.CommentMaxLength + 1);
+
+        using var response = await client.PostAsync(
+            "/api/orders",
+            Body($$"""{"firstName":"Іван","phone":"+380670000000","comment":"{{comment}}","lines":[{"productId":"101","title":"Ручка","unitPrice":1,"quantity":1}]}"""));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.True(problem.RootElement.GetProperty("errors").TryGetProperty("Comment", out _));
+        Assert.Empty(await scenario.OrdersAsync());
+    }
+
     [SkippableTheory]
     [InlineData("""{"firstName":"Іван","phone":"","lines":[{"productId":"101","title":"Ручка","unitPrice":1,"quantity":1}]}""", "Phone")]
     [InlineData("""{"firstName":"Іван","phone":"+380670000000","lines":[]}""", "Lines")]

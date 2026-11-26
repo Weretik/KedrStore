@@ -6,6 +6,7 @@ public static class QuickOrderErrors
 {
     public static DomainError FirstNameRequired() => new("sales.quick_order.first_name_required", "Вкажіть ім’я.", Field: "FirstName");
     public static DomainError PhoneRequired() => new("sales.quick_order.phone_required", "Вкажіть номер телефону.", Field: "Phone");
+    public static DomainError CommentTooLong() => new("sales.quick_order.comment_too_long", "Коментар надто довгий (не більше 800 символів).", Field: "Comment");
     public static DomainError ItemsRequired() => new("sales.quick_order.items_required", "Додайте хоча б один товар.", Field: "Lines");
     public static DomainError ProductIdRequired() => new("sales.quick_order.product_id_required", "Некоректний товар.", Field: "ProductId");
     public static DomainError TitleRequired() => new("sales.quick_order.title_required", "Вкажіть назву товару.", Field: "Title");

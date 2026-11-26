@@ -33,5 +33,6 @@ internal static class GetQuickOrderByIdEndpoint
         order.TelegramLastError,
         order.Items
             .Select(item => new GetAdminQuickOrderItemResponse(item.ProductId, item.Title, item.UnitPrice, item.Quantity, item.Amount))
-            .ToList());
+            .ToList(),
+        order.Comment);
 }

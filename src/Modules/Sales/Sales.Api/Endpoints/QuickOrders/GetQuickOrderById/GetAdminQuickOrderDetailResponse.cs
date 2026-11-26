@@ -12,4 +12,5 @@ public sealed record GetAdminQuickOrderDetailResponse(
     DateTimeOffset? TelegramSentAtUtc,
     DateTimeOffset? TelegramLastAttemptAtUtc,
     string? TelegramLastError,
-    IReadOnlyList<GetAdminQuickOrderItemResponse> Items);
+    IReadOnlyList<GetAdminQuickOrderItemResponse> Items,
+    string? Comment = null);

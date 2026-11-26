@@ -30,6 +30,7 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 
 - **R-013.** (2026-11-26, owner request) Every new site order also becomes an ordinary Sales order that goes to 1C. The site order is saved with a second outbox message `QuickOrderToOneC` (type `sales.quick-order-to-1c`, id `QuickOrder.OneCOrderMessageId`) in the same save; its handler, run by the general outbox task (and once right after the request), makes an `Order` on the counterparty `Sales:SiteOrders:CounterpartyId` (default `000001588`, «РОЗНИЦА ХАЛТУРИНА») with the site lines at the prices the buyer saw (`Amount` = unit price × quantity, UAH retail), comment `Сайт № 52992220, Іван, +380…, 26.11.2026 12:15` (order number, name, phone, Kyiv time), and the order's own `OrderPlaced` message in the 1C lane, then links it (`QuickOrder.OneCOrderId`). A repeated message sees the link and makes nothing; a missing counterparty or a product id that is not a catalog number fails the attempt and the outbox retries. No `EmployeeId`: the current 1C method has no such field. Site orders placed before this release have no message id and are not sent. One dispatch transaction creates the `Order` root and changes the `QuickOrder` root (the link): the link must commit with the order, or a retried message would make a second 1C order; both roots are in Sales. The comment carries the buyer's name and phone into `sales."Orders"` and 1C (owner request); they are kept like other orders and still never logged.
 
+- **R-014.** (2026-11-26, owner request) The buyer may leave an optional comment on the site order (`comment` in `POST /api/orders`, 800 characters at most, trimmed; a blank comment is stored as none; the validator and the aggregate both answer 400 `Comment` when it is longer). It is kept in `QuickOrders.Comment`, shown in the Telegram caption (`💬`, HTML-escaped) and the Excel file, returned by `GET /api/admin/quick-orders/{id}`, and appended to the 1C order comment as «. Коментар покупця: …» ([R-013](#rules)). The limit is below the 1000 characters of the 1C order comment, so the line with the buyer's comment always fits. The comment is personal data like the name and phone and is never logged ([R-011](#rules)); the same key with another comment is an idempotency conflict.
 ## Scenarios
 
 | ID | Scenario |
@@ -46,6 +47,7 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 | **SC-010** | Domain: `Create` rejects no lines, an empty name or phone, a quantity ≤ 0 and a negative price with typed errors; the total is the sum of the lines; `RequestTelegramResend` works only from failed. |
 | **SC-011** | Search by the order number, by `№` + number in lower case, and by the whole id finds exactly that order. |
 | **SC-012** | A site order with the retail counterparty present: one `Orders` row on `000001588` with the comment and the lines, linked from the site order, its `OrderPlaced` message delivered to 1C; a repeated message adds nothing; without the counterparty the attempt fails and no order is made. |
+| **SC-013** | A buyer writes a comment in the checkout: the order keeps it, Telegram and the Excel file show it, and the 1C order comment ends with «Коментар покупця: …»; no comment changes nothing; more than 800 characters answers 400. |
 
 ## Design
 
@@ -168,3 +170,4 @@ Unit `FullyQualifiedName~QuickOrder`, integration `FullyQualifiedName~QuickOrder
 | R-010 | SC-009 | TS-002 |
 | R-011 | code review in TS-007 | TS-007 |
 | R-013 | SC-012 | `CreateOneCOrderFromQuickOrderTests`, `QuickOrderToOneCPostgresTests` (filter `FullyQualifiedName~QuickOrder`) |
+| R-014 | SC-013 | `QuickOrderTests` (comment), `QuickOrderOneCCommentTests`, `QuickOrderTelegramCaptionTests`, `QuickOrderApiTests` (filter `FullyQualifiedName~QuickOrder`) |
