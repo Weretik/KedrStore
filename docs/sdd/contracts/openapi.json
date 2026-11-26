@@ -14384,7 +14384,8 @@
         "required": [
           "firstName",
           "phone",
-          "lines"
+          "lines",
+          "comment"
         ],
         "type": "object",
         "properties": {
@@ -15063,7 +15064,8 @@
           "telegramSentAtUtc",
           "telegramLastAttemptAtUtc",
           "telegramLastError",
-          "items"
+          "items",
+          "comment"
         ],
         "type": "object",
         "properties": {
