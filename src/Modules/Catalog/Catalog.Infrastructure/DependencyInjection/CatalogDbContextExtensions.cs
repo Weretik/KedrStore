@@ -50,6 +50,7 @@ public static class CatalogDbContextExtensions
         services.AddScoped<Catalog.Application.Features.Attributes.Jobs.RecognizeCatalogAttributesJob>();
         services.AddScoped<CategoryFilterReader>();
         services.AddScoped<ICategoryStatsReader, CategoryStatsReader>();
+        services.AddScoped<Catalog.Application.Features.RetailPrices.Shared.RetailPriceStatusReader>();
         services.AddScoped<IAdminCategoryInsightsReader, AdminCategoryInsightsReader>();
 
         services.AddScoped<IDatabaseMigrator, DbMigrator<CatalogDbContext>>();

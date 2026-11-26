@@ -8,6 +8,7 @@ using Catalog.Api.Endpoints.MobileSync;
 using Catalog.Api.Endpoints.Overview;
 using Catalog.Api.Endpoints.ProductAttributes;
 using Catalog.Api.Endpoints.Products;
+using Catalog.Api.Endpoints.RetailPrices;
 using Catalog.Api.Endpoints.SiteModels;
 using Catalog.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Routing;
@@ -34,6 +35,7 @@ public static class CatalogModule
         endpoints.MapOverviewEndpoints();
         endpoints.MapProductAttributesEndpoints();
         endpoints.MapProductsEndpoints();
+        endpoints.MapRetailPricesEndpoints();
         endpoints.MapSiteModelsEndpoints();
         return endpoints;
     }

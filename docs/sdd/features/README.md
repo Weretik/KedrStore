@@ -12,6 +12,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 - [Admin products](catalog/admin-products.md) — paged lists with server filters (including `withoutPhoto` and `hasStock`), full list, and product details by slug.
 - [Product photos and schemes](catalog/product-media.md) — photos in order and a scheme linked from the media library, auto-link in the CDN sync run.
 - [1C catalog import](catalog/one-c-import.md) — background import of categories, product details, prices, price types, and stock.
+- [Retail prices from an Excel file](catalog/retail-price-file.md) — the owner's 1C price list sets the site's retail price type (11) by code, optionally locked from the 1C price sync (spec 010).
 - [Catalog attributes](catalog/attributes.md) — attribute dictionary, product attribute values, review state, the CSV import, and variant groups with their admin API, and the site models (spec 007) with theirs.
 - [Product and stock projection](catalog/stock-projection.md) — separate read model for product lists and its updates.
 

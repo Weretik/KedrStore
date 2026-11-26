@@ -62,7 +62,7 @@ public sealed class MobileCatalogSnapshotApiTests
         Assert.True(lockProduct.GetProperty("inStock").GetBoolean());
         var prices = lockProduct.GetProperty("prices");
         Assert.Equal(2, prices.GetArrayLength());
-        Assert.Equal(12, prices[0].GetProperty("priceTypeId").GetInt32());
+        Assert.Equal(11, prices[0].GetProperty("priceTypeId").GetInt32());
         Assert.Equal(150m, prices[0].GetProperty("amount").GetDecimal());
 
         var lowStock = products[1];
@@ -87,8 +87,8 @@ public sealed class MobileCatalogSnapshotApiTests
         Assert.Equal(HttpStatusCode.NotModified, notModified.StatusCode);
         Assert.Empty(await notModified.Content.ReadAsByteArrayAsync());
 
-        var price = db.ProductPrices.Single(p => p.ProductId == ProductId.Create(20) && p.PriceTypeId == PriceTypeId.Create(12));
-        price.Update(ProductId.Create(20), PriceTypeId.Create(12), new Money(175m, "UAH"));
+        var price = db.ProductPrices.Single(p => p.ProductId == ProductId.Create(20) && p.PriceTypeId == PriceTypeId.Create(11));
+        price.UpdateFromOneC(new Money(175m, "UAH"));
         db.SaveChanges();
 
         using var changed = new HttpRequestMessage(HttpMethod.Get, Route);
@@ -132,7 +132,7 @@ public sealed class MobileCatalogSnapshotApiTests
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
 
-        db.PriceTypes.Add(PriceType.Create(PriceTypeId.Create(12), "Роздрібна"));
+        db.PriceTypes.Add(PriceType.Create(PriceTypeId.Create(11), "Роздрібна"));
         db.PriceTypes.Add(PriceType.Create(PriceTypeId.Create(14), "Оптова"));
         AddCategory(db, 1, "Фурнітура", "n1", null);
         AddCategory(db, 2, "Замки", "n1.n2", 1);
@@ -144,14 +144,14 @@ public sealed class MobileCatalogSnapshotApiTests
             new ProductMediaFile(MediaFileId.FromStorage(3), "https://cdn/20-scheme.webp"), Now);
         lockProduct.SetTranslation("uk", "Замок український", Now);
         lockProduct.SetTranslation("ru", "Замок русский", Now);
-        AddPrice(db, 20, 12, 150m);
+        AddPrice(db, 20, 11, 150m);
         AddPrice(db, 20, 14, 120m);
 
         AddProduct(db, 21, 2, stock: 2);
-        AddPrice(db, 21, 12, 80m);
+        AddPrice(db, 21, 11, 80m);
 
         AddProduct(db, 22, 2, stock: 9).MarkDeleted(Now);
-        AddPrice(db, 22, 12, 99m);
+        AddPrice(db, 22, 11, 99m);
 
         db.SaveChanges();
         return db;

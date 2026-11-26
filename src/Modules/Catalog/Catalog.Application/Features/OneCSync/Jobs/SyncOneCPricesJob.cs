@@ -42,18 +42,23 @@ public sealed class SyncOneCPricesJob(
             .ToDictionaryAsync(price => (price.ProductId, price.PriceTypeId), cancellationToken);
 
         var removed = RemoveMissing(deduped, existing.Values, rootCategoryOneCId);
-        var (added, changed) = await AddOrUpdateAsync(deduped, existing, productIds, rootCategoryOneCId, cancellationToken);
+        var (added, changed, kept) = await AddOrUpdateAsync(deduped, existing, productIds, rootCategoryOneCId,
+            cancellationToken);
         await priceRepo.SaveChangesAsync(cancellationToken);
 
         if (rebuildProjection)
             await productListProjectionRebuilder.RebuildAsync(cancellationToken);
 
         logger.LogInformation(
-            "SyncOneCPricesJob finished for {Root}: added {Added}, changed {Changed}, removed {Removed}",
-            rootCategoryOneCId, added, changed, removed);
+            "SyncOneCPricesJob finished for {Root}: added {Added}, changed {Changed}, removed {Removed}, " +
+            "kept as locked by the price file {Kept}",
+            rootCategoryOneCId, added, changed, removed, kept);
     }
 
-    /// <summary>Removes this root's prices of the received products that 1C no longer sends.</summary>
+    /// <summary>
+    /// Removes this root's prices of the received products that 1C no longer sends, except prices locked by the owner's
+    /// price file (spec catalog/010 RP-05).
+    /// </summary>
     private int RemoveMissing(IReadOnlyList<OneCPriceDto> priceDtos, IEnumerable<ProductPrice> existing,
         string productTypeIdOneC)
     {
@@ -62,7 +67,8 @@ public sealed class SyncOneCPricesJob(
             .ToHashSet();
 
         var toDelete = existing
-            .Where(p => p.ProductTypeIdOneC == productTypeIdOneC && !keepKeys.Contains((p.ProductId, p.PriceTypeId)))
+            .Where(p => p.ProductTypeIdOneC == productTypeIdOneC && p.CanBeRemovedByOneC &&
+                        !keepKeys.Contains((p.ProductId, p.PriceTypeId)))
             .ToList();
 
         foreach (var price in toDelete)
@@ -70,7 +76,7 @@ public sealed class SyncOneCPricesJob(
         return toDelete.Count;
     }
 
-    private async Task<(int Added, int Changed)> AddOrUpdateAsync(IReadOnlyList<OneCPriceDto> priceDtos,
+    private async Task<(int Added, int Changed, int Kept)> AddOrUpdateAsync(IReadOnlyList<OneCPriceDto> priceDtos,
         IReadOnlyDictionary<(ProductId, PriceTypeId), ProductPrice> existing, ProductId[] productIds,
         string productTypeIdOneC, CancellationToken cancellationToken)
     {
@@ -81,7 +87,7 @@ public sealed class SyncOneCPricesJob(
                 .ToListAsync(cancellationToken))
             .ToHashSet();
 
-        var (added, changed) = (0, 0);
+        var (added, changed, kept) = (0, 0, 0);
         foreach (var item in priceDtos)
         {
             var productId = ProductId.Create(item.ProductId);
@@ -92,11 +98,14 @@ public sealed class SyncOneCPricesJob(
 
             if (existing.TryGetValue((productId, priceTypeId), out var price))
             {
-                var updated = price.Update(productId: productId, priceTypeId: priceTypeId, price: priceValue);
-                if (updated.IsFailure)
-                    LogSkipped(productId, updated.Error!);
-                else
+                var updated = price.UpdateFromOneC(priceValue);
+                if (updated.IsSuccess)
                     changed++;
+                // A price locked by the owner's price file keeps its amount (spec catalog/010 RP-05).
+                else if (updated.Error!.Code == ProductPriceErrors.LockedFromOneC().Code)
+                    kept++;
+                else
+                    LogSkipped(productId, updated.Error!);
                 continue;
             }
 
@@ -115,7 +124,7 @@ public sealed class SyncOneCPricesJob(
             added++;
         }
 
-        return (added, changed);
+        return (added, changed, kept);
     }
 
     private void LogSkipped(ProductId productId, DomainError error)

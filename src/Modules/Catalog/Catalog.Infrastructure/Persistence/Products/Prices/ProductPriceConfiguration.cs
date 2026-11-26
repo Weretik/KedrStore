@@ -41,6 +41,13 @@ public class ProductPriceConfiguration : IEntityTypeConfiguration<ProductPrice>
             .IsUnicode(false)
             .IsRequired();
 
+        // Spec catalog/010: set while the owner's price file keeps this price from the 1C sync.
+        builder.Property(p => p.LockedFromOneCAt);
+
+        // PostgreSQL xmin: a 1C sync that read a price before the price file locked it fails its save instead of
+        // overwriting the file's price (database rules 4).
+        builder.Property<uint>("xmin").IsRowVersion();
+
         builder.HasOne<Product>()
             .WithMany()
             .HasForeignKey(p => p.ProductId)

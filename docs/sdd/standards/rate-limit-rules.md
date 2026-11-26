@@ -33,7 +33,7 @@ A request must pass the global limit **and** its named policy. All limits are pe
 | `PublicRead` | 600 per minute | anonymous catalogue and content reads (groups `api/catalog/{lang}`, `api/content`, articles, documents, gallery, contacts, requisites, wholesale, SEO) |
 | `PublicSearch` | 300 per minute | product lists with search and filters (`getPublicProducts`, `getPublicProductsByCategorySlug`) |
 | `Upload` | 60 per minute | file uploads (media, avatars, article cover, attribute swatch) |
-| `HeavyOperation` | 20 per minute | mobile snapshots, customer snapshot, work reports, order sync retry, site order Telegram resend |
+| `HeavyOperation` | 20 per minute | mobile snapshots, customer snapshot, work reports, order sync retry, site order Telegram resend, retail price file import and unlock |
 
 The numbers for global, `PublicRead`, `PublicSearch`, `Upload` and `HeavyOperation` come from the `RateLimiting` configuration section (`RateLimiting__GlobalPerMinute` and so on as environment variables on the Cloud Run service), so they can be tuned without code. The defaults are soft: they stop a flood or a runaway script, not a normal buyer or a busy manager.
 

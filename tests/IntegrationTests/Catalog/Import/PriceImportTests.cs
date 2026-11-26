@@ -54,6 +54,43 @@ public sealed class PriceImportTests
         Assert.Equal(1, saves.Count);
     }
 
+    [Fact]
+    public async Task Import_KeepsPricesLockedByTheOwnersFile_AndSyncsTheRest()
+    {
+        await using var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options);
+        Seed(db);
+        var locked = Price(2, Retail, 341);
+        locked.SetFromFile(341m, lockFromOneC: true, DateTimeOffset.UtcNow);
+        db.ProductPrices.Add(locked);
+        db.ProductPrices.Add(Price(2, Wholesale, 300));
+        await db.SaveChangesAsync();
+        // Spec catalog/010 SC-RP04: 1C sends a new retail price for product 2 and stops sending product 1's retail.
+        var oneC = new FakeOneC
+        {
+            Prices = [new OneCPriceDto(1, Wholesale, 95), new OneCPriceDto(2, Retail, 250), new OneCPriceDto(2, Wholesale, 310)]
+        };
+
+        await PricesJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
+
+        Assert.Equal(
+            [new PriceRow(1, Wholesale, 95m), new PriceRow(2, Retail, 341m),
+                new PriceRow(2, Wholesale, 310m)],
+            await Snapshot(db));
+
+        (await db.ProductPrices.SingleAsync(price => price.Id == locked.Id)).UnlockFromOneC();
+        await db.SaveChangesAsync();
+        await PricesJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
+
+        Assert.Contains(new PriceRow(2, Retail, 250m), await Snapshot(db));
+    }
+
+    private static Task<List<PriceRow>> Snapshot(CatalogDbContext db)
+        => db.ProductPrices.AsNoTracking()
+            .Select(price => new PriceRow(price.ProductId.Value, price.PriceTypeId.Value, price.Amount))
+            .OrderBy(price => price.Product).ThenBy(price => price.Type)
+            .ToListAsync();
+
     private static void Seed(CatalogDbContext db)
     {
         db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky",
@@ -84,4 +121,6 @@ public sealed class PriceImportTests
             return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
     }
+
+    private sealed record PriceRow(int Product, int Type, decimal Amount);
 }

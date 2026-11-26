@@ -87,6 +87,7 @@ Write them first (Red → Green), next to the use case's other tests:
 | Outbox: `QuickOrderTelegramSender` | Sent once per row; a crash between the send and the commit can send one duplicate file | Accepted risk (Telegram has no dedupe key) |
 | Scheduler tick, «Запустити зараз» | Claims tasks with a `Version` token; «run now» sets a flag | Protected (row version, catalog group, advisory lock in the rebuild) |
 | 1C catalog, price, and counterparty syncs | Upsert by 1C codes in steps | Protected (upsert, rerunnable steps) |
+| `POST /api/admin/retail-prices/import`, `.../unlock` (owner's Excel price file, 2026-11-26) | Upsert of the retail price by product code: the same file again sets the same amounts and reports them unchanged; unlock finds no locked prices the second time | Protected (upsert by natural key, state check); a race with the 1C price sync answers 409 through `xmin` |
 | Admin creates with a natural key: staff account (e-mail), catalog attribute and value (code), product group and site model (slug), article (slug), gallery item, media file | Second copy refused by a unique index | Protected (unique index) |
 | Admin creates without a natural key: work tasks, home FAQ items and brands, media folders, legal document drafts | A double press could add a second item | Acceptable: the admin buttons are disabled while the request runs and nothing leaves the system; add a key if a duplicate becomes harmful |
 | Updates (`PUT` of names, slugs, texts, settings, order of items), deletes | Same final state | Naturally idempotent |

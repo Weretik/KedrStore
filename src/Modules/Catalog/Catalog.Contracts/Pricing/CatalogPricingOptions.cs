@@ -4,5 +4,5 @@ public sealed class CatalogPricingOptions
 {
     public const string SectionName = "Catalog:Pricing";
 
-    public int RetailPriceTypeId { get; init; } = 12;
+    public int RetailPriceTypeId { get; init; } = 11;
 }
