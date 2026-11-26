@@ -26,7 +26,7 @@ Owns sales customers and counterparties, pricing policy, manager and site orders
 
 Layers: Content.Api, Content.Application, Content.Contracts, Content.Domain, Content.Infrastructure.
 
-Aggregates (root → children): `Article` → legacy cover; `CompanyContacts`; `CompanyRequisites`; `LegalDocumentVersion`; `GalleryItem`; `HomeBrand`; `HomeFaqItem`; `PageSeo`; `SiteSeoSettings`; `WholesalePage`. Append-only log: `CompanyRequisitesChange`.
+Aggregates (root → children): `Article` → legacy cover; `CompanyContacts`; `CompanyRequisites`; `LegalDocumentVersion`; `GalleryItem`; `HomeBrand`; `HomeFaqItem`; `PageSeo`; `SiteRedirect`; `SiteSeoSettings`; `WholesalePage`. Append-only log: `CompanyRequisitesChange`.
 
 `Content.Contracts` offers nothing yet; no other module uses Content.
 

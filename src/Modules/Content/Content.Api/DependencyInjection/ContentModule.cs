@@ -7,6 +7,7 @@ using Content.Api.Endpoints.Documents;
 using Content.Api.Endpoints.Gallery;
 using Content.Api.Endpoints.Home;
 using Content.Api.Endpoints.Overview;
+using Content.Api.Endpoints.Redirects;
 using Content.Api.Endpoints.Requisites;
 using Content.Api.Endpoints.SeoSettings;
 using Content.Api.Endpoints.Site;
@@ -40,6 +41,7 @@ public static class ContentModule
         endpoints.MapSeoSettingsEndpoints();
         endpoints.MapSiteEndpoints();
         endpoints.MapSiteSeoEndpoints();
+        endpoints.MapRedirectsEndpoints();
         endpoints.MapWholesaleEndpoints();
         return endpoints;
     }

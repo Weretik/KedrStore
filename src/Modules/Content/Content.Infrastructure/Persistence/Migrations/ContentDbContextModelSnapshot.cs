@@ -21,6 +21,7 @@ namespace Content.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Content.Domain.Articles.Article", b =>
@@ -344,6 +345,61 @@ namespace Content.Infrastructure.Persistence.Migrations
                     b.HasIndex(new[] { "Position" }, "IX_HomeFaqItems_Position");
 
                     b.ToTable("HomeFaqItems", "content");
+                });
+
+            modelBuilder.Entity("Content.Domain.Redirects.SiteRedirect", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FromPath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ToUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "FromPath" }, "IX_SiteRedirects_FromPath_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "FromPath" }, "IX_SiteRedirects_FromPath_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "FromPath" }, "IX_SiteRedirects_FromPath_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "ToUrl" }, "IX_SiteRedirects_ToUrl_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "ToUrl" }, "IX_SiteRedirects_ToUrl_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "ToUrl" }, "IX_SiteRedirects_ToUrl_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "UpdatedAt" }, "IX_SiteRedirects_UpdatedAt");
+
+                    b.HasIndex(new[] { "FromPath" }, "UX_SiteRedirects_FromPath")
+                        .IsUnique();
+
+                    b.ToTable("SiteRedirects", "content");
                 });
 
             modelBuilder.Entity("Content.Domain.Requisites.CompanyRequisites", b =>
