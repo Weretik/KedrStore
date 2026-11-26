@@ -37,7 +37,7 @@ public sealed class PublicModelCatalogReader(
 
         var accepted = await db.ProductGroups.AsNoTracking()
             .Where(model => model.Status == ProductGroupStatus.Accepted)
-            .Select(model => new { model.Id, model.Name, model.Slug, model.CategoryId, model.MainProductId })
+            .Select(model => new { model.Id, model.Name, model.Slug, model.CategoryId, model.MainProductId, model.UpdatedAt })
             .ToListAsync(cancellationToken);
         var acceptedIds = accepted.Select(model => model.Id).ToList();
         var members = (await db.ProductGroupMembers.AsNoTracking()
@@ -63,7 +63,8 @@ public sealed class PublicModelCatalogReader(
             if (onSite.Count > 0)
                 models.Add(new PublicModelFacts(model.Slug, model.Name, model.CategoryId, model.Id,
                     model.MainProductId, onSite,
-                    axes[model.Id].OrderBy(axis => axis.Position).Select(axis => axis.AttributeId).ToList()));
+                    axes[model.Id].OrderBy(axis => axis.Position).Select(axis => axis.AttributeId).ToList(),
+                    model.UpdatedAt));
         }
 
         // A product of an accepted model in a hidden category stays off the site, not on a page of its own.
@@ -113,7 +114,7 @@ public sealed class PublicModelCatalogReader(
         var texts = (await db.ProductGroupTexts.AsNoTracking()
                 .Where(text => acceptedIds.Contains(text.GroupId))
                 .Select(text => new PublicModelTextFacts(text.GroupId, text.Language, text.ShortDescription,
-                    text.Description, text.SeoTitle, text.SeoDescription))
+                    text.Description, text.SeoTitle, text.SeoDescription, text.UpdatedAt))
                 .ToListAsync(cancellationToken))
             .ToLookup(text => text.ModelId);
 
@@ -140,7 +141,7 @@ public sealed class PublicModelCatalogReader(
             .Select(category => new
             {
                 Facts = new PublicCategoryFacts(category.Id, category.ParentId, category.Slug, category.ShortNameUk,
-                    category.ShortNameRu),
+                    category.ShortNameRu, category.IsClosedFromSearch),
                 category.ProductTypeIdOneC,
                 category.IsShownOnSite
             })

@@ -9,8 +9,14 @@ internal static class CategoryTree
         IEnumerable<ProductCategory> categories,
         string lang,
         IReadOnlyDictionary<int, CategoryStats> stats,
-        bool hideEmpty)
+        bool hideEmpty,
+        IReadOnlyDictionary<int, DateTimeOffset>? contentChanges = null)
     {
+        DateTimeOffset? ChangedAt(int id, DateTimeOffset? own)
+            => contentChanges is not null && contentChanges.TryGetValue(id, out var text) && (own is null || text > own)
+                ? text
+                : own;
+
         int CountOf(int id) => stats.TryGetValue(id, out var value) ? value.ProductCount : 0;
 
         var items = categories.ToList()
@@ -24,6 +30,8 @@ internal static class CategoryTree
                 c.ShortNameRu,
                 c.SortOrder,
                 c.Level,
+                c.IsClosedFromSearch,
+                c.UpdatedAt,
                 Path = c.Path.Value
             })
             .ToList();
@@ -54,7 +62,9 @@ internal static class CategoryTree
                     Children: ancestors.Contains(i.Path)
                         ? []
                         : BuildBranch(i.Path, new HashSet<string>(ancestors, StringComparer.Ordinal) { i.Path }),
-                    ProductCount: CountOf(i.Id)
+                    ProductCount: CountOf(i.Id),
+                    IsClosedFromSearch: i.IsClosedFromSearch,
+                    UpdatedAt: ChangedAt(i.Id, i.UpdatedAt)
                 ))
                 .ToList();
         }

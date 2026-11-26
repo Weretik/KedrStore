@@ -51,6 +51,29 @@ public sealed class ArticleTests
     }
 
     [Fact]
+    public void SeoFields_AreOptionalTrimmedAndLimited_SpecContent012()
+    {
+        ArticleText[] texts =
+        [
+            new("uk", "Петлі", "Коротко.", "<p>Текст</p>", "  Приховані петлі оптом  ", "  "),
+            new("ru", "Петли", "Коротко.", "<p>Текст</p>"),
+        ];
+
+        var article = Article.Create("a", Day, true, texts, Now, Editor).Value;
+
+        Assert.Equal("Приховані петлі оптом", article.Text("uk").SeoTitle);
+        Assert.Null(article.Text("uk").MetaDescription);
+        Assert.Null(article.Text("ru").SeoTitle);
+
+        ArticleText[] tooLong =
+        [
+            new("uk", "Т", "К", "<p>Т</p>", new string('я', ArticleTranslation.SeoTitleMaxLength + 1)),
+            new("ru", "Т", "К", "<p>Т</p>", null, new string('я', ArticleTranslation.MetaDescriptionMaxLength + 1)),
+        ];
+        Assert.Equal("SeoTitle", DomainAssert.Fails(article.Update("a", Day, true, tooLong, Now, Editor)).Field);
+    }
+
+    [Fact]
     public void Cover_IsALibraryFileAndRemovable()
     {
         var article = Article.Create("a", Day, true, Texts(), Now, Editor).Value;

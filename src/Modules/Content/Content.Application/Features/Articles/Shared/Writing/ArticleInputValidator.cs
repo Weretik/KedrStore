@@ -40,6 +40,11 @@ public abstract class ArticleInputValidator<TCommand> : AbstractValidator<TComma
                 text.RuleFor(t => t.Title).NotEmpty().MaximumLength(ArticleTranslation.TitleMaxLength);
                 text.RuleFor(t => t.Excerpt).NotEmpty().MaximumLength(ArticleTranslation.ExcerptMaxLength);
                 text.RuleFor(t => t.BodyHtml).NotEmpty().MaximumLength(ArticleTranslation.BodyHtmlMaxLength);
+                text.RuleFor(t => t.SeoTitle).Must(value => value is null || value.Trim().Length <= ArticleTranslation.SeoTitleMaxLength)
+                    .WithMessage($"Не більше {ArticleTranslation.SeoTitleMaxLength} символів.");
+                text.RuleFor(t => t.MetaDescription)
+                    .Must(value => value is null || value.Trim().Length <= ArticleTranslation.MetaDescriptionMaxLength)
+                    .WithMessage($"Не більше {ArticleTranslation.MetaDescriptionMaxLength} символів.");
             }).When(x => x.Input.Texts is not null).OverridePropertyName("texts");
         });
     }

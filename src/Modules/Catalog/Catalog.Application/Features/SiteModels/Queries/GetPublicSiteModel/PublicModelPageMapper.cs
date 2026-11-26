@@ -25,7 +25,10 @@ public static class PublicModelPageMapper
             catalog.PathOf(model.CategoryId).Select(item => ToCategory(item, language)).ToList(),
             TextsOf(catalog, model, language),
             model.MainProductId is { } mainId && model.Products.Contains(mainId) ? catalog.Products[mainId].Slug : null,
-            axes, products, Characteristics(catalog, model, language));
+            axes, products, Characteristics(catalog, model, language))
+        {
+            IsClosedFromSearch = category.IsClosedFromSearch
+        };
     }
 
     private static PublicSiteModelCategoryDto ToCategory(PublicCategoryFacts category, string language)

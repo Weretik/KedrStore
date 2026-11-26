@@ -1,8 +1,8 @@
 # Catalog categories
 
-**Static code check:** 2026-11-18. **Module:** Catalog.
+**Static code check:** 2026-11-26. **Module:** Catalog.
 
-Public tree and category page by slug, Admin reads, Admin slug edit, Admin-written SEO text and FAQ per language, and the Admin «show on site» mark.
+Public tree and category page by slug, Admin reads, Admin slug edit, Admin-written SEO text and FAQ per language, the Admin «show on site» mark, and the search settings: «Закрити від пошуку», site names, and the link-preview picture.
 
 ## Structure and relationships
 
@@ -10,11 +10,13 @@ The [public endpoints](../../../../src/Modules/Catalog/Catalog.Api/Endpoints/Cat
 
 **Show on site** ([spec 007 R-18](../../specs/catalog/007-site-models/README.md#stage-4b-categories-on-the-site-and-the-showcase-by-model)): an Admin sets the mark with `PUT api/categories/{id}/site-visibility` ([handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySiteVisibility/SetCategorySiteVisibilityHandler.cs)). Hiding takes every subcategory with it; showing also shows every parent; Cosmos is never shown. The 1C category sync never changes the mark and gives a new category its parent's (a new top category is shown only in the hardware root). The migration `CategorySiteVisibility` shows the whole «Фурнітура» root (1C `000005513`) once. Hidden categories and their products also leave «Вітрина сайту», «Моделі», and the «Огляд» counts.
 
+**Search settings** ([spec catalog/010](../../specs/catalog/010-site-search-settings/README.md)): `PUT api/categories/{id}/search-settings` ([handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySearchSettings/SetCategorySearchSettingsHandler.cs)) sets «Закрити від пошуку» for the category and every subcategory ([CategorySearchClosing](../../../../src/Modules/Catalog/Catalog.Domain/Categories/CategorySearchClosing.cs)) and the link-preview picture (a media-library file read through `IProductMediaLibrary`); `PUT api/categories/{id}/site-names` ([handler](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Commands/SetCategorySiteNames/SetCategorySiteNamesHandler.cs)) saves the admin's uk/ru names, which win over 1C: `ShortNameUk`/`ShortNameRu` keep the shown name, the sync keeps the admin's, and a blank name goes back to the 1C name at once. A new 1C category takes its parent's search mark. The public tree carries `isClosedFromSearch` and `updatedAt` (the later of the category's and its content's change); the category page also `shareImageUrl` and the later change date of the category and its content. The admin by-id read returns the picture's `shareImageUrl`.
+
 The active admin list also carries `productCount` (all active products of the category and its descendants, on the site or not) and `filledContentLanguages` (languages with any text or FAQ) from [AdminCategoryInsightsReader](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Queries/GetAdminCategories/AdminCategoryInsightsReader.cs); the Admin tree uses them to show counts and mark categories without texts. Deleted rows and the by-id read leave both `null`.
 
 **Cache** ([read cache](../platform/read-cache.md), ADR-0016): the public tree is kept in memory for 2 minutes per language as [CategoryTreeSnapshot](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Shared/Tree/CategoryTreeSnapshot.cs) ([CategoryTreeCache](../../../../src/Modules/Catalog/Catalog.Application/Features/Categories/Shared/Tree/CategoryTreeCache.cs)). The «show on site» mark and a category slug change drop it on their instance at once; product counts from the 1C import show within 2 minutes.
 
-Access: reads need `CanManageProducts`; slug edit, content save, the «show on site» mark, and `deleted=true` need `CanManageSiteCatalog` (Admin or Seo).
+Access: reads need `CanManageProducts`; slug edit, content save, the «show on site» mark, the search settings, the site names, and `deleted=true` need `CanManageSiteCatalog` (Admin or Seo).
 
 ## Code structure
 
@@ -32,6 +34,7 @@ src/
     │   │   ├── AdminGetById/, AdminGetList/  # Admin reads (+ deleted filter, counts and filled languages)
     │   │   ├── Content/Get/, Content/Save/  # Admin content query and command
     │   │   ├── SiteVisibility/  # Admin «show on site» mark with subcategories and parents
+    │   │   ├── Commands/SetCategorySearchSettings/, SetCategorySiteNames/  # spec 010: search mark, picture, site names
     │   │   ├── GetBySlug/GetCategoryBySlugHandler.cs  # history, redirect, counts, prices, content
     │   │   ├── GetList/GetCategoriesHandler.cs  # tree with counts, hides empty, through the read cache
     │   │   ├── Tree/CategoryTreeCache.cs, CategoryTreeSnapshot.cs  # cache entry, tag, cached read model
@@ -64,7 +67,7 @@ flowchart LR
 
 ## Tests
 
-[CategoryPresentationApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/CategoryPresentationApplicationTests.cs) · [AdminCategoriesListApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/AdminCategoriesListApplicationTests.cs) · [AdminCategoryInsightsPostgresTests.cs](../../../../tests/IntegrationTests/Catalog/Categories/AdminCategoryInsightsPostgresTests.cs) · [SlugTextTests.cs](../../../../tests/UnitTests/Catalog/Slugs/SlugTextTests.cs) · [ImportSyncTests.cs](../../../../tests/UnitTests/Catalog/Sync/ImportSyncTests.cs) · [CatalogSoftDeleteAndContentTests.cs](../../../../tests/UnitTests/Catalog/Domain/CatalogSoftDeleteAndContentTests.cs) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs) · [CategoryPresentationPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/CategoryPresentationPersistenceTests.cs)
+[CategoryPresentationApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/CategoryPresentationApplicationTests.cs) · [AdminCategoriesListApplicationTests.cs](../../../../tests/UnitTests/Catalog/Application/AdminCategoriesListApplicationTests.cs) · [AdminCategoryInsightsPostgresTests.cs](../../../../tests/IntegrationTests/Catalog/Categories/AdminCategoryInsightsPostgresTests.cs) · [SlugTextTests.cs](../../../../tests/UnitTests/Catalog/Slugs/SlugTextTests.cs) · [ImportSyncTests.cs](../../../../tests/UnitTests/Catalog/Sync/ImportSyncTests.cs) · [CatalogSoftDeleteAndContentTests.cs](../../../../tests/UnitTests/Catalog/Domain/CatalogSoftDeleteAndContentTests.cs) · [CatalogStableUrlsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Api/CatalogStableUrlsApiTests.cs) · [CategoryPresentationPersistenceTests.cs](../../../../tests/IntegrationTests/Catalog/Persistence/CategoryPresentationPersistenceTests.cs) · [CategorySearchSettingsTests.cs](../../../../tests/UnitTests/Catalog/Domain/CategorySearchSettingsTests.cs) · [CategorySearchSettingsApiTests.cs](../../../../tests/IntegrationTests/Catalog/Categories/CategorySearchSettingsApiTests.cs)
 
 Focused run: `dotnet test tests/UnitTests/UnitTests.csproj --filter "FullyQualifiedName~UnitTests.Catalog"` and `dotnet test tests/IntegrationTests/IntegrationTests.csproj --filter "FullyQualifiedName~CatalogStableUrlsApiTests"` (in-memory, no Docker).
 

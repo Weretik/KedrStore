@@ -9,7 +9,7 @@ KedrStore PostgreSQL
 └── schema catalog
     └── Catalog / CatalogDbContext — 22 tables
         ├── Categories
-        │   ├── ProductCategories          # category tree, slug, names, soft delete
+        │   ├── ProductCategories          # category tree, slug, names, site names, search mark, soft delete
         │   ├── CategoryContents           # SEO text per category and language
         │   ├── CategoryFaqItems           # FAQ of one content row
         │   └── CatalogSlugHistory         # former product and category slugs
@@ -70,9 +70,9 @@ KedrStore PostgreSQL
 └── schema content
     └── Content / ContentDbContext — 8 tables
         ├── Articles                      # slug, date, publication flag, cover version
-        ├── ArticleTranslations           # uk/ru title, excerpt, sanitized body
+        ├── ArticleTranslations           # uk/ru title, excerpt, sanitized body, search title and description
         ├── ArticleCovers                 # cover WebP bytes
-        ├── CompanyContacts               # the one row of site contacts
+        ├── CompanyContacts               # the one row of site contacts, shop address and hours
         ├── CompanyRequisites             # the one row of payment requisites
         ├── CompanyRequisitesChanges      # who changed requisites, when, old → new (jsonb)
         ├── LegalDocumentVersions         # offer/privacy/returns/delivery editions: draft, published, archived

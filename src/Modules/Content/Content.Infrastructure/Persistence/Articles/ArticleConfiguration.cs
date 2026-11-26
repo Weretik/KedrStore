@@ -31,6 +31,8 @@ internal sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             text.Property(t => t.Title).HasMaxLength(ArticleTranslation.TitleMaxLength).IsRequired();
             text.Property(t => t.Excerpt).HasMaxLength(ArticleTranslation.ExcerptMaxLength).IsRequired();
             text.Property(t => t.BodyHtml).HasMaxLength(ArticleTranslation.BodyHtmlMaxLength).IsRequired();
+            text.Property(t => t.SeoTitle).HasMaxLength(ArticleTranslation.SeoTitleMaxLength);
+            text.Property(t => t.MetaDescription).HasMaxLength(ArticleTranslation.MetaDescriptionMaxLength);
         });
         builder.Navigation(article => article.Translations).UsePropertyAccessMode(PropertyAccessMode.Field);
         // The legacy cover is a child in its own table; dropping it from the article deletes the row.

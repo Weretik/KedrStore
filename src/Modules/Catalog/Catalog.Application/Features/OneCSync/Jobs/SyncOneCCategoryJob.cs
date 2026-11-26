@@ -171,20 +171,20 @@ public sealed class SyncOneCCategoryJob(IOneCClient oneC, ICatalogRepository<Pro
     }
 
     /// <summary>
-    /// A new category takes its parent's «show on site» value; a new top category is shown only in the hardware root
-    /// (spec catalog/007 R-18). Parents come first by path, so a new child of a new parent sees the parent's value.
+    /// A new category takes its parent's «show on site» value (a new top category is shown only in the hardware root,
+    /// spec catalog/007 R-18) and its parent's «Закрити від пошуку» (spec catalog/010 R-01). Parents come first by path,
+    /// so a new child of a new parent sees the parent's values.
     /// </summary>
     private static void InheritSiteVisibility(IReadOnlyList<ProductCategory> created,
         IReadOnlyDictionary<int, ProductCategory> existingById, bool isHardwareRoot, DateTimeOffset now)
     {
-        var shown = existingById.Values.ToDictionary(category => category.Id, category => category.IsShownOnSite);
+        var parents = existingById.Values.ToDictionary(category => category.Id);
         foreach (var category in created.OrderBy(category => category.Path.Value.Length))
         {
-            var isShown = category.ParentId is { } parentId && shown.TryGetValue(parentId, out var parentShown)
-                ? parentShown
-                : isHardwareRoot;
-            category.SetShownOnSite(isShown, now);
-            shown[category.Id] = isShown;
+            var parent = category.ParentId is { } parentId ? parents.GetValueOrDefault(parentId) : null;
+            category.SetShownOnSite(parent?.IsShownOnSite ?? isHardwareRoot, now);
+            category.SetClosedFromSearch(parent?.IsClosedFromSearch ?? false, now);
+            parents[category.Id] = category;
         }
     }
 

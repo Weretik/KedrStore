@@ -1,12 +1,14 @@
 # Company contacts
 
-**Static code check:** 2026-11-04. **Module:** Content.
+**Static code check:** 2026-11-26. **Module:** Content.
 
 One set of company contacts that every site page shows: sales phone, email, Telegram link, Viber number, map link, and the city in Ukrainian and Russian. Managers and Admins change them in the admin; the site reads them anonymously. The values the site kept in code were moved into the database by the migration that creates the table.
 
 ## Structure and relationships
 
 The [public and admin endpoint groups](../../../../src/Modules/Content/Content.Api/Endpoints/Contacts/ContactsEndpoints.cs) (one `<UseCase>Endpoint` per operation) dispatch to one query and one command. [CompanyContacts](../../../../src/Modules/Content/Content.Domain/Contacts/CompanyContacts.cs) is a single-row aggregate (`Id = 1`, guarded by a check constraint): it is never created or deleted through the API, only replaced as a whole. Phones are stored in E.164 (`+380XXXXXXXXX`) and formatted by clients; Telegram must be an `https://t.me/` or `https://telegram.me/` link, the map any `https` link. The [validator](../../../../src/Modules/Content/Content.Application/Features/Contacts/Commands/UpdateCompanyContacts/UpdateCompanyContactsValidator.cs) reports each field by its JSON name, so the admin form can show it.
+
+The row also holds the shop customers visit ([Content 012](../../specs/content/012-article-seo-and-store-address/README.md)): [CompanyStore](../../../../src/Modules/Content/Content.Domain/Contacts/CompanyStore.cs), an owned value in the same row, with the shop name as Google Maps shows it, the street and region in uk/ru, a five-digit postal code, and opening hours for weekdays, Saturday and Sunday as `HH:mm` pairs (none is a day off). Every field is optional; both responses carry it as `store`, and the site builds its `LocalBusiness` markup from it. The migration `ArticleSeoAndStoreAddress` filled in the owner's shop.
 
 A save stores `UpdatedBy`, the editor's email ([ContentEditor](../../../../src/Modules/Content/Content.Application/Shared/ContentEditor.cs)); only the admin responses (`AdminCompanyContacts`) return it.
 

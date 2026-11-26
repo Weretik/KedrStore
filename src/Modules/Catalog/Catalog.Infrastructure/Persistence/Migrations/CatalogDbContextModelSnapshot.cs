@@ -531,6 +531,11 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsClosedFromSearch")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -561,6 +566,9 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<long?>("ShareImageMediaFileId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ShortNameRu")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -568,6 +576,14 @@ namespace Catalog.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ShortNameUk")
                         .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("SiteNameRu")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("SiteNameUk")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

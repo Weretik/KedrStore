@@ -18,6 +18,7 @@ using Catalog.Domain.Products;
 using Catalog.Domain.Products.Media;
 using Catalog.Domain.Slugs;
 using Catalog.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,6 +74,24 @@ public sealed class PublicSiteModelsApiTests
         Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/catalog/uk/models?sort=random")).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest,
             (await client.GetAsync("/api/catalog/uk/katehoriia-10/models?filter=bez-dvokrapky")).StatusCode);
+    }
+
+    [Fact]
+    public async Task ModelOfAClosedCategory_IsMarkedClosedFromSearch_AndAProductOfItsOwnHasNoChangeDate_SpecCatalog010()
+    {
+        await using var db = await SeedAsync();
+        var category = await db.Categories.SingleAsync(item => item.Id == ProductCategoryId.Create(10));
+        category.SetClosedFromSearch(true, DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        using var model = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/model/product-1"));
+        Assert.True(model.RootElement.GetProperty("isClosedFromSearch").GetBoolean());
+
+        using var list = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/katehoriia-10/models"));
+        Assert.All(list.RootElement.GetProperty("items").EnumerateArray(),
+            item => Assert.Equal(JsonValueKind.Null, item.GetProperty("updatedAt").ValueKind));
     }
 
     private static WebApplicationFactory<Program> CreateFactory(CatalogDbContext db)

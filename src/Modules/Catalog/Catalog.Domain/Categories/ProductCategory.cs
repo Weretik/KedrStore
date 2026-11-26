@@ -1,4 +1,4 @@
-﻿namespace Catalog.Domain.Categories;
+namespace Catalog.Domain.Categories;
 
 public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 {
@@ -21,6 +21,22 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     /// it; the 1C sync never changes it and gives a new category its parent's value.
     /// </summary>
     public bool IsShownOnSite { get; private set; }
+
+    /// <summary>
+    /// Names an admin wrote for the site (spec catalog/010 R-02). They win over the 1C name and the configured short
+    /// name: <see cref="ShortNameUk"/> and <see cref="ShortNameRu"/> always hold the name the site shows.
+    /// </summary>
+    public string? SiteNameUk { get; private set; }
+    public string? SiteNameRu { get; private set; }
+
+    /// <summary>
+    /// Whether search engines must not index the category and its products (spec catalog/010 R-01): the site still shows
+    /// them, with <c>noindex</c> and outside the sitemap. An admin owns it; a new 1C category takes its parent's value.
+    /// </summary>
+    public bool IsClosedFromSearch { get; private set; }
+
+    /// <summary>The media-library picture for link previews of the category page; <c>null</c> keeps the site's own.</summary>
+    public MediaFileId? ShareImageMediaFileId { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     #endregion
@@ -116,6 +132,51 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         return true;
     }
 
+    /// <summary>Closes or opens the category for search engines; returns whether it changed.</summary>
+    public bool SetClosedFromSearch(bool isClosed, DateTimeOffset now)
+    {
+        if (IsClosedFromSearch == isClosed) return false;
+        IsClosedFromSearch = isClosed;
+        UpdatedAt = now;
+        return true;
+    }
+
+    /// <summary>Sets or removes the link-preview picture; returns whether it changed.</summary>
+    public DomainResult<bool> SetShareImage(MediaFileId? mediaFileId, DateTimeOffset now)
+    {
+        if (mediaFileId is { Value: <= 0 })
+            return CategoryErrors.ShareImageInvalid();
+        if (ShareImageMediaFileId == mediaFileId) return false;
+        ShareImageMediaFileId = mediaFileId;
+        UpdatedAt = now;
+        return true;
+    }
+
+    /// <summary>
+    /// Sets the admin's site names; a blank one goes back to <paramref name="sourceUk"/> or <paramref name="sourceRu"/>,
+    /// the name 1C and the configuration give. Returns whether the shown names changed.
+    /// </summary>
+    public DomainResult<bool> SetSiteNames(string? nameUk, string? nameRu, string sourceUk, string sourceRu,
+        DateTimeOffset now)
+    {
+        var checks = new DomainChecks();
+        var checkedUk = checks.Take(CheckSiteName(nameUk, nameof(SiteNameUk)));
+        var checkedRu = checks.Take(CheckSiteName(nameRu, nameof(SiteNameRu)));
+        if (checks.Error is { } error)
+            return error;
+
+        var namesChanged = !string.Equals(SiteNameUk, checkedUk, StringComparison.Ordinal) ||
+                           !string.Equals(SiteNameRu, checkedRu, StringComparison.Ordinal);
+        SiteNameUk = checkedUk;
+        SiteNameRu = checkedRu;
+        var shown = UpdatePresentationMetadata(sourceUk, sourceRu, SortOrder, Level);
+        if (shown.IsFailure)
+            return shown.Error!;
+        if (namesChanged || shown.Value)
+            UpdatedAt = now;
+        return namesChanged || shown.Value;
+    }
+
     public bool Restore(DateTimeOffset now)
     {
         if (!IsDeleted) return false;
@@ -150,6 +211,16 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         return trimmed.Length > ShortNameMaxLength ? CategoryErrors.ShortNameTooLong(field, trimmed.Length) : trimmed;
     }
 
+    private static DomainResult<string?> CheckSiteName(string? name, string field)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return (string?)null;
+        var trimmed = name.Trim();
+        return trimmed.Length > ShortNameMaxLength
+            ? CategoryErrors.ShortNameTooLong(field, trimmed.Length)
+            : trimmed;
+    }
+
     private DomainResult CheckLevel(int level)
     {
         if (level < 0)
@@ -161,7 +232,10 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     #endregion
 
     #region ProductCategory API
-    /// <summary>Sets presentation metadata and returns whether anything changed.</summary>
+    /// <summary>
+    /// Sets presentation metadata from 1C and the configuration and returns whether anything changed. An admin's site
+    /// name (<see cref="SiteNameUk"/>, <see cref="SiteNameRu"/>) stays the shown name.
+    /// </summary>
     public DomainResult<bool> UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder,
         int level)
     {
@@ -174,6 +248,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
         if (checks.Error is { } error)
             return error;
 
+        validatedShortNameUk = SiteNameUk ?? validatedShortNameUk;
+        validatedShortNameRu = SiteNameRu ?? validatedShortNameRu;
         var changed = !string.Equals(ShortNameUk, validatedShortNameUk, StringComparison.Ordinal) ||
                       !string.Equals(ShortNameRu, validatedShortNameRu, StringComparison.Ordinal) ||
                       SortOrder != sortOrder ||

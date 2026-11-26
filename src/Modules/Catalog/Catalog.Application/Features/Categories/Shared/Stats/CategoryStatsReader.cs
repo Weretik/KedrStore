@@ -20,4 +20,11 @@ public sealed class CategoryStatsReader(IReadCatalogDbContext catalogDbContext) 
 
         return rows.ToDictionary(row => row.CategoryId.Value, row => new CategoryStats(row.Count, row.Min, row.Max));
     }
+
+    public async Task<IReadOnlyDictionary<int, DateTimeOffset>> LoadContentChangesAsync(string language,
+        CancellationToken cancellationToken)
+        => await catalogDbContext.CategoryContents.AsNoTracking()
+            .Where(content => content.Language == language)
+            .Select(content => new { content.CategoryId, content.UpdatedAt })
+            .ToDictionaryAsync(content => content.CategoryId.Value, content => content.UpdatedAt, cancellationToken);
 }

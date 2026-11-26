@@ -32,7 +32,8 @@ public sealed record PublicModelFacts(
     ProductGroupId? ModelId,
     ProductId? MainProductId,
     IReadOnlyList<ProductId> Products,
-    IReadOnlyList<AttributeId> Axes)
+    IReadOnlyList<AttributeId> Axes,
+    DateTimeOffset? UpdatedAt = null)
 {
     public bool IsAccepted => ModelId is not null;
 }
@@ -72,7 +73,8 @@ public sealed record PublicCategoryFacts(
     ProductCategoryId? ParentId,
     string Slug,
     string NameUk,
-    string NameRu)
+    string NameRu,
+    bool IsClosedFromSearch = false)
 {
     public string Name(string language) => PublicText.Localized(language, NameUk, NameRu);
 }
@@ -87,7 +89,8 @@ public sealed record PublicModelTextFacts(
     string ShortDescription,
     string Description,
     string SeoTitle,
-    string SeoDescription);
+    string SeoDescription,
+    DateTimeOffset? UpdatedAt = null);
 
 internal static class PublicText
 {

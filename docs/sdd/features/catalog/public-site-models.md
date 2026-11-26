@@ -1,6 +1,6 @@
 # Public site models
 
-**Static code check:** 2026-11-26 (spec 007 stage 9). **Module:** Catalog.
+**Static code check:** 2026-11-26 (spec 007 stage 9, spec 010). **Module:** Catalog.
 
 Anonymous reads the new public site is built from: model cards of a category with attribute filters, the search, the model page, and the model address of an old product address. Decisions and scenarios are in [spec 007](../../specs/catalog/007-site-models/README.md) (M-04, M-09–M-12).
 
@@ -11,6 +11,8 @@ Anonymous reads the new public site is built from: model cards of a category wit
 - `GET {categorySlug}/models` and `GET models` — [list handler](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/GetPublicSiteModelsHandler.cs): models of the category tree (a former category slug still works) or of every category for the search. [PublicModelFilter](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/PublicModelFilter.cs) keeps a model when one of its products matches the attribute choices and the common filters; attribute filters only in a final category (400 in a parent, 404 for an unknown slug). [PublicModelFacets](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModels/PublicModelFacets.cs) counts models per value of the category's filters, applying every other choice. The search matches every word in the model name or in one product's names or 1C code; an exact on-site 1C code also gives `exactMatch`.
 - `GET model/{modelSlug}` — [model handler](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModel/GetPublicSiteModelHandler.cs) and [PublicModelPageMapper](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicSiteModel/PublicModelPageMapper.cs): axes with the values the products have, each product with its axis values (`selection`), texts (Russian falls back to Ukrainian field by field), breadcrumbs, and the shared characteristics. A former model slug or the slug of a product inside an accepted model answers 404 with the address to redirect to.
 - `GET product/{productSlug}/model` — [address handler](../../../../src/Modules/Catalog/Catalog.Application/Features/SiteModels/Queries/GetPublicProductModelAddress/GetPublicProductModelAddressHandler.cs): the model and axis values of a current or former product slug (M-11); a product off the site or deleted gives 404 with its category as [CatalogRedirect](../../../../src/Modules/Catalog/Catalog.Contracts/Category/CatalogRedirect.cs).
+
+For search engines ([spec catalog/010](../../specs/catalog/010-site-search-settings/README.md)): the model page carries `isClosedFromSearch` from its category («Закрити від пошуку»), and a model card carries `updatedAt`, the later change of the accepted model and its texts (`null` for a product of its own), which the site's sitemap uses as `lastmod`.
 
 The product endpoints of [public products](public-products.md) stay for the current Angular site until the Next.js site moves to models (stage 6).
 

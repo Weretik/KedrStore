@@ -32,7 +32,11 @@ public sealed record PublicSiteModelCardDto(
     int ProductCount,
     bool IsAccepted,
     IReadOnlyList<PublicSiteModelSwatchDto> Colors,
-    int? ProductId);
+    int? ProductId)
+{
+    /// <summary>When the accepted model or its texts last changed (spec catalog/010 R-04); <c>null</c> for a product of its own.</summary>
+    public DateTimeOffset? UpdatedAt { get; init; }
+}
 
 /// <summary>A color of a value: <c>Hex</c> <c>#RRGGBB</c> or a texture picture; both empty means a text chip.</summary>
 public sealed record PublicSiteModelSwatchDto(string Slug, string Name, string? Hex, string? TextureUrl);

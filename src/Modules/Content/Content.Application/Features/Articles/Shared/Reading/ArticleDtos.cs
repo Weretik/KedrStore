@@ -1,7 +1,8 @@
 namespace Content.Application.Features.Articles.Shared.Reading;
 
-/// <summary>Text of one language as the admin sends it; the body is HTML from the editor.</summary>
-public sealed record ArticleTextInput(string Language, string Title, string Excerpt, string BodyHtml);
+/// <summary>Text of one language as the admin sends it; the body is HTML from the editor, the SEO fields are optional.</summary>
+public sealed record ArticleTextInput(string Language, string Title, string Excerpt, string BodyHtml,
+    string? SeoTitle = null, string? MetaDescription = null);
 
 /// <summary>
 /// Create and update body. An empty slug on create is generated from the Ukrainian title.
@@ -66,6 +67,8 @@ public sealed record PublicArticleDetails(
     string BodyHtml,
     DateOnly PublishedOn,
     ArticleCoverView Cover,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? SeoTitle = null,
+    string? MetaDescription = null);
 
 public sealed record ArticleCoverFile(byte[] Data, string ContentType, int Version);

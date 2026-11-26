@@ -33,4 +33,7 @@ public static class CategoryErrors
 
     public static DomainError PathRequired() =>
         new("Catalog.Category.Path.Required", "Потрібне місце категорії в дереві.", Field: "Path");
+
+    public static DomainError ShareImageInvalid() =>
+        new("Catalog.Category.ShareImage.Invalid", "Оберіть зображення з медіатеки.", Field: "ShareImageMediaFileId");
 }
