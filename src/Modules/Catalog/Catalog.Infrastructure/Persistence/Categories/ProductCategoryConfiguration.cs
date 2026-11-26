@@ -49,6 +49,18 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(c => c.SiteNameUk)
+            .HasMaxLength(ProductCategory.ShortNameMaxLength);
+
+        builder.Property(c => c.SiteNameRu)
+            .HasMaxLength(ProductCategory.ShortNameMaxLength);
+
+        builder.Property(c => c.IsClosedFromSearch)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(c => c.ShareImageMediaFileId);
+
         builder.Property(c => c.ProductTypeIdOneC)
             .HasMaxLength(10)
             .IsRequired();

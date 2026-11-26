@@ -15,7 +15,11 @@ public sealed record PublicSiteModelDto(
     string? MainProductSlug,
     IReadOnlyList<PublicSiteModelAxisDto> Axes,
     IReadOnlyList<PublicSiteModelProductDto> Products,
-    IReadOnlyList<PublicSiteModelCharacteristicDto> Characteristics);
+    IReadOnlyList<PublicSiteModelCharacteristicDto> Characteristics)
+{
+    /// <summary>The model's category is closed from search (spec catalog/011 R-01): the page gets <c>noindex</c>.</summary>
+    public bool IsClosedFromSearch { get; init; }
+}
 
 public sealed record PublicSiteModelCategoryDto(int Id, string Slug, string Name);
 

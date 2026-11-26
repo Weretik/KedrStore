@@ -13,7 +13,7 @@ internal static class ArticleResponseMapper
 
     public static ArticleResponse ToResponse(PublicArticleDetails item) => new(
         item.Id, item.Slug, item.Title, item.Excerpt, item.BodyHtml, item.PublishedOn,
-        CoverPath(item.Id, item.Cover), item.Cover.Url, item.UpdatedAt);
+        CoverPath(item.Id, item.Cover), item.Cover.Url, item.UpdatedAt, item.SeoTitle, item.MetaDescription);
 
     public static AdminArticleSummaryResponse ToResponse(AdminArticleListItem item) => new(
         item.Id, item.Slug, item.Title, item.PublishedOn, item.IsPublished, CoverPath(item.Id, item.Cover), item.Cover.Url,
@@ -22,13 +22,15 @@ internal static class ArticleResponseMapper
     public static AdminArticleResponse ToResponse(AdminArticleDetails item) => new(
         item.Id, item.Slug, item.PublishedOn, item.IsPublished, CoverPath(item.Id, item.Cover), item.Cover.Url,
         item.Cover.MediaFileId, item.UpdatedAt, item.UpdatedBy,
-        item.Texts.Select(text => new ArticleTextDto(text.Language, text.Title, text.Excerpt, text.BodyHtml)).ToList(),
+        item.Texts.Select(text => new ArticleTextDto(text.Language, text.Title, text.Excerpt, text.BodyHtml,
+            text.SeoTitle, text.MetaDescription)).ToList(),
         item.Version);
 
     public static ArticleCoverUploadResponse ToResponse(UploadedArticleCover cover) => new(cover.MediaFileId, cover.Url);
 
     public static ArticleInput ToInput(SaveArticleRequest request) => new(
         request.Slug, request.PublishedOn, request.IsPublished,
-        (request.Texts ?? []).Select(text => new ArticleTextInput(text.Language, text.Title, text.Excerpt, text.BodyHtml)).ToList(),
+        (request.Texts ?? []).Select(text => new ArticleTextInput(text.Language, text.Title, text.Excerpt, text.BodyHtml,
+            text.SeoTitle, text.MetaDescription)).ToList(),
         request.CoverMediaFileId, request.RemoveCover, request.Version);
 }

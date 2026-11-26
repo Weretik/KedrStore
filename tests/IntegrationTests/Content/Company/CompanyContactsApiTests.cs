@@ -77,6 +77,59 @@ public sealed class CompanyContactsApiTests
     }
 
     [Fact]
+    public async Task Manager_SavesTheShopAddressAndHours_AndTheSiteReadsThem_SpecContent012()
+    {
+        await using var db = Seed();
+        using var factory = CreateFactory(db);
+        using var manager = factory.CreateClientWithRole("Manager");
+
+        using var update = await manager.PutAsJsonAsync("/api/admin/content/contacts", new
+        {
+            salesPhone = "+380687135049",
+            email = "sales@classkedr.com.ua",
+            telegramUrl = "https://t.me/classkedr",
+            viberPhone = "+380687135049",
+            mapUrl = "https://maps.app.goo.gl/new",
+            cityUk = "Харків",
+            cityRu = "Харьков",
+            store = new
+            {
+                storeName = "Крамниця Дверна фурнітура CLASS",
+                streetAddressUk = "вул. Ахієзерів, 46",
+                streetAddressRu = "ул. Ахиезеров, 46",
+                regionUk = "Харківська обл.",
+                regionRu = "Харьковская обл.",
+                postalCode = "61038",
+                weekdaysOpens = "9:00",
+                weekdaysCloses = "16:00",
+            },
+        });
+        Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+
+        using var client = factory.CreateClient();
+        using var json = JsonDocument.Parse(await client.GetStringAsync("/api/content/contacts"));
+        var store = json.RootElement.GetProperty("store");
+        Assert.Equal("вул. Ахієзерів, 46", store.GetProperty("streetAddressUk").GetString());
+        Assert.Equal("61038", store.GetProperty("postalCode").GetString());
+        Assert.Equal("09:00", store.GetProperty("weekdaysOpens").GetString());
+        Assert.Equal(JsonValueKind.Null, store.GetProperty("saturdayOpens").ValueKind);
+
+        using var invalid = await manager.PutAsJsonAsync("/api/admin/content/contacts", new
+        {
+            salesPhone = "+380687135049",
+            email = "sales@classkedr.com.ua",
+            telegramUrl = "https://t.me/classkedr",
+            viberPhone = "+380687135049",
+            mapUrl = "https://maps.app.goo.gl/new",
+            cityUk = "Харків",
+            cityRu = "Харьков",
+            store = new { postalCode = "610" },
+        });
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        Assert.Contains("store.postalCode", await invalid.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
     public async Task InvalidPhone_IsAFieldError_AndNothingChanges()
     {
         await using var db = Seed();

@@ -10,4 +10,6 @@ public sealed record CategoryTreeDto(
     int SortOrder,
     int Level,
     IReadOnlyList<CategoryTreeDto> Children,
-    int ProductCount = 0);
+    int ProductCount = 0,
+    bool IsClosedFromSearch = false,
+    DateTimeOffset? UpdatedAt = null);

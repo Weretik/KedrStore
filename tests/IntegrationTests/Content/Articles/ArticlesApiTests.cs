@@ -99,6 +99,42 @@ public sealed class ArticlesApiTests
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
     }
 
+    [Fact]
+    public async Task Manager_SavesSeoTitleAndDescription_AndTheSiteReadsThemPerLanguage_SpecContent012()
+    {
+        await using var db = Seed();
+        using var factory = CreateFactory(db);
+        using var manager = factory.CreateClientWithRole("Manager");
+
+        using var create = await manager.PostAsJsonAsync("/api/admin/articles", new
+        {
+            slug = "seo-stattia",
+            publishedOn = "2026-11-05",
+            isPublished = true,
+            texts = new object[]
+            {
+                new
+                {
+                    language = "uk", title = "Стаття", excerpt = "Коротко.", bodyHtml = "<p>Текст</p>",
+                    seoTitle = "Як обрати петлі", metaDescription = "Поради з вибору петель."
+                },
+                new { language = "ru", title = "Статья", excerpt = "Коротко.", bodyHtml = "<p>Текст</p>" },
+            }
+        });
+        Assert.Equal(HttpStatusCode.OK, create.StatusCode);
+        using var created = JsonDocument.Parse(await create.Content.ReadAsStringAsync());
+        var uk = created.RootElement.GetProperty("texts").EnumerateArray()
+            .Single(text => text.GetProperty("language").GetString() == "uk");
+        Assert.Equal("Як обрати петлі", uk.GetProperty("seoTitle").GetString());
+
+        using var client = factory.CreateClient();
+        using var ukPage = JsonDocument.Parse(await client.GetStringAsync("/api/content/uk/articles/seo-stattia"));
+        Assert.Equal("Як обрати петлі", ukPage.RootElement.GetProperty("seoTitle").GetString());
+        Assert.Equal("Поради з вибору петель.", ukPage.RootElement.GetProperty("metaDescription").GetString());
+        using var ruPage = JsonDocument.Parse(await client.GetStringAsync("/api/content/ru/articles/seo-stattia"));
+        Assert.Equal(JsonValueKind.Null, ruPage.RootElement.GetProperty("seoTitle").ValueKind);
+    }
+
     private static ContentDbContext Seed()
     {
         var db = new ContentDbContext(new DbContextOptionsBuilder<ContentDbContext>()

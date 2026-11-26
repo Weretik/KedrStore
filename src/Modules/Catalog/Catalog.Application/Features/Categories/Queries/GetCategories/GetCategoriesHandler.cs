@@ -35,6 +35,8 @@ public class GetCategoriesHandler(
             .Where(category => !PublicCatalogScope.IsHidden(category, roots.Value))
             .ToList();
         var stats = CategoryStatsRollup.Rollup(categories, await statsReader.LoadDirectAsync(cancellationToken));
-        return new CategoryTreeSnapshot(CategoryTree.Build(categories, language, stats, hideEmpty: true));
+        // A text edit changes the page too, so the sitemap's lastmod takes the later date (spec catalog/011 R-04).
+        var contentChanges = await statsReader.LoadContentChangesAsync(language, cancellationToken);
+        return new CategoryTreeSnapshot(CategoryTree.Build(categories, language, stats, hideEmpty: true, contentChanges));
     }
 }

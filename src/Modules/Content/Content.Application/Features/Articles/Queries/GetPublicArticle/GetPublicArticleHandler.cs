@@ -19,7 +19,7 @@ public sealed class GetPublicArticleHandler(IReadContentDbContext db, IMediaImag
             {
                 article.Id, article.Slug, article.PublishedOn, article.CoverVersion, article.CoverMediaFileId, article.UpdatedAt,
                 Text = article.Translations.Where(text => text.Language == language)
-                    .Select(text => new { text.Title, text.Excerpt, text.BodyHtml }).FirstOrDefault()
+                    .Select(text => new { text.Title, text.Excerpt, text.BodyHtml, text.SeoTitle, text.MetaDescription }).FirstOrDefault()
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -29,6 +29,7 @@ public sealed class GetPublicArticleHandler(IReadContentDbContext db, IMediaImag
         var covers = await ArticleCovers.ImagesAsync(images, [article.CoverMediaFileId], cancellationToken);
         return Result.Success(new PublicArticleDetails(article.Id.Value, article.Slug, article.Text.Title,
             article.Text.Excerpt, article.Text.BodyHtml, article.PublishedOn,
-            ArticleCovers.View(article.CoverMediaFileId, article.CoverVersion, covers), article.UpdatedAt));
+            ArticleCovers.View(article.CoverMediaFileId, article.CoverVersion, covers), article.UpdatedAt,
+            article.Text.SeoTitle, article.Text.MetaDescription));
     }
 }

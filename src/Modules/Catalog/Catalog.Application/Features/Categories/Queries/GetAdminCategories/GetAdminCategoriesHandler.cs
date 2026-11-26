@@ -20,7 +20,7 @@ public sealed class GetAdminCategoriesHandler(
         if (query.Deleted)
         {
             var deleted = await repository.ListAsync(new DeletedCategoriesSpec(), cancellationToken);
-            return Result.Success<IReadOnlyList<AdminCategoryResponse>>(deleted.Select(CategoryReadMapper.ToAdminResponse).ToList());
+            return Result.Success<IReadOnlyList<AdminCategoryResponse>>(deleted.Select(category => CategoryReadMapper.ToAdminResponse(category)).ToList());
         }
 
         var categories = await repository.ListAsync(new AllCategoriesSpec(null), cancellationToken);

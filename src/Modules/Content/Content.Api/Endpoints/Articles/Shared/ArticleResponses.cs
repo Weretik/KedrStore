@@ -8,16 +8,21 @@ public sealed record ArticleSummaryResponse(
     long Id, string Slug, string Title, string Excerpt, DateOnly PublishedOn, string? CoverPath, string? CoverUrl,
     DateTimeOffset UpdatedAt);
 
-/// <summary>Full article page; <c>BodyHtml</c> is sanitized on save.</summary>
+/// <summary>
+/// Full article page; <c>BodyHtml</c> is sanitized on save. <c>SeoTitle</c> and <c>MetaDescription</c> are null when
+/// not written; the site then uses the title and the excerpt (spec content/012 R-01).
+/// </summary>
 public sealed record ArticleResponse(
     long Id, string Slug, string Title, string Excerpt, string BodyHtml, DateOnly PublishedOn, string? CoverPath,
-    string? CoverUrl, DateTimeOffset UpdatedAt);
+    string? CoverUrl, DateTimeOffset UpdatedAt, string? SeoTitle, string? MetaDescription);
 
 public sealed record AdminArticleSummaryResponse(
     long Id, string Slug, string Title, DateOnly PublishedOn, bool IsPublished, string? CoverPath, string? CoverUrl,
     DateTimeOffset UpdatedAt, string? UpdatedBy);
 
-public sealed record ArticleTextDto(string Language, string Title, string Excerpt, string BodyHtml);
+/// <summary>Text of one language; the search title and description are optional (spec content/012 R-01).</summary>
+public sealed record ArticleTextDto(string Language, string Title, string Excerpt, string BodyHtml,
+    string? SeoTitle = null, string? MetaDescription = null);
 
 /// <summary><c>CoverMediaFileId</c> stays set when the library file was deleted; then <c>CoverUrl</c> is null.</summary>
 public sealed record AdminArticleResponse(

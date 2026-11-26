@@ -547,6 +547,14 @@ namespace Content.Infrastructure.Persistence.Migrations
                                 .HasMaxLength(300)
                                 .HasColumnType("character varying(300)");
 
+                            b1.Property<string>("MetaDescription")
+                                .HasMaxLength(160)
+                                .HasColumnType("character varying(160)");
+
+                            b1.Property<string>("SeoTitle")
+                                .HasMaxLength(70)
+                                .HasColumnType("character varying(70)");
+
                             b1.Property<string>("Title")
                                 .IsRequired()
                                 .HasMaxLength(200)
@@ -566,9 +574,82 @@ namespace Content.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Content.Domain.Articles.ArticleCover", b =>
                 {
                     b.HasOne("Content.Domain.Articles.Article", null)
-                        .WithOne()
+                        .WithOne("LegacyCover")
                         .HasForeignKey("Content.Domain.Articles.ArticleCover", "ArticleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Content.Domain.Contacts.CompanyContacts", b =>
+                {
+                    b.OwnsOne("Content.Domain.Contacts.CompanyStore", "Store", b1 =>
+                        {
+                            b1.Property<int>("CompanyContactsId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("PostalCode")
+                                .HasMaxLength(5)
+                                .HasColumnType("character varying(5)")
+                                .HasColumnName("PostalCode");
+
+                            b1.Property<string>("RegionRu")
+                                .HasMaxLength(80)
+                                .HasColumnType("character varying(80)")
+                                .HasColumnName("RegionRu");
+
+                            b1.Property<string>("RegionUk")
+                                .HasMaxLength(80)
+                                .HasColumnType("character varying(80)")
+                                .HasColumnName("RegionUk");
+
+                            b1.Property<TimeOnly?>("SaturdayCloses")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("SaturdayCloses");
+
+                            b1.Property<TimeOnly?>("SaturdayOpens")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("SaturdayOpens");
+
+                            b1.Property<string>("StoreName")
+                                .HasMaxLength(120)
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("StoreName");
+
+                            b1.Property<string>("StreetAddressRu")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("StreetAddressRu");
+
+                            b1.Property<string>("StreetAddressUk")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("StreetAddressUk");
+
+                            b1.Property<TimeOnly?>("SundayCloses")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("SundayCloses");
+
+                            b1.Property<TimeOnly?>("SundayOpens")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("SundayOpens");
+
+                            b1.Property<TimeOnly?>("WeekdaysCloses")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("WeekdaysCloses");
+
+                            b1.Property<TimeOnly?>("WeekdaysOpens")
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("WeekdaysOpens");
+
+                            b1.HasKey("CompanyContactsId");
+
+                            b1.ToTable("CompanyContacts", "content");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompanyContactsId");
+                        });
+
+                    b.Navigation("Store")
                         .IsRequired();
                 });
 
@@ -859,6 +940,11 @@ namespace Content.Infrastructure.Persistence.Migrations
 
                     b.Navigation("Uk")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Content.Domain.Articles.Article", b =>
+                {
+                    b.Navigation("LegacyCover");
                 });
 #pragma warning restore 612, 618
         }

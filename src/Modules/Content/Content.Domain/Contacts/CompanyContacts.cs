@@ -11,7 +11,8 @@ public sealed record CompanyContactsValues(
     string ViberPhone,
     string MapUrl,
     string CityUk,
-    string CityRu);
+    string CityRu,
+    CompanyStoreValues? Store = null);
 
 /// <summary>
 /// The company's public contacts: the sales phone, email, messengers, map, and city that every site page
@@ -36,6 +37,8 @@ public sealed partial class CompanyContacts : IAggregateRoot
     public string MapUrl { get; private set; } = null!;
     public string CityUk { get; private set; } = null!;
     public string CityRu { get; private set; } = null!;
+    /// <summary>The shop's address and opening hours for the <c>LocalBusiness</c> markup (spec content/012 R-02).</summary>
+    public CompanyStore Store { get; private set; } = CompanyStore.Empty();
     public DateTimeOffset UpdatedAt { get; private set; }
 
     /// <summary>Who saved the last change; empty for the row created by the migration.</summary>
@@ -70,6 +73,8 @@ public sealed partial class CompanyContacts : IAggregateRoot
         var mapUrl = checks.Take(Checked(values.MapUrl, nameof(MapUrl), UrlMaxLength, IsValidHttpsUrl));
         var cityUk = checks.Take(Checked(values.CityUk, nameof(CityUk), CityMaxLength, _ => true));
         var cityRu = checks.Take(Checked(values.CityRu, nameof(CityRu), CityMaxLength, _ => true));
+        // An older admin form sends no shop; it then stays as it is (spec content/012 R-02).
+        var store = values.Store is { } typed ? checks.Take(CompanyStore.Create(typed)) : Store;
         if (checks.Error is { } error)
             return error;
 
@@ -80,6 +85,7 @@ public sealed partial class CompanyContacts : IAggregateRoot
         MapUrl = mapUrl;
         CityUk = cityUk;
         CityRu = cityRu;
+        Store = store;
         UpdatedAt = now;
         return DomainResult.Success();
     }

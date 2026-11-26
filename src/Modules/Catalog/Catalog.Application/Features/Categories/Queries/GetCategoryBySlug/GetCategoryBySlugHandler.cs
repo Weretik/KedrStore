@@ -1,3 +1,4 @@
+using Catalog.Application.Abstractions.Media;
 using Catalog.Application.Features.Categories.Shared;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Application.Features.OneCSync.Mapping;
@@ -18,6 +19,7 @@ public sealed class GetCategoryBySlugHandler(
     IReadCatalogDbContext catalogDbContext,
     ISlugService slugService,
     ICategoryStatsReader statsReader,
+    IProductMediaLibrary media,
     IOptions<RootCategoryId> roots)
     : IQueryHandler<GetCategoryBySlugQuery, Result<CatalogLookup<CategoryDetailsResponse>>>
 {
@@ -57,8 +59,16 @@ public sealed class GetCategoryBySlugHandler(
             response.Id, response.Slug, response.Name, response.ParentId, response.SortOrder,
             response.Level, response.Children, Breadcrumbs(selected, map, query.Lang),
             selectedStats.ProductCount, selectedStats.MinPrice, selectedStats.MaxPrice,
-            CategoryContentMapper.ToPublic(content))));
+            CategoryContentMapper.ToPublic(content))
+        {
+            IsClosedFromSearch = selected.IsClosedFromSearch,
+            ShareImageUrl = await CategoryShareImage.UrlAsync(media, selected.ShareImageMediaFileId, cancellationToken),
+            UpdatedAt = Later(selected.UpdatedAt, content?.UpdatedAt)
+        }));
     }
+
+    private static DateTimeOffset? Later(DateTimeOffset? category, DateTimeOffset? content)
+        => category is null ? content : content is null || category > content ? category : content;
 
     private Task<int?> FindDeletedBySlugAsync(string slug, CancellationToken cancellationToken)
         => catalogDbContext.Categories.IgnoreQueryFilters().AsNoTracking()

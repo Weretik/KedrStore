@@ -180,6 +180,10 @@ public sealed class CategoryPresentationApplicationTests
     {
         public Task<IReadOnlyDictionary<int, CategoryStats>> LoadDirectAsync(CancellationToken cancellationToken)
             => Task.FromResult(stats);
+
+        public Task<IReadOnlyDictionary<int, DateTimeOffset>> LoadContentChangesAsync(string language,
+            CancellationToken cancellationToken)
+            => Task.FromResult<IReadOnlyDictionary<int, DateTimeOffset>>(new Dictionary<int, DateTimeOffset>());
     }
 
     private static ProductCategory CreateCategory(int id, string path, string name, int sortOrder, int level)

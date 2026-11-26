@@ -27,6 +27,9 @@ public sealed class UpdateCompanyContactsValidator : AbstractValidator<UpdateCom
                 .OverridePropertyName("cityUk");
             RuleFor(x => x.Input.CityRu).NotEmpty().MaximumLength(CompanyContacts.CityMaxLength)
                 .OverridePropertyName("cityRu");
+            RuleFor(x => x.Input.Store!.PostalCode).Must(CompanyStore.IsValidPostalCode)
+                .WithMessage("Індекс: п'ять цифр.").OverridePropertyName("store.postalCode")
+                .When(x => x.Input.Store is not null);
         });
     }
 }

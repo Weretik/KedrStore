@@ -1035,6 +1035,154 @@
         }
       }
     },
+    "/api/categories/{id}/site-names": {
+      "put": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Set the Ukrainian and Russian site names of a category",
+        "description": "Spec catalog/011 R-02. The names win over the 1C name and the configured short name on the site, in breadcrumbs, and in titles; the 1C sync never changes them. A blank name goes back to the name from 1C at once. Repeating the same request is safe.",
+        "operationId": "setAdminCategorySiteNames",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCategorySiteNamesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}/search-settings": {
+      "put": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "summary": "Close a category from search engines and set its link-preview picture",
+        "description": "Spec catalog/011 R-01, R-03. Closing or opening applies to every subcategory too; the site keeps showing a closed category and its products, with noindex and outside the sitemap. A new 1C category takes its parent's mark. The picture is a media-library file; null removes it and the site keeps its own. Repeating the same request is safe.",
+        "operationId": "setAdminCategorySearchSettings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCategorySearchSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/categories/{id}/content": {
       "get": {
         "tags": [
@@ -11627,7 +11775,12 @@
           "deletedAt",
           "isShownOnSite",
           "productCount",
-          "filledContentLanguages"
+          "filledContentLanguages",
+          "siteNameUk",
+          "siteNameRu",
+          "isClosedFromSearch",
+          "shareImageMediaFileId",
+          "shareImageUrl"
         ],
         "type": "object",
         "properties": {
@@ -11693,6 +11846,34 @@
             "items": {
               "type": "string"
             }
+          },
+          "siteNameUk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "siteNameRu": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isClosedFromSearch": {
+            "type": "boolean"
+          },
+          "shareImageMediaFileId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "shareImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -11822,6 +12003,7 @@
           "mapUrl",
           "cityUk",
           "cityRu",
+          "store",
           "updatedAt",
           "updatedBy"
         ],
@@ -11847,6 +12029,9 @@
           },
           "cityRu": {
             "type": "string"
+          },
+          "store": {
+            "$ref": "#/components/schemas/CompanyStoreDto"
           },
           "updatedAt": {
             "type": "string",
@@ -12934,7 +13119,9 @@
           "publishedOn",
           "coverPath",
           "coverUrl",
-          "updatedAt"
+          "updatedAt",
+          "seoTitle",
+          "metaDescription"
         ],
         "type": "object",
         "properties": {
@@ -12973,6 +13160,18 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "seoTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "metaDescription": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -13029,7 +13228,9 @@
           "language",
           "title",
           "excerpt",
-          "bodyHtml"
+          "bodyHtml",
+          "seoTitle",
+          "metaDescription"
         ],
         "type": "object",
         "properties": {
@@ -13044,6 +13245,18 @@
           },
           "bodyHtml": {
             "type": "string"
+          },
+          "seoTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "metaDescription": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -13436,7 +13649,10 @@
           "productCount",
           "minPrice",
           "maxPrice",
-          "content"
+          "content",
+          "isClosedFromSearch",
+          "shareImageUrl",
+          "updatedAt"
         ],
         "type": "object",
         "properties": {
@@ -13504,6 +13720,22 @@
                 "$ref": "#/components/schemas/CategoryContentResponse"
               }
             ]
+          },
+          "isClosedFromSearch": {
+            "type": "boolean"
+          },
+          "shareImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -13531,7 +13763,9 @@
           "sortOrder",
           "level",
           "children",
-          "productCount"
+          "productCount",
+          "isClosedFromSearch",
+          "updatedAt"
         ],
         "type": "object",
         "properties": {
@@ -13569,6 +13803,16 @@
           "productCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "isClosedFromSearch": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -13747,6 +13991,7 @@
           "mapUrl",
           "cityUk",
           "cityRu",
+          "store",
           "updatedAt"
         ],
         "type": "object",
@@ -13771,6 +14016,9 @@
           },
           "cityRu": {
             "type": "string"
+          },
+          "store": {
+            "$ref": "#/components/schemas/CompanyStoreDto"
           },
           "updatedAt": {
             "type": "string",
@@ -13839,6 +14087,97 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "CompanyStoreDto": {
+        "required": [
+          "storeName",
+          "streetAddressUk",
+          "streetAddressRu",
+          "regionUk",
+          "regionRu",
+          "postalCode",
+          "weekdaysOpens",
+          "weekdaysCloses",
+          "saturdayOpens",
+          "saturdayCloses",
+          "sundayOpens",
+          "sundayCloses"
+        ],
+        "type": "object",
+        "properties": {
+          "storeName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "streetAddressUk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "streetAddressRu": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionUk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionRu": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "weekdaysOpens": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "weekdaysCloses": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "saturdayOpens": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "saturdayCloses": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sundayOpens": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sundayCloses": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -16304,7 +16643,8 @@
           "productCount",
           "isAccepted",
           "colors",
-          "productId"
+          "productId",
+          "updatedAt"
         ],
         "type": "object",
         "properties": {
@@ -16355,6 +16695,13 @@
               "integer"
             ],
             "format": "int32"
+          },
+          "updatedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -16411,7 +16758,8 @@
           "mainProductSlug",
           "axes",
           "products",
-          "characteristics"
+          "characteristics",
+          "isClosedFromSearch"
         ],
         "type": "object",
         "properties": {
@@ -16459,6 +16807,9 @@
             "items": {
               "$ref": "#/components/schemas/PublicSiteModelCharacteristicDto"
             }
+          },
+          "isClosedFromSearch": {
+            "type": "boolean"
           }
         }
       },
@@ -17111,6 +17462,16 @@
           },
           "cityRu": {
             "type": "string"
+          },
+          "store": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CompanyStoreDto"
+              }
+            ]
           }
         }
       },
@@ -17631,6 +17992,42 @@
             "items": {
               "$ref": "#/components/schemas/SetCategoryAttributeFilterRequest"
             }
+          }
+        }
+      },
+      "SetCategorySearchSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "isClosedFromSearch": {
+            "type": "boolean"
+          },
+          "shareImageMediaFileId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "SetCategorySiteNamesRequest": {
+        "required": [
+          "nameUk",
+          "nameRu"
+        ],
+        "type": "object",
+        "properties": {
+          "nameUk": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nameRu": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
