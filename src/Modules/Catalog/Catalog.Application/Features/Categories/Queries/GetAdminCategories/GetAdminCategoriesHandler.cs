@@ -7,7 +7,7 @@ using Catalog.Application.Features.Categories.Shared.Stats;
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 
 /// <summary>
-/// Active rows come depth-first in tree order with product counts (including descendants) and the languages that
+/// Active rows come depth-first in tree order with product and site model counts (including descendants) and the languages that
 /// have site texts; deleted rows come newest first without them.
 /// </summary>
 public sealed class GetAdminCategoriesHandler(
@@ -25,10 +25,13 @@ public sealed class GetAdminCategoriesHandler(
 
         var categories = await repository.ListAsync(new AllCategoriesSpec(null), cancellationToken);
         var directCounts = await insights.LoadDirectProductCountsAsync(cancellationToken);
-        var counts = CategoryStatsRollup.Rollup(
-            categories,
-            directCounts.ToDictionary(pair => pair.Key, pair => new CategoryStats(pair.Value, null, null)));
+        var counts = CategoryStatsRollup.RollupCounts(categories, directCounts);
         var languages = await insights.LoadFilledContentLanguagesAsync(cancellationToken);
+        var models = await insights.LoadDirectModelCountsAsync(cancellationToken);
+        var modelCounts = CategoryStatsRollup.RollupCounts(
+            categories, models.ToDictionary(pair => pair.Key, pair => pair.Value.Total));
+        var proposedCounts = CategoryStatsRollup.RollupCounts(
+            categories, models.ToDictionary(pair => pair.Key, pair => pair.Value.Proposed));
         var byId = categories.ToDictionary(x => x.Id.Value);
         var children = categories.ToLookup(x => x.ParentId?.Value);
         var result = new List<AdminCategoryResponse>();
@@ -39,8 +42,10 @@ public sealed class GetAdminCategoriesHandler(
             if (!visited.Add(item.Id.Value)) return;
             result.Add(CategoryReadMapper.ToAdminResponse(item) with
             {
-                ProductCount = counts.TryGetValue(item.Id.Value, out var stats) ? stats.ProductCount : 0,
-                FilledContentLanguages = languages.TryGetValue(item.Id.Value, out var filled) ? filled : []
+                ProductCount = counts[item.Id.Value],
+                FilledContentLanguages = languages.TryGetValue(item.Id.Value, out var filled) ? filled : [],
+                ModelCount = modelCounts[item.Id.Value],
+                ProposedModelCount = proposedCounts[item.Id.Value]
             });
             foreach (var child in children[item.Id.Value].OrderBy(x => x.SortOrder).ThenBy(x => x.Id.Value)) Visit(child);
         }

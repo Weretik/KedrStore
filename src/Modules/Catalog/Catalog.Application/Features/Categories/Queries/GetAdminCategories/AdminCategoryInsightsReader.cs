@@ -1,4 +1,5 @@
 using Catalog.Application.Abstractions.Persistence;
+using Catalog.Domain.Groups;
 
 namespace Catalog.Application.Features.Categories.Queries.GetAdminCategories;
 
@@ -16,6 +17,22 @@ public sealed class AdminCategoryInsightsReader(IReadCatalogDbContext catalogDbC
             .ToListAsync(cancellationToken);
 
         return rows.ToDictionary(row => row.CategoryId.Value, row => row.Count);
+    }
+
+    public async Task<IReadOnlyDictionary<int, CategoryModelCounts>> LoadDirectModelCountsAsync(
+        CancellationToken cancellationToken)
+    {
+        var rows = await catalogDbContext.ProductGroups.AsNoTracking()
+            .GroupBy(model => model.CategoryId)
+            .Select(group => new
+            {
+                CategoryId = group.Key,
+                Total = group.Count(),
+                Proposed = group.Count(model => model.Status == ProductGroupStatus.Proposed)
+            })
+            .ToListAsync(cancellationToken);
+
+        return rows.ToDictionary(row => row.CategoryId.Value, row => new CategoryModelCounts(row.Total, row.Proposed));
     }
 
     public async Task<IReadOnlyDictionary<int, IReadOnlyList<string>>> LoadFilledContentLanguagesAsync(

@@ -28,13 +28,13 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
     private static readonly DateTimeOffset Created = new(2026, 11, 4, 0, 0, 0, TimeSpan.Zero);
 
     [SkippableFact]
-    public async Task Reader_CountsListedProducts_AndNamesLanguagesWithAnyText()
+    public async Task Reader_CountsListedProductsAndModels_AndNamesLanguagesWithAnyText()
     {
         postgres.SkipIfUnavailable();
         await using (var db = postgres.CreateContext())
         {
             await db.Database.ExecuteSqlRawAsync(
-                """TRUNCATE catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."ProductCategories" CASCADE;""");
+                """TRUNCATE catalog."ProductMedia", catalog."ProductListProjections", catalog."ProductPrices", catalog."ProductTranslations", catalog."Products", catalog."CatalogSlugHistory", catalog."CategoryFaqItems", catalog."CategoryContents", catalog."CatalogProductGroups", catalog."ProductCategories" CASCADE;""");
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(10), Root, "Замки", "zamky", CategoryPath.Create("n10")).Value);
             db.Categories.Add(ProductCategory.Create(ProductCategoryId.Create(11), Root, "Завіси", "zavisy", CategoryPath.Create("n11")).Value);
             foreach (var (id, exported) in new[] { (801, true), (802, false) })
@@ -54,6 +54,9 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
             var cleared = CategoryContent.Create(ProductCategoryId.Create(11), "uk");
             cleared.Replace(null, null, null, null, [], "admin", Created);
             db.CategoryContents.AddRange(withFaqOnly, withTitle, cleared);
+            db.ProductGroups.Add(ProductGroup.CreateManual(ProductCategoryId.Create(10), "Замок KEDR", "zamok-kedr", Created).Value);
+            db.ProductGroups.Add(ProductGroup.CreateAutomatic(ProductCategoryId.Create(10), "Замок навісний", "zamok navisnyi",
+                "zamok-navisnyi", Created).Value);
             await db.SaveChangesAsync();
         }
 
@@ -62,10 +65,13 @@ public sealed class AdminCategoryInsightsPostgresTests(CatalogPostgresFixture po
 
         var counts = await reader.LoadDirectProductCountsAsync(CancellationToken.None);
         var languages = await reader.LoadFilledContentLanguagesAsync(CancellationToken.None);
+        var models = await reader.LoadDirectModelCountsAsync(CancellationToken.None);
 
         Assert.Equal(2, counts[10]);
         Assert.False(counts.ContainsKey(11));
         Assert.Equal(["ru", "uk"], languages[10]);
         Assert.False(languages.ContainsKey(11));
+        Assert.Equal(new CategoryModelCounts(2, 1), models[10]);
+        Assert.False(models.ContainsKey(11));
     }
 }
