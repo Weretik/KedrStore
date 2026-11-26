@@ -1,4 +1,4 @@
-namespace Catalog.Domain.Categories;
+namespace Catalog.Domain.Categories.Tree;
 
 /// <summary>
 /// Spreads a site-visibility change over the category tree (spec catalog/007 R-18). Hiding hides the category and every

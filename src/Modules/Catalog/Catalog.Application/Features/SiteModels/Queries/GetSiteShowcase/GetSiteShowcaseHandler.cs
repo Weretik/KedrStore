@@ -71,7 +71,7 @@ public sealed class GetSiteShowcaseHandler(SiteModelStateReader reader)
         var photo = products.Select(product => product.Photo).FirstOrDefault(value => value.Length > 0) ?? string.Empty;
 
         return new SiteShowcaseRowDto(model is null ? $"p{productIds[0].Value}" : $"m{model.Id.Value}", modelDto,
-            name, photo, categoryId.Value, state.CategoryNames.GetValueOrDefault(categoryId) ?? string.Empty,
+            name, photo, categoryId.Value, state.CategoryPathOf(categoryId),
             products.Select(product => product.RetailPrice).Where(price => price is not null).Min(),
             products.Any(product => product.InStock), products, problems);
     }
@@ -87,7 +87,7 @@ public sealed class GetSiteShowcaseHandler(SiteModelStateReader reader)
                     value.ValueId is { } valueId ? state.ValueNames.GetValueOrDefault(valueId) ?? "" : value.Number)))
             .ToList();
         return new SiteShowcaseItemDto(product.Id.Value, product.Name, product.Slug, product.Photo,
-            product.CategoryId.Value, state.CategoryNames.GetValueOrDefault(product.CategoryId) ?? string.Empty,
+            product.CategoryId.Value, state.CategoryPathOf(product.CategoryId),
             product.RetailPrice, product.InStock, model, values, state.ProductProblems(id));
     }
 }

@@ -49,8 +49,10 @@ public sealed class SyncOneCProductDetailsJob(
         }
         else
         {
+            // 1C gives a product only its folder as text; the folder list lets it match by path, not by a shared name.
+            var folders = await oneC.GetCategoriesAsync(rootCategoryId, cancellationToken);
             var rows = await categoryRepo.ListAsync(new ActiveCategoryNamesByRootSpec(rootCategoryId), cancellationToken);
-            categoryNames = new CategoryNameMap(rows);
+            categoryNames = new CategoryNameMap(rows, folders);
         }
 
         var products = CatalogMapper.MapProduct(productsOneC, categoryNames, rootCategoryId, fallbackCategoryId);

@@ -58,7 +58,7 @@ Owner decisions are recorded in the [backend analysis](https://claude.ai/artifac
 
 - **R-021.** The category import loads all categories of the root (including deleted) in one query and compares in memory.
 - **R-022.** A row is written only when a 1C-owned field actually changed; `UpdatedAt` changes only then.
-- **R-023.** Product → category mapping by 1C category name: names are compared trimmed and case-insensitive among active categories of the root. A product whose name maps to no category or to several categories keeps its current category if it already exists (and is skipped if new); the run logs one aggregated warning with counts and examples instead of failing the whole root.
+- **R-023.** Product → category mapping by the folder 1C gives the product as text (it sends no folder code): it is matched against the folders 1C lists for the root (`GetCategories`), first by the full folder path, then by the folder name, trimmed and case-insensitive, among active categories. Our configured groups and manual categories are not 1C folders and never match; without the folder list the names of the active 1C categories are used. A product whose folder maps to no category or to several categories keeps its current category if it already exists (and is skipped if new); the run logs one aggregated warning with counts and examples instead of failing the whole root. (Changed 2026-11-26: matching by name only left products in an old category when a folder name was shared.)
 - **R-024.** Each root and phase logs its duration and counters: received, created, updated, unchanged, deleted, restored, skipped, guard-blocked. Per-product informational logs are removed.
 
 ## Acceptance scenarios
@@ -77,6 +77,7 @@ Owner decisions are recorded in the [backend analysis](https://claude.ai/artifac
 - **SC-012 (R-018).** A deleted product slug returns `404` with `redirectSlug` of its active category.
 - **SC-013 (R-021, R-022, R-024).** Given an unchanged 1C response; when the import runs twice; then the second run writes no product or category row, `UpdatedAt` is unchanged, and the log reports all items as unchanged with phase durations.
 - **SC-014 (R-023).** Given two active categories with the same name and a product mapped to that name; when the import runs; then the run completes for the root, the product keeps its previous category, and one warning lists the ambiguous name.
+- **SC-014a (R-023).** Given a product kept in an old category because its folder name is shared, and 1C lists its folder with a full path; when the import runs with that path; then the product moves to that folder — `ProductImportSoftDeleteTests.Import_MovesProductToTheFolder1CGivesByPath_WhenTheNameIsShared`, `ImportSyncTests.CategoryNameMap_ResolvesBy1CFolderPathThenName_IgnoringOurOwnGroups`.
 - **SC-015 (migration, design §Rollout).** After the migration, every product and category has a KMU 2010 slug without the ID suffix, and each previous slug (`zamki-900002`) resolves to the new one.
 
 ## Tasks and traceability

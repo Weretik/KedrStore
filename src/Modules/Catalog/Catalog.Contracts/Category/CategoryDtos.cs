@@ -64,6 +64,8 @@ public sealed record AdminCategoryResponse(
     public long? ShareImageMediaFileId { get; init; }
     /// <summary>CDN address of the link-preview picture; only the by-id read and the save fill it (R-03).</summary>
     public string? ShareImageUrl { get; init; }
+    /// <summary>Made by hand in the admin (spec catalog/012 MC-01): only such a category can be deleted.</summary>
+    public bool IsManual { get; init; }
 }
 
 public sealed record CategoryFaqItemDto(string Question, string Answer);

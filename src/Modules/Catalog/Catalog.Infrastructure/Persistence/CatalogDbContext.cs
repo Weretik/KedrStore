@@ -1,4 +1,5 @@
 using BuildingBlocks.Infrastructure.Persistence;
+using Catalog.Infrastructure.Persistence.Categories;
 using Catalog.Application.Abstractions.Persistence;
 using Catalog.Domain.Categories;
 using Catalog.Domain.Categories.Content;
@@ -55,6 +56,8 @@ public class CatalogDbContext(DbContextOptions<CatalogDbContext> options)
 
         modelBuilder.HasPostgresExtension("ltree");
         modelBuilder.HasPostgresExtension("pg_trgm");
+        // Ids of categories made by hand, outside 1C codes and the configured groups (spec catalog/012 MC-01).
+        modelBuilder.HasSequence<int>(ManualCategoryIds.SequenceName).StartsAt(ManualCategoryIds.FirstId);
 
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(CatalogDbContext).Assembly,

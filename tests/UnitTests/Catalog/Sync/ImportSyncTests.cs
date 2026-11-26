@@ -49,6 +49,42 @@ public sealed class ImportSyncTests
     }
 
     [Fact]
+    public void CategoryNameMap_ResolvesBy1CFolderPathThenName_IgnoringOurOwnGroups()
+    {
+        // Our database also holds the configured group «Ручки» and a manual category: 1C does not know them.
+        var active = new[]
+        {
+            new CategoryNameRow(5915, "На планці"), new CategoryNameRow(5853, "R-08/R-10"),
+            new CategoryNameRow(7001, "На планці"), new CategoryNameRow(900003, "Ручки"),
+            new CategoryNameRow(800000001, "Ручки")
+        };
+        var oneC = new[]
+        {
+            new OneCCategoryDto(5900, 5513, "Ручки", "Фурнітура/Ручки"),
+            new OneCCategoryDto(5915, 5900, "На планці", "Фурнітура/Ручки/На планці"),
+            new OneCCategoryDto(5853, 5900, "R-08/R-10", "Фурнітура/Ручки/R-08/R-10"),
+            new OneCCategoryDto(7001, 7000, "На планці", "Фурнітура/Засувки/На планці")
+        };
+
+        var map = new CategoryNameMap(active, oneC);
+
+        Assert.Equal(5915, map.Resolve(" фурнітура / ручки / на планці "));
+        Assert.Equal(5853, map.Resolve("R-08/R-10"));
+        Assert.Null(map.Resolve("Ручки"));
+        Assert.Equal(["Ручки"], map.MissingNames);
+        Assert.Null(map.Resolve("На планці"));
+        Assert.Equal(["На планці"], map.AmbiguousNames);
+    }
+
+    [Fact]
+    public void CategoryNameMap_WithoutTheFolderListFallsBackToOurNames()
+    {
+        var map = new CategoryNameMap([new CategoryNameRow(10, "Замки")], []);
+
+        Assert.Equal(10, map.Resolve("Замки"));
+    }
+
+    [Fact]
     public void MapProduct_LeavesCategoryEmptyWhenNameDoesNotResolve()
     {
         var map = new CategoryNameMap([new CategoryNameRow(10, "Замки")]);

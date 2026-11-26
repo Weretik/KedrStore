@@ -23,6 +23,7 @@ public static class CategoryReadMapper
         SiteNameRu = category.SiteNameRu,
         IsClosedFromSearch = category.IsClosedFromSearch,
         ShareImageMediaFileId = category.ShareImageMediaFileId?.Value,
-        ShareImageUrl = shareImageUrl
+        ShareImageUrl = shareImageUrl,
+        IsManual = category.IsManual
     };
 }
