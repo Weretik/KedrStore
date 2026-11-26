@@ -41,8 +41,20 @@ public class GetProductBySlugHandler(
         var breadcrumbs = await catalogDbContext.Categories
             .AsNoTracking()
             .BuildCategoryBreadcrumbsAsync(result.CategorySlug, cancellationToken);
+        var inStock = await IsInStockAsync(productId.Value, cancellationToken);
 
-        return Result.Success(CatalogLookup<ProductBySlugDto>.Found(result with { Breadcrumbs = breadcrumbs }));
+        return Result.Success(CatalogLookup<ProductBySlugDto>.Found(
+            result with { Breadcrumbs = breadcrumbs, InStock = inStock }));
+    }
+
+    /// <summary>The list projection's rule (hardware needs more than 2), so the page and the catalog agree.</summary>
+    private Task<bool> IsInStockAsync(int productId, CancellationToken cancellationToken)
+    {
+        var id = ProductId.Create(productId);
+        return catalogDbContext.ProductListProjections.AsNoTracking()
+            .Where(projection => projection.ProductId == id)
+            .Select(projection => projection.InStock)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private Task<int?> FindDeletedBySlugAsync(string slug, CancellationToken cancellationToken)

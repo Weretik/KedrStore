@@ -192,6 +192,25 @@ public sealed class CatalogStableUrlsApiTests
         Assert.Equal(90m, asked.RootElement.GetProperty("price").GetDecimal());
     }
 
+    [Fact]
+    public async Task PublicProduct_TakesAvailabilityFromTheCatalogList_NotFromAnyStockAboveZero()
+    {
+        await using var db = Seed();
+        // Stock 5 above zero, but the list says not available (for example hardware with 2 or fewer).
+        db.ProductListProjections.Remove(db.ProductListProjections.Single(row => row.ProductId == ProductId.Create(21)));
+        db.ProductListProjections.Add(ProductListProjection.Create(ProductId.Create(21), "Замок Б", "Замок Б", "zamok-b", "",
+            ProductCategoryId.Create(2), "zamky", inStock: false, isSale: false, isNew: false, exportToSite: true, retailPrice: 250m));
+        await db.SaveChangesAsync();
+        using var factory = CreateFactory(db);
+        using var client = factory.CreateClient();
+
+        using var available = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-a"));
+        using var unavailable = JsonDocument.Parse(await client.GetStringAsync("/api/catalog/uk/product/zamok-b"));
+
+        Assert.True(available.RootElement.GetProperty("inStock").GetBoolean());
+        Assert.False(unavailable.RootElement.GetProperty("inStock").GetBoolean());
+    }
+
     private static CatalogDbContext Seed()
     {
         var db = new CatalogDbContext(new DbContextOptionsBuilder<CatalogDbContext>()

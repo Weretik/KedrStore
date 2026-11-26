@@ -13,6 +13,8 @@ public record  ProductBySlugDto
     /// <summary>All photo URLs in gallery order; the first equals <see cref="Photo"/>.</summary>
     public IReadOnlyList<string> Photos { get; init; } = [];
     public decimal Stock { get; init; }
+    /// <summary>Available to order by the catalog rule: hardware needs more than 2 in stock, other goods more than 0.</summary>
+    public bool InStock { get; init; }
 
     public string CategoryName { get; init; } = null!;
     public string CategorySlug { get; init; } = null!;
