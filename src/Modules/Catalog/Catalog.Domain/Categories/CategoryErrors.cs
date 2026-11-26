@@ -41,7 +41,7 @@ public static class CategoryErrors
         new("Catalog.Category.Parent.Deleted", "Ця категорія видалена: оберіть іншу.", Field: "ParentId");
 
     public static DomainError NotManual() =>
-        new("Catalog.Category.NotManual", "Категорію з 1С не можна переносити чи видаляти тут.");
+        new("Catalog.Category.NotManual", "Категорію з 1С не можна видалити: її можна сховати з сайту.");
 
     public static DomainError MoveIntoItself() =>
         new("Catalog.Category.Move.IntoItself", "Категорію не можна вкласти в неї саму чи її підкатегорію.",

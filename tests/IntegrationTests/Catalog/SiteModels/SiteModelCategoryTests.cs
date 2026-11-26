@@ -157,6 +157,8 @@ public sealed class SiteModelCategoryTests
 
         var row = Assert.Single((await handlers.ListAsync(new GetSiteModelsRequest())).Items);
         Assert.Equal((hinges.Id.Value, Final), (row.Id, row.CategoryId));
+        Assert.Equal("Категорія 10 > Категорія 11", row.CategoryName);
+        Assert.Equal("Категорія 10 > Категорія 11", added.Value.CategoryName);
         Assert.Equal(["Категорія 12"], row.OneCCategories);
 
         var categories = await handlers.CategoriesAsync();

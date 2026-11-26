@@ -35,6 +35,22 @@ public sealed class SiteModelState
     /// <summary>How many attributes each category offers as site filters (its own rows, not its subcategories').</summary>
     public required IReadOnlyDictionary<ProductCategoryId, int> FilterCounts { get; init; }
 
+    /// <summary>The full path of a category, «Фурнітура &gt; Ручки &gt; На планці», as the products show it.</summary>
+    public string CategoryPathOf(ProductCategoryId categoryId)
+    {
+        var names = new List<string>();
+        var visited = new HashSet<ProductCategoryId>();
+        for (ProductCategoryId? current = categoryId; current is { } id && visited.Add(id);
+             current = CategoryParents.GetValueOrDefault(id))
+        {
+            if (CategoryNames.GetValueOrDefault(id) is { Length: > 0 } name)
+                names.Add(name);
+        }
+
+        names.Reverse();
+        return string.Join(" > ", names);
+    }
+
     /// <summary>Whether a category is the selected one or inside it; no selection matches everything.</summary>
     public bool InCategory(ProductCategoryId categoryId, int? selected)
     {
