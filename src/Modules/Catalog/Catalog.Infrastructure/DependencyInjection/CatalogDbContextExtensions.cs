@@ -44,6 +44,8 @@ public static class CatalogDbContextExtensions
         services.AddScoped<PublicModelCatalogReader>();
         services.AddSingleton<PublicModelCatalogCache>();
         services.AddScoped<SiteModelChanges>();
+        services.AddScoped<IManualCategoryIds, Catalog.Infrastructure.Persistence.Categories.ManualCategoryIds>();
+        services.AddScoped<Catalog.Application.Features.CategoryPlacement.Shared.CategoryTreeEditor>();
         services.AddScoped<UnresolvedCodeReader>();
         services.AddScoped<CodeMeaningReader>();
         services.AddScoped<Catalog.Application.Features.Attributes.Shared.Import.RecognizedProductWriter>();

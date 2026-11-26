@@ -1,6 +1,8 @@
+using Catalog.Domain.Categories.Tree;
+
 namespace Catalog.Domain.Categories;
 
-public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
+public partial class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 {
     public const int ShortNameMaxLength = 100;
 
@@ -67,6 +69,7 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
             Slug = checkedSlug,
             Path = path,
             ParentId = parentId,
+            OneCParentId = parentId,
         };
         var metadata = category.UpdatePresentationMetadata(checkedName, checkedName, int.MaxValue,
             GetLevelFromPath(path));
@@ -74,19 +77,18 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     }
 
     /// <summary>
-    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here.
+    /// Applies 1C-owned fields. The slug is not 1C-owned and never changes here. A category placed by hand keeps its
+    /// place and only remembers the 1C parent (spec catalog/011 MC-09); the full paths are rebuilt by
+    /// <see cref="CategoryTreePlacement"/> after the sync, so a moved ancestor does not count as a change here.
     /// Returns whether anything changed.
     /// </summary>
     public DomainResult<bool> UpdateFromOneC(string name, CategoryPath path, ProductCategoryId? parentId,
         DateTimeOffset now)
     {
         var trimmedName = name?.Trim() ?? string.Empty;
-        if (string.Equals(Name, trimmedName, StringComparison.Ordinal) &&
-            Path.Value == path.Value &&
-            ParentId == parentId)
-        {
+        var parentChanged = OneCParentId != parentId || (!IsPlacedByHand && ParentId != parentId);
+        if (string.Equals(Name, trimmedName, StringComparison.Ordinal) && !parentChanged)
             return false;
-        }
 
         var checks = new DomainChecks();
         var checkedName = checks.Take(CheckName(name!));
@@ -95,9 +97,13 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
             return error;
 
         Name = checkedName;
-        Path = path;
-        ParentId = parentId;
-        Level = GetLevelFromPath(path);
+        OneCParentId = parentId;
+        if (!IsPlacedByHand && ParentId != parentId)
+        {
+            Path = path;
+            ParentId = parentId;
+            Level = GetLevelFromPath(path);
+        }
         UpdatedAt = now;
         return true;
     }
@@ -234,7 +240,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
     #region ProductCategory API
     /// <summary>
     /// Sets presentation metadata from 1C and the configuration and returns whether anything changed. An admin's site
-    /// name (<see cref="SiteNameUk"/>, <see cref="SiteNameRu"/>) stays the shown name.
+    /// name (<see cref="SiteNameUk"/>, <see cref="SiteNameRu"/>) stays the shown name, and an order set by hand stays
+    /// (spec catalog/011 MC-10).
     /// </summary>
     public DomainResult<bool> UpdatePresentationMetadata(string shortNameUk, string shortNameRu, int sortOrder,
         int level)
@@ -250,6 +257,8 @@ public class ProductCategory : BaseEntity<ProductCategoryId>, IAggregateRoot
 
         validatedShortNameUk = SiteNameUk ?? validatedShortNameUk;
         validatedShortNameRu = SiteNameRu ?? validatedShortNameRu;
+        if (IsOrderedByHand)
+            sortOrder = SortOrder;
         var changed = !string.Equals(ShortNameUk, validatedShortNameUk, StringComparison.Ordinal) ||
                       !string.Equals(ShortNameRu, validatedShortNameRu, StringComparison.Ordinal) ||
                       SortOrder != sortOrder ||

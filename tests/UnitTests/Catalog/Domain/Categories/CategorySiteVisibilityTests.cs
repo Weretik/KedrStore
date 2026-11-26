@@ -1,7 +1,8 @@
+using Catalog.Domain.Categories.Tree;
 using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 
-namespace UnitTests.Catalog.Domain;
+namespace UnitTests.Catalog.Domain.Categories;
 
 public sealed class CategorySiteVisibilityTests
 {

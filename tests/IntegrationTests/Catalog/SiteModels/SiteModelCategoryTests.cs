@@ -3,6 +3,7 @@ using BuildingBlocks.Application.Users;
 using BuildingBlocks.Domain.Identifiers;
 using Microsoft.EntityFrameworkCore;
 using IntegrationTests.Platform.Caching;
+using global::Catalog.Application.Features.CategoryPlacement.Commands.AddCategorySiteModels;
 using global::Catalog.Application.Features.Groups.Shared;
 using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 using global::Catalog.Application.Features.SiteModels.Commands.AddSiteModelProducts;
@@ -62,6 +63,9 @@ public sealed class SiteModelCategoryTests
             Changes, State, TimeProvider.System, new CatalogTransaction(db));
 
         public AddSiteModelProductsHandler Add => new(db, Changes, Reader, TimeProvider.System);
+
+        public AddCategorySiteModelsHandler AddToCategory => new(db, new TestRepository<ProductGroup>(db),
+            new Manager(), Changes, TimeProvider.System, new CatalogTransaction(db));
 
         public async Task<Ardalis.Result.Result<SiteModelDto>> MoveAsync(int modelId, int categoryId)
             => await ChangeCategory.Handle(new ChangeSiteModelCategoryCommand(modelId,
@@ -158,6 +162,34 @@ public sealed class SiteModelCategoryTests
         var categories = await handlers.CategoriesAsync();
         Assert.Equal([Parent, Final], categories.Select(category => category.Id));
         Assert.Equal(3, categories.Single(category => category.Id == Final).OnSiteProducts);
+    }
+
+    [Fact]
+    public async Task ModelsAreAddedToACategory_AProposedOneIsAccepted_AParentIsRefused_SC_MC03()
+    {
+        await using var db = await CatalogAsync([1, 2, 3]);
+        await RunAsync(db, Dictionary, Csv(Row(1, "Завіса", "AB", "L"), Row(2, "Завіса", "CR", "L"),
+            Row(3, "Ручка", "AB", "L")), apply: true);
+        var hinges = await ModelOfAsync(db, 1);
+        var handles = await ModelOfAsync(db, 3);
+        var handlers = new Handlers(db);
+
+        var parent = await handlers.AddToCategory.Handle(
+            new AddCategorySiteModelsCommand(Parent, [hinges.Id.Value]), CancellationToken.None);
+        Assert.Equal(Ardalis.Result.ResultStatus.Invalid, parent.Status);
+        var unknown = await handlers.AddToCategory.Handle(
+            new AddCategorySiteModelsCommand(OtherFinal, [hinges.Id.Value, 999]), CancellationToken.None);
+        Assert.Equal(Ardalis.Result.ResultStatus.NotFound, unknown.Status);
+
+        var added = await handlers.AddToCategory.Handle(
+            new AddCategorySiteModelsCommand(OtherFinal, [hinges.Id.Value, handles.Id.Value]), CancellationToken.None);
+
+        Assert.True(added.IsSuccess);
+        db.ChangeTracker.Clear();
+        var moved = await db.ProductGroups.AsNoTracking()
+            .Where(group => group.Id == hinges.Id || group.Id == handles.Id).ToListAsync();
+        Assert.All(moved, model => Assert.Equal(ProductCategoryId.Create(OtherFinal), model.CategoryId));
+        Assert.All(moved, model => Assert.Equal(ProductGroupStatus.Accepted, model.Status));
     }
 
     private sealed class Manager : ICurrentUserService

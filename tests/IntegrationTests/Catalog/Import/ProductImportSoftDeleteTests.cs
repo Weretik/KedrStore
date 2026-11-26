@@ -51,6 +51,29 @@ public sealed class ProductImportSoftDeleteTests
     }
 
     [Fact]
+    public async Task Import_MovesProductToTheFolder1CGivesByPath_WhenTheNameIsShared()
+    {
+        await using var db = CreateContext();
+        Seed(db, productCount: 2);
+        var oneC = new FakeOneC
+        {
+            Categories =
+            [
+                new OneCCategoryDto(10, 5513, "Замки", "Фурнітура/Замки"),
+                new OneCCategoryDto(11, 5513, "Ручки", "Фурнітура/Ручки"),
+                new OneCCategoryDto(12, 10, "ручки", "Фурнітура/Замки/ручки")
+            ],
+            Products = [Row(1, "Фурнітура/Ручки"), Row(2, "Замки")]
+        };
+
+        await ProductJob(db, oneC).RunAsync(Root, CancellationToken.None, rebuildProjection: false);
+
+        var all = await db.Products.ToDictionaryAsync(product => product.Id.Value);
+        Assert.Equal(11, all[1].CategoryId.Value);
+        Assert.Equal(10, all[2].CategoryId.Value);
+    }
+
+    [Fact]
     public async Task Import_KeepsMediaLinksOfKnownProducts_AndStartsNewProductsWithoutPhoto()
     {
         await using var db = CreateContext();

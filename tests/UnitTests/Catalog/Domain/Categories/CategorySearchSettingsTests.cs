@@ -1,7 +1,8 @@
+using Catalog.Domain.Categories.Tree;
 using BuildingBlocks.Domain.Identifiers;
 using Catalog.Domain.Categories;
 
-namespace UnitTests.Catalog.Domain;
+namespace UnitTests.Catalog.Domain.Categories;
 
 /// <summary>Spec catalog/010: «Закрити від пошуку», the admin's site names, and the link-preview picture.</summary>
 public sealed class CategorySearchSettingsTests

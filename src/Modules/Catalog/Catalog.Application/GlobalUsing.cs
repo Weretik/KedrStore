@@ -14,6 +14,7 @@ global using Microsoft.Extensions.Configuration;
 
 //  Catalog.Domain namespaces
 global using Catalog.Domain.Categories;
+global using Catalog.Domain.Categories.Tree;
 global using Catalog.Domain.Categories.Content;
 global using Catalog.Domain.PriceTypes;
 global using Catalog.Domain.Products;

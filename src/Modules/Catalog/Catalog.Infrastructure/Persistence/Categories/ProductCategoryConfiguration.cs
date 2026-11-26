@@ -61,6 +61,11 @@ public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<Prod
 
         builder.Property(c => c.ShareImageMediaFileId);
 
+        builder.Property(c => c.IsManual).IsRequired().HasDefaultValue(false);
+        builder.Property(c => c.IsPlacedByHand).IsRequired().HasDefaultValue(false);
+        builder.Property(c => c.IsOrderedByHand).IsRequired().HasDefaultValue(false);
+        builder.Property(c => c.OneCParentId);
+
         builder.Property(c => c.ProductTypeIdOneC)
             .HasMaxLength(10)
             .IsRequired();

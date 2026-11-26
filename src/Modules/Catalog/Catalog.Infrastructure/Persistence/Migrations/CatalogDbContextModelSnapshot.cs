@@ -25,6 +25,9 @@ namespace Catalog.Infrastructure.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence<int>("ManualCategoryIds")
+                .StartsAt(800000000L);
+
             modelBuilder.Entity("Catalog.Application.Features.Products.Shared.ProductListProjection", b =>
                 {
                     b.Property<int>("ProductId")
@@ -541,6 +544,21 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<bool>("IsManual")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsOrderedByHand")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsPlacedByHand")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsShownOnSite")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -553,6 +571,9 @@ namespace Catalog.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("OneCParentId")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("integer");

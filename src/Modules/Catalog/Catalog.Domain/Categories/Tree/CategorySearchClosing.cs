@@ -1,4 +1,4 @@
-namespace Catalog.Domain.Categories;
+namespace Catalog.Domain.Categories.Tree;
 
 /// <summary>
 /// Spreads «Закрити від пошуку» over the category tree (spec catalog/010 R-01): closing or opening a category does the

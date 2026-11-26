@@ -36,4 +36,20 @@ public static class CategoryErrors
 
     public static DomainError ShareImageInvalid() =>
         new("Catalog.Category.ShareImage.Invalid", "Оберіть зображення з медіатеки.", Field: "ShareImageMediaFileId");
+
+    public static DomainError ParentDeleted() =>
+        new("Catalog.Category.Parent.Deleted", "Ця категорія видалена: оберіть іншу.", Field: "ParentId");
+
+    public static DomainError NotManual() =>
+        new("Catalog.Category.NotManual", "Категорію з 1С не можна переносити чи видаляти тут.");
+
+    public static DomainError MoveIntoItself() =>
+        new("Catalog.Category.Move.IntoItself", "Категорію не можна вкласти в неї саму чи її підкатегорію.",
+            Field: "ParentId");
+
+    public static DomainError NameTaken() =>
+        DomainError.Conflict("Catalog.Category.Name.Taken", "Категорія з такою назвою вже є тут.");
+
+    public static DomainError NotEmpty() =>
+        DomainError.Conflict("Catalog.Category.NotEmpty", "Спочатку приберіть моделі та підкатегорії.");
 }
