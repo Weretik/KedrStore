@@ -34,17 +34,23 @@ public sealed record SiteModelSnapshot(
                 Model: ProductGroupId.FromStorage(member.ModelId)))
             .Where(member => models.ContainsKey(member.Model))
             .ToList();
+        var modelOfProduct = members.ToDictionary(member => member.Product, member => member.Model);
+
+        // A model's product is shown by the model's category, a product in no model by its own (R-24).
+        bool IsShown(ProductRow product)
+            => shown.Contains(modelOfProduct.TryGetValue(ProductId.FromStorage(product.Id), out var modelId)
+                ? models[modelId].CategoryId
+                : ProductCategoryId.FromStorage(product.CategoryId));
 
         return new SiteModelState
         {
             Products = Products.ToDictionary(product => ProductId.FromStorage(product.Id), product =>
                 new SiteModelProductFacts(ProductId.FromStorage(product.Id), product.Name, product.Slug,
                     ProductCategoryId.FromStorage(product.CategoryId), product.Photo, product.RetailPrice,
-                    product.InStock, product.ExportToSite, product.IsDeleted,
-                    shown.Contains(ProductCategoryId.FromStorage(product.CategoryId)))),
+                    product.InStock, product.ExportToSite, product.IsDeleted, IsShown(product))),
             Models = models,
             MembersByModel = members.ToLookup(member => member.Model, member => member.Product),
-            ModelOfProduct = members.ToDictionary(member => member.Product, member => member.Model),
+            ModelOfProduct = modelOfProduct,
             SavedAxes = Axes.Select(axis => new SiteModelAxisFacts(ProductGroupId.FromStorage(axis.ModelId),
                     AttributeId.FromStorage(axis.AttributeId), axis.Position))
                 .ToLookup(axis => axis.GroupId),

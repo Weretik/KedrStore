@@ -139,7 +139,7 @@ public sealed class SiteModelTests
         public SiteModelChanges Changes => new(db, new TestRepository<ProductGroup>(db),
             new ProductGroupPins(db, new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), State);
 
-        public AcceptSiteModelsHandler Accept => new(db, new TestRepository<ProductGroup>(db), new Manager(),
+        public AcceptSiteModelsHandler Accept => new(db, new Manager(),
             Changes, State, TimeProvider.System, new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db));
 
         public CreateSiteModelHandler Create => new(new TestRepository<ProductGroup>(db), new SlugService(db),
@@ -239,7 +239,7 @@ public sealed class SiteModelTests
     }
 
     [Fact]
-    public async Task PersonCreatesModel_InFinalCategory_WithProductsOfThatCategoryOnly_SC_M03()
+    public async Task PersonCreatesModel_InFinalCategory_WithoutProductsOfAnotherAcceptedModel_SC_M03()
     {
         await using var db = await CatalogAsync([1, 2, 3, 4, 5], inOtherCategory: [5]);
         await RunAsync(db, Dictionary, Csv(Row(1, "Ручка", "AB", "L"), Row(2, "Ручка", "CR", "L"),
@@ -256,7 +256,7 @@ public sealed class SiteModelTests
             }), CancellationToken.None);
 
         Assert.False((await CreateAsync(Parent, 1)).IsSuccess);
-        Assert.False((await CreateAsync(Final, 1, 5)).IsSuccess);
+        // Since stage 9 a product of another 1C category may join (R-23); one of another accepted model may not.
         Assert.False((await CreateAsync(Final, 1, 3)).IsSuccess);
 
         var created = await CreateAsync(Final, 1);

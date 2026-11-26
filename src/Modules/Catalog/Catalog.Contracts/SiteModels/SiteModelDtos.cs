@@ -3,6 +3,7 @@ namespace Catalog.Contracts.SiteModels;
 /// <summary>A model in the «Моделі» list (spec catalog/007). <c>Status</c>: <c>proposed</c> or <c>accepted</c>.</summary>
 /// <param name="Axes">Names of the model's axes (saved, or offered for a proposed model).</param>
 /// <param name="Problems">Problem codes of the model and of its on-site products (R-08); empty when all is well.</param>
+/// <param name="OneCCategories">1C categories of its products that differ from the model's category (R-25).</param>
 public sealed record SiteModelListItemDto(
     int Id,
     int CategoryId,
@@ -15,7 +16,8 @@ public sealed record SiteModelListItemDto(
     decimal? MinPrice,
     string Photo,
     IReadOnlyList<string> Axes,
-    IReadOnlyList<string> Problems);
+    IReadOnlyList<string> Problems,
+    IReadOnlyList<string> OneCCategories);
 
 public sealed record SiteModelListDto(IReadOnlyList<SiteModelListItemDto> Items, int TotalCount, int Page, int PageSize);
 
@@ -55,6 +57,7 @@ public sealed record SiteModelTextDto(
 public sealed record SiteModelCharacteristicDto(int AttributeId, string Name, IReadOnlyList<string> Values);
 
 /// <summary>A site model with its products, axes, texts, and problems (spec catalog/007).</summary>
+/// <param name="OneCCategories">1C categories of its products that differ from the model's category (R-25).</param>
 public sealed record SiteModelDto(
     int Id,
     int CategoryId,
@@ -69,7 +72,8 @@ public sealed record SiteModelDto(
     IReadOnlyList<SiteModelProductDto> Products,
     IReadOnlyList<SiteModelTextDto> Texts,
     IReadOnlyList<SiteModelCharacteristicDto> Characteristics,
-    IReadOnlyList<string> Problems);
+    IReadOnlyList<string> Problems,
+    IReadOnlyList<string> OneCCategories);
 
 /// <summary>
 /// Site health for «Огляд» (R-08). <c>ProductsWithoutModel</c> is the hard error: on-site products in no model at all

@@ -45,7 +45,10 @@ public sealed record SiteModelProductFacts(
     bool IsDeleted,
     bool IsCategoryShown)
 {
-    /// <summary>Exported from 1C, not deleted, and its category is shown on the site (R-08, R-18).</summary>
+    /// <summary>
+    /// Exported from 1C, not deleted, and its site category is shown (R-08, R-18): the model's category for a product
+    /// in a model, its own otherwise (R-24).
+    /// </summary>
     public bool IsOnSite => ExportToSite && !IsDeleted && IsCategoryShown;
     public bool HasPhoto => Photo.Length > 0;
 }

@@ -1,6 +1,6 @@
 # 007 — Site models and their attributes
 
-**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification), stage 2 (models in the database and the admin API), stage 4 (admin) and stage 5 (public API) implemented 2026-11-05; stages 4b, 4c, 6 (site pages and filters) and 7 (SEO) implemented 2026-11-06; stage 3 (owner reviews the proposals in «Вітрина сайту») and stage 8 (AI drafts) planned. **Date:** 2026-11-05.
+**Module:** Catalog. **Status:** accepted 2026-11-05; stage 1 (this specification), stage 2 (models in the database and the admin API), stage 4 (admin) and stage 5 (public API) implemented 2026-11-05; stages 4b, 4c, 6 (site pages and filters) and 7 (SEO) implemented 2026-11-06; stage 3 (owner reviews the proposals in «Вітрина сайту») and stage 8 (AI drafts) planned; stage 9 (a model's own category) server part implemented 2026-11-26, admin pages in kedr-web in progress. **Date:** 2026-11-05.
 
 The owner-facing plan with the audit, the screens, and every decision is the Russian document [«Кедр: модели и признаки — новый подход»](https://claude.ai/artifact/3NDXYvcRvtd7hWTTAgx7NT); the screen concept is the canvas [«Кедр: моделі та ознаки»](https://claude.ai/artifact/DYfVE9Kkxc6RGD293mjXNV). This file is the technical summary, the design, and the evidence log. It changes the direction of [spec 006](../006-attributes-variants-filters/README.md): phases 1–4 of 006 stay as they are and are reused; its phase 5 (filters per product) is reworked here into stage 5 (filters per model), and its phases 6–7 move to stages 7–8.
 
@@ -10,7 +10,7 @@ The public site is built from **models**. A model is one site page in one final 
 
 Models and attributes are a layer for the site only. The 1C products, their names, and the admin «Товари» page stay as they were before spec 006 phase 3.
 
-**Out of scope:** changing original 1C product names; models across categories; the Angular storefront; the mobile app.
+**Out of scope:** changing original 1C product names; a model in more than one category (since stage 9 a model's products may come from several 1C categories, the model itself sits in one); the Angular storefront; the mobile app.
 
 **Term in code.** A model is the existing `ProductGroup` (table `CatalogProductGroups`); the code keeps that name, the admin and the site say «модель».
 
@@ -222,6 +222,51 @@ src/Modules/Catalog/
     └── GetCategories/                      # lone products, accepted models with problems, filter count
 ```
 
+## Stage 9: a model's category is the site's category
+
+Owner requests 2026-11-26 in the thread «Улучшить UX страницы «Вітрина сайту»» and its concept canvas [«Вітрина сайту — концепт»](https://claude.ai/artifact/72FnMkg3CRhiD87vYuBvnt): a person must put a model, with all its products, into the category the shop wants, even when 1C sends another one; a model can be made by hand from products of any 1C category; the admin splits «Вітрина сайту» into the pages «Моделі», «Перевірка», and «Ознаки та фільтри» (kedr-web). This stage is the server part.
+
+### Rules
+
+- **R-22.** A person changes a model's category to a final category (M-03); the same category changes nothing. A proposed model whose category changes is accepted in the same step (its products pinned, the offered axes saved, R-03, R-05), so the next build cannot rebuild it in the 1C category. The 1C sync and «Товари» keep each product's own 1C category.
+- **R-23.** R-04 changes: creating a model and adding products to it take products of any 1C category. The checks left are that each product exists and is not in another accepted model.
+- **R-24.** R-11, R-18 and R-19 change: a product in a model is placed and shown by its model's category; a product in no model by its own. The public site lists an accepted model with all its on-site products in its category, its category's mark «show on site» decides whether they are on the site, and the admin lists, the category tree, the health and «Огляд» counts follow the same placement.
+- **R-25.** The model list and the model carry `oneCCategories`: the names of the 1C categories of the model's on-site products that differ from the model's category, so the admin shows «У 1С: …». An empty list is not marked.
+
+**Rate limit.** `PUT api/admin/site-models/{id}/category` is a cheap signed-in Manager or Admin call: the global soft limit is enough (rate limit rules). **Idempotency.** It sets a value: repeating it gives the same state, no key needed.
+
+### Scenarios
+
+- **SC-M16 (R-22, R-24).** An accepted model moves to another final category: the public list of the new category shows it with all its products, the old one no longer does; each product keeps its 1C category; a 1C update of a product's category does not move the model.
+- **SC-M17 (R-22).** A proposed model whose category changes is accepted with its products pinned; a new build leaves it in the new category.
+- **SC-M18 (R-22).** A parent category answers 400 `CategoryNotFinal`; an unknown model answers 404; the same category changes nothing.
+- **SC-M19 (R-23, R-25).** A product of another 1C category joins a model; the list and the model name that category in `oneCCategories`, and the category tree counts the product under the model's category.
+
+### Design
+
+`ProductGroup.ChangeCategory(categoryId, now)` returns whether it changed. The command `ChangeSiteModelCategory` (`PUT api/admin/site-models/{id}/category`, body `categoryId`, answer `SiteModelDto`, operation `changeAdminSiteModelCategory`) checks the final category, accepts a proposed model through `SiteModelChanges.AcceptAsync` (shared with «Прийняти»), changes the category, and saves in one transaction; it drops the site models read cache. `SiteModelState.PlacementOf` gives a product's category by R-24; `PublicModelCatalogReader` reads every exported product and keeps an accepted model's members when the model's category is public.
+
+### Files (stage 9)
+
+```text
+src/Modules/Catalog/
+├── Catalog.Domain/Groups/ProductGroup.cs                       # + ChangeCategory
+├── Catalog.Contracts/SiteModels/SiteModelDtos.cs, SiteModelRequests.cs  # + OneCCategories; ChangeSiteModelCategoryRequest
+├── Catalog.Application/Features/SiteModels/
+│   ├── Commands/ChangeSiteModelCategory/                       # new: command, handler, validator
+│   ├── Commands/AcceptSiteModels/AcceptSiteModelsHandler.cs    # uses SiteModelChanges.AcceptAsync
+│   ├── Shared/State/SiteModelChanges.cs                        # any 1C category (R-23); AcceptAsync
+│   ├── Shared/State/SiteModelSnapshot.cs, SiteModelState.cs    # placement by model (R-24)
+│   ├── Shared/SiteModelMapper.cs                               # oneCCategories (R-25)
+│   ├── Queries/GetSiteModelCategories/                         # counts by placement
+│   └── Shared/Public/PublicModelCatalogReader.cs               # members by the model's category
+└── Catalog.Api/Endpoints/SiteModels/ChangeAdminSiteModelCategory/  # new endpoint
+tests/
+├── UnitTests/Catalog/Groups/SiteModelDomainTests.cs            # ChangeCategory
+├── IntegrationTests/Catalog/SiteModels/SiteModelCategoryTests.cs  # SC-M17–SC-M19
+└── IntegrationTests/Catalog/SiteModels/PublicSiteModelTests.cs # SC-M16
+```
+
 ## Stages
 
 | Stage | Scope | Status |
@@ -236,6 +281,7 @@ src/Modules/Catalog/
 | 6 | Next.js site: category, parent with subcategory links, model page with live switchers, search; server: `productId` on a one-product card (R-21) | done 2026-11-06 (KedrStore #183, kedr-web #80) |
 | 7 | SEO: model metadata, canonical, `ProductGroup` JSON-LD, model sitemap, single-filter pages | done 2026-11-06 (kedr-web #81, no backend change): pages only for colour and size values with at least two models; other filters stay `?query` and noindex |
 | 8 | Optional AI drafts for SEO texts and unrecognized attributes (a person confirms) | planned |
+| 9 | A model's category is the site's category; models from products of any 1C category (R-22–R-25); admin pages «Моделі», «Перевірка», «Ознаки та фільтри» in kedr-web | server implemented 2026-11-26; admin in progress |
 
 ## Evidence (stage 2)
 

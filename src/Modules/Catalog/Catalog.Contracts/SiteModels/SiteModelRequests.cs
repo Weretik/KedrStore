@@ -27,6 +27,12 @@ public sealed record RenameSiteModelRequest
     public string Name { get; init; } = string.Empty;
 }
 
+/// <summary>The final category the model moves to (spec catalog/007 R-22).</summary>
+public sealed record ChangeSiteModelCategoryRequest
+{
+    public int CategoryId { get; init; }
+}
+
 public sealed record AcceptSiteModelsRequest
 {
     public IReadOnlyList<int> Ids { get; init; } = [];

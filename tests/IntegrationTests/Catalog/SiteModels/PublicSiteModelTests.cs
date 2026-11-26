@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using global::Catalog.Application.Features.Attributes.Shared.Import;
 using global::Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
+using global::Catalog.Application.Features.SiteModels.Commands.ChangeSiteModelCategory;
 using global::Catalog.Application.Features.SiteModels.Shared;
 using global::Catalog.Application.Features.SiteModels.Shared.Public;
 using global::Catalog.Application.Features.SiteModels.Queries.GetPublicSiteModel;
@@ -114,7 +115,7 @@ public sealed class PublicSiteModelTests
         var hinges = await db.ProductGroupMembers.AsNoTracking()
             .Where(member => member.ProductId == ProductId.Create(1)).Select(member => member.GroupId!.Value).SingleAsync();
         var state = new SiteModelStateReader(db, NoReadCache.Instance);
-        var accepted = await new AcceptSiteModelsHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
+        var accepted = await new AcceptSiteModelsHandler(db, new Manager(),
                 new SiteModelChanges(db, new TestRepository<ProductGroup>(db),
                     new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
                         new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state),
@@ -260,6 +261,42 @@ public sealed class PublicSiteModelTests
         Assert.Equal((slug, side.Right), (moved.Redirect!.ModelSlug, moved.Redirect.Selection[side.Attribute]));
         Assert.Equal(Ardalis.Result.ResultStatus.NotFound,
             (await handler.Handle(new GetPublicSiteModelQuery("uk", "nemaie"), CancellationToken.None)).Status);
+    }
+
+    [Fact]
+    public async Task ModelMovedToAnotherCategory_ShowsThereWithAllItsProducts_WhatEver1CSays_SC_M16()
+    {
+        await using var db = await CatalogAsync();
+        var hinges = await db.ProductGroupMembers.AsNoTracking()
+            .Where(member => member.ProductId == ProductId.Create(1)).Select(member => member.GroupId!.Value).SingleAsync();
+        var state = new SiteModelStateReader(db, NoReadCache.Instance);
+        var changes = new SiteModelChanges(db, new TestRepository<ProductGroup>(db),
+            new global::Catalog.Application.Features.Groups.Shared.ProductGroupPins(db,
+                new TestRepository<ProductGroupMember>(db)), GroupBuilder(db), state);
+        var moved = await new ChangeSiteModelCategoryHandler(db, new TestRepository<ProductGroup>(db), new Manager(),
+                changes, new SiteModelReader(state), TimeProvider.System,
+                new global::Catalog.Infrastructure.Persistence.CatalogTransaction(db))
+            .Handle(new ChangeSiteModelCategoryCommand(hinges.Value,
+                new ChangeSiteModelCategoryRequest { CategoryId = OtherFinal }), CancellationToken.None);
+        Assert.True(moved.IsSuccess);
+        db.ChangeTracker.Clear();
+
+        var other = (await ListAsync(db, "katehoriia-12", new GetPublicSiteModelsRequest())).Value;
+        var card = Assert.Single(other.Items, item => item.Name == "Завіса");
+        Assert.Equal((2, "katehoriia-12"), (card.ProductCount, card.CategorySlug));
+        Assert.Contains(other.Items, item => item.Name == "Засувка AB");
+        var own = (await ListAsync(db, "katehoriia-11", new GetPublicSiteModelsRequest())).Value;
+        Assert.DoesNotContain(own.Items, item => item.Name == "Завіса");
+
+        // 1C moves product 1 elsewhere: the model, and the product with it, stay in the model's category.
+        var product = await db.Products.SingleAsync(item => item.Id == ProductId.Create(1));
+        Assert.Equal(ProductCategoryId.Create(Final), product.CategoryId);
+        product.UpdateFromOneC(product.Name, ProductCategoryId.Create(Parent), 1, exportToSite: true, false, false,
+            DateTimeOffset.UtcNow);
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
+        var still = (await ListAsync(db, "katehoriia-12", new GetPublicSiteModelsRequest())).Value;
+        Assert.Equal(2, Assert.Single(still.Items, item => item.Name == "Завіса").ProductCount);
     }
 
     [Fact]

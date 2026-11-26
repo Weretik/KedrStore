@@ -7,7 +7,7 @@ using Catalog.Application.Features.SiteModels.Shared.State;
 namespace Catalog.Application.Features.SiteModels.Commands.AddSiteModelProducts;
 
 /// <summary>
-/// Adds products of the model's category; a product leaves the proposed model it was in, a product of another
+/// Adds products of any 1C category (R-23); a product leaves the proposed model it was in, a product of another
 /// accepted model is refused (R-04). The products are pinned.
 /// </summary>
 public sealed class AddSiteModelProductsHandler(
@@ -21,14 +21,11 @@ public sealed class AddSiteModelProductsHandler(
         CancellationToken cancellationToken)
     {
         var modelId = ProductGroupId.Create(command.ModelId);
-        var categoryId = await db.ProductGroups.Where(group => group.Id == modelId)
-            .Select(group => (ProductCategoryId?)group.CategoryId)
-            .SingleOrDefaultAsync(cancellationToken);
-        if (categoryId is null)
+        if (!await db.ProductGroups.AnyAsync(group => group.Id == modelId, cancellationToken))
             return Result.NotFound();
 
         var productIds = command.Request.ProductIds.Select(ProductId.Create).ToList();
-        if (await changes.CheckProductsAsync(categoryId.Value, productIds, modelId, cancellationToken) is { } error)
+        if (await changes.CheckProductsAsync(productIds, modelId, cancellationToken) is { } error)
             return error;
 
         await changes.PinAsync(productIds, modelId, clock.GetUtcNow(), cancellationToken);

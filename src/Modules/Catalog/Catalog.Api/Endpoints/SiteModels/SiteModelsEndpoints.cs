@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Catalog.Api.Endpoints.SiteModels.AcceptAdminSiteModels;
 
 using Catalog.Api.Endpoints.SiteModels.RenameAdminSiteModel;
+using Catalog.Api.Endpoints.SiteModels.ChangeAdminSiteModelCategory;
 using Catalog.Api.Endpoints.SiteModels.GetAdminSiteModel;
 using Catalog.Api.Endpoints.SiteModels.RemoveAdminSiteModelProduct;
 using Catalog.Api.Endpoints.SiteModels.FillAdminSiteModelFromNames;
@@ -44,6 +45,7 @@ public static class SiteModelsEndpoints
         GetAdminSiteModelEndpoint.Map(adminSiteModels);
         CreateAdminSiteModelEndpoint.Map(adminSiteModels);
         RenameAdminSiteModelEndpoint.Map(adminSiteModels);
+        ChangeAdminSiteModelCategoryEndpoint.Map(adminSiteModels);
         AcceptAdminSiteModelsEndpoint.Map(adminSiteModels);
         SetAdminSiteModelAxesEndpoint.Map(adminSiteModels);
         AddAdminSiteModelProductsEndpoint.Map(adminSiteModels);
