@@ -11,4 +11,5 @@ public sealed record PlaceQuickOrderCommand(
     string FirstName,
     string Phone,
     IReadOnlyList<QuickOrderLine> Lines,
-    Guid? IdempotencyKey = null) : ICommand<Result<Guid>>;
+    Guid? IdempotencyKey = null,
+    string? Comment = null) : ICommand<Result<Guid>>;

@@ -61,7 +61,7 @@ public sealed class PlaceQuickOrderHandler(
             items.Add(item.Value);
         }
 
-        return QuickOrder.Create(id, command.FirstName, command.Phone, items, now);
+        return QuickOrder.Create(id, command.FirstName, command.Phone, items, now, command.Comment);
     }
 
     private static Result<Guid> Repeat(QuickOrder stored, QuickOrder candidate) =>

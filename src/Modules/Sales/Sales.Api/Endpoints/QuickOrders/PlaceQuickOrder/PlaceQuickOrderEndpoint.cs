@@ -32,7 +32,7 @@ internal static class PlaceQuickOrderEndpoint
             .ToList();
 
         var result = await sender.Send(
-            new PlaceQuickOrderCommand(request.FirstName, request.Phone, lines, idempotencyKey), cancellationToken);
+            new PlaceQuickOrderCommand(request.FirstName, request.Phone, lines, idempotencyKey, request.Comment), cancellationToken);
 
         return result.IsSuccess ? TypedResults.Ok(new QuickOrderResponse(result.Value)) : result.ToProblem(http);
     }

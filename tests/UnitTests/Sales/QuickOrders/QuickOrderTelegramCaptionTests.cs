@@ -32,6 +32,16 @@ public sealed class QuickOrderTelegramCaptionTests
     }
 
     [Fact]
+    public void Caption_ShowsTheBuyersComment_EscapedAndOnlyWhenThereIsOne()
+    {
+        Assert.DoesNotContain("💬", QuickOrderTelegramCaption.Build(Order));
+
+        var caption = QuickOrderTelegramCaption.Build(Order with { Comment = "Дзвонити <після> 15:00" });
+
+        Assert.Contains("💬 Дзвонити &lt;після&gt; 15:00", caption);
+    }
+
+    [Fact]
     public void ExcelFile_IsNamedByTheOrderNumber()
     {
         Assert.Equal("order_019A8B1C.xlsx", QuickOrderExcelFile.NameOf(Order));

@@ -32,6 +32,36 @@ public sealed class QuickOrderTests
     }
 
     [Fact]
+    public void Create_KeepsTheTrimmedComment_AndTreatsABlankOneAsNone()
+    {
+        QuickOrderItem[] items = [Item("101", "Ручка", 1m, 1)];
+
+        Assert.Equal("Дзвонити після 15:00", QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now, "  Дзвонити після 15:00 ").Value.Comment);
+        Assert.Null(QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now, "   ").Value.Comment);
+        Assert.Null(QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now).Value.Comment);
+    }
+
+    [Fact]
+    public void Create_WithATooLongComment_Fails()
+    {
+        var result = QuickOrder.Create(
+            Id, "Ірина", "+380954315238", [Item("101", "Ручка", 1m, 1)], Now, new string('к', QuickOrder.CommentMaxLength + 1));
+
+        Assert.Equal("sales.quick_order.comment_too_long", result.Error?.Code);
+    }
+
+    [Fact]
+    public void SameAs_ComparesTheComment()
+    {
+        QuickOrderItem[] items = [Item("101", "Ручка", 1m, 1)];
+        var order = QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now, "Доставка до складу").Value;
+
+        Assert.True(order.SameAs(QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now, " Доставка до складу ").Value));
+        Assert.False(order.SameAs(QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now, "Самовивіз").Value));
+        Assert.False(order.SameAs(QuickOrder.Create(Id, "Ірина", "+380954315238", items, Now).Value));
+    }
+
+    [Fact]
     public void Create_WithoutLines_Fails()
     {
         var result = QuickOrder.Create(Id, "Ірина", "+380954315238", [], Now);

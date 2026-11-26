@@ -24,7 +24,10 @@ public static class QuickOrderExcelFile
         sheet.Cell("B3").Value = "Телефон:";
         sheet.Cell("C3").Value = order.Phone;
 
-        sheet.Range("B1:B3").Style.Font.Bold = true;
+        sheet.Cell("B4").Value = "Коментар:";
+        sheet.Cell("C4").Value = order.Comment ?? string.Empty;
+
+        sheet.Range("B1:B4").Style.Font.Bold = true;
 
         sheet.Cell("A6").Value = "№";
         sheet.Cell("B6").Value = "ID товару";

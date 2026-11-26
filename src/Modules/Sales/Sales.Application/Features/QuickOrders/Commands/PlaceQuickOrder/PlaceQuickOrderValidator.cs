@@ -18,6 +18,10 @@ public sealed class PlaceQuickOrderValidator : AbstractValidator<PlaceQuickOrder
             .MaximumLength(QuickOrder.PhoneMaxLength).WithMessage("Номер телефону надто довгий.")
             .WithName("Телефон");
 
+        RuleFor(x => x.Comment)
+            .MaximumLength(QuickOrder.CommentMaxLength).WithMessage("Коментар надто довгий (не більше 800 символів).")
+            .WithName("Коментар");
+
         RuleFor(x => x.Lines)
             .NotEmpty().WithMessage("Додайте хоча б один товар.")
             .WithName("Товари");

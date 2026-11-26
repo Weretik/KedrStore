@@ -21,6 +21,7 @@ public sealed class QuickOrderConfiguration : IEntityTypeConfiguration<QuickOrde
 
         builder.Property(order => order.FirstName).HasMaxLength(QuickOrder.FirstNameMaxLength).IsRequired();
         builder.Property(order => order.Phone).HasMaxLength(QuickOrder.PhoneMaxLength).IsRequired();
+        builder.Property(order => order.Comment).HasMaxLength(QuickOrder.CommentMaxLength);
         builder.Property(order => order.PlacedAtUtc).IsRequired();
         builder.Property(order => order.Total).HasPrecision(18, 2).IsRequired();
         builder.Property(order => order.TelegramLastError).HasMaxLength(QuickOrder.TelegramErrorMaxLength);
