@@ -66,6 +66,10 @@ public sealed record AdminCategoryResponse(
     public string? ShareImageUrl { get; init; }
     /// <summary>Made by hand in the admin (spec catalog/012 MC-01): only such a category can be deleted.</summary>
     public bool IsManual { get; init; }
+    /// <summary>Site models here and in descendants; only the active list fills it.</summary>
+    public int? ModelCount { get; init; }
+    /// <summary>Of <see cref="ModelCount"/>, models a person has not accepted yet («Не перевірена»); only the active list fills it.</summary>
+    public int? ProposedModelCount { get; init; }
 }
 
 public sealed record CategoryFaqItemDto(string Question, string Answer);

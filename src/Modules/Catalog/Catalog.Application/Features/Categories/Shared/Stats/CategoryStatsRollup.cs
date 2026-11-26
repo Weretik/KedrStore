@@ -2,6 +2,13 @@ namespace Catalog.Application.Features.Categories.Shared.Stats;
 
 public static class CategoryStatsRollup
 {
+    /// <summary>Adds each category's direct count (products, models) to itself and every ancestor on its path.</summary>
+    public static Dictionary<int, int> RollupCounts(
+        IEnumerable<ProductCategory> categories,
+        IReadOnlyDictionary<int, int> direct)
+        => Rollup(categories, direct.ToDictionary(pair => pair.Key, pair => new CategoryStats(pair.Value, null, null)))
+            .ToDictionary(pair => pair.Key, pair => pair.Value.ProductCount);
+
     /// <summary>Adds each category's direct stats to itself and every ancestor on its path (R-015).</summary>
     public static Dictionary<int, CategoryStats> Rollup(
         IEnumerable<ProductCategory> categories,
