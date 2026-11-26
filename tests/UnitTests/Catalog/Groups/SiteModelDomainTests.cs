@@ -43,6 +43,19 @@ public sealed class SiteModelDomainTests
     }
 
     [Fact]
+    public void ChangeCategory_MovesTheModel_AndTheSameCategoryChangesNothing_R22()
+    {
+        var model = ProductGroup.CreateManual(ProductCategoryId.Create(10), "Ручка KEDR", "ruchka-kedr", Now).Value;
+        var later = Now.AddHours(1);
+
+        Assert.False(model.ChangeCategory(ProductCategoryId.Create(10), later));
+        Assert.Equal(Now, model.UpdatedAt);
+
+        Assert.True(model.ChangeCategory(ProductCategoryId.Create(12), later));
+        Assert.Equal((ProductCategoryId.Create(12), later), (model.CategoryId, model.UpdatedAt));
+    }
+
+    [Fact]
     public void Texts_AreTrimmed_CompleteWithShortAndSeoDescription_AndLimited()
     {
         var text = ProductGroupText.Create(ProductGroupId.Create(1), "uk", Now);

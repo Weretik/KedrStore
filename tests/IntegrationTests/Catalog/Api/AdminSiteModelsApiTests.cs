@@ -102,6 +102,8 @@ public sealed class AdminSiteModelsApiTests
         Assert.Equal(HttpStatusCode.OK, texts.StatusCode);
         using var badLanguage = await manager.PutAsJsonAsync($"{Base}/{id}/texts/en", new { shortDescription = "x" });
         Assert.Equal(HttpStatusCode.BadRequest, badLanguage.StatusCode);
+        using var noCategory = await manager.PutAsJsonAsync($"{Base}/{id}/category", new { categoryId = 999999 });
+        Assert.Equal(HttpStatusCode.BadRequest, noCategory.StatusCode);
 
         using var model = JsonDocument.Parse(await manager.GetStringAsync($"{Base}/{id}"));
         Assert.Equal("Ручка KEDR", model.RootElement.GetProperty("name").GetString());

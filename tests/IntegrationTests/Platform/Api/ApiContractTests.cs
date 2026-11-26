@@ -105,6 +105,9 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/products/{productId}", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/texts/{language}", out _));
         Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/fill-from-names", out _));
+        Assert.True(paths.TryGetProperty("/api/admin/site-models/{id}/category", out var siteModelCategory));
+        Assert.True(siteModelCategory.TryGetProperty("put", out var siteModelCategoryPut));
+        AssertOperationId(siteModelCategoryPut, "changeAdminSiteModelCategory");
         Assert.True(paths.TryGetProperty("/api/catalog/{lang}/models", out _));
         Assert.True(paths.TryGetProperty("/api/catalog/{lang}/{categorySlug}/models", out _));
         Assert.True(paths.TryGetProperty("/api/catalog/{lang}/model/{modelSlug}", out _));

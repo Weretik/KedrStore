@@ -11,7 +11,8 @@ namespace Catalog.Application.Features.SiteModels.Shared.Public;
 /// <summary>
 /// Reads <see cref="PublicModelCatalog"/> without tracking. Hidden categories (R-18), the Cosmos import root (owner
 /// decision 2026-11-01), and everything under them stay out with their products; only values a person confirmed count
-/// (spec catalog/006 R-06). The result is shared through <see cref="PublicModelCatalogCache"/>.
+/// (spec catalog/006 R-06). An accepted model places all its products in its own category, whatever category 1C
+/// gives them (spec catalog/007 R-24). The result is shared through <see cref="PublicModelCatalogCache"/>.
 /// </summary>
 public sealed class PublicModelCatalogReader(
     IReadCatalogDbContext db,
@@ -25,14 +26,13 @@ public sealed class PublicModelCatalogReader(
     private async Task<PublicModelCatalog> LoadAsync(CancellationToken cancellationToken)
     {
         var categories = await ReadCategoriesAsync(cancellationToken);
-        var products = (await (from projection in db.ProductListProjections.AsNoTracking()
+        var exported = (await (from projection in db.ProductListProjections.AsNoTracking()
                     where projection.ExportToSite
                     join product in db.Products.AsNoTracking() on projection.ProductId equals product.Id
                     select new PublicProductFacts(projection.ProductId, projection.NameUk, projection.NameRu,
                         projection.ProductSlug, projection.CategoryId, projection.Photo, projection.RetailPrice,
                         projection.InStock, projection.IsSale, projection.IsNew))
                 .ToListAsync(cancellationToken))
-            .Where(product => categories.ContainsKey(product.CategoryId))
             .ToDictionary(product => product.Id);
 
         var accepted = await db.ProductGroups.AsNoTracking()
@@ -51,22 +51,29 @@ public sealed class PublicModelCatalogReader(
             .ToLookup(axis => axis.GroupId);
 
         var models = new List<PublicModelFacts>();
-        foreach (var model in accepted)
+        var products = new Dictionary<ProductId, PublicProductFacts>();
+        foreach (var model in accepted.Where(model => categories.ContainsKey(model.CategoryId)))
         {
             var onSite = members[model.Id]
-                .Where(id => products.TryGetValue(id, out var product) && product.CategoryId == model.CategoryId)
+                .Where(exported.ContainsKey)
                 .OrderBy(id => id.Value)
                 .ToList();
+            foreach (var id in onSite)
+                products[id] = exported[id];
             if (onSite.Count > 0)
                 models.Add(new PublicModelFacts(model.Slug, model.Name, model.CategoryId, model.Id,
                     model.MainProductId, onSite,
                     axes[model.Id].OrderBy(axis => axis.Position).Select(axis => axis.AttributeId).ToList()));
         }
 
+        // A product of an accepted model in a hidden category stays off the site, not on a page of its own.
+        var inAccepted = accepted.SelectMany(model => members[model.Id]).ToHashSet();
         var modelOfProduct = models.SelectMany(model => model.Products.Select(id => (id, model)))
             .ToDictionary(pair => pair.id, pair => pair.model);
-        foreach (var product in products.Values.Where(product => !modelOfProduct.ContainsKey(product.Id)))
+        foreach (var product in exported.Values.Where(product => !inAccepted.Contains(product.Id)
+                                                              && categories.ContainsKey(product.CategoryId)))
         {
+            products[product.Id] = product;
             var own = new PublicModelFacts(product.Slug, product.NameUk, product.CategoryId, null, product.Id,
                 [product.Id], []);
             models.Add(own);

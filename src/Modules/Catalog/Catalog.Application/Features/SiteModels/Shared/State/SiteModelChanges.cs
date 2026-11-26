@@ -5,8 +5,9 @@ using Catalog.Domain.Groups.Members;
 namespace Catalog.Application.Features.SiteModels.Shared.State;
 
 /// <summary>
-/// Shared steps of the model commands: checking the products a person adds (R-04), pinning them, saving the offered
-/// axes of a model that has none (R-05), and the build that tidies proposed models afterwards.
+/// Shared steps of the model commands: checking the products a person adds (R-04, R-23), accepting models (R-03),
+/// pinning products, saving the offered axes of a model that has none (R-05), and the build that tidies proposed
+/// models afterwards.
 /// </summary>
 public sealed class SiteModelChanges(
     IReadCatalogDbContext db,
@@ -15,19 +16,21 @@ public sealed class SiteModelChanges(
     ProductGroupBuilder builder,
     SiteModelStateReader stateReader)
 {
-    /// <summary>An error when a product is missing, of another category, or in another accepted model.</summary>
-    public async Task<Result?> CheckProductsAsync(ProductCategoryId categoryId, IReadOnlyCollection<ProductId> productIds,
-        ProductGroupId? modelId, CancellationToken cancellationToken)
+    /// <summary>
+    /// An error when a product is missing or in another accepted model. A product of any 1C category may join (R-23).
+    /// </summary>
+    public async Task<Result?> CheckProductsAsync(IReadOnlyCollection<ProductId> productIds, ProductGroupId? modelId,
+        CancellationToken cancellationToken)
     {
-        var inCategory = await db.Products.IgnoreQueryFilters()
-            .Where(product => productIds.Contains(product.Id) && product.CategoryId == categoryId)
+        var found = await db.Products.IgnoreQueryFilters()
+            .Where(product => productIds.Contains(product.Id))
             .Select(product => product.Id)
             .ToListAsync(cancellationToken);
-        var wrong = productIds.Except(inCategory).Select(id => id.Value).ToList();
-        if (wrong.Count > 0)
+        var missing = productIds.Except(found).Select(id => id.Value).ToList();
+        if (missing.Count > 0)
         {
             return SiteModelValidation.Invalid("productIds",
-                $"Products not found in the model's category: {string.Join(", ", wrong)}.", "ProductNotInCategory");
+                $"Товарів не знайдено: {string.Join(", ", missing)}.", "ProductNotFound");
         }
 
         var taken = await db.ProductGroupMembers
@@ -39,7 +42,7 @@ public sealed class SiteModelChanges(
         if (taken.Count > 0)
         {
             return SiteModelValidation.Invalid("productIds",
-                "Products already in another model: " +
+                "Товари вже в іншій моделі: " +
                 string.Join(", ", taken.Select(row => $"{row.ProductId.Value} («{row.Name}»)")) + ".",
                 "ProductInAnotherModel");
         }
@@ -51,6 +54,32 @@ public sealed class SiteModelChanges(
     public async Task<bool> IsFinalCategoryAsync(ProductCategoryId categoryId, CancellationToken cancellationToken)
         => await db.Categories.AnyAsync(category => category.Id == categoryId, cancellationToken) &&
            !await db.Categories.AnyAsync(category => category.ParentId == categoryId, cancellationToken);
+
+    /// <summary>
+    /// Accepts the proposed models among the given tracked ones: saves their offered axes first (R-05), then accepts
+    /// them, saves, pins their products, and tidies (R-03). Returns the ids it accepted.
+    /// </summary>
+    public async Task<IReadOnlyList<ProductGroupId>> AcceptAsync(IReadOnlyCollection<ProductGroup> found, string acceptedBy,
+        DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        // Offered axes are read while the models are still proposed.
+        await SaveOfferedAxesAsync(found.Where(model => !model.IsAccepted).Select(model => model.Id).ToList(),
+            cancellationToken);
+
+        var accepted = found.Where(model => model.Accept(acceptedBy, now)).Select(model => model.Id).ToList();
+        if (accepted.Count == 0)
+            return accepted;
+
+        await models.SaveChangesAsync(cancellationToken);
+        var members = await db.ProductGroupMembers
+            .Where(member => member.GroupId != null && accepted.Contains(member.GroupId.Value))
+            .Select(member => new { member.ProductId, GroupId = member.GroupId!.Value })
+            .ToListAsync(cancellationToken);
+        foreach (var model in members.GroupBy(member => member.GroupId))
+            await PinAsync(model.Select(member => member.ProductId).ToList(), model.Key, now, cancellationToken);
+        await TidyAsync(cancellationToken);
+        return accepted;
+    }
 
     public Task PinAsync(IReadOnlyCollection<ProductId> productIds, ProductGroupId? modelId, DateTimeOffset now,
         CancellationToken cancellationToken)

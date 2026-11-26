@@ -14,7 +14,6 @@ namespace Catalog.Application.Features.SiteModels.Commands.AcceptSiteModels;
 /// </summary>
 public sealed class AcceptSiteModelsHandler(
     IReadCatalogDbContext db,
-    ICatalogRepository<ProductGroup> models,
     ICurrentUserService currentUser,
     SiteModelChanges changes,
     SiteModelStateReader stateReader,
@@ -33,25 +32,7 @@ public sealed class AcceptSiteModelsHandler(
         if (missing.Count > 0)
             return SiteModelValidation.Invalid("ids", $"Моделей не знайдено: {string.Join(", ", missing)}.", "NotFound");
 
-        // Offered axes are read while the models are still proposed.
-        await changes.SaveOfferedAxesAsync(found.Where(model => !model.IsAccepted).Select(model => model.Id).ToList(),
-            cancellationToken);
-
-        var now = clock.GetUtcNow();
-        var by = ReviewerName.Of(currentUser);
-        var accepted = found.Where(model => model.Accept(by, now)).Select(model => model.Id).ToList();
-        if (accepted.Count == 0)
-            return Result.Success((await stateReader.ReadFreshCatalogAsync(cancellationToken)).Health());
-
-        await models.SaveChangesAsync(cancellationToken);
-        var members = await db.ProductGroupMembers
-            .Where(member => member.GroupId != null && accepted.Contains(member.GroupId.Value))
-            .Select(member => new { member.ProductId, GroupId = member.GroupId!.Value })
-            .ToListAsync(cancellationToken);
-        foreach (var model in members.GroupBy(member => member.GroupId))
-            await changes.PinAsync(model.Select(member => member.ProductId).ToList(), model.Key, now, cancellationToken);
-        await changes.TidyAsync(cancellationToken);
-
+        await changes.AcceptAsync(found, ReviewerName.Of(currentUser), clock.GetUtcNow(), cancellationToken);
         return Result.Success((await stateReader.ReadFreshCatalogAsync(cancellationToken)).Health());
     }
 }

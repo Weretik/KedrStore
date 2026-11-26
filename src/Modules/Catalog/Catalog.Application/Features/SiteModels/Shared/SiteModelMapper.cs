@@ -19,7 +19,8 @@ public static class SiteModelMapper
             state.CategoryNames.GetValueOrDefault(model.CategoryId) ?? string.Empty, model.Name, model.Slug,
             SiteModelState.StatusText(model.Status), members.Count, onSite.Count,
             onSite.Select(id => state.Products[id].RetailPrice).Where(price => price is not null).Min(),
-            photo, state.AxesOf(modelId).Select(axis => axis.Attribute.Name).ToList(), state.ModelProblems(modelId));
+            photo, state.AxesOf(modelId).Select(axis => axis.Attribute.Name).ToList(), state.ModelProblems(modelId),
+            state.OneCCategoriesOf(modelId));
     }
 
     public static SiteModelDto ToDetail(SiteModelState state, ProductGroupId modelId)
@@ -60,7 +61,7 @@ public static class SiteModelMapper
             axes.Select(axis => new SiteModelAxisDto(axis.Attribute.Id.Value, axis.Attribute.Code, axis.Attribute.Name,
                 SiteModelState.DisplayOf(axis.Attribute), axis.IsSaved)).ToList(),
             products, texts, Characteristics(state, modelId, axes.Select(axis => axis.Attribute.Id).ToHashSet()),
-            state.ModelProblems(modelId, withProducts: false));
+            state.ModelProblems(modelId, withProducts: false), state.OneCCategoriesOf(modelId));
     }
 
     /// <summary>Attributes outside the axes that every on-site product of the model has with the same values.</summary>

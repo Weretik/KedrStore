@@ -108,6 +108,20 @@ public partial class ProductGroup : IAggregateRoot
         return true;
     }
 
+    /// <summary>
+    /// Moves the model to another site category; its products follow it on the site, while each keeps its 1C category
+    /// (spec catalog/007 R-22). Returns whether it changed.
+    /// </summary>
+    public bool ChangeCategory(ProductCategoryId categoryId, DateTimeOffset now)
+    {
+        if (CategoryId == categoryId)
+            return false;
+
+        CategoryId = categoryId;
+        UpdatedAt = now;
+        return true;
+    }
+
     public DomainResult ChangeSlug(string slug, DateTimeOffset now)
     {
         var checkedSlug = Text(slug, SlugMaxLength, nameof(Slug));

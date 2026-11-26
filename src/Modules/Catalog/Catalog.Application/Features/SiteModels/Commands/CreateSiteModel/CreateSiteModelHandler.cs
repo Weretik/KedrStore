@@ -7,7 +7,10 @@ using Catalog.Application.Features.SiteModels.Shared.State;
 
 namespace Catalog.Application.Features.SiteModels.Commands.CreateSiteModel;
 
-/// <summary>A person creates a model in a final category; it is accepted at once and its products pinned (R-04).</summary>
+/// <summary>
+/// A person creates a model in a final category from products of any 1C category; it is accepted at once and its
+/// products pinned (R-04, R-23).
+/// </summary>
 public sealed class CreateSiteModelHandler(
     ICatalogRepository<ProductGroup> models,
     ISlugService slugs,
@@ -31,7 +34,7 @@ public sealed class CreateSiteModelHandler(
         }
 
         var productIds = request.ProductIds.Select(ProductId.Create).ToList();
-        if (await changes.CheckProductsAsync(categoryId, productIds, null, cancellationToken) is { } error)
+        if (await changes.CheckProductsAsync(productIds, null, cancellationToken) is { } error)
             return error;
 
         var now = clock.GetUtcNow();

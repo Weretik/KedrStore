@@ -7,7 +7,7 @@ namespace Catalog.Application.Features.SiteModels.Queries.GetSiteModelCategories
 /// <summary>
 /// The category tree of «Вітрина сайту» (R-18): categories shown on the site with on-site products in them or below
 /// them, each with its parent, and counts that include subcategories; ordered by name within a parent. The filter
-/// count is the category's own (R-20).
+/// count is the category's own (R-20). A model's product counts under the model's category (R-24).
 /// </summary>
 public sealed class GetSiteModelCategoriesHandler(SiteModelStateReader reader)
     : IQueryHandler<GetSiteModelCategoriesQuery, Result<List<SiteModelCategoryDto>>>
@@ -31,7 +31,7 @@ public sealed class GetSiteModelCategoriesHandler(SiteModelStateReader reader)
         foreach (var product in state.Products.Values.Where(product => product.IsOnSite))
         {
             var lone = state.IsLone(product.Id);
-            AddUp(product.CategoryId, value => value with
+            AddUp(state.PlacementOf(product.Id), value => value with
             {
                 Products = value.Products + 1, Lone = value.Lone + (lone ? 1 : 0)
             });

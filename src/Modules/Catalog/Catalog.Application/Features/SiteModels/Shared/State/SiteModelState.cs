@@ -55,6 +55,20 @@ public sealed class SiteModelState
     /// <summary>An on-site product that is in no model at all, proposed or accepted (R-08).</summary>
     public bool IsLone(ProductId id) => IsOnSite(id) && !ModelOfProduct.ContainsKey(id);
 
+    /// <summary>The site category of a product: its model's, or its own 1C category when it is in no model (R-24).</summary>
+    public ProductCategoryId PlacementOf(ProductId id)
+        => ModelOfProduct.TryGetValue(id, out var modelId) ? Models[modelId].CategoryId : Products[id].CategoryId;
+
+    /// <summary>1C categories of the model's on-site products that differ from the model's own, by name (R-25).</summary>
+    public IReadOnlyList<string> OneCCategoriesOf(ProductGroupId modelId)
+        => OnSiteMembers(modelId).Select(id => Products[id].CategoryId)
+            .Where(categoryId => categoryId != Models[modelId].CategoryId)
+            .Distinct()
+            .Select(categoryId => CategoryNames.GetValueOrDefault(categoryId) ?? string.Empty)
+            .Where(name => name.Length > 0)
+            .Order(StringComparer.CurrentCulture)
+            .ToList();
+
     public bool IsOnSite(ProductId id) => Products.TryGetValue(id, out var product) && product.IsOnSite;
 
     public IEnumerable<ProductId> OnSiteMembers(ProductGroupId modelId)
