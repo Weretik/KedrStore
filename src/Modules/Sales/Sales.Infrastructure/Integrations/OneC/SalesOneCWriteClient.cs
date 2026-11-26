@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.ServiceModel;
 using Sales.Application.Abstractions.Integrations.OneC;
 using OneCItem = BuildingBlocks.Integrations.OneC.Generated.Item;
 using OneCRequestData = BuildingBlocks.Integrations.OneC.Generated.RequestData;
@@ -46,15 +47,22 @@ public sealed class SalesOneCWriteClient(
         }
         catch (Exception exception)
         {
-            var diagnostic = Normalize(exception.GetType().Name, 128) ?? "SoapTransportFailure";
+            // A SOAP fault is an error raised inside 1C; its reason goes to the order's diagnostic that staff see in
+            // the Admin («FaultException: …»), never to the logs, which keep only the type.
+            var diagnostic = exception is FaultException fault
+                ? Normalize($"{nameof(FaultException)}: {fault.Message}", MaximumFaultDiagnosticLength)
+                : Normalize(exception.GetType().Name, 128);
+            diagnostic ??= "SoapTransportFailure";
             logger.LogWarning(
                 "1C transport failure for order delivery {OrderNumber} with outcome {Outcome} and diagnostic {Diagnostic}",
                 request.OrderNumber,
                 OneCOrderDeliveryOutcome.TransportError,
-                diagnostic);
+                exception.GetType().Name);
             return OneCOrderDeliveryResult.TransportError(diagnostic);
         }
     }
+
+    private const int MaximumFaultDiagnosticLength = 500;
 
     private static OneCRequestData MapRequest(OneCOrderDeliveryRequest request)
         => new()
