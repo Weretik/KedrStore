@@ -15,6 +15,7 @@ Use double underscores in environment variable keys: for example, `ConnectionStr
 | `OneCSoap:Endpoint`, `Username`, `Password` | 1C SOAP integration | Endpoint is environment-specific; credentials are secret |
 | `Telegram:BotToken`, `ChatId` | Telegram integration | Yes |
 | `Sales:OneCOrderSync` | Kyiv sending window for orders to 1C (`SendingWindowStart`, `SendingWindowEnd`; defaults 07:00 and 20:00), read by `Host.Api` for the outbox tick | No |
+| `Sales:SiteOrders:CounterpartyId` | The 1C counterparty every site order is placed on (default `000001588`, «РОЗНИЦА ХАЛТУРИНА»); must exist in the synced customers, or the site order's 1C attempt fails and retries | No |
 | `Cors:AllowedOrigins` / `AllowedOriginsCsv` | Allowed browser origins for the API | No, but environment-specific |
 | `Identity:SessionCookies` | Cookie names, paths, lifetime, `Secure`, SameSite, and the CSRF cookie domain (`CsrfCookieDomain`, set in `appsettings.Production.json`) | No |
 | `MediaStorage:PublicBaseUrl`, `Ftp:Host`, `Port`, `Username`, `Password` | Media library CDN over FTP (user with the CDN root as home); password from GCP secret `cdn-media-ftp-password`. Without it uploads answer 503 | Password only |

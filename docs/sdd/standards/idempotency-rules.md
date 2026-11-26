@@ -83,6 +83,7 @@ Write them first (Red → Green), next to the use case's other tests:
 | Outbox: `OrderOneCDeliveryFailedHandler` (Telegram alert) | Queued once in the same transaction that gives up; sent once per row | Accepted risk, as for the quick order (Telegram has no dedupe key) |
 | Outbox: `RemovedCounterpartyIdentityDeleter` | A user already gone counts as deleted; a user linked again is kept | Protected (state check) |
 | `POST /api/admin/orders/{orderId}/sync/retry` | Puts the same outbox row back in the queue; a repeat on a waiting order is 409 | Protected (state check, conditional update of the row) |
+| Outbox: `CreateOneCOrderFromQuickOrderHandler` (site order → 1C order, 2026-11-26) | Returns at once when the site order already has `OneCOrderId`; the order, its 1C message and the link commit in one dispatch transaction | Protected (state check, outbox row locked) |
 | Outbox: `QuickOrderTelegramSender` | Sent once per row; a crash between the send and the commit can send one duplicate file | Accepted risk (Telegram has no dedupe key) |
 | Scheduler tick, «Запустити зараз» | Claims tasks with a `Version` token; «run now» sets a flag | Protected (row version, catalog group, advisory lock in the rebuild) |
 | 1C catalog, price, and counterparty syncs | Upsert by 1C codes in steps | Protected (upsert, rerunnable steps) |

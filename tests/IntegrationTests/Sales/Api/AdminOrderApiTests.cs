@@ -273,6 +273,8 @@ public sealed class AdminOrderApiTests
             state.IdempotencyRecords[record.IdempotencyKey] = record;
             return Task.FromResult(true);
         }
+
+        public Task AddFromOutboxAsync(Order order, CancellationToken cancellationToken) => throw new NotSupportedException();
     }
 
     private sealed class TestOrderProductReader : IOrderProductReader

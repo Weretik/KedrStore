@@ -11,7 +11,7 @@ Every order a buyer sends from the site is kept as a site order in the database,
 
 Given a buyer sends an order from the site, when Telegram is down, the bot was removed from the group, or the site stopped waiting for the answer after the order was saved, then the order is in «Замовлення з сайту» and the managers can still work it.
 
-**Out of scope:** turning a site order into a 1C order, statuses of handling an order (new, in work, done), editing or deleting a site order, a menu badge or «Огляд» counter, changing the Telegram message format, a new Telegram group (an operations step, not code).
+**Out of scope:** statuses of handling an order (new, in work, done), editing or deleting a site order, a menu badge or «Огляд» counter, changing the Telegram message format, a new Telegram group (an operations step, not code).
 
 ## Rules
 
@@ -28,6 +28,8 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 - **R-011.** Name and phone are personal data: they are never written to logs; the log line of a placed or resent order carries only the order id, the line count and the total.
 - **R-012.** (2026-11-24, owner request) The order number people see is the first 8 hex digits of the order id in upper case (`QuickOrderNumberSearch.NumberOf`): the site shows it after sending, Telegram shows `№ 52992220` without the whole id, the Excel file is named `order_52992220.xlsx` and carries the number in its «Заявка» cell, the Admin shows it instead of the whole id. A list search word that is such a number (optionally with `№` or `#`), or a whole id, also matches the orders whose id starts with it, as a range on the primary key; the word still matches name and phone too, so a phone fragment of 8 digits keeps working. The site sends a random `Idempotency-Key`, so numbers of site orders differ; an order placed without a key gets a time-ordered id, and two such orders in the same minute can share a number (the search then shows both).
 
+- **R-013.** (2026-11-26, owner request) Every new site order also becomes an ordinary Sales order that goes to 1C. The site order is saved with a second outbox message `QuickOrderToOneC` (type `sales.quick-order-to-1c`, id `QuickOrder.OneCOrderMessageId`) in the same save; its handler, run by the general outbox task (and once right after the request), makes an `Order` on the counterparty `Sales:SiteOrders:CounterpartyId` (default `000001588`, «РОЗНИЦА ХАЛТУРИНА») with the site lines at the prices the buyer saw (`Amount` = unit price × quantity, UAH retail), comment `Сайт № 52992220, Іван, +380…, 26.11.2026 12:15` (order number, name, phone, Kyiv time), and the order's own `OrderPlaced` message in the 1C lane, then links it (`QuickOrder.OneCOrderId`). A repeated message sees the link and makes nothing; a missing counterparty or a product id that is not a catalog number fails the attempt and the outbox retries. No `EmployeeId`: the current 1C method has no such field. Site orders placed before this release have no message id and are not sent. One dispatch transaction creates the `Order` root and changes the `QuickOrder` root (the link): the link must commit with the order, or a retried message would make a second 1C order; both roots are in Sales. The comment carries the buyer's name and phone into `sales."Orders"` and 1C (owner request); they are kept like other orders and still never logged.
+
 ## Scenarios
 
 | ID | Scenario |
@@ -43,6 +45,7 @@ Given a buyer sends an order from the site, when Telegram is down, the bot was r
 | **SC-009** | The migration copies existing quick-order outbox rows: a processed row becomes `sent`, a failed row `failed` with its error, a waiting row `pending`; running the copy again adds nothing. |
 | **SC-010** | Domain: `Create` rejects no lines, an empty name or phone, a quantity ≤ 0 and a negative price with typed errors; the total is the sum of the lines; `RequestTelegramResend` works only from failed. |
 | **SC-011** | Search by the order number, by `№` + number in lower case, and by the whole id finds exactly that order. |
+| **SC-012** | A site order with the retail counterparty present: one `Orders` row on `000001588` with the comment and the lines, linked from the site order, its `OrderPlaced` message delivered to 1C; a repeated message adds nothing; without the counterparty the attempt fails and no order is made. |
 
 ## Design
 
@@ -137,6 +140,17 @@ tests/IntegrationTests/Sales/QuickOrders/              API + PostgreSQL (SC-001�
 - Module boundaries, layers, CQRS level 1, one save per command (place: one `SaveChanges`; resend: one transaction for the outbox requeue and the order), outbox for the Telegram side effect with the delivery state saved in the dispatch transaction, per-word trigram search, named indexes, `xmin` and conditional requeue for races, idempotency (request key on create, state check on resend), rate limits, access policy, personal data and logs, Ukrainian messages: no findings. No ADR or C4 change: no new module, external system or way to run work.
 - Fresh evidence after the fixes: unit `QuickOrder` 27, integration `QuickOrder` 13, architecture 74, all passed.
 
+## Feature audit of R-013 (2026-11-26)
+
+`backend-code-audit` on the staged change.
+
+- **Step 0.** [Quality targets](../../../architecture/overview/quality-targets.md): writes P95 1 159 ms against 2 s. `POST /api/orders` now also tries the 1C message right after the commit (two small inserts and a key lookup in the dispatch transaction, next to the Telegram upload that already runs there); site orders are a few a day. No new speed risk; «orders per day» stays «Not measured» (existing gap).
+- **AF-004 (Medium, fixed).** The [idempotency audit table](../../../standards/idempotency-rules.md#audit-2026-11-15-write-operations-and-handlers) did not list the new at-least-once handler. Added `CreateOneCOrderFromQuickOrderHandler`: a repeat sees `OneCOrderId` and makes nothing; the order, its 1C message and the link commit together.
+- **AF-005 (Medium, fixed).** A handler that changes two roots needs its reason in the SDD; added to R-013 with the personal-data note.
+- **AF-006 (Low, accepted, owner's call).** The 1C order amounts are the cart prices the site sent (R-004: a copy, not a price check). A forged request could put a wrong amount in the 1C order; the manager confirms the order in 1C as with the Excel file. Pricing the lines from the catalogue is a separate change if wanted.
+- Module boundaries (Sales only, no new Contracts), layers, CQRS level 1, typed `OrderId` reference without navigation, `LinkOneCOrder` checked in the root, `Order.Create`/`OrderLine.Create` returning results, outbox for the side effect, savepoint and detach on a failed save inside the batch, additive migration (two nullable columns, FK `SET NULL`) that keeps the previous release working, no new endpoint (no rate limit or contract change), folder axiom, logs without name or phone: no findings. No ADR or C4 change: no new module, external system or way to run work.
+- Fresh evidence: unit `QuickOrder|CreateOrderCommandHandler` 49, integration `QuickOrder|OrderOneCDelivery|AdminOrderCreation` 25, architecture 74, all passed; `check_doc_links.py`, `check_module_maps.py` pass.
+
 ## Verification plan
 
 Unit `FullyQualifiedName~QuickOrder`, integration `FullyQualifiedName~QuickOrder` (Docker), architecture tests, `OpenApiDocumentRulesTests`, `RateLimitCoverageTests`, `check_doc_links.py`, `check_module_maps.py`.
@@ -153,3 +167,4 @@ Unit `FullyQualifiedName~QuickOrder`, integration `FullyQualifiedName~QuickOrder
 | R-008 | SC-007 | TS-005 |
 | R-010 | SC-009 | TS-002 |
 | R-011 | code review in TS-007 | TS-007 |
+| R-013 | SC-012 | `CreateOneCOrderFromQuickOrderTests`, `QuickOrderToOneCPostgresTests` (filter `FullyQualifiedName~QuickOrder`) |

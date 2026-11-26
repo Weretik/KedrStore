@@ -19,7 +19,7 @@ See the feature card's “Code structure” section for actual file paths and ro
 
 - [Manager orders and 1C](sales/admin-orders.md) — order creation, reading, synchronization status, and retry.
 - [Admin order workspace](sales/admin-order-workspace.md) — separate protected operations for search, customer prices, server-side quoting with per-unit discounts and markups, checkout, and saved drafts in React Admin.
-- [Site quick order](sales/quick-order.md) — public `POST /api/orders`, kept in `sales."QuickOrders"` and sent to the managers' Telegram chat as an Excel file; Admin «Замовлення з сайту»: list, detail, Telegram delivery state and resend (`/api/admin/quick-orders`).
+- [Site quick order](sales/quick-order.md) — public `POST /api/orders`, kept in `sales."QuickOrders"` and sent to the managers' Telegram chat as an Excel file, and turned into an order to 1C on the retail counterparty; Admin «Замовлення з сайту»: list, detail, Telegram delivery state and resend (`/api/admin/quick-orders`).
 - [Customers and counterparties](sales/customers.md) — Admin counterparty list and details, local synchronization with 1C.
 - [Manager catalog](sales/manager-catalog.md) — authorized sales product list.
 

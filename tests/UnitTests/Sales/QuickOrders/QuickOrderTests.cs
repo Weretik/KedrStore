@@ -1,3 +1,4 @@
+using Sales.Domain.Orders.ValueObjects;
 using Sales.Domain.QuickOrders;
 
 namespace UnitTests.Sales.QuickOrders;
@@ -110,6 +111,20 @@ public sealed class QuickOrderTests
         Assert.True(order.SameAs(Valid(Item("101", "Ручка", 1.00m, 1), Item("102", "Замок", 2m, 1))));
         Assert.False(order.SameAs(Valid(Item("102", "Замок", 2m, 1), Item("101", "Ручка", 1m, 1))));
         Assert.False(order.SameAs(Valid(Item("101", "Ручка", 1m, 2), Item("102", "Замок", 2m, 1))));
+    }
+
+    [Fact]
+    public void NewOrder_HasA1CMessage_AndIsLinkedToOne1COrderOnly()
+    {
+        var order = Valid(Item("101", "Ручка", 1m, 1));
+        var first = OrderId.Create(7);
+
+        Assert.NotNull(order.OneCOrderMessageId);
+        Assert.Null(order.OneCOrderId);
+        Assert.True(order.LinkOneCOrder(first).IsSuccess);
+        Assert.True(order.LinkOneCOrder(first).IsSuccess);
+        Assert.Equal("one_c_order_already_linked", order.LinkOneCOrder(OrderId.Create(8)).Error?.Code);
+        Assert.Equal(first, order.OneCOrderId);
     }
 
     private static QuickOrder Valid(params QuickOrderItem[] items) =>

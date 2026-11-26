@@ -21,4 +21,11 @@ public interface IOrderCreationStore
         Order order,
         Func<OrderId, CreateOrderIdempotencyRecord> idempotencyRecordFactory,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Adds an order made by an outbox handler, with its 1C outbox message, in the dispatch transaction (spec
+    /// sales/009, R-010). It saves once to get the id for the order number; the dispatch saves the rest. On a failed
+    /// save it forgets the order, so the dispatch still records the other messages.
+    /// </summary>
+    Task AddFromOutboxAsync(Order order, CancellationToken cancellationToken);
 }

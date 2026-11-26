@@ -47,6 +47,7 @@ public static class SalesInfrastructure
         services.AddScoped<IQuickOrderReadService, QuickOrderReadService>();
         services.AddOutboxHandler<QuickOrderPlaced, QuickOrderTelegramSender>(QuickOrderPlaced.TypeName);
         services.AddOutboxGiveUpHandler<QuickOrderPlaced, QuickOrderTelegramGiveUpHandler>();
+        services.AddSiteOrdersToOneC(configuration);
         // Platform spec 006, stage 2: orders to 1C, their give-up signal, and the removed customers' Identity users.
         services.AddScoped<IOrderOneCDeliveryStore, OrderOneCDeliveryStore>();
         services.AddOutboxHandler<OrderPlaced, SendOrderToOneCHandler>(OrderPlaced.TypeName, OutboxLanes.OneCOrders);

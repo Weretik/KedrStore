@@ -251,7 +251,9 @@ public sealed class QuickOrderApiTests(SalesPostgresFixture postgres)
         public async Task<IReadOnlyList<OutboxMessage>> RowsAsync()
         {
             await using SalesDbContext dbContext = postgres.CreateContext();
-            return await dbContext.Set<OutboxMessage>().AsNoTracking().ToListAsync();
+            // The Telegram messages; each order also stores its 1C message (R-010), tested in QuickOrderToOneCPostgresTests.
+            return await dbContext.Set<OutboxMessage>().AsNoTracking()
+                .Where(message => message.Type == QuickOrderPlaced.TypeName).ToListAsync();
         }
 
         public async Task<IReadOnlyList<QuickOrder>> OrdersAsync()

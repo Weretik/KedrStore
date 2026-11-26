@@ -7,7 +7,7 @@ using Sales.Domain.QuickOrders;
 namespace Sales.Application.Features.QuickOrders.Commands.PlaceQuickOrder;
 
 /// <summary>
-/// Stores the site order with its Telegram outbox message, then tries to send it once (spec sales/009, R-001…R-003;
+/// Stores the site order with its Telegram and 1C outbox messages, then tries both once (spec sales/009, R-001…R-003, R-010;
 /// platform spec 006, R-003). The buyer gets the order id even when Telegram is down. With an idempotency key the key
 /// is the order id: a repeat answers with the stored order and sends nothing again; the same key with other data is a
 /// conflict.
@@ -33,7 +33,8 @@ public sealed class PlaceQuickOrderHandler(
         if (command.IdempotencyKey is not null && await store.FindAsync(id, CancellationToken.None) is { } stored)
             return Repeat(stored, order);
 
-        if (!await store.TryAddAsync(order, QuickOrderPlaced.From(order), CancellationToken.None))
+        var toOneC = new QuickOrderToOneC(id.Value);
+        if (!await store.TryAddAsync(order, QuickOrderPlaced.From(order), toOneC, CancellationToken.None))
         {
             // Another copy of the same request was stored between the check and the save: answer as it did.
             var winner = await store.FindAsync(id, CancellationToken.None)
@@ -43,7 +44,8 @@ public sealed class PlaceQuickOrderHandler(
 
         logger.LogInformation("Quick order {QuickOrderId} placed with {LineCount} lines, total {Total}.",
             id.Value, order.Items.Count, order.Total);
-        await outbox.DispatchAsync([id.Value], CancellationToken.None);
+        // R-010: the 1C order is made right away too; it reaches 1C through its own message in the 1C lane.
+        await outbox.DispatchAsync([id.Value, order.OneCOrderMessageId!.Value], CancellationToken.None);
 
         return Result.Success(id.Value);
     }
