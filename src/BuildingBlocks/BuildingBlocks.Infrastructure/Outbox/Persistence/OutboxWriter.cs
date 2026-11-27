@@ -56,4 +56,16 @@ public sealed class OutboxWriter(OutboxMessageTypes types, TimeProvider clock)
         Add(dbContext, message, id);
         return true;
     }
+
+    /// <summary>
+    /// Makes a message that waits for a retry due now, keeping its attempts, so the next run of its lane sends it
+    /// without waiting out the backoff. A conditional update: false when the message is already sent, given up, or gone.
+    /// </summary>
+    public async Task<bool> BringForwardAsync(DbContext dbContext, Guid id, CancellationToken cancellationToken)
+    {
+        var nowUtc = clock.GetUtcNow();
+        return await dbContext.Set<OutboxMessage>()
+            .Where(row => row.Id == id && row.ProcessedAtUtc == null && row.FailedAtUtc == null)
+            .ExecuteUpdateAsync(row => row.SetProperty(x => x.NextAttemptAtUtc, nowUtc), cancellationToken) == 1;
+    }
 }

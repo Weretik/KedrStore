@@ -36,8 +36,11 @@ internal sealed class OrderSyncRetryStore(
             return Result(OrderSyncRetryStoreOutcome.InvalidStatus, order, state.Status);
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-        if (!await outbox.RequeueAsync(dbContext, new OrderPlaced(orderId), order.OneCMessageId, cancellationToken)
-            || order.ReopenOneCDelivery(requestedAtUtc).IsFailure)
+        // Platform spec 006, R-015: an order that waits for a retry is made due now with its attempts kept; the others start over.
+        var queued = state.Status == OneCOrderSyncStatus.RetryScheduled
+            ? await outbox.BringForwardAsync(dbContext, order.OneCMessageId, cancellationToken)
+            : await outbox.RequeueAsync(dbContext, new OrderPlaced(orderId), order.OneCMessageId, cancellationToken);
+        if (!queued || order.ReopenOneCDelivery(requestedAtUtc).IsFailure)
             return Result(OrderSyncRetryStoreOutcome.ConcurrencyConflict, order, state.Status);
 
         dbContext.OrderSyncRetryAudits.Add(new OrderSyncRetryAudit

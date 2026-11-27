@@ -28,6 +28,10 @@ public sealed record OrderOneCSync(
             : new(OneCOrderSyncStatus.Pending, null, 0, null, message.NextAttemptAtUtc);
     }
 
-    /// <summary>A manager can send the order again (R-013).</summary>
-    public bool CanRetry => Status is OneCOrderSyncStatus.BusinessError or OneCOrderSyncStatus.DeadLetter;
+    /// <summary>
+    /// A manager can send the order again (R-013), or send now an order that waits for its next automatic attempt
+    /// (platform spec 006, R-015).
+    /// </summary>
+    public bool CanRetry => Status is OneCOrderSyncStatus.BusinessError or OneCOrderSyncStatus.DeadLetter
+        or OneCOrderSyncStatus.RetryScheduled;
 }
