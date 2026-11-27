@@ -6,7 +6,10 @@ using Sales.Domain.QuickOrders;
 
 namespace Sales.Infrastructure.Persistence.QuickOrders;
 
-/// <summary>Admin reads of site orders as projections, paged in SQL (spec sales/009, R-006 and R-007).</summary>
+/// <summary>
+/// Admin reads of site orders as projections, paged in SQL (spec sales/009, R-006 and R-007), with the order made from each
+/// for 1C looked up by its primary key (R-015).
+/// </summary>
 internal sealed class QuickOrderReadService(SalesDbContext dbContext) : IQuickOrderReadService
 {
     public async Task<PagedResult<List<QuickOrderListItemDto>>> GetListAsync(
@@ -56,7 +59,10 @@ internal sealed class QuickOrderReadService(SalesDbContext dbContext) : IQuickOr
                 order.TelegramSentAtUtc != null
                     ? QuickOrderTelegramStatus.Sent
                     : order.TelegramFailedAtUtc != null ? QuickOrderTelegramStatus.Failed : QuickOrderTelegramStatus.Pending,
-                order.TelegramSentAtUtc == null ? order.TelegramLastError : null))
+                order.TelegramSentAtUtc == null ? order.TelegramLastError : null,
+                order.OneCOrderId == null ? null : order.OneCOrderId.Value.Value,
+                dbContext.Orders.Where(made => made.Id == order.OneCOrderId).Select(made => made.OrderNumber).FirstOrDefault(),
+                dbContext.Orders.Where(made => made.Id == order.OneCOrderId).Select(made => made.OneCDocumentNumber).FirstOrDefault()))
             .ToListAsync(cancellationToken);
         var totalPages = totalRecords == 0 ? 0 : (long)Math.Ceiling(totalRecords / (double)request.PageSize);
 
@@ -87,7 +93,10 @@ internal sealed class QuickOrderReadService(SalesDbContext dbContext) : IQuickOr
                     .Select(item => new QuickOrderItemDto(
                         item.ProductId, item.Title, item.UnitPrice, item.Quantity, item.UnitPrice * item.Quantity))
                     .ToList(),
-                order.Comment))
+                order.Comment,
+                order.OneCOrderId == null ? null : order.OneCOrderId.Value.Value,
+                dbContext.Orders.Where(made => made.Id == order.OneCOrderId).Select(made => made.OrderNumber).FirstOrDefault(),
+                dbContext.Orders.Where(made => made.Id == order.OneCOrderId).Select(made => made.OneCDocumentNumber).FirstOrDefault()))
             .SingleOrDefaultAsync(cancellationToken);
     }
 }

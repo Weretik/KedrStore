@@ -33,7 +33,8 @@ internal static class GetQuickOrderListEndpoint
         var rows = result.Value.Value
             .Select(order => new GetAdminQuickOrderListItemResponse(
                 order.OrderId, order.PlacedAtUtc, order.FirstName, order.Phone, order.LineCount, order.Total,
-                order.TelegramStatus.ToString().ToLowerInvariant(), order.TelegramLastError))
+                order.TelegramStatus.ToString().ToLowerInvariant(), order.TelegramLastError,
+                order.OneCOrderId, order.OneCOrderNumber, order.OneCDocumentNumber))
             .ToList();
         return TypedResults.Ok(new PagedResult<List<GetAdminQuickOrderListItemResponse>>(result.Value.PagedInfo, rows));
     }

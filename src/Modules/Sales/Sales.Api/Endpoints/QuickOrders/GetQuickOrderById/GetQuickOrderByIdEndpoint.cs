@@ -34,5 +34,8 @@ internal static class GetQuickOrderByIdEndpoint
         order.Items
             .Select(item => new GetAdminQuickOrderItemResponse(item.ProductId, item.Title, item.UnitPrice, item.Quantity, item.Amount))
             .ToList(),
-        order.Comment);
+        order.Comment,
+        order.OneCOrderId,
+        order.OneCOrderNumber,
+        order.OneCDocumentNumber);
 }

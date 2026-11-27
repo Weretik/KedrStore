@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sales.Application.Abstractions.Integrations.OneC;
 using Sales.Application.Abstractions.QuickOrders;
+using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Application.Features.QuickOrders.Queries.GetQuickOrderList;
 using Sales.Application.Features.Orders.OneCDelivery.Messages;
 using Sales.Application.Features.QuickOrders.Messages;
 using Sales.Domain.Customers;
@@ -57,6 +59,48 @@ public sealed class QuickOrderToOneCPostgresTests(SalesPostgresFixture postgres)
         Assert.Equal(Retail, sent.CounterpartyId);
         Assert.Equal(order.Comment, sent.Comment);
         Assert.NotNull(Assert.Single(await sales.MessagesAsync(OrderPlaced.TypeName)).ProcessedAtUtc);
+    }
+
+    [SkippableFact]
+    public async Task SiteOrder_AndIts1COrder_NameEachOther_InTheAdminReads()
+    {
+        await using var sales = await CreateAsync(withRetail: true);
+        var quickOrder = await PlaceAsync(sales);
+        await sales.Dispatcher.DispatchAsync([quickOrder.OneCOrderMessageId!.Value], CancellationToken.None);
+        sales.OneC.Otherwise = OneCOrderDeliveryResult.Accepted("DOC-7", null);
+        await sales.Dispatcher.DispatchLaneAsync(OutboxLanes.OneCOrders, CancellationToken.None);
+        var number = quickOrder.Id.Value.ToString("N")[..8].ToUpperInvariant();
+
+        var (listed, detail, orderRow, orderDetail) = await sales.InScopeAsync(async services =>
+        {
+            var siteOrders = services.GetRequiredService<IQuickOrderReadService>();
+            var orders = services.GetRequiredService<IWorkspaceOrderReader>();
+            var page = await siteOrders.GetListAsync(new QuickOrderListRequest(), CancellationToken.None);
+            var row = Assert.Single(page.Value);
+            var site = (await siteOrders.GetByIdAsync(quickOrder.Id.Value, CancellationToken.None))!;
+            var orderPage = await orders.GetOrdersAsync(null, null, null, null, "-createdAt", 1, 50, CancellationToken.None);
+            var order = Assert.Single(orderPage.Value);
+            return (row, site, order, (await orders.GetOrderAsync(order.OrderId, CancellationToken.None))!);
+        });
+
+        Assert.Equal((orderRow.OrderId, orderRow.OrderNumber, "DOC-7"),
+            (listed.OneCOrderId, listed.OneCOrderNumber, listed.OneCDocumentNumber));
+        Assert.Equal((orderRow.OrderId, orderRow.OrderNumber, "DOC-7"),
+            (detail.OneCOrderId, detail.OneCOrderNumber, detail.OneCDocumentNumber));
+        Assert.Equal((quickOrder.Id.Value, number), (orderRow.SiteOrderId, orderRow.SiteOrderNumber));
+        Assert.Equal((quickOrder.Id.Value, number), (orderDetail.SiteOrderId, orderDetail.SiteOrderNumber));
+    }
+
+    [SkippableFact]
+    public async Task SiteOrder_Before1COrderIsMade_HasNoLink()
+    {
+        await using var sales = await CreateAsync(withRetail: true);
+        var quickOrder = await PlaceAsync(sales);
+
+        var detail = await sales.InScopeAsync(async services =>
+            (await services.GetRequiredService<IQuickOrderReadService>().GetByIdAsync(quickOrder.Id.Value, CancellationToken.None))!);
+
+        Assert.Equal((null, null, null), (detail.OneCOrderId, detail.OneCOrderNumber, detail.OneCDocumentNumber));
     }
 
     [SkippableFact]

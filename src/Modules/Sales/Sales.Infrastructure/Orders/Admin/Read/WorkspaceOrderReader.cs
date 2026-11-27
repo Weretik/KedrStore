@@ -3,7 +3,9 @@ using Sales.Application.Abstractions.Workspace;
 using static Sales.Infrastructure.Orders.WorkspaceQueryTools;
 using Sales.Application.Abstractions.Orders;
 using Sales.Application.Abstractions.Workspace.Orders;
+using Sales.Application.Features.QuickOrders.Queries.GetQuickOrderList;
 using Sales.Domain.Orders.ValueObjects;
+using Sales.Domain.QuickOrders;
 
 namespace Sales.Infrastructure.Orders;
 
@@ -51,7 +53,9 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
                 x.order.Id, x.order.OrderNumber, x.order.CounterpartyId, CustomerName = x.customer.Name,
                 x.order.CreatedAt, LineCount = x.order.Lines.Count, Total = x.order.Lines.Sum(y => y.Amount),
                 Adjustment = x.order.Lines.Sum(y => y.PriceAdjustment * y.Quantity),
-                x.order.OneCDocumentNumber, x.order.OneCRejection, x.message
+                x.order.OneCDocumentNumber, x.order.OneCRejection, x.message,
+                // Spec sales/009, R-015: the site order it was made from; IX_QuickOrders_OneCOrderId serves the lookup.
+                SiteOrderId = db.Set<QuickOrder>().Where(site => site.OneCOrderId == x.order.Id).Select(site => (QuickOrderId?)site.Id).FirstOrDefault()
             })
             .ToListAsync(ct);
         var items = rows.Select(x =>
@@ -59,7 +63,8 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             var oneC = OrderOneCQueries.OneC(x.OneCDocumentNumber, x.OneCRejection, x.message);
             return new WorkspaceOrderListItem(x.Id.Value, x.OrderNumber, x.CounterpartyId.Value, x.CustomerName,
                 x.CreatedAt, x.LineCount, x.Total, oneC.Status.ToString(), x.Adjustment,
-                oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
+                oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc,
+                x.SiteOrderId?.Value, SiteOrderNumber(x.SiteOrderId));
         }).ToList();
         return new WorkspacePage<WorkspaceOrderListItem>(PageInfo(page, pageSize, count), items);
     }
@@ -72,7 +77,9 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
             from x in db.OrdersWithOneCMessage()
             join customer in db.Counterparties.IgnoreQueryFilters().AsNoTracking() on x.Order.CounterpartyId equals customer.Id
             where x.Order.Id == id
-            select new { order = x.Order, customer, message = x.Message }).SingleOrDefaultAsync(ct);
+            select new { order = x.Order, customer, message = x.Message,
+                siteOrderId = db.Set<QuickOrder>().Where(site => site.OneCOrderId == x.Order.Id).Select(site => (QuickOrderId?)site.Id).FirstOrDefault() })
+            .SingleOrDefaultAsync(ct);
         if (row is null) return null;
         var stored = await db.OrderLines.AsNoTracking()
             .Where(x => EF.Property<OrderId>(x, "OrderId") == id)
@@ -82,6 +89,10 @@ internal sealed class WorkspaceOrderReader(SalesDbContext db) : IWorkspaceOrderR
         return new WorkspaceOrderDetail(orderId, row.order.OrderNumber, row.order.CounterpartyId.Value,
             row.customer.Name, row.order.CreatedAt, row.order.Comment, stored,
             stored.Sum(x => x.Amount), oneC.Status.ToString(), row.order.OneCDocumentNumber,
-            oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc);
+            oneC.Error, oneC.Attempts, oneC.LastAttemptAtUtc, oneC.NextAttemptAtUtc,
+            row.siteOrderId?.Value, SiteOrderNumber(row.siteOrderId));
     }
+
+    private static string? SiteOrderNumber(QuickOrderId? siteOrderId) =>
+        siteOrderId is { } id ? QuickOrderNumberSearch.NumberOf(id.Value) : null;
 }
