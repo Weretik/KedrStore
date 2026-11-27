@@ -1,0 +1,47 @@
+name: Branch name
+
+# Every pull request branch follows Conventional Branch: <type>/<short-kebab-description>.
+# Bot branches (dependabot/*, renovate/*) are allowed as they are.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  branch-name:
+    name: branch name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the branch name
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -eu
+          case "$BRANCH" in
+            dependabot/*|renovate/*) echo "Bot branch '$BRANCH' is allowed."; exit 0 ;;
+          esac
+
+          fail() {
+            echo "::error title=Wrong branch name::Branch '$BRANCH' $1"
+            echo
+            echo "Branch name format: <type>/<short-description-in-kebab-case>"
+            echo "  types:  feat, fix, hotfix, refactor, perf, docs, test, chore"
+            echo "  rules:  English, lowercase letters, digits and hyphens, 3-6 words in the description,"
+            echo "          no 'claude', no random suffixes, hashes or dates"
+            echo "  examples: feat/site-order-1c-link, fix/model-category-save-button, chore/ci-contract-drift"
+            echo "Rename the branch and open the pull request again (the same branch name in every repository of one feature)."
+            exit 1
+          }
+
+          echo "$BRANCH" | grep -Eq '^(feat|fix|hotfix|refactor|perf|docs|test|chore)/[a-z0-9]+(-[a-z0-9]+)*$' \
+            || fail "does not match <type>/<kebab-case-description> with an allowed type."
+
+          desc="${BRANCH#*/}"
+          words=$(echo "$desc" | tr '-' '\n' | wc -l)
+          [ "$words" -ge 3 ] && [ "$words" -le 6 ] || fail "has $words words in the description; use 3-6."
+
+          echo "$desc" | grep -qi 'claude' && fail "contains the word 'claude'."
+          echo "$desc" | grep -Eq '(^|-)[0-9]{6,}(-|$)|(^|-)[0-9a-f]{7,}(-|$)' && fail "ends with a hash, date or random number."
+          echo "Branch '$BRANCH' is OK."
