@@ -1,0 +1,43 @@
+name: PR title
+
+# The pull request title becomes the squash commit message, so it follows Conventional Commits:
+# <type>(<scope>): <description>. Bot pull requests (dependabot/*, renovate/*) are allowed as they are.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-title:
+    name: pr title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the pull request title
+        env:
+          BRANCH: ${{ github.head_ref }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -eu
+          case "$BRANCH" in
+            dependabot/*|renovate/*) echo "Bot pull request is allowed."; exit 0 ;;
+          esac
+
+          fail() {
+            echo "::error title=Wrong pull request title::Title '$TITLE' $1"
+            echo
+            echo "Title format (Conventional Commits): <type>(<scope>): <description>"
+            echo "  types:  feat, fix, refactor, perf, docs, test, chore, ci, build"
+            echo "  rules:  English, the scope is optional (lowercase), the description starts with a lowercase"
+            echo "          letter or digit, no trailing period, at most 72 characters"
+            echo "  examples: feat(catalog): add product swatches, fix(admin): keep filters after reload, ci: check pr titles"
+            echo "Edit the pull request title; the check runs again by itself."
+            exit 1
+          }
+
+          [ "${#TITLE}" -le 72 ] || fail "is ${#TITLE} characters long; use at most 72."
+          echo "$TITLE" | grep -Eq '^(feat|fix|refactor|perf|docs|test|chore|ci|build)(\([a-z0-9]+(-[a-z0-9]+)*\))?!?: [a-z0-9`]' \
+            || fail "does not match <type>(<scope>): <description> with an allowed type and a lowercase start."
+          case "$TITLE" in *.) fail "ends with a period." ;; esac
+          echo "Title '$TITLE' is OK."
