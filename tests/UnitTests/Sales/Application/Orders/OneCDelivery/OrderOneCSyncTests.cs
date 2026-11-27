@@ -24,6 +24,8 @@ public sealed class OrderOneCSyncTests
             Message(attempts: 2, next: Now.AddMinutes(5), last: Now, error: "1С недоступна"));
 
         Assert.Equal(new OrderOneCSync(OneCOrderSyncStatus.RetryScheduled, "1С недоступна", 2, Now, Now.AddMinutes(5)), sync);
+        // Platform spec 006, R-015: «Надіслати зараз» instead of waiting for the next attempt.
+        Assert.True(sync.CanRetry);
     }
 
     [Fact]

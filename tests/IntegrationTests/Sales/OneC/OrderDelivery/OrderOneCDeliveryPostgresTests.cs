@@ -142,6 +142,25 @@ public sealed class OrderOneCDeliveryPostgresTests(SalesPostgresFixture postgres
         Assert.Null(row.SyncError);
     }
 
+    [SkippableFact]
+    public async Task SendNow_WhileARetryIsScheduled_MakesItDueNow_AndTheNextRunSendsIt()
+    {
+        await using var sales = await SalesOutboxHarness.CreateAsync(postgres);
+        var orderId = await CreateOrderAsync(sales);
+        await DispatchAllAsync(sales);
+        sales.Clock.Advance(TimeSpan.FromSeconds(30));
+        Assert.Equal("RetryScheduled", (await ListedAsync(sales, orderId)).SyncStatus);
+
+        var result = await RetryAsync(sales, orderId);
+
+        Assert.Equal(OrderSyncRetryStoreOutcome.Scheduled, result.Outcome);
+        Assert.Equal(OneCOrderSyncStatus.RetryScheduled, result.PreviousStatus);
+        Assert.Equal(sales.Clock.GetUtcNow(), (await ListedAsync(sales, orderId)).SyncNextAttemptAtUtc);
+        sales.OneC.Answers.Enqueue(OneCOrderDeliveryResult.Accepted("DOC-5", null));
+        await DispatchAllAsync(sales);
+        Assert.Equal("Accepted", (await ListedAsync(sales, orderId)).SyncStatus);
+    }
+
     /// <summary>The order lane is sent by its own task, the rest (give-up signals) by the general one.</summary>
     private static async Task DispatchAllAsync(SalesOutboxHarness sales)
     {

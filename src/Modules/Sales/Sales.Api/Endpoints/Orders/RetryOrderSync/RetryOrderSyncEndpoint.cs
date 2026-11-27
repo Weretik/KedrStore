@@ -10,7 +10,7 @@ internal static class RetryOrderSyncEndpoint
         group.MapPost("{orderId:long}/sync/retry", Handle)
             .WithName("retryAdminOrderSync").RequireRateLimiting("HeavyOperation")
             .WithSummary("Schedule a failed order for another 1C delivery cycle")
-            .WithDescription("Allowed only for BusinessError and DeadLetter. The request records an audit entry and puts the order back in the outbox queue (state Pending, attempts from zero); it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).")
+            .WithDescription("Allowed for BusinessError and DeadLetter (back in the outbox queue, state Pending, attempts from zero) and for RetryScheduled («Надіслати зараз»: the waiting attempt is due now, attempts kept). The request records an audit entry; it does not call 1C synchronously. Policy CanManageOrders (Manager, Seo, and Admin).")
             .Produces<RetryAdminOrderSyncResponse>(StatusCodes.Status202Accepted)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
