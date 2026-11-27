@@ -6,9 +6,14 @@ public sealed record WorkspaceCreatedOrder(long OrderId, string OrderNumber, dec
 /// <param name="SyncError">Why 1C refused the order or why the last delivery attempt failed (platform spec 006, R-012).</param>
 /// <param name="SyncAttempts">Delivery attempts since the order was created or last retried by a manager.</param>
 /// <param name="SyncNextAttemptAtUtc">When the outbox sends the order next; null once 1C answered or delivery gave up.</param>
+/// <param name="SiteOrderId">The site order this order was made from (spec sales/009, R-015); null for a manager's order.</param>
+/// <param name="SiteOrderNumber">That site order's number, as the site and Telegram show it.</param>
 public sealed record WorkspaceOrderListItem(long OrderId, string OrderNumber, string CounterpartyId, string CounterpartyName, DateTimeOffset CreatedAtUtc, int LineCount, decimal TotalAmount, string SyncStatus, decimal AdjustmentAmount,
-    string? SyncError, int SyncAttempts, DateTimeOffset? SyncLastAttemptAtUtc, DateTimeOffset? SyncNextAttemptAtUtc);
+    string? SyncError, int SyncAttempts, DateTimeOffset? SyncLastAttemptAtUtc, DateTimeOffset? SyncNextAttemptAtUtc,
+    Guid? SiteOrderId = null, string? SiteOrderNumber = null);
 /// <param name="SyncError">See <see cref="WorkspaceOrderListItem"/>.</param>
+/// <param name="SiteOrderId">See <see cref="WorkspaceOrderListItem"/>.</param>
 public sealed record WorkspaceOrderDetail(long OrderId, string OrderNumber, string CounterpartyId, string CounterpartyName, DateTimeOffset CreatedAtUtc, string? Comment, IReadOnlyList<WorkspaceStoredLine> Lines, decimal TotalAmount, string SyncStatus, string? OneCDocumentNumber,
-    string? SyncError, int SyncAttempts, DateTimeOffset? SyncLastAttemptAtUtc, DateTimeOffset? SyncNextAttemptAtUtc);
+    string? SyncError, int SyncAttempts, DateTimeOffset? SyncLastAttemptAtUtc, DateTimeOffset? SyncNextAttemptAtUtc,
+    Guid? SiteOrderId = null, string? SiteOrderNumber = null);
 public sealed record WorkspaceStoredLine(string ProductId, string ProductName, int Quantity, decimal Amount, decimal PriceAdjustment);

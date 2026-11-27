@@ -2,6 +2,7 @@ using Sales.Domain.QuickOrders;
 
 namespace Sales.Application.Features.QuickOrders.Queries.GetQuickOrderById;
 
+/// <param name="OneCOrderId">See <see cref="GetQuickOrderList.QuickOrderListItemDto"/>.</param>
 public sealed record QuickOrderDetailDto(
     Guid OrderId,
     DateTimeOffset PlacedAtUtc,
@@ -13,4 +14,7 @@ public sealed record QuickOrderDetailDto(
     DateTimeOffset? TelegramLastAttemptAtUtc,
     string? TelegramLastError,
     IReadOnlyList<QuickOrderItemDto> Items,
-    string? Comment = null);
+    string? Comment = null,
+    long? OneCOrderId = null,
+    string? OneCOrderNumber = null,
+    string? OneCDocumentNumber = null);

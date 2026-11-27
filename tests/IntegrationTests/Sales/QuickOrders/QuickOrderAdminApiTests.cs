@@ -40,12 +40,16 @@ public sealed class QuickOrderAdminApiTests(SalesPostgresFixture postgres)
         Assert.Equal(JsonValueKind.Null, row.GetProperty("telegramLastError").ValueKind);
         Assert.Equal(1, row.GetProperty("lineCount").GetInt32());
         Assert.Equal(251.00m, row.GetProperty("total").GetDecimal());
+        // R-015: no retail counterparty here, so no 1C order is made and the link stays empty.
+        Assert.Equal(JsonValueKind.Null, row.GetProperty("oneCOrderId").ValueKind);
+        Assert.Equal(JsonValueKind.Null, row.GetProperty("oneCOrderNumber").ValueKind);
 
         using var detail = await JsonOf(await admin.GetAsync($"/api/admin/quick-orders/{orderId}"));
         Assert.Equal("Ірина", detail.RootElement.GetProperty("firstName").GetString());
         var item = Assert.Single(detail.RootElement.GetProperty("items").EnumerateArray());
         Assert.Equal("Ручка Кедр", item.GetProperty("title").GetString());
         Assert.Equal(251.00m, item.GetProperty("amount").GetDecimal());
+        Assert.Equal(JsonValueKind.Null, detail.RootElement.GetProperty("oneCDocumentNumber").ValueKind);
     }
 
     [SkippableFact]
